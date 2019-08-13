@@ -1,0 +1,169 @@
+# This is the Docker Compose entry point for this project.
+# Services listed in this file will automatically be built and started when you bring
+# the project up.
+version: "3.7"
+
+services:
+  # The Drupal service is the main entrypoint into the application. It runs both
+  # Apache and PHP.
+  drupal:
+    build:
+      context: ./services/drupal
+      dockerfile: dev.Dockerfile
+    # This command line detects if the F1_XDEBUG parameter was set by `f1 up --xdebug',
+    # and enables XDebug accordingly. We do not do this by default due to the significant
+    # performance penalty imposed by XDebug.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |-
+        chmod a+w /var/www/html/web/sites/default/files
+        if test ! -z "${F1_XDEBUG:-}"; then
+          docker-php-ext-enable xdebug
+          echo 'xdebug.remote_enable=1' > /usr/local/etc/php/conf.d/xdebug.ini
+        fi
+        exec apache2-foreground
+    depends_on:
+      - mysql
+    environment:
+      # In production, this would be an actually secure string.
+      DRUPAL_HASH_SALT: abcdefg
+
+      # Route SMTP mail to MailHog
+      SMTPHOST: mailhog:1025
+
+      # This enables connecting back to the user's computer during an XDebug session.
+      XDEBUG_CONFIG: remote_host=${F1_XDEBUG_REMOTE:-127.0.0.1}
+
+      # The VCAP_SERVICES we inject here are a subset of the VCAP_SERVICES
+      # offered by a CloudFoundry service binding. For the most part, we only
+      # concern ourselves with the access credentials.
+      #
+      # The service keys come from inspecting CloudFoundry service bindings.
+      #
+      # Further reading: https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#VCAP-SERVICES
+      #
+      # Remember to keep this value in sync with the drush container's VCAP_SERVICES
+      # environment variable (see docker-compose.cli.yml).
+      VCAP_SERVICES: |
+        {
+          "aws-rds": [
+            {
+              "credentials": {
+                "db_name": "web",
+                "host": "mysql",
+                "password": "web",
+                "port": "3306",
+                "username": "web"
+              }
+            }
+          ],
+          "s3": [
+            {
+              "provider": "minio",
+              "credentials": {
+                "access_key_id": "minio_access",
+                "secret_access_key": "minio_secret",
+                "region": "us-east-1",
+                "bucket": "drupal",
+                "additional_buckets": []
+              }
+            }
+          ],
+          "redis32": [
+            {
+              "credentials": {
+                "hostname": "redis",
+                "password": null,
+                "port": "6379"
+              }
+            }
+          ]
+        }
+    ports:
+      - 8080:80
+      - 8443:443
+    volumes:
+      - ${F1_TLS_CERT}:/run/secrets/local.crt:ro,cached
+      - ${F1_TLS_KEY}:/run/secrets/local.key:ro,cached
+      - ./services/drupal:/var/www/html:cached
+      - ./services/apache/httpd.conf:/etc/apache2/sites-enabled/000-default.conf:ro,cached
+      - ./services/drupal/modules.conf:/etc/apache2/conf-enabled/modules.conf:ro,cached
+      - type: volume
+        source: fs-data
+        target: /var/www/html/web/sites/default/files
+
+  # MySQL container. Remember to use the hostname "mysql" instead of "localhost" if you're
+  # used to VM-based (e.g., Vagrant) development.
+  #
+  # When the cluster is running, you can connect to MySQL via localhost:13306 using a
+  # tool like Sequel Pro or MySQL Workbench.
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: web
+      MYSQL_USER: web
+      MYSQL_PASSWORD: web
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    ports:
+      - 13306:3306
+    volumes:
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+
+  # MailHog is a mail-catching service. Mail sent to it over SMTP (mailhog:1025) is caught
+  # in the logs. You can view an inbox UI at http://localhost:8025, which will send
+  # notifications if your browser supports them.
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+
+  # Minio is an object storage service that provides an S3-compatible API. It's how we
+  # will mimic the production environment's use of S3 instead of the filesystem.
+  #
+  # When starting this project up for the first time, remember to use `f1 run aws s3 mb'
+  # to create the necessary bucket(s) - refer to VCAP_SERVICES above to see what's needed.
+  minio:
+    image: minio/minio
+    command:
+      - minio
+      - server
+      - /data
+    environment:
+      MINIO_ACCESS_KEY: minio_access
+      MINIO_SECRET_KEY: minio_secret
+
+      # Setting this value allows minio to discover the bucket name by introspecting the
+      # HTTP Host header, enabling requests to http://drupal.minio:9000 to succeed.
+      MINIO_DOMAIN: minio
+    networks:
+      default:
+        aliases:
+          - drupal.minio
+    ports:
+      - 8888:9000
+    volumes:
+      - type: volume
+        source: minio-data
+        target: /data
+
+  # Redis with persistence enabled
+  redis:
+    image: redis:3.2-alpine
+    entrypoint:
+      - redis-server
+      - --appendonly
+      - 'yes'
+    volumes:
+      - type: volume
+        source: redis-data
+        target: /data
+
+# Persistent storage volumes. Volumes allow for data to survive container shutdown.
+volumes:
+  fs-data: null
+  minio-data: null
+  mysql-data: null
+  redis-data: null
