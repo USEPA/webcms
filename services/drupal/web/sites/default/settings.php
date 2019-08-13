@@ -821,6 +821,29 @@ if (isset($cf_service_bindings->redis32)) {
   $settings['container_yamls'][] = 'modules/redis/example.services.yml';
 }
 
+if (isset($cf_service_bindings->elasticsearch56)) {
+  list($es_settings) = $cf_service_bindings->elasticsearch56;
+  $es_credentials = $es_settings->credentials;
+
+  $es_url = 'http://' . $es_credentials->hostname . ':' . $es_credentials->port;
+
+  // This attempt to synthesize a cluster config entity doesn't work, but has been left
+  // in as a reference point for the fields in the configuration.
+  $config['elasticsearch_connector.cluster']['elasticsearch'] = [
+    'cluster_id' => 'elasticsearch',
+    'name' => 'Elasticsearch',
+    'url' => $es_url,
+    'options' => [
+      'multiple_nodes_connection' => FALSE,
+      'use_authentication' => TRUE,
+      'authentication_type' => 'Basic',
+      'username' => $es_credentials->username,
+      'password' => $es_credentials->password,
+      'timeout' => '3',
+    ],
+  ];
+}
+
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 /**
