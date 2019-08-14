@@ -821,6 +821,17 @@ if (isset($cf_service_bindings->redis32)) {
   $settings['container_yamls'][] = 'modules/redis/example.services.yml';
 }
 
+if (isset($cf_service_bindings->elasticsearch56)) {
+  list($es_settings) = $cf_service_bindings->elasticsearch56;
+  $es_credentials = $es_settings->credentials;
+@
+  $es_url = 'http://' . $es_credentials->hostname . ':' . $es_credentials->port;
+
+  $config['elasticsearch_connector.cluster.elasticsearch']['url'] = $es_url;
+  $config['elasticsearch_connector.cluster.elasticsearch']['options']['username'] = $es_credentials->username;
+  $config['elasticsearch_connector.cluster.elasticsearch']['options']['password'] = $es_credentials->password;
+}
+
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 /**

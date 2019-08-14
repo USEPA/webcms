@@ -78,6 +78,16 @@ services:
                 "port": "6379"
               }
             }
+          ],
+          "elasticsearch56": [
+            {
+              "credentials": {
+                "hostname": "elasticsearch",
+                "username": "root",
+                "password": "",
+                "port": "9200"
+              }
+            }
           ]
         }
     ports:
@@ -161,8 +171,28 @@ services:
         source: redis-data
         target: /data
 
+  # ElasticSearch 5.6
+  elasticsearch:
+    # Found in https://github.com/18F/kubernetes-broker/blob/master/catalogData/elasticsearch56/medium/k8s/deployment.json
+    image: 18fgsa/k8s-elasticsearch:5.6.5
+    environment:
+      CLUSTER_NAME: elasticsearch
+      DISCOVERY_SERVICE: elasticsearch
+      MINIMUM_MASTER_NODES: '1'
+      EXPECTED_MASTER_NODES: '1'
+      EXPECTED_DATA_NODES: '1'
+      RECOVER_AFTER_MASTER_NODES: '1'
+      RECOVER_AFTER_DATA_NODES: '1'
+      ES_JAVA_OPTS: -Djava.net.preferIPv4Stack=true -Xms512m -Xmx512m
+      discovery.type: single-node
+    volumes:
+      - type: volume
+        source: es-data
+        target: /usr/share/elasticsearch/data
+
 # Persistent storage volumes. Volumes allow for data to survive container shutdown.
 volumes:
+  es-data: null
   fs-data: null
   minio-data: null
   mysql-data: null
