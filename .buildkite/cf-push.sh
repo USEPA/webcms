@@ -10,7 +10,7 @@ set -x
 tag="$BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER"
 image_name="$DOCKER_REPOSITORY:$tag"
 
-curl -s 'https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github' > \
+curl -Ls 'https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github' > \
   cf-cli.tgz
 
 tar xzf cf-cli.tgz cf
