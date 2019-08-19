@@ -10,11 +10,16 @@ steps:
               secret-id: epa/stage/app
               json-key: .AWS_SECRET_ACCESS_KEY
 
-            # NB. This value *MUST* be read last. After this value is place into the
-            # env, we no longer have access to the Buildkite server's IAM permissions
-            # -- that is, the permissions needed to obtain secrets from the secrets
-            # manager -- and have switched over to the credentials needed to read and
-            # write to ECR.
+      # NB. This value *MUST* be read last. After this value is placed into the
+      # env, we no longer have access to the Buildkite server's IAM permissions
+      # -- that is, the permissions needed to obtain secrets from the secrets
+      # manager -- and have switched over to the credentials needed to read and
+      # write to ECR.
+      #
+      # We read this out as the last step in order to avoid unspecified evaluation order
+      # of the plugin variables.
+      - seek-oss/aws-sm#v2.0.0:
+          env:
             AWS_ACCESS_KEY_ID:
               secret-id: epa/stage/app
               json-key: .AWS_ACCESS_KEY_ID
@@ -37,11 +42,14 @@ steps:
               secret-id: epa/stage/app
               json-key: .CF_PASSWORD
 
-            # Obtain these secrets last - see the comments in the above pipeline step for
-            # why.
             AWS_SECRET_ACCESS_KEY:
               secret-id: epa/stage/app
               json-key: .AWS_SECRET_ACCESS_KEY
+
+      # Obtain these secrets last - see the comments in the above pipeline step for
+      # why.
+      - seek-oss/aws-sm#v2.0.0:
+          env:
             AWS_ACCESS_KEY_ID:
               secret-id: epa/stage/app
               json-key: .AWS_ACCESS_KEY_ID
