@@ -15,8 +15,8 @@ curl -Ls 'https://packages.cloudfoundry.org/stable?release=linux64-binary&source
 
 tar xzf cf-cli.tgz cf
 
-cf auth
+./cf auth
 
-cf push --docker-username AWS --docker-image "$image_name"
+./cf push --docker-username AWS --docker-image "$image_name"
 
-cf logout
+./cf logout
