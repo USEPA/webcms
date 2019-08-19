@@ -6,8 +6,12 @@ steps:
     plugins:
       - seek-oss/aws-sm#v2.0.0:
           env:
-            AWS_ACCESS_KEY_ID: epa/stage/app
-            AWS_SECRET_ACCESS_KEY: epa/stage/app
+            AWS_ACCESS_KEY_ID:
+              secret-id: epa/stage/app
+              json-key: .AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY:
+              secret-id: epa/stage/app
+              json-key: .AWS_SECRET_ACCESS_KEY
       - ecr#v2.0.0:
           login: true
           no-include-email: true
