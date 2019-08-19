@@ -5,12 +5,9 @@ steps:
     command: bash .buildkite/docker-build.sh
     plugins:
       - seek-oss/aws-sm#v2.0.0:
-          file:
-            - path: .env
-              secret-id: epa/dev/app
-          # env:
-          #   AWS_ACCESS_KEY_ID: epa/dev/app
-          #   AWS_SECRET_ACCESS_KEY: epa/dev/app
+          env:
+            AWS_ACCESS_KEY_ID: epa/dev/app
+            AWS_SECRET_ACCESS_KEY: epa/dev/app
       - ecr#v2.0.0:
           login: true
           no-include-email: true
