@@ -1,0 +1,38 @@
+env:
+  DOCKER_REPOSITORY: 192850101482.dkr.ecr.us-east-1.amazonaws.com/epa-webcms
+steps:
+  - label: Build Docker image
+    command: bash .buildkite/docker-build.sh
+    plugins:
+      - seek-oss/aws-sm#v2.0.0:
+          env:
+            AWS_ACCESS_KEY_ID:
+              secret-id: epa/dev/app
+              json-key: .AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY:
+              secret-id: epa/dev/app
+              json-key: .AWS_SECRET_ACCESS_KEY
+      - ecr#v2.0.0:
+          login: true
+          no-include-email: true
+
+  - wait: ~
+
+  - label: Deploy to CloudFoundry
+    command: bash .buildkite/cf-push.sh
+    branches: master stable
+    plugins:
+      - seek-oss/aws-sm#v2.0.0:
+          env:
+            AWS_ACCESS_KEY_ID:
+              secret-id: epa/dev/app
+              json-key: .AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY:
+              secret-id: epa/dev/app
+              json-key: .AWS_SECRET_ACCESS_KEY
+            CF_USERNAME:
+              secret-id: epa/dev/app
+              json-key: .CF_USERNAME
+            CF_PASSWORD:
+              secret-id: epa/dev/app
+              json-key: .CF_PASSWORD
