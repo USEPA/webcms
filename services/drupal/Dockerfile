@@ -40,7 +40,7 @@ COPY ./config config
 
 CMD \
   S3_BUCKET="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].bucket')" \
-  sed -e s/S3_BUCKET/"$S3_BUCKET"/ \
+  && sed -e s/S3_BUCKET/"$S3_BUCKET"/ \
     /etc/apache2/sites-available/000-default.conf \
     > /etc/apache2/sites-enabled/000-default.conf \
-  exec apache2-foreground
+  && exec apache2-foreground
