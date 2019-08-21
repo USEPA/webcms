@@ -18,8 +18,8 @@
    f1 run aws s3api put-bucket-policy --bucket drupal --policy "$(cat services/minio/policy.json)"
    ```
 
-4. Copy `settings.docker.local.php` to `settings.local.php`. Uncomment the last line (setting the default cache backend).
+4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
 
 5. Install Drupal from config (or restore a backup).
 
-6. Comment out the line you commented in step 4 - without it, you won't be caching in Redis.
+6. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.

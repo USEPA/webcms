@@ -834,6 +834,14 @@ if (isset($cf_service_bindings->elasticsearch56)) {
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
+$config_directories['sync'] = '../config/sync';
+
+$env_name = getenv('ENV_NAME');
+$env_state = getenv('ENV_STATE');
+if (!empty($env_name)){
+  include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
+}
+
 /**
  * Load local development override configuration, if available.
  *
@@ -847,4 +855,4 @@ $settings['cache']['bins']['data'] = 'cache.backend.php';
 if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
 }
-$config_directories['sync'] = '../config/sync';
+
