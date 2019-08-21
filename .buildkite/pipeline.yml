@@ -23,6 +23,7 @@ steps:
             AWS_ACCESS_KEY_ID:
               secret-id: epa/stage/app
               json-key: .AWS_ACCESS_KEY_ID
+      # Authorize against ECR to allow `docker push' to succeed
       - ecr#v2.0.0:
           login: true
           no-include-email: true
@@ -31,10 +32,14 @@ steps:
 
   - label: Deploy to CloudFoundry
     command: bash .buildkite/cf-push.sh
-    branches: master stable EPAD8-13-build-pipeline
+    branches: master
     plugins:
       - seek-oss/aws-sm#v2.0.0:
           env:
+            # The CF_USERNAME and CF_PASSWORD environment variables are the credentials
+            # for a Cloud.gov space deployer account.
+            #
+            # Further reading: https://cloud.gov/docs/services/cloud-gov-service-account/
             CF_USERNAME:
               secret-id: epa/stage/app
               json-key: .CF_USERNAME
@@ -46,8 +51,7 @@ steps:
               secret-id: epa/stage/app
               json-key: .AWS_SECRET_ACCESS_KEY
 
-      # Obtain these secrets last - see the comments in the above pipeline step for
-      # why.
+      # Obtain this secret last - see the comments in the above pipeline step for why.
       - seek-oss/aws-sm#v2.0.0:
           env:
             AWS_ACCESS_KEY_ID:
