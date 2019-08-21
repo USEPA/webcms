@@ -1,0 +1,122 @@
+uuid: 21fee236-9ff8-4e19-8f31-1db73b01695b
+langcode: en
+status: true
+dependencies:
+  module:
+    - content_moderation
+id: epa_default
+label: 'EPA Default'
+type: content_moderation
+type_settings:
+  states:
+    draft:
+      label: Draft
+      published: false
+      default_revision: false
+      weight: -4
+    draft_approved:
+      published: false
+      default_revision: false
+      label: 'Draft, approved'
+      weight: -2
+    draft_needs_review:
+      published: false
+      default_revision: false
+      label: 'Draft, needs review'
+      weight: -3
+    published:
+      label: Published
+      published: true
+      default_revision: true
+      weight: -1
+    published_needs_review:
+      published: true
+      default_revision: true
+      label: 'Published, needs review'
+      weight: 0
+    published_scheduled_for_expiration:
+      published: true
+      default_revision: true
+      label: 'Published, scheduled for expiration'
+      weight: 1
+    unpublished:
+      published: false
+      default_revision: true
+      label: Unpublished
+      weight: 2
+  transitions:
+    approve_leave_unpublished:
+      label: 'Approve; leave unpublished'
+      from:
+        - draft
+        - draft_approved
+        - draft_needs_review
+      to: draft_approved
+      weight: 3
+    content_reviewed_republish:
+      label: 'Content reviewed; republish'
+      from:
+        - published_needs_review
+        - published_scheduled_for_expiration
+      to: published
+      weight: 6
+    create_new_draft:
+      label: 'Create New Draft'
+      to: draft
+      weight: 0
+      from:
+        - draft
+        - published
+        - published_needs_review
+        - published_scheduled_for_expiration
+        - unpublished
+    publish:
+      label: Publish
+      to: published
+      weight: 1
+      from:
+        - draft
+        - draft_approved
+        - draft_needs_review
+        - published
+        - unpublished
+    return_to_author:
+      label: 'Return to author'
+      from:
+        - draft_needs_review
+      to: draft
+      weight: 5
+    send_for_review:
+      label: 'Send for review'
+      from:
+        - draft
+      to: draft_needs_review
+      weight: 2
+    send_to_author_for_review:
+      label: 'Send to author for review'
+      from:
+        - published
+      to: published_needs_review
+      weight: 7
+    send_to_editor_s_for_review:
+      label: 'Send to editor(s) for review'
+      from:
+        - published_needs_review
+      to: published_scheduled_for_expiration
+      weight: 8
+    unapprove_return_to_draft:
+      label: 'Unapprove; return to draft'
+      from:
+        - draft_approved
+      to: draft
+      weight: 4
+    unpublish:
+      label: Unpublish
+      from:
+        - published
+        - published_needs_review
+        - published_scheduled_for_expiration
+      to: unpublished
+      weight: 9
+  entity_types: {  }
+  default_moderation_state: draft
