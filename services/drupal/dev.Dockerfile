@@ -1,12 +1,10 @@
-FROM drupal:8.7.6-apache
+FROM drupal:8.7.6-fpm-alpine
 
 RUN set -ex \
-  && savedAptMark="$(apt-mark showmanual)" \
-  && apt-get update \
-  && apt-get install --no-install-recommends -y $PHPIZE_DEPS \
-  && pecl install xdebug
+  && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+  && pecl install xdebug \
+  && apk del .build-deps \
+  && apk add --no-cache tini nginx \
+  && mkdir -p /run/nginx
 
-RUN set -ex \
-  && mkdir /tmp/cache \
-  && chown www-data:www-data /tmp/cache \
-  && chmod 0700 /tmp/cache
+ENTRYPOINT [ "tini", "-g", "--" ]

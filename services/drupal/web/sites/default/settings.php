@@ -794,6 +794,7 @@ if (isset($cf_service_bindings->s3)) {
   $settings['s3fs.secret_key'] = $s3_credentials->secret_access_key;
 
   $config['s3fs.settings']['bucket'] = $s3_credentials->bucket;
+  $config['s3fs.settings']['region'] = $s3_credentials->region;
 
   $settings['s3fs.use_s3_for_public'] = TRUE;
   $settings['s3fs.use_s3_for_private'] = TRUE;

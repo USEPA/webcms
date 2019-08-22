@@ -1,28 +1,15 @@
-FROM php:7.3-cli-stretch
+FROM php:7.3-cli-alpine
 
 RUN set -ex \
-  && savedAptMark="$(apt-mark showmanual)" \
-  && apt-get update \
-  && apt-get install -y $PHPIZE_DEPS \
-    libfreetype6-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libpq-dev \
-    libzip-dev \
-  && docker-php-ext-configure gd \
-    --with-freetype-dir=/usr \
-    --with-jpeg-dir=/usr \
-    --with-png-dir=/usr \
+  && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS coreutils freetype-dev libjpeg-turbo-dev postgresql-dev libzip-dev \
+  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ \
   && docker-php-ext-install -j $(nproc) gd opcache pdo_mysql pdo_pgsql zip \
-  && apt-mark auto '.*' > /dev/null \
-  && apt-mark manual $savedAptMark \
-  && ldd "$(php -r 'echo ini_get("extension_dir");')"/*.so \
-    | awk '/=>/ { print $3 }' \
-    | sort -u \
-    | xargs -r dpkg-query -S \
-    | cut -d: -f1 \
-    | sort -u \
-    | xargs -rt apt-mark manual \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && apt-get install -y --no-install-recommends default-mysql-client openssh-client rsync \
-  && rm -rf /var/lib/apt/lists/*
+  && runDeps="$(\
+    scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+      | tr ',' '\n' \
+      | sort -u \
+      | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+  )" \
+  && apk add --virtual .docker-phpexts-rundeps $runDeps \
+  && apk del .build-deps \
+  && apk add --no-cache mysql-client openssh rsync
