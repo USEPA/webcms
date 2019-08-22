@@ -24,12 +24,24 @@ ENV PORT 80
 WORKDIR /var/www/html
 
 RUN set -ex \
+  # Remove the contents of /var/www/html
   && ls -1A | xargs rm -r \
+  # Create a cache directory for Twig that's outside of sites/default/files
   && mkdir /tmp/cache \
   && chown www-data:www-data /tmp/cache \
   && chmod 0700 /tmp/cache \
+  # Install needed utilities
   && apk add --no-cache jq nginx tini \
-  && mkdir -p /run/nginx
+  && mkdir -p /run/nginx \
+  # Switch php-fpm to a Unix socket. It needs to be world-writable because the
+  # nginx APK creates an 'nginx' user.
+  # Doing this avoids issues where CloudFoundry assigns 9000 to $PORT, which would
+  # otherwise be taken by PHP-FPM.
+  && { \
+    echo '[www]'; \
+    echo 'listen = /var/run/fpm.sock'; \
+    echo 'listen.mode = 0666'; \
+  } | tee /usr/local/etc/php-fpm.d/zz-docker.conf
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
@@ -41,7 +53,7 @@ COPY --from=build /app/web web
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
 
-ENTRYPOINT ["tini", "-g", "--"]
+ENTRYPOINT [ "tini", "-g", "-s", "--" ]
 
 CMD \
   S3_BUCKET="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].credentials.bucket')" \
