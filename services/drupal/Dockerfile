@@ -27,7 +27,7 @@ RUN set -ex \
 
 RUN ls -1A | xargs rm -rf
 
-COPY httpd.conf /etc/apache2/sites-available/000-default.conf
+COPY httpd.conf /etc/apache2/sites-enabled/000-default.conf
 COPY modules.conf /etc/apache2/conf-enabled/
 
 COPY load.environment.php ./
@@ -38,9 +38,7 @@ COPY --from=build /app/web web
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
 
-CMD \
-  S3_BUCKET="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].bucket')" \
-  && sed -e s/S3_BUCKET/"$S3_BUCKET"/ \
-    /etc/apache2/sites-available/000-default.conf \
-    > /etc/apache2/sites-enabled/000-default.conf \
+ENTRYPOINT \
+  S3_BUCKET="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].credentials.bucket')" \
+  && sed -i -e s/S3_BUCKET/"$S3_BUCKET"/ /etc/apache2/sites-enabled/000-default.conf \
   && exec apache2-foreground
