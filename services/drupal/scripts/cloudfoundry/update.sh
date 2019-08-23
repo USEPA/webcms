@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script is run after a successful CloudFoundry deployment. See the cf-push.sh script
 # in the .buildkite directory.

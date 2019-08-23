@@ -45,7 +45,7 @@ echo '--- Deploying'
 if ! ./cf push "$app_name" --docker-username AWS --docker-image "$image_name"; then
   exit_code=$?
 
-  cf logs "$app_name" --recent > cf-recent.txt
+  ./cf logs "$app_name" --recent > cf-recent.txt
   buildkite-agent artifact upload cf-recent.txt
 
   echo "^^^ +++"
@@ -57,4 +57,31 @@ echo '--- Running Drush'
 
 # Re-use the image tag for this deployment: we can quickly find the task name based on
 # the build metadata.
-./cf run-task "$app_name" 'bash scripts/update.sh' --name "$tag"
+./cf run-task "$app_name" 'sh scripts/cloudfoundry/update.sh' --name "$tag"
+
+# Spin loop: CF doesn't appear to have a wait API for tasks, so we have to check manually.
+while true; do
+  status="$(./cf tasks | APP="$app_name" awk '$2 == ENV["APP"] { print $3 }')"
+  echo "[$(date)] Task status: $status"
+
+  case "$status" in
+    RUNNING)
+      sleep 5
+      ;;
+
+    SUCCEEDED)
+      # Let Drush succeed quietly - the logs are still accessible in CloudFoundry, so
+      # we aren't losing information.
+      break
+      ;;
+
+    FAILED)
+      ./cf logs "$app_name" --recent | grep "TASK/$tag" > task-logs.txt
+      buildkite-agent artifact upload task-logs.txt
+
+      echo "^^^ +++"
+      echo "Drush update failed. Logs have been uploaded." > /dev/stderr
+      exit 1
+      ;;
+  esac
+done
