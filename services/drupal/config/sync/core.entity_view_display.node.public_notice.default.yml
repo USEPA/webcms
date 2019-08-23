@@ -1,0 +1,116 @@
+uuid: fe023428-e886-45aa-af8a-71a464b1a1c7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.public_notice.body
+    - field.field.node.public_notice.comments_due_date
+    - field.field.node.public_notice.computed_comments_due_date
+    - field.field.node.public_notice.documents
+    - field.field.node.public_notice.extension_date
+    - field.field.node.public_notice.how_to_comment
+    - field.field.node.public_notice.notice_sort_date
+    - field.field.node.public_notice.permit_number
+    - field.field.node.public_notice.publication_date
+    - field.field.node.public_notice.review_deadline
+    - node.type.public_notice
+  module:
+    - datetime
+    - file
+    - text
+    - user
+id: node.public_notice.default
+targetEntityType: node
+bundle: public_notice
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  comments_due_date:
+    weight: 102
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  computed_comments_due_date:
+    weight: 105
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  documents:
+    weight: 109
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    type: file_default
+    region: content
+  extension_date:
+    weight: 103
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  how_to_comment:
+    weight: 104
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  notice_sort_date:
+    weight: 106
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  permit_number:
+    weight: 107
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  publication_date:
+    weight: 108
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  review_deadline:
+    weight: 110
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+hidden: {  }

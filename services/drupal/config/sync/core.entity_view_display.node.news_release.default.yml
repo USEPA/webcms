@@ -1,0 +1,58 @@
+uuid: 981ab390-247b-44d5-98fe-85f4a615aeb1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.news_release.body
+    - field.field.node.news_release.release
+    - field.field.node.news_release.review_deadline
+    - field.field.node.news_release.secondary_headline
+    - node.type.news_release
+  module:
+    - datetime
+    - text
+    - user
+id: node.news_release.default
+targetEntityType: node
+bundle: news_release
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  release:
+    weight: 103
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  review_deadline:
+    weight: 104
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  secondary_headline:
+    weight: 102
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+hidden: {  }

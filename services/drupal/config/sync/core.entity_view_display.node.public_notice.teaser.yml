@@ -1,0 +1,30 @@
+uuid: c7a7342a-b9b4-4171-b704-0c20eecf3d39
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.public_notice.body
+    - node.type.public_notice
+  module:
+    - text
+    - user
+id: node.public_notice.teaser
+targetEntityType: node
+bundle: public_notice
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 101
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden: {  }
