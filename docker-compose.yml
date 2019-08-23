@@ -5,7 +5,7 @@ version: "3.7"
 
 services:
   # The Drupal service is the main entrypoint into the application. It runs both
-  # Apache and PHP.
+  # nginx and PHP.
   drupal:
     build:
       context: ./services/drupal
@@ -13,16 +13,17 @@ services:
     # This command line detects if the F1_XDEBUG parameter was set by `f1 up --xdebug',
     # and enables XDebug accordingly. We do not do this by default due to the significant
     # performance penalty imposed by XDebug.
-    entrypoint:
+    command:
       - /bin/sh
       - -c
-      - |-
+      - |
         chmod a+w /var/www/html/web/sites/default/files
         if test ! -z "${F1_XDEBUG:-}"; then
           docker-php-ext-enable xdebug
           echo 'xdebug.remote_enable=1' > /usr/local/etc/php/conf.d/xdebug.ini
         fi
-        exec apache2-foreground
+        php-fpm -D
+        exec nginx -g 'daemon off;'
     depends_on:
       - mysql
     environment:
@@ -97,8 +98,7 @@ services:
       - ${F1_TLS_CERT}:/run/secrets/local.crt:ro,cached
       - ${F1_TLS_KEY}:/run/secrets/local.key:ro,cached
       - ./services/drupal:/var/www/html:cached
-      - ./services/apache/httpd.conf:/etc/apache2/sites-enabled/000-default.conf:ro,cached
-      - ./services/drupal/modules.conf:/etc/apache2/conf-enabled/modules.conf:ro,cached
+      - ./services/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,cached
       - type: volume
         source: fs-data
         target: /var/www/html/web/sites/default/files
