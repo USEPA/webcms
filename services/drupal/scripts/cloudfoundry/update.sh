@@ -7,6 +7,8 @@ set -exuo pipefail
 
 export PATH="$PATH:/var/www/html/vendor/bin"
 
+cd /var/www/html/web
+
 drush updb -y
 drush cim -y
 drush cr

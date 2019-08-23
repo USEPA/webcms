@@ -57,31 +57,32 @@ echo '--- Running Drush'
 
 # Re-use the image tag for this deployment: we can quickly find the task name based on
 # the build metadata.
-./cf run-task "$app_name" 'sh scripts/cloudfoundry/update.sh' --name "$tag"
+./cf run-task "$app_name" 'sh /var/www/html/scripts/cloudfoundry/update.sh' --name "$tag"
 
 # Spin loop: CF doesn't appear to have a wait API for tasks, so we have to check manually.
 while true; do
-  status="$(./cf tasks | APP="$app_name" awk '$2 == ENV["APP"] { print $3 }')"
-  echo "[$(date)] Task status: $status"
+  status="$(./cf tasks "$app_name" | env APP="$tag" awk '$2 == ENVIRON["APP"] { print $3 }')"
 
   case "$status" in
     RUNNING)
       sleep 5
       ;;
 
-    SUCCEEDED)
-      # Let Drush succeed quietly - the logs are still accessible in CloudFoundry, so
-      # we aren't losing information.
-      break
-      ;;
-
-    FAILED)
+    SUCCEEDED|FAILED)
       ./cf logs "$app_name" --recent | grep "TASK/$tag" > task-logs.txt
       buildkite-agent artifact upload task-logs.txt
 
-      echo "^^^ +++"
-      echo "Drush update failed. Logs have been uploaded." > /dev/stderr
-      exit 1
+      if test "$status" == FAILED; then
+        echo "^^^ +++"
+        echo "Drush update failed. Logs have been uploaded." > /dev/stderr
+        exit 1
+      fi
+
+      break
+      ;;
+
+    *)
+      echo "Unknown status: $status" > /dev/stderr
       ;;
   esac
 done
