@@ -1,0 +1,29 @@
+uuid: 7743e880-a3c3-4561-bbee-a1a3dabfb8ac
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_type
+    - node.type.news_release
+    - taxonomy.vocabulary.type
+id: node.news_release.field_type
+field_name: field_type
+entity_type: node
+bundle: news_release
+label: Type
+description: 'Use <a href="https://www.epa.gov/webguide/metadata-basic-pages#type" class="external" target="_blank">this guide</a> for choosing the right type.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      type: type
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

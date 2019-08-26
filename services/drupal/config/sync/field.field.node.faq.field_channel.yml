@@ -1,0 +1,29 @@
+uuid: 95fd9d60-4a07-4d21-8f97-3d17331642c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_channel
+    - node.type.faq
+    - taxonomy.vocabulary.channels
+id: node.faq.field_channel
+field_name: field_channel
+entity_type: node
+bundle: faq
+label: Channel
+description: 'Use <a href="https://www.epa.gov/webguide/metadata-web-area-homepages#channel" class="external" target="_blank">this guide</a> for choosing the right channel.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      channels: channels
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

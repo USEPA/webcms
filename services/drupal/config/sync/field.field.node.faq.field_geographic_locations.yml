@@ -1,0 +1,29 @@
+uuid: 042367e9-f55b-4e2a-abb9-412036a963de
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_geographic_locations
+    - node.type.faq
+    - taxonomy.vocabulary.geographic_locations
+id: node.faq.field_geographic_locations
+field_name: field_geographic_locations
+entity_type: node
+bundle: faq
+label: 'Geographic Locations'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      geographic_locations: geographic_locations
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

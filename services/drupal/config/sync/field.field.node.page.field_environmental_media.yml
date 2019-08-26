@@ -1,0 +1,29 @@
+uuid: 2d93f030-1625-433f-bbe8-3ed480c2e818
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_environmental_media
+    - node.type.page
+    - taxonomy.vocabulary.environmental_media_topics
+id: node.page.field_environmental_media
+field_name: field_environmental_media
+entity_type: node
+bundle: page
+label: 'Environmental Media'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      environmental_media_topics: environmental_media_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

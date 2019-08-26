@@ -1,0 +1,29 @@
+uuid: 87265081-b49b-4ca3-8cc7-345772c5b306
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pollution_prevention
+    - node.type.faq
+    - taxonomy.vocabulary.pollution_prevention_topics
+id: node.faq.field_pollution_prevention
+field_name: field_pollution_prevention
+entity_type: node
+bundle: faq
+label: 'Pollution Prevention'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      pollution_prevention_topics: pollution_prevention_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

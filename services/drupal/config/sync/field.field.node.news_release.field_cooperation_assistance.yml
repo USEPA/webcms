@@ -1,0 +1,29 @@
+uuid: 28d6b0ac-13da-4355-8017-1c7ffeb3ec4f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cooperation_assistance
+    - node.type.news_release
+    - taxonomy.vocabulary.cooperation_and_assistance_topic
+id: node.news_release.field_cooperation_assistance
+field_name: field_cooperation_assistance
+entity_type: node
+bundle: news_release
+label: 'Cooperation & Assistance'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      cooperation_and_assistance_topic: cooperation_and_assistance_topic
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

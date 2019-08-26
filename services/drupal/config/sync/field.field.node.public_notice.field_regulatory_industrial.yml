@@ -1,0 +1,29 @@
+uuid: afd5bae2-c523-42bc-93c0-161a4a3cff8c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_regulatory_industrial
+    - node.type.public_notice
+    - taxonomy.vocabulary.regulatory_and_industrial_topics
+id: node.public_notice.field_regulatory_industrial
+field_name: field_regulatory_industrial
+entity_type: node
+bundle: public_notice
+label: 'Regulatory & Industrial'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      regulatory_and_industrial_topics: regulatory_and_industrial_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

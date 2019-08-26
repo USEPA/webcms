@@ -1,0 +1,29 @@
+uuid: 6f3ca984-6bae-46c5-b22b-3152a45029b0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cooperation_assistance
+    - node.type.page
+    - taxonomy.vocabulary.cooperation_and_assistance_topic
+id: node.page.field_cooperation_assistance
+field_name: field_cooperation_assistance
+entity_type: node
+bundle: page
+label: 'Cooperation & Assistance'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      cooperation_and_assistance_topic: cooperation_and_assistance_topic
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,29 @@
+uuid: 3d99990e-29e6-448a-8be2-ac00f7ab0c24
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_env_laws_regs_and_treaties
+    - node.type.faq
+    - taxonomy.vocabulary.environmental_laws
+id: node.faq.field_env_laws_regs_and_treaties
+field_name: field_env_laws_regs_and_treaties
+entity_type: node
+bundle: faq
+label: 'Environmental Laws, Regulations & Treaties'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      environmental_laws: environmental_laws
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,29 @@
+uuid: e17c8ab9-379c-431b-89f4-185b1c3a7c15
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_agency_function
+    - node.type.public_notice
+    - taxonomy.vocabulary.agency_function
+id: node.public_notice.field_agency_function
+field_name: field_agency_function
+entity_type: node
+bundle: public_notice
+label: 'Agency Function'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      agency_function: agency_function
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
