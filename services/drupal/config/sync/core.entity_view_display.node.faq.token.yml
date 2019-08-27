@@ -1,8 +1,9 @@
-uuid: 8743e6e3-4ea6-4a69-8147-8787cf1c779d
+uuid: 39ee83a3-861c-467d-a418-d86135ebb6d4
 langcode: en
-status: true
+status: false
 dependencies:
   config:
+    - core.entity_view_mode.node.token
     - field.field.node.faq.body
     - field.field.node.faq.field_agency_function
     - field.field.node.faq.field_audiences
@@ -35,10 +36,10 @@ dependencies:
     - options
     - text
     - user
-id: node.faq.default
+id: node.faq.token
 targetEntityType: node
 bundle: faq
-mode: default
+mode: token
 content:
   body:
     label: hidden
@@ -230,9 +231,10 @@ content:
   question:
     weight: 1
     label: hidden
-    settings: {  }
+    settings:
+      trim_length: 80
     third_party_settings: {  }
-    type: text_default
+    type: text_summary_or_trimmed
     region: content
   related_questions:
     weight: 3
