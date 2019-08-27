@@ -21,15 +21,16 @@ dependencies:
     - field.field.node.public_notice.field_health
     - field.field.node.public_notice.field_industries
     - field.field.node.public_notice.field_is_record
-    - field.field.node.public_notice.field_keywords
     - field.field.node.public_notice.field_language
     - field.field.node.public_notice.field_machine_name
     - field.field.node.public_notice.field_page_head
     - field.field.node.public_notice.field_pollution_prevention
+    - field.field.node.public_notice.field_programs_or_statutes
     - field.field.node.public_notice.field_r_and_a_and_technology
     - field.field.node.public_notice.field_regulatory_industrial
     - field.field.node.public_notice.field_substances
     - field.field.node.public_notice.field_type
+    - field.field.node.public_notice.field_type_of_proposed_action
     - field.field.node.public_notice.how_to_comment
     - field.field.node.public_notice.notice_sort_date
     - field.field.node.public_notice.permit_number
@@ -49,8 +50,6 @@ third_party_settings:
       children:
         - field_language
         - field_is_record
-        - field_subtype
-        - field_administrator
       parent_name: ''
       weight: 13
       format_type: tab
@@ -81,12 +80,10 @@ third_party_settings:
     group_metadata:
       children:
         - field_description
-        - field_keywords
         - field_type
         - field_channel
         - field_machine_name
         - field_geographic_locations
-        - field_searchable_collection
       parent_name: ''
       weight: 9
       format_type: tab
@@ -130,6 +127,21 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Page Javascript'
+    group_public_notice_comments:
+      children:
+        - comments_due_date
+        - extension_date
+        - how_to_comment
+      parent_name: ''
+      weight: 6
+      format_type: fieldset
+      format_settings:
+        label: Comments
+        description: ''
+        required_fields: true
+        id: ''
+        classes: 'group-public-notice-comments field-group-fieldset'
+      label: Comments
 id: node.public_notice.default
 targetEntityType: node
 bundle: public_notice
@@ -137,7 +149,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 1
+    weight: 2
     region: content
     settings:
       rows: 9
@@ -163,7 +175,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   documents:
-    weight: 3
+    weight: 7
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
@@ -296,15 +308,6 @@ content:
     third_party_settings: {  }
     type: boolean_checkbox
     region: content
-  field_keywords:
-    weight: 11
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete_tags
-    region: content
   field_language:
     weight: 45
     settings: {  }
@@ -329,6 +332,16 @@ content:
     region: content
   field_pollution_prevention:
     weight: 41
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_programs_or_statutes:
+    weight: 3
     settings:
       display_node_count: false
       create_new_items: false
@@ -373,6 +386,16 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  field_type_of_proposed_action:
+    weight: 4
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
   how_to_comment:
     weight: 8
     settings:
@@ -394,7 +417,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   permit_number:
-    weight: 4
+    weight: 5
     settings:
       size: 60
       placeholder: ''
@@ -409,13 +432,13 @@ content:
     region: content
     third_party_settings: {  }
   publication_date:
-    weight: 2
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
     region: content
   review_deadline:
-    weight: 5
+    weight: 8
     settings: {  }
     third_party_settings: {  }
     type: datetime_default

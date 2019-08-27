@@ -13,11 +13,11 @@ dependencies:
     - field.field.node.faq.field_env_laws_regs_and_treaties
     - field.field.node.faq.field_environmental_media
     - field.field.node.faq.field_epa_operations
+    - field.field.node.faq.field_faq_taxonomy_topics
     - field.field.node.faq.field_geographic_locations
     - field.field.node.faq.field_health
     - field.field.node.faq.field_industries
     - field.field.node.faq.field_is_record
-    - field.field.node.faq.field_keywords
     - field.field.node.faq.field_language
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
@@ -42,10 +42,8 @@ third_party_settings:
       children:
         - field_language
         - field_is_record
-        - field_subtype
-        - field_administrator
       parent_name: ''
-      weight: 9
+      weight: 10
       format_type: tab
       format_settings:
         id: ''
@@ -62,7 +60,7 @@ third_party_settings:
         - field_industries
         - field_substances
       parent_name: ''
-      weight: 7
+      weight: 8
       format_type: tab
       format_settings:
         id: ''
@@ -79,9 +77,8 @@ third_party_settings:
         - field_channel
         - field_machine_name
         - field_geographic_locations
-        - field_searchable_collection
       parent_name: ''
-      weight: 5
+      weight: 6
       format_type: tab
       format_settings:
         id: ''
@@ -101,7 +98,7 @@ third_party_settings:
         - field_regulatory_industrial
         - field_r_and_a_and_technology
       parent_name: ''
-      weight: 6
+      weight: 7
       format_type: tab
       format_settings:
         id: ''
@@ -114,7 +111,7 @@ third_party_settings:
       children:
         - field_page_head
       parent_name: ''
-      weight: 8
+      weight: 9
       format_type: tab
       format_settings:
         id: ''
@@ -130,7 +127,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 1
+    weight: 2
     region: content
     settings:
       rows: 9
@@ -139,7 +136,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 12
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -227,6 +224,15 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_faq_taxonomy_topics:
+    weight: 3
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
   field_geographic_locations:
     weight: 15
     settings:
@@ -263,15 +269,6 @@ content:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
-    region: content
-  field_keywords:
-    weight: 11
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete_tags
     region: content
   field_language:
     weight: 45
@@ -343,7 +340,7 @@ content:
     region: content
   path:
     type: path
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -351,11 +348,11 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 13
+    weight: 14
     region: content
     third_party_settings: {  }
   question:
-    weight: 2
+    weight: 1
     settings:
       rows: 5
       placeholder: ''
@@ -363,7 +360,7 @@ content:
     type: string_textarea
     region: content
   related_questions:
-    weight: 3
+    weight: 4
     settings:
       match_operator: CONTAINS
       size: 60
@@ -372,7 +369,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   review_deadline:
-    weight: 4
+    weight: 5
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
@@ -381,14 +378,14 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 16
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 14
+    weight: 15
     region: content
     third_party_settings: {  }
   title:
@@ -401,7 +398,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 11
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS

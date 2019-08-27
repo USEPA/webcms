@@ -1,0 +1,29 @@
+uuid: 383868d4-2f96-484a-8eb9-8435757c7e08
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_press_office
+    - node.type.news_release
+    - taxonomy.vocabulary.press_office
+id: node.news_release.field_press_office
+field_name: field_press_office
+entity_type: node
+bundle: news_release
+label: 'Press Office'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      press_office: press_office
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
