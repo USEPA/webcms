@@ -1,0 +1,32 @@
+uuid: 29b5fb9c-2028-4fe2-a40b-10ef755e7628
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.applicants_or_respondents.address
+    - field.field.paragraph.applicants_or_respondents.applicant_name
+    - paragraphs.paragraphs_type.applicants_or_respondents
+  module:
+    - address
+id: paragraph.applicants_or_respondents.default
+targetEntityType: paragraph
+bundle: applicants_or_respondents
+mode: default
+content:
+  address:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: address_default
+    region: content
+  applicant_name:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true

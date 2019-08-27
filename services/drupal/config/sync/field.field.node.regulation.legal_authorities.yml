@@ -1,0 +1,49 @@
+uuid: 192f9327-88f8-4465-a57d-3cce07bb88c9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.legal_authorities
+    - node.type.regulation
+    - paragraphs.paragraphs_type.legal_authorities
+  module:
+    - entity_reference_revisions
+id: node.regulation.legal_authorities
+field_name: legal_authorities
+entity_type: node
+bundle: regulation
+label: 'Legal Authorities'
+description: 'Provide U.S. Code title(s) and section(s). Example: 7 U.S.C. §136. The "Section" component cannot contain more than 20 characters.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      legal_authorities: legal_authorities
+    target_bundles_drag_drop:
+      press_officers:
+        weight: 8
+        enabled: false
+      applicants_or_respondents:
+        weight: 9
+        enabled: false
+      cfr:
+        weight: 10
+        enabled: false
+      docket:
+        weight: 11
+        enabled: false
+      frc:
+        weight: 12
+        enabled: false
+      legal_authorities:
+        enabled: true
+        weight: 13
+      locations_of_prop_actions:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions

@@ -4,8 +4,11 @@ status: true
 dependencies:
   config:
     - field.field.node.regulation.additional_resources
+    - field.field.node.regulation.cfr
     - field.field.node.regulation.compliance
+    - field.field.node.regulation.docket_numbers
     - field.field.node.regulation.effective_dates
+    - field.field.node.regulation.federal_register_citations
     - field.field.node.regulation.field_agency_function
     - field.field.node.regulation.field_audiences
     - field.field.node.regulation.field_channel
@@ -27,6 +30,7 @@ dependencies:
     - field.field.node.regulation.field_regulatory_industrial
     - field.field.node.regulation.field_substances
     - field.field.node.regulation.field_type
+    - field.field.node.regulation.legal_authorities
     - field.field.node.regulation.review_deadline
     - field.field.node.regulation.rule_history
     - field.field.node.regulation.rule_summary
@@ -34,6 +38,7 @@ dependencies:
     - node.type.regulation
   module:
     - datetime
+    - entity_reference_revisions
     - options
     - text
     - user
@@ -49,12 +54,30 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+  cfr:
+    type: entity_reference_revisions_entity_view
+    weight: 130
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
   compliance:
     weight: 102
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
+    region: content
+  docket_numbers:
+    weight: 131
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
     region: content
   effective_dates:
     weight: 103
@@ -64,6 +87,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  federal_register_citations:
+    weight: 132
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
     region: content
   field_agency_function:
     weight: 108
@@ -231,6 +263,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  legal_authorities:
+    type: entity_reference_revisions_entity_view
+    weight: 133
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
     region: content
   links:
     weight: 100

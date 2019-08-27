@@ -1,0 +1,49 @@
+uuid: fa255109-023e-4f62-9658-cb2a677862aa
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.applicants_or_respondents
+    - node.type.public_notice
+    - paragraphs.paragraphs_type.applicants_or_respondents
+  module:
+    - entity_reference_revisions
+id: node.public_notice.applicants_or_respondents
+field_name: applicants_or_respondents
+entity_type: node
+bundle: public_notice
+label: 'Applicants or Respondents'
+description: 'Provide the name(s) and address(es) of all applicants and/or respondents.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      applicants_or_respondents: applicants_or_respondents
+    target_bundles_drag_drop:
+      press_officers:
+        weight: 8
+        enabled: false
+      applicants_or_respondents:
+        enabled: true
+        weight: 9
+      cfr:
+        weight: 10
+        enabled: false
+      docket:
+        weight: 11
+        enabled: false
+      frc:
+        weight: 12
+        enabled: false
+      legal_authorities:
+        weight: 13
+        enabled: false
+      locations_of_prop_actions:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions

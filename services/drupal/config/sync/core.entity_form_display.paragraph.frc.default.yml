@@ -1,0 +1,34 @@
+uuid: 50c793c3-1aba-40e8-a1f9-3a2d65877760
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.frc.frc_citation
+    - field.field.paragraph.frc.link
+    - paragraphs.paragraphs_type.frc
+  module:
+    - link
+id: paragraph.frc.default
+targetEntityType: paragraph
+bundle: frc
+mode: default
+content:
+  frc_citation:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  link:
+    weight: 1
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
+hidden:
+  created: true
+  status: true

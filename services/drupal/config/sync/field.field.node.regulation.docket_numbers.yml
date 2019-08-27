@@ -1,0 +1,49 @@
+uuid: fe02e693-55fc-4f97-8a13-699666e583b6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.docket_numbers
+    - node.type.regulation
+    - paragraphs.paragraphs_type.docket
+  module:
+    - entity_reference_revisions
+id: node.regulation.docket_numbers
+field_name: docket_numbers
+entity_type: node
+bundle: regulation
+label: 'Docket Numbers'
+description: 'Examples: EPA-HQ-RCRA-1988-0068, EPA-HQ-SFUND-2008-0001, EPA-R09-OAR-2016-AZ-0012'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      docket: docket
+    target_bundles_drag_drop:
+      press_officers:
+        weight: 8
+        enabled: false
+      applicants_or_respondents:
+        weight: 9
+        enabled: false
+      cfr:
+        weight: 10
+        enabled: false
+      docket:
+        enabled: true
+        weight: 11
+      frc:
+        weight: 12
+        enabled: false
+      legal_authorities:
+        weight: 13
+        enabled: false
+      locations_of_prop_actions:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions

@@ -4,8 +4,11 @@ status: true
 dependencies:
   config:
     - field.field.node.regulation.additional_resources
+    - field.field.node.regulation.cfr
     - field.field.node.regulation.compliance
+    - field.field.node.regulation.docket_numbers
     - field.field.node.regulation.effective_dates
+    - field.field.node.regulation.federal_register_citations
     - field.field.node.regulation.field_agency_function
     - field.field.node.regulation.field_audiences
     - field.field.node.regulation.field_channel
@@ -27,6 +30,7 @@ dependencies:
     - field.field.node.regulation.field_regulatory_industrial
     - field.field.node.regulation.field_substances
     - field.field.node.regulation.field_type
+    - field.field.node.regulation.legal_authorities
     - field.field.node.regulation.review_deadline
     - field.field.node.regulation.rule_history
     - field.field.node.regulation.rule_summary
@@ -35,6 +39,7 @@ dependencies:
   module:
     - datetime
     - field_group
+    - paragraphs
     - path
     - shs
     - text
@@ -44,10 +49,8 @@ third_party_settings:
       children:
         - field_language
         - field_is_record
-        - field_subtype
-        - field_administrator
       parent_name: ''
-      weight: 12
+      weight: 16
       format_type: tab
       format_settings:
         id: ''
@@ -64,7 +67,7 @@ third_party_settings:
         - field_industries
         - field_substances
       parent_name: ''
-      weight: 10
+      weight: 14
       format_type: tab
       format_settings:
         id: ''
@@ -80,9 +83,8 @@ third_party_settings:
         - field_channel
         - field_machine_name
         - field_geographic_locations
-        - field_searchable_collection
       parent_name: ''
-      weight: 8
+      weight: 12
       format_type: tab
       format_settings:
         id: ''
@@ -102,7 +104,7 @@ third_party_settings:
         - field_regulatory_industrial
         - field_r_and_a_and_technology
       parent_name: ''
-      weight: 9
+      weight: 13
       format_type: tab
       format_settings:
         id: ''
@@ -115,7 +117,7 @@ third_party_settings:
       children:
         - field_page_head
       parent_name: ''
-      weight: 11
+      weight: 15
       format_type: tab
       format_settings:
         id: ''
@@ -130,15 +132,27 @@ bundle: regulation
 mode: default
 content:
   additional_resources:
-    weight: 5
+    weight: 9
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
     type: text_textarea
     region: content
+  cfr:
+    type: entity_reference_paragraphs
+    weight: 3
+    settings:
+      title: 'Federal Regulations Citation'
+      title_plural: 'Federal Regulations Citations'
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: cfr
+    third_party_settings: {  }
+    region: content
   compliance:
-    weight: 7
+    weight: 11
     settings:
       rows: 5
       placeholder: ''
@@ -147,15 +161,39 @@ content:
     region: content
   created:
     type: datetime_timestamp
-    weight: 15
+    weight: 19
     region: content
     settings: {  }
     third_party_settings: {  }
+  docket_numbers:
+    weight: 4
+    settings:
+      title: 'Docket Number'
+      title_plural: 'Docket Numbers'
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: docket
+    third_party_settings: {  }
+    type: entity_reference_paragraphs
+    region: content
   effective_dates:
-    weight: 1
+    weight: 5
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  federal_register_citations:
+    weight: 2
+    settings:
+      title: 'Federal Register Citation'
+      title_plural: 'Federal Register Citations'
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: cfr
+    third_party_settings: {  }
+    type: entity_reference_paragraphs
     region: content
   field_agency_function:
     weight: 29
@@ -346,9 +384,21 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  legal_authorities:
+    type: entity_reference_paragraphs
+    weight: 1
+    settings:
+      title: 'Legal Authority'
+      title_plural: 'Legal Authorities'
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: legal_authorities
+    third_party_settings: {  }
+    region: content
   path:
     type: path
-    weight: 13
+    weight: 17
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -356,17 +406,17 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 20
     region: content
     third_party_settings: {  }
   review_deadline:
-    weight: 6
+    weight: 10
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
     region: content
   rule_history:
-    weight: 4
+    weight: 8
     settings:
       rows: 5
       placeholder: ''
@@ -374,7 +424,7 @@ content:
     type: text_textarea
     region: content
   rule_summary:
-    weight: 2
+    weight: 6
     settings:
       rows: 5
       placeholder: ''
@@ -385,14 +435,14 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 18
+    weight: 22
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 17
+    weight: 21
     region: content
     third_party_settings: {  }
   title:
@@ -405,7 +455,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 14
+    weight: 18
     region: content
     settings:
       match_operator: CONTAINS
@@ -413,7 +463,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   wide_template:
-    weight: 3
+    weight: 7
     settings:
       display_label: true
     third_party_settings: {  }

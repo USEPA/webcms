@@ -26,12 +26,14 @@ dependencies:
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_substances
     - field.field.node.news_release.field_type
+    - field.field.node.news_release.press_officers
     - field.field.node.news_release.release
     - field.field.node.news_release.review_deadline
     - field.field.node.news_release.secondary_headline
     - node.type.news_release
   module:
     - datetime
+    - entity_reference_revisions
     - options
     - text
     - user
@@ -226,6 +228,15 @@ content:
   links:
     weight: 100
     settings: {  }
+    third_party_settings: {  }
+    region: content
+  press_officers:
+    type: entity_reference_revisions_entity_view
+    weight: 131
+    label: above
+    settings:
+      view_mode: default
+      link: ''
     third_party_settings: {  }
     region: content
   release:

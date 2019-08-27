@@ -1,0 +1,49 @@
+uuid: 67180587-11ea-491c-99b9-d079ffa22720
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.federal_register_citations
+    - node.type.public_notice
+    - paragraphs.paragraphs_type.frc
+  module:
+    - entity_reference_revisions
+id: node.public_notice.federal_register_citations
+field_name: federal_register_citations
+entity_type: node
+bundle: public_notice
+label: 'Federal Register Citations'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      frc: frc
+    target_bundles_drag_drop:
+      press_officers:
+        weight: 8
+        enabled: false
+      applicants_or_respondents:
+        weight: 9
+        enabled: false
+      cfr:
+        weight: 10
+        enabled: false
+      docket:
+        weight: 11
+        enabled: false
+      frc:
+        enabled: true
+        weight: 12
+      legal_authorities:
+        weight: 13
+        enabled: false
+      locations_of_prop_actions:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions

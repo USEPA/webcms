@@ -1,0 +1,36 @@
+uuid: 320362fe-db45-4b35-b61f-93e9548acdac
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.cfr.code_federal_regulations
+    - field.field.paragraph.cfr.link
+    - paragraphs.paragraphs_type.cfr
+  module:
+    - link
+id: paragraph.cfr.default
+targetEntityType: paragraph
+bundle: cfr
+mode: default
+content:
+  code_federal_regulations:
+    weight: 0
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  link:
+    weight: 1
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
+hidden: {  }

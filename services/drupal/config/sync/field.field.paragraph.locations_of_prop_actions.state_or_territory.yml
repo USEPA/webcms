@@ -1,0 +1,29 @@
+uuid: 5fee4831-7e37-4555-8807-a1fd53ba27d7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.state_or_territory
+    - paragraphs.paragraphs_type.locations_of_prop_actions
+    - taxonomy.vocabulary.geographic_locations
+id: paragraph.locations_of_prop_actions.state_or_territory
+field_name: state_or_territory
+entity_type: paragraph
+bundle: locations_of_prop_actions
+label: 'State or Territory'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      geographic_locations: geographic_locations
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -3,11 +3,14 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.public_notice.applicants_or_respondents
     - field.field.node.public_notice.body
     - field.field.node.public_notice.comments_due_date
     - field.field.node.public_notice.computed_comments_due_date
+    - field.field.node.public_notice.docket_numbers
     - field.field.node.public_notice.documents
     - field.field.node.public_notice.extension_date
+    - field.field.node.public_notice.federal_register_citations
     - field.field.node.public_notice.field_agency_function
     - field.field.node.public_notice.field_audiences
     - field.field.node.public_notice.field_channel
@@ -32,6 +35,7 @@ dependencies:
     - field.field.node.public_notice.field_type
     - field.field.node.public_notice.field_type_of_proposed_action
     - field.field.node.public_notice.how_to_comment
+    - field.field.node.public_notice.locations_of_proposed_actions
     - field.field.node.public_notice.notice_sort_date
     - field.field.node.public_notice.permit_number
     - field.field.node.public_notice.publication_date
@@ -39,6 +43,7 @@ dependencies:
     - node.type.public_notice
   module:
     - datetime
+    - entity_reference_revisions
     - file
     - options
     - text
@@ -48,6 +53,15 @@ targetEntityType: node
 bundle: public_notice
 mode: default
 content:
+  applicants_or_respondents:
+    type: entity_reference_revisions_entity_view
+    weight: 132
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
   body:
     label: hidden
     type: text_default
@@ -73,6 +87,15 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
+  docket_numbers:
+    type: entity_reference_revisions_entity_view
+    weight: 133
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
   documents:
     weight: 109
     label: above
@@ -89,6 +112,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  federal_register_citations:
+    type: entity_reference_revisions_entity_view
+    weight: 134
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
     region: content
   field_agency_function:
     weight: 108
@@ -283,6 +315,15 @@ content:
   links:
     weight: 100
     settings: {  }
+    third_party_settings: {  }
+    region: content
+  locations_of_proposed_actions:
+    type: entity_reference_revisions_entity_view
+    weight: 135
+    label: above
+    settings:
+      view_mode: default
+      link: ''
     third_party_settings: {  }
     region: content
   notice_sort_date:
