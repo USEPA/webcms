@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_custom_tokens.module.
+ */
+
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Component\Utility\Unicode;
+
+/**
+ * Implements hook_tokens_alter().
+ */
+function epa_custom_tokens_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+  // Replace the [node:question:summary] if empty.
+  if ($context['type'] == 'node' && !empty($context['data']['node'])) {
+    $node = $context['data']['node'];
+
+    if (isset($context['tokens']['question:summary']) && empty($replacements[$context['tokens']['question:summary']])) {
+      $question = $node->question->value;
+      $truncated_question = Unicode::truncate($question, 80, TRUE);
+      $replacements[$context['tokens']['question:summary']] = $truncated_question;
+    }
+  }
+}
