@@ -18,6 +18,7 @@ dependencies:
     - field.field.node.faq.field_health
     - field.field.node.faq.field_industries
     - field.field.node.faq.field_is_record
+    - field.field.node.faq.field_keywords
     - field.field.node.faq.field_language
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
@@ -72,6 +73,7 @@ third_party_settings:
     group_metadata:
       children:
         - field_description
+        - field_keywords
         - field_type
         - field_channel
         - field_machine_name
@@ -268,6 +270,15 @@ content:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
+    region: content
+  field_keywords:
+    weight: 11
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete_tags
     region: content
   field_language:
     weight: 45

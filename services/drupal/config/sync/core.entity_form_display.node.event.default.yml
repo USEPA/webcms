@@ -23,6 +23,7 @@ dependencies:
     - field.field.node.event.field_health
     - field.field.node.event.field_industries
     - field.field.node.event.field_is_record
+    - field.field.node.event.field_keywords
     - field.field.node.event.field_language
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
@@ -307,6 +308,15 @@ content:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
+    region: content
+  field_keywords:
+    weight: 11
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete_tags
     region: content
   field_language:
     weight: 45
