@@ -1,0 +1,36 @@
+uuid: 8ea99ed9-45f9-4eeb-a268-41cd9b6a5e30
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.locations_of_prop_actions.field_location_proposed_other
+    - field.field.paragraph.locations_of_prop_actions.field_state_or_territory
+    - paragraphs.paragraphs_type.locations_of_prop_actions
+  module:
+    - shs
+id: paragraph.locations_of_prop_actions.default
+targetEntityType: paragraph
+bundle: locations_of_prop_actions
+mode: default
+content:
+  field_location_proposed_other:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_state_or_territory:
+    weight: 0
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+hidden:
+  created: true
+  status: true

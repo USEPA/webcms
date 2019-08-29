@@ -1,0 +1,29 @@
+uuid: 516e6aad-d334-47d4-9703-edf08f3f36ab
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_environmental_media
+    - node.type.faq
+    - taxonomy.vocabulary.environmental_media_topics
+id: node.faq.field_environmental_media
+field_name: field_environmental_media
+entity_type: node
+bundle: faq
+label: 'Environmental Media'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      environmental_media_topics: environmental_media_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

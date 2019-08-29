@@ -1,0 +1,29 @@
+uuid: 504afbf7-1a7a-4ea4-b50d-68488d5101c1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_programs_or_statutes
+    - node.type.public_notice
+    - taxonomy.vocabulary.program_or_statute
+id: node.public_notice.field_programs_or_statutes
+field_name: field_programs_or_statutes
+entity_type: node
+bundle: public_notice
+label: 'Programs or Statutes'
+description: 'This tags the notice for faceted searching. It will NOT appear on the finished page. Select one or more statutes.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      program_or_statute: program_or_statute
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,34 @@
+uuid: d3f55c9c-c653-43cb-beab-996391e0f81b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.docket.field_link
+    - field.field.paragraph.docket.field_number
+    - paragraphs.paragraphs_type.docket
+  module:
+    - link
+id: paragraph.docket.default
+targetEntityType: paragraph
+bundle: docket
+mode: default
+content:
+  field_link:
+    weight: 1
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
+  field_number:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true

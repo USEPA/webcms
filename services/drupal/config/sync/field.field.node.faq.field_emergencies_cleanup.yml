@@ -1,0 +1,29 @@
+uuid: d797dd8f-58ce-4733-afaa-c793e34c468a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_emergencies_cleanup
+    - node.type.faq
+    - taxonomy.vocabulary.emergencies_and_cleanup_topics
+id: node.faq.field_emergencies_cleanup
+field_name: field_emergencies_cleanup
+entity_type: node
+bundle: faq
+label: 'Emergencies & Cleanup'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      emergencies_and_cleanup_topics: emergencies_and_cleanup_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

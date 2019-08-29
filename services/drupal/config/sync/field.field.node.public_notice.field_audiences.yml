@@ -1,0 +1,29 @@
+uuid: cea2cbc8-def1-4a47-8fc4-e1e5b164f79f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_audiences
+    - node.type.public_notice
+    - taxonomy.vocabulary.audiences
+id: node.public_notice.field_audiences
+field_name: field_audiences
+entity_type: node
+bundle: public_notice
+label: Audiences
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      audiences: audiences
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
