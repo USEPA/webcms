@@ -2,6 +2,13 @@ uuid: 21fee236-9ff8-4e19-8f31-1db73b01695b
 langcode: en
 status: true
 dependencies:
+  config:
+    - node.type.event
+    - node.type.faq
+    - node.type.news_release
+    - node.type.page
+    - node.type.public_notice
+    - node.type.regulation
   module:
     - content_moderation
 id: epa_default
@@ -120,5 +127,12 @@ type_settings:
         - published_scheduled_for_expiration
       to: unpublished
       weight: 9
-  entity_types: {  }
+  entity_types:
+    node:
+      - event
+      - faq
+      - news_release
+      - page
+      - public_notice
+      - regulation
   default_moderation_state: draft
