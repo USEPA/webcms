@@ -3,12 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.regulation.additional_resources
-    - field.field.node.regulation.cfr
-    - field.field.node.regulation.compliance
-    - field.field.node.regulation.docket_numbers
-    - field.field.node.regulation.effective_dates
-    - field.field.node.regulation.federal_register_citations
+    - field.field.node.regulation.field_additional_resources
+    - field.field.node.regulation.field_cfr
+    - field.field.node.regulation.field_compliance
+    - field.field.node.regulation.field_docket_numbers
+    - field.field.node.regulation.field_effective_dates
+    - field.field.node.regulation.field_federal_register_citations
     - field.field.node.regulation.field_agency_function
     - field.field.node.regulation.field_audiences
     - field.field.node.regulation.field_channel
@@ -31,11 +31,11 @@ dependencies:
     - field.field.node.regulation.field_regulatory_industrial
     - field.field.node.regulation.field_substances
     - field.field.node.regulation.field_type
-    - field.field.node.regulation.legal_authorities
-    - field.field.node.regulation.review_deadline
-    - field.field.node.regulation.rule_history
-    - field.field.node.regulation.rule_summary
-    - field.field.node.regulation.wide_template
+    - field.field.node.regulation.field_legal_authorities
+    - field.field.node.regulation.field_review_deadline
+    - field.field.node.regulation.field_rule_history
+    - field.field.node.regulation.field_rule_summary
+    - field.field.node.regulation.field_wide_template
     - node.type.regulation
   module:
     - datetime
@@ -48,14 +48,14 @@ targetEntityType: node
 bundle: regulation
 mode: default
 content:
-  additional_resources:
+  field_additional_resources:
     weight: 101
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  cfr:
+  field_cfr:
     type: entity_reference_revisions_entity_view
     weight: 130
     label: above
@@ -64,14 +64,14 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  compliance:
+  field_compliance:
     weight: 102
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  docket_numbers:
+  field_docket_numbers:
     weight: 131
     label: above
     settings:
@@ -80,7 +80,7 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  effective_dates:
+  field_effective_dates:
     weight: 103
     label: above
     settings:
@@ -89,7 +89,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  federal_register_citations:
+  field_federal_register_citations:
     weight: 132
     label: above
     settings:
@@ -273,7 +273,7 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
-  legal_authorities:
+  field_legal_authorities:
     type: entity_reference_revisions_entity_view
     weight: 133
     label: above
@@ -282,12 +282,12 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  links:
+  field_links:
     weight: 100
     settings: {  }
     third_party_settings: {  }
     region: content
-  review_deadline:
+  field_review_deadline:
     weight: 104
     label: above
     settings:
@@ -296,21 +296,21 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  rule_history:
+  field_rule_history:
     weight: 105
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  rule_summary:
+  field_rule_summary:
     weight: 106
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  wide_template:
+  field_wide_template:
     weight: 107
     label: above
     settings:

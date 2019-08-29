@@ -1,16 +1,15 @@
-uuid: fe023428-e886-45aa-af8a-71a464b1a1c7
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.public_notice.applicants_or_respondents
+    - field.field.node.public_notice.field_applicants_or_respondents
     - field.field.node.public_notice.body
-    - field.field.node.public_notice.comments_due_date
-    - field.field.node.public_notice.computed_comments_due_date
-    - field.field.node.public_notice.docket_numbers
-    - field.field.node.public_notice.documents
-    - field.field.node.public_notice.extension_date
-    - field.field.node.public_notice.federal_register_citations
+    - field.field.node.public_notice.field_comments_due_date
+    - field.field.node.public_notice.field_computed_comments_due_date
+    - field.field.node.public_notice.field_docket_numbers
+    - field.field.node.public_notice.field_documents
+    - field.field.node.public_notice.field_extension_date
+    - field.field.node.public_notice.field_federal_register_citations
     - field.field.node.public_notice.field_agency_function
     - field.field.node.public_notice.field_audiences
     - field.field.node.public_notice.field_channel
@@ -35,12 +34,12 @@ dependencies:
     - field.field.node.public_notice.field_substances
     - field.field.node.public_notice.field_type
     - field.field.node.public_notice.field_type_of_proposed_action
-    - field.field.node.public_notice.how_to_comment
-    - field.field.node.public_notice.locations_of_proposed_actions
-    - field.field.node.public_notice.notice_sort_date
-    - field.field.node.public_notice.permit_number
-    - field.field.node.public_notice.publication_date
-    - field.field.node.public_notice.review_deadline
+    - field.field.node.public_notice.field_how_to_comment
+    - field.field.node.public_notice.field_locations_of_prop_actions
+    - field.field.node.public_notice.field_notice_sort_date
+    - field.field.node.public_notice.field_permit_number
+    - field.field.node.public_notice.field_publication_date
+    - field.field.node.public_notice.field_review_deadline
     - node.type.public_notice
   module:
     - datetime
@@ -54,7 +53,7 @@ targetEntityType: node
 bundle: public_notice
 mode: default
 content:
-  applicants_or_respondents:
+  field_applicants_or_respondents:
     type: entity_reference_revisions_entity_view
     weight: 132
     label: above
@@ -70,7 +69,7 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
-  comments_due_date:
+  field_comments_due_date:
     weight: 102
     label: above
     settings:
@@ -79,7 +78,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  computed_comments_due_date:
+  field_computed_comments_due_date:
     weight: 105
     label: above
     settings:
@@ -88,7 +87,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  docket_numbers:
+  field_docket_numbers:
     type: entity_reference_revisions_entity_view
     weight: 133
     label: above
@@ -97,7 +96,7 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  documents:
+  field_documents:
     weight: 109
     label: above
     settings:
@@ -105,7 +104,7 @@ content:
     third_party_settings: {  }
     type: file_default
     region: content
-  extension_date:
+  field_extension_date:
     weight: 103
     label: above
     settings:
@@ -114,7 +113,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  federal_register_citations:
+  field_federal_register_citations:
     type: entity_reference_revisions_entity_view
     weight: 134
     label: above
@@ -314,19 +313,19 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
-  how_to_comment:
+  field_how_to_comment:
     weight: 104
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  links:
+  field_links:
     weight: 100
     settings: {  }
     third_party_settings: {  }
     region: content
-  locations_of_proposed_actions:
+  field_locations_of_prop_actions:
     type: entity_reference_revisions_entity_view
     weight: 135
     label: above
@@ -335,7 +334,7 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  notice_sort_date:
+  field_notice_sort_date:
     weight: 106
     label: above
     settings:
@@ -344,7 +343,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  permit_number:
+  field_permit_number:
     weight: 107
     label: above
     settings:
@@ -352,7 +351,7 @@ content:
     third_party_settings: {  }
     type: string
     region: content
-  publication_date:
+  field_publication_date:
     weight: 108
     label: above
     settings:
@@ -361,7 +360,7 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  review_deadline:
+  field_review_deadline:
     weight: 110
     label: above
     settings:

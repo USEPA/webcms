@@ -1,0 +1,49 @@
+uuid: 5209597f-75ec-4a85-81c4-70e4eb6c94c2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cfr
+    - node.type.regulation
+    - paragraphs.paragraphs_type.cfr
+  module:
+    - entity_reference_revisions
+id: node.regulation.field_cfr
+field_name: field_cfr
+entity_type: node
+bundle: regulation
+label: 'Code of Federal Regulations Citations'
+description: 'Provide the title number and section of the codified regulation(s). Examples: 40 CFR Part 180, 40 CFR Part 122'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      cfr: cfr
+    target_bundles_drag_drop:
+      press_officers:
+        weight: 8
+        enabled: false
+      applicants_or_respondents:
+        weight: 9
+        enabled: false
+      cfr:
+        enabled: true
+        weight: 10
+      docket:
+        weight: 11
+        enabled: false
+      frc:
+        weight: 12
+        enabled: false
+      legal_authorities:
+        weight: 13
+        enabled: false
+      locations_of_prop_actions:
+        weight: 14
+        enabled: false
+field_type: entity_reference_revisions
