@@ -23,13 +23,13 @@ dependencies:
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_pollution_prevention
+    - field.field.node.faq.field_question
     - field.field.node.faq.field_r_and_a_and_technology
     - field.field.node.faq.field_regulatory_industrial
-    - field.field.node.faq.field_substances
-    - field.field.node.faq.field_type
-    - field.field.node.faq.field_question
     - field.field.node.faq.field_related_questions
     - field.field.node.faq.field_review_deadline
+    - field.field.node.faq.field_substances
+    - field.field.node.faq.field_type
     - node.type.faq
   module:
     - datetime
@@ -44,27 +44,11 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 2
+    weight: 1
     settings: {  }
     third_party_settings: {  }
     region: content
   field_agency_function:
-    weight: 7
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_audiences:
-    weight: 8
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_channel:
     weight: 6
     label: above
     settings:
@@ -72,8 +56,24 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_audiences:
+    weight: 7
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_channel:
+    weight: 5
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_cooperation_assistance:
-    weight: 9
+    weight: 8
     label: above
     settings:
       link: true
@@ -88,7 +88,7 @@ content:
     type: basic_string
     region: content
   field_emergencies_cleanup:
-    weight: 10
+    weight: 9
     label: above
     settings:
       link: true
@@ -96,7 +96,7 @@ content:
     type: entity_reference_label
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 11
+    weight: 10
     label: above
     settings:
       link: true
@@ -104,7 +104,7 @@ content:
     type: entity_reference_label
     region: content
   field_environmental_media:
-    weight: 12
+    weight: 11
     label: above
     settings:
       link: true
@@ -112,7 +112,7 @@ content:
     type: entity_reference_label
     region: content
   field_epa_operations:
-    weight: 13
+    weight: 12
     label: above
     settings:
       link: true
@@ -128,7 +128,7 @@ content:
     type: entity_reference_label
     region: content
   field_geographic_locations:
-    weight: 14
+    weight: 13
     label: above
     settings:
       link: true
@@ -136,7 +136,7 @@ content:
     type: entity_reference_label
     region: content
   field_health:
-    weight: 15
+    weight: 14
     label: above
     settings:
       link: true
@@ -144,7 +144,7 @@ content:
     type: entity_reference_label
     region: content
   field_industries:
-    weight: 16
+    weight: 15
     label: above
     settings:
       link: true
@@ -162,7 +162,7 @@ content:
     type: boolean
     region: content
   field_keywords:
-    weight: 18
+    weight: 17
     label: above
     settings:
       link: true
@@ -176,6 +176,11 @@ content:
     third_party_settings: {  }
     type: list_default
     region: content
+  field_links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_machine_name:
     weight: 23
     label: above
@@ -192,12 +197,19 @@ content:
     type: basic_string
     region: content
   field_pollution_prevention:
-    weight: 17
+    weight: 16
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_question:
+    weight: 0
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
     region: content
   field_r_and_a_and_technology:
     weight: 18
@@ -215,6 +227,23 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_related_questions:
+    weight: 2
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_review_deadline:
+    weight: 3
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_substances:
     weight: 20
     label: above
@@ -224,40 +253,16 @@ content:
     type: entity_reference_label
     region: content
   field_type:
-    weight: 5
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_links:
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_question:
-    weight: 1
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_related_questions:
-    weight: 3
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_review_deadline:
     weight: 4
     label: above
     settings:
-      format_type: medium
-      timezone_override: ''
+      link: true
     third_party_settings: {  }
-    type: datetime_default
+    type: entity_reference_label
     region: content
+  links:
+    weight: 27
+    region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden: {  }

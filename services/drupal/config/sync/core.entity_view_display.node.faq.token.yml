@@ -19,17 +19,17 @@ dependencies:
     - field.field.node.faq.field_health
     - field.field.node.faq.field_industries
     - field.field.node.faq.field_is_record
+    - field.field.node.faq.field_keywords
     - field.field.node.faq.field_language
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_pollution_prevention
     - field.field.node.faq.field_r_and_a_and_technology
     - field.field.node.faq.field_regulatory_industrial
-    - field.field.node.faq.field_substances
-    - field.field.node.faq.field_type
-    - field.field.node.faq.field_question
     - field.field.node.faq.field_related_questions
     - field.field.node.faq.field_review_deadline
+    - field.field.node.faq.field_substances
+    - field.field.node.faq.field_type
     - node.type.faq
   module:
     - datetime
@@ -168,6 +168,11 @@ content:
     third_party_settings: {  }
     type: list_default
     region: content
+  field_links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_machine_name:
     weight: 23
     label: above
@@ -207,35 +212,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
-  field_substances:
-    weight: 20
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_type:
-    weight: 5
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_links:
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_question:
-    weight: 1
-    label: hidden
-    settings:
-      trim_length: 80
-    third_party_settings: {  }
-    type: text_summary_or_trimmed
-    region: content
   field_related_questions:
     weight: 3
     label: above
@@ -253,4 +229,26 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-hidden: {  }
+  field_substances:
+    weight: 20
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_type:
+    weight: 5
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_keywords: true
