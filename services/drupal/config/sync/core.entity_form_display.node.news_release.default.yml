@@ -22,15 +22,15 @@ dependencies:
     - field.field.node.news_release.field_machine_name
     - field.field.node.news_release.field_pollution_prevention
     - field.field.node.news_release.field_press_office
+    - field.field.node.news_release.field_press_officers
     - field.field.node.news_release.field_r_and_a_and_technology
     - field.field.node.news_release.field_regulatory_industrial
-    - field.field.node.news_release.field_subjects
-    - field.field.node.news_release.field_substances
-    - field.field.node.news_release.field_type
-    - field.field.node.news_release.field_press_officers
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
     - field.field.node.news_release.field_secondary_headline
+    - field.field.node.news_release.field_subjects
+    - field.field.node.news_release.field_substances
+    - field.field.node.news_release.field_type
     - node.type.news_release
   module:
     - datetime
@@ -45,8 +45,8 @@ third_party_settings:
       children:
         - field_language
         - field_is_record
-      parent_name: ''
-      weight: 12
+      parent_name: group_additional_fields
+      weight: 13
       format_type: tab
       format_settings:
         id: ''
@@ -62,8 +62,8 @@ third_party_settings:
         - field_env_laws_regs_and_treaties
         - field_industries
         - field_substances
-      parent_name: ''
-      weight: 11
+      parent_name: group_additional_fields
+      weight: 12
       format_type: tab
       format_settings:
         id: ''
@@ -79,8 +79,8 @@ third_party_settings:
         - field_type
         - field_channel
         - field_machine_name
-      parent_name: ''
-      weight: 9
+      parent_name: group_additional_fields
+      weight: 10
       format_type: tab
       format_settings:
         id: ''
@@ -99,8 +99,8 @@ third_party_settings:
         - field_pollution_prevention
         - field_regulatory_industrial
         - field_r_and_a_and_technology
-      parent_name: ''
-      weight: 10
+      parent_name: group_additional_fields
+      weight: 11
       format_type: tab
       format_settings:
         id: ''
@@ -109,6 +109,20 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Taxonomy Topic'
+    group_additional_fields:
+      children:
+        - group_metadata
+        - group_topics
+        - group_facets
+        - group_other_metadata
+      parent_name: ''
+      weight: 9
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: 'Additional Fields'
 id: node.news_release.default
 targetEntityType: node
 bundle: news_release
@@ -125,7 +139,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 15
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -293,6 +307,18 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_press_officers:
+    type: entity_reference_paragraphs
+    weight: 3
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+    third_party_settings: {  }
+    region: content
   field_r_and_a_and_technology:
     weight: 43
     settings:
@@ -312,6 +338,26 @@ content:
       force_deepest: false
     third_party_settings: {  }
     type: options_shs
+    region: content
+  field_release:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_review_deadline:
+    weight: 8
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_secondary_headline:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
     region: content
   field_subjects:
     weight: 5
@@ -341,61 +387,29 @@ content:
     region: content
   path:
     type: path
-    weight: 13
+    weight: 14
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_press_officers:
-    type: entity_reference_paragraphs
-    weight: 3
-    settings:
-      title: Paragraph
-      title_plural: Paragraphs
-      edit_mode: open
-      add_mode: dropdown
-      form_display_mode: default
-      default_paragraph_type: ''
-    third_party_settings: {  }
-    region: content
   promote:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 17
     region: content
     third_party_settings: {  }
-  field_release:
-    weight: 2
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_review_deadline:
-    weight: 8
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_secondary_headline:
-    weight: 1
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: string_textfield
-    region: content
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 18
+    weight: 19
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 17
+    weight: 18
     region: content
     third_party_settings: {  }
   title:
@@ -408,7 +422,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 14
+    weight: 15
     region: content
     settings:
       match_operator: CONTAINS

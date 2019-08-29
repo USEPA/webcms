@@ -4,20 +4,20 @@ status: true
 dependencies:
   config:
     - field.field.node.event.body
-    - field.field.node.event.field_date
-    - field.field.node.event.field_deadline
-    - field.field.node.event.field_display_arcgis_map
-    - field.field.node.event.field_event_cancellation
-    - field.field.node.event.field_event_host
     - field.field.node.event.field_agency_function
     - field.field.node.event.field_audiences
     - field.field.node.event.field_channel
     - field.field.node.event.field_cooperation_assistance
+    - field.field.node.event.field_date
+    - field.field.node.event.field_deadline
     - field.field.node.event.field_description
+    - field.field.node.event.field_display_arcgis_map
     - field.field.node.event.field_emergencies_cleanup
     - field.field.node.event.field_env_laws_regs_and_treaties
     - field.field.node.event.field_environmental_media
     - field.field.node.event.field_epa_operations
+    - field.field.node.event.field_event_cancellation
+    - field.field.node.event.field_event_host
     - field.field.node.event.field_event_type
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_health
@@ -25,16 +25,16 @@ dependencies:
     - field.field.node.event.field_is_record
     - field.field.node.event.field_keywords
     - field.field.node.event.field_language
+    - field.field.node.event.field_links
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_page_head
     - field.field.node.event.field_pollution_prevention
     - field.field.node.event.field_r_and_a_and_technology
     - field.field.node.event.field_regulatory_industrial
+    - field.field.node.event.field_review_deadline
     - field.field.node.event.field_substances
     - field.field.node.event.field_type
-    - field.field.node.event.field_links
-    - field.field.node.event.field_review_deadline
     - node.type.event
   module:
     - address
@@ -50,8 +50,8 @@ third_party_settings:
       children:
         - field_language
         - field_is_record
-      parent_name: ''
-      weight: 15
+      parent_name: group_additional_fields
+      weight: 16
       format_type: tab
       format_settings:
         id: ''
@@ -67,8 +67,8 @@ third_party_settings:
         - field_env_laws_regs_and_treaties
         - field_industries
         - field_substances
-      parent_name: ''
-      weight: 13
+      parent_name: group_additional_fields
+      weight: 14
       format_type: tab
       format_settings:
         id: ''
@@ -85,8 +85,8 @@ third_party_settings:
         - field_channel
         - field_machine_name
         - field_geographic_locations
-      parent_name: ''
-      weight: 11
+      parent_name: group_additional_fields
+      weight: 12
       format_type: tab
       format_settings:
         id: ''
@@ -105,8 +105,8 @@ third_party_settings:
         - field_pollution_prevention
         - field_regulatory_industrial
         - field_r_and_a_and_technology
-      parent_name: ''
-      weight: 12
+      parent_name: group_additional_fields
+      weight: 13
       format_type: tab
       format_settings:
         id: ''
@@ -118,8 +118,8 @@ third_party_settings:
     group_javascript:
       children:
         - field_page_head
-      parent_name: ''
-      weight: 14
+      parent_name: group_additional_fields
+      weight: 15
       format_type: tab
       format_settings:
         id: ''
@@ -128,6 +128,21 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Page Javascript'
+    group_additional_fields:
+      children:
+        - group_metadata
+        - group_topics
+        - group_facets
+        - group_javascript
+        - group_other_metadata
+      parent_name: ''
+      weight: 11
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: 'Additional Fields'
 id: node.event.default
 targetEntityType: node
 bundle: event
@@ -144,44 +159,10 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 18
+    weight: 19
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_date:
-    weight: 2
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_deadline:
-    weight: 4
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_display_arcgis_map:
-    weight: 6
-    settings:
-      display_label: true
-    third_party_settings: {  }
-    type: boolean_checkbox
-    region: content
-  field_event_cancellation:
-    weight: 3
-    settings:
-      display_label: true
-    third_party_settings: {  }
-    type: boolean_checkbox
-    region: content
-  field_event_host:
-    weight: 9
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_agency_function:
     weight: 29
     settings:
@@ -218,6 +199,18 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_date:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_deadline:
+    weight: 4
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_description:
     weight: 10
     settings:
@@ -225,6 +218,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textarea
+    region: content
+  field_display_arcgis_map:
+    weight: 6
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
     region: content
   field_emergencies_cleanup:
     weight: 36
@@ -265,6 +265,21 @@ content:
       force_deepest: false
     third_party_settings: {  }
     type: options_shs
+    region: content
+  field_event_cancellation:
+    weight: 3
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_event_host:
+    weight: 9
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
     region: content
   field_event_type:
     weight: 10
@@ -324,6 +339,14 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  field_links:
+    weight: 8
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
   field_location:
     weight: 5
     settings: {  }
@@ -376,6 +399,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_review_deadline:
+    weight: 7
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_substances:
     weight: 33
     settings:
@@ -392,17 +421,9 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
-  field_links:
-    weight: 8
-    settings:
-      placeholder_url: ''
-      placeholder_title: ''
-    third_party_settings: {  }
-    type: link_default
-    region: content
   path:
     type: path
-    weight: 16
+    weight: 17
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -410,27 +431,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 19
+    weight: 20
     region: content
     third_party_settings: {  }
-  field_review_deadline:
-    weight: 7
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 21
+    weight: 22
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 20
+    weight: 21
     region: content
     third_party_settings: {  }
   title:
@@ -443,7 +458,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 17
+    weight: 18
     region: content
     settings:
       match_operator: CONTAINS
