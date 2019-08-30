@@ -1,0 +1,29 @@
+uuid: 0176a925-1d8b-4452-927e-01e77b6e27b9
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_epa_operations
+    - node.type.web_area
+    - taxonomy.vocabulary.epa_operations_topics
+id: node.web_area.field_epa_operations
+field_name: field_epa_operations
+entity_type: node
+bundle: web_area
+label: 'EPA Operations'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      epa_operations_topics: epa_operations_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -1,0 +1,29 @@
+uuid: 1c6e43c5-0da8-404f-ae8e-2e7b1215a30a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_type
+    - node.type.web_area
+    - taxonomy.vocabulary.type
+id: node.web_area.field_type
+field_name: field_type
+entity_type: node
+bundle: web_area
+label: Type
+description: 'Use <a href="https://www.epa.gov/webguide/metadata-basic-pages#type" class="external" target="_blank">this guide</a> for choosing the right type.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      type: type
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
