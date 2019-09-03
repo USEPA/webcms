@@ -1,0 +1,29 @@
+uuid: c6ed6a21-339f-4fc7-9ea4-b97ec418b5a2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_industries
+    - node.type.web_area
+    - taxonomy.vocabulary.industries
+id: node.web_area.field_industries
+field_name: field_industries
+entity_type: node
+bundle: web_area
+label: Industries
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      industries: industries
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

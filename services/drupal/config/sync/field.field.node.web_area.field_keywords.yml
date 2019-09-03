@@ -1,0 +1,29 @@
+uuid: cd305aa7-1f19-4925-9db6-d6e2504c447b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_keywords
+    - node.type.web_area
+    - taxonomy.vocabulary.keywords
+id: node.web_area.field_keywords
+field_name: field_keywords
+entity_type: node
+bundle: web_area
+label: Keywords
+description: 'A comma-separated list of keywords and phrases about the page. Do not repeat terms from title/description. Use terms that are part of your page or document content.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      keywords: keywords
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

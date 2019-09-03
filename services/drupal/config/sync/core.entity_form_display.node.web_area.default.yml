@@ -1,0 +1,449 @@
+uuid: f7ebedf0-f824-4093-b162-ccad2a65bec8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.web_area.body
+    - field.field.node.web_area.field_agency_function
+    - field.field.node.web_area.field_aside_block
+    - field.field.node.web_area.field_audiences
+    - field.field.node.web_area.field_channel
+    - field.field.node.web_area.field_contact_us_form
+    - field.field.node.web_area.field_cooperation_assistance
+    - field.field.node.web_area.field_description
+    - field.field.node.web_area.field_emergencies_cleanup
+    - field.field.node.web_area.field_env_laws_regs_and_treaties
+    - field.field.node.web_area.field_environmental_media
+    - field.field.node.web_area.field_epa_operations
+    - field.field.node.web_area.field_geographic_locations
+    - field.field.node.web_area.field_health
+    - field.field.node.web_area.field_industries
+    - field.field.node.web_area.field_is_record
+    - field.field.node.web_area.field_keywords
+    - field.field.node.web_area.field_language
+    - field.field.node.web_area.field_long_name
+    - field.field.node.web_area.field_machine_name
+    - field.field.node.web_area.field_page_head
+    - field.field.node.web_area.field_pollution_prevention
+    - field.field.node.web_area.field_r_and_a_and_technology
+    - field.field.node.web_area.field_regulatory_industrial
+    - field.field.node.web_area.field_review_deadline
+    - field.field.node.web_area.field_substances
+    - field.field.node.web_area.field_type
+    - field.field.node.web_area.field_web_area_type
+    - node.type.web_area
+    - workflows.workflow.epa_default
+  module:
+    - content_moderation
+    - datetime
+    - field_group
+    - path
+    - shs
+    - text
+    - webform
+third_party_settings:
+  field_group:
+    group_facets:
+      children:
+        - field_agency_function
+        - field_audiences
+        - field_env_laws_regs_and_treaties
+        - field_industries
+        - field_substances
+      parent_name: group_additional
+      weight: 23
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: 'Taxonomy Facets'
+    group_metadata:
+      children:
+        - field_description
+        - field_keywords
+        - field_type
+        - field_channel
+        - field_machine_name
+        - field_geographic_locations
+      parent_name: group_additional
+      weight: 21
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: open
+        description: ''
+        required_fields: true
+      label: 'Primary Metadata'
+    group_topics:
+      children:
+        - field_cooperation_assistance
+        - field_emergencies_cleanup
+        - field_environmental_media
+        - field_epa_operations
+        - field_health
+        - field_pollution_prevention
+        - field_regulatory_industrial
+        - field_r_and_a_and_technology
+      parent_name: group_additional
+      weight: 22
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: 'Taxonomy Topic'
+    group_other_metadata:
+      children:
+        - field_language
+        - field_is_record
+      parent_name: group_additional
+      weight: 25
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: 'Other Metadata'
+    group_javascript:
+      children:
+        - field_page_head
+      parent_name: group_additional
+      weight: 24
+      format_type: tab
+      format_settings:
+        id: ''
+        classes: ''
+        formatter: closed
+        description: ''
+        required_fields: true
+      label: 'Page Javascript'
+    group_additional:
+      children:
+        - group_metadata
+        - group_topics
+        - group_facets
+        - group_javascript
+        - group_other_metadata
+      parent_name: ''
+      weight: 7
+      format_type: tabs
+      format_settings:
+        id: ''
+        classes: ''
+        direction: vertical
+      label: 'Additional Fields'
+id: node.web_area.default
+targetEntityType: node
+bundle: web_area
+mode: default
+content:
+  body:
+    type: text_textarea_with_summary
+    weight: 4
+    region: content
+    settings:
+      rows: 9
+      summary_rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 9
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_agency_function:
+    weight: 29
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_aside_block:
+    weight: 3
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_audiences:
+    weight: 30
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_channel:
+    weight: 13
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_contact_us_form:
+    weight: 5
+    settings:
+      default_data: true
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: webform_entity_reference_autocomplete
+    region: content
+  field_cooperation_assistance:
+    weight: 35
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_description:
+    weight: 10
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textarea
+    region: content
+  field_emergencies_cleanup:
+    weight: 36
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_env_laws_regs_and_treaties:
+    weight: 31
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_environmental_media:
+    weight: 37
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_epa_operations:
+    weight: 39
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_geographic_locations:
+    weight: 15
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_health:
+    weight: 40
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_industries:
+    weight: 32
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_is_record:
+    weight: 46
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
+  field_keywords:
+    weight: 11
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete_tags
+    region: content
+  field_language:
+    weight: 45
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_long_name:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_machine_name:
+    weight: 14
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  field_page_head:
+    weight: 49
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textarea
+    region: content
+  field_pollution_prevention:
+    weight: 41
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_r_and_a_and_technology:
+    weight: 43
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_regulatory_industrial:
+    weight: 42
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_review_deadline:
+    weight: 6
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_substances:
+    weight: 33
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_type:
+    weight: 12
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_web_area_type:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  moderation_state:
+    type: moderation_state_default
+    weight: 14
+    settings: {  }
+    region: content
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 13
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 10
+    region: content
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 12
+    region: content
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 11
+    region: content
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 8
+    region: content
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }

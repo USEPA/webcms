@@ -1,0 +1,29 @@
+uuid: 08a22911-d396-458b-85d6-f1fd851d6633
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_r_and_a_and_technology
+    - node.type.web_area
+    - taxonomy.vocabulary.research_analysis_tech_topics
+id: node.web_area.field_r_and_a_and_technology
+field_name: field_r_and_a_and_technology
+entity_type: node
+bundle: web_area
+label: 'Research, Analysis & Technology'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      research_analysis_tech_topics: research_analysis_tech_topics
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

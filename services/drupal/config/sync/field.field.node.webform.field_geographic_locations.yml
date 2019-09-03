@@ -1,0 +1,29 @@
+uuid: d55cffeb-5ef3-48a5-a9f2-00ddb068229f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_geographic_locations
+    - node.type.webform
+    - taxonomy.vocabulary.geographic_locations
+id: node.webform.field_geographic_locations
+field_name: field_geographic_locations
+entity_type: node
+bundle: webform
+label: 'Geographic Locations'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      geographic_locations: geographic_locations
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
