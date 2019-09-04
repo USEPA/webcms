@@ -16,6 +16,7 @@ dependencies:
     - field.field.node.news_release.field_epa_operations
     - field.field.node.news_release.field_geographic_locations
     - field.field.node.news_release.field_health
+    - field.field.node.news_release.field_hublinks
     - field.field.node.news_release.field_industries
     - field.field.node.news_release.field_is_record
     - field.field.node.news_release.field_keywords
@@ -23,14 +24,15 @@ dependencies:
     - field.field.node.news_release.field_machine_name
     - field.field.node.news_release.field_pollution_prevention
     - field.field.node.news_release.field_press_office
+    - field.field.node.news_release.field_press_officers
     - field.field.node.news_release.field_r_and_a_and_technology
     - field.field.node.news_release.field_regulatory_industrial
-    - field.field.node.news_release.field_subjects
-    - field.field.node.news_release.field_substances
-    - field.field.node.news_release.field_type
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
     - field.field.node.news_release.field_secondary_headline
+    - field.field.node.news_release.field_subjects
+    - field.field.node.news_release.field_substances
+    - field.field.node.news_release.field_type
     - node.type.news_release
   module:
     - text
@@ -46,6 +48,11 @@ content:
     weight: 101
     settings:
       trim_length: 600
+    third_party_settings: {  }
+    region: content
+  content_moderation_control:
+    weight: -20
+    settings: {  }
     third_party_settings: {  }
     region: content
   links:
@@ -65,6 +72,7 @@ hidden:
   field_epa_operations: true
   field_geographic_locations: true
   field_health: true
+  field_hublinks: true
   field_industries: true
   field_is_record: true
   field_keywords: true
@@ -72,11 +80,12 @@ hidden:
   field_machine_name: true
   field_pollution_prevention: true
   field_press_office: true
+  field_press_officers: true
   field_r_and_a_and_technology: true
   field_regulatory_industrial: true
-  field_subjects: true
-  field_substances: true
-  field_type: true
   field_release: true
   field_review_deadline: true
   field_secondary_headline: true
+  field_subjects: true
+  field_substances: true
+  field_type: true
