@@ -4,37 +4,38 @@ status: true
 dependencies:
   config:
     - field.field.node.event.body
-    - field.field.node.event.field_date
-    - field.field.node.event.field_deadline
-    - field.field.node.event.field_display_arcgis_map
-    - field.field.node.event.field_event_cancellation
-    - field.field.node.event.field_event_host
     - field.field.node.event.field_agency_function
     - field.field.node.event.field_audiences
     - field.field.node.event.field_channel
     - field.field.node.event.field_cooperation_assistance
+    - field.field.node.event.field_date
+    - field.field.node.event.field_deadline
     - field.field.node.event.field_description
+    - field.field.node.event.field_display_arcgis_map
     - field.field.node.event.field_emergencies_cleanup
     - field.field.node.event.field_env_laws_regs_and_treaties
     - field.field.node.event.field_environmental_media
     - field.field.node.event.field_epa_operations
+    - field.field.node.event.field_event_cancellation
+    - field.field.node.event.field_event_host
     - field.field.node.event.field_event_type
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_health
+    - field.field.node.event.field_hublinks
     - field.field.node.event.field_industries
     - field.field.node.event.field_is_record
     - field.field.node.event.field_keywords
     - field.field.node.event.field_language
+    - field.field.node.event.field_links
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_page_head
     - field.field.node.event.field_pollution_prevention
     - field.field.node.event.field_r_and_a_and_technology
     - field.field.node.event.field_regulatory_industrial
+    - field.field.node.event.field_review_deadline
     - field.field.node.event.field_substances
     - field.field.node.event.field_type
-    - field.field.node.event.field_links
-    - field.field.node.event.field_review_deadline
     - node.type.event
   module:
     - address
@@ -55,51 +56,10 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_date:
-    weight: 102
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
+  content_moderation_control:
+    weight: -20
+    settings: {  }
     third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_deadline:
-    weight: 104
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_display_arcgis_map:
-    weight: 105
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_event_cancellation:
-    weight: 103
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_event_host:
-    weight: 106
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
     region: content
   field_agency_function:
     weight: 108
@@ -133,12 +93,40 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_date:
+    weight: 102
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_deadline:
+    weight: 104
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_description:
     weight: 128
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
+    region: content
+  field_display_arcgis_map:
+    weight: 105
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
     region: content
   field_emergencies_cleanup:
     weight: 111
@@ -172,6 +160,24 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_event_cancellation:
+    weight: 103
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+    region: content
+  field_event_host:
+    weight: 106
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
   field_event_type:
     weight: 130
     label: above
@@ -190,6 +196,14 @@ content:
     region: content
   field_health:
     weight: 116
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_hublinks:
+    weight: 130
     label: above
     settings:
       link: true
@@ -228,6 +242,18 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: list_default
+    region: content
+  field_links:
+    weight: 108
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
     region: content
   field_location:
     weight: 131
@@ -275,6 +301,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_review_deadline:
+    weight: 107
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_substances:
     weight: 122
     label: above
@@ -291,25 +326,9 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
-  field_links:
-    weight: 108
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
+  links:
+    weight: 100
+    settings: {  }
     third_party_settings: {  }
-    type: link
-    region: content
-  field_review_deadline:
-    weight: 107
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
     region: content
 hidden: {  }
