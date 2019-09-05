@@ -8,7 +8,7 @@ This module creates placeholder content items for nodes and taxonomies on instal
 
 ## Build
 
-This module was built using drush commands made available using the [default_content:1.x-dev](https://www.drupal.org/docs/8/modules/default-content-for-d8/overview which also depends on Drupal 8 core's hal and serialization modules.
+This module was built using drush commands made available using the [default_content:1.x-dev](https://www.drupal.org/docs/8/modules/default-content-for-d8/overview) which also depends on Drupal 8 core's hal and serialization modules.
 
 ### Setup
 1. After installing Default Content, you will create a custom module with a .info.yml file and a content directory.
