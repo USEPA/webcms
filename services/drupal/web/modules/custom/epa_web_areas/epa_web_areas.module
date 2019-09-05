@@ -45,11 +45,13 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
   if (isset($form['field_hublinks']) && $form_state->getFormObject() instanceof EntityForm) {
     $entity = $form_state->getformObject()->getEntity();
     $has_hublinks = FALSE;
-    foreach (GroupContent::loadByEntity($entity) as $group_content) {
-      $group = $group_content->getGroup();
-      $group_type = $group->getGroupType()->id();
-      if ($group_type == 'web_area' && $group->field_navigation_style->value == 'hublinks') {
-        $has_hublinks = TRUE;
+    if ($entity->id()) {
+      foreach (GroupContent::loadByEntity($entity) as $group_content) {
+        $group = $group_content->getGroup();
+        $group_type = $group->getGroupType()->id();
+        if ($group_type == 'web_area' && $group->field_navigation_style->value == 'hublinks') {
+          $has_hublinks = TRUE;
+        }
       }
     }
     $form['field_hublinks']['#access'] = $has_hublinks;
