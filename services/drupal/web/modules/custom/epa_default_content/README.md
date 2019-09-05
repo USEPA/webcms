@@ -28,7 +28,8 @@ This module was built using drush commands made available using the [default_con
     PowerShell example for multiple taxonomies using a file where each term id is on a new line.
     ```shell
     ForEach ( $line in [System.IO.File]::ReadLines("/path/to/file") ) { drush dcer taxonomy_term $line --folder=path/to/custom_module/content }
-```
+    ```
+
 4. Install the module with a new site making sure the Default Content module has already been installed.
 
 ### Notes
