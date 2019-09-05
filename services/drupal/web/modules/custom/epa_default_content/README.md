@@ -13,7 +13,7 @@ This module was built using drush commands made available by [default_content:1.
 ### Setup
 1. After installing Default Content, you will create a custom module with a .info.yml file and a content directory.
 2. Manually create your default content or perhaps use a tool like [Devel Generate](https://www.drupal.org/project/devel).
-3. Export content using `drush dcer`, which exports the content and any referenced entity (i.e. When exporting a node that contains a file field, both the node and the file entity with be exported).
+3. Export content using `drush dcer`, which exports the content and any referenced entity (i.e. when exporting a node that contains a file field, both the node and the file entity will be exported).
 
     Example for a single node.
     ```shell
