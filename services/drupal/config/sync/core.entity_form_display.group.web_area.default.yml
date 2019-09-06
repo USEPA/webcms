@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
     - group.type.web_area
@@ -13,6 +14,15 @@ targetEntityType: group
 bundle: web_area
 mode: default
 content:
+  field_editor_in_chief:
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
   field_navigation_style:
     weight: 3
     settings: {  }
