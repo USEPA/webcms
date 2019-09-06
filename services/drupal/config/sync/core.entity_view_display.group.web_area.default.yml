@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.group.web_area.field_contact_us_form
     - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
@@ -14,6 +15,14 @@ targetEntityType: group
 bundle: web_area
 mode: default
 content:
+  field_contact_us_form:
+    weight: 0
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_editor_in_chief:
     weight: -1
     label: above
