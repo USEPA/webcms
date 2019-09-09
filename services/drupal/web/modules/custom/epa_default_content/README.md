@@ -34,7 +34,7 @@ This module was built using drush commands made available by [default_content:1.
 
 ### Notes
 
-1. When exporting entity with its referenced entities, a user will also be exported. You may want to delete the users from the export if they already exist within the site where this custom module will be enabled.
+1. When exporting an entity with its referenced entities, a user will also be exported. You will want to delete the users from the export if they already exist within the site where this custom module will be enabled.
 2. There are a number of shortcomings.
     - Relies on command line tools to export content.
     - Has [one method](https://www.drupal.org/docs/8/modules/default-content-for-d8/overview#s-default-content-export-module) for handling multiple files, which requires knowing the UUID for each entity.
