@@ -29,12 +29,10 @@ dependencies:
     - field.field.node.web_area.field_review_deadline
     - field.field.node.web_area.field_substances
     - field.field.node.web_area.field_type
-    - field.field.node.web_area.field_web_area_type
     - node.type.web_area
     - workflows.workflow.epa_default
   module:
     - content_moderation
-    - datetime
     - field_group
     - path
     - shs
@@ -131,7 +129,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 7
+      weight: 4
       format_type: tabs
       format_settings:
         id: ''
@@ -145,7 +143,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 4
+    weight: 3
     region: content
     settings:
       rows: 9
@@ -154,7 +152,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 9
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -169,7 +167,7 @@ content:
     type: options_shs
     region: content
   field_aside_block:
-    weight: 3
+    weight: 2
     settings:
       rows: 5
       placeholder: ''
@@ -356,12 +354,6 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
-  field_review_deadline:
-    weight: 6
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_substances:
     weight: 33
     settings:
@@ -378,21 +370,15 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
-  field_web_area_type:
-    weight: 2
-    settings: {  }
-    third_party_settings: {  }
-    type: options_select
-    region: content
   moderation_state:
     type: moderation_state_default
-    weight: 14
+    weight: 11
     settings: {  }
     region: content
     third_party_settings: {  }
   path:
     type: path
-    weight: 13
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -400,21 +386,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 10
+    weight: 7
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 12
+    weight: 9
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 11
+    weight: 8
     region: content
     third_party_settings: {  }
   title:
@@ -427,11 +413,12 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 5
     region: content
     settings:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_review_deadline: true

@@ -93,7 +93,6 @@ third_party_settings:
         - field_type
         - field_channel
         - field_machine_name
-        - field_geographic_locations
       parent_name: group_additional_fields
       weight: 14
       format_type: tab
@@ -160,7 +159,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 14
+      weight: 13
       format_type: tabs
       format_settings:
         id: ''
@@ -183,7 +182,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 17
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -227,12 +226,6 @@ content:
     region: content
   field_comments_due_date:
     weight: 6
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_computed_comments_due_date:
-    weight: 18
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
@@ -332,16 +325,6 @@ content:
       default_paragraph_type: frc
     third_party_settings: {  }
     region: content
-  field_geographic_locations:
-    weight: 15
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_health:
     weight: 40
     settings:
@@ -421,12 +404,6 @@ content:
     third_party_settings: {  }
     type: string_textfield
     region: content
-  field_notice_sort_date:
-    weight: 20
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_page_head:
     weight: 49
     settings:
@@ -489,12 +466,6 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
-  field_review_deadline:
-    weight: 13
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_substances:
     weight: 33
     settings:
@@ -523,13 +494,13 @@ content:
     region: content
   moderation_state:
     type: moderation_state_default
-    weight: 23
+    weight: 22
     settings: {  }
     region: content
     third_party_settings: {  }
   path:
     type: path
-    weight: 15
+    weight: 14
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -537,21 +508,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 19
+    weight: 18
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 22
+    weight: 21
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 21
+    weight: 20
     region: content
     third_party_settings: {  }
   title:
@@ -564,11 +535,15 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 16
+    weight: 15
     region: content
     settings:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_computed_comments_due_date: true
+  field_geographic_locations: true
+  field_notice_sort_date: true
+  field_review_deadline: true

@@ -10,32 +10,6 @@ use Drupal\group\Entity\GroupContent;
 use Drupal\Core\Entity\EntityForm;
 
 /**
- * Implements hook_form_alter().
- *
- * - Used to hide Banner and Aside Block field from Web Area form input
- * if not a Microsite type.
- */
-function epa_web_areas_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  switch ($form_id) {
-    case 'node_web_area_form':
-    case 'node_web_area_edit_form':
-      // Add #states to Banner field.
-      // Add #states to Aside Block.
-      $form['field_aside_block']['#states'] = [
-        'visible' => [
-          ':input[name="field_web_area_type"]' => ['value' => 'WEB_AREA_TYPE_MICROSITE'],
-        ],
-      ];
-      $form['field_aside_block']['widget'][0]['#states'] = [
-        'required' => [
-          ':input[name="field_web_area_type"]' => ['value' => 'WEB_AREA_TYPE_MICROSITE'],
-        ],
-      ];
-      break;
-  }
-}
-
-/**
  * Implements hook_form_FORM_BASE_ID_alter().
  *
  * - Used to hide field_hublinks if content belongs to group using hublinks
