@@ -40,6 +40,7 @@ dependencies:
     - node.type.regulation
   module:
     - datetime
+    - datetime_range
     - entity_reference_revisions
     - options
     - text
@@ -126,13 +127,14 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   field_effective_dates:
-    weight: 103
+    weight: 134
     label: above
     settings:
+      separator: '-'
       format_type: medium
       timezone_override: ''
     third_party_settings: {  }
-    type: datetime_default
+    type: daterange_default
     region: content
   field_emergencies_cleanup:
     weight: 111
