@@ -15,6 +15,8 @@ if test "$CF_INSTANCE_INDEX" != 0; then
   exit 0
 fi
 
+drush_uri="$(sh /var/www/html/scripts/cloudfoundry/drush-uri.sh)"
+
 cd /var/www/html/web
 
-drush cron
+drush --uri="$drush_uri" cron

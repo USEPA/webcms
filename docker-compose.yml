@@ -101,6 +101,21 @@ services:
             }
           ]
         }
+
+      # The VCAP_APPLICATION environment variable governs attributes of the running app.
+      # As with VCAP_SERVICES above, we only inject a subset of the data that CloudFoundry
+      # makes available to us.
+      #
+      # Further reading: https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#VCAP-APPLICATION
+      #
+      # This value must be kept in sync with the drush container's VCAP_APPLICATION variable
+      # in docker-compose.cli.yml.
+      VCAP_APPLICATION: |
+        {
+          "application_uris": [
+            "localhost:8080"
+          ]
+        }
     ports:
       - 8080:80
       - 8443:443
