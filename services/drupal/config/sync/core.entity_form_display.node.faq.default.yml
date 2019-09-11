@@ -16,6 +16,7 @@ dependencies:
     - field.field.node.faq.field_faq_taxonomy_topics
     - field.field.node.faq.field_geographic_locations
     - field.field.node.faq.field_health
+    - field.field.node.faq.field_hublinks
     - field.field.node.faq.field_industries
     - field.field.node.faq.field_is_record
     - field.field.node.faq.field_keywords
@@ -31,8 +32,9 @@ dependencies:
     - field.field.node.faq.field_substances
     - field.field.node.faq.field_type
     - node.type.faq
+    - workflows.workflow.epa_default
   module:
-    - datetime
+    - content_moderation
     - field_group
     - path
     - shs
@@ -152,7 +154,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 14
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -269,6 +271,15 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_hublinks:
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
   field_industries:
     weight: 32
     settings:
@@ -364,12 +375,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
-  field_review_deadline:
-    weight: 5
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_substances:
     weight: 33
     settings:
@@ -386,9 +391,15 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  moderation_state:
+    type: moderation_state_default
+    weight: 13
+    settings: {  }
+    region: content
+    third_party_settings: {  }
   path:
     type: path
-    weight: 12
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -396,21 +407,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 10
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 17
+    weight: 12
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 11
     region: content
     third_party_settings: {  }
   title:
@@ -423,11 +434,12 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 13
+    weight: 8
     region: content
     settings:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_review_deadline: true

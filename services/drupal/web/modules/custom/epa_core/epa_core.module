@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_core.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_FORM_BASE_ID_alter().
+ *
+ * - Used to hide auto generate descriptions and keywords for news releases.
+ */
+function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  switch ($form_id) {
+    case 'node_news_release_form':
+    case 'node_news_release_edit_form':
+      $node = $form_state->getFormObject()->getEntity();
+      $node_langcode = $node->language()->getId();
+
+      // UI element for generating default description.
+      $description = $node->field_description->value;
+      $default_description = t('EPA News Release: @title', ['@title' => $node->label()], ['langcode' => $node_langcode]);
+
+      $form['generate_description'] = [
+        '#type' => 'checkbox',
+        '#title' => t('Generate automatic description'),
+        '#default_value' => !$node->label() || $description == $default_description ? TRUE : FALSE,
+        '#description' => t('Uncheck this to create a custom description below.'),
+        '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
+      ];
+
+      // UI element for generating default keywords.
+      $keywords = [];
+      foreach ($node->field_keywords as $keyword) {
+        if ($keyword->entity) {
+          $keywords[] = drupal_strtowlower($keyword->entity->label());
+        }
+      }
+      sort($keywords);
+      $keywords = implode(', ', $keywords);
+
+      $default_keywords = [];
+      foreach ($node->field_subjects as $subject) {
+        if ($subject->entity) {
+          $default_keywords[] = $subject->entity->label();
+        }
+      }
+      sort($default_keywords);
+      $default_keywords = implode(', ', $default_keywords);
+
+      $form['generate_keywords'] = [
+        '#type' => 'checkbox',
+        '#title' => t('Generate automatic keywords'),
+        '#default_value' => $keywords == $default_keywords,
+        '#description' => t('Uncheck this to add custom keywords below.'),
+        '#weight' => isset($form['field_keywords']['#weight']) ? (int) $form['field_keywords']['#weight'] - 0.5 : 8.5,
+      ];
+
+      // Use states to disable fields when checked.
+      $form['field_description']['#states']['!enabled']['input[name="generate_description"]'] = ['checked' => TRUE];
+      $form['field_keywords']['#states']['!enabled']['input[name="generate_keywords"]'] = ['checked' => TRUE];
+
+      // TODO: Validation.
+      //$form['field_description']['widget'][0]['#required'] = FALSE;
+      //$form['field_description']['widget'][0]['#element_validate'][] = ['epa_core_new_release_description_validate'];
+
+      break;
+  }
+}
+
+/**
+ * Implements hook_field_group_build_pre_render_alter().
+ *
+ * Move pseudo fields into relevant groups.
+ */
+function epa_core_field_group_build_pre_render_alter(&$element) {
+  if (isset($element['generate_description'])) {
+    $element['#group_children']['generate_description'] = 'group_metadata';
+    $element['group_additional_fields']['group_metadata']['generate_description'] = $element['generate_description'];
+    unset($element['generate_description']);
+  }
+  if (isset($element['generate_keywords'])) {
+    $element['#group_children']['generate_keywords'] = 'group_metadata';
+    $element['group_additional_fields']['group_metadata']['generate_keywords'] = $element['generate_keywords'];
+    unset($element['generate_keywords']);
+  }
+}

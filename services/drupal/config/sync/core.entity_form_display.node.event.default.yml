@@ -21,6 +21,7 @@ dependencies:
     - field.field.node.event.field_event_type
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_health
+    - field.field.node.event.field_hublinks
     - field.field.node.event.field_industries
     - field.field.node.event.field_is_record
     - field.field.node.event.field_keywords
@@ -36,9 +37,12 @@ dependencies:
     - field.field.node.event.field_substances
     - field.field.node.event.field_type
     - node.type.event
+    - workflows.workflow.epa_default
   module:
     - address
+    - content_moderation
     - datetime
+    - datetime_range
     - field_group
     - link
     - path
@@ -150,7 +154,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 1
+    weight: 6
     region: content
     settings:
       rows: 9
@@ -159,7 +163,7 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 19
+    weight: 14
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -200,13 +204,13 @@ content:
     type: options_shs
     region: content
   field_date:
-    weight: 2
+    weight: 1
     settings: {  }
     third_party_settings: {  }
-    type: datetime_default
+    type: daterange_default
     region: content
   field_deadline:
-    weight: 4
+    weight: 3
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
@@ -220,7 +224,7 @@ content:
     type: string_textarea
     region: content
   field_display_arcgis_map:
-    weight: 6
+    weight: 5
     settings:
       display_label: true
     third_party_settings: {  }
@@ -267,7 +271,7 @@ content:
     type: options_shs
     region: content
   field_event_cancellation:
-    weight: 3
+    weight: 2
     settings:
       display_label: true
     third_party_settings: {  }
@@ -282,7 +286,7 @@ content:
     type: string_textfield
     region: content
   field_event_type:
-    weight: 10
+    weight: 8
     settings: {  }
     third_party_settings: {  }
     type: options_select
@@ -306,6 +310,15 @@ content:
       force_deepest: false
     third_party_settings: {  }
     type: options_shs
+    region: content
+  field_hublinks:
+    weight: 10
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
     region: content
   field_industries:
     weight: 32
@@ -340,7 +353,7 @@ content:
     type: options_select
     region: content
   field_links:
-    weight: 8
+    weight: 7
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -348,7 +361,7 @@ content:
     type: link_default
     region: content
   field_location:
-    weight: 5
+    weight: 4
     settings: {  }
     third_party_settings: {  }
     type: address_default
@@ -399,12 +412,6 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
-  field_review_deadline:
-    weight: 7
-    settings: {  }
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_substances:
     weight: 33
     settings:
@@ -421,9 +428,15 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  moderation_state:
+    type: moderation_state_default
+    weight: 18
+    settings: {  }
+    region: content
+    third_party_settings: {  }
   path:
     type: path
-    weight: 17
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -431,21 +444,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 20
+    weight: 15
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 22
+    weight: 17
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 21
+    weight: 16
     region: content
     third_party_settings: {  }
   title:
@@ -458,11 +471,12 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 18
+    weight: 13
     region: content
     settings:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_review_deadline: true

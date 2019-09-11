@@ -15,6 +15,7 @@ dependencies:
     - field.field.node.news_release.field_epa_operations
     - field.field.node.news_release.field_geographic_locations
     - field.field.node.news_release.field_health
+    - field.field.node.news_release.field_hublinks
     - field.field.node.news_release.field_industries
     - field.field.node.news_release.field_is_record
     - field.field.node.news_release.field_keywords
@@ -22,15 +23,15 @@ dependencies:
     - field.field.node.news_release.field_machine_name
     - field.field.node.news_release.field_pollution_prevention
     - field.field.node.news_release.field_press_office
+    - field.field.node.news_release.field_press_officers
     - field.field.node.news_release.field_r_and_a_and_technology
     - field.field.node.news_release.field_regulatory_industrial
-    - field.field.node.news_release.field_subjects
-    - field.field.node.news_release.field_substances
-    - field.field.node.news_release.field_type
-    - field.field.node.news_release.field_press_officers
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
     - field.field.node.news_release.field_secondary_headline
+    - field.field.node.news_release.field_subjects
+    - field.field.node.news_release.field_substances
+    - field.field.node.news_release.field_type
     - node.type.news_release
   module:
     - datetime
@@ -47,6 +48,11 @@ content:
     label: hidden
     type: text_default
     weight: 101
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  content_moderation_control:
+    weight: -20
     settings: {  }
     third_party_settings: {  }
     region: content
@@ -137,6 +143,14 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_hublinks:
+    weight: 130
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_industries:
     weight: 117
     label: above
@@ -170,6 +184,11 @@ content:
     third_party_settings: {  }
     type: list_default
     region: content
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
   field_machine_name:
     weight: 127
     label: above
@@ -194,6 +213,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_press_officers:
+    type: entity_reference_revisions_entity_view
+    weight: 131
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
   field_r_and_a_and_technology:
     weight: 120
     label: above
@@ -209,44 +237,6 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
-    region: content
-  field_subjects:
-    weight: 130
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_substances:
-    weight: 122
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_type:
-    weight: 106
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_links:
-    weight: 100
-    settings: {  }
-    third_party_settings: {  }
-    region: content
-  field_press_officers:
-    type: entity_reference_revisions_entity_view
-    weight: 131
-    label: above
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
     region: content
   field_release:
     weight: 103
@@ -273,5 +263,34 @@ content:
       link_to_entity: false
     third_party_settings: {  }
     type: string
+    region: content
+  field_subjects:
+    weight: 130
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_substances:
+    weight: 122
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_type:
+    weight: 106
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
     region: content
 hidden: {  }
