@@ -5,10 +5,10 @@
 
 set -exuo pipefail
 
-export PATH="$PATH:/var/www/html/vendor/bin"
+drush_uri="$(sh /var/www/html/scripts/cloudfoundry/drush-uri.sh)"
 
 cd /var/www/html/web
 
-drush updb -y
-drush cim -y
-drush cr
+drush --uri="$drush_uri" updb -y
+drush --uri="$drush_uri" cim -y
+drush --uri="$drush_uri" cr

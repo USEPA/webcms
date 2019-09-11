@@ -62,6 +62,15 @@ services:
             }
           ]
         }
+
+      # See the docker-compose.yml for why we use this variable. Keep it in sync with
+      # the Drupal container's value!
+      VCAP_APPLICATION: |
+        {
+          "application_uris": [
+            "localhost:8080"
+          ]
+        }
     volumes:
       - ./services/drupal:/var/www/html:cached
       - type: volume

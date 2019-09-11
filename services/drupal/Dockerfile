@@ -32,18 +32,20 @@ RUN set -ex \
   && chmod 0700 /tmp/cache \
   # Install needed utilities
   && apk add --no-cache jq nginx tini \
-  && mkdir -p /run/nginx \
+  && mkdir -p /run/nginx /var/log/php-fpm \
   # Switch php-fpm to a Unix socket. It needs to be world-writable because the
   # nginx APK creates an 'nginx' user.
   # Doing this avoids issues where CloudFoundry assigns 9000 to $PORT, which would
   # otherwise be taken by PHP-FPM.
+  # We also redirect logs to files (see the entrypoint script).
   && { \
+    echo '[global]'; \
+    echo 'error_log = /var/log/php-fpm/error.log'; \
     echo '[www]'; \
     echo 'listen = /var/run/fpm.sock'; \
     echo 'listen.mode = 0666'; \
+    echo 'access.log = /var/log/php-fpm/access.log'; \
   } | tee /usr/local/etc/php-fpm.d/zz-docker.conf
-
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY load.environment.php ./
 COPY --from=build /app/scripts scripts
@@ -53,15 +55,19 @@ COPY --from=build /app/web web
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
 
+# Add the entrypoint script
+COPY scripts/cloudfoundry/entrypoint.sh /entrypoint.sh
+
+# Copy cron scripts into the /etc/periodic directories (these ship with busybox cron by default)
+COPY scripts/cloudfoundry/cron-drush.sh /etc/periodic/hourly/cron-drush
+COPY scripts/cloudfoundry/cron-truncate.sh /etc/periodic/daily/cron-truncate
+RUN chmod +x /etc/periodic/hourly/cron-drush /etc/periodic/daily/cron-truncate
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Ensure drush is available in the $PATH
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/var/www/html/vendor/bin
+
 ENTRYPOINT [ "tini", "-g", "-s", "--" ]
 
-CMD \
-  S3_BUCKET="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].credentials.bucket')" \
-  && S3_REGION="$(echo "$VCAP_SERVICES" | jq -r '.s3[0].credentials.region')" \
-  && sed -i \
-    -e s/S3_BUCKET/"$S3_BUCKET"/ \
-    -e s/S3_REGION/"$S3_REGION"/ \
-    -e s/PORT/"$PORT"/ \
-    /etc/nginx/conf.d/default.conf \
-  && php-fpm -D \
-  && exec nginx -g 'daemon off;'
+CMD ["sh", "/entrypoint.sh"]
