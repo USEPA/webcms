@@ -16,7 +16,10 @@ RUN set -ex \
     echo 'listen = /var/run/fpm.sock'; \
     echo 'listen.mode = 0666'; \
     echo 'access.log = /var/log/php-fpm/access.log'; \
-  } | tee /usr/local/etc/php-fpm.d/zz-docker.conf
+  } | tee /usr/local/etc/php-fpm.d/zz-docker.conf \
+  && { \
+    echo 'memory_limit = -1'; \
+  } | tee /usr/local/etc/php/php-cli.ini
 
 COPY scripts/cloudfoundry/entrypoint.sh /entrypoint.sh
 COPY scripts/cloudfoundry/cron-drush.sh /etc/periodic/hourly/cron-drush

@@ -45,7 +45,12 @@ RUN set -ex \
     echo 'listen = /var/run/fpm.sock'; \
     echo 'listen.mode = 0666'; \
     echo 'access.log = /var/log/php-fpm/access.log'; \
-  } | tee /usr/local/etc/php-fpm.d/zz-docker.conf
+  } | tee /usr/local/etc/php-fpm.d/zz-docker.conf \
+  # Allow Drush unlimited access to task memory
+  # php-cli.ini is only read by the CLI SAPI, so this won't affect the FPM workers.
+  && { \
+    echo 'memory_limit = -1'; \
+  } | tee /usr/local/etc/php/php-cli.ini
 
 COPY load.environment.php ./
 COPY --from=build /app/scripts scripts
