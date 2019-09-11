@@ -1,0 +1,66 @@
+uuid: bc71fb5e-3d86-4217-8701-17bbff8c368a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.group.web_area.field_contact_us_form
+    - field.field.group.web_area.field_editor_in_chief
+    - field.field.group.web_area.field_navigation_style
+    - field.field.group.web_area.field_publisher
+    - group.type.web_area
+  module:
+    - path
+id: group.web_area.default
+targetEntityType: group
+bundle: web_area
+mode: default
+content:
+  field_contact_us_form:
+    weight: 4
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_editor_in_chief:
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_navigation_style:
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
+  field_publisher:
+    weight: 1
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  label:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  uid: true

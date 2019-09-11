@@ -6,3 +6,28 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\group\Entity\GroupContent;
+use Drupal\Core\Entity\EntityForm;
+
+/**
+ * Implements hook_form_FORM_BASE_ID_alter().
+ *
+ * - Used to hide field_hublinks if content belongs to group using hublinks
+ * as its naviagtion style.
+ */
+function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['field_hublinks']) && $form_state->getFormObject() instanceof EntityForm) {
+    $entity = $form_state->getformObject()->getEntity();
+    $has_hublinks = FALSE;
+    if ($entity->id()) {
+      foreach (GroupContent::loadByEntity($entity) as $group_content) {
+        $group = $group_content->getGroup();
+        $group_type = $group->getGroupType()->id();
+        if ($group_type == 'web_area' && $group->field_navigation_style->value == 'hublinks') {
+          $has_hublinks = TRUE;
+        }
+      }
+    }
+    $form['field_hublinks']['#access'] = $has_hublinks;
+  }
+}

@@ -1,0 +1,29 @@
+uuid: 25e01908-428c-4538-856a-d857a7e8b1f8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.group.field_publisher
+    - group.type.web_area
+    - taxonomy.vocabulary.epa_organization
+id: group.web_area.field_publisher
+field_name: field_publisher
+entity_type: group
+bundle: web_area
+label: Publisher
+description: 'Choose your office from the pick list. As you start typing, you will see matching results.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      epa_organization: epa_organization
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
