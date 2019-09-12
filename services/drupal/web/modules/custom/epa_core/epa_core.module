@@ -35,7 +35,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = drupal_strtowlower($keyword->entity->label());
+          $keywords[] = drupal_strtolower($keyword->entity->label());
         }
       }
       sort($keywords);
