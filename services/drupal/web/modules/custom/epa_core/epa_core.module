@@ -62,11 +62,35 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $form['field_description']['#states']['!enabled']['input[name="generate_description"]'] = ['checked' => TRUE];
       $form['field_keywords']['#states']['!enabled']['input[name="generate_keywords"]'] = ['checked' => TRUE];
 
-      // TODO: Validation.
+      // @todo Validation.
       //$form['field_description']['widget'][0]['#required'] = FALSE;
       //$form['field_description']['widget'][0]['#element_validate'][] = ['epa_core_new_release_description_validate'];
 
       break;
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * See Drupal\link\Plugin\Field\FieldWidget\LinkWidget::formElement().
+ */
+function epa_core_field_widget_form_alter(&$element, FormStateInterface &$form_state, $context) {
+  // Overwrite uri description with configured description.
+  // Assumes that configured description supersedes default description
+  // and title is not used.
+  $field_parents = [
+    'field_legal_authorities',
+    'field_federal_register_citations',
+    'field_docket_numbers',
+    'field_cfr',
+  ];
+  if (
+    get_class($context['widget']) === 'Drupal\link\Plugin\Field\FieldWidget\LinkWidget' &&
+    in_array($element['#field_parents'][0], $field_parents) &&
+    !empty($element['#description'])
+  ) {
+    $element['uri']['#description'] = $element['#description'];
   }
 }
 
