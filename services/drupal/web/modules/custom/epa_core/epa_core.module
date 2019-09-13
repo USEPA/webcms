@@ -35,7 +35,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = drupal_strtowlower($keyword->entity->label());
+          $keywords[] = drupal_strtolower($keyword->entity->label());
         }
       }
       sort($keywords);
@@ -62,7 +62,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $form['field_description']['#states']['!enabled']['input[name="generate_description"]'] = ['checked' => TRUE];
       $form['field_keywords']['#states']['!enabled']['input[name="generate_keywords"]'] = ['checked' => TRUE];
 
-      // TODO: Validation.
+      // @todo Validation.
       //$form['field_description']['widget'][0]['#required'] = FALSE;
       //$form['field_description']['widget'][0]['#element_validate'][] = ['epa_core_new_release_description_validate'];
 
