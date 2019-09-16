@@ -5,6 +5,8 @@ dependencies:
   config:
     - field.field.group.web_area.field_contact_us_form
     - field.field.group.web_area.field_editor_in_chief
+    - field.field.group.web_area.field_homepage
+    - field.field.group.web_area.field_long_name
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
     - group.type.web_area
@@ -16,7 +18,7 @@ bundle: web_area
 mode: default
 content:
   field_contact_us_form:
-    weight: 4
+    weight: 6
     settings:
       match_operator: CONTAINS
       size: 60
@@ -25,7 +27,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_editor_in_chief:
-    weight: 2
+    weight: 3
     settings:
       match_operator: CONTAINS
       size: 60
@@ -33,14 +35,31 @@ content:
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
+  field_homepage:
+    weight: 4
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_long_name:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
   field_navigation_style:
-    weight: 3
+    weight: 5
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
     region: content
   field_publisher:
-    weight: 1
+    weight: 2
     settings:
       match_operator: CONTAINS
       size: 60
@@ -58,7 +77,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 5
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
