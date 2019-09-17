@@ -5,29 +5,78 @@
  * Contains epa_web_areas.module.
  */
 
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\group\Entity\GroupContent;
+use Drupal\block\Entity\Block;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\group\Entity\Group;
+use Drupal\group\Entity\GroupContent;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
  *
- * - Used to hide field_hublinks if content belongs to group using hublinks
- * as its naviagtion style.
+ * - Used to hide field_hublinks if content belongs to group using
+ * sidebar navigation as its naviagtion style.
  */
 function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if (isset($form['field_hublinks']) && $form_state->getFormObject() instanceof EntityForm) {
     $entity = $form_state->getformObject()->getEntity();
     $has_hublinks = FALSE;
     if ($entity->id()) {
-      foreach (GroupContent::loadByEntity($entity) as $group_content) {
+      $group_contents = GroupContent::loadByEntity($entity);
+      foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
-        $group_type = $group->getGroupType()->id();
-        if ($group_type == 'web_area' && $group->field_navigation_style->value == 'hublinks') {
-          $has_hublinks = TRUE;
-        }
+        $has_hublinks = _web_area_check_navigation_style($group);
       }
     }
     $form['field_hublinks']['#access'] = $has_hublinks;
   }
+}
+
+/**
+ * Implements hook_block_access().
+ *
+ * - Used to hide sidebar menu if content belongs to group using hublinks
+ * as its naviagtion style.
+ */
+function epa_web_areas_block_access(Block $block, $operation, AccountInterface $account) {
+  if ($operation == 'view' && $block->getPluginId() == 'groupmenus') {
+    $node = \Drupal::routeMatch()->getParameter('node');
+    $has_hublinks = TRUE;
+    if ($node) {
+      $group_contents = GroupContent::loadByEntity($node);
+      foreach ($group_contents as $group_content) {
+        $group = $group_content->getGroup();
+        $has_hublinks = _web_area_check_navigation_style($group);
+      }
+    }
+    else {
+      $group = \Drupal::routeMatch()->getParameter('group');
+      if ($group) {
+        $has_hublinks = _web_area_check_navigation_style($group);
+      }
+    }
+    return AccessResult::forbiddenIf($has_hublinks)->addCacheableDependency($block);
+  }
+  return AccessResult::neutral();
+}
+
+/**
+ * Helper function checking if web area has a navigation style.
+ *
+ * @param Drupal\group\Entity\Group $group
+ *   The $group enity.
+ * @param string $style
+ *   The navigation style being tested.
+ *
+ * @return bool
+ *   Returns true if navigation style is selected for group.
+ */
+function _web_area_check_navigation_style(Group $group, $style = 'hublinks') {
+  $group_type = $group->getGroupType()->id();
+  if ($group_type == 'web_area' && $group->field_navigation_style->value == $style) {
+    return TRUE;
+  }
+  return FALSE;
 }
