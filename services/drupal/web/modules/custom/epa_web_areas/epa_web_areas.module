@@ -22,7 +22,6 @@ use Drupal\group\Entity\GroupContent;
 function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if (isset($form['field_hublinks']) && $form_state->getFormObject() instanceof EntityForm) {
     $entity = $form_state->getformObject()->getEntity();
-    $has_hublinks = FALSE;
     if ($entity->id()) {
       $group_contents = GroupContent::loadByEntity($entity);
       foreach ($group_contents as $group_content) {
@@ -32,9 +31,7 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     elseif (isset($form_state->getStorage()['group'])) {
       $group = $form_state->getStorage()['group'];
     }
-    if (!empty($group)) {
-      $has_hublinks = _web_area_check_navigation_style($group);
-    }
+    $has_hublinks = !empty($group) ? _web_area_check_navigation_style($group) : FALSE;
     $form['field_hublinks']['#access'] = $has_hublinks;
   }
 }
@@ -48,20 +45,16 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
 function epa_web_areas_block_access(Block $block, $operation, AccountInterface $account) {
   if ($operation == 'view' && $block->getPluginId() == 'groupmenus') {
     $node = \Drupal::routeMatch()->getParameter('node');
-    $has_hublinks = TRUE;
     if ($node) {
       $group_contents = GroupContent::loadByEntity($node);
       foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
-        $has_hublinks = _web_area_check_navigation_style($group);
       }
     }
     else {
       $group = \Drupal::routeMatch()->getParameter('group');
-      if ($group) {
-        $has_hublinks = _web_area_check_navigation_style($group);
-      }
     }
+    $has_hublinks = !empty($group) ? _web_area_check_navigation_style($group) : TRUE;
     return AccessResult::forbiddenIf($has_hublinks)->addCacheableDependency($block);
   }
   return AccessResult::neutral();
