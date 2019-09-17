@@ -27,8 +27,13 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $group_contents = GroupContent::loadByEntity($entity);
       foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
-        $has_hublinks = _web_area_check_navigation_style($group);
       }
+    }
+    elseif (isset($form_state->getStorage()['group'])) {
+      $group = $form_state->getStorage()['group'];
+    }
+    if (!empty($group)) {
+      $has_hublinks = _web_area_check_navigation_style($group);
     }
     $form['field_hublinks']['#access'] = $has_hublinks;
   }
