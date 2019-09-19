@@ -825,7 +825,6 @@ if (isset($cf_service_bindings->redis32)) {
 if (isset($cf_service_bindings->elasticsearch56)) {
   list($es_settings) = $cf_service_bindings->elasticsearch56;
   $es_credentials = $es_settings->credentials;
-@
   $es_url = 'http://' . $es_credentials->hostname . ':' . $es_credentials->port;
 
   $config['elasticsearch_connector.cluster.elasticsearch']['url'] = $es_url;
@@ -839,7 +838,7 @@ $config_directories['sync'] = '../config/sync';
 
 $env_name = getenv('ENV_NAME');
 $env_state = getenv('ENV_STATE');
-if (!empty($env_name)){
+if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
 
