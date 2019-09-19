@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.page.body
     - field.field.node.page.field_administrator
     - field.field.node.page.field_agency_function
     - field.field.node.page.field_audiences
@@ -24,23 +23,27 @@ dependencies:
     - field.field.node.page.field_language
     - field.field.node.page.field_machine_name
     - field.field.node.page.field_page_head
+    - field.field.node.page.field_paragraphs
     - field.field.node.page.field_pollution_prevention
     - field.field.node.page.field_r_and_a_and_technology
     - field.field.node.page.field_regulatory_industrial
     - field.field.node.page.field_review_deadline
+    - field.field.node.page.field_sidebar_paragraphs
     - field.field.node.page.field_substances
     - field.field.node.page.field_subtype
     - field.field.node.page.field_type
     - field.field.node.page.field_wide_template
+    - field.field.node.page.layout_builder__layout
+    - field.field.node.page.layout_selection
     - node.type.page
     - workflows.workflow.epa_default
   module:
     - content_moderation
     - field_group
     - file
+    - paragraphs
     - path
     - shs
-    - text
 third_party_settings:
   field_group:
     group_additional:
@@ -51,7 +54,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 5
+      weight: 7
       format_type: tabs
       format_settings:
         id: ''
@@ -147,18 +150,9 @@ targetEntityType: node
 bundle: page
 mode: default
 content:
-  body:
-    type: text_textarea_with_summary
-    weight: 1
-    region: content
-    settings:
-      rows: 9
-      summary_rows: 3
-      placeholder: ''
-    third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 7
+    weight: 9
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -213,7 +207,7 @@ content:
     type: string_textarea
     region: content
   field_documents:
-    weight: 2
+    weight: 4
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
@@ -280,7 +274,7 @@ content:
     type: options_shs
     region: content
   field_hublinks:
-    weight: 4
+    weight: 6
     settings:
       match_operator: CONTAINS
       size: 60
@@ -336,6 +330,18 @@ content:
     third_party_settings: {  }
     type: string_textarea
     region: content
+  field_paragraphs:
+    weight: 2
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+    third_party_settings: {  }
+    type: entity_reference_paragraphs
+    region: content
   field_pollution_prevention:
     weight: 41
     settings:
@@ -366,6 +372,18 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_sidebar_paragraphs:
+    type: entity_reference_paragraphs
+    weight: 3
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+    third_party_settings: {  }
+    region: content
   field_substances:
     weight: 33
     settings:
@@ -389,21 +407,27 @@ content:
     type: options_select
     region: content
   field_wide_template:
-    weight: 3
+    weight: 5
     settings:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
     region: content
+  layout_selection:
+    type: options_buttons
+    region: content
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 12
+    weight: 14
     settings: {  }
     region: content
     third_party_settings: {  }
   path:
     type: path
-    weight: 10
+    weight: 12
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -411,21 +435,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 8
+    weight: 10
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 11
+    weight: 13
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 9
+    weight: 11
     region: content
     third_party_settings: {  }
   title:
@@ -438,7 +462,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 6
+    weight: 8
     region: content
     settings:
       match_operator: CONTAINS
@@ -447,3 +471,4 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  layout_builder__layout: true

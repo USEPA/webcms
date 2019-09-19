@@ -1,0 +1,51 @@
+uuid: 33014e9b-c110-488e-81f0-82d6bfbf7c8c
+langcode: en
+status: true
+dependencies: {  }
+id: basic_two_column
+label: 'Basic two column'
+targetEntityType: node
+targetBundle: page
+layout:
+  -
+    layout_id: layout_twocol_section
+    layout_settings:
+      column_widths: 67-33
+    components:
+      b60f6512-1372-47bf-b8a9-0df42e105efb:
+        uuid: b60f6512-1372-47bf-b8a9-0df42e105efb
+        region: first
+        configuration:
+          id: 'field_block:node:page:field_paragraphs'
+          label: Body
+          provider: layout_builder
+          label_display: '0'
+          formatter:
+            label: hidden
+            type: entity_reference_revisions_entity_view
+            settings:
+              view_mode: default
+            third_party_settings: {  }
+          context_mapping:
+            entity: layout_builder.entity
+        additional: {  }
+        weight: 0
+      41d6fe6b-ad82-4702-a05f-7d84393208a7:
+        uuid: 41d6fe6b-ad82-4702-a05f-7d84393208a7
+        region: second
+        configuration:
+          id: 'field_block:node:page:field_sidebar_paragraphs'
+          label: Sidebar
+          provider: layout_builder
+          label_display: '0'
+          formatter:
+            label: hidden
+            type: entity_reference_revisions_entity_view
+            settings:
+              view_mode: default
+            third_party_settings: {  }
+          context_mapping:
+            entity: layout_builder.entity
+        additional: {  }
+        weight: 0
+    third_party_settings: {  }
