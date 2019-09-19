@@ -1,0 +1,26 @@
+uuid: d44ac4be-cf8d-46f3-9bef-ba191d5e62a0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.library_item.field_paragraph
+    - paragraphs.paragraphs_type.library_item
+  module:
+    - entity_reference_revisions
+id: paragraph.library_item.default
+targetEntityType: paragraph
+bundle: library_item
+mode: default
+content:
+  field_paragraph:
+    weight: 0
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_autocomplete
+    region: content
+hidden:
+  created: true
+  status: true
