@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.web_area.body
     - field.field.node.web_area.field_agency_function
     - field.field.node.web_area.field_aside_block
     - field.field.node.web_area.field_audiences
@@ -21,6 +20,7 @@ dependencies:
     - field.field.node.web_area.field_language
     - field.field.node.web_area.field_machine_name
     - field.field.node.web_area.field_page_head
+    - field.field.node.web_area.field_paragraphs
     - field.field.node.web_area.field_pollution_prevention
     - field.field.node.web_area.field_r_and_a_and_technology
     - field.field.node.web_area.field_regulatory_industrial
@@ -31,6 +31,7 @@ dependencies:
     - node.type.web_area
   module:
     - datetime
+    - entity_reference_revisions
     - layout_builder
     - layout_discovery
     - options
@@ -45,34 +46,29 @@ third_party_settings:
         layout_id: layout_onecol
         layout_settings: {  }
         components:
-          ad78a25f-8cca-4917-b8a2-7457358687da:
-            uuid: ad78a25f-8cca-4917-b8a2-7457358687da
+          ae4fd28a-00e4-4f65-9abd-429f78dcd867:
+            uuid: ae4fd28a-00e4-4f65-9abd-429f78dcd867
             region: content
             configuration:
               label_display: '0'
               context_mapping:
                 entity: layout_builder.entity
-              id: 'field_block:node:web_area:body'
+              id: 'field_block:node:web_area:field_paragraphs'
               formatter:
-                label: hidden
-                type: text_default
-                settings: {  }
+                type: entity_reference_revisions_entity_view
+                label: above
+                settings:
+                  view_mode: default
+                  link: ''
                 third_party_settings: {  }
             additional: {  }
-            weight: 2
+            weight: 0
         third_party_settings: {  }
 id: node.web_area.default
 targetEntityType: node
 bundle: web_area
 mode: default
 content:
-  body:
-    label: hidden
-    type: text_default
-    weight: 101
-    settings: {  }
-    third_party_settings: {  }
-    region: content
   content_moderation_control:
     weight: -20
     settings: {  }
@@ -209,6 +205,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: basic_string
+    region: content
+  field_paragraphs:
+    type: entity_reference_revisions_entity_view
+    weight: 130
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
     region: content
   field_pollution_prevention:
     weight: 119
