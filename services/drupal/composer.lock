@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f9750e96bd752473db496f4cee490f5e",
+    "content-hash": "8c1b9f3c855e14f86f9e595ce565e460",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -2529,6 +2529,58 @@
             }
         },
         {
+            "name": "drupal/config_ignore",
+            "version": "dev-2.x",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/config_ignore.git",
+                "reference": "2b1740411fd1eb8bb139711be5e10535c40ddbbf"
+            },
+            "require": {
+                "drupal/config_filter": "1.*",
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-2.x": "2.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-2.1+5-dev",
+                    "datestamp": "1537980780",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Tommy Lynge Jørgensen",
+                    "homepage": "https://www.drupal.org/u/tlyngej",
+                    "email": "tlyngej@gmail.com",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Fabian Bircher",
+                    "homepage": "https://www.drupal.org/u/bircher",
+                    "role": "Maintainer"
+                }
+            ],
+            "description": "Ignore certain configuration during import.",
+            "homepage": "http://drupal.org/project/config_ignore",
+            "support": {
+                "source": "http://cgit.drupalcode.org/config_ignore",
+                "issues": "http://drupal.org/project/config_ignore",
+                "irc": "irc://irc.freenode.org/drupal-contribute"
+            },
+            "time": "2018-09-26T16:48:09+00:00"
+        },
+        {
             "name": "drupal/console",
             "version": "1.9.2",
             "source": {
@@ -3447,7 +3499,8 @@
                 },
                 "patches_applied": {
                     "Media enabler": "https://www.drupal.org/files/issues/2019-05-30/media-enabler-2984315-31.patch",
-                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2019-08-12/group-support_string_entity_ids-2797793-168.patch"
+                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2019-08-12/group-support_string_entity_ids-2797793-168.patch",
+                    "admin/group view (groups list) is not found": "https://www.drupal.org/files/issues/2019-08-02/group-3062380-15.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -3506,6 +3559,10 @@
                         "status": "not-covered",
                         "message": "Beta releases are not covered by Drupal security advisories."
                     }
+                },
+                "patches_applied": {
+                    "Change references to entity_id field in group content": "https://www.drupal.org/files/issues/2019-04-04/groupmenu-change_references_to_entity_id-3010909-9.patch",
+                    "Add max depth option to group menu block": "https://www.drupal.org/files/issues/2019-08-22/group-menu-max-depth-3076635-2.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -10359,6 +10416,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "drupal/auto_entitylabel": 10,
+        "drupal/config_ignore": 20,
         "drupal/custom_add_another": 10,
         "drupal/default_content": 20,
         "drupal/group": 5,
