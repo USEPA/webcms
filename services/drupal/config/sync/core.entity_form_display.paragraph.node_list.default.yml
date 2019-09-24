@@ -1,0 +1,44 @@
+uuid: f62761a5-cfb7-4f95-945c-453b95da9d47
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.node_list.field_body
+    - field.field.paragraph.node_list.field_node_ref
+    - field.field.paragraph.node_list.field_title
+    - paragraphs.paragraphs_type.node_list
+  module:
+    - text
+id: paragraph.node_list.default
+targetEntityType: paragraph
+bundle: node_list
+mode: default
+content:
+  field_body:
+    weight: 1
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_node_ref:
+    weight: 2
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_title:
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true
