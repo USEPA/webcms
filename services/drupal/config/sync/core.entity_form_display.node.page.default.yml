@@ -24,11 +24,11 @@ dependencies:
     - field.field.node.page.field_machine_name
     - field.field.node.page.field_page_head
     - field.field.node.page.field_paragraphs
+    - field.field.node.page.field_paragraphs_1
     - field.field.node.page.field_pollution_prevention
     - field.field.node.page.field_r_and_a_and_technology
     - field.field.node.page.field_regulatory_industrial
     - field.field.node.page.field_review_deadline
-    - field.field.node.page.field_paragraphs_1
     - field.field.node.page.field_substances
     - field.field.node.page.field_subtype
     - field.field.node.page.field_type
@@ -336,14 +336,21 @@ content:
       title: Paragraph
       title_plural: Paragraphs
       edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
       add_mode: dropdown
       form_display_mode: default
-      default_paragraph_type: ''
+      default_paragraph_type: _none
+      features:
+        duplicate: duplicate
+        collapse_edit_all: collapse_edit_all
+        add_above: '0'
     third_party_settings: {  }
-    type: entity_reference_paragraphs
+    type: paragraphs
     region: content
   field_paragraphs_1:
-    type: entity_reference_paragraphs
+    type: paragraphs
     weight: 3
     settings:
       title: Paragraph
@@ -352,6 +359,12 @@ content:
       add_mode: dropdown
       form_display_mode: default
       default_paragraph_type: ''
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      features:
+        duplicate: duplicate
+        collapse_edit_all: collapse_edit_all
     third_party_settings: {  }
     region: content
   field_pollution_prevention:
