@@ -12,4 +12,7 @@ RUN set -ex \
   )" \
   && apk add --virtual .docker-phpexts-rundeps $runDeps \
   && apk del .build-deps \
-  && apk add --no-cache mysql-client openssh rsync
+  && apk add --no-cache mysql-client openssh rsync \
+  && { \
+    echo 'memory_limit = -1'; \
+  } | tee /usr/local/etc/php/conf.d/custom.ini
