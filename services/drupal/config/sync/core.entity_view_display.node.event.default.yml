@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.event.body
     - field.field.node.event.field_agency_function
     - field.field.node.event.field_audiences
     - field.field.node.event.field_channel
@@ -30,6 +29,7 @@ dependencies:
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_page_head
+    - field.field.node.event.field_paragraphs
     - field.field.node.event.field_pollution_prevention
     - field.field.node.event.field_r_and_a_and_technology
     - field.field.node.event.field_regulatory_industrial
@@ -41,29 +41,22 @@ dependencies:
     - address
     - datetime
     - datetime_range
+    - entity_reference_revisions
     - link
     - options
-    - text
     - user
 id: node.event.default
 targetEntityType: node
 bundle: event
 mode: default
 content:
-  body:
-    label: hidden
-    type: text_default
-    weight: 101
-    settings: {  }
-    third_party_settings: {  }
-    region: content
   content_moderation_control:
-    weight: -20
+    weight: 0
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
   field_agency_function:
-    weight: 108
+    weight: 12
     label: above
     settings:
       link: true
@@ -71,7 +64,7 @@ content:
     type: entity_reference_label
     region: content
   field_audiences:
-    weight: 109
+    weight: 13
     label: above
     settings:
       link: true
@@ -79,7 +72,7 @@ content:
     type: entity_reference_label
     region: content
   field_channel:
-    weight: 107
+    weight: 9
     label: above
     settings:
       link: true
@@ -87,7 +80,7 @@ content:
     type: entity_reference_label
     region: content
   field_cooperation_assistance:
-    weight: 110
+    weight: 14
     label: above
     settings:
       link: true
@@ -95,7 +88,7 @@ content:
     type: entity_reference_label
     region: content
   field_date:
-    weight: 102
+    weight: 3
     label: above
     settings:
       separator: '-'
@@ -105,7 +98,7 @@ content:
     type: daterange_default
     region: content
   field_deadline:
-    weight: 104
+    weight: 5
     label: above
     settings:
       format_type: medium
@@ -114,14 +107,14 @@ content:
     type: datetime_default
     region: content
   field_description:
-    weight: 128
+    weight: 29
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
   field_display_arcgis_map:
-    weight: 105
+    weight: 6
     label: above
     settings:
       format: default
@@ -131,7 +124,7 @@ content:
     type: boolean
     region: content
   field_emergencies_cleanup:
-    weight: 111
+    weight: 15
     label: above
     settings:
       link: true
@@ -139,7 +132,7 @@ content:
     type: entity_reference_label
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 112
+    weight: 16
     label: above
     settings:
       link: true
@@ -147,7 +140,7 @@ content:
     type: entity_reference_label
     region: content
   field_environmental_media:
-    weight: 113
+    weight: 17
     label: above
     settings:
       link: true
@@ -155,7 +148,7 @@ content:
     type: entity_reference_label
     region: content
   field_epa_operations:
-    weight: 114
+    weight: 18
     label: above
     settings:
       link: true
@@ -163,7 +156,7 @@ content:
     type: entity_reference_label
     region: content
   field_event_cancellation:
-    weight: 103
+    weight: 4
     label: above
     settings:
       format: default
@@ -173,7 +166,7 @@ content:
     type: boolean
     region: content
   field_event_host:
-    weight: 106
+    weight: 8
     label: above
     settings:
       link_to_entity: false
@@ -181,7 +174,7 @@ content:
     type: string
     region: content
   field_event_type:
-    weight: 130
+    weight: 32
     label: above
     settings:
       link: true
@@ -189,7 +182,7 @@ content:
     type: entity_reference_label
     region: content
   field_geographic_locations:
-    weight: 115
+    weight: 19
     label: above
     settings:
       link: true
@@ -197,7 +190,7 @@ content:
     type: entity_reference_label
     region: content
   field_health:
-    weight: 116
+    weight: 20
     label: above
     settings:
       link: true
@@ -205,7 +198,7 @@ content:
     type: entity_reference_label
     region: content
   field_hublinks:
-    weight: 130
+    weight: 31
     label: above
     settings:
       link: true
@@ -213,7 +206,7 @@ content:
     type: entity_reference_label
     region: content
   field_industries:
-    weight: 117
+    weight: 21
     label: above
     settings:
       link: true
@@ -221,7 +214,7 @@ content:
     type: entity_reference_label
     region: content
   field_is_searchable_collection:
-    weight: 131
+    weight: 33
     label: above
     settings:
       format: default
@@ -231,7 +224,7 @@ content:
     type: boolean
     region: content
   field_keywords:
-    weight: 118
+    weight: 22
     label: above
     settings:
       link: true
@@ -239,14 +232,14 @@ content:
     type: entity_reference_label
     region: content
   field_language:
-    weight: 125
+    weight: 27
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_links:
-    weight: 108
+    weight: 11
     label: above
     settings:
       trim_length: 80
@@ -258,14 +251,14 @@ content:
     type: link
     region: content
   field_location:
-    weight: 131
+    weight: 34
     label: above
     settings: {  }
     third_party_settings: {  }
     type: address_default
     region: content
   field_machine_name:
-    weight: 127
+    weight: 28
     label: above
     settings:
       link_to_entity: false
@@ -273,14 +266,23 @@ content:
     type: string
     region: content
   field_page_head:
-    weight: 129
+    weight: 30
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
+  field_paragraphs:
+    weight: 2
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
   field_pollution_prevention:
-    weight: 119
+    weight: 23
     label: above
     settings:
       link: true
@@ -288,7 +290,7 @@ content:
     type: entity_reference_label
     region: content
   field_r_and_a_and_technology:
-    weight: 120
+    weight: 24
     label: above
     settings:
       link: true
@@ -296,7 +298,7 @@ content:
     type: entity_reference_label
     region: content
   field_regulatory_industrial:
-    weight: 121
+    weight: 25
     label: above
     settings:
       link: true
@@ -304,7 +306,7 @@ content:
     type: entity_reference_label
     region: content
   field_review_deadline:
-    weight: 107
+    weight: 10
     label: above
     settings:
       format_type: medium
@@ -313,7 +315,7 @@ content:
     type: datetime_default
     region: content
   field_substances:
-    weight: 122
+    weight: 26
     label: above
     settings:
       link: true
@@ -321,7 +323,7 @@ content:
     type: entity_reference_label
     region: content
   field_type:
-    weight: 106
+    weight: 7
     label: above
     settings:
       link: true
@@ -329,8 +331,8 @@ content:
     type: entity_reference_label
     region: content
   links:
-    weight: 100
+    weight: 1
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden: {  }
