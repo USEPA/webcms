@@ -5,8 +5,6 @@ dependencies:
   config:
     - field.storage.paragraph.field_paragraphs
     - paragraphs.paragraphs_type.box
-    - paragraphs.paragraphs_type.html
-    - paragraphs.paragraphs_type.link_list
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -28,9 +26,7 @@ settings:
   handler: 'default:paragraph'
   handler_settings:
     negate: 0
-    target_bundles:
-      html: html
-      link_list: link_list
+    target_bundles: null
     target_bundles_drag_drop:
       box:
         weight: 12
@@ -51,14 +47,14 @@ settings:
         weight: 17
         enabled: false
       html:
-        enabled: true
         weight: 18
+        enabled: false
       legal_authorities:
         weight: 19
         enabled: false
       link_list:
-        enabled: true
         weight: 20
+        enabled: false
       locations_of_prop_actions:
         weight: 21
         enabled: false
