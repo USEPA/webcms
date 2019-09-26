@@ -3,25 +3,15 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.link_list.field_body
     - field.field.paragraph.link_list.field_links
-    - field.field.paragraph.link_list.field_title
     - paragraphs.paragraphs_type.link_list
   module:
     - link
-    - text
 id: paragraph.link_list.default
 targetEntityType: paragraph
 bundle: link_list
 mode: default
 content:
-  field_body:
-    weight: 1
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
   field_links:
     weight: 2
     label: above
@@ -33,13 +23,5 @@ content:
       target: ''
     third_party_settings: {  }
     type: link
-    region: content
-  field_title:
-    weight: 0
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
     region: content
 hidden: {  }
