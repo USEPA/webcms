@@ -3,7 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.event.body
     - field.field.node.event.field_agency_function
     - field.field.node.event.field_audiences
     - field.field.node.event.field_channel
@@ -30,6 +29,7 @@ dependencies:
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_page_head
+    - field.field.node.event.field_paragraphs
     - field.field.node.event.field_pollution_prevention
     - field.field.node.event.field_r_and_a_and_technology
     - field.field.node.event.field_regulatory_industrial
@@ -45,9 +45,9 @@ dependencies:
     - datetime_range
     - field_group
     - link
+    - paragraphs
     - path
     - shs
-    - text
 third_party_settings:
   field_group:
     group_other_metadata:
@@ -152,15 +152,6 @@ targetEntityType: node
 bundle: event
 mode: default
 content:
-  body:
-    type: text_textarea_with_summary
-    weight: 6
-    region: content
-    settings:
-      rows: 9
-      summary_rows: 3
-      placeholder: ''
-    third_party_settings: {  }
   created:
     type: datetime_timestamp
     weight: 14
@@ -381,6 +372,24 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textarea
+    region: content
+  field_paragraphs:
+    weight: 6
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      features:
+        duplicate: duplicate
+        collapse_edit_all: collapse_edit_all
+    third_party_settings: {  }
+    type: paragraphs
     region: content
   field_pollution_prevention:
     weight: 41
