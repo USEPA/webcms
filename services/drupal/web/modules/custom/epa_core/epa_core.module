@@ -88,3 +88,16 @@ function epa_core_field_group_build_pre_render_alter(&$element) {
     unset($element['generate_keywords']);
   }
 }
+
+/**
+ * Implements hook_token_info().
+ */
+function epa_core_token_info() {
+  $tokens['machine-name-alias'] = [
+    'name' => t('Machine name alias'),
+    'description' => t('Machine name field.'),
+  ];
+  return [
+    'tokens' => ['node' => $tokens],
+  ];
+}
