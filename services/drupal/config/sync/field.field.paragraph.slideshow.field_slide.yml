@@ -1,0 +1,34 @@
+uuid: 18645840-6724-41a7-b9f4-9d35da473732
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_slide
+    - media.type.image
+    - paragraphs.paragraphs_type.slideshow
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: paragraph.slideshow.field_slide
+field_name: field_slide
+entity_type: paragraph
+bundle: slideshow
+label: Slide
+description: 'The more images added to the page the slower the resulting web page will load.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

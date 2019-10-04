@@ -4,7 +4,6 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.news_release.body
     - field.field.node.news_release.field_agency_function
     - field.field.node.news_release.field_audiences
     - field.field.node.news_release.field_channel
@@ -35,21 +34,12 @@ dependencies:
     - field.field.node.news_release.field_type
     - node.type.news_release
   module:
-    - text
     - user
 id: node.news_release.teaser
 targetEntityType: node
 bundle: news_release
 mode: teaser
 content:
-  body:
-    label: hidden
-    type: text_summary_or_trimmed
-    weight: 101
-    settings:
-      trim_length: 600
-    third_party_settings: {  }
-    region: content
   content_moderation_control:
     weight: -20
     settings: {  }
