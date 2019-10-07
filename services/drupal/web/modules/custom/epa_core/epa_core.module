@@ -101,3 +101,40 @@ function epa_core_token_info() {
     'tokens' => ['node' => $tokens],
   ];
 }
+
+/**
+ * Implements hook_tokens().
+ */
+function epa_core_tokens($type, $tokens, $data = [], $options = []) {
+
+  $replacements = [];
+
+  if ($type == 'node' && !empty($data['node'])) {
+    $node = $data['node'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'machine-name-alias':
+          $replacements[$original] = _epa_core_get_machine_name_alias($node);
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}
+
+/**
+ * Helper function to determine node machine name.
+ */
+function _epa_core_get_machine_name_alias($node) {
+  $alias_string = '';
+
+  if (!$node->field_machine_name->isEmpty()) {
+    $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($node->field_machine_name->value);
+  }
+  if (empty($alias_string)) {
+    $alias_string = $node->getTitle();
+  }
+
+  return $alias_string;
+}
