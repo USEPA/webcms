@@ -129,12 +129,19 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
 function _epa_core_get_machine_name_alias($node) {
   $alias_string = '';
 
+  // Set alias_string to pathauto cleaned url if given a machine name.
   if (!$node->field_machine_name->isEmpty()) {
     $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($node->field_machine_name->value);
   }
-  if (empty($alias_string)) {
-    $alias_string = $node->getTitle();
+
+  // If cleaned string is empty set alias_string to group's title
+  // for web areas.
+  if (empty($alias_string) && $node->getType() == 'web_area') {
+    $token_service = \Drupal::token();
+    $options = ['clear' => TRUE];
+    $alias_string = $token_service->replace('[node:group:title]', ['node' => $node], $options);
   }
 
-  return $alias_string;
+  // If $alias_string is still empty fallback to node's title.
+  return empty($alias_string) ? $node->getTitle() : $alias_string;
 }
