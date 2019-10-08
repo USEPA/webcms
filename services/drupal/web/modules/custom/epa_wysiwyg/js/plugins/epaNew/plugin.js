@@ -1,4 +1,8 @@
 (function (CKEDITOR, $) {
+  'use strict';
+
+  CKEDITOR.dtd.$removeEmpty['ins'] = false;
+  
   CKEDITOR.plugins.add('epaNew', {
     requires: ['button'],
 
