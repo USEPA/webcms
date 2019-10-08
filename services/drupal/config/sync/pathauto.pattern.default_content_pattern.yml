@@ -7,8 +7,21 @@ dependencies:
 id: default_content_pattern
 label: 'Default Content Pattern'
 type: 'canonical_entities:node'
-pattern: '[node:group:title]/[node:title]'
-selection_criteria: {  }
+pattern: '[node:group:field_homepage:entity:machine-name-alias]/[node:machine-name-alias]'
+selection_criteria:
+  08ba3f28-0341-40d3-881b-4368712c8b39:
+    id: node_type
+    bundles:
+      event: event
+      faq: faq
+      news_release: news_release
+      page: page
+      public_notice: public_notice
+      regulation: regulation
+    negate: false
+    context_mapping:
+      node: node
+    uuid: 08ba3f28-0341-40d3-881b-4368712c8b39
 selection_logic: and
 weight: 0
 relationships: {  }
