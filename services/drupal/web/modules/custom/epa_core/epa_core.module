@@ -9,9 +9,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
 
 /**
- * Implements hook_form_FORM_BASE_ID_alter().
+ * Implements hook_form_BASE_FORM_ID_alter().
  *
  * - Used to hide auto generate descriptions and keywords for news releases.
+ * - Hide path field.
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   switch ($form_id) {
@@ -93,13 +94,19 @@ function epa_core_field_group_build_pre_render_alter(&$element) {
  * Implements hook_token_info().
  */
 function epa_core_token_info() {
-  $tokens['machine-name-alias'] = [
+  $machine_name_token = [
     'name' => t('Machine name alias'),
     'description' => t('Machine name field.'),
   ];
-  return [
-    'tokens' => ['node' => $tokens],
+  $tokens['tokens'] = [
+    'node' => [
+      'machine-name-alias' => $machine_name_token,
+    ],
+    'group' => [
+      'machine-name-alias' => $machine_name_token,
+    ],
   ];
+  return $tokens;
 }
 
 /**
@@ -109,12 +116,12 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
 
   $replacements = [];
 
-  if ($type == 'node' && !empty($data['node'])) {
-    $node = $data['node'];
+  if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
+    $entity = $data[$type];
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'machine-name-alias':
-          $replacements[$original] = _epa_core_get_machine_name_alias($node);
+          $replacements[$original] = _epa_core_get_machine_name_alias($entity);
           break;
       }
     }
@@ -126,16 +133,16 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
 /**
  * Helper function to determine node machine name.
  */
-function _epa_core_get_machine_name_alias($node) {
+function _epa_core_get_machine_name_alias($entity) {
   $alias_string = '';
 
   // Set alias_string to machine name.
   // If $alias_string is empty fallback to node's title.
-  if (!$node->field_machine_name->isEmpty()) {
-    $alias_string = $node->field_machine_name->value;
+  if (!$entity->get('field_machine_name')->isEmpty()) {
+    $alias_string = $entity->get('field_machine_name')->value;
   }
   if (empty($alias_string)) {
-    $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($node->getTitle());
+    $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($entity->label());
   }
 
   return $alias_string;
