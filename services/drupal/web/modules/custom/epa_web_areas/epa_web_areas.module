@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupContent;
+use Drupal\pathauto\PathautoState;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -86,14 +87,9 @@ function _web_area_check_navigation_style(Group $group, $style = 'hublinks') {
 function epa_web_areas_group_presave(EntityInterface $entity) {
   // Check entity is a web area and if homepage is referenced.
   if ($entity->bundle() == 'web_area' && !$entity->get('field_homepage')->isEmpty()) {
-    // Check if desired alias is already used by homepage.
-    $token_service = \Drupal::token();
-    $group_alias = $token_service->replace('[group:machine-name-alias]', ['group' => $entity]);
+    // Update homepage alias.
     $homepage = $entity->get('field_homepage')->entity;
-    $node_aliases = \Drupal::database()->query('
-      SELECT alias, pid
-      FROM {url_alias}
-      WHERE source = :source
-    ', [':source' => '/node/' . $homepage->id()])->fetchAll();
+    $entity->path->pathauto = PathautoState::CREATE;
+    \Drupal::service('pathauto.generator')->updateEntityAlias($homepage, 'bulkupdate', ['message' => TRUE]);
   }
 }
