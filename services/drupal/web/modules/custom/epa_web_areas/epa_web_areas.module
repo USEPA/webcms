@@ -8,12 +8,10 @@
 use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupContent;
-use Drupal\pathauto\PathautoState;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -82,14 +80,8 @@ function _web_area_check_navigation_style(Group $group, $style = 'hublinks') {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
+ * Implements hook_entity_type_alter().
  */
-function epa_web_areas_group_presave(EntityInterface $entity) {
-  // Check entity is a web area and if homepage is referenced.
-  if ($entity->bundle() == 'web_area' && !$entity->get('field_homepage')->isEmpty()) {
-    // Update homepage alias.
-    $homepage = $entity->get('field_homepage')->entity;
-    $entity->path->pathauto = PathautoState::CREATE;
-    \Drupal::service('pathauto.generator')->updateEntityAlias($homepage, 'bulkupdate', ['message' => TRUE]);
-  }
+function epa_web_areas_entity_type_alter(array &$entity_types) {
+  $entity_types['group']->setClass('Drupal\epa_web_areas\Entity\EPAGroup');
 }
