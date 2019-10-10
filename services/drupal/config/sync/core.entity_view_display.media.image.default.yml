@@ -3,12 +3,14 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_caption
     - field.field.media.image.field_directory
     - field.field.media.image.field_media_image
     - image.style.thumbnail
     - media.type.image
   module:
     - image
+    - text
     - user
 id: media.image.default
 targetEntityType: media
@@ -25,6 +27,13 @@ content:
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
+  field_caption:
+    weight: 8
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
   field_directory:
     weight: 7
     label: above
