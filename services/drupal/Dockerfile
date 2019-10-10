@@ -45,6 +45,8 @@ RUN set -ex \
     echo 'listen = /var/run/fpm.sock'; \
     echo 'listen.mode = 0666'; \
     echo 'access.log = /var/log/php-fpm/access.log'; \
+    echo 'php_admin_value[upload_max_filesize] = 1G'; \
+    echo 'php_admin_value[post_max_size] = 1G'; \
   } | tee /usr/local/etc/php-fpm.d/zz-docker.conf \
   # Allow Drush unlimited access to task memory
   # php-cli.ini is only read by the CLI SAPI, so this won't affect the FPM workers.
