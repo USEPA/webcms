@@ -1,19 +1,25 @@
-uuid: 3bafd292-f55e-4b00-9752-6c1c310760d0
+uuid: a1db8dc7-7ddd-4faf-afd7-294e1ae1673e
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.image.field_caption
-    - field.field.media.image.field_directory
-    - field.field.media.image.field_media_image
-    - media.type.image
+    - core.entity_view_mode.media.medium
+    - field.field.media.remote_video.field_caption
+    - field.field.media.remote_video.field_directory
+    - field.field.media.remote_video.field_media_oembed_video
+    - media.type.remote_video
   module:
-    - image
+    - layout_builder
+    - media
     - text
-id: media.image.default
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: media.remote_video.medium
 targetEntityType: media
-bundle: image
-mode: default
+bundle: remote_video
+mode: medium
 content:
   field_caption:
     weight: 2
@@ -22,14 +28,14 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
-  field_media_image:
+  field_media_oembed_video:
+    type: oembed
     weight: 1
     label: hidden
     settings:
-      image_style: ''
-      image_link: ''
+      max_width: 500
+      max_height: 0
     third_party_settings: {  }
-    type: image
     region: content
   name:
     type: string
