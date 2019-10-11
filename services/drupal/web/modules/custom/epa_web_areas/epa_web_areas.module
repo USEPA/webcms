@@ -78,3 +78,12 @@ function _web_area_check_navigation_style(Group $group, $style = 'hublinks') {
   }
   return FALSE;
 }
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function epa_web_areas_entity_type_alter(array &$entity_types) {
+  if (isset($entity_types['group'])) {
+    $entity_types['group']->setClass('Drupal\epa_web_areas\Entity\EPAGroup');
+  }
+}
