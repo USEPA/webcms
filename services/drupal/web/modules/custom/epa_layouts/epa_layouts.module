@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_layouts.module.
+ */
+
+function epa_layouts_element_info_alter(array &$types) {
+  if (isset($types['layout_builder'])) {
+    $types['layout_builder']['#attached']['library'][] = 'epa_layouts/epa_layouts';
+  }
+}
