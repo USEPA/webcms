@@ -1,3 +1,11 @@
 services:
   epa_web_areas.alias_batch:
     class: Drupal\epa_web_areas\AliasBatch
+  epa_web_areas.node_add_access_check:
+    class: Drupal\epa_web_areas\Access\NodeAddAccessCheck
+    tags:
+      - { name: access_check, applies_to: _node_add_access }
+  epa_web_areas.route_subscriber:
+    class: Drupal\epa_web_areas\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
