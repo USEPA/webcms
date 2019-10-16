@@ -20,6 +20,8 @@
 
 4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
 
-5. Install Drupal from config (or restore a backup).
+5. Install dependencies: ```f1 composer install```
 
-6. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+6. Install Drupal from config (or restore a backup).  You can install from config by running: ```f1 drush si --existing-config```
+
+7. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
