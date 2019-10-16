@@ -2,8 +2,9 @@
 
 namespace Drupal\epa_web_areas\Entity;
 
-use Drupal\group\Entity\Group;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\group\Entity\Group;
+use Drupal\node\Entity\Node;
 
 /**
  * Extends entity for group.
@@ -28,6 +29,22 @@ class EPAGroup extends Group {
         $entities = $this->getContentEntities();
         \Drupal::service('epa_web_areas.alias_batch')->startAliasBatch($entities);
       }
+    }
+
+    // If group is inserted and group type is web area
+    // after save create a web area home page node.
+    if ($update === FALSE && $group_type_id == 'web_area') {
+      // Create node.
+      $node = Node::create([
+        'type' => 'web_area',
+        'title' => $this->label(),
+      ]);
+      $node->save();
+
+      // Add node to group via entity reference and as group content.
+      $this->addContent($node, 'group_node:web_area');
+      $this->field_homepage->target_id = $node->id();
+      $this->save();
     }
   }
 
