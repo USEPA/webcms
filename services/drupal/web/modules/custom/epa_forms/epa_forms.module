@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_forms.module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\webform\Entity\Webform;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function epa_forms_node_insert(EntityInterface $entity) {
+  if ($entity->bundle() == 'webform' && $entity->get('webform')->isEmpty()) {
+    $title = $entity->label();
+    $machine_name = $entity->get('field_machine_name')->getValue();
+    $label = !empty($machine_name) ? $machine_name : $title;
+    $id = preg_replace('@[^a-z0-9-]+@', '_', strtolower($label));
+    $id .= '_' . $entity->id();
+
+    $settings = Webform::getDefaultSettings();
+
+    $webform = Webform::create([
+      'id' => $id,
+      'title' => $title,
+      'settings' => $settings,
+    ]);
+    $webform->save();
+
+    $entity->get('webform')->target_id = $id;
+    $entity->save();
+
+    \Drupal::messenger()->addStatus(t('Webform %label has been created.', ['%label' => $webform->toLink()->toString()]));
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function epa_forms_node_delete(EntityInterface $entity) {
+  if ($entity->bundle() == 'webform' && !$entity->get('webform')->isEmpty()) {
+    $webform = $entity->get('webform')->entity;
+    $webform->delete();
+    \Drupal::messenger()->addStatus(t('The Webform %label has been deleted.', ['%label' => $webform->label()]));
+  }
+}
