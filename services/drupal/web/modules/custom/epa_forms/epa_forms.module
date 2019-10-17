@@ -6,7 +6,9 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\webform\Entity\Webform;
+use Drupal\webform\WebformEntityDeleteForm;
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
@@ -43,5 +45,47 @@ function epa_forms_node_delete(EntityInterface $entity) {
     $webform = $entity->get('webform')->entity;
     $webform->delete();
     \Drupal::messenger()->addStatus(t('The Webform %label has been deleted.', ['%label' => $webform->label()]));
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  switch ($form_id) {
+    case 'node_webform_form':
+      $form['webform']['#access'] = FALSE;
+      break;
+
+    case 'node_webform_edit_form':
+      $node = $form_state->getFormObject()->getEntity();
+      if (!empty($node) && !$node->get('webform')->isEmpty()) {
+        $form['webform']['widget'][0]['target_id']['#access'] = FALSE;
+        $form['webform']['widget'][0]['settings']['#open'] = FALSE;
+
+        $webform = $node->get('webform')->entity;
+        $weight = $form['webform']['#weight'] - .5;
+
+        $url = $webform->toUrl('edit-form');
+        $markup = t('<a href=":url" target="_blank">@title</a>',
+          [
+            '@title' => $webform->label(),
+            ':url' => $url->toString(),
+          ]
+        );
+        $form['webform_link'] = [
+          '#type' => 'item',
+          '#title' => $form['webform']['widget']['#title'],
+          '#markup' => $markup,
+          '#weight' => $weight,
+        ];
+      }
+      break;
+
+    case 'node_webform_delete_form':
+      $form['webform_description'] = [
+        '#markup' => t('This action will also remove any associated webform entity and <strong>delete its submissions</strong>.'),
+      ];
+      break;
   }
 }
