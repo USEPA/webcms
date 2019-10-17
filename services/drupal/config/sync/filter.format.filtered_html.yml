@@ -2,8 +2,12 @@ uuid: d4791072-84e4-4981-957c-b6ddd89e61a9
 langcode: en
 status: true
 dependencies:
+  config:
+    - core.entity_view_mode.media.full
+    - core.entity_view_mode.media.large
+    - core.entity_view_mode.media.medium
   module:
-    - entity_embed
+    - media
 name: 'Filtered HTML'
 format: filtered_html
 weight: 0
@@ -23,9 +27,19 @@ filters:
       allowed_html: '<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol type start> <li> <dl> <dt> <dd> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <p> <h1> <pre> <sup> <sub> <hr> <table> <caption> <tbody> <thead> <tfoot> <th> <td> <tr> <img src alt data-entity-type data-entity-uuid>'
       filter_html_help: true
       filter_html_nofollow: false
-  entity_embed:
-    id: entity_embed
-    provider: entity_embed
+  media_embed:
+    id: media_embed
+    provider: media
     status: true
     weight: 100
-    settings: {  }
+    settings:
+      default_view_mode: default
+      allowed_media_types:
+        document: document
+        image: image
+        remote_video: remote_video
+      allowed_view_modes:
+        default: default
+        full: full
+        large: large
+        medium: medium
