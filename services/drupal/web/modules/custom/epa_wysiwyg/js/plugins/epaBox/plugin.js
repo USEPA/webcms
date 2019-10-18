@@ -1,4 +1,6 @@
 (function (CKEDITOR) {
+  'use strict';
+  
   function StringBuffer() {
     this.buffer = [];
   }

@@ -1,4 +1,6 @@
 (function (CKEDITOR) {
+  'use strict';
+  
   CKEDITOR.plugins.add('epaArchiveLink', {
     requires: ['button'],
 

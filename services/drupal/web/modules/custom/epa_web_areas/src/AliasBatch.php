@@ -27,7 +27,7 @@ class AliasBatch {
           [$entities],
         ],
       ],
-      'error_message' => $this->t('An error occured druing processing'),
+      'error_message' => $this->t('An error occured during processing'),
       'finished' => [$class, 'finishedUpdateAliases'],
     ];
     batch_set($batch);
