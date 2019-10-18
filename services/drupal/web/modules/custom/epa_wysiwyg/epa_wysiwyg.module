@@ -4,3 +4,10 @@
  * @file
  * Contains epa_wysiwyg.module.
  */
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function epa_wysiwyg_preprocess_page(&$variables) {
+  $variables['#attached']['library'][] = 'epa_wysiwyg/epaNew';
+}
