@@ -58,12 +58,10 @@ class AliasBatch {
     $entities = array_slice($entities, $sandbox['current'], $limit);
 
     foreach ($entities as $entity) {
-      $entity_type_id = $entity->getEntityTypeId();
-      $entity_id = $entity->id();
       $saved = \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'update');
       if ($saved) {
         $results['updated']++;
-        $results['tags'][] = $entity_type_id . ":" . $entity_id;
+        $results['tags'] = array_merge($results['tags'], $entity->getCacheTagsToInvalidate());
       }
       $sandbox['current']++;
     }
