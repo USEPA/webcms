@@ -93,6 +93,7 @@ class AliasBatch {
     else {
       $message = t('Finished with an error.');
     }
+    \Drupal::service('pathauto.generator')->resetCaches();
     drupal_set_message($message);
   }
 
