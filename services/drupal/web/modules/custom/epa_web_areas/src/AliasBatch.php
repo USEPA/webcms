@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_web_areas;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -48,16 +49,21 @@ class AliasBatch {
         'max' => count($entities),
       ];
       $context['results']['updated'] = 0;
+      $context['results']['tags'] = [];
     }
     $sandbox = &$context['sandbox'];
+    $results = &$context['results'];
 
     $limit = 5;
     $entities = array_slice($entities, $sandbox['current'], $limit);
 
     foreach ($entities as $entity) {
+      $entity_type_id = $entity->getEntityTypeId();
+      $entity_id = $entity->id();
       $saved = \Drupal::service('pathauto.generator')->updateEntityAlias($entity, 'update');
       if ($saved) {
-        $context['results']['updated']++;
+        $results['updated']++;
+        $results['tags'][] = $entity_type_id . ":" . $entity_id;
       }
       $sandbox['current']++;
     }
@@ -93,7 +99,9 @@ class AliasBatch {
     else {
       $message = t('Finished with an error.');
     }
-    \Drupal::service('pathauto.generator')->resetCaches();
+
+    Cache::invalidateTags($results['tags']);
+
     drupal_set_message($message);
   }
 
