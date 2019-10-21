@@ -1,4 +1,6 @@
 (function (CKEDITOR, $) {
+  'use strict';
+  
   CKEDITOR.plugins.add('epaNew', {
     requires: ['button'],
 
