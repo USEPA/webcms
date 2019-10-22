@@ -19,8 +19,8 @@ class EPAGroup extends Group {
 
     // If group is updated, group type is web area, and machine name
     // or title is changed bulk update associated group content entities.
-    $group_type_id = $this->getGroupTypeId();
-    if ($update === TRUE && $group_type_id == 'web_area') {
+    $bundle = $this->bundle();
+    if ($update === TRUE && $bundle == 'web_area') {
       if (($this->get('field_machine_name')->isEmpty()
           && $this->matchesOriginal('field_machine_name')
           && $this->label() != $this->original->label())
@@ -49,13 +49,6 @@ class EPAGroup extends Group {
       $this->field_homepage->target_id = $node->id();
       $this->save();
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getGroupTypeId() {
-    return $this->getGroupType()->id();
   }
 
   /**
