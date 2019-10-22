@@ -1,0 +1,46 @@
+<div class="row cols-2">
+  <div class="col size-3of4">
+    {{ content.main }}
+
+  {% if content.a1 or content.a2 %}
+    <div class="row cols-2">
+      <div class="col">
+        {{ content.a1 }}
+      </div>
+      <div class="col">
+        {{ content.a2 }}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if content.b1 or content.b2 %}
+    <div class="row cols-2">
+      <div class="col">
+        {{ content.b1 }}
+      </div>
+      <div class="col">
+        {{ content.b2 }}
+      </div>
+    </div>
+  {% endif %}
+  
+  {% if content.c1 or content.c2 %}
+    <div class="row cols-2">
+      <div class="col">
+        {{ content.c1 }}
+      </div>
+      <div class="col">
+        {{ content.c2 }}
+      </div>
+    </div>
+  {% endif %}
+
+    {{ content.bottom }}
+  </div>
+
+{% if content.sidebar %}
+  <aside class="col size-1of4">
+    {{ content.sidebar }}
+  </aside>
+{% endif %}
+</div>
