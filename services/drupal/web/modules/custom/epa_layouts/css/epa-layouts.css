@@ -2,12 +2,12 @@
  * @file
  * Provides the layout styles for epa layouts.
  */
-.layout-builder__section .row.cols-2 {
+.layout-builder__section .row {
   display: flex;
   flex-wrap: wrap;
 }
 
-.layout-builder__section .row.cols-2 > .col {
+.layout-builder__section .row > .col {
   flex: 0 1 100%;
 }
 
@@ -20,7 +20,16 @@
     flex: 0 1 75%;
   }
 
-  .layout-builder__section .row.cols-2 > .col.size-1of4 {
+  .layout-builder__section .row.cols-2 > .col.size-1of4,
+  .layout-builder__section .row.cols-4 > .col.size-1of4 {
     flex: 0 1 25%;
+  }
+
+  .layout-builder__section .row.cols-3 > .col.size-1of3 {
+    flex: 0 1 33%;
+  }
+
+  .layout-builder__section .row.cols-3 > .col.size-1of3:nth-child(2) {
+    flex: 0 1 34%;
   }
 }
