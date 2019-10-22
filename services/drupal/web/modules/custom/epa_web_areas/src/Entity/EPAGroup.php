@@ -34,7 +34,7 @@ class EPAGroup extends Group {
     // If group is inserted, group type is web area, and
     // homepage field is empty, after save, create a web area home page node.
     if ($update === FALSE
-        && $group_type_id == 'web_area'
+        && $bundle == 'web_area'
         && $this->get('field_homepage')->isEmpty()
     ) {
       // Create node.
