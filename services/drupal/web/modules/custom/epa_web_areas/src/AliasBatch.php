@@ -100,7 +100,7 @@ class AliasBatch {
 
     Cache::invalidateTags($results['tags']);
 
-    drupal_set_message($message);
+    \Drupal::messenger()->addStatus($message);
   }
 
 }
