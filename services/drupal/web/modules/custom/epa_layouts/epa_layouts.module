@@ -5,8 +5,22 @@
  * Contains epa_layouts.module.
  */
 
+/**
+ * Implements hook_element_info_alter().
+ */
 function epa_layouts_element_info_alter(array &$types) {
   if (isset($types['layout_builder'])) {
     $types['layout_builder']['#attached']['library'][] = 'epa_layouts/epa_layouts';
+  }
+}
+
+/**
+ * Implements hook_plugin_filter_TYPE__CONSUMER_alter().
+ */
+function epa_layouts_plugin_filter_layout__layout_builder_alter(array &$definitions, array $extra) {
+  foreach ($definitions as $layout => $definition) {
+    if ($definition->getProvider() == 'layout_builder' || $layout == 'layout_onecol') {
+      unset($definitions[$layout]);
+    }
   }
 }
