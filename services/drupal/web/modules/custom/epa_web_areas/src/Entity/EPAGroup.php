@@ -48,6 +48,8 @@ class EPAGroup extends Group {
       $this->addContent($node, 'group_node:web_area');
       $this->field_homepage->target_id = $node->id();
       $this->save();
+
+      \Drupal::messenger()->addStatus(t('Node %label has been created.', ['%label' => $node->toLink()->toString()]));
     }
   }
 
