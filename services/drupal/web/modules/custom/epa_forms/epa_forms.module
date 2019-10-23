@@ -113,69 +113,9 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     return AccessResult::neutral();
   }
   $node = \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-  $plugin_id = 'group_node:' . $node->bundle();
 
-  // Only act if there are group content types for this node type.
-  $group_content_types = GroupContentType::loadByContentPluginId($plugin_id);
-  if (empty($group_content_types)) {
-    return AccessResult::neutral();
-  }
-
-  // Load all the group content for this node.
-  $group_contents = \Drupal::entityTypeManager()
-    ->getStorage('group_content')
-    ->loadByProperties([
-      'type' => array_keys($group_content_types),
-      'entity_id' => $node->id(),
-    ]);
-
-  // If the node does not belong to any group, we have nothing to say.
-  if (empty($group_contents)) {
-    return AccessResult::neutral();
-  }
-
-  /** @var \Drupal\group\Entity\GroupInterface[] $groups */
-  $groups = [];
-  foreach ($group_contents as $group_content) {
-    /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
-    $group = $group_content->getGroup();
-    $groups[$group->id()] = $group;
-  }
-
-  // From this point on you need group to allow you to perform the operation.
-  switch ($operation) {
-    case 'view':
-      foreach ($groups as $group) {
-        if ($node->isPublished()) {
-          if ($group->hasPermission("view $plugin_id entity", $account)) {
-            return AccessResult::allowed();
-          }
-        }
-        elseif ($group->hasPermission("view unpublished $plugin_id entity", $account)) {
-          return AccessResult::allowed();
-        }
-      }
-      break;
-
-    case 'submission_page':
-    case 'submission_view_any':
-      foreach ($groups as $group) {
-        if ($group->hasPermission("view group webform submissions", $account)) {
-          return AccessResult::allowed();
-        }
-      }
-      break;
-
-    case 'update':
-      foreach ($groups as $group) {
-        if ($group->hasPermission("update any $plugin_id entity", $account)) {
-          return AccessResult::allowed();
-        }
-        elseif ($account->id() == $node->getOwnerId() && $group->hasPermission("update own $plugin_id entity", $account)) {
-          return AccessResult::allowed();
-        }
-      }
-      break;
+  if ($operation == 'view' || $operation == 'update') {
+    return $node->access($operation, $account, TRUE);
   }
 
   return AccessResult::neutral();
