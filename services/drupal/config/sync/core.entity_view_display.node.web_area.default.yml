@@ -31,8 +31,8 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - epa_layouts
     - layout_builder
-    - layout_discovery
     - options
     - text
     - user
@@ -42,24 +42,25 @@ third_party_settings:
     enabled: true
     sections:
       -
-        layout_id: layout_onecol
+        layout_id: epa_one_column
         layout_settings: {  }
         components:
-          ae4fd28a-00e4-4f65-9abd-429f78dcd867:
-            uuid: ae4fd28a-00e4-4f65-9abd-429f78dcd867
-            region: content
+          1ca61118-09e7-45bf-a926-f8508a52426f:
+            uuid: 1ca61118-09e7-45bf-a926-f8508a52426f
+            region: main
             configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
               id: 'field_block:node:web_area:field_paragraphs'
+              label: Body
+              provider: layout_builder
+              label_display: '0'
               formatter:
+                label: hidden
                 type: entity_reference_revisions_entity_view
-                label: above
                 settings:
                   view_mode: default
-                  link: ''
                 third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
             additional: {  }
             weight: 0
         third_party_settings: {  }

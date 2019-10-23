@@ -84,6 +84,7 @@ class AliasBatch {
    */
   public static function finishedUpdateAliases(bool $success, array $results) {
     // The 'success' parameter means no fatal PHP errors were detected.
+    $message = t('No aliases to update.');
     if ($success) {
       $updated = $results['updated'];
       if ($updated) {
@@ -100,7 +101,7 @@ class AliasBatch {
 
     Cache::invalidateTags($results['tags']);
 
-    drupal_set_message($message);
+    \Drupal::messenger()->addStatus($message);
   }
 
 }
