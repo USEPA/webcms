@@ -103,8 +103,16 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
  */
 function epa_forms_webform_access(EntityInterface $entity, $operation, AccountInterface $account) {
   // Always deny access to delete or duplicate.
-  if ($operation == 'duplicate' || $operation == 'delete') {
-    return AccessResult::forbidden();
+  switch ($operation) {
+    case 'duplicate':
+    case 'delete':
+      return AccessResult::forbidden();
+      break;
+
+    case 'view':
+    case 'update':
+      return $node->access($operation, $account, TRUE);
+      break;
   }
 
   // Get node from webform.
@@ -143,10 +151,6 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
   }
 
   switch ($operation) {
-    case 'view':
-    case 'update':
-      return $node->access($operation, $account, TRUE);
-
     case 'submission_page':
     case 'submission_view_any':
       foreach ($groups as $group) {
