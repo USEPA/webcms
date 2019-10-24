@@ -103,16 +103,8 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
  */
 function epa_forms_webform_access(EntityInterface $entity, $operation, AccountInterface $account) {
   // Always deny access to delete or duplicate.
-  switch ($operation) {
-    case 'duplicate':
-    case 'delete':
-      return AccessResult::forbidden();
-      break;
-
-    case 'view':
-    case 'update':
-      return $node->access($operation, $account, TRUE);
-      break;
+  if ($operation == 'duplicate' || $operation == 'delete') {
+    return AccessResult::forbidden();
   }
 
   // Get node from webform.
@@ -121,6 +113,11 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     return AccessResult::neutral();
   }
   $node = \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+
+  if ($operation == 'view' || $operation == 'update') {
+    return $node->access($operation, $account, TRUE);
+  }
+
   $plugin_id = 'group_node:' . $node->bundle();
 
   // Only act if there are group content types for this node type.
@@ -150,15 +147,12 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     $groups[$group->id()] = $group;
   }
 
-  switch ($operation) {
-    case 'submission_page':
-    case 'submission_view_any':
-      foreach ($groups as $group) {
-        if ($group->hasPermission("view group webform submissions", $account)) {
-          return AccessResult::allowed();
-        }
+  if ($operation == 'submission_page' || $operation == 'submission_view_any') {
+    foreach ($groups as $group) {
+      if ($group->hasPermission("view group webform submissions", $account)) {
+        return AccessResult::allowed();
       }
-      break;
+    }
   }
 
   return AccessResult::neutral();
