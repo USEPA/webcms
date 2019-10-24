@@ -112,7 +112,7 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     // Infer access from node access when viewing or updating.
     case 'view':
     case 'update':
-      $node = _get_webform_referencing_node($entity);
+      $node = _epa_forms_get_webform_referencing_node($entity);
       return $node->access($operation, $account, TRUE);
       break;
 
@@ -120,8 +120,8 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     // See epa_forms.group.permissions.yml.
     case 'submission_page':
     case 'submission_view_any':
-      $node = _get_webform_referencing_node($entity);
-      $groups = _get_webform_referencing_groups($node);
+      $node = _epa_forms_get_webform_referencing_node($entity);
+      $groups = _epa_forms_get_webform_referencing_groups($node);
       foreach ($groups as $group) {
         if ($group->hasPermission("view group webform submissions", $account)) {
           return AccessResult::allowed();
