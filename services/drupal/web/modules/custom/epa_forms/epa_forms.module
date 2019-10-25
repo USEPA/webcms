@@ -99,7 +99,6 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
  * Implements hook_ENTITY_TYPE_access().
  *
  * Infer access through content type referencing webform.
- * See: gnode_node_access().
  */
 function epa_forms_webform_access(EntityInterface $entity, $operation, AccountInterface $account) {
   switch ($operation) {
@@ -113,7 +112,7 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     case 'view':
     case 'update':
       $node = _epa_forms_get_webform_referencing_node($entity);
-      return $node->access($operation, $account, TRUE);
+      return empty($node) ? AccessResult::neutral() : $node->access($operation, $account, TRUE);
       break;
 
     // Custom permissions are provided to view submissions.
@@ -121,10 +120,15 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     case 'submission_page':
     case 'submission_view_any':
       $node = _epa_forms_get_webform_referencing_node($entity);
+      if (empty($node)) {
+        return;
+      }
       $groups = _epa_forms_get_webform_referencing_groups($node);
-      foreach ($groups as $group) {
-        if ($group->hasPermission("view group webform submissions", $account)) {
-          return AccessResult::allowed();
+      if (!empty($groups)) {
+        foreach ($groups as $group) {
+          if ($group->hasPermission("view group webform submissions", $account)) {
+            return AccessResult::allowed();
+          }
         }
       }
       break;
@@ -140,7 +144,7 @@ function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
   // Get node from webform.
   $nid = $entity->getThirdPartySetting('epa_forms', 'nid');
   if (empty($nid)) {
-    return AccessResult::neutral();
+    return;
   }
   return \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 }
@@ -154,7 +158,7 @@ function _epa_forms_get_webform_referencing_groups($node) {
   // Only act if there are group content types for this node type.
   $group_content_types = GroupContentType::loadByContentPluginId($plugin_id);
   if (empty($group_content_types)) {
-    return AccessResult::neutral();
+    return;
   }
 
   // Load all the group content for this node.
@@ -167,7 +171,7 @@ function _epa_forms_get_webform_referencing_groups($node) {
 
   // If the node does not belong to any group, we have nothing to say.
   if (empty($group_contents)) {
-    return AccessResult::neutral();
+    return;
   }
 
   /** @var \Drupal\group\Entity\GroupInterface[] $groups */
