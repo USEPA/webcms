@@ -9,7 +9,7 @@ if test "$BUILDKITE_PULL_REQUEST" != "false"; then
   echo 'Skipping deployment on pull requests'
 fi
 
-CF_DOCKER_PASSWORD="$(aws --region=us-east-1 ecr get-authorization-token --output=text --query='authorizationData[].authorizationToken' | base64 --decode | cut -d: -f2)"
+CF_DOCKER_PASSWORD="$AWS_SECRET_ACCESS_KEY"
 export CF_DOCKER_PASSWORD
 
 # Define a logout function - this allows us to invoke `./cf logout' even if a command trips
@@ -42,7 +42,7 @@ trap logout EXIT
 echo '--- Deploying'
 
 # Run app push - if CloudFoundry reports a failure, capture logs and upload them to Buildkite.
-if ! ./cf push "$app_name" --docker-username AWS --docker-image "$image_name"; then
+if ! ./cf push "$app_name" --docker-username "$AWS_ACCESS_KEY_ID" --docker-image "$image_name"; then
   exit_code=$?
 
   ./cf logs "$app_name" --recent > cf-recent.txt
