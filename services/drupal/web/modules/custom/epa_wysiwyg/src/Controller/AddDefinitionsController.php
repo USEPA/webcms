@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\image_popup\Controller\AddDefinitions.
- */
-
 namespace Drupal\epa_wysiwyg\Controller;
 
 use Drupal\Component\Utility\UrlHelper;
@@ -13,13 +8,22 @@ use Drupal\Core\Url;
 use Drupal\epa_wysiwyg\Plugin\CKEditorPlugin\EPAAddDefinitions;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class AddDefinitionsController.
  */
 class AddDefinitionsController extends ControllerBase {
+
+  /**
+   * Symfony\Component\HttpFoundation\Request definition.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $request;
 
   /**
    * GuzzleHttp\Client definition.
@@ -29,10 +33,19 @@ class AddDefinitionsController extends ControllerBase {
   protected $httpClient;
 
   /**
+   * Psr\Log\LoggerInterface definition.
+   *
+   * @var \Psr\Log\LoggerInterface
+   */
+  protected $logger;
+
+  /**
    * Constructor for our class.
    */
-  public function __construct(Client $http_client) {
+  public function __construct(Request $request, Client $http_client, LoggerInterface $logger) {
+    $this->request = $request;
     $this->httpClient = $http_client;
+    $this->logger = $logger;
   }
 
   /**
@@ -40,7 +53,9 @@ class AddDefinitionsController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('http_client')
+      $container->get('request_stack')->getCurrentRequest(),
+      $container->get('http_client'),
+      $container->get('logger.factory')->get('epa_wysiwyg')
     );
   }
 
@@ -48,23 +63,25 @@ class AddDefinitionsController extends ControllerBase {
    * Prints available terms.
    */
   public function getTerms() {
+    $response = new Response();
+    $post = $this->request->get('text');
     // Check that required parameter is present.
-    if (!isset($_POST['text'])) {
-      return;
+    if (empty($post)) {
+      return $response;
     }
 
-    $url = Url::fromUri(EPAAddDefinitions::SERVICE_ENDPOINT, ['query' => ['callback' => 'CKEDITOR.dictionaryCallback']]);
-    $post_data = UrlHelper::buildQuery(['text' => $_POST['text']]);
+    $url = Url::fromUri(EPAAddDefinitions::SERVICE_ENDPOINT, ['query' => ['callback' => 'CKEditorAddDefinitions.dictionaryCallback']]);
+    $post_data['body'] = UrlHelper::buildQuery(['text' => $post]);
 
     try {
-      $response = $this->httpClient()->post($url, $post_data);
-      $data = $response->getBody();
+      $request = $this->httpClient->post($url->toString(), $post_data);
+      $response->setContent($request->getBody());
     }
     catch (RequestException $e) {
-      watchdog_exception('epa_wysiwyg', $e->getMessage());
+      $this->logger->error('Error returned for add definitions term lookup: @error', ['@error' => $e->getMessage()]);
     }
 
-    return new Response($data, 200);
+    return $response;
   }
 
 }
