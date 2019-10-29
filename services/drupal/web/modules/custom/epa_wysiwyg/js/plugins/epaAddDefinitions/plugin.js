@@ -1,7 +1,7 @@
 /**
  * Main definition for CKEditorAddDefinitions module, a singleton used to namespace functions for the native CKEditor dictionary plugin.
  */
-(function(my) {
+var CKEditorAddDefinitions = (function(my) {
   'use strict';
 
   /**
@@ -72,4 +72,4 @@
   }
 
   return my;
-})(CKEDITOR);
+})(CKEditorAddDefinitions || {});

@@ -1,7 +1,7 @@
 /**
  * Main controller logic for CKEditor plugin.
  */
-(function(my, $, undefined) {
+var CKEditorAddDefinitions = (function(my, $, undefined) {
   'use strict';
 
   // Constants
@@ -753,4 +753,4 @@
 
   return my;
 
-})(CKEDITOR, jQuery);
+})(CKEditorAddDefinitions || {}, jQuery);

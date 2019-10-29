@@ -1,7 +1,7 @@
 /**
  * Augment IE8 with necessary String, Array, and Iterator functions.
  */
-(function(my) {
+var CKEditorAddDefinitions = (function(my) {
   'use strict';
 
   if (typeof console === "undefined") {
@@ -155,4 +155,4 @@
   };
 
   return my;
-})(CKEDITOR);
+})(CKEditorAddDefinitions || {});

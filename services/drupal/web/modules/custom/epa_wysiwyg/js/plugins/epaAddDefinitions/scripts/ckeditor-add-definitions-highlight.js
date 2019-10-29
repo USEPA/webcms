@@ -2,7 +2,7 @@
  * Augment CKEditorAddDefinitions with Highlight submodule to handle all term-highlighting
  * routines on the dialog window's preview pane.
  */
-(function(my, undefined) {
+var CKEditorAddDefinitions = (function(my, undefined) {
   'use strict';
 
   my.Highlighter = {
@@ -94,4 +94,4 @@
 
   return my;
 
-})(CKEDITOR);
+})(CKEditorAddDefinitions || {});

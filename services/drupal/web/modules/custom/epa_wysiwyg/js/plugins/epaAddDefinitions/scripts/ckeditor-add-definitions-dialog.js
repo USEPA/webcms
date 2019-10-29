@@ -1,7 +1,7 @@
 /**
  * Add dialog for Dictionary plugin to CKEditor and related handlers.
  */
-(function(my) {
+var CKEditorAddDefinitions = (function(my) {
   'use strict';
 
   // Cached dialog box DOM elements.
@@ -285,7 +285,7 @@
     my.dictSelect.style.visibility = 'hidden';
     my.statusDiv.innerHTML = '';
     my.definitionDiv.innerHTML = '';
-    my.undoRedoUpdate;
+    my.undoRedoUpdate();
   }
 
   // Get the term which is currently highlighted in the dictionary dialog/
@@ -300,4 +300,4 @@
 
   return my;
 
-})(CKEDITOR);
+})(CKEditorAddDefinitions || {});

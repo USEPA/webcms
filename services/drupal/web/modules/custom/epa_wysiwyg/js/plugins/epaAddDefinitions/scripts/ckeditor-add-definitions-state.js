@@ -1,7 +1,7 @@
 /**
  * Augment CKEditorAddDefinitions with undo, redo, save state, load state functions.
  */
-(function(my) {
+var CKEditorAddDefinitions = (function(my) {
   'use strict';
 
   // Undo and redo stacks.
@@ -156,4 +156,4 @@
 
   return my;
 
-})(CKEDITOR);
+})(CKEditorAddDefinitions || {});
