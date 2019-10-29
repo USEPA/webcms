@@ -9,7 +9,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\group\Entity\GroupContentType;
 use Drupal\webform\Entity\Webform;
 
 /**
@@ -123,7 +122,7 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
       if (empty($node)) {
         return AccessResult::neutral();
       }
-      $groups = _epa_forms_get_webform_referencing_groups($node);
+      $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($node);
       foreach ($groups as $group) {
         if ($group->hasPermission("view group webform submissions", $account)) {
           return AccessResult::allowed();
@@ -145,39 +144,4 @@ function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
     return;
   }
   return \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-}
-
-/**
- * Helper function to grab groups associated with node.
- */
-function _epa_forms_get_webform_referencing_groups($node) {
-  $plugin_id = 'group_node:' . $node->bundle();
-
-  // Only act if there are group content types for this node type.
-  $group_content_types = GroupContentType::loadByContentPluginId($plugin_id);
-  if (empty($group_content_types)) {
-    return [];
-  }
-
-  // Load all the group content for this node.
-  $group_contents = \Drupal::entityTypeManager()
-    ->getStorage('group_content')
-    ->loadByProperties([
-      'type' => array_keys($group_content_types),
-      'entity_id' => $node->id(),
-    ]);
-
-  // If the node does not belong to any group, we have nothing to say.
-  if (empty($group_contents)) {
-    return [];
-  }
-
-  /** @var \Drupal\group\Entity\GroupInterface[] $groups */
-  $groups = [];
-  foreach ($group_contents as $group_content) {
-    /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
-    $group = $group_content->getGroup();
-    $groups[$group->id()] = $group;
-  }
-  return $groups;
 }

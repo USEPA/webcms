@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_web_areas;
+namespace Drupal\epa_web_areas\Utility;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -19,7 +19,7 @@ class AliasBatch {
    *   Entities to batch update aliases.
    */
   public function startAliasBatch(array $entities) {
-    $class = 'Drupal\epa_web_areas\AliasBatch';
+    $class = 'Drupal\epa_web_areas\Utility\AliasBatch';
     $batch = [
       'title' => $this->t('Updating related content entities path aliases.'),
       'operations' => [
