@@ -1,0 +1,35 @@
+uuid: f85f9404-fd26-4f3a-817e-c8d4e175fac4
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_directory
+    - media.type.image
+    - taxonomy.vocabulary.media_directory
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: media.image.field_directory
+field_name: field_directory
+entity_type: media
+bundle: image
+label: Directory
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      media_directory: media_directory
+    sort:
+      field: name
+      direction: asc
+    auto_create: true
+    auto_create_bundle: ''
+field_type: entity_reference

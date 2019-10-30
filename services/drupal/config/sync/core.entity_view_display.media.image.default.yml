@@ -3,51 +3,44 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_caption
+    - field.field.media.image.field_directory
     - field.field.media.image.field_media_image
-    - image.style.thumbnail
     - media.type.image
   module:
     - image
-    - user
+    - text
 id: media.image.default
 targetEntityType: media
 bundle: image
 mode: default
 content:
-  created:
+  field_caption:
+    weight: 2
     label: hidden
-    type: timestamp
-    weight: 0
-    region: content
-    settings:
-      date_format: medium
-      custom_date_format: ''
-      timezone: ''
+    settings: {  }
     third_party_settings: {  }
+    type: text_default
+    region: content
   field_media_image:
-    weight: 6
-    label: above
+    weight: 1
+    label: hidden
     settings:
       image_style: ''
       image_link: ''
     third_party_settings: {  }
     type: image
     region: content
-  thumbnail:
-    type: image
-    weight: 5
-    label: hidden
-    settings:
-      image_style: thumbnail
-      image_link: ''
-    region: content
-    third_party_settings: {  }
-  uid:
-    label: hidden
-    type: author
+  name:
+    type: string
     weight: 0
     region: content
-    settings: {  }
+    label: hidden
+    settings:
+      link_to_entity: false
     third_party_settings: {  }
 hidden:
-  name: true
+  created: true
+  field_directory: true
+  thumbnail: true
+  uid: true

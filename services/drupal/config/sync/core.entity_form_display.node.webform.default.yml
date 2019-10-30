@@ -13,7 +13,7 @@ dependencies:
     - field.field.node.webform.field_paragraphs
     - field.field.node.webform.field_review_deadline
     - field.field.node.webform.field_type
-    - field.field.node.webform.field_webform
+    - field.field.node.webform.webform
     - node.type.webform
     - workflows.workflow.epa_default
   module:
@@ -159,7 +159,7 @@ content:
       closed_mode_threshold: 0
       add_mode: dropdown
       form_display_mode: default
-      default_paragraph_type: ''
+      default_paragraph_type: html
       features:
         duplicate: duplicate
         collapse_edit_all: collapse_edit_all
@@ -171,13 +171,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: options_select
-    region: content
-  field_webform:
-    weight: 2
-    settings:
-      default_data: true
-    third_party_settings: {  }
-    type: webform_entity_reference_select
     region: content
   moderation_state:
     type: moderation_state_default
@@ -223,6 +216,12 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  webform:
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+    type: webform_entity_reference_select
+    region: content
 hidden:
   field_review_deadline: true
   path: true

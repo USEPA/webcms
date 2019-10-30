@@ -1,3 +1,10 @@
 services:
   epa_web_areas.alias_batch:
-    class: Drupal\epa_web_areas\AliasBatch
+    class: Drupal\epa_web_areas\Utility\AliasBatch
+  epa_web_areas.web_areas_helper:
+    class: Drupal\epa_web_areas\Utility\WebAreasHelper
+    arguments: ['@entity_type.manager']
+  epa_web_areas.route_subscriber:
+    class: Drupal\epa_web_areas\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -16,6 +16,9 @@ RUN set -ex \
     echo 'listen = /var/run/fpm.sock'; \
     echo 'listen.mode = 0666'; \
     echo 'access.log = /var/log/php-fpm/access.log'; \
+    echo 'php_admin_value[upload_max_filesize] = 1G'; \
+    echo 'php_admin_value[post_max_size] = 1G'; \
+    echo 'request_terminate_timeout = 0'; \
   } | tee /usr/local/etc/php-fpm.d/zz-docker.conf \
   && { \
     echo 'memory_limit = -1'; \
