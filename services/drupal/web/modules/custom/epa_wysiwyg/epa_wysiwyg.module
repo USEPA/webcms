@@ -12,12 +12,3 @@ function epa_wysiwyg_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-new';
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-add-definitions';
 }
-
-/**
- * Implements hook_element_info_alter().
- */
-function epa_wysiwyg_element_info_alter(array &$types) {
-  if (isset($types['textarea'])) {
-    $types['textarea']['#attached']['library'][] = 'epa_wysiwyg/epa-add-definitions-admin';
-  }
-}
