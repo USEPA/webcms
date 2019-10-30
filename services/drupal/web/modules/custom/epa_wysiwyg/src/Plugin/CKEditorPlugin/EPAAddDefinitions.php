@@ -84,20 +84,21 @@ class EPAAddDefinitions extends CKEditorPluginBase {
    * {@inheritdoc}
    */
   public function getLibraries(Editor $editor) {
-    return [];
+    return [
+      'epa_wysiwyg/epa-add-definitions-admin',
+    ];
   }
 
   /**
    * {@inheritdoc}
    */
   public function getConfig(Editor $editor) {
-    $config = [
+    return [
       'glossaryFilterEnabled' => self::GLOSSARY_FILTER_ENABLED,
       'undoRedoEnabled' => self::UNDO_REDO_ENABLED,
       'firstOccurrenceOnly' => self::FIRST_OCCURRENCE_ONLY,
       'serviceEndpoint' => self::SERVICE_ENDPOINT,
     ];
-    return $config;
   }
 
 }
