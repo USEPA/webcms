@@ -540,7 +540,7 @@ var CKEditorAddDefinitions = (function(my, $, undefined) {
     my.applyTermReplace(my.displayContent, entry.term, indexNum+1, replaceMaskNode, [], [], true);
 
     my.termOrder[step][2] = ('<a class="termlookup-tooltip" href="#self"><span class="termlookup-custom"><img width="48" height="48" alt="Help" src="'
-    + my.dictionaryModulePath + '/images/add_definitions_icon_popup_help.png"><em> ' + entry.term + '</em> ' + entry.definition + '</span></a>'
+    + my.dictionaryModulePath + 'images/add_definitions_icon_popup_help.png"><em> ' + entry.term + '</em> ' + entry.definition + '</span></a>'
     ).length;
   }
 
@@ -664,7 +664,7 @@ var CKEditorAddDefinitions = (function(my, $, undefined) {
     img.setAttribute('width', '48');
     img.setAttribute('height', '48');
     img.setAttribute('alt', 'Help');
-    img.setAttribute('src', my.dictionaryModulePath + '/images/add_definitions_icon_popup_help.png');
+    img.setAttribute('src', my.dictionaryModulePath + 'images/add_definitions_icon_popup_help.png');
 
     var em = document.createElement('em');
 
