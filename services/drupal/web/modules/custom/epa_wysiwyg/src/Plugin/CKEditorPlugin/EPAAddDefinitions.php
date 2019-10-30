@@ -37,7 +37,7 @@ class EPAAddDefinitions extends CKEditorPluginBase {
   /**
    * URL for Term Lookup Service.
    */
-  const SERVICE_ENDPOINT = 'http://termlookup.epa.gov/termlookup/v1/terms';
+  const SERVICE_ENDPOINT = 'https://termlookup.epa.gov/termlookup/v1/terms';
 
   /**
    * {@inheritdoc}
