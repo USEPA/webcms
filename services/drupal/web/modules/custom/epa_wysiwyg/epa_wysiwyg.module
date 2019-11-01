@@ -6,8 +6,9 @@
  */
 
 /**
- * Implements hook_preprocess_page().
+ * Implements hook_page_attachments().
  */
-function epa_wysiwyg_preprocess_page(&$variables) {
-  $variables['#attached']['library'][] = 'epa_wysiwyg/epaNew';
+function epa_wysiwyg_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-new';
+  $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-add-definitions';
 }
