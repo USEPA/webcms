@@ -1,0 +1,123 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_inline_media.module.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function epa_inline_media_theme() {
+  return [
+    'media__inline_embed' => [
+      'template' => 'media--inline-embed',
+      'base hook' => 'media',
+    ],
+    'field__media__document__inline_embed' => [
+      'template' => 'field--media--document--inline-media',
+      'base hook' => 'field',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme_suggestions_alter().
+ */
+function epa_inline_media_theme_suggestions_alter(array &$suggestions, array $variables, $hook) {
+  switch ($hook) {
+    case 'media':
+      // Get information about embed from display.
+      $elements = $variables['elements'];
+      $media = $elements['#media'];
+      $embed_info = _epa_inline_media_get_embed_info($elements, $media->bundle());
+
+      // If view mode is meant to be embedded inline add theme suggestions.
+      if ($embed_info['embed_inline']) {
+        $suggestions[] = $hook . '__inline_embed';
+        $suggestions[] = 'media__' . $media->bundle() . '__inline_embed';
+        $suggestions[] = 'media__' . $media->bundle() . '__' . $embed_info['sanitized_view_mode'] . '__inline_embed';
+      }
+      break;
+
+    case 'field':
+      // Get information about embed from display.
+      if (empty($variables['element']) || $variables['element']['#entity_type'] != 'media') {
+        return;
+      }
+      $elements = $variables['element'];
+      $embed_info = _epa_inline_media_get_embed_info($elements, $elements['#bundle']);
+
+      // If parent view mode is embedded inline add theme suggestion for field.
+      if ($embed_info['embed_inline']) {
+        $suggestions[] = $hook . '__' . $elements['#entity_type'] . '__' . $elements['#bundle'] . '__inline_embed';
+      }
+      break;
+  }
+}
+
+/**
+ * Helper function to return display and view mode as sanitized string.
+ */
+function _epa_inline_media_get_embed_info($elements, $bundle) {
+  $entity_type = $elements['#entity_type'];
+  $view_mode = $elements['#view_mode'] == 'full' ? 'default' : $elements['#view_mode'];
+  $display_id = implode('.', [$entity_type, $bundle, $view_mode]);
+
+  $sanitized_view_mode = strtr($view_mode, '.', '_');
+
+  // Load display.
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+  $display = $storage->load($display_id);
+
+  return [
+    'embed_inline' => $display->getThirdPartySetting('epa_inline_media', 'embed_inline', FALSE),
+    'sanitized_view_mode' => $sanitized_view_mode,
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function epa_inline_media_form_entity_view_display_edit_form_alter(array &$form, FormStateInterface $form_state) {
+  /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display */
+  $display = $form_state->getFormObject()->getEntity();
+
+  // We want to act on entities of type media.
+  if ($display->getTargetEntityTypeId() == 'media') {
+    $embed_inline = $display->getThirdPartySetting('epa_inline_media', 'embed_inline', FALSE);
+
+    $form['wysiwyg'] = [
+      '#type' => 'details',
+      '#open' => TRUE,
+      '#title' => t('WYSIWYG options'),
+      '#tree' => TRUE,
+    ];
+    $form['wysiwyg']['embed_inline'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Embed inline'),
+      '#description' => t('Allow content editors to embed this entity inline in WYSIWYG'),
+      '#default_value' => $embed_inline,
+    ];
+    $form['#entity_builders']['epa_inline_media'] = '_epa_inline_media_entity_view_display_form_entity_builder';
+  }
+}
+
+/**
+ * Entity builder for entity_view_display_edit_form.
+ */
+function _epa_inline_media_entity_view_display_form_entity_builder($entity_type_id, LayoutEntityDisplayInterface $display, &$form, FormStateInterface &$form_state) {
+  $embed_inline = (bool) $form_state->getValue(['wysiwyg', 'embed_inline'], FALSE);
+  $display->setThirdPartySetting('epa_inline_media', 'embed_inline', $embed_inline);
+}
+
+/**
+ * Implements hook_filter_info_alter().
+ */
+function epa_inline_media_filter_info_alter(&$info) {
+  $info['media_embed']['class'] = 'Drupal\epa_inline_media\Plugin\Filter\EPAMediaEmbed';
+  $info['media_embed']['description'] = t("Embeds media items using a custom tags, <code>&lt;drupal-media&gt;</code> or <code>&lt;drupal-inline-media&gt;</code>. If used in conjunction with the 'Align/Caption' filters, make sure this filter is configured to run after them.");
+}
