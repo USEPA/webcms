@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_inline_media\Plugin\CKEditorPlugin;
+namespace Drupal\media_inline_embed\Plugin\CKEditorPlugin;
 
 use Drupal\media_library\Plugin\CKEditorPlugin\DrupalMediaLibrary;
 
@@ -18,7 +18,7 @@ class DrupalInlineMedia extends DrupalMediaLibrary {
    * {@inheritdoc}
    */
   public function getFile() {
-    return $this->moduleExtensionList->getPath('epa_inline_media') . '/js/plugins/drupalinlinemedia/plugin.js';
+    return $this->moduleExtensionList->getPath('media_inline_embed') . '/js/plugins/drupalinlinemedia/plugin.js';
   }
 
   /**
@@ -28,7 +28,7 @@ class DrupalInlineMedia extends DrupalMediaLibrary {
     return [
       'DrupalInlineMedia' => [
         'label' => $this->t('Insert inline from Media Library'),
-        'image' => $this->moduleExtensionList->getPath('epa_inline_media') . '/js/plugins/drupalinlinemedia/icons/drupalinlinemedia.png',
+        'image' => $this->moduleExtensionList->getPath('media_inline_embed') . '/js/plugins/drupalinlinemedia/icons/drupalinlinemedia.png',
       ],
     ];
   }

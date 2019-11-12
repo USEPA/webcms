@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_inline_media\Plugin\Filter;
+namespace Drupal\media_inline_embed\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\filter\FilterProcessResult;
@@ -11,7 +11,7 @@ use Drupal\media\Plugin\Filter\MediaEmbed;
 /**
  * Extends Drupal's MediaEmbed class.
  */
-class EPAMediaEmbed extends MediaEmbed {
+class MediaInlineEmbed extends MediaEmbed {
 
   /**
    * {@inheritdoc}

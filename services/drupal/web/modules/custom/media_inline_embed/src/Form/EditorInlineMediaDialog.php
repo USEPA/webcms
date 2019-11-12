@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_inline_media\Form;
+namespace Drupal\media_inline_embed\Form;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\editor\EditorInterface;
@@ -9,7 +9,7 @@ use Drupal\media\Form\EditorMediaDialog;
 /**
  * Extends EditorMediaDialog.
  */
-class EPAEditorMediaDialog extends EditorMediaDialog {
+class EditorInlineMediaDialog extends EditorMediaDialog {
 
   /**
    * {@inheritdoc}

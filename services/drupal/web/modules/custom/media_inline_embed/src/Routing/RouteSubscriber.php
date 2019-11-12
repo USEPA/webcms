@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_inline_media\Routing;
+namespace Drupal\media_inline_embed\Routing;
 
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
@@ -15,7 +15,7 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     if ($route = $collection->get('editor.media_dialog')) {
-      $route->setDefault('_form', '\Drupal\epa_inline_media\Form\EPAEditorMediaDialog');
+      $route->setDefault('_form', '\Drupal\media_inline_embed\Form\EditorInlineMediaDialog');
     }
   }
 
