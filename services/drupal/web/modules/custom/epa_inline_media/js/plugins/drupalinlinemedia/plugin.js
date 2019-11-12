@@ -20,6 +20,7 @@
           }
           data.attributes = CKEDITOR.tools.copy(attributes);
           data.hasCaption = data.attributes.hasOwnProperty('data-caption');
+          data.isInline = true;
 
           if (data.hasCaption && data.attributes['data-caption'] === '') {
             data.attributes['data-caption'] = ' ';
