@@ -70,3 +70,28 @@ function epa_web_areas_entity_type_alter(array &$entity_types) {
     $entity_types['group']->setFormClass('edit', $form_class);
   }
 }
+
+// Copied from admin_toolbar_links_access_filter with a change to ensure admins get links filtered, too.
+function epa_web_areas_preprocess_menu(&$variables) {
+  if (empty($variables['items'])) {
+    // Additional empty check to prevent exotic situations, where the preprocess
+    // function is entered even without items.
+    // @see https://www.drupal.org/node/2833885
+    return;
+  }
+  // Ensure that menu_name exists.
+  if (!isset($variables['menu_name'])) {
+    // In rare cases (for unknown reasons) menu_name may not be set.
+    // As fallback, we can fetch it from the first menu item.
+    $first_link = reset($variables['items']);
+    /** @var Drupal\Core\Menu\MenuLinkDefault $original_link */
+    // Fetch the menu_name from the original link.
+    $original_link = $first_link['original_link'];
+    $variables['menu_name'] = $original_link->getMenuName();
+  }
+  if ($variables['menu_name'] == 'admin') {
+    if (admin_toolbar_links_access_filter_user_has_admin_role($variables['user'])) {
+      admin_toolbar_links_access_filter_filter_non_accessible_links($variables['items']);
+    }
+  }
+}
