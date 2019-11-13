@@ -99,7 +99,7 @@ function media_inline_embed_form_entity_view_display_edit_form_alter(array &$for
     $form['wysiwyg']['embed_inline'] = [
       '#type' => 'checkbox',
       '#title' => t('Embed inline'),
-      '#description' => t('Allow content editors to embed this entity inline in WYSIWYG'),
+      '#description' => t('Allow content editors to embed entities with this view mode inline in WYSIWYG'),
       '#default_value' => $embed_inline,
     ];
     $form['#entity_builders']['media_inline_embed'] = '_media_inline_embed_entity_view_display_form_entity_builder';
@@ -112,12 +112,4 @@ function media_inline_embed_form_entity_view_display_edit_form_alter(array &$for
 function _media_inline_embed_entity_view_display_form_entity_builder($entity_type_id, LayoutEntityDisplayInterface $display, &$form, FormStateInterface &$form_state) {
   $embed_inline = (bool) $form_state->getValue(['wysiwyg', 'embed_inline'], FALSE);
   $display->setThirdPartySetting('media_inline_embed', 'embed_inline', $embed_inline);
-}
-
-/**
- * Implements hook_filter_info_alter().
- */
-function media_inline_embed_filter_info_alter(&$info) {
-  $info['media_embed']['class'] = 'Drupal\media_inline_embed\Plugin\Filter\MediaInlineEmbed';
-  $info['media_embed']['description'] = t("Embeds media items using a custom tags, <code>&lt;drupal-media&gt;</code> or <code>&lt;drupal-inline-media&gt;</code>. If used in conjunction with the 'Align/Caption' filters, make sure this filter is configured to run after them.");
 }
