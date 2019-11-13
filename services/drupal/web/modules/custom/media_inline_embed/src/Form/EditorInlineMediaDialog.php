@@ -30,14 +30,17 @@ class EditorInlineMediaDialog extends EditorMediaDialog {
       $media_embed_element = $editor_object['attributes'];
       $form_state->set('media_embed_element', $media_embed_element);
       $has_caption = $editor_object['hasCaption'];
+      $is_inline = empty($editor_object['isInline']) ? FALSE : TRUE;
       $form_state
         ->set('hasCaption', $has_caption)
+        ->set('isInline', $is_inline)
         ->setCached(TRUE);
     }
     else {
       // Retrieve the user input from form state.
       $media_embed_element = $form_state->get('media_embed_element');
       $has_caption = $form_state->get('hasCaption');
+      $is_inline = $form_state->get('isInline');
     }
 
     $form['#tree'] = TRUE;
@@ -49,12 +52,12 @@ class EditorInlineMediaDialog extends EditorMediaDialog {
     $filter_html = $filters->get('filter_html');
     $filter_align = $filters->get('filter_align');
     $filter_caption = $filters->get('filter_caption');
-    $media_embed_filter = $filters->get('media_embed');
+    $media_embed_filter = $is_inline ? $filters->get('media_inline_embed') : $filters->get('media_embed');
 
     $allowed_attributes = [];
     if ($filter_html->status) {
       $restrictions = $filter_html->getHTMLRestrictions();
-      $allowed_attributes = $restrictions['allowed']['drupal-media'];
+      $allowed_attributes = $is_inline ? $restrictions['allowed']['drupal-inline-media'] : $restrictions['allowed']['drupal-media'];
     }
 
     $media = $this->entityRepository->loadEntityByUuid('media', $media_embed_element['data-entity-uuid']);

@@ -93,7 +93,7 @@
             editor.fire('saveSnapshot');
           };
 
-          Drupal.ckeditor.openDialog(editor, editor.config.DrupalMediaLibrary_url, {}, saveCallback, editor.config.DrupalMediaLibrary_dialogOptions);
+          Drupal.ckeditor.openDialog(editor, editor.config.DrupalInlineMediaLibrary_url, {}, saveCallback, editor.config.DrupalInlineMediaLibrary_dialogOptions);
         }
       });
 

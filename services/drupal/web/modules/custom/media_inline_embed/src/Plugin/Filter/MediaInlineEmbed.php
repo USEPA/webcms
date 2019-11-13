@@ -10,6 +10,19 @@ use Drupal\media\Plugin\Filter\MediaEmbed;
 
 /**
  * Extends Drupal's MediaEmbed class.
+ *
+ * @Filter(
+ *   id = "media_inline_embed",
+ *   title = @Translation("Embed media inline"),
+ *   description = @Translation("Embeds media items using a custom tag, <code>&lt;drupal-inline-media&gt;</code>. If used in conjunction with the 'Align/Caption' filters, make sure this filter is configured to run after them."),
+ *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
+ *   settings = {
+ *     "default_view_mode" = "default",
+ *     "allowed_view_modes" = {},
+ *     "allowed_media_types" = {},
+ *   },
+ *   weight = 100,
+ * )
  */
 class MediaInlineEmbed extends MediaEmbed {
 
@@ -19,7 +32,7 @@ class MediaInlineEmbed extends MediaEmbed {
   public function process($text, $langcode) {
     $result = new FilterProcessResult($text);
 
-    if (stristr($text, '<drupal-media') === FALSE && stristr($text, '<drupal-inline-media') === FALSE) {
+    if (stristr($text, '<drupal-inline-media') === FALSE) {
       return $result;
     }
 
