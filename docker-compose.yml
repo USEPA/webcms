@@ -127,6 +127,12 @@ services:
       - type: volume
         source: fs-data
         target: /var/www/html/web/sites/default/files
+      - type: volume
+        source: gesso-patternlab
+        target: /var/www/html/web/themes/guswds/pattern-lab
+      - type: volume
+        source: gesso-css
+        target: /var/www/html/web/themes/guswds/css
 
   # MySQL container. Remember to use the hostname "mysql" instead of "localhost" if you're
   # used to VM-based (e.g., Vagrant) development.
@@ -222,3 +228,5 @@ volumes:
   minio-data: null
   mysql-data: null
   redis-data: null
+  gesso-patternlab: null
+  gesso-css: null
