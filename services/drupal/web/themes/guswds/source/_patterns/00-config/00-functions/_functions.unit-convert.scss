@@ -1,0 +1,56 @@
+/// Convert unitless number to unit value
+// @param {Number} $value - unitless number
+// @return {String} - unit type
+
+@function convert($value, $unit: px) {
+  @if unitless($value) {
+    @if $unit == px {
+      @return $value * 1px;
+    }
+    @if $unit == em {
+      @return $value * 1em;
+    }
+  } @else {
+    @return $value;
+  }
+}
+
+// Convert values to px.
+// $base must be a base font size in pixels.
+@function px($value, $base: gesso-get-map(typography, base-font-size)) {
+  @if unitless($value) {
+    @return convert($value, px);
+  }
+  @if (type-of($base) != 'number' or unit($base) != 'px') {
+    @error "Base font size must be in pixels.";
+  }
+  @return strip-unit($value) * $base;
+}
+
+// Convert values to em.
+@function em($value, $base: gesso-get-map(typography, base-font-size)) {
+  @if (type-of($base) != 'number' or unit($base) != 'px') {
+    @error "Base font size must be in pixels.";
+  }
+  @if (type-of($value) == 'number' and unit($value) != 'em') {
+    @if (unit($value) != 'px') {
+      $value: px($value, $base);
+    }
+    @return ($value / $base) * 1em;
+  }
+  @return $value;
+}
+
+// Convert values to rem.
+@function rem($value, $base: gesso-get-map(typography, base-font-size)) {
+  @if (type-of($base) != 'number' or unit($base) != 'px') {
+    @error "Base font size must be in pixels.";
+  }
+  @if (type-of($value) == 'number' and unit($value) != 'rem') {
+    @if (unit($value) != 'px') {
+      $value: px($value, $base);
+    }
+    @return ($value / $base) * 1rem;
+  }
+  @return $value;
+}

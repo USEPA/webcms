@@ -1,0 +1,21 @@
+// @file
+// Ordered list styles.
+
+ol {
+  @extend %usa-list;
+
+  @if $support-for-rtl {
+    [dir='rtl'] & {
+      padding: 0 rem(gesso-spacing(3)) 0 0;
+    }
+  }
+
+  li {
+    @extend %usa-list-item;
+  }
+
+  ol,
+  ul {
+    margin: rem(gesso-spacing(2) / 2) 0 0;
+  }
+}
