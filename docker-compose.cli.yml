@@ -108,13 +108,13 @@ services:
   # gesso, for building the theme
   gesso:
     build:
-      context: ./services/drupal/web/themes/guswds
-      dockerfile: $PWD/services/drupal/web/themes/guswds/Dockerfile
+      context: ./services/drupal/web/themes/epa_theme
+      dockerfile: $PWD/services/drupal/web/themes/epa_theme/Dockerfile
     init: true
     volumes:
-      - ./services/drupal/web/themes/guswds/images:/app/images:cached
-      - ./services/drupal/web/themes/guswds/js:/app/js:cached
-      - ./services/drupal/web/themes/guswds/source:/app/source:cached
+      - ./services/drupal/web/themes/epa_theme/images:/app/images:cached
+      - ./services/drupal/web/themes/epa_theme/js:/app/js:cached
+      - ./services/drupal/web/themes/epa_theme/source:/app/source:cached
       - type: volume
         source: gesso-patternlab
         target: /app/pattern-lab

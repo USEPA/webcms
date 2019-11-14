@@ -33,7 +33,7 @@ WORKDIR /app
 
 COPY --from=build /app/web web
 
-WORKDIR web/themes/guswds
+WORKDIR web/themes/epa_theme
 
 RUN if test -e package-lock.json; then npm ci; else npm i; fi
 RUN npx gulp build
