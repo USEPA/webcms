@@ -1,0 +1,42 @@
+{#
+ /**
+  * @file
+  * Theme override for a set of links.
+  *
+  * Available variables:
+  * - attributes: Attributes for the UL containing the list of links.
+  * - links: Links to be output.
+  *   - title: The link text.
+  *   - href: The link URL.
+  *   - attributes: (optional) HTML attributes for the anchor.
+  * - heading: (optional) A heading to precede the links.
+  *   - text: The heading text.
+  *   - level: The heading level (e.g. 'h2', 'h3').
+  *   - attributes: (optional) A keyed list of attributes for the heading.
+  *
+  * @see template_preprocess_links()
+  */
+#}
+
+{% if links -%}
+  {%- if heading -%}
+    {%- if heading.level -%}
+      <{{ heading.level }}{{ heading.attributes }}>{{ heading.text }}</{{ heading.level }}>
+    {%- else -%}
+      <h2{{ heading.attributes }}>{{ heading.text }}</h2>
+    {%- endif -%}
+  {%- endif -%}
+  <ul{{ attributes }}>
+    {%- for item in links -%}
+      <li{{ item.attributes }}>
+        {%- if item.link -%}
+          {{ item.link }}
+        {%- elseif item.text_attributes -%}
+          <span{{ item.text_attributes }}>{{ item.text }}</span>
+        {%- else -%}
+          {{ item.text }}
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif %}
