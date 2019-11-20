@@ -4,7 +4,7 @@
 version: "3.7"
 
 services:
-  # We build a separate Drush container in order to avoid pollutting the main web server
+  # We build a separate Drush container in order to avoid polluting the main web server
   # container with things like an SSH client and rsync, which aren't needed for a
   # container-based deployment.
   drush:
@@ -104,5 +104,23 @@ services:
       - redis-cli
       - -h
       - redis
+
+  # gesso, for building the theme
+  gesso:
+    build:
+      context: ./services/drupal/web/themes/epa_theme
+      dockerfile: $PWD/services/drupal/web/themes/epa_theme/Dockerfile
+    init: true
+    volumes:
+      - ./services/drupal/web/themes/epa_theme/images:/app/images:cached
+      - ./services/drupal/web/themes/epa_theme/js:/app/js:cached
+      - ./services/drupal/web/themes/epa_theme/source:/app/source:cached
+      - type: volume
+        source: gesso-pattern-lab
+        target: /app/pattern-lab
+      - type: volume
+        source: gesso-css
+        target: /app/css
+
 volumes:
   {}
