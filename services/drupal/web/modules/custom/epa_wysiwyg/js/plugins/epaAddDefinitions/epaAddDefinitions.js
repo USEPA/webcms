@@ -22,13 +22,11 @@
           if (this.getAttribute('data-popup-lock') !== 'true') {
             fadeInPopup(this);
           }
-          console.log(this.getAttribute('data-popup-lock'));
         })
         .on('mouseleave.desktop', function () {
           if (this.getAttribute('data-popup-lock') !== 'true') {
             hidePopup(this);
           }
-          console.log(this.getAttribute('data-popup-lock'))
         })
         .on('click.desktop', function () {
           clickPopup(this);
@@ -48,18 +46,15 @@
 
       // Determine if page is mobile width.
       var isMobile = function () {
-        console.log($(window).width());
         return ($(window).width() < 800) ? true : false;
       };
 
       // Create or destroy event handlers.
       var setEventHandlers = function () {
         if (isMobile()) {
-          console.log(isMobile());
           mobileInit();
         }
         else {
-          console.log('james');
           desktopInit();
           hideModal();
         }
