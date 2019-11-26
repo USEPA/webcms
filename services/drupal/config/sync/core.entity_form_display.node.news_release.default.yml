@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.news_release.field_env_laws_regs_and_treaties
     - field.field.node.news_release.field_environmental_media
     - field.field.node.news_release.field_epa_operations
+    - field.field.node.news_release.field_expiration_date
     - field.field.node.news_release.field_geographic_locations
     - field.field.node.news_release.field_health
     - field.field.node.news_release.field_hublinks
@@ -24,10 +25,12 @@ dependencies:
     - field.field.node.news_release.field_pollution_prevention
     - field.field.node.news_release.field_press_office
     - field.field.node.news_release.field_press_officers
+    - field.field.node.news_release.field_publish_date
     - field.field.node.news_release.field_r_and_a_and_technology
     - field.field.node.news_release.field_regulatory_industrial
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
+    - field.field.node.news_release.field_scheduled_transition
     - field.field.node.news_release.field_secondary_headline
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_substances
@@ -45,6 +48,9 @@ third_party_settings:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
+        - field_sunset_date
       parent_name: group_additional_fields
       weight: 13
       format_type: tab
@@ -219,6 +225,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_geographic_locations:
     weight: 7
     settings:
@@ -344,6 +356,12 @@ content:
         collapse_edit_all: collapse_edit_all
     third_party_settings: {  }
     region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_r_and_a_and_technology:
     weight: 43
     settings:
@@ -450,4 +468,5 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  field_scheduled_transition: true
   path: true

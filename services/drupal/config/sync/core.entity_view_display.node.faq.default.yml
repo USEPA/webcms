@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.faq.field_env_laws_regs_and_treaties
     - field.field.node.faq.field_environmental_media
     - field.field.node.faq.field_epa_operations
+    - field.field.node.faq.field_expiration_date
     - field.field.node.faq.field_faq_taxonomy_topics
     - field.field.node.faq.field_geographic_locations
     - field.field.node.faq.field_health
@@ -24,17 +25,20 @@ dependencies:
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_pollution_prevention
+    - field.field.node.faq.field_publish_date
     - field.field.node.faq.field_question
     - field.field.node.faq.field_r_and_a_and_technology
     - field.field.node.faq.field_regulatory_industrial
     - field.field.node.faq.field_related_questions
     - field.field.node.faq.field_review_deadline
+    - field.field.node.faq.field_scheduled_transition
     - field.field.node.faq.field_substances
     - field.field.node.faq.field_type
     - node.type.faq
   module:
     - datetime
     - options
+    - scheduled_publish
     - text
     - user
 id: node.faq.default
@@ -124,6 +128,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_expiration_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 134
     region: content
   field_faq_taxonomy_topics:
     weight: 26
@@ -218,6 +231,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_publish_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 132
+    region: content
   field_question:
     weight: 0
     label: hidden
@@ -257,6 +279,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_scheduled_transition:
+    label: above
+    type: scheduled_publish_generic_formatter
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    weight: 133
     region: content
   field_substances:
     weight: 20

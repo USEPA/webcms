@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.page.field_env_laws_regs_and_treaties
     - field.field.node.page.field_environmental_media
     - field.field.node.page.field_epa_operations
+    - field.field.node.page.field_expiration_date
     - field.field.node.page.field_geographic_locations
     - field.field.node.page.field_health
     - field.field.node.page.field_hublinks
@@ -25,9 +26,11 @@ dependencies:
     - field.field.node.page.field_paragraphs
     - field.field.node.page.field_paragraphs_1
     - field.field.node.page.field_pollution_prevention
+    - field.field.node.page.field_publish_date
     - field.field.node.page.field_r_and_a_and_technology
     - field.field.node.page.field_regulatory_industrial
     - field.field.node.page.field_review_deadline
+    - field.field.node.page.field_scheduled_transition
     - field.field.node.page.field_substances
     - field.field.node.page.field_type
     - field.field.node.page.field_wide_template
@@ -37,6 +40,7 @@ dependencies:
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - datetime
     - field_group
     - file
     - paragraphs
@@ -97,6 +101,8 @@ third_party_settings:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
       parent_name: group_additional
       weight: 25
       format_type: tab
@@ -242,6 +248,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_geographic_locations:
     weight: 15
     settings:
@@ -366,6 +378,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_r_and_a_and_technology:
     weight: 43
     settings:
@@ -461,5 +479,6 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  field_scheduled_transition: true
   layout_builder__layout: true
   path: true

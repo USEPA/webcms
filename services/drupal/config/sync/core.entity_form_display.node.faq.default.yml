@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.faq.field_env_laws_regs_and_treaties
     - field.field.node.faq.field_environmental_media
     - field.field.node.faq.field_epa_operations
+    - field.field.node.faq.field_expiration_date
     - field.field.node.faq.field_faq_taxonomy_topics
     - field.field.node.faq.field_geographic_locations
     - field.field.node.faq.field_health
@@ -24,17 +25,20 @@ dependencies:
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_pollution_prevention
+    - field.field.node.faq.field_publish_date
     - field.field.node.faq.field_question
     - field.field.node.faq.field_r_and_a_and_technology
     - field.field.node.faq.field_regulatory_industrial
     - field.field.node.faq.field_related_questions
     - field.field.node.faq.field_review_deadline
+    - field.field.node.faq.field_scheduled_transition
     - field.field.node.faq.field_substances
     - field.field.node.faq.field_type
     - node.type.faq
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - datetime
     - field_group
     - shs
     - text
@@ -43,6 +47,9 @@ third_party_settings:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
+        - field_sunset_date
       parent_name: group_additional_fields
       weight: 11
       format_type: tab
@@ -241,6 +248,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_faq_taxonomy_topics:
     weight: 3
     settings:
@@ -336,6 +349,12 @@ content:
       force_deepest: false
     third_party_settings: {  }
     type: options_shs
+    region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
     region: content
   field_question:
     weight: 1
@@ -436,4 +455,5 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  field_scheduled_transition: true
   path: true

@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.page.field_env_laws_regs_and_treaties
     - field.field.node.page.field_environmental_media
     - field.field.node.page.field_epa_operations
+    - field.field.node.page.field_expiration_date
     - field.field.node.page.field_geographic_locations
     - field.field.node.page.field_health
     - field.field.node.page.field_hublinks
@@ -25,9 +26,11 @@ dependencies:
     - field.field.node.page.field_paragraphs
     - field.field.node.page.field_paragraphs_1
     - field.field.node.page.field_pollution_prevention
+    - field.field.node.page.field_publish_date
     - field.field.node.page.field_r_and_a_and_technology
     - field.field.node.page.field_regulatory_industrial
     - field.field.node.page.field_review_deadline
+    - field.field.node.page.field_scheduled_transition
     - field.field.node.page.field_substances
     - field.field.node.page.field_type
     - field.field.node.page.field_wide_template
@@ -42,6 +45,7 @@ dependencies:
     - layout_discovery
     - layout_library
     - options
+    - scheduled_publish
     - user
 third_party_settings:
   layout_builder:
@@ -524,6 +528,57 @@ third_party_settings:
                 third_party_settings: {  }
             additional: {  }
             weight: 31
+          b1516bde-18a3-4e9d-ace8-389d784c72dc:
+            uuid: b1516bde-18a3-4e9d-ace8-389d784c72dc
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:page:field_publish_date'
+              formatter:
+                label: above
+                settings:
+                  format_type: medium
+                  timezone_override: ''
+                third_party_settings: {  }
+                type: datetime_default
+            additional: {  }
+            weight: 32
+          cdefd56a-17c9-4c4c-b775-25bd8d8e7a01:
+            uuid: cdefd56a-17c9-4c4c-b775-25bd8d8e7a01
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:page:field_scheduled_transition'
+              formatter:
+                label: above
+                settings:
+                  date_format: html_datetime
+                  text_pattern: '%moderation_state% - %date%'
+                third_party_settings: {  }
+                type: scheduled_publish_generic_formatter
+            additional: {  }
+            weight: 34
+          50e7a9d4-cd74-4655-8026-03dba67b3465:
+            uuid: 50e7a9d4-cd74-4655-8026-03dba67b3465
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:page:field_expiration_date'
+              formatter:
+                label: above
+                settings:
+                  format_type: medium
+                  timezone_override: ''
+                third_party_settings: {  }
+                type: datetime_default
+            additional: {  }
+            weight: 35
         third_party_settings: {  }
   layout_library:
     enable: true
@@ -615,6 +670,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_expiration_date:
+    weight: 137
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
     region: content
   field_geographic_locations:
     weight: 115
@@ -719,6 +783,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_publish_date:
+    weight: 134
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_r_and_a_and_technology:
     weight: 120
     label: above
@@ -743,6 +816,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_scheduled_transition:
+    weight: 136
+    label: above
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    type: scheduled_publish_generic_formatter
     region: content
   field_substances:
     weight: 122

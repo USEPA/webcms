@@ -18,6 +18,7 @@ dependencies:
     - field.field.node.event.field_event_cancellation
     - field.field.node.event.field_event_host
     - field.field.node.event.field_event_type
+    - field.field.node.event.field_expiration_date
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_health
     - field.field.node.event.field_hublinks
@@ -31,9 +32,11 @@ dependencies:
     - field.field.node.event.field_page_head
     - field.field.node.event.field_paragraphs
     - field.field.node.event.field_pollution_prevention
+    - field.field.node.event.field_publish_date
     - field.field.node.event.field_r_and_a_and_technology
     - field.field.node.event.field_regulatory_industrial
     - field.field.node.event.field_review_deadline
+    - field.field.node.event.field_scheduled_transition
     - field.field.node.event.field_substances
     - field.field.node.event.field_type
     - node.type.event
@@ -46,13 +49,15 @@ dependencies:
     - field_group
     - link
     - paragraphs
-    - path
     - shs
 third_party_settings:
   field_group:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
+        - field_sunset_date
       parent_name: group_additional_fields
       weight: 16
       format_type: tab
@@ -282,6 +287,12 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_geographic_locations:
     weight: 15
     settings:
@@ -401,6 +412,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_r_and_a_and_technology:
     weight: 43
     settings:
@@ -483,4 +500,5 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  field_scheduled_transition: true
   path: true
