@@ -5,7 +5,7 @@
  *
  * @param $variables
  */
- function gesso_preprocess_menu_local_tasks(&$variables) {
+ function guswds_preprocess_menu_local_tasks(&$variables) {
    foreach (['primary', 'secondary'] as $type) {
      $tabs = [];
 

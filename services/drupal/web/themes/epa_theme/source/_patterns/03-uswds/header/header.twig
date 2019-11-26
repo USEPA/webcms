@@ -1,0 +1,11 @@
+<div class="usa-overlay"></div>
+<header class="usa-header{% if is_extended %} usa-header--extended{% else %} usa-header--basic{% endif %} {{ modifier_classes }}" role="banner">
+  {% if not is_extended %}<div class="usa-nav-container">{% endif %}
+  {% block content %}
+    {% include "@uswds/navbar/navbar.twig" %}
+    {% include "@uswds/nav/nav.twig" with {
+      is_extended: is_extended
+    }%}
+  {% endblock %}
+  {% if not is_extended %}</div>{% endif %}
+</header>

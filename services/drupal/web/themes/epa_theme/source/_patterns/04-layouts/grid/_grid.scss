@@ -1,0 +1,65 @@
+// @file
+// Styles for Grid Layout.
+
+$grid-gutter: 5;
+@import "packages/layout-grid";
+
+.l-grid {
+  @include grid-row;
+
+  > * {
+    @include grid-col(12);
+  }
+}
+
+.l-grid--2col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(600px) {
+    > * {
+      @include grid-col(6);
+    }
+  }
+}
+
+.l-grid--3col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(760px) {
+    > * {
+      @include grid-col(4);
+    }
+  }
+}
+
+.l-grid--4col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(600px 800px) {
+    > * {
+      @include grid-col(6);
+    }
+  }
+
+  @include breakpoint(801px) {
+    > * {
+      @include grid-col(3);
+    }
+  }
+}
+
+.l-grid--6col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(600px 999px) {
+    > * {
+      @include grid-col(4);
+    }
+  }
+
+  @include breakpoint(1000px) {
+    > * {
+      @include grid-col(2);
+    }
+  }
+}
