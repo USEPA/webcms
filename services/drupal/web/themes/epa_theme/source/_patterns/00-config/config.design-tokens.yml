@@ -1,5 +1,12 @@
 # Design Tokens
 # Define basic design variables here.
+uswds:
+  image-path: '../images'
+  root-font-size: 16px
+  font-weight-semibold: 600
+  show-compile-warnings: false
+  grid-container-max-width: 'widescreen'
+  column-gap-desktop: 5
 gesso:
   palette:
     brand:
@@ -113,13 +120,21 @@ gesso:
       fallback: '0 16px 32px 0 rgba(0, 0, 0, 0.1)'
   constrains:
     sm: 800px
-    md: 1440px
+    md: !uswds uswds.grid-container-max-width
     lg: 2200px
   breakpoints:
-    xs: 480px
-    sm: 700px
-    md: 960px
-    lg: 1280px
+    xs: !sass
+      sass: 'units("mobile-lg")'
+      fallback: 480px
+    sm: !sass
+      sass: 'units("tablet")'
+      fallback: 640px
+    md: !sass
+      sass: 'units("desktop")'
+      fallback: 1024px
+    lg: !sass
+      sass: 'units("widescreen")'
+      fallback: 1400px
   colors:
     text:
       primary: grayscale.black
@@ -128,6 +143,7 @@ gesso:
       on-dark: grayscale.white
       link: brand.blue.base
       link-hover: brand.blue.dark
+      link-active: brand.blue.dark
       link-visited: brand.blue.dark
     background:
       site: grayscale.white
@@ -194,6 +210,7 @@ gesso:
         accent: brand.blue.base
         accent-dark: brand.blue.dark-1
         accent-light: brand.blue.light
+        focus: brand.blue.light
       error:
         background: other.red.light-1
         border: other.red.light
@@ -218,7 +235,7 @@ gesso:
         stack: !sass
           sass: 'family("mono")'
           fallback: '"Roboto Mono Web", "Roboto Mono Web", "Bitstream Vera Sans Mono", "Consolas", "Courier", monospace'
-    base-font-size: 16px
+    base-font-size: uswds.root-font-size
     font-size:
       0: !sass
         sass: 'size("body", "3xs")'
@@ -377,3 +394,4 @@ gesso:
     15: !sass
       sass: 'units(15)'
       fallback: '120px'
+  gutter-width: !uswds uswds.column-gap-desktop
