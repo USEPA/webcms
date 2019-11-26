@@ -5,6 +5,7 @@
 // Be sure to initialize any components as well (see init() function below.)
 import domready from 'domready';
 import accordion from 'uswds/src/js/components/accordion.js';
+import navigation from './modules/navigation';
 
 (function() {
   'use strict';
@@ -28,5 +29,6 @@ import accordion from 'uswds/src/js/components/accordion.js';
 
   domready(() => {
     accordion.on(document.body);
+    navigation(); // If used with the USWDS accordion component, the navigation must run after it.
   });
 })();

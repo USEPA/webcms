@@ -21,6 +21,7 @@ const asyncWebpack = util.promisify(webpack);
 const readSource = require('./lib/readSource');
 const transform = require('./lib/transform');
 const renderSass = require('./lib/renderSass');
+const renderUswdsConfig = require('./lib/renderUswdsConfig');
 
 const writeFile = util.promisify(fs.writeFile);
 const os = require('os');
@@ -28,6 +29,7 @@ const os = require('os');
 const buildConfig = async () => {
   const scssDir = path.join(__dirname, '/source/_patterns/00-config');
   const ymlDir = path.join(__dirname, './source/_data');
+  const configDir = path.join(__dirname, '/source/_patterns');
 
   const parsed = await readSource(
     path.join(
@@ -52,11 +54,16 @@ const buildConfig = async () => {
       dataComment + os.EOL + yaml.stringify(transformed.data)
     ),
     writeFile(
+      path.join(configDir, '_uswds-theme-settings.artifact.scss'),
+      sassComment + os.EOL + renderUswdsConfig(transformed.data)
+    ),
+    writeFile(
       path.join(scssDir, '_design-tokens.artifact.scss'),
       sassComment + os.EOL + renderSass(transformed.data)
     ),
   ]);
 };
+exports.buildConfig = buildConfig;
 
 const lintStyles = () => {
   return src('**/*.scss', { cwd: './source', since: lastRun(lintStyles) }).pipe(

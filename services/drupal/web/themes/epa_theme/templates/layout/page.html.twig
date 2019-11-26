@@ -38,9 +38,23 @@
 {% extends '@layouts/site-container/site-container.twig' %}
   {% block site_content %}
 
-    {{ page.header }}
-
-    {{ page.navigation }}
+    {% embed "@uswds/header/header.twig" with {
+      'is_extended': page.secondary.content is empty
+    }
+    %}
+      {% block content %}
+        {{ page.header }}
+        {% embed '@uswds/nav/nav.twig' with {
+          'label': 'Primary navigation',
+          'is_extended': page.secondary.content is empty
+        } %}
+          {% block content %}
+            {{ page.navigation }}
+            {{ page.secondary }}
+          {% endblock %}
+        {% endembed %}
+      {% endblock %}
+    {% endembed %}
 
     {{ page.breadcrumb }}
 
@@ -54,6 +68,14 @@
       {{ page.postscript }}
     </main>
 
-    {{ page.footer }}
-
+    {% embed '@uswds/footer/footer.twig' with {
+      has_back_to_top: true
+    } %}
+      {% block primary %}
+        {{ page.footer }}
+      {% endblock %}
+      {% block secondary %}
+        {{ page.subfooter }}
+      {% endblock %}
+    {% endembed %}
   {% endblock %}
