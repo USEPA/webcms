@@ -5,7 +5,7 @@
  *
  * @param $variables
  */
- function guswds_preprocess_menu_local_tasks(&$variables) {
+ function epa_theme_preprocess_menu_local_tasks(&$variables) {
    foreach (['primary', 'secondary'] as $type) {
      $tabs = [];
 
