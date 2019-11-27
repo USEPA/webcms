@@ -5,28 +5,8 @@
 const { NaniError } = require('nani');
 
 const SassValue = require('./SassValue');
-
-/**
- * Prepares a JS value for output as a Sass value.
- *
- * @param {unknown} value
- */
-function cleanValue(value) {
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  if (typeof value !== 'string') {
-    throw new NaniError({
-      shortMessage: `Value passed to cleanValue() is ${typeof value}, not a string or number`,
-    });
-  }
-
-  if (!value.includes(' ')) {
-    return value;
-  }
-  return value.includes("'") ? '"' + value + '"' : "'" + value + "'";
-}
+const cleanValue = require('./cleanValue');
+const UswdsValue = require('./UswdsValue');
 
 function createSassMap(data, indent = 2) {
   let output = '';
@@ -52,6 +32,8 @@ function createSassMap(data, indent = 2) {
         } else if (value instanceof SassValue) {
           // Don't output the `fallback' field for raw Sass.
           output += value.sass;
+        } else if (value instanceof UswdsValue) {
+          output += `${value.fn}(${value.value})`;
         } else {
           output += createSassMap(value, indent + 2);
         }

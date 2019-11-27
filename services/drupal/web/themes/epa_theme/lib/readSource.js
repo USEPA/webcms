@@ -11,6 +11,7 @@ const readFile = util.promisify(fs.readFile);
 
 const CodeMap = require('./CodeMap');
 const SassValue = require('./SassValue');
+const UswdsValue = require('./UswdsValue');
 
 /**
  * @param {string} sourcePath
@@ -20,7 +21,9 @@ async function readSource(sourcePath) {
   const source = await readFile(sourcePath, 'utf-8');
   const map = new CodeMap(source);
 
-  const ast = YAML.parseDocument(source, { customTags: [SassValue.tag] });
+  const ast = YAML.parseDocument(source, {
+    customTags: [SassValue.tag, UswdsValue.tag]
+  });
   if (ast.errors && ast.errors.length) {
     const max = Math.min(ast.errors.length, 10);
     const errors = ast.errors.slice(0, max).map(yamlError => {

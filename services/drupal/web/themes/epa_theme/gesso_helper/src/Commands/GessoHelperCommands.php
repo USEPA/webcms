@@ -24,6 +24,12 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
   use SiteAliasManagerAwareTrait;
 
   /**
+   * Set of available themes.
+   * @var array
+   */
+  protected $themeList;
+
+  /**
    * Create a new theme based on the Gesso theme.
    *
    * @param $name
@@ -64,6 +70,7 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
         . 'with a letter and may only contain lowercase letters, numbers, and underscores.'));
     }
 
+    $this->io()->text(dt('Setting up the theme. This may take a while...'));
     // Get theme paths.
     $drupalRoot = Drush::bootstrapManager()->getRoot();
     $gesso_path = Path::join($drupalRoot, drupal_get_path('theme', 'gesso'));
@@ -77,42 +84,48 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
     $this->gesso_recursive_rm(Path::join($new_path, 'gesso_helper'));
 
     // Rename the .info.yml file.
-    $gesso_info_file = Path::join($new_path, 'gesso.info.yml');
+    $gesso_info_file = Path::join($new_path, 'guswds.info.yml');
     $new_info_file = Path::join($new_path, $machine_name . '.info.yml');
     drush_op('rename', $gesso_info_file, $new_info_file);
 
     // Update the .info.yml file based on the command options.
     $changes = [
-      'Gesso' => $name,
-      'Sass-based starter theme.' => $description,
-      'gesso' => $machine_name,
+      'Gesso USWDS' => $name,
+      'Sass-based starter theme based on Gesso and the United States Web Design System.' => $description,
+      'guswds' => $machine_name,
     ];
     $this->gesso_file_str_replace($new_info_file, array_keys($changes), $changes);
 
     // Rename the .breakpoints.yml file.
-    $gesso_info_file = Path::join($new_path, 'gesso.breakpoints.yml');
+    $gesso_info_file = Path::join($new_path, 'guswds.breakpoints.yml');
     $new_info_file = Path::join($new_path, $machine_name . '.breakpoints.yml');
     drush_op('rename', $gesso_info_file, $new_info_file);
 
     // Rename the .libraries.yml file.
-    $gesso_libraries_file = Path::join($new_path, 'gesso.libraries.yml');
+    $gesso_libraries_file = Path::join($new_path, 'guswds.libraries.yml');
     $new_libraries_file = Path::join($new_path, $machine_name . '.libraries.yml');
     drush_op('rename', $gesso_libraries_file, $new_libraries_file);
 
+    // Rename the .layouts.yml file.
+    $gesso_layouts_file = Path::join($new_path, 'guswds.layouts.yml');
+    $new_layouts_file = Path::join($new_path, $machine_name . '.layouts.yml');
+    drush_op('rename', $gesso_layouts_file, $new_layouts_file);
+
     // Rename the .theme file.
-    $gesso_theme_file = Path::join($new_path, 'gesso.theme');
+    $gesso_theme_file = Path::join($new_path, 'guswds.theme');
     $new_theme_file = Path::join($new_path, $machine_name . '.theme');
     drush_op('rename', $gesso_theme_file, $new_theme_file);
 
-    // Replace all occurrences of 'gesso' with the machine name of the new theme.
+    // Replace all occurrences of 'guswds' with the machine name of the new theme.
     $breakpoints_file = $machine_name . '.breakpoints.yml';
     $libraries_file = $machine_name . '.libraries.yml';
+    $layouts_file = $machine_name . '.layouts.yml';
     $theme_file = $machine_name . '.theme';
     $files = [
       $breakpoints_file,
       $libraries_file,
       $theme_file,
-      'js/scripts.js',
+      $layouts_file,
       'includes/block.inc',
       'includes/field.inc',
       'includes/form.inc',
@@ -122,7 +135,7 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
       'includes/views.inc',
     ];
     foreach ($files as $file) {
-      $this->gesso_file_str_replace(Path::join($new_path, $file), 'gesso', $machine_name);
+      $this->gesso_file_str_replace(Path::join($new_path, $file), ['guswds', 'Gesso USWDS'], [$machine_name, $name]);
     }
 
     // Notify user of the newly created theme.
@@ -135,12 +148,8 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
     ), 'SUCCESS', 'fg=black;bg=green', ' ! ');
 
     // Warn the user that they might have some additional steps.
-    $this->io()->caution(dt('If you want to remove the gesso theme entirely, be sure to copy and rename the '
+    $this->io()->caution(dt('If you want to remove the guswds theme entirely, be sure to copy and rename the '
      . 'gesso_helper module first.'));
-    $this->io()->note(dt('The gulp commands for !name are still gessoBuild and gessoWatch. If you want to change '
-      . 'those, you will need to modify the gulpfile and any build processes and/or CI tools.', [
-        '!name' => $name,
-    ]));
   }
 
   /**
@@ -165,10 +174,12 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
    * Checks if $theme_name already exists in Drupal.
    */
   private function gesso_theme_exists($theme_name) {
-    $theme_handler = \Drupal::service('theme_handler');
-    $themes = $theme_handler->listInfo();
+    if (empty($this->themeList)) {
+      $theme_handler = \Drupal::service('theme_handler');
+      $this->themeList = $theme_handler->rebuildThemeData();
+    }
 
-    return isset($themes[$theme_name]);
+    return isset($this->themeList[$theme_name]);
   }
 
   /**

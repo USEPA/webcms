@@ -1,0 +1,27 @@
+<footer class="usa-footer usa-footer--slim" role="contentinfo">
+  {% if has_back_to_top %}
+    <div class="usa-footer__return-to-top grid-container">
+      <a href="#">{{ 'Return to top'|t }}</a>
+    </div>
+  {% endif %}
+  <div class="usa-footer__primary-section">
+    <div class="usa-footer__primary-container grid-row">
+      <div class="mobile-lg:grid-col-8">
+        <nav class="usa-footer__nav">
+          {% block primary %}
+            Primary Content
+          {% endblock %}
+        </nav>
+      </div>
+    </div>
+  </div>
+  <div class="usa-footer__secondary-section">
+    <div class="grid-container">
+      <div class="grid-row grid-gap-2">
+        {% block secondary %}
+          Secondary Content
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</footer>

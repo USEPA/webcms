@@ -1,4 +1,5 @@
 // @ts-check
+const YAML = require('yaml');
 
 const {
   NaniError,
@@ -6,6 +7,7 @@ const {
 } = require('nani');
 
 const SassValue = require('./SassValue');
+const UswdsValue = require('./UswdsValue');
 
 /**
  * @param {import('yaml').ast.AstNode} node
@@ -25,7 +27,8 @@ function isScalar(node) {
     type === 'QUOTE_SINGLE' ||
     // If we have a tagged sass value, always consider it a scalar
     // (even if it's a structured object with a 'fallback' field)
-    tag === '!sass'
+    tag === '!sass' ||
+    tag === '!uswds'
   );
 }
 
@@ -107,7 +110,34 @@ const fontFamilyTransformer = (node, doc, map) => {
     );
   }
 
-  return identityTransformer(value, doc, map);
+  return identityTransformer(value);
+};
+
+const uswdsTransformer = (node, doc, map) => {
+  const nodeValue = node.value;
+  // For SassValues, return the raw sass.
+  if (nodeValue instanceof SassValue) {
+    return nodeValue;
+  }
+  // For UswdsValues, transform the value.
+  if (nodeValue instanceof UswdsValue) {
+    nodeValue.setValue(
+      uswdsTransformer(
+        YAML.createNode(nodeValue.getValue()),
+        doc,
+        map
+      )
+    );
+    return nodeValue;
+  }
+  const key = String(nodeValue);
+  const keys = key.split('.');
+  const value = doc.getIn(keys, true);
+  if (value !== undefined) {
+    return identityTransformer(value);
+  }
+
+  return identityTransformer(node);
 };
 
 /** @type {import('./types').ScalarTransformer} */
@@ -134,15 +164,15 @@ function getScalarVisitor(path) {
     const prefix = path[4];
 
     if (prefix === 'letter-spacing') {
-      return identityTransformer;
+      return uswdsTransformer;
     }
 
     if (prefix === 'font-style') {
-      return identityTransformer;
+      return uswdsTransformer;
     }
 
     if (prefix === 'text-transform') {
-      return identityTransformer;
+      return uswdsTransformer;
     }
 
     if (prefix === 'color') {
@@ -186,7 +216,7 @@ function getScalarVisitor(path) {
     };
   }
 
-  return identityTransformer;
+  return uswdsTransformer;
 }
 
 /**
