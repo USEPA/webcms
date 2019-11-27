@@ -4,3 +4,90 @@
  * @file
  * Contains epa_workflow.module.
  */
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function epa_workflow_content_moderation_state_insert(EntityInterface $entity) {
+  epa_workflow_automate_moderation($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @see Drupal\group\Entity\GroupContent::postSave
+ * @see https://www.drupal.org/project/group/issues/2872697
+ * @see https://www.drupal.org/project/drupal/issues/2803717
+ */
+function epa_workflow_content_moderation_state_update(EntityInterface $entity) {
+  // Group will trigger an update after insert.
+  // Check to see if content revision id has changed.
+  // Also, check that the moderation state isn't looping over itself.
+  if ($entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
+      && $entity->getRevisionId() != $entity->getLoadedRevisionId()
+  ) {
+    epa_workflow_automate_moderation($entity);
+  }
+}
+
+/**
+ * Triggers events based on content moderation state.
+ */
+function epa_workflow_automate_moderation(EntityInterface $entity) {
+  $state = $entity->moderation_state->value;
+  switch ($state) {
+    case 'draft_approved':
+      epa_workflow_on_enter_draft_approved($entity);
+      break;
+
+    case 'published':
+      epa_workflow_on_enter_published($entity);
+      break;
+  }
+}
+
+/**
+ * Performs actions when a draft is approved.
+ */
+function epa_workflow_on_enter_draft_approved(EntityInterface $entity) {
+  epa_workflow_schedule_transition($entity, 'field_publish_date', 'published');
+
+  \Drupal::logger('epa_workflow')->info('Content was transitioned to draft approved');
+}
+
+/**
+ * Performs actions when content is published.
+ */
+function epa_workflow_on_enter_published(EntityInterface $entity) {
+  epa_workflow_schedule_transition($entity, 'field_expiration_date', 'unpublished');
+
+  \Drupal::logger('epa_workflow')->info('Content was transitioned to published');
+}
+
+/**
+ * Transfer date to schedule transition.
+ */
+function epa_workflow_schedule_transition(EntityInterface $entity, $date_field, $moderation_state) {
+  // Get content entity.
+  $content_entity_type = $entity->content_entity_type_id->value;
+  $content_entity_id = $entity->content_entity_id->value;
+  $content_entity = \Drupal::entityTypeManager()->getStorage($content_entity_type)->load($content_entity_id);
+
+  $content_entity_revision_id = $entity->content_entity_revision_id->value;
+  $content_entity_revision = \Drupal::entityTypeManager()->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
+
+  // Stop if content doesn't have a publish date.
+  if (!$content_entity->hasField($date_field) || $content_entity->get($date_field)->isEmpty()) {
+    return;
+  }
+
+  // Do not create a new revision and set scheduled transition.
+  $content_entity_revision->setSyncing(TRUE);
+  $content_entity_revision->set('field_scheduled_transition', [
+    'moderation_state' => $moderation_state,
+    'value' => $content_entity_revision->{$date_field}->value,
+  ]);
+  $content_entity_revision->save();
+}
