@@ -9,7 +9,6 @@ drush_uri="$(sh /var/www/html/scripts/cloudfoundry/drush-uri.sh)"
 
 cd /var/www/html/web
 
-drush --uri="$drush_uri" cr
 drush --uri="$drush_uri" updb -y
 drush --uri="$drush_uri" cim -y
 drush --uri="$drush_uri" cr
