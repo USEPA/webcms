@@ -28,7 +28,7 @@
         "drupal/ckeditor_abbreviation": "^1.5",
         "drupal/config_ignore": "2.x-dev",
         "drupal/console": "^1.0.2",
-        "drupal/core": "8.8.x-dev",
+        "drupal/core": "~8.8.0",
         "drupal/custom_add_another": "^1.0@beta",
         "drupal/default_content": "1.x-dev",
         "drupal/editor_advanced_link": "^1.4",
@@ -39,10 +39,10 @@
         "drupal/group": "1.x-dev",
         "drupal/groupmenu": "^1.0@beta",
         "drupal/layout_library": "^1.0@beta",
-        "drupal/masquerade": "^2.0@beta",
-        "drupal/module_filter": "^3.1",
         "drupal/linkit": "5.x-dev",
         "drupal/linkit_media_creation": "^1.0@alpha",
+        "drupal/masquerade": "^2.0@beta",
+        "drupal/module_filter": "^3.1",
         "drupal/paragraphs": "^1.9",
         "drupal/pathauto": "^1.4",
         "drupal/redis": "^1.1",
@@ -60,7 +60,7 @@
         "zaporylie/composer-drupal-optimizations": "^1.0"
     },
     "require-dev": {
-        "webflo/drupal-core-require-dev": "8.8.x-dev"
+        "webflo/drupal-core-require-dev": "~8.8.0"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -115,6 +115,9 @@
             }
         },
         "patches": {
+            "drupal/core": {
+                "Allow end date to be optional": "https://www.drupal.org/files/issues/2019-10-23/drupal-make_end_date_optional-2794481-81.patch"
+            },
             "drupal/s3fs": {
                 "Allow using 'localhost' for CNAME": "https://www.drupal.org/files/issues/2019-08-19/s3fs-localhost-3075876-2-D8.patch"
             },
@@ -136,9 +139,6 @@
             },
             "drupal/default_content": {
                 "Do not reimport existing entities": "https://www.drupal.org/files/issues/2019-04-29/2698425--accept-content-updates--115.patch"
-            },
-            "drupal/core": {
-                "Allow end date to be optional": "https://www.drupal.org/files/issues/2018-05-14/2794481-60.patch"
             },
             "drupal/linkit": {
                 "Fix direct link to media file": "https://www.drupal.org/files/issues/2019-07-22/3069481-direct-media-url.patch"
