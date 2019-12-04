@@ -81,6 +81,7 @@ COPY load.environment.php ./
 COPY --from=build /app/scripts scripts
 COPY --from=build /app/console console
 COPY --from=build /app/vendor vendor
+COPY --from=build /app/web web
 COPY --from=gesso /app web/themes/epa_theme
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
