@@ -30,15 +30,11 @@ RUN set -ex \
   && npm i -g gulp-cli
 
 WORKDIR /app
+COPY web/themes/epa_theme/package*.json ./
+RUN npm ci
 
-COPY --from=build /app/web web
-
-WORKDIR web/themes/epa_theme
-
-RUN if test -e package-lock.json; then npm ci; else npm i; fi
-RUN npx gulp build
-
-COPY . .
+COPY web/themes/epa_theme ./
+RUN npx gulp build && rm -rf node_modules
 
 FROM drupal:8.7.6-fpm-alpine
 
@@ -84,7 +80,7 @@ COPY load.environment.php ./
 COPY --from=build /app/scripts scripts
 COPY --from=build /app/console console
 COPY --from=build /app/vendor vendor
-COPY --from=gesso /app/web web
+COPY --from=gesso /app web/themes/epa_theme
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
 
