@@ -29,7 +29,7 @@ class EPAWorkflowNotificationsWidget extends WidgetBase implements ContainerFact
   /**
    * The notification information service.
    *
-   * @var \Drupal\epa_workflow_notifications\NotificationInformation
+   * @var \Drupal\content_moderation_notifications\NotificationInformation
    */
   protected $notificationInformation;
 
@@ -72,6 +72,9 @@ class EPAWorkflowNotificationsWidget extends WidgetBase implements ContainerFact
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state): array {
+    $this->required = $element['#required'];
+    $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
+
     $entity = $items->getEntity();
 
     $options = $this->notificationInformation->getNotificationsList($entity);
