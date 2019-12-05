@@ -41,18 +41,18 @@ class EPAWorkflowNotificationsItem extends FieldItemBase implements DateTimeItem
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
 
     $properties['value'] = DataDefinition::create('datetime_iso8601')
-      ->setLabel($this->t('Date value'))
+      ->setLabel(t('Date value'))
       ->setRequired(TRUE);
 
     $properties['date'] = DataDefinition::create('any')
-      ->setLabel($this->t('Computed date'))
-      ->setDescription($this->t('The computed DateTime object.'))
+      ->setLabel(t('Computed date'))
+      ->setDescription(t('The computed DateTime object.'))
       ->setComputed(TRUE)
       ->setClass('\Drupal\datetime\DateTimeComputed')
       ->setSetting('date source', 'value');
 
     $properties['notification_type'] = DataDefinition::create('string')
-      ->setLabel($this->t('Notification type'));
+      ->setLabel(t('Notification type'));
 
     return $properties;
   }

@@ -48,7 +48,7 @@ class EPANotificationInformation extends NotificationInformation {
         ->condition('workflow', $workflow->id())
         ->condition('status', 1);
 
-      $notification_ids = $query->execute()->fetchCol();
+      $notification_ids = $query->execute();
 
       $notifications = $this->entityTypeManager->getStorage('content_moderation_notification')->loadMultiple($notification_ids);
 

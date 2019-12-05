@@ -207,7 +207,7 @@ class EPAWorkflowNotificationsFormatter extends FormatterBase implements Contain
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  private function parseData(string $strDateTime, string $strDateFormat, string $notificationType, string $pattern): string {
+  private function parseData(string $strDateTime, string $strDateFormat, string $notificationType, string $pattern) {
     $date = $this->parseDate($strDateTime, $strDateFormat);
     return str_replace(['%notification_type%', '%date%'], [
       $notificationType,
@@ -229,7 +229,7 @@ class EPAWorkflowNotificationsFormatter extends FormatterBase implements Contain
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  private function parseDate(string $strDateTime, string $strDateFormat): string {
+  private function parseDate(string $strDateTime, string $strDateFormat) {
     $dateFormat = $this->entityTypeManager->getStorage('date_format')
       ->load($strDateFormat);
     if ($dateFormat !== NULL) {
