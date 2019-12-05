@@ -31,14 +31,14 @@ function views_theme_suggestions_views_view_unformatted(array $variables) {
 /**
  * Implements preprocess_views_view().
  */
-function gesso_preprocess_views_view(&$variables) {
+function epa_theme_preprocess_views_view(&$variables) {
   $variables['path'] = $variables['view']->getRequest()->getPathInfo();
 }
 
 /**
 * Implements hook_theme_suggestions_container_alter().
 */
-function gesso_theme_suggestions_container_alter(array &$suggestions, array $variables) {
+function epa_theme_theme_suggestions_container_alter(array &$suggestions, array $variables) {
   // A list of view names in which to exclude the container markup.
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.
   $exclude_views = [

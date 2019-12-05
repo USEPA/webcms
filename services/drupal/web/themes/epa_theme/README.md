@@ -1,4 +1,4 @@
-# Gesso
+# Gesso USWDS
 
 Gesso is a [Sass](http://sass-lang.com/)-based and [Pattern Lab](https://patternlab.io)
 integrated starter theme that outputs accessible HTML5 markup. It uses a
@@ -17,6 +17,11 @@ To submit bug reports or feature requests, visit the
 [Gesso issue queue](https://github.com/forumone/gesso/issues).
 Also available for [WordPress](https://github.com/forumone/gesso-wp).
 
+The United States Web Design System is a set of design guidelines and starting
+code for creating digital government services. For more information view the
+[USWDS](https://designsystem.digital.gov) project website or the 
+[USWDS Github repo](https://github.com/uswds/uswds).
+
 ## Global Prerequisites
 
 The following packages need to be installed on your system in order to use
@@ -30,8 +35,8 @@ available on the command line.
 
 ## Installation
 
-1. Place the Gesso theme in your site’s theme directory. (e.g.,
-   themes/gesso) Read documentation on
+1. Place the Gesso USWDS theme in your site’s theme directory. (e.g.,
+   themes/guswds) Read documentation on
    [installing themes](https://drupal.org/getting-started/install-contrib/themes)
    for more information.
 
@@ -61,11 +66,11 @@ Type `drush help gesso` for more information. If you get an error that the
 `gesso` command is not defined, make sure you have enabled the Gesso Helper
 module.
 
-If you can’t use Drush, then manually replace all instances of `gesso`
+If you can’t use Drush, then manually replace all instances of `guswds`
 within this directory with a machine-readable name of your choice, including
-folder names, filenames, and all occurrences within files. This custom name must
-start with a letter and may only contain lowercase letters, numbers, and
-underscores.
+folder names, filenames, and all occurrences within Drupal theme files. 
+This custom name must start with a letter and may only contain lowercase 
+letters, numbers, and underscores.
 
 Edit the .info.yml file and update the theme name and description. You can also
 change the screenshot image (images/screenshot.png) shown on the Appearance
@@ -104,7 +109,7 @@ browser from your file system.
 
 ### Design Tokens
 
-Gesso uses a configuration file `source/\_patterns/00-config/config.design-tokens.yml`
+Gesso USWDS uses a configuration file `source/\_patterns/00-config/config.design-tokens.yml`
 to manage the theme’s design tokens and automatically generate the global sass
 map for styling and patterns to represent the theme’s design tokens. The default
 gulp command will monitor changes in the config and rebuild all necessary
@@ -114,7 +119,7 @@ assets. To rebuild the theme assets a single time run `gulp build`
 
 In addition to using hex values for colors, you can also use Sass functions and
 provide a fallback hex value to be used in Pattern Lab. This is useful when
-pulling in an external design system, such as [USWDS](https://designsystem.digital.gov/).
+pulling in tokens from [USWDS](https://designsystem.digital.gov/).
 
 For example:
 
@@ -125,8 +130,8 @@ gesso:
       blue:
         base: '#0071bc'
         light: !sass
-          sass: 'lighten(#0071bc, 20%)'
-          fallback: '#23a7ff'
+          sass: 'color("blue-40")'
+          fallback: '#4f97d1'
 ```
 
 #### Design Token Functions
@@ -295,11 +300,12 @@ See the README.md file in the /js directory for details on included scripts
 
 ## Maintainers
 
-The Gesso theme is maintained by [Dan Mouyard](https://drupal.org/u/dcmouyard)
+The Gesso USWDS theme is maintained by [Dan Mouyard](https://drupal.org/u/dcmouyard)
 ([@dcmouyard](http://twitter.com/dcmouyard)),
 [Shawn Brackat](https://drupal.org/u/bkny_139)
-([@shawnbrackat](http://twitter.com/shawnbrackat)) and
+([@shawnbrackat](http://twitter.com/shawnbrackat)),
 [Corey Lafferty](https://drupal.org/u/clafferty)
-([@coreylafferty](http://twitter.com/coreylafferty)).
+([@coreylafferty](http://twitter.com/coreylafferty)), and
+[Kelli Monahan](https://drupal.org/u/kmonahan).
 
-Please use the Github issue queue: https://github.com/forumone/gesso/issues
+Please use the Github issue queue: https://github.com/forumone/gesso-uswds/issues
