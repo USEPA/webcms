@@ -14,6 +14,28 @@ RUN composer install \
   --no-dev \
   --optimize-autoloader
 
+FROM php:7.3-cli AS gesso
+
+ENV NODE_VERSION=v12.13.0 \
+  NODE_CHECKSUM=c69671c89d0faa47b64bd5f37079e4480852857a9a9366ee86cdd8bc9670074a
+
+ENV NODE_FILENAME=node-${NODE_VERSION}-linux-x64.tar.gz
+
+RUN set -ex \
+  && cd /tmp \
+  && curl -fsSO "https://nodejs.org/dist/${NODE_VERSION}/${NODE_FILENAME}" \
+  && echo "${NODE_CHECKSUM}  ${NODE_FILENAME}" | sha256sum -c \
+  && tar xf "${NODE_FILENAME}" --strip-components=1 -C /usr/local \
+  && rm "${NODE_FILENAME}" \
+  && npm i -g gulp-cli
+
+WORKDIR /app
+COPY web/themes/epa_theme/package*.json ./
+RUN npm ci
+
+COPY web/themes/epa_theme ./
+RUN npx gulp build && rm -rf node_modules
+
 FROM drupal:8.7.6-fpm-alpine
 
 # CloudFoundry overwrites this port with a random number - we're doing this instead of
@@ -59,6 +81,7 @@ COPY --from=build /app/scripts scripts
 COPY --from=build /app/console console
 COPY --from=build /app/vendor vendor
 COPY --from=build /app/web web
+COPY --from=gesso /app web/themes/epa_theme
 COPY --from=build /app/composer.json /app/composer.lock ./
 COPY ./config config
 

@@ -1,0 +1,48 @@
+<nav class="usa-nav" role="navigation" aria-label="{{ label }}">
+  {% if is_extended %}<div class="usa-nav__inner">{% endif %}
+  <button class="usa-nav__close">{{ 'Close'|t }}</button>
+  {% block content %}
+    {% set prefix = is_extended ? "extended" : "basic" %}
+    <ul class="usa-nav__primary usa-accordion">
+      <li class="usa-nav__primary-item">
+        <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-one">
+          <span>Current section</span>
+        </button>
+        <ul id="{{ prefix }}-nav-section-one" class="usa-nav__submenu">
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+        </ul>
+      </li>
+      <li class="usa-nav__primary-item">
+        <button class="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-two">
+          <span>Section</span>
+        </button>
+        <ul id="{{ prefix }}-nav-section-two" class="usa-nav__submenu">
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+          <li class="usa-nav__submenu-item">
+            <a href="#">Navigation link</a>
+          </li>
+        </ul>
+      </li>
+      <li class="usa-nav__primary-item">
+        <a class="usa-nav__link" href="#"><span>Simple link</span></a>
+      </li>
+    </ul>
+    {% if is_extended %}
+      {% include "@uswds/nav/_secondary.twig" %}
+    {% endif %}
+  {% endblock %}
+  {% if is_extended %}</div>{% endif %}
+</nav>

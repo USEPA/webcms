@@ -1,0 +1,26 @@
+// @file
+// Utility classes
+
+// Clearfix
+.clearfix {
+  @include clearfix;
+}
+
+// Accessibility utility classes
+.visually-hidden {
+  @include visually-hidden-important;
+  &.focusable {
+    &:focus,
+    &:active {
+      @include visually-hidden-off-important;
+    }
+  }
+}
+
+.hidden {
+  @include hidden-important;
+}
+
+.invisible {
+  @include invisible-important;
+}

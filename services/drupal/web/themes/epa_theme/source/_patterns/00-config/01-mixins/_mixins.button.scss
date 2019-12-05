@@ -1,0 +1,73 @@
+// @file
+// Button styles
+@import "packages/required";
+@import "packages/usa-button";
+$button-border-radius: radius($theme-button-border-radius) !default;
+$button-background-color: gesso-color(button, primary, background) !default;
+$button-background-color-active: gesso-color(
+  button,
+  primary,
+  background-active
+) !default;
+$button-background-color-disabled: gesso-color(
+  button,
+  disabled,
+  background
+) !default;
+$button-background-color-hover: gesso-color(
+  button,
+  primary,
+  background-hover
+) !default;
+$button-text-color: gesso-color(button, primary, text) !default;
+$button-text-color-active: gesso-color(button, primary, text-active) !default;
+$button-text-color-disabled: gesso-color(button, disabled, text) !default;
+$button-text-color-hover: gesso-color(button, primary, text-hover) !default;
+$button-font-size: gesso-base-font-size() !default;
+
+@mixin button(
+  $color-background: $button-background-color,
+  $color-text: $button-text-color,
+  $color-background-hover: $button-background-color-hover,
+  $color-text-hover: $button-text-color-hover,
+  $color-background-active: $button-background-color-active,
+  $color-text-active: $button-text-color-active,
+  $color-background-disabled: $button-background-color-disabled,
+  $color-text-disabled: $button-text-color-disabled,
+  $border-radius: $button-border-radius,
+  $font-size: $button-font-size
+) {
+  /* stylelint-disable-next-line scss/at-extend-no-missing-placeholder */
+  @extend .usa-button;
+
+  background-color: $color-background;
+  border-radius: $border-radius;
+  color: $color-text;
+  display: inline-block;
+  font-family: gesso-font-family(primary);
+  font-size: rem($font-size);
+  transition: background gesso-duration(short) gesso-easing(ease-in);
+  vertical-align: top;
+  white-space: normal;
+
+  &:visited {
+    color: $color-text;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $color-background-hover;
+    color: $color-text-hover;
+  }
+
+  &:active {
+    background-color: $color-background-active;
+    color: $color-text-active;
+  }
+
+  &[disabled] {
+    @include button-disabled;
+    background-color: $color-background-disabled;
+    color: $color-text-disabled;
+  }
+}
