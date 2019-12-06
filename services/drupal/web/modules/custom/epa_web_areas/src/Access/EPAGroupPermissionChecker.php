@@ -6,6 +6,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Access\CalculatedGroupPermissionsItemInterface;
 use Drupal\group\Access\ChainGroupPermissionCalculatorInterface;
 use Drupal\group\Access\GroupPermissionChecker;
+use Drupal\group\Access\GroupPermissionCheckerInterface;
 use Drupal\group\Entity\GroupInterface;
 
 /**
@@ -23,12 +24,12 @@ class EPAGroupPermissionChecker extends GroupPermissionChecker {
   /**
    * Constructs a GroupPermissionChecker object.
    *
-   * @param \Drupal\group\Access\GroupPermissionChecker $group_permission_checker
+   * @param \Drupal\group\Access\GroupPermissionCheckerInterface $group_permission_checker
    *   The original group permission checker service.
    * @param \Drupal\group\Access\ChainGroupPermissionCalculatorInterface $permission_calculator
    *   The group permission calculator.
    */
-  public function __construct(GroupPermissionChecker $group_permission_checker, ChainGroupPermissionCalculatorInterface $permission_calculator) {
+  public function __construct(GroupPermissionCheckerInterface $group_permission_checker, ChainGroupPermissionCalculatorInterface $permission_calculator) {
     $this->groupPermissionChecker = $group_permission_checker;
     parent::__construct($permission_calculator);
   }
