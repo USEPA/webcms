@@ -5,12 +5,28 @@
  * Contains epa_workflow.module.
  */
 
-use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
+    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Moderation automated'))
+      ->setDescription(t('When true current moderation state is automated.'))
+      ->setComputed(TRUE)
+      ->setRevisionable(TRUE);
+    return $fields;
+  }
+}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
  */
-function epa_workflow_content_moderation_state_insert(ContentEntityInterface $entity) {
+function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
   epa_workflow_automate_moderation($entity);
 }
 
@@ -21,7 +37,7 @@ function epa_workflow_content_moderation_state_insert(ContentEntityInterface $en
  * @see https://www.drupal.org/project/group/issues/2872697
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
-function epa_workflow_content_moderation_state_update(ContentEntityInterface $entity) {
+function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
   // Group will trigger an update after insert.
   // Check to see if content revision id has changed.
   // Also, check that the moderation state isn't looping over itself.
@@ -35,7 +51,7 @@ function epa_workflow_content_moderation_state_update(ContentEntityInterface $en
 /**
  * Triggers events based on content moderation state.
  */
-function epa_workflow_automate_moderation(ContentEntityInterface $entity) {
+function epa_workflow_automate_moderation(ContentModerationStateInterface $entity) {
   $state = $entity->moderation_state->value;
   switch ($state) {
     case 'draft_approved':
@@ -51,7 +67,7 @@ function epa_workflow_automate_moderation(ContentEntityInterface $entity) {
 /**
  * Performs actions when a draft is approved.
  */
-function epa_workflow_on_enter_draft_approved(ContentEntityInterface $entity) {
+function epa_workflow_on_enter_draft_approved(ContentModerationStateInterface $entity) {
   // If publish date entered, schedule content to be published.
   epa_workflow_schedule_transition($entity, 'field_publish_date', 'published');
 
@@ -61,7 +77,7 @@ function epa_workflow_on_enter_draft_approved(ContentEntityInterface $entity) {
 /**
  * Performs actions when content is published.
  */
-function epa_workflow_on_enter_published(ContentEntityInterface $entity) {
+function epa_workflow_on_enter_published(ContentModerationStateInterface $entity) {
   // If sunset date entered, schedule content to be unpublished.
   epa_workflow_schedule_transition($entity, 'field_expiration_date', 'unpublished');
 
@@ -71,7 +87,7 @@ function epa_workflow_on_enter_published(ContentEntityInterface $entity) {
 /**
  * Transfer date to schedule transition.
  */
-function epa_workflow_schedule_transition(ContentEntityInterface $entity, $date_field, $moderation_state) {
+function epa_workflow_schedule_transition(ContentModerationStateInterface $entity, $date_field, $moderation_state) {
   // Get content entity.
   $content_entity_type = $entity->content_entity_type_id->value;
 
@@ -87,6 +103,7 @@ function epa_workflow_schedule_transition(ContentEntityInterface $entity, $date_
   }
 
   // Do not create a new revision and set scheduled transition.
+  // Mark scheduled transition as automated.
   $content_entity_revision->setSyncing(TRUE);
   $content_entity_revision->set('field_scheduled_transition', [
     'moderation_state' => $moderation_state,
