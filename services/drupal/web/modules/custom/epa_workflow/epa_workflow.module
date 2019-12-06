@@ -71,6 +71,22 @@ function epa_workflow_on_enter_draft_approved(ContentModerationStateInterface $e
   // If publish date entered, schedule content to be published.
   epa_workflow_schedule_transition($entity, 'field_publish_date', 'published');
 
+  // Delete this. This is just for testing.
+  // Get content entity.
+  $content_entity_type = $entity->content_entity_type_id->value;
+
+  $content_entity_revision_id = $entity->content_entity_revision_id->value;
+  /**
+   * @var Drupal\Core\Entity\ContentEntityInterface $content_entity_revision
+   */
+  $content_entity_revision = \Drupal::entityTypeManager()->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
+  $field_publish_date = $content_entity_revision->get('field_publish_date');
+  $settings = $field_publish_date->getSettings();
+  $itemdef = $field_publish_date->getItemDefinition();
+  $fielddef = $field_publish_date->getFieldDefinition();
+  $date = $field_publish_date->getValue();
+  $next_date = '';
+
   \Drupal::logger('epa_workflow')->info('Content was transitioned to draft approved');
 }
 
@@ -81,11 +97,16 @@ function epa_workflow_on_enter_published(ContentModerationStateInterface $entity
   // If sunset date entered, schedule content to be unpublished.
   epa_workflow_schedule_transition($entity, 'field_expiration_date', 'unpublished');
 
+  // Set review date field.
+  epa_workflow_set_review_deadline($entity);
+
   \Drupal::logger('epa_workflow')->info('Content was transitioned to published');
 }
 
 /**
  * Transfer date to schedule transition.
+ *
+ * @todo Refactor to use helper function to retrieve content entity revision.
  */
 function epa_workflow_schedule_transition(ContentModerationStateInterface $entity, $date_field, $moderation_state) {
   // Get content entity.
@@ -110,4 +131,38 @@ function epa_workflow_schedule_transition(ContentModerationStateInterface $entit
     'value' => $content_entity_revision->{$date_field}->value,
   ]);
   $content_entity_revision->save();
+}
+
+/**
+ * Sets field_review_deadline value based on metadata type.
+ *
+ * @todo Refactor to use helper function to retrieve content entity revision.
+ */
+function epa_workflow_set_review_deadline($entity, $reset = FALSE) {
+  // Get content entity.
+  $content_entity_type = $entity->content_entity_type_id->value;
+
+  $content_entity_revision_id = $entity->content_entity_revision_id->value;
+  /**
+   * @var Drupal\Core\Entity\ContentEntityInterface $content_entity_revision
+   */
+  $content_entity_revision = \Drupal::entityTypeManager()->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
+
+  // Stop if content use a review deadline.
+  if (!$content_entity_revision->hasField('field_review_deadline') || $content_entity_revision->get('field_review_deadline')->isEmpty()) {
+    return;
+  }
+
+  $content_entity_revision->setSyncing(TRUE);
+
+  if ($reset) {
+    $content_entity_revision->set('field_review_deadline', NULL);
+    $content_entity_revision->save();
+    return $content_entity_revision;
+  }
+
+  if (!$content_entity_revision->get('field_type')->isEmpty() && $type->field) {
+
+  }
+
 }
