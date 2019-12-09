@@ -7,7 +7,7 @@ RUN composer global require hirak/prestissimo:=0.3.9
 COPY ./scripts scripts
 COPY ./console console
 COPY ./web web
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock composer.patches.json ./
 
 RUN composer install \
   --ignore-platform-reqs \
