@@ -93,7 +93,18 @@
         }
     },
     "autoload": {
+        "classmap": [
+            "scripts/composer/ScriptHandler.php"
+        ],
         "files": ["load.environment.php"]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createFilesDir"
+        ],
+        "post-update-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createFilesDir"
+        ]
     },
     "extra": {
         "composer-exit-on-patch-failure": true,
