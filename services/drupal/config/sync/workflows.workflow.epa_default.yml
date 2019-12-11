@@ -43,7 +43,7 @@ type_settings:
       default_revision: true
       label: 'Published, needs review'
       weight: 0
-    published_scheduled_for_expiration:
+    published_expiring:
       published: true
       default_revision: true
       label: 'Published, scheduled for expiration'
@@ -66,7 +66,7 @@ type_settings:
       label: 'Content reviewed; republish'
       from:
         - published_needs_review
-        - published_scheduled_for_expiration
+        - published_expiring
       to: published
       weight: 6
     create_new_draft:
@@ -79,7 +79,7 @@ type_settings:
         - draft_needs_review
         - published
         - published_needs_review
-        - published_scheduled_for_expiration
+        - published_expiring
         - unpublished
     publish:
       label: Publish
@@ -113,7 +113,7 @@ type_settings:
       label: 'Send to editor(s) for review'
       from:
         - published_needs_review
-      to: published_scheduled_for_expiration
+      to: published_expiring
       weight: 8
     unapprove_return_to_draft:
       label: 'Unapprove; return to draft'
@@ -126,7 +126,7 @@ type_settings:
       from:
         - published
         - published_needs_review
-        - published_scheduled_for_expiration
+        - published_expiring
       to: unpublished
       weight: 9
   entity_types:
