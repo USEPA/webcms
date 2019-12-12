@@ -16,13 +16,14 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * Implements hook_entity_base_field_info().
  */
 function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
   if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
     $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Moderation automated'))
       ->setDescription(t('When true current moderation state is automated.'))
       ->setRevisionable(TRUE);
-    return $fields;
   }
+  return $fields;
 }
 
 /**
