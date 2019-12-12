@@ -206,12 +206,14 @@ function epa_workflow_schedule_transition($content_entity_revision, $transition_
     $date = $transition_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
   }
 
-  // Do not create a new revision and set scheduled transition.
-  $new_transition = [
-    'moderation_state' => $moderation_state,
-    'value' => $date,
-  ];
-  $content_entity_revision->field_scheduled_transition->appendItem($new_transition);
+  // Set scheduled transition.
+  if ($content_entity_revision->hasField('field_scheduled_transition')) {
+    $new_transition = [
+      'moderation_state' => $moderation_state,
+      'value' => $date,
+    ];
+    $content_entity_revision->field_scheduled_transition->appendItem($new_transition);
+  }
 
   return $content_entity_revision;
 }
