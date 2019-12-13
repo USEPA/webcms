@@ -834,6 +834,7 @@ if (isset($cf_service_bindings->elasticsearch56)) {
 
 if (isset($cf_service_bindings->{'epa-smtp'})) {
   list($smtp_credentials) = $cf_service_bindings->{'epa-smtp'};
+  $smtp_credentials = $smtp_credentials->credentials;
   $config['smtp.settings']['smtp_username'] = $smtp_credentials->smtp_username;
   $config['smtp.settings']['smtp_password'] = $smtp_credentials->smtp_password;
   $config['smtp.settings']['smtp_from'] = $smtp_credentials->smtp_from;
