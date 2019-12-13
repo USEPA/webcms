@@ -1,0 +1,15 @@
+<?php
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_install().
+ */
+function epa_workflow_install() {
+  $storage_definition = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Moderation automated'))
+    ->setDescription(t('When true current moderation state is automated.'))
+    ->setRevisionable(TRUE);
+
+  \Drupal::entityDefinitionUpdateManager()->installFieldStorageDefinition('epa_workflow_automated', 'node', 'node', $storage_definition);
+}

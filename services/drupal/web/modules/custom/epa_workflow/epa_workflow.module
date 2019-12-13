@@ -15,22 +15,29 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 /**
  * Implements hook_entity_base_field_info().
  */
-function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
-  $fields = [];
-  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
-    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Moderation automated'))
-      ->setDescription(t('When true current moderation state is automated.'))
-      ->setRevisionable(TRUE);
-  }
-  return $fields;
-}
+//function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+//  $fields = [];
+//  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
+//    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
+//      ->setLabel(t('Moderation automated'))
+//      ->setDescription(t('When true current moderation state is automated.'))
+//      ->setRevisionable(TRUE);
+//  }
+//  return $fields;
+//}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
+ *
+ * @todo Use helper to check if entity is moderated.
  */
 function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
-  epa_workflow_automate_moderation($entity);
+  $content_entity_type_id = $entity->content_entity_type_id->value;
+  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+  if ($moderation_info->isModeratedEntityType($content_entity_type)) {
+    epa_workflow_automate_moderation($entity);
+  }
 }
 
 /**
@@ -41,10 +48,15 @@ function epa_workflow_content_moderation_state_insert(ContentModerationStateInte
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
 function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  $content_entity_type_id = $entity->content_entity_type_id->value;
+  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
   // Group will trigger an update after insert.
+  // Check to see if entity is moderated.
   // Check to see if content revision id has changed.
   // Also, check that the moderation state isn't looping over itself.
-  if ($entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
+  if ($moderation_info->isModeratedEntityType($content_entity_type)
+      && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
       && $entity->getRevisionId() != $entity->getLoadedRevisionId()
   ) {
     epa_workflow_automate_moderation($entity);
