@@ -1,7 +1,7 @@
 // @file
 // Styles for hero using a background image.
 
-$hero-bg-image-bp: gesso-breakpoint(md) !default;
+$hero-bg-image-bp: gesso-breakpoint(desktop) !default;
 
 .hero-bg-image {
   background-position: 50% 50%;
@@ -37,18 +37,18 @@ $hero-bg-image-bp: gesso-breakpoint(md) !default;
   margin-bottom: rem(gesso-spacing(5));
 
   @include breakpoint(max-width $hero-bg-image-bp) {
-    font-size: rem(gesso-font-size(6));
+    font-size: font-size(heading, 3xl);
     margin-bottom: rem(gesso-spacing(3));
   }
 }
 
 .hero-bg-image__summary {
-  @include display-text-style(body-large);
+  @include display-text-style(lead);
   color: gesso-color(text, on-dark);
   margin-bottom: rem(gesso-spacing(5));
 
   @include breakpoint(max-width $hero-bg-image-bp) {
-    font-size: rem(gesso-font-size(1));
+    font-size: font-size(body, sm);
     margin-bottom: rem(gesso-spacing(3));
   }
 }

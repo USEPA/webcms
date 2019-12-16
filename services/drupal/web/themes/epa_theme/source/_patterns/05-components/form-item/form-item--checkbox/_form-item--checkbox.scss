@@ -13,7 +13,6 @@
     display: block;
 
     &::before {
-      @include focus();
       background: gesso-color(form, background-unchecked);
       border: 1px solid gesso-color(form, border-dark);
       content: '\a0';
@@ -39,7 +38,7 @@
   }
 
   &:focus + .form-item__label::before {
-    outline-color: gesso-color(ui, generic, focus);
+    @include focus-outline();
   }
 
   &:disabled + .form-item__label {
