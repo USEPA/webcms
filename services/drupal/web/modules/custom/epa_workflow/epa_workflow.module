@@ -7,35 +7,13 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
- * Implements hook_entity_base_field_info().
- */
-//function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
-//  $fields = [];
-//  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
-//    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
-//      ->setLabel(t('Moderation automated'))
-//      ->setDescription(t('When true current moderation state is automated.'))
-//      ->setRevisionable(TRUE);
-//  }
-//  return $fields;
-//}
-
-/**
  * Implements hook_ENTITY_TYPE_insert().
- *
- * @todo Use helper to check if entity is moderated.
  */
 function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
-  $content_entity_type_id = $entity->content_entity_type_id->value;
-  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
-  $moderation_info = \Drupal::service('content_moderation.moderation_information');
-  if ($moderation_info->isModeratedEntityType($content_entity_type)) {
+  if (epa_workflow_is_moderated_entity($entity)) {
     epa_workflow_automate_moderation($entity);
   }
 }
@@ -48,14 +26,11 @@ function epa_workflow_content_moderation_state_insert(ContentModerationStateInte
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
 function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
-  $content_entity_type_id = $entity->content_entity_type_id->value;
-  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
-  $moderation_info = \Drupal::service('content_moderation.moderation_information');
   // Group will trigger an update after insert.
   // Check to see if entity is moderated.
   // Check to see if content revision id has changed.
   // Also, check that the moderation state isn't looping over itself.
-  if ($moderation_info->isModeratedEntityType($content_entity_type)
+  if (epa_workflow_is_moderated_entity($entity)
       && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
       && $entity->getRevisionId() != $entity->getLoadedRevisionId()
   ) {
@@ -103,7 +78,6 @@ function epa_workflow_on_enter_draft_approved(ContentModerationStateInterface $e
   $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, 'field_publish_date', 'published');
 
   // @see \Drupal\scheduled_publish\Service\ScheduledPublishCron::updateEntity.
-  $content_entity_revision->set('epa_workflow_automated', 0);
   $content_entity_revision->save();
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to draft approved.');
@@ -146,9 +120,7 @@ function epa_workflow_on_enter_published_needs_review(ContentModerationStateInte
 
   $content_entity_revision->setSyncing(TRUE);
 
-  if ($content_entity_revision->hasField('epa_workflow_automated')
-      && $content_entity_revision->epa_workflow_automated->value
-      && $content_entity_revision->hasField('field_review_deadline')
+  if ($content_entity_revision->hasField('field_review_deadline')
       && !$content_entity_revision->get('field_review_deadline')->isEmpty()
   ) {
     $transition_date = $content_entity_revision->field_review_deadline->date;
@@ -156,9 +128,6 @@ function epa_workflow_on_enter_published_needs_review(ContentModerationStateInte
     $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'published_expiring');
     // @see \Drupal\scheduled_publish\Service\ScheduledPublishCron::updateEntity.
     $content_entity_revision->save();
-  }
-  else {
-    $content_entity_revision->set('epa_workflow_automated', 0);
   }
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to published needs review.');
@@ -172,17 +141,12 @@ function epa_workflow_on_enter_published_expiring(ContentModerationStateInterfac
 
   $content_entity_revision->setSyncing(TRUE);
 
-  if ($content_entity_revision->hasField('epa_workflow_automated')
-      && $content_entity_revision->epa_workflow_automated->value
-      && $content_entity_revision->hasField('field_review_deadline')
+  if ($content_entity_revision->hasField('field_review_deadline')
       && !$content_entity_revision->get('field_review_deadline')->isEmpty()
   ) {
     $transition_date = $content_entity_revision->field_review_deadline->date;
     $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'unpublished');
     $content_entity_revision->save();
-  }
-  else {
-    $content_entity_revision->set('epa_workflow_automated', 0);
   }
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to published, scheduled for expiration.');
@@ -285,6 +249,16 @@ function epa_workflow_clear_scheduled_transitions($content_entity_revision) {
 }
 
 /**
+ * Check if content is moderated.
+ */
+function epa_workflow_is_moderated_entity(ContentModerationStateInterface $entity) {
+  $content_entity_type_id = $entity->content_entity_type_id->value;
+  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+  return $moderation_info->isModeratedEntityType($content_entity_type);
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  *
  * @todo This should probably be contributed back.
@@ -296,4 +270,20 @@ function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
   $entity_types = $workflow->getTypePlugin()->getEntityTypes();
   $entity_types[] = 'content_moderation_notifications';
   $form['body']['token_tree_link']['#token_types'] = array_unique(array_merge($form['body']['token_tree_link']['#token_types'], $entity_types));
+}
+
+/**
+ * Implements hook_mail_alter().
+ *
+ * Sets header content type to html.
+ * Can also achieve by installing mailsystem and add a module specific
+ * configuration for content_moderation_notifications.
+ *
+ * @see https://www.drupal.org/project/content_moderation_notifications/issues/2903550
+ * @todo Move to custom notifications module.
+ */
+function epa_workflow_mail_alter(&$message) {
+  if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
+    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+  }
 }
