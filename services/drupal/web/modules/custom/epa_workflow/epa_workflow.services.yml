@@ -5,3 +5,9 @@ services:
     decoration_priority: 5
     public: false
     arguments: ['@epa_workflow.content_moderation_notifications.notification.inner', '@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@content_moderation_notifications.notification_information', '@?token.entity_mapper']
+  epa_workflow.scheduled_publish.update:
+    class: Drupal\epa_workflow\EPAScheduledPublishCron
+    decorates: scheduled_publish.update
+    decoration_priority: 5
+    public: false
+    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time']
