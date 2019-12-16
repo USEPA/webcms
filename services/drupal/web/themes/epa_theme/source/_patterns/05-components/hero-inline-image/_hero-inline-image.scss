@@ -1,7 +1,7 @@
 // @file
 // Styles for hero using an inline image element.
 
-$hero-inline-image-bp: gesso-breakpoint(md) !default;
+$hero-inline-image-bp: gesso-breakpoint(desktop) !default;
 
 .hero-inline-image {
   @include breakpoint($hero-inline-image-bp) {
@@ -66,12 +66,12 @@ $hero-inline-image-bp: gesso-breakpoint(md) !default;
   }
 
   @include breakpoint(max-width $hero-inline-image-bp) {
-    font-size: rem(gesso-font-size(6));
+    font-size: font-size(heading, 3xl);
   }
 }
 
 .hero-inline-image__summary {
-  @include display-text-style(body-large);
+  @include display-text-style(lead);
   margin-bottom: rem(gesso-spacing(3));
 
   @include breakpoint($hero-inline-image-bp) {

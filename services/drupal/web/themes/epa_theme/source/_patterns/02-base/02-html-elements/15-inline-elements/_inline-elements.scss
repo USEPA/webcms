@@ -2,7 +2,6 @@
 // Inline element styles.
 
 a {
-  @include focus();
   background-color: transparent;
   color: gesso-color(text, link);
   -webkit-text-decoration-skip: objects;
@@ -31,7 +30,7 @@ a {
 
     &[href]::after {
       content: ' <' attr(href) '>';
-      font-family: gesso-font-family(primary);
+      font-family: font-family(body);
       font-size: 10pt;
       font-weight: normal;
       text-transform: lowercase;
@@ -54,9 +53,8 @@ a {
 
 abbr {
   &[title] {
-    border-bottom: 0;
-    text-decoration: underline;
-    text-decoration: underline dotted;
+    border-bottom: 1px dotted;
+    text-decoration: none;
   }
 
   &:hover {
@@ -81,7 +79,7 @@ cite {
 // del {}
 
 dfn {
-  font-style: italic;
+  font-style: normal;
 }
 
 // em {}
@@ -93,8 +91,8 @@ dfn {
 // kbd {}
 
 mark {
-  background: gesso-color(mark, background);
-  color: gesso-color(mark, text);
+  background: #ff0;
+  color: #000;
 }
 
 // q {}
@@ -104,10 +102,18 @@ mark {
 // samp {}
 
 small {
-  font-size: 75%;
+  font-size: 80%;
 }
 
 // strong {}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
 
 sub {
   bottom: -0.25em;
@@ -121,4 +127,6 @@ sup {
 
 // u {}
 
-// var {}
+var {
+  font-style: normal;
+}
