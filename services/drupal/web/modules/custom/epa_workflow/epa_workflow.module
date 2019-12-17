@@ -7,7 +7,23 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
+    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Moderation automated'))
+      ->setDescription(t('When true current moderation state is automated.'))
+      ->setRevisionable(TRUE)
+      ->setComputed(TRUE);
+    return $fields;
+  }
+}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
