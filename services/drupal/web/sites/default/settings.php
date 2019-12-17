@@ -832,6 +832,20 @@ if (isset($cf_service_bindings->elasticsearch56)) {
   $config['elasticsearch_connector.cluster.elasticsearch']['options']['password'] = $es_credentials->password;
 }
 
+$user_services = [];
+
+if (isset($cf_service_bindings->{'user-provided'})) {
+  foreach ($cf_service_bindings->{'user-provided'} as $user_service) {
+    $user_services[$user_service->instance_name] = $user_service;
+  }
+}
+
+if (isset($user_services['epa-smtp'])) {
+  $smtp_credentials = $user_services['epa-smtp']->credentials;
+  $config['smtp.settings']['smtp_username'] = $smtp_credentials->smtp_username;
+  $config['smtp.settings']['smtp_password'] = $smtp_credentials->smtp_password;
+  $config['smtp.settings']['smtp_from'] = $smtp_credentials->smtp_from;
+}
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 $config_directories['sync'] = '../config/sync';

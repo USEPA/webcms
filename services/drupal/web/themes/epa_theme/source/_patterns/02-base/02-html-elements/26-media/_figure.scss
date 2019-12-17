@@ -2,7 +2,17 @@
 // Figure element styles.
 
 figure {
-  margin: 0 0 rem(gesso-spacing(2));
+  margin: 0;
+
+  // Add top margin when preceded by another element.
+  * + & {
+    margin-top: 1em;
+  }
+
+  // Add top margin to item directly after this.
+  + * {
+    margin-top: 1em;
+  }
 }
 
 // figcaption {}
