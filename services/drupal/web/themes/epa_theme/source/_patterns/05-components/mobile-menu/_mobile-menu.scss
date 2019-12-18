@@ -11,8 +11,8 @@ $mobile-menu-submenu-link-color: gesso-color(ui, generic, text-dark) !default;
 $mobile-menu-submenu-link-hover-color: gesso-color(ui, generic, text-darker) !default;
 $mobile-menu-button-height: rem(54px);
 $mobile-menu-button-width: 44px;
-$mobile-menu-font-size: gesso-font-size(2);
-$mobile-menu-line-height: gesso-line-height(base);
+$mobile-menu-font-size: font-size(ui, md);
+$mobile-menu-line-height: line-height(ui, $theme-body-line-height);
 
 .mobile-menu {
   background-color: $mobile-menu-fallback-bg-color;
@@ -41,7 +41,7 @@ $mobile-menu-line-height: gesso-line-height(base);
   border: 0;
   color: $mobile-menu-link-color;
   display: block;
-  font-family: gesso-font-family(system);
+  font-family: gesso-font-family(ui);
   font-size: rem($mobile-menu-font-size);
   font-weight: gesso-font-weight(bold);
   line-height: $mobile-menu-line-height;
@@ -66,7 +66,6 @@ $mobile-menu-line-height: gesso-line-height(base);
 }
 
 .mobile-menu__subnav-arrow {
-  @include focus();
   @include image-replace($mobile-menu-button-width, $mobile-menu-button-height);
   @include svg-background-inline(mobile-arrow-down);
   background-attachment: initial;
@@ -84,6 +83,10 @@ $mobile-menu-line-height: gesso-line-height(base);
   top: 0;
   vertical-align: top;
   z-index: 2;
+
+  &:focus {
+    @include focus-outline();
+  }
 
   @if $support-for-rtl {
     [dir='rtl'] & {

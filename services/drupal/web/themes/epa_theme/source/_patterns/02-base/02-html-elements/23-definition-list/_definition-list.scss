@@ -2,11 +2,28 @@
 // Definition list styles.
 
 dd {
-  margin-bottom: rem(gesso-spacing(1));
+  margin: 0 0 1em 3ch;
+
+  @if $support-for-rtl {
+    [dir='rtl'] & {
+      margin-left: 0;
+      margin-right: 3ch;
+    }
+  }
 }
 
 dl {
-  margin: 0 0 rem(gesso-spacing(1));
+  margin: 0;
+
+  // Add top margin when preceded by another element.
+  * + & {
+    margin-top: 1em;
+  }
+
+  // Add top margin to item directly after this.
+  + * {
+    margin-top: 1em;
+  }
 }
 
 // dt {}
