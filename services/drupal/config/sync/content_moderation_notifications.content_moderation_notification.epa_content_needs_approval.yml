@@ -8,12 +8,15 @@ transitions:
   send_for_review: send_for_review
 roles: {  }
 group_type: web_area
-group_use: false
+group_use: true
 group_roles:
+  web_area-approver: web_area-approver
   web_area-30cda0a61: '0'
   web_area-a1df8f829: '0'
   web_area-a416e6833: '0'
   web_area-a57c51304: '0'
+  web_area-administrator: '0'
+  web_area-editor: '0'
   web_area-member: '0'
   web_area-outsider: '0'
 author: false
@@ -21,6 +24,6 @@ site_mail: true
 emails: ''
 subject: 'EPA Content Needs Approval: [node:group:title] > [node:title]'
 body:
-  value: "The following EPA page has been submitted for review and approval. Please approve it or make changes:\r\n\r\n[node:group:title] > [node:title]\r\n\r\n[node:edit-url]\r\n"
+  value: "<p>The following EPA page has been submitted for review and approval. Please approve it or make changes: [node:group:title] &gt; [node:title] [node:edit-url]</p>\r\n"
   format: filtered_html
 label: 'EPA Content Needs Approval'
