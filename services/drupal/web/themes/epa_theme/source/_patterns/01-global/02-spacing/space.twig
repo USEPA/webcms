@@ -2,6 +2,7 @@
   <thead>
     <tr>
       <th class="pattern-lab-spacing__header">Token</th>
+      <th class="pattern-lab-spacing__header">USWDS Function</th>
       <th class="pattern-lab-spacing__header">REM</th>
       <th class="pattern-lab-spacing__header">PX</th>
       <th class="pattern-lab-spacing__header">Example</th>
@@ -20,13 +21,14 @@
       %}
 
       <tr>
-        <td class="pattern-lab-spacing__cell">{{name}}</td>
-        <td class="pattern-lab-spacing__cell">{{remValue}}rem
-          {% if unit_label is not empty %} (<code>{{ unit_label }}</code>){% endif %}
-        </td>
-        <td class="pattern-lab-spacing__cell">{{unit}}</td>
+        <td class="pattern-lab-spacing__cell">{{ name }}</td>
+        {% if unit_label is not empty %}
+          <td class="pattern-lab-spacing__cell"><code>{{ unit_label }}</code></td>
+        {% endif %}
+        <td class="pattern-lab-spacing__cell">{{ remValue }}rem</td>
+        <td class="pattern-lab-spacing__cell">{{ unit }}</td>
         <td class="pattern-lab-spacing__cell">
-          <div style="height:{{unit}}; width:{{unit}}; background-color: #ccc;"></div>
+          <div style="height:{{ unit }}; width:{{ unit }}; background-color: #ccc;"></div>
         </td>
       </tr>
     {% endfor %}

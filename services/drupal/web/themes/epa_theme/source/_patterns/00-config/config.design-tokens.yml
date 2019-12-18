@@ -1,106 +1,328 @@
 # Design Tokens
 # Define basic design variables here.
 uswds:
+  # https://github.com/uswds/uswds/blob/develop/src/stylesheets/theme/_uswds-theme-general.scss
   image-path: '../images'
-  root-font-size: 16px
-  font-weight-semibold: 600
   show-compile-warnings: false
-  grid-container-max-width: 'widescreen'
+  # https://github.com/uswds/uswds/blob/develop/src/stylesheets/theme/_uswds-theme-typography.scss
+  font-path: '../fonts'
+  type-scale-md: 7
+  # https://github.com/uswds/uswds/blob/develop/src/stylesheets/theme/_uswds-theme-spacing.scss
   column-gap-desktop: 5
+  grid-container-max-width: 'widescreen'
+  site-max-width: 'widescreen'
+  # https://github.com/uswds/uswds/blob/develop/src/stylesheets/theme/_uswds-theme-color.scss
+  color-base-family: 'gray-cool'
+  color-base-lightest: 'gray-5'
+  color-base-lighter: 'gray-cool-10'
+  color-base-light: 'gray-cool-30'
+  color-base: 'gray-cool-50'
+  color-base-dark: 'gray-cool-60'
+  color-base-darker: 'gray-cool-70'
+  color-base-darkest: 'gray-90'
+  color-base-ink: 'gray-90'
+  color-primary-lightest: false
+  color-primary-lighter: 'blue-10'
+  color-primary-light: 'blue-30'
+  color-primary: 'blue-60v'
+  color-primary-vivid: 'blue-warm-60v'
+  color-primary-dark: 'blue-warm-70v'
+  color-primary-darker: 'blue-warm-80v'
+  color-primary-darkest: false
+  color-secondary-lightest: false
+  color-secondary-lighter: 'red-cool-10'
+  color-secondary-light: 'red-30'
+  color-secondary: 'red-50'
+  color-secondary-vivid: 'red-cool-50v'
+  color-secondary-dark: 'red-60v'
+  color-secondary-darker: 'red-70v'
+  color-secondary-darkest: false
+  color-accent-warm-lightest: false
+  color-accent-warm-lighter: 'orange-10'
+  color-accent-warm-light: 'orange-20v'
+  color-accent-warm: 'orange-30v'
+  color-accent-warm-dark: 'orange-50v'
+  color-accent-warm-darker: 'orange-60'
+  color-accent-warm-darkest: false
+  color-accent-cool-lightest: false
+  color-accent-cool-lighter: 'blue-cool-5v'
+  color-accent-cool-light: 'blue-cool-20v'
+  color-accent-cool: 'cyan-30v'
+  color-accent-cool-dark: 'blue-cool-40v'
+  color-accent-cool-darker: 'blue-cool-60v'
+  color-accent-cool-darkest: false
+  color-error-lighter: 'red-warm-10'
+  color-error-light: 'red-warm-30v'
+  color-error: 'red-warm-50v'
+  color-error-dark: 'red-60v'
+  color-error-darker: 'red-70'
+  color-warning-lighter: 'yellow-5'
+  color-warning-light: 'yellow-10v'
+  color-warning: 'gold-20v'
+  color-warning-dark: 'gold-30v'
+  color-warning-darker: 'gold-50v'
+  color-success-lighter: 'green-cool-5'
+  color-success-light: 'green-cool-20v'
+  color-success: 'green-cool-40v'
+  color-success-dark: 'green-cool-50'
+  color-success-darker: 'green-cool-60'
+  color-info-lighter: 'cyan-5'
+  color-info-light: 'cyan-20'
+  color-info: 'cyan-30v'
+  color-info-dark: 'cyan-40v'
+  color-info-darker: 'blue-cool-60'
+  color-disabled-light: 'gray-10'
+  color-disabled: 'gray-20'
+  color-disabled-dark: 'gray-30'
+  link-color: 'primary'
+  link-visited-color: 'violet-70v'
+  link-hover-color: 'primary-dark'
+  link-active-color: 'primary-darker'
 gesso:
   palette:
     brand:
       blue:
-        base: !sass
-          sass: 'color("blue-60v")'
-          fallback: '#005ea2'
-        light: !sass
-          sass: 'color("blue-40")'
-          fallback: '#4f97d1'
         light-1: !sass
-          sass: 'color("blue-20")'
+          sass: 'color(blue-20)'
           fallback: '#aacdec'
-        light-2: !sass
-          sass: 'sass("blue-10")'
-          fallback: '#d9e8f6'
+        light: !sass
+          sass: 'color(blue-40)'
+          fallback: '#4f97d1'
+        base: !sass
+          sass: 'color(blue-60v)'
+          fallback: '#005ea2'
         dark: !sass
-          sass: 'sass("blue-warm-70v")'
+          sass: 'color(blue-warm-70v)'
           fallback: '#1a4480'
         dark-1: !sass
-          sass: 'sass("blue-warm-80v")'
+          sass: 'color(blue-warm-80v)'
           fallback: '#162e51'
-      ocean-blue:
-        base: !sass
-          sass: 'color("cyan-30v")'
-          fallback: '#00bde3'
-        light: !sass
-          sass: 'color("blue-cool-20v")'
-          fallback: '#97d4ea'
+      aqua:
         light-1: !sass
-          sass: 'color("blue-cool-5v")'
+          sass: 'color(blue-cool-5v)'
           fallback: '#e1f3f8'
+        light: !sass
+          sass: 'color(blue-cool-20v)'
+          fallback: '#97d4ea'
+        base: !sass
+          sass: 'color(cyan-30v)'
+          fallback: '#00bde3'
         dark: !sass
-          sass: 'color("blue-cool-40v")'
+          sass: 'color(blue-cool-40v)'
           fallback: '#28a0cb'
         dark-1: !sass
-          sass: 'color("blue-cool-60v")'
+          sass: 'color(blue-cool-60v)'
           fallback: '#07648d'
+      green:
+        light-1: !sass
+          sass: 'color(green-cool-10)'
+          fallback: '#dbebde'
+        light: !sass
+          sass: 'color(green-cool-30)'
+          fallback: '#86b98e'
+        base: !sass
+          sass: 'color(green-cool-40)'
+          fallback: '#5e9f69'
+        dark: !sass
+          sass: 'color(green-cool-50)'
+          fallback: '#4d8055'
+        dark-1: !sass
+          sass: 'color(green-cool-70)'
+          fallback: '#37493b'
     grayscale:
       white: '#fff'
       gray-1: !sass
-        sass: 'color("gray-cool-5")'
+        sass: 'color(gray-cool-5)'
         fallback: '#f0f0f0'
       gray-2: !sass
-        sass: 'color("gray-cool-10")'
+        sass: 'color(gray-cool-10)'
         fallback: '#dcdee0'
       gray-3: !sass
-        sass: 'color("gray-cool-30")'
+        sass: 'color(gray-cool-30)'
         fallback: '#a9aeb1'
       gray-4: !sass
-        sass: 'color("gray-cool-50")'
+        sass: 'color(gray-cool-50)'
         fallback: '#71767a'
       gray-5: !sass
-        sass: 'color("gray-cool-60")'
+        sass: 'color(gray-cool-60)'
         fallback: '#565c65'
       gray-6: !sass
-        sass: 'color("gray-cool-70")'
+        sass: 'color(gray-cool-70)'
         fallback: '#3d4551'
-      black: !sass
-        sass: 'color("gray-90")'
+      gray-7: !sass
+        sass: 'color(gray-90)'
         fallback: '#1b1b1b'
-    other:
-      yellow:
-        base: !sass
-          sass: 'color("yellow-20v")'
-          fallback: '#face00'
+      black: '#000'
+    uswds:
+      base:
+        lightest: !sass
+          sass: 'color($theme-color-base-lightest)'
+          fallback: '#f0f0f0'
+        lighter: !sass
+          sass: 'color($theme-color-base-lighter)'
+          fallback: '#dcdee0'
         light: !sass
-          sass: 'color("yellow-10v")'
-          fallback: '#fee685'
-      yellow-neon:
-        base: '#ff0'
-      green:
+          sass: 'color($theme-color-base-light)'
+          fallback: '#a9aeb1'
         base: !sass
-          sass: 'color("green-40")'
-          fallback: '#7d9b4e'
-        light: !sass
-          sass: 'color("green-10")'
-          fallback: '#dfeacd'
-      red:
-        base: !sass
-          sass: 'color("red-50")'
-          fallback: '#d83933'
-        light: !sass
-          sass: 'color("red-30")'
-          fallback: '#f2938c'
-        light-1: !sass
-          sass: 'color("red-cool-10v")'
-          fallback: '#f8dfe2'
+          sass: 'color($theme-color-base)'
+          fallback: '#71767a'
         dark: !sass
-          sass: 'color("red-60v")'
-          fallback: '#b51d09'
-        dark-1: !sass
-          sass: 'color("red-70v")'
-          fallback: '#8b1303'
+          sass: 'color($theme-color-base-dark)'
+          fallback: '#565c65'
+        darker: !sass
+          sass: 'color($theme-color-base-darker)'
+          fallback: '#3d4551'
+        darkest: !sass
+          sass: 'color($theme-color-base-darkest)'
+          fallback: '#1b1b1b'
+        ink: !sass
+          sass: 'color($theme-color-base-ink)'
+          fallback: '#1b1b1b'
+      primary:
+        lighter: !sass
+          sass: 'color($theme-color-primary-lighter)'
+          fallback: '#d9e8f6'
+        light: !sass
+          sass: 'color($theme-color-primary-light)'
+          fallback: '#73b3e7'
+        base: !sass
+          sass: 'color($theme-color-primary)'
+          fallback: '#005ea2'
+        vivid: !sass
+          sass: 'color($theme-color-primary-vivid)'
+          fallback: '#0050d8'
+        dark: !sass
+          sass: 'color($theme-color-primary-dark)'
+          fallback: '#1a4480'
+        darker: !sass
+          sass: 'color($theme-color-primary-darker)'
+          fallback: '#162e51'
+      secondary:
+        lighter: !sass
+          sass: 'color($theme-color-secondary-lighter)'
+          fallback: '#f3e1e4'
+        light: !sass
+          sass: 'color($theme-color-secondary-light)'
+          fallback: '#f2938c'
+        base: !sass
+          sass: 'color($theme-color-secondary)'
+          fallback: '#e52207'
+        vivid: !sass
+          sass: 'color($theme-color-secondary-vivid)'
+          fallback: '#e41d3d'
+        dark: !sass
+          sass: 'color($theme-color-secondary-dark)'
+          fallback: '#b50909'
+        darker: !sass
+          sass: 'color($theme-color-secondary-darker)'
+          fallback: '#8b0a03'
+      accent-warm:
+        lighter: !sass
+          sass: 'color($theme-color-accent-warm-lighter)'
+          fallback: '#f2e4d4'
+        light: !sass
+          sass: 'color($theme-color-accent-warm-light)'
+          fallback: '#ffbc78'
+        base: !sass
+          sass: 'color($theme-color-accent-warm)'
+          fallback: '#fa9441'
+        dark: !sass
+          sass: 'color($theme-color-accent-warm-dark)'
+          fallback: '#c05600'
+        darker: !sass
+          sass: 'color($theme-color-accent-warm-darker)'
+          fallback: '#775540'
+      accent-cool:
+        lighter: !sass
+          sass: 'color($theme-color-accent-cool-lighter)'
+          fallback: '#e1f3f8'
+        light: !sass
+          sass: 'color($theme-color-accent-cool-light)'
+          fallback: '#97d4ea'
+        base: !sass
+          sass: 'color($theme-color-accent-cool)'
+          fallback: '#00bde3'
+        dark: !sass
+          sass: 'color($theme-color-accent-cool-dark)'
+          fallback: '#28a0cb'
+        darker: !sass
+          sass: 'color($theme-color-accent-cool-darker)'
+          fallback: '#07648d'
+      error:
+        lighter: !sass
+          sass: 'color($theme-color-error-lighter)'
+          fallback: '#f4e3db'
+        light: !sass
+          sass: 'color($theme-color-error-light)'
+          fallback: '#f39268'
+        base: !sass
+          sass: 'color($theme-color-error)'
+          fallback: '#d63e04'
+        dark: !sass
+          sass: 'color($theme-color-error-dark)'
+          fallback: '#b50909'
+        darker: !sass
+          sass: 'color($theme-color-error-darker)'
+          fallback: '#6f3331'
+      warning:
+        lighter: !sass
+          sass: 'color($theme-color-warning-lighter)'
+          fallback: '#faf3d1'
+        light: !sass
+          sass: 'color($theme-color-warning-light)'
+          fallback: '#fee685'
+        base: !sass
+          sass: 'color($theme-color-warning)'
+          fallback: '#ffbe2e'
+        dark: !sass
+          sass: 'color($theme-color-warning-dark)'
+          fallback: '#e5a000'
+        darker: !sass
+          sass: 'color($theme-color-warning-darker)'
+          fallback: '#936f38'
+      success:
+        lighter: !sass
+          sass: 'color($theme-color-success-lighter)'
+          fallback: '#ecf3ec'
+        light: !sass
+          sass: 'color($theme-color-success-light)'
+          fallback: '#70e17b'
+        base: !sass
+          sass: 'color($theme-color-success)'
+          fallback: '#00a91c'
+        dark: !sass
+          sass: 'color($theme-color-success-dark)'
+          fallback: '#4d8055'
+        darker: !sass
+          sass: 'color($theme-color-success-darker)'
+          fallback: '#446443'
+      info:
+        lighter: !sass
+          sass: 'color($theme-color-info-lighter)'
+          fallback: '#e7f6f8'
+        light: !sass
+          sass: 'color($theme-color-info-light)'
+          fallback: '#9ddfeb'
+        base: !sass
+          sass: 'color($theme-color-info)'
+          fallback: '#00bde3'
+        dark: !sass
+          sass: 'color($theme-color-info-dark)'
+          fallback: '#009ec1'
+        darker: !sass
+          sass: 'color($theme-color-info-darker)'
+          fallback: '#2e6276'
+      disabled:
+        light: !sass
+          sass: 'color($theme-color-disabled-light)'
+          fallback: '#e6e6e6'
+        base: !sass
+          sass: 'color($theme-color-disabled)'
+          fallback: '#c9c9c9'
+        dark: !sass
+          sass: 'color($theme-color-disabled-dark)'
+          fallback: '#adadad'
   box-shadow:
     0: none
     1: !sass
@@ -123,80 +345,89 @@ gesso:
     md: !uswds uswds.grid-container-max-width
     lg: 2200px
   breakpoints:
-    xs: !sass
-      sass: 'units("mobile-lg")'
+    mobile: !sass
+      sass: 'units(mobile)'
+      fallback: 320px
+    mobile-lg: !sass
+      sass: 'units(mobile-lg)'
       fallback: 480px
-    sm: !sass
-      sass: 'units("tablet")'
+    tablet: !sass
+      sass: 'units(tablet)'
       fallback: 640px
-    md: !sass
-      sass: 'units("desktop")'
+    tablet-lg: !sass
+      sass: 'units(tablet-lg)'
+      fallback: 880px
+    desktop: !sass
+      sass: 'units(desktop)'
       fallback: 1024px
-    lg: !sass
-      sass: 'units("widescreen")'
+    desktop-lg: !sass
+      sass: 'units(desktop-lg)'
+      fallback: 1200px
+    widescreen: !sass
+      sass: 'units(widescreen)'
       fallback: 1400px
   colors:
     text:
-      primary: grayscale.black
+      primary: grayscale.gray-7
       secondary: grayscale.gray-5
-      on-light: grayscale.black
+      on-light: grayscale.gray-7
       on-dark: grayscale.white
-      link: brand.blue.base
-      link-hover: brand.blue.dark
-      link-active: brand.blue.dark
-      link-visited: brand.blue.dark
+      link: !sass
+        sass: 'color($theme-link-color)'
+        fallback: '#005ea2'
+      link-hover: !sass
+        sass: 'color($theme-link-hover-color)'
+        fallback: '#1a4480'
+      link-active: !sass
+        sass: 'color($theme-link-active-color)'
+        fallback: '#162e51'
+      link-visited: !sass
+        sass: 'color($theme-link-visited-color)'
+        fallback: '#562b97'
     background:
       site: grayscale.white
     button:
       primary:
-        background: brand.blue.base
-        background-hover: brand.blue.dark
-        background-active: brand.blue.dark-1
+        background: uswds.primary.base
+        background-hover: uswds.primary.dark
+        background-active: uswds.primary.darker
         text: grayscale.white
         text-hover: grayscale.white
         text-active: grayscale.white
       secondary:
-        background: brand.ocean-blue.base
-        background-hover: brand.ocean-blue.dark
-        background-active: brand.ocean-blue.dark-1
-        text: grayscale.white
+        background: uswds.accent-cool.base
+        background-hover: uswds.accent-cool.dark
+        background-active: uswds.accent-cool.darker
+        text: grayscale.gray-7
         text-hover: grayscale.white
         text-active: grayscale.white
       disabled:
-        background: grayscale.gray-2
-        text: grayscale.gray-4
+        background: uswds.disabled.base
+        text: grayscale.white
       danger:
-        background: other.red.base
-        background-hover: other.red.dark
-        background-active: other.red.dark-1
+        background: uswds.error.base
+        background-hover: uswds.error.dark
+        background-active: uswds.error.darker
         text: grayscale.white
         text-hover: grayscale.white
         text-active: grayscale.white
     form:
       background: grayscale.gray-1
       background-active: grayscale.white
-      background-checked: brand.blue.base
+      background-checked: uswds.primary.base
       background-unchecked: grayscale.white
       border: grayscale.gray-3
       border-dark: grayscale.gray-5
       border-light: grayscale.gray-1
       thumb: grayscale.gray-5
       track: grayscale.gray-4
-    mark:
-      background: other.yellow-neon.base
-      text: grayscale.black
     selection:
-      background: brand.blue.base
+      background: uswds.primary.base
       text: grayscale.white
-    table:
-      border: grayscale.gray-5
-      background: grayscale.white
-      background-head: grayscale.gray-2
-      background-foot: grayscale.gray-2
     ui:
       generic:
         background: grayscale.gray-4
-        background-darker: grayscale.black
+        background-darker: grayscale.gray-7
         background-dark: grayscale.gray-6
         background-light: grayscale.gray-2
         background-lighter: grayscale.gray-1
@@ -206,155 +437,174 @@ gesso:
         text-lighter: grayscale.white
         text-light: grayscale.gray-4
         text-dark: grayscale.gray-5
-        text-darker: grayscale.black
-        accent: brand.blue.base
-        accent-dark: brand.blue.dark-1
-        accent-light: brand.blue.light
-        focus: brand.blue.light
+        text-darker: grayscale.gray-7
+        accent: uswds.accent-cool.base
+        accent-dark: uswds.accent-cool.dark
+        accent-light: uswds.accent-cool.light
       error:
-        background: other.red.light-1
-        border: other.red.light
+        background: uswds.error.lighter
+        border: uswds.error.light
       success:
-        background: other.green.light
-        border: other.green.base
+        background: uswds.success.lighter
+        border: uswds.success.light
       warning:
-        background: other.yellow.light
-        border: other.yellow.base
+        background: uswds.warning.lighter
+        border: uswds.warning.base
   typography:
     font-family:
-      primary:
-        name: Primary
+      body:
+        name: Body
         stack: !sass
-          sass: 'family("body")'
-          fallback: '"Source Sans Pro", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif'
-      system:
-        name: System
-        stack: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Oxygen-Sans", Ubuntu, Cantarell, "Fira Sans", Droid Sans, sans-serif'
-      monospace:
-        name: Monospace
+          sass: 'font-family(body)'
+          fallback: '"Source Sans Pro Web", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif'
+      heading:
+        name: Heading
         stack: !sass
-          sass: 'family("mono")'
-          fallback: '"Roboto Mono Web", "Roboto Mono Web", "Bitstream Vera Sans Mono", "Consolas", "Courier", monospace'
-    base-font-size: uswds.root-font-size
-    font-size:
-      0: !sass
-        sass: 'size("body", "3xs")'
-        fallback: 13px
-      1: !sass
-        sass: 'size("body", "2xs")'
-        fallback: 14px
-      2: !sass
-        sass: 'size("body", "xs")'
-        fallback: 15px
-      3: !sass
-        sass: 'size("body", "sm")'
-        fallback: 16px
-      4: !sass
-        sass: 'size("heading", "md")'
-        fallback: 17px
-      5: !sass
-        sass: 'size("heading", "lg")'
-        fallback: 22px
-      6: !sass
-        sass: 'size("heading", "xl")'
-        fallback: 32px
-      7: !sass
-        sass: 'size("heading", "2xl")'
-        fallback: 40px
-      8: !sass
-        sass: 'size("heading", "3xl")'
-        fallback: 48px
-      9: !sass
-        sass: 'size("heading", 18)'
-        fallback: 80px
+          sass: 'font-family(heading)'
+          fallback: '"Merriweather Web", Georgia, Cambria, "Times New Roman", Times, serif'
+      code:
+        name: Code
+        stack: !sass
+          sass: 'font-family(mono)'
+          fallback: '"Roboto Mono Web", "Bitstream Vera Sans Mono", Consolas, Courier, monospace'
+      ui:
+        name: UI
+        stack: !sass
+          sass: 'font-family(ui)'
+          fallback: '"Source Sans Pro Web", "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif'
+      alt:
+        name: Alternate
+        stack: !sass
+          sass: 'font-family(alt)'
+          fallback: '"Merriweather Web", Georgia, Cambria, "Times New Roman", Times, serif'
+    base-font-size: 16px # Changing this value will throw off USWDS calculations.
     font-weight:
       light: !sass
-        sass: 'font-weight("light")'
+        sass: 'font-weight(light)'
         fallback: 300
-      regular: !sass
-        sass: 'font-weight("normal")'
+      normal: !sass
+        sass: 'font-weight(normal)'
         fallback: 400
-      semibold: !sass
-        sass: 'font-weight("semibold")'
-        fallback: 600
       bold: !sass
-        sass: 'font-weight("bold")'
+        sass: 'font-weight(bold)'
         fallback: 700
     line-height:
-      tight: 1.1
-      base: 1.45
-      loose: 1.7
+      1: 1
+      2: 1.2
+      3: 1.35
+      4: 1.5
+      5: 1.62
+      6: 1.75
     display:
       display:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 8
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-display-font-size)'
+          fallback: 2.93rem
         font-weight: bold
-        line-height: tight
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h1:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 7
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-h1-font-size)'
+          fallback: 2.44rem
         font-weight: bold
-        line-height: tight
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h2:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 6
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-h2-font-size)'
+          fallback: 1.95rem
         font-weight: bold
-        line-height: tight
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h3:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 5
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-h3-font-size)'
+          fallback: 1.34rem
         font-weight: bold
-        line-height: tight
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h4:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 4
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-h4-font-size)'
+          fallback: 0.98rem
         font-weight: bold
-        line-height: base
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h5:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 2
+        font-family: heading.stack
+        font-size: !sass
+          sass: 'font-size(heading, $theme-h5-font-size)'
+          fallback: 0.91rem
         font-weight: bold
-        line-height: base
+        line-height: !sass
+          sass: 'line-height(heading, $theme-heading-line-height)'
+          fallback: 1.2
       h6:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 0
-        font-weight: semibold
-        letter-spacing: -0.04em
-        line-height: loose
+        font-family: body.stack
+        font-size: !sass
+          sass: 'font-size(body, $theme-h6-font-size)'
+          fallback: 0.87rem
+        font-weight: normal
+        letter-spacing: !sass
+          sass: 'letter-spacing(ls-1)'
+          fallback: 0.025em
+        line-height: !sass
+          sass: 'line-height(body, $theme-heading-line-height)'
+          fallback: 1.1
         text-transform: uppercase
       blockquote:
-        color: text.link
-        font-family: primary.stack
-        font-size: 5
-        font-weight: regular
-        line-height: base
+        font-family: alt.stack
+        font-size: !sass
+          sass: 'font-size(alt, md)'
+          fallback: 1.04rem
+        font-weight: normal
+        line-height: !sass
+          sass: 'line-height(alt, $theme-body-line-height)'
+          fallback: 1.7
       body:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 3
-        font-weight: regular
-        line-height: base
-      body-large:
-        color: text.primary
-        font-family: primary.stack
-        font-size: 4
-        font-weight: regular
-        line-height: base
+        font-family: body.stack
+        font-size: !sass
+          sass: 'font-size(body, $theme-body-font-size)'
+          fallback: 1.06rem
+        font-weight: normal
+        line-height: !sass
+          sass: 'line-height(body, $theme-body-line-height)'
+          fallback: 1.5
       cite:
         color: text.secondary
-        font-family: primary.stack
-        font-size: 0
+        font-family: body.stack
+        font-size: !sass
+          sass: 'font-size(body, 2xs)'
+          fallback: 0.93rem
         font-style: normal
-        font-weight: semibold
-        letter-spacing: .02em
-        line-height: tight
+        font-weight: normal
+        letter-spacing: !sass
+          sass: 'letter-spacing(ls-1)'
+          fallback: 0.025em
+        line-height: !sass
+          sass: 'line-height(body, 6)'
+          fallback: 1.6
+      lead:
+        font-family: !sass
+          sass: 'family($theme-lead-font-family)'
+          fallback: '"Merriweather Web", Georgia, Cambria, "Times New Roman", Times, serif'
+        font-size: !sass
+          sass: 'font-size($theme-lead-font-family, $theme-lead-font-size)'
+          fallback: 1.34rem
+        line-height: !sass
+          sass: 'line-height($theme-lead-font-family, $theme-lead-line-height)'
+          fallback: 1.8
   transitions:
     ease:
       ease-in-out: 'cubic-bezier(0.4, 0, 0.2, 1)'
@@ -373,24 +623,45 @@ gesso:
     drawer: 1200
     modal: 1300
   spacing:
-    "05": !sass
-      sass: 'units("05")'
+    '05': !sass
+      sass: "units('05')"
       fallback: '4px'
     1: !sass
       sass: 'units(1)'
       fallback: '8px'
+    '105': !sass
+      sass: "units('105')"
+      fallback: '12px'
     2: !sass
       sass: 'units(2)'
       fallback: '16px'
+    '205': !sass
+      sass: "units('205')"
+      fallback: '20px'
     3: !sass
       sass: 'units(3)'
       fallback: '24px'
+    4: !sass
+      sass: 'units(4)'
+      fallback: '32px'
     5: !sass
       sass: 'units(5)'
       fallback: '40px'
+    6: !sass
+      sass: 'units(6)'
+      fallback: '48px'
+    7: !sass
+      sass: 'units(7)'
+      fallback: '56px'
     8: !sass
       sass: 'units(8)'
       fallback: '64px'
+    9: !sass
+      sass: 'units(9)'
+      fallback: '72px'
+    10: !sass
+      sass: 'units(10)'
+      fallback: '80px'
     15: !sass
       sass: 'units(15)'
       fallback: '120px'
