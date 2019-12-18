@@ -7,6 +7,7 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -14,16 +15,15 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 /**
  * Implements hook_entity_base_field_info().
  */
-function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
-  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
-    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Moderation automated'))
-      ->setDescription(t('When true current moderation state is automated.'))
-      ->setRevisionable(TRUE)
-      ->setComputed(TRUE);
-    return $fields;
-  }
-}
+//function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+//  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
+//    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
+//      ->setLabel(t('Moderation automated'))
+//      ->setDescription(t('When true current moderation state is automated.'))
+//      ->setRevisionable(TRUE);
+//    return $fields;
+//  }
+//}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
@@ -90,10 +90,12 @@ function epa_workflow_on_enter_draft_approved(ContentModerationStateInterface $e
 
   $content_entity_revision->setSyncing(TRUE);
 
+  $content_entity_revision = epa_workflow_clear_scheduled_transitions($content_entity_revision);
+
   // If publish date entered, schedule content to be published.
   $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, 'field_publish_date', 'published');
 
-  // @see \Drupal\scheduled_publish\Service\ScheduledPublishCron::updateEntity.
+  $content_entity_revision->set('epa_workflow_automated', 0);
   $content_entity_revision->save();
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to draft approved.');
@@ -106,6 +108,8 @@ function epa_workflow_on_enter_published(ContentModerationStateInterface $entity
   $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
 
   $content_entity_revision->setSyncing(TRUE);
+
+  $content_entity_revision = epa_workflow_clear_scheduled_transitions($content_entity_revision);
 
   // If sunset date entered, schedule content to be unpublished.
   $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, 'field_expiration_date', 'unpublished');
@@ -136,14 +140,18 @@ function epa_workflow_on_enter_published_needs_review(ContentModerationStateInte
 
   $content_entity_revision->setSyncing(TRUE);
 
-  if ($content_entity_revision->hasField('field_review_deadline')
+  if ($content_entity_revision->hasField('epa_workflow_automated')
+      && $content_entity_revision->epa_workflow_automated->value
+      && $content_entity_revision->hasField('field_review_deadline')
       && !$content_entity_revision->get('field_review_deadline')->isEmpty()
   ) {
     $transition_date = $content_entity_revision->field_review_deadline->date;
     $transition_date = $transition_date->sub(new DateInterval('P1W'));
     $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'published_expiring');
-    // @see \Drupal\scheduled_publish\Service\ScheduledPublishCron::updateEntity.
     $content_entity_revision->save();
+  }
+  else {
+    $content_entity_revision->set('epa_workflow_automated', 0);
   }
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to published needs review.');
@@ -157,12 +165,17 @@ function epa_workflow_on_enter_published_expiring(ContentModerationStateInterfac
 
   $content_entity_revision->setSyncing(TRUE);
 
-  if ($content_entity_revision->hasField('field_review_deadline')
+  if ($content_entity_revision->hasField('epa_workflow_automated')
+      && $content_entity_revision->epa_workflow_automated->value
+      && $content_entity_revision->hasField('field_review_deadline')
       && !$content_entity_revision->get('field_review_deadline')->isEmpty()
   ) {
     $transition_date = $content_entity_revision->field_review_deadline->date;
     $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'unpublished');
     $content_entity_revision->save();
+  }
+  else {
+    $content_entity_revision->set('epa_workflow_automated', 0);
   }
 
   \Drupal::logger('epa_workflow')->info('Content was transitioned to published, scheduled for expiration.');
@@ -177,6 +190,7 @@ function epa_workflow_on_enter_unpublished(ContentModerationStateInterface $enti
   $content_entity_revision->setSyncing(TRUE);
 
   $content_entity_revision = epa_workflow_set_review_deadline($content_entity_revision, TRUE);
+  $content_entity_revision->set('epa_workflow_automated', 0);
 
   $content_entity_revision->save();
   \Drupal::logger('epa_workflow')->info('Content was transitioned to unpublished.');
@@ -260,7 +274,9 @@ function epa_workflow_get_content_entity_revision($entity) {
  * Clear scheduled transitions on content entity revision.
  */
 function epa_workflow_clear_scheduled_transitions($content_entity_revision) {
-  $content_entity_revision->set('field_scheduled_transition', NULL);
+  if ($content_entity_revision->hasField('field_scheduled_transition')) {
+    $content_entity_revision->set('field_scheduled_transition', NULL);
+  }
   return $content_entity_revision;
 }
 
@@ -301,5 +317,22 @@ function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
 function epa_workflow_mail_alter(&$message) {
   if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
     $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+  }
+}
+
+/**
+ * Implements hook_content_moderation_notification_mail_data_alter().
+ */
+function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
+  $eic_notifications = [
+    'epa_content_has_been_approved',
+    'epa_content_about_to_expire',
+    'epa_content_has_expired',
+  ];
+  if (in_array($data['notification']->id, $eic_notifications)) {
+    $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($entity);
+    foreach ($groups as $group) {
+      $data['to'][] = $group->field_editor_in_chief->entity->mail->value;
+    }
   }
 }

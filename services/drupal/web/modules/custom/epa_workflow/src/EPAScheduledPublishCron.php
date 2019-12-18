@@ -202,7 +202,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
   private function updateEntity(ContentEntityBase $entity, string $moderationState, string $scheduledPublishField, $scheduledValue): void {
     $entity->set($scheduledPublishField, $scheduledValue);
     $entity->set('moderation_state', $moderationState);
-    $entity->__set('automatedTransition', TRUE);
+    $entity->set('epa_workflow_automated', 1);
     $entity->save();
   }
 
