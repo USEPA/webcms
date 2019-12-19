@@ -71,7 +71,12 @@ function epa_web_areas_entity_type_alter(array &$entity_types) {
   }
 }
 
-// Copied from admin_toolbar_links_access_filter with a change to ensure admins get links filtered, too.
+/**
+ * Implements HOOK_preprocess_menu().
+ *
+ * Copied from admin_toolbar_links_access_filter with a change to ensure admins
+ * get links filtered, too.
+ */
 function epa_web_areas_preprocess_menu(&$variables) {
   if (empty($variables['items'])) {
     // Additional empty check to prevent exotic situations, where the preprocess
