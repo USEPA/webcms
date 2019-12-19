@@ -15,15 +15,15 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 /**
  * Implements hook_entity_base_field_info().
  */
-//function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
-//  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
-//    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
-//      ->setLabel(t('Moderation automated'))
-//      ->setDescription(t('When true current moderation state is automated.'))
-//      ->setRevisionable(TRUE);
-//    return $fields;
-//  }
-//}
+function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
+    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Moderation automated'))
+      ->setDescription(t('When true current moderation state is automated.'))
+      ->setRevisionable(TRUE);
+    return $fields;
+  }
+}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
@@ -123,7 +123,7 @@ function epa_workflow_on_enter_published(ContentModerationStateInterface $entity
       && !$content_entity_revision->get('field_review_deadline')->isEmpty()
   ) {
     $transition_date = $content_entity_revision->field_review_deadline->date;
-    $transition_date->sub(new \DateInterval("P6W"));
+    $transition_date->sub(new \DateInterval("P3W"));
     $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'published_needs_review');
   }
 
@@ -332,7 +332,10 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
   if (in_array($data['notification']->id, $eic_notifications)) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($entity);
     foreach ($groups as $group) {
-      $data['to'][] = $group->field_editor_in_chief->entity->mail->value;
+      $eic_email = $group->field_editor_in_chief->entity->mail->value;
+      if (!in_array($eic_email, $data['to'])) {
+        $data['to'][] = $eic_email;
+      }
     }
   }
 }
