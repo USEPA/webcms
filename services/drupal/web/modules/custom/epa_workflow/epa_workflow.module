@@ -322,6 +322,8 @@ function epa_workflow_mail_alter(&$message) {
 
 /**
  * Implements hook_content_moderation_notification_mail_data_alter().
+ *
+ * @todo Move to notifications module.
  */
 function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
   $eic_notifications = [
@@ -336,6 +338,31 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
       if (!in_array($eic_email, $data['to'])) {
         $data['to'][] = $eic_email;
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ *
+ * Create views field converting current and scheduled moderation
+ * state to applicable transition.
+ *
+ * @todo Move to notifications module.
+ */
+function epa_workflow_views_data_alter(array &$data) {
+  $entity_types = \Drupal::entityTypeManager()->getDefinitions();
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+  foreach ($entity_types as $entity_type) {
+    if ($moderation_info->isModeratedEntityType($entity_type)) {
+      $data[$entity_type]['epa_scheduled_transition_name'] = [
+        'title' => t('Scheduled transition name'),
+        'field' => [
+          'title' => t('Scheduled tranisition name'),
+          'help' => t('Gets transition name based on current and scheduled moderation state.'),
+          'id' => 'epa_scheduled_transition_name',
+        ],
+      ];
     }
   }
 }
