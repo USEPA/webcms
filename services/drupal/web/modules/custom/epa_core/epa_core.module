@@ -64,11 +64,39 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $form['field_description']['#states']['!enabled']['input[name="generate_description"]'] = ['checked' => TRUE];
       $form['field_keywords']['#states']['!enabled']['input[name="generate_keywords"]'] = ['checked' => TRUE];
 
-      // @todo Validation.
+      // Element validation.
+      $form['field_description']['widget'][0]['value']['#required'] = FALSE;
+      $form['field_description']['widget']['#element_validate'] = ['epa_core_new_release_description_validate'];
       //$form['field_description']['widget'][0]['#required'] = FALSE;
-      //$form['field_description']['widget'][0]['#element_validate'][] = ['epa_core_new_release_description_validate'];
+
+      // @todo element validation for keywords.
 
       break;
+  }
+}
+
+/**
+ * Element validation: new release description field.
+ */
+function epa_core_new_release_description_validate(&$element, FormStateInterface $form_state, $form) {
+  if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
+    $node = $form_state->getFormObject()->getEntity();
+    $node_langcode = $node->language()->getId();
+    $title = $form_state->getValue('title');
+    $description = t('EPA News Release: @title', ['@title' => $title[0]['value']], ['langcode' => $node_langcode]);
+    $element['#value'] = $description->render();
+    $form_state->setValueforElement($element, [['value' => $element['#value']]]);
+  }
+
+  epa_admin_required_fields_validate($element, $form_state);
+}
+
+/**
+ * Element validation: required fields.
+ */
+function epa_admin_required_fields_validate($element, FormStateInterface $form_state) {
+  if (empty($element['#value']) && $element['#value'] !== 0) {
+    $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
 }
 
