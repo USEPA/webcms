@@ -1,8 +1,9 @@
-uuid: 7ce28bdd-98fc-4294-9888-856285c42a9e
+uuid: b7665b1d-cc87-4636-bf4c-86fd11ad5693
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.media.link_with_metadata
     - field.field.media.document.field_filename
     - field.field.media.document.field_keywords
     - field.field.media.document.field_media_file
@@ -14,15 +15,16 @@ dependencies:
   module:
     - file
     - image
-    - media_inline_embed
+    - layout_builder
     - user
 third_party_settings:
-  media_inline_embed:
-    embed_inline: false
-id: media.document.default
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: media.document.link_with_metadata
 targetEntityType: media
 bundle: document
-mode: default
+mode: link_with_metadata
 content:
   created:
     label: hidden
@@ -67,14 +69,6 @@ content:
     third_party_settings: {  }
     type: number_integer
     region: content
-  field_publication_date:
-    weight: 12
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
   field_publication_number:
     weight: 11
     label: above
@@ -100,4 +94,5 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
+  field_publication_date: true
   name: true
