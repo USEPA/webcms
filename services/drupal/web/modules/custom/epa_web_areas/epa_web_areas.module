@@ -32,34 +32,11 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $group = $form_state->getStorage()['group'];
     }
 
-    // Publisher appears on all node edit forms.
-    $publisher = $group->field_publisher->entity->label();
-    $weight = $form['field_channel']['#weight'] + .5;
-    $form['publisher'] = [
-      '#type' => 'item',
-      '#title' => t('Publisher'),
-      '#markup' => $publisher,
-      '#weight' => $weight,
-    ];
-
     // Set access to hublinks for Web Area homepage.
     if (isset($form['field_hublinks'])) {
       $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : FALSE;
       $form['field_hublinks']['#access'] = $has_hublinks;
     }
-  }
-}
-
-/**
- * Implements hook_field_group_build_pre_render_alter().
- *
- * Move pseudo fields into relevant groups.
- */
-function epa_web_areas_field_group_build_pre_render_alter(&$element) {
-  if (isset($element['publisher'])) {
-    $element['#group_children']['publisher'] = 'group_metadata';
-    $element['group_additional_fields']['group_metadata']['publisher'] = $element['publisher'];
-    unset($element['publisher']);
   }
 }
 
