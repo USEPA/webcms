@@ -1,48 +1,64 @@
-uuid: 5c689833-5d4b-42cf-b356-5f53480e3a08
+uuid: f74705d2-d82a-4c4c-a262-b68b5609d403
 langcode: en
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.media.medium
+    - core.entity_view_mode.media.link
     - field.field.media.image.field_caption
     - field.field.media.image.field_directory
     - field.field.media.image.field_keywords
     - field.field.media.image.field_media_image
-    - image.style.medium
     - media.type.image
   module:
     - image
     - layout_builder
+    - media_inline_embed
     - text
 third_party_settings:
+  media_inline_embed:
+    embed_inline: false
   layout_builder:
     allow_custom: false
     enabled: false
-id: media.image.medium
+id: media.image.link
 targetEntityType: media
 bundle: image
-mode: medium
+mode: link
 content:
   field_caption:
-    weight: 1
+    weight: 2
     label: hidden
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
+  field_keywords:
+    weight: 3
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   field_media_image:
-    weight: 0
+    weight: 1
     label: hidden
     settings:
-      image_style: medium
+      image_style: ''
       image_link: ''
     third_party_settings: {  }
     type: image
     region: content
+  name:
+    type: string
+    weight: 0
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
 hidden:
   created: true
   field_directory: true
-  field_keywords: true
-  name: true
   thumbnail: true
   uid: true
