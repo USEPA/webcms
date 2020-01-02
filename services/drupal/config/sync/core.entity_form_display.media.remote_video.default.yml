@@ -5,10 +5,13 @@ dependencies:
   config:
     - field.field.media.remote_video.field_caption
     - field.field.media.remote_video.field_directory
+    - field.field.media.remote_video.field_keywords
     - field.field.media.remote_video.field_media_oembed_video
+    - field.field.media.remote_video.field_title
     - media.type.remote_video
   module:
     - media
+    - path
     - shs
     - text
 id: media.remote_video.default
@@ -16,8 +19,14 @@ targetEntityType: media
 bundle: remote_video
 mode: default
 content:
+  created:
+    type: datetime_timestamp
+    weight: 7
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_caption:
-    weight: 1
+    weight: 3
     settings:
       rows: 5
       placeholder: ''
@@ -25,7 +34,7 @@ content:
     type: text_textarea
     region: content
   field_directory:
-    weight: 2
+    weight: 4
     settings:
       display_node_count: false
       create_new_items: false
@@ -34,17 +43,61 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_keywords:
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
   field_media_oembed_video:
     type: oembed_textfield
-    weight: 0
+    weight: 2
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
     region: content
-hidden:
-  created: true
-  name: true
-  path: true
-  status: true
-  uid: true
+  field_title:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 8
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 9
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 6
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }
