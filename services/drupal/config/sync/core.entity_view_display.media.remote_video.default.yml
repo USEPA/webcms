@@ -7,9 +7,9 @@ dependencies:
     - field.field.media.remote_video.field_directory
     - field.field.media.remote_video.field_keywords
     - field.field.media.remote_video.field_media_oembed_video
-    - field.field.media.remote_video.field_title
     - media.type.remote_video
   module:
+    - image
     - media
     - media_inline_embed
     - text
@@ -45,14 +45,6 @@ content:
       max_height: 0
     third_party_settings: {  }
     region: content
-  field_title:
-    weight: 4
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
   name:
     type: string
     weight: 0
@@ -61,8 +53,16 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
+  thumbnail:
+    type: image
+    weight: 4
+    region: content
+    label: above
+    settings:
+      image_style: ''
+      image_link: ''
+    third_party_settings: {  }
 hidden:
   created: true
   field_directory: true
-  thumbnail: true
   uid: true
