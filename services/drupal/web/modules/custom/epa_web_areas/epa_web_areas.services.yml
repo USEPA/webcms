@@ -1,6 +1,12 @@
 services:
   epa_web_areas.alias_batch:
     class: Drupal\epa_web_areas\Utility\AliasBatch
+  epa_web_areas.group_permission_checker:
+    class: Drupal\epa_web_areas\Access\EPAGroupPermissionChecker
+    decorates: group_permission.checker
+    decoration_priority: 5
+    public: false
+    arguments: ['@epa_web_areas.group_permission_checker.inner', '@group_permission.chain_calculator']
   epa_web_areas.web_areas_helper:
     class: Drupal\epa_web_areas\Utility\WebAreasHelper
     arguments: ['@entity_type.manager']
