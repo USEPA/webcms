@@ -355,7 +355,8 @@ function epa_workflow_views_data_alter(array &$data) {
   $moderation_info = \Drupal::service('content_moderation.moderation_information');
   foreach ($entity_types as $entity_type) {
     if ($moderation_info->isModeratedEntityType($entity_type)) {
-      $data[$entity_type]['epa_scheduled_transition_name'] = [
+      $entity_type_id = $entity_type->id();
+      $data[$entity_type_id]['epa_scheduled_transition_name'] = [
         'title' => t('Scheduled transition name'),
         'field' => [
           'title' => t('Scheduled tranisition name'),
