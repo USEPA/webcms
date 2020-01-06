@@ -8,22 +8,7 @@
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
-
-/**
- * Implements hook_entity_base_field_info().
- */
-function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
-  if (\Drupal::service('content_moderation.moderation_information')->isModeratedEntityType($entity_type)) {
-    $fields['epa_workflow_automated'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Moderation automated'))
-      ->setDescription(t('When true current moderation state is automated.'))
-      ->setRevisionable(TRUE);
-    return $fields;
-  }
-}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
@@ -137,6 +122,8 @@ function epa_workflow_on_enter_published(ContentModerationStateInterface $entity
  */
 function epa_workflow_on_enter_published_needs_review(ContentModerationStateInterface $entity) {
   $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
+
+  $automated = epa_workflow_is_automated($content_entity_revision, $entity->moderation_state->value);
 
   $content_entity_revision->setSyncing(TRUE);
 
@@ -281,6 +268,20 @@ function epa_workflow_clear_scheduled_transitions($content_entity_revision) {
 }
 
 /**
+ * Check if temp storage key indicating automation.
+ */
+function epa_workflow_is_automated($content_entity_revision, $moderation_state) {
+  $tempstore_key_ids = [
+    $content_entity_revision->getEntityTypeId(),
+    $content_entity_revision->id(),
+    'auto',
+  ];
+  $tempstore_key = implode('_', $tempstore_key_ids);
+  $tempstore = \Drupal::service('tempstore.private');
+  return $tempstore->get('epa_workflow')->get($tempstore_key);
+}
+
+/**
  * Check if content is moderated.
  */
 function epa_workflow_is_moderated_entity(ContentModerationStateInterface $entity) {
@@ -322,8 +323,6 @@ function epa_workflow_mail_alter(&$message) {
 
 /**
  * Implements hook_content_moderation_notification_mail_data_alter().
- *
- * @todo Move to notifications module.
  */
 function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
   $eic_notifications = [
@@ -343,27 +342,10 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
 }
 
 /**
- * Implements hook_views_data_alter().
- *
- * Create views field converting current and scheduled moderation
- * state to applicable transition.
- *
- * @todo Move to notifications module.
+ * Implements hook_field_formatter_info_alter().
  */
-function epa_workflow_views_data_alter(array &$data) {
-  $entity_types = \Drupal::entityTypeManager()->getDefinitions();
-  $moderation_info = \Drupal::service('content_moderation.moderation_information');
-  foreach ($entity_types as $entity_type) {
-    if ($moderation_info->isModeratedEntityType($entity_type)) {
-      $entity_type_id = $entity_type->id();
-      $data[$entity_type_id]['epa_scheduled_transition_name'] = [
-        'title' => t('Scheduled transition name'),
-        'field' => [
-          'title' => t('Scheduled tranisition name'),
-          'help' => t('Gets transition name based on current and scheduled moderation state.'),
-          'id' => 'epa_scheduled_transition_name',
-        ],
-      ];
-    }
+function epa_workflow_field_formatter_info_alter(array &$info) {
+  if (!empty($info['scheduled_publish_generic_formatter'])) {
+    $info['scheduled_publish_generic_formatter']['class'] = 'Drupal\epa_workflow\Plugin\Field\FieldFormatter\EPAScheduledPublishGenericFormatter';
   }
 }
