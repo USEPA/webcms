@@ -1,9 +1,0 @@
-services:
-  epa_workflow_notifications.notification_information:
-    class: Drupal\epa_workflow_notifications\EPANotificationInformation
-    decorates: content_moderation_notifications.notification_information
-    decoration_priority: 5
-    arguments: ['@epa_workflow_notifications.notification_information.inner', '@entity_type.manager', '@content_moderation.moderation_information']
-  epa_workflow_notifications.update:
-    class: Drupal\epa_workflow_notifications\EPANotificationCron
-    arguments: ['@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time']
