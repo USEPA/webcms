@@ -6,16 +6,15 @@
  */
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
-use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
  */
 function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
-  if (epa_workflow_is_moderated_entity($entity)) {
-    epa_workflow_automate_moderation($entity);
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  if ($epa_moderation->isModeratedEntity($entity)) {
+    $epa_moderation->processModeration($entity);
   }
 }
 
@@ -27,275 +26,23 @@ function epa_workflow_content_moderation_state_insert(ContentModerationStateInte
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
 function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
   // Group will trigger an update after insert.
   // Check to see if entity is moderated.
   // Check to see if content revision id has changed.
   // Also, check that the moderation state isn't looping over itself.
-  if (epa_workflow_is_moderated_entity($entity)
+  if ($epa_moderation->isModeratedEntity($entity)
       && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
       && $entity->getRevisionId() != $entity->getLoadedRevisionId()
   ) {
-    epa_workflow_automate_moderation($entity);
+    $epa_moderation->processModeration($entity);
   }
-}
-
-/**
- * Triggers events based on content moderation state.
- */
-function epa_workflow_automate_moderation(ContentModerationStateInterface $entity) {
-  $state = $entity->moderation_state->value;
-  switch ($state) {
-    case 'draft_approved':
-      epa_workflow_on_enter_draft_approved($entity);
-      break;
-
-    case 'published':
-      epa_workflow_on_enter_published($entity);
-      break;
-
-    case 'published_needs_review':
-      epa_workflow_on_enter_published_needs_review($entity);
-      break;
-
-    case 'published_expiring':
-      epa_workflow_on_enter_published_expiring($entity);
-      break;
-
-    case 'unpublished':
-      epa_workflow_on_enter_unpublished($entity);
-      break;
-  }
-}
-
-/**
- * Performs actions when a draft is approved.
- */
-function epa_workflow_on_enter_draft_approved(ContentModerationStateInterface $entity) {
-  $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
-
-  $content_entity_revision->setSyncing(TRUE);
-
-  $content_entity_revision = epa_workflow_clear_scheduled_transitions($content_entity_revision);
-
-  // If publish date entered, schedule content to be published.
-  $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, 'field_publish_date', 'published');
-
-  $content_entity_revision->set('epa_workflow_automated', 0);
-  $content_entity_revision->save();
-
-  \Drupal::logger('epa_workflow')->info('Content was transitioned to draft approved.');
-}
-
-/**
- * Performs actions when content is published.
- */
-function epa_workflow_on_enter_published(ContentModerationStateInterface $entity) {
-  $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
-
-  $content_entity_revision->setSyncing(TRUE);
-
-  $content_entity_revision = epa_workflow_clear_scheduled_transitions($content_entity_revision);
-
-  // If sunset date entered, schedule content to be unpublished.
-  $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, 'field_expiration_date', 'unpublished');
-
-  // Set review date field.
-  $content_entity_revision = epa_workflow_set_review_deadline($content_entity_revision);
-
-  // The review transition duration interval should probably be
-  // a static variable or in config.
-  if ($content_entity_revision->hasField('field_review_deadline')
-      && !$content_entity_revision->get('field_review_deadline')->isEmpty()
-  ) {
-    $transition_date = $content_entity_revision->field_review_deadline->date;
-    $transition_date->sub(new \DateInterval("P3W"));
-    $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'published_needs_review');
-  }
-
-  $content_entity_revision->save();
-
-  \Drupal::logger('epa_workflow')->info('Content was transitioned to published.');
-}
-
-/**
- * Performs actions when content is published needs review.
- */
-function epa_workflow_on_enter_published_needs_review(ContentModerationStateInterface $entity) {
-  $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
-
-  $automated = epa_workflow_is_automated($content_entity_revision, $entity->moderation_state->value);
-
-  $content_entity_revision->setSyncing(TRUE);
-
-  if ($content_entity_revision->hasField('epa_workflow_automated')
-      && $content_entity_revision->epa_workflow_automated->value
-      && $content_entity_revision->hasField('field_review_deadline')
-      && !$content_entity_revision->get('field_review_deadline')->isEmpty()
-  ) {
-    $transition_date = $content_entity_revision->field_review_deadline->date;
-    $transition_date = $transition_date->sub(new DateInterval('P1W'));
-    $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'published_expiring');
-    $content_entity_revision->save();
-  }
-  else {
-    $content_entity_revision->set('epa_workflow_automated', 0);
-  }
-
-  \Drupal::logger('epa_workflow')->info('Content was transitioned to published needs review.');
-}
-
-/**
- * Performs actions when content is published needs review.
- */
-function epa_workflow_on_enter_published_expiring(ContentModerationStateInterface $entity) {
-  $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
-
-  $content_entity_revision->setSyncing(TRUE);
-
-  if ($content_entity_revision->hasField('epa_workflow_automated')
-      && $content_entity_revision->epa_workflow_automated->value
-      && $content_entity_revision->hasField('field_review_deadline')
-      && !$content_entity_revision->get('field_review_deadline')->isEmpty()
-  ) {
-    $transition_date = $content_entity_revision->field_review_deadline->date;
-    $content_entity_revision = epa_workflow_schedule_transition($content_entity_revision, $transition_date, 'unpublished');
-    $content_entity_revision->save();
-  }
-  else {
-    $content_entity_revision->set('epa_workflow_automated', 0);
-  }
-
-  \Drupal::logger('epa_workflow')->info('Content was transitioned to published, scheduled for expiration.');
-}
-
-/**
- * Performs actions when content is unpublished.
- */
-function epa_workflow_on_enter_unpublished(ContentModerationStateInterface $entity) {
-  $content_entity_revision = epa_workflow_get_content_entity_revision($entity);
-
-  $content_entity_revision->setSyncing(TRUE);
-
-  $content_entity_revision = epa_workflow_set_review_deadline($content_entity_revision, TRUE);
-  $content_entity_revision->set('epa_workflow_automated', 0);
-
-  $content_entity_revision->save();
-  \Drupal::logger('epa_workflow')->info('Content was transitioned to unpublished.');
-}
-
-/**
- * Transfer date to schedule transition.
- */
-function epa_workflow_schedule_transition($content_entity_revision, $transition_date, $moderation_state) {
-  // Set date value.
-  if (is_string($transition_date)) {
-    // Stop if content doesn't have a publish date.
-    if (!$content_entity_revision->hasField($transition_date) || $content_entity_revision->get($transition_date)->isEmpty()) {
-      return $content_entity_revision;
-    }
-    $date = $content_entity_revision->{$transition_date}->value;
-  }
-  else {
-    // We are expecting a datetime object here.
-    $date = $transition_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
-  }
-
-  // Set scheduled transition.
-  if ($content_entity_revision->hasField('field_scheduled_transition')) {
-    $new_transition = [
-      'moderation_state' => $moderation_state,
-      'value' => $date,
-    ];
-    $content_entity_revision->field_scheduled_transition->appendItem($new_transition);
-  }
-
-  return $content_entity_revision;
-}
-
-/**
- * Sets field_review_deadline value based on metadata type.
- */
-function epa_workflow_set_review_deadline($content_entity_revision, $reset = FALSE) {
-  $content_entity_revision->setSyncing(TRUE);
-
-  // Stop if content use a review deadline.
-  if (!$content_entity_revision->hasField('field_review_deadline') || !$content_entity_revision->get('field_review_deadline')->isEmpty()) {
-    return $content_entity_revision;
-  }
-
-  if ($reset) {
-    $content_entity_revision->set('field_review_deadline', NULL);
-    $content_entity_revision->save();
-    return $content_entity_revision;
-  }
-
-  if (!$content_entity_revision->get('field_type')->isEmpty()
-      && !$content_entity_revision->get('field_type')->entity->get('field_term_days_til_review')->isEmpty()
-  ) {
-    // Create datetime with appropriate offset.
-    $review_period = $content_entity_revision->field_type->entity->field_term_days_til_review->value;
-    $date = new DrupalDateTime();
-    $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
-    $date->add(new \DateInterval("P{$review_period}D"));
-    $review_deadline = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
-    $content_entity_revision->set('field_review_deadline', $review_deadline);
-  }
-  return $content_entity_revision;
-}
-
-/**
- * Get content entity revision from moderation state.
- */
-function epa_workflow_get_content_entity_revision($entity) {
-  $content_entity_type = $entity->content_entity_type_id->value;
-  $content_entity_revision_id = $entity->content_entity_revision_id->value;
-  /**
-   * @var Drupal\Core\Entity\ContentEntityInterface $content_entity_revision
-   */
-  $content_entity_revision = \Drupal::entityTypeManager()->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
-
-  return $content_entity_revision;
-}
-
-/**
- * Clear scheduled transitions on content entity revision.
- */
-function epa_workflow_clear_scheduled_transitions($content_entity_revision) {
-  if ($content_entity_revision->hasField('field_scheduled_transition')) {
-    $content_entity_revision->set('field_scheduled_transition', NULL);
-  }
-  return $content_entity_revision;
-}
-
-/**
- * Check if temp storage key indicating automation.
- */
-function epa_workflow_is_automated($content_entity_revision, $moderation_state) {
-  $tempstore_key_ids = [
-    $content_entity_revision->getEntityTypeId(),
-    $content_entity_revision->id(),
-    'auto',
-  ];
-  $tempstore_key = implode('_', $tempstore_key_ids);
-  $tempstore = \Drupal::service('tempstore.private');
-  return $tempstore->get('epa_workflow')->get($tempstore_key);
-}
-
-/**
- * Check if content is moderated.
- */
-function epa_workflow_is_moderated_entity(ContentModerationStateInterface $entity) {
-  $content_entity_type_id = $entity->content_entity_type_id->value;
-  $content_entity_type = \Drupal::entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
-  $moderation_info = \Drupal::service('content_moderation.moderation_information');
-  return $moderation_info->isModeratedEntityType($content_entity_type);
 }
 
 /**
  * Implements hook_form_FORM_ID_alter().
  *
  * @todo This should probably be contributed back.
- * @todo Move to custom notifications module.
  */
 function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
   $workflow_id = $form['workflow']['#default_value'];
@@ -313,7 +60,6 @@ function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
  * configuration for content_moderation_notifications.
  *
  * @see https://www.drupal.org/project/content_moderation_notifications/issues/2903550
- * @todo Move to custom notifications module.
  */
 function epa_workflow_mail_alter(&$message) {
   if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {

@@ -9,7 +9,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\scheduled_publish\Plugin\Field\FieldType\ScheduledPublish;
 use Drupal\scheduled_publish\Service\ScheduledPublishCron;
 
@@ -56,13 +55,6 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
   private $dateTime;
 
   /**
-   * The tempstre factory.
-   *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
-   */
-  protected $tempstorePrivate;
-
-  /**
    * The constructor.
    *
    * @param \Drupal\scheduled_publish\Service\ScheduledPublishCron $scheduled_publish_cron
@@ -76,13 +68,12 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @param \Drupal\Component\Datetime\TimeInterface $date_time
    *   The datetime.
    */
-  public function __construct(ScheduledPublishCron $scheduled_publish_cron, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, TimeInterface $date_time, PrivateTempStoreFactory $tempstore_private) {
+  public function __construct(ScheduledPublishCron $scheduled_publish_cron, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, TimeInterface $date_time) {
     $this->scheduledPublishCron = $scheduled_publish_cron;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->dateTime = $date_time;
-    $this->tempstorePrivate = $tempstore_private;
   }
 
   /**
@@ -207,20 +198,13 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @param $scheduledValue
    *
    * @throws \Drupal\Core\Entity\EntityStorageException
-   * 
+   *
    * @todo Use a better key.
    */
   private function updateEntity(ContentEntityBase $entity, string $moderationState, string $scheduledPublishField, $scheduledValue): void {
     $entity->set($scheduledPublishField, $scheduledValue);
     $entity->set('moderation_state', $moderationState);
-    $tempstore_key_ids = [
-      $entity->getEntityTypeId(),
-      $entity->id(),
-      'auto',
-    ];
-    $tempstore_key = implode('_', $tempstore_key_ids);
-    $this->tempstorePrivate->get('epa_workflow')->set($tempstore_key, 1);
-    $entity->set('epa_workflow_automated', 1);
+    $entity->set('epa_revision_automated', 1);
     $entity->save();
   }
 
