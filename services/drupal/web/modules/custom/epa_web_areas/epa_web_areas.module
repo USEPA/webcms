@@ -19,7 +19,8 @@ use Drupal\group\Entity\GroupContent;
  * sidebar navigation as its naviagtion style.
  */
 function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if (isset($form['field_hublinks']) && $form_state->getFormObject() instanceof EntityForm) {
+  if ($form_state->getFormObject() instanceof EntityForm) {
+    // Get group node is associated with.
     $entity = $form_state->getformObject()->getEntity();
     if ($entity->id()) {
       $group_contents = GroupContent::loadByEntity($entity);
@@ -30,8 +31,12 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     elseif (isset($form_state->getStorage()['group'])) {
       $group = $form_state->getStorage()['group'];
     }
-    $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : FALSE;
-    $form['field_hublinks']['#access'] = $has_hublinks;
+
+    // Set access to hublinks for Web Area homepage.
+    if (isset($form['field_hublinks'])) {
+      $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : FALSE;
+      $form['field_hublinks']['#access'] = $has_hublinks;
+    }
   }
 }
 

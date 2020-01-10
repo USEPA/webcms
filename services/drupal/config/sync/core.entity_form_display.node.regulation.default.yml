@@ -4,37 +4,25 @@ status: true
 dependencies:
   config:
     - field.field.node.regulation.field_additional_resources
-    - field.field.node.regulation.field_agency_function
-    - field.field.node.regulation.field_audiences
     - field.field.node.regulation.field_cfr
     - field.field.node.regulation.field_channel
     - field.field.node.regulation.field_compliance
-    - field.field.node.regulation.field_cooperation_assistance
     - field.field.node.regulation.field_description
     - field.field.node.regulation.field_docket_numbers
     - field.field.node.regulation.field_effective_dates
-    - field.field.node.regulation.field_emergencies_cleanup
     - field.field.node.regulation.field_env_laws_regs_and_treaties
-    - field.field.node.regulation.field_environmental_media
-    - field.field.node.regulation.field_epa_operations
     - field.field.node.regulation.field_federal_register_citations
     - field.field.node.regulation.field_geographic_locations
-    - field.field.node.regulation.field_health
     - field.field.node.regulation.field_hublinks
-    - field.field.node.regulation.field_industries
     - field.field.node.regulation.field_is_searchable_collection
     - field.field.node.regulation.field_keywords
     - field.field.node.regulation.field_language
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
     - field.field.node.regulation.field_page_head
-    - field.field.node.regulation.field_pollution_prevention
-    - field.field.node.regulation.field_r_and_a_and_technology
-    - field.field.node.regulation.field_regulatory_industrial
     - field.field.node.regulation.field_review_deadline
     - field.field.node.regulation.field_rule_history
     - field.field.node.regulation.field_rule_summary
-    - field.field.node.regulation.field_substances
     - field.field.node.regulation.field_type
     - field.field.node.regulation.field_wide_template
     - node.type.regulation
@@ -61,23 +49,6 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Other Metadata'
-    group_facets:
-      children:
-        - field_agency_function
-        - field_audiences
-        - field_env_laws_regs_and_treaties
-        - field_industries
-        - field_substances
-      parent_name: group_additional_fields
-      weight: 15
-      format_type: tab
-      format_settings:
-        id: ''
-        classes: ''
-        formatter: closed
-        description: ''
-        required_fields: true
-      label: 'Taxonomy Facets'
     group_metadata:
       children:
         - field_description
@@ -86,6 +57,7 @@ third_party_settings:
         - field_channel
         - field_machine_name
         - field_geographic_locations
+        - field_env_laws_regs_and_treaties
         - field_is_searchable_collection
       parent_name: group_additional_fields
       weight: 13
@@ -97,26 +69,6 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Primary Metadata'
-    group_topics:
-      children:
-        - field_cooperation_assistance
-        - field_emergencies_cleanup
-        - field_environmental_media
-        - field_epa_operations
-        - field_health
-        - field_pollution_prevention
-        - field_regulatory_industrial
-        - field_r_and_a_and_technology
-      parent_name: group_additional_fields
-      weight: 14
-      format_type: tab
-      format_settings:
-        id: ''
-        classes: ''
-        formatter: closed
-        description: ''
-        required_fields: true
-      label: 'Taxonomy Topic'
     group_javascript:
       children:
         - field_page_head
@@ -164,26 +116,6 @@ content:
     third_party_settings: {  }
     type: text_textarea
     region: content
-  field_agency_function:
-    weight: 29
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
-  field_audiences:
-    weight: 30
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_cfr:
     type: paragraphs
     weight: 3
@@ -215,16 +147,6 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: text_textarea
-    region: content
-  field_cooperation_assistance:
-    weight: 35
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
     region: content
   field_description:
     weight: 10
@@ -258,38 +180,8 @@ content:
     third_party_settings: {  }
     type: daterange_default
     region: content
-  field_emergencies_cleanup:
-    weight: 37
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_env_laws_regs_and_treaties:
-    weight: 31
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
-  field_environmental_media:
-    weight: 38
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
-  field_epa_operations:
-    weight: 39
+    weight: 16
     settings:
       display_node_count: false
       create_new_items: false
@@ -326,16 +218,6 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
-  field_health:
-    weight: 40
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_hublinks:
     weight: 11
     settings:
@@ -346,18 +228,8 @@ content:
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
-  field_industries:
-    weight: 32
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_is_searchable_collection:
-    weight: 16
+    weight: 17
     settings:
       display_label: true
     third_party_settings: {  }
@@ -413,36 +285,6 @@ content:
     third_party_settings: {  }
     type: string_textarea
     region: content
-  field_pollution_prevention:
-    weight: 41
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
-  field_r_and_a_and_technology:
-    weight: 43
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
-  field_regulatory_industrial:
-    weight: 42
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
-    region: content
   field_rule_history:
     weight: 7
     settings:
@@ -458,16 +300,6 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: text_textarea
-    region: content
-  field_substances:
-    weight: 33
-    settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
-      force_deepest: false
-    third_party_settings: {  }
-    type: options_shs
     region: content
   field_type:
     weight: 12
