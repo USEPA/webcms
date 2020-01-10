@@ -35,12 +35,11 @@ function epa_workflow_install() {
  * Implements hook_uninstall().
  */
 function epa_workflow_uninstall() {
-  // Remove epa_revision_automated base field.
+  // Clear values stored in epa_revision_automated.
   $entity_type_manager = \Drupal::service('entity_type.manager');
   $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
   $entity_type = $entity_type_manager->getDefinition('node');
 
-  $entity_type_id = $entity_type->id();
   $entity_revision_table = $entity_type->getRevisionTable();
 
   if ($revision_metadata_keys = $entity_type->get('revision_metadata_keys')) {
@@ -56,10 +55,6 @@ function epa_workflow_uninstall() {
     $database->update($entity_revision_table)
       ->fields(['epa_revision_automated' => NULL])
       ->execute();
-  }
-
-  if ($epa_revision_automated = $definition_update_manager->getFieldStorageDefinition('epa_revision_automated', $entity_type_id)) {
-    $definition_update_manager->uninstallFieldStorageDefinition($epa_revision_automated);
   }
 
 }
