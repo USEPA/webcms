@@ -95,7 +95,7 @@ function epa_core_new_release_description_validate(&$element, FormStateInterface
  * Element validation: required fields.
  */
 function epa_admin_required_fields_validate($element, FormStateInterface $form_state) {
-  if (empty($element['#value']) && $element['#value'] !== 0) {
+  if (empty($element[0]['value']['#value']) && $element[0]['value']['#value'] !== 0) {
     $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
 }
