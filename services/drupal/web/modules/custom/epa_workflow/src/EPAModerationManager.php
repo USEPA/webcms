@@ -3,6 +3,7 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -71,7 +72,7 @@ class EPAModerationManager {
    */
   public function isModeratedEntity(ContentModerationStateInterface $moderation_entity) {
     $content_entity_type_id = $moderation_entity->content_entity_type_id->value;
-    $content_entity_type = $this->entityTypeManager()->getStorage($content_entity_type_id)->getEntityType();
+    $content_entity_type = $this->entityTypeManager->getStorage($content_entity_type_id)->getEntityType();
     return $this->moderationInformation->isModeratedEntityType($content_entity_type);
   }
 
