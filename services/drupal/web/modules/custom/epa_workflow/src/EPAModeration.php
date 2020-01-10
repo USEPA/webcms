@@ -56,6 +56,13 @@ abstract class EPAModeration implements EPAModerationInterface {
   protected $entityTypeManager;
 
   /**
+   * The workflow storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $workflowStorage;
+
+  /**
    * Constructs EPAModeration.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
@@ -66,6 +73,7 @@ abstract class EPAModeration implements EPAModerationInterface {
   public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->logger = $logger_factory->get('epa_workflow');
     $this->entityTypeManager = $entity_type_manager;
+    $this->workflowStorage = $entity_type_manager->getStorage('workflow');
   }
 
   /**
@@ -78,11 +86,9 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->moderationEntity = $moderation_entity;
     $this->setContentEntityRevision();
     $this->contentEntityRevision->setSyncing(TRUE);
-    $definitions = $this->contentEntityRevision->getFieldDefinitions();
-    $test = $this->contentEntityRevision->epa_revision_automated;
-    if ($this->contentEntityRevision->epa_revision_automated) {
+    if ($this->contentEntityRevision->epa_revision_automated->value) {
       $this->isAutomated = TRUE;
-      $this->contentEntityRevision->set('epa_revision_automated', 0);
+      $this->contentEntityRevision->set('epa_revision_automated', NULL);
     }
   }
 
@@ -104,7 +110,7 @@ abstract class EPAModeration implements EPAModerationInterface {
    * Log transition.
    */
   public function logTransition() {
-    $moderation_label = strtolower($this->moderationEntity->label());
+    $moderation_label = strtolower($this->getModerationLabel());
     $this->logger->notice('Content was transitioned to %moderation_label', ['%moderation_label' => $moderation_label]);
   }
 
@@ -144,7 +150,7 @@ abstract class EPAModeration implements EPAModerationInterface {
     // Log scheduled transition.
     $this->logger->notice('%title will be transitioned from %current_state to %target_state on %date.', [
       '%title' => $this->contentEntityRevision->label(),
-      '%current_state' => $this->moderationEntity->id(),
+      '%current_state' => $this->getModerationLabel(),
       '%target_state' => $moderation_state,
       '%date' => date('m-d-Y H:i:s', $timestamp),
     ]);
@@ -225,6 +231,16 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   protected function contentHasFieldValue($field_name) {
     return $this->contentEntityRevision->hasField($field_name) && !$this->contentEntityRevision->get($field_name)->isEmpty();
+  }
+
+  /**
+   * Returns bundle label for moderation state.
+   */
+  protected function getModerationLabel() {
+    $workflow_id = $this->moderationEntity->workflow->target_id;
+    $workflow = $this->workflowStorage->load($workflow_id);
+    $state = $this->moderationEntity->moderation_state->value;
+    return $workflow->getTypePlugin()->getState($state)->label();
   }
 
 }
