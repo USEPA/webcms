@@ -7,6 +7,24 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  $config_syncing = \Drupal::isConfigSyncing();
+  if ($entity_type->id() == 'node' && !$config_syncing) {
+    $fields['epa_revision_automated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Moderation automated'))
+      ->setDescription(t('When true current moderation state is automated.'))
+      ->setRevisionable(TRUE)
+      ->setDefaultValue(NULL);
+  }
+  return $fields;
+}
 
 /**
  * Implements hook_ENTITY_TYPE_insert().
