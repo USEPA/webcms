@@ -3,8 +3,6 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
  * Processes approved draft content.
@@ -15,26 +13,6 @@ class EPADraftApproved extends EPAModeration {
    * {@inheritdoc}
    */
   protected $moderationName = 'draft_approved';
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * Constructor for EPADraftApproved.
-   *
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
-   *   The logger channel factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
-   */
-  public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager) {
-    parent::__construct($logger_factory);
-    $this->entityTypeManager = $entity_type_manager;
-  }
 
   /**
    * {@inheritdoc}

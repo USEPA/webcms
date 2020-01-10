@@ -18,12 +18,11 @@ services:
     tags:
       - { name: service_collector, call: addModeration, tag: epa_workflow_moderation_manager }
   epa_workflow.default_moderation:
-    arguments: ['@logger.factory']
+    arguments: ['@logger.factory', '@entity_type.manager']
     public: false
     abstract: true
   epa_workflow.draft_approved_moderation:
     class: Drupal\epa_workflow\EPADraftApproved
-    arguments: ['@logger.factory', '@entity_type.manager']
     parent: epa_workflow.default_moderation
     tags:
       - { name: epa_workflow_moderation_manager }

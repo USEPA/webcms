@@ -4,6 +4,7 @@ namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
@@ -48,13 +49,23 @@ abstract class EPAModeration implements EPAModerationInterface {
   protected $logger;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs EPAModeration.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger channel factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
-  public function __construct(LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->logger = $logger_factory->get('epa_workflow');
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -67,7 +78,9 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->moderationEntity = $moderation_entity;
     $this->setContentEntityRevision();
     $this->contentEntityRevision->setSyncing(TRUE);
-    if ($this->contentEntityRevision->epa_revision_automated->value) {
+    $definitions = $this->contentEntityRevision->getFieldDefinitions();
+    $test = $this->contentEntityRevision->epa_revision_automated;
+    if ($this->contentEntityRevision->epa_revision_automated) {
       $this->isAutomated = TRUE;
       $this->contentEntityRevision->set('epa_revision_automated', 0);
     }
@@ -85,6 +98,14 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   public function getModerationName() {
     return $this->moderationName;
+  }
+
+  /**
+   * Log transition.
+   */
+  public function logTransition() {
+    $moderation_label = strtolower($this->moderationEntity->label());
+    $this->logger->notice('Content was transitioned to %moderation_label', ['%moderation_label' => $moderation_label]);
   }
 
   /**
@@ -118,12 +139,14 @@ abstract class EPAModeration implements EPAModerationInterface {
       $this->contentEntityRevision->field_scheduled_transition->appendItem($new_transition);
     }
 
+    $timestamp = strtotime($date);
+
     // Log scheduled transition.
     $this->logger->notice('%title will be transitioned from %current_state to %target_state on %date.', [
       '%title' => $this->contentEntityRevision->label(),
       '%current_state' => $this->moderationEntity->id(),
       '%target_state' => $moderation_state,
-      '%date' => $transition_date->format('Y-m-d H:i:s'),
+      '%date' => date('m-d-Y H:i:s', $timestamp),
     ]);
   }
 
@@ -173,7 +196,7 @@ abstract class EPAModeration implements EPAModerationInterface {
   protected function clearScheduledTransitions($moderation_state = NULL) {
     if ($this->contentEntityRevision->hasField('field_scheduled_transition')) {
       if (!empty($moderation_state)) {
-        foreach ($this->contentEntityRevision->field_scheduled_transition as $key => $scheduled_transition){
+        foreach ($this->contentEntityRevision->field_scheduled_transition as $key => $scheduled_transition) {
           if ($scheduled_transition->get('moderation_state') == $moderation_state) {
             $this->contentEntityRevision->field_scheduled_transition->removeItem($key);
           }
@@ -195,14 +218,6 @@ abstract class EPAModeration implements EPAModerationInterface {
     $content_entity_revision = $this->entityTypeManager->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
 
     $this->contentEntityRevision = $content_entity_revision;
-  }
-
-  /**
-   * Log transition.
-   */
-  protected function logTransition() {
-    $moderation_label = strtolower($this->moderationEntity->label());
-    $this->logger->notice('Content was transitioned to %moderation_label', ['%moderation_label' => $moderation_label]);
   }
 
   /**
