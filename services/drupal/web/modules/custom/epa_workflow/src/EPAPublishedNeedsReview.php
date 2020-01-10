@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_workflow;
 
+use DateInterval;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 
 /**
