@@ -151,7 +151,7 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->logger->notice('%title will be transitioned from %current_state to %target_state on %date.', [
       '%title' => $this->contentEntityRevision->label(),
       '%current_state' => $this->getModerationLabel(),
-      '%target_state' => $moderation_state,
+      '%target_state' => $this->getModerationLabel($moderation_state),
       '%date' => date('m-d-Y H:i:s', $timestamp),
     ]);
   }
@@ -236,11 +236,13 @@ abstract class EPAModeration implements EPAModerationInterface {
   /**
    * Returns bundle label for moderation state.
    */
-  protected function getModerationLabel() {
+  protected function getModerationLabel($moderation_state = NULL) {
     $workflow_id = $this->moderationEntity->workflow->target_id;
     $workflow = $this->workflowStorage->load($workflow_id);
-    $state = $this->moderationEntity->moderation_state->value;
-    return $workflow->getTypePlugin()->getState($state)->label();
+    if (empty($moderation_state)) {
+      $moderation_state = $this->moderationEntity->moderation_state->value;
+    }
+    return $workflow->getTypePlugin()->getState($moderation_state)->label();
   }
 
 }
