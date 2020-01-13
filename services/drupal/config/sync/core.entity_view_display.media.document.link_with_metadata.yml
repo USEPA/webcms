@@ -10,14 +10,11 @@ dependencies:
     - field.field.media.document.field_num_of_pages
     - field.field.media.document.field_publication_date
     - field.field.media.document.field_publication_number
-    - image.style.thumbnail
     - media.type.document
   module:
     - file
-    - image
     - layout_builder
     - media_inline_embed
-    - user
 third_party_settings:
   layout_builder:
     allow_custom: false
@@ -29,43 +26,25 @@ targetEntityType: media
 bundle: document
 mode: link_with_metadata
 content:
-  created:
-    label: hidden
-    type: timestamp
-    weight: 2
-    region: content
-    settings:
-      date_format: medium
-      custom_date_format: ''
-      timezone: ''
-    third_party_settings: {  }
   field_filename:
-    weight: 7
-    label: above
+    weight: 1
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
-  field_keywords:
-    weight: 5
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_media_file:
-    weight: 4
-    label: above
+    weight: 0
+    label: hidden
     settings:
       use_description_as_link_text: true
     third_party_settings: {  }
     type: file_default
     region: content
   field_num_of_pages:
-    weight: 6
-    label: above
+    weight: 2
+    label: hidden
     settings:
       thousand_separator: ''
       prefix_suffix: true
@@ -74,42 +53,23 @@ content:
     region: content
   field_publication_date:
     type: string
-    weight: 8
+    weight: 3
     region: content
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
   field_publication_number:
-    weight: 9
-    label: above
+    weight: 4
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
-  name:
-    type: string
-    weight: 0
-    region: content
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-  thumbnail:
-    type: image
-    weight: 3
-    label: hidden
-    settings:
-      image_style: thumbnail
-      image_link: ''
-    region: content
-    third_party_settings: {  }
-  uid:
-    label: hidden
-    type: author
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  created: true
+  field_keywords: true
+  name: true
+  thumbnail: true
+  uid: true

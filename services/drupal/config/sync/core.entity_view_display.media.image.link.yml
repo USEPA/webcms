@@ -14,7 +14,7 @@ dependencies:
     - media_inline_embed
 third_party_settings:
   media_inline_embed:
-    embed_inline: false
+    embed_inline: true
   layout_builder:
     allow_custom: false
     enabled: false
@@ -23,22 +23,13 @@ targetEntityType: media
 bundle: image
 mode: link
 content:
-  field_keywords:
-    weight: 3
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_media_image:
     weight: 1
     label: hidden
     settings:
       image_style: ''
-      image_link: ''
     third_party_settings: {  }
-    type: image
+    type: image_url
     region: content
   name:
     type: string
@@ -51,5 +42,6 @@ content:
 hidden:
   created: true
   field_directory: true
+  field_keywords: true
   thumbnail: true
   uid: true

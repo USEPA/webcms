@@ -9,10 +9,8 @@ dependencies:
     - field.field.media.remote_video.field_media_oembed_video
     - media.type.remote_video
   module:
-    - image
     - media
     - media_inline_embed
-    - text
 third_party_settings:
   media_inline_embed:
     embed_inline: false
@@ -21,48 +19,20 @@ targetEntityType: media
 bundle: remote_video
 mode: default
 content:
-  field_caption:
-    weight: 2
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_keywords:
-    weight: 3
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_media_oembed_video:
     type: oembed
-    weight: 1
-    label: hidden
-    settings:
-      max_width: 0
-      max_height: 0
-    third_party_settings: {  }
-    region: content
-  name:
-    type: string
     weight: 0
     region: content
     label: hidden
     settings:
-      link_to_entity: false
-    third_party_settings: {  }
-  thumbnail:
-    type: image
-    weight: 4
-    region: content
-    label: above
-    settings:
-      image_style: ''
-      image_link: ''
+      max_width: 1020
+      max_height: 0
     third_party_settings: {  }
 hidden:
   created: true
+  field_caption: true
   field_directory: true
+  field_keywords: true
+  name: true
+  thumbnail: true
   uid: true
