@@ -65,13 +65,16 @@ function media_inline_embed_theme_suggestions_alter(array &$suggestions, array $
 function _media_inline_embed_get_embed_info($elements, $bundle) {
   $entity_type = $elements['#entity_type'];
   $view_mode = $elements['#view_mode'] == 'full' ? 'default' : $elements['#view_mode'];
-  $display_id = implode('.', [$entity_type, $bundle, $view_mode]);
-
-  $sanitized_view_mode = strtr($view_mode, '.', '_');
 
   // Load display.
+  $display_id = implode('.', [$entity_type, $bundle, $view_mode]);
   $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
   $display = $storage->load($display_id);
+  if (empty($display)) {
+    return ['embed_inline' => FALSE];
+  }
+
+  $sanitized_view_mode = strtr($view_mode, '.', '_');
 
   return [
     'embed_inline' => $display->getThirdPartySetting('media_inline_embed', 'embed_inline', FALSE),

@@ -1,18 +1,17 @@
 uuid: 5c689833-5d4b-42cf-b356-5f53480e3a08
 langcode: en
-status: true
+status: false
 dependencies:
   config:
     - core.entity_view_mode.media.medium
-    - field.field.media.image.field_caption
     - field.field.media.image.field_directory
+    - field.field.media.image.field_keywords
     - field.field.media.image.field_media_image
     - image.style.medium
     - media.type.image
   module:
     - image
     - layout_builder
-    - text
 third_party_settings:
   layout_builder:
     allow_custom: false
@@ -22,13 +21,6 @@ targetEntityType: media
 bundle: image
 mode: medium
 content:
-  field_caption:
-    weight: 1
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
   field_media_image:
     weight: 0
     label: hidden
@@ -41,6 +33,7 @@ content:
 hidden:
   created: true
   field_directory: true
+  field_keywords: true
   name: true
   thumbnail: true
   uid: true
