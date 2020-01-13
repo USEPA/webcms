@@ -84,8 +84,7 @@ function epa_core_new_release_description_validate(&$element, FormStateInterface
     $node_langcode = $node->language()->getId();
     $title = $form_state->getValue('title');
     $description = t('EPA News Release: @title', ['@title' => $title[0]['value']], ['langcode' => $node_langcode]);
-    $element['#value'] = $description->render();
-    $form_state->setValueforElement($element, [['value' => $element['#value']]]);
+    $form_state->setValueforElement($element, [['value' => $description->render()]]);
   }
 
   epa_admin_required_fields_validate($element, $form_state);
