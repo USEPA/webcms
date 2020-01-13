@@ -1,31 +1,34 @@
-uuid: 5c689833-5d4b-42cf-b356-5f53480e3a08
+uuid: b3a38f3b-bcca-4f3f-9148-979d0e308761
 langcode: en
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.media.medium
+    - core.entity_view_mode.media.full_width
     - field.field.media.image.field_directory
     - field.field.media.image.field_keywords
     - field.field.media.image.field_media_image
-    - image.style.medium
+    - image.style.large
     - media.type.image
   module:
     - image
     - layout_builder
+    - media_inline_embed
 third_party_settings:
+  media_inline_embed:
+    embed_inline: false
   layout_builder:
     allow_custom: false
     enabled: false
-id: media.image.medium
+id: media.image.full_width
 targetEntityType: media
 bundle: image
-mode: medium
+mode: full_width
 content:
   field_media_image:
     weight: 0
     label: hidden
     settings:
-      image_style: medium
+      image_style: large
       image_link: ''
     third_party_settings: {  }
     type: image

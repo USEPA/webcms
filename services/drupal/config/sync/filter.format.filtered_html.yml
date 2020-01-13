@@ -5,10 +5,12 @@ dependencies:
   config:
     - core.entity_view_mode.media.full
     - core.entity_view_mode.media.large
+    - core.entity_view_mode.media.link_with_metadata
     - core.entity_view_mode.media.medium
   module:
-    - media
     - linkit
+    - media
+    - media_inline_embed
 name: 'Filtered HTML'
 format: filtered_html
 weight: 0
@@ -36,7 +38,6 @@ filters:
     settings:
       default_view_mode: default
       allowed_media_types:
-        document: document
         image: image
         remote_video: remote_video
       allowed_view_modes:
@@ -51,3 +52,20 @@ filters:
     weight: 0
     settings:
       title: true
+  media_inline_embed:
+    id: media_inline_embed
+    provider: media_inline_embed
+    status: true
+    weight: 100
+    settings:
+      default_view_mode: link_with_metadata
+      allowed_media_types:
+        document: document
+      allowed_view_modes:
+        link_with_metadata: link_with_metadata
+  filter_caption:
+    id: filter_caption
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
