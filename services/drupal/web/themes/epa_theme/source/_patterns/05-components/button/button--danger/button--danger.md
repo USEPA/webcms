@@ -1,7 +1,10 @@
 ---
 el: .button--danger
 title: Danger Button
+state: inreview
 ---
+
+Drupal outputs this class on buttons that can delete content.
 
 __Variables:__
 * is_button_tag: [boolean] Whether to output as a button element.

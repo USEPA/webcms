@@ -1,6 +1,7 @@
 ---
 el: .article
 title: Article
+state: inprogress
 ---
 
 __Variables:__

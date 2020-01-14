@@ -1,6 +1,7 @@
 ---
 el: .site-logo
 title: Site Logo
+state: inprogress
 ---
 
 __Variables:__

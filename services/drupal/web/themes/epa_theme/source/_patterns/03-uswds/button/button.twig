@@ -1,0 +1,15 @@
+{% set classes = [
+  'usa-button',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% if is_button_tag %}
+  <button class="{{ classes }}"{% if is_disabled %} disabled{% endif %}>{{ text }}</button>
+{% else %}
+  <a href="{{ url }}" class="{{ classes }}">{{ text }}</a>
+{% endif %}
+
+{% if is_demo %}
+  <a href="{{ url }}" class="{{ classes }}">{{ text_demo }}</a>
+  <button class="{{ classes }}" disabled>Disabled {{ text }}</button>
+{% endif %}

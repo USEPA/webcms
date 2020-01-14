@@ -1,12 +1,17 @@
-<div class="usa-accordion">
-{% for item in accordion %}
-  <h2 class="usa-accordion__heading">
-    <button class="usa-accordion__button" aria-expanded="false" aria-controls="a{{ loop.index }}">
-      {{ item.title }}
-    </button>
-  </h2>
-  <div id="a{{ loop.index }}" class="usa-accordion__content">
-    {{ item.content }}
-  </div>
-{% endfor %}
+{% set classes = [
+  'usa-accordion',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
+  {% for item in accordion %}
+    <h2 class="usa-accordion__heading">
+      <button class="usa-accordion__button" aria-expanded="false" aria-controls="{{ accordion_id }}-a{{ loop.index }}">
+        {{ item.title }}
+      </button>
+    </h2>
+    <div id="{{ accordion_id }}-a{{ loop.index }}" class="usa-accordion__content">
+      {{ item.content }}
+    </div>
+  {% endfor %}
 </div>

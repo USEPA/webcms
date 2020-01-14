@@ -1,6 +1,7 @@
 ---
 el: .pager
 title: Pager
+state: inprogress
 ---
 
 __Variables:__

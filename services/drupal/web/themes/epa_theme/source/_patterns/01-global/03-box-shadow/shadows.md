@@ -1,3 +1,4 @@
 ---
 title: Shadows
+state: complete
 ---

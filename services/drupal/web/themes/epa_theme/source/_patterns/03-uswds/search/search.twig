@@ -1,0 +1,14 @@
+{% set classes = [
+  'usa-search',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<form class="{{ classes }}">
+  <div role="search">
+    <label class="usa-sr-only" for="{{ id }}">{{ label }}</label>
+    <input class="usa-input" id="{{ id }}" type="search" name="search">
+    <button class="usa-button" type="submit">
+      <span class="{% if hide_button_text %}usa-sr-only{% else %}usa-search__submit-text{% endif %}">{{ button_text}}</span>
+    </button>
+  </div>
+</form>

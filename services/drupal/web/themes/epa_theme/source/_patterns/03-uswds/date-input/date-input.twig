@@ -1,0 +1,22 @@
+<fieldset class="usa-fieldset">
+  {% if label %}
+    <legend class="usa-legend">{{ label }}</legend>
+  {% endif %}
+  {% if hint and hint_id %}
+    <span class="usa-hint" id="{{ hint_id }}">{{ hint }}</span>
+  {% endif %}
+  <div class="usa-memorable-date">
+    <div class="usa-form-group usa-form-group--month">
+      <label class="usa-label" for="{{ month_id }}">{{ 'Month'|t }}</label>
+      <input class="usa-input usa-input--inline"{% if hint_id %} aria-describedby="{{ hint_id }}"{% endif %} id="{{ month_id }}" name="{{ month_id }}" type="number" min="1" max="12" value="">
+    </div>
+    <div class="usa-form-group usa-form-group--day">
+      <label class="usa-label" for="{{ day_id }}">{{ 'Day'|t }}</label>
+      <input class="usa-input usa-input--inline"{% if hint_id %} aria-describedby="{{ hint_id }}"{% endif %} id="{{ day_id }}" name="{{ day_id }}" type="number" min="1" max="31" value="">
+    </div>
+    <div class="usa-form-group usa-form-group--year">
+      <label class="usa-label" for="{{ year_id }}">{{ 'Year'|t }}</label>
+      <input class="usa-input usa-input--inline"{% if hint_id %} aria-describedby="{{ hint_id }}"{% endif %} id="{{ year_id }}" name="{{ year_id }}" type="number"{% if year_min %} min="{{ year_min }}"{% endif %}{% if year_max %} max="{{ year_max }}"{% endif %} value="">
+    </div>
+  </div>
+</fieldset>

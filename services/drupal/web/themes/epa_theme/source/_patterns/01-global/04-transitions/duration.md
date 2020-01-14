@@ -1,3 +1,4 @@
 ---
 title: Duration
+state: complete
 ---

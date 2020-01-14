@@ -6,11 +6,11 @@
   required ? 'js-form-required',
 ] %}
 
-{% if title is not empty or required -%}
+{% if title is not empty -%}
   <label{{ attributes.addClass(classes) }}>
     {{ title }}
-    {% if required %}
-      <span class="form-item__required-marker"><span class="visually-hidden">{{ 'This field is required.'|t }}</span></span>
-    {% endif %}
+    {% if not required and title_display != 'after' -%}
+      <span class="usa-hint">({{ 'optional'|t }})</span>
+    {%- endif %}
   </label>
 {%- endif %}

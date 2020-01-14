@@ -1,6 +1,7 @@
 ---
 el: .teaser
 title: Teaser
+state: inprogress
 ---
 
 __Variables:__

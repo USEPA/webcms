@@ -1,6 +1,7 @@
 ---
 el: .l-grid--3col
 title: Three Column Grid Layout
+state: inprogress
 ---
 
 __Variables:__

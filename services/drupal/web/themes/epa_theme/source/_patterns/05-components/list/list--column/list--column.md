@@ -1,6 +1,7 @@
 ---
 el: .list--column
 title: Column List
+state: inprogress
 ---
 
 __Variables:__

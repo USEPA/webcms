@@ -1,6 +1,7 @@
 ---
 el: .date
 title: Date
+state: inprogress
 ---
 
 __Variables:__
