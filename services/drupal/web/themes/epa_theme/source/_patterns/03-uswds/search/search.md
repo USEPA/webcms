@@ -1,6 +1,7 @@
 ---
 el: .usa-search
 title: Search
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/search/]() and
 [https://components.designsystem.digital.gov/components/detail/search--default.html]().

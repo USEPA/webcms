@@ -1,6 +1,7 @@
 ---
 el: .usa-section
 title: Section
+state: inreview
 ---
 See
 [https://components.designsystem.digital.gov/components/detail/graphic-list.html]().

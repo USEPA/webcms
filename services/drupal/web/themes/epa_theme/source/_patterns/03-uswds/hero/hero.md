@@ -1,6 +1,7 @@
 ---
 el: .usa-hero
 title: Hero
+state: inreview
 ---
 See
 [https://components.designsystem.digital.gov/components/detail/hero.html]().

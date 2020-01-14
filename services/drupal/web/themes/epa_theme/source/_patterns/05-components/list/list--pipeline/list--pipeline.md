@@ -1,6 +1,7 @@
 ---
 el: .list--pipeline
 title: Pipeline List
+state: inprogress
 ---
 
 __Variables:__

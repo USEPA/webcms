@@ -1,6 +1,7 @@
 ---
 el: .usa-button--base
 title: Base Button
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/button/]() and
 [https://components.designsystem.digital.gov/components/detail/buttons--base.html]().

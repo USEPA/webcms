@@ -1,6 +1,7 @@
 ---
 el: .l-sidebar
 title: Sidebar Layout
+state: inprogress
 ---
 
 __Variables:__

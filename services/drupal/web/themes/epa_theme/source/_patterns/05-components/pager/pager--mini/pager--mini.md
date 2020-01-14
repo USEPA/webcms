@@ -1,6 +1,7 @@
 ---
 el: .pager--mini
 title: Mini Pager
+state: inprogress
 ---
 
 __Variables:__

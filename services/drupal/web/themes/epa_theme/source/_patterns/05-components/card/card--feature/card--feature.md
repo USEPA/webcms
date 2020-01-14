@@ -1,6 +1,7 @@
 ---
 el: .card--feature
 title: Feature Card
+state: inprogress
 ---
 
 __Variables:__

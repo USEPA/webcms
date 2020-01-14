@@ -1,3 +1,4 @@
 ---
 title: Easing
+state: complete
 ---

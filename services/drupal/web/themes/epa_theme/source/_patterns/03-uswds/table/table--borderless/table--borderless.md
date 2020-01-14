@@ -1,6 +1,7 @@
 ---
 el: .usa-table--borderless
 title: Borderless Table
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/table/]() and
 [https://components.designsystem.digital.gov/components/detail/tables.html]().

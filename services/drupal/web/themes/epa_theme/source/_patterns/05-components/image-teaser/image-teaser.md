@@ -1,6 +1,7 @@
 ---
 el: .image-teaser
 title: Image Teaser
+state: inprogress
 ---
 
 __Variables:__

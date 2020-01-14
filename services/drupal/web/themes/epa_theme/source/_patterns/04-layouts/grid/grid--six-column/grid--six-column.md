@@ -1,6 +1,7 @@
 ---
 el: .l-grid--6col
 title: Six Column Grid Layout
+state: inprogress
 ---
 
 __Variables:__

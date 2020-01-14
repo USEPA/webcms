@@ -1,6 +1,7 @@
 ---
 el: .author
 title: Author
+state: inprogress
 ---
 
 __Variables:__

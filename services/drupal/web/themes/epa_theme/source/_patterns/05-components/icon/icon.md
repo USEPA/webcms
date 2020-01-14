@@ -1,6 +1,7 @@
 ---
 el: .icon
 title: Icon
+state: inprogress
 ---
 
 __Variables:__

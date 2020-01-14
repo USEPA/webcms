@@ -1,6 +1,7 @@
 ---
 el: .usa-footer
 title: Footer
+state: inprogress
 ---
 See [https://designsystem.digital.gov/components/footer/]() and
 [https://components.designsystem.digital.gov/components/detail/footer--default.html]().

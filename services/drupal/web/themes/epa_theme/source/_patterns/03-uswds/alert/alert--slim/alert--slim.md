@@ -1,6 +1,7 @@
 ---
 el: .usa-alert--slim
 title: Slim Alert
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/alert/] and
 [https://components.designsystem.digital.gov/components/detail/alerts--slim.html]().

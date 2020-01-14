@@ -1,6 +1,7 @@
 ---
 el: .site-name
 title: Site Name
+state: inprogress
 ---
 
 __Variables:__

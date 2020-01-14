@@ -1,6 +1,7 @@
 ---
 el: .card
 title: Card
+state: inprogress
 ---
 
 __Variables:__

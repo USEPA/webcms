@@ -1,6 +1,7 @@
 ---
 el: .usa-memorable-date
 title: Date Input
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/form-controls/]() and
 [https://components.designsystem.digital.gov/components/detail/date-input.html]().

@@ -1,3 +1,4 @@
 ---
 title: Blockquote
+state: complete
 ---

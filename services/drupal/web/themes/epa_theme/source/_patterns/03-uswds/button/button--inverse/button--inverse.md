@@ -1,6 +1,7 @@
 ---
 el: .usa-button--inverse
 title: Outline Inverse Button
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/button/]() and
 [https://components.designsystem.digital.gov/components/detail/buttons--outline-inverse.html]().

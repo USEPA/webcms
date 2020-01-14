@@ -1,6 +1,7 @@
 ---
 el: .usa-accordion
 title: Borderless Accordion
+state: inreview
 ---
 See [https://designsystem.digital.gov/components/accordion/]() and
 [https://components.designsystem.digital.gov/components/detail/accordion--default.html]().
