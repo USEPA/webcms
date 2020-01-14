@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.public_notice.field_docket_numbers
     - field.field.node.public_notice.field_documents
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
+    - field.field.node.public_notice.field_expiration_date
     - field.field.node.public_notice.field_extension_date
     - field.field.node.public_notice.field_federal_register_citations
     - field.field.node.public_notice.field_geographic_locations
@@ -27,7 +28,9 @@ dependencies:
     - field.field.node.public_notice.field_permit_number
     - field.field.node.public_notice.field_programs_or_statutes
     - field.field.node.public_notice.field_publication_date
+    - field.field.node.public_notice.field_publish_date
     - field.field.node.public_notice.field_review_deadline
+    - field.field.node.public_notice.field_scheduled_transition
     - field.field.node.public_notice.field_type
     - field.field.node.public_notice.field_type_of_proposed_action
     - node.type.public_notice
@@ -45,6 +48,9 @@ third_party_settings:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
+        - field_sunset_date
       parent_name: group_additional_fields
       weight: 18
       format_type: tab
@@ -211,6 +217,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_extension_date:
     weight: 7
     settings: {  }
@@ -334,6 +346,12 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_type:
     weight: 12
     settings: {  }
@@ -400,4 +418,5 @@ hidden:
   field_geographic_locations: true
   field_notice_sort_date: true
   field_review_deadline: true
+  field_scheduled_transition: true
   path: true

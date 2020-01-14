@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.news_release.field_channel
     - field.field.node.news_release.field_description
     - field.field.node.news_release.field_env_laws_regs_and_treaties
+    - field.field.node.news_release.field_expiration_date
     - field.field.node.news_release.field_geographic_locations
     - field.field.node.news_release.field_hublinks
     - field.field.node.news_release.field_is_searchable_collection
@@ -15,8 +16,10 @@ dependencies:
     - field.field.node.news_release.field_paragraphs
     - field.field.node.news_release.field_press_office
     - field.field.node.news_release.field_press_officers
+    - field.field.node.news_release.field_publish_date
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
+    - field.field.node.news_release.field_scheduled_transition
     - field.field.node.news_release.field_secondary_headline
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_type
@@ -25,6 +28,7 @@ dependencies:
     - datetime
     - entity_reference_revisions
     - options
+    - scheduled_publish
     - user
 id: node.news_release.default
 targetEntityType: node
@@ -58,6 +62,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_expiration_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 103
     region: content
   field_geographic_locations:
     weight: 15
@@ -139,6 +152,15 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
+  field_publish_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 101
+    region: content
   field_release:
     weight: 4
     label: above
@@ -156,6 +178,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_scheduled_transition:
+    label: above
+    type: scheduled_publish_generic_formatter
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    weight: 102
     region: content
   field_secondary_headline:
     weight: 3

@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.regulation.field_docket_numbers
     - field.field.node.regulation.field_effective_dates
     - field.field.node.regulation.field_env_laws_regs_and_treaties
+    - field.field.node.regulation.field_expiration_date
     - field.field.node.regulation.field_federal_register_citations
     - field.field.node.regulation.field_geographic_locations
     - field.field.node.regulation.field_hublinks
@@ -20,15 +21,18 @@ dependencies:
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
     - field.field.node.regulation.field_page_head
+    - field.field.node.regulation.field_publish_date
     - field.field.node.regulation.field_review_deadline
     - field.field.node.regulation.field_rule_history
     - field.field.node.regulation.field_rule_summary
+    - field.field.node.regulation.field_scheduled_transition
     - field.field.node.regulation.field_type
     - field.field.node.regulation.field_wide_template
     - node.type.regulation
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - datetime
     - datetime_range
     - field_group
     - paragraphs
@@ -39,6 +43,9 @@ third_party_settings:
     group_other_metadata:
       children:
         - field_language
+        - field_publish_date
+        - field_expiration_date
+        - field_sunset_date
       parent_name: group_additional_fields
       weight: 17
       format_type: tab
@@ -190,6 +197,12 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_expiration_date:
+    weight: 47
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_federal_register_citations:
     weight: 2
     settings:
@@ -285,6 +298,12 @@ content:
     third_party_settings: {  }
     type: string_textarea
     region: content
+  field_publish_date:
+    weight: 46
+    settings: {  }
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
   field_rule_history:
     weight: 7
     settings:
@@ -361,4 +380,5 @@ content:
     third_party_settings: {  }
 hidden:
   field_review_deadline: true
+  field_scheduled_transition: true
   path: true

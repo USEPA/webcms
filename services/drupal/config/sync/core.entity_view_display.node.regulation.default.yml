@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.regulation.field_docket_numbers
     - field.field.node.regulation.field_effective_dates
     - field.field.node.regulation.field_env_laws_regs_and_treaties
+    - field.field.node.regulation.field_expiration_date
     - field.field.node.regulation.field_federal_register_citations
     - field.field.node.regulation.field_geographic_locations
     - field.field.node.regulation.field_hublinks
@@ -20,9 +21,11 @@ dependencies:
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
     - field.field.node.regulation.field_page_head
+    - field.field.node.regulation.field_publish_date
     - field.field.node.regulation.field_review_deadline
     - field.field.node.regulation.field_rule_history
     - field.field.node.regulation.field_rule_summary
+    - field.field.node.regulation.field_scheduled_transition
     - field.field.node.regulation.field_type
     - field.field.node.regulation.field_wide_template
     - node.type.regulation
@@ -31,6 +34,7 @@ dependencies:
     - datetime_range
     - entity_reference_revisions
     - options
+    - scheduled_publish
     - text
     - user
 id: node.regulation.default
@@ -107,6 +111,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_expiration_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 137
     region: content
   field_federal_register_citations:
     weight: 132
@@ -187,6 +200,15 @@ content:
     third_party_settings: {  }
     type: basic_string
     region: content
+  field_publish_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 135
+    region: content
   field_review_deadline:
     weight: 104
     label: above
@@ -210,6 +232,15 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+field_scheduled_transition:
+  label: above
+  type: scheduled_publish_generic_formatter
+  settings:
+    date_format: html_datetime
+    text_pattern: '%moderation_state% - %date%'
+  third_party_settings: {  }
+  weight: 136
+  region: content
   field_type:
     weight: 106
     label: above

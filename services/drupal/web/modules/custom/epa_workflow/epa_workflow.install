@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the book module.
+ */
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_install().
+ */
+function epa_workflow_install() {
+  $entity_type_manager = \Drupal::service('entity_type.manager');
+  $entity_type = $entity_type_manager->getDefinition('node');
+
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type_id = $entity_type->id();
+
+  $revision_metadata_keys = $entity_type->get('revision_metadata_keys');
+  $revision_metadata_keys['epa_revision_automated'] = 'epa_revision_automated';
+  $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
+  $definition_update_manager->updateEntityType($entity_type);
+
+  $epa_revision_automated = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Moderation automated'))
+    ->setDescription(t('When true current moderation state is automated.'))
+    ->setRevisionable(TRUE)
+    ->setDefaultValue(NULL);
+
+  $definition_update_manager->installFieldStorageDefinition('epa_revision_automated', $entity_type_id, $entity_type_id, $epa_revision_automated);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function epa_workflow_uninstall() {
+  // Clear values stored in epa_revision_automated.
+  $entity_type_manager = \Drupal::service('entity_type.manager');
+  $definition_update_manager = \Drupal::entityDefinitionUpdateManager();
+  $entity_type = $entity_type_manager->getDefinition('node');
+
+  $entity_revision_table = $entity_type->getRevisionTable();
+
+  if ($revision_metadata_keys = $entity_type->get('revision_metadata_keys')) {
+    if (is_array($revision_metadata_keys) && isset($revision_metadata_keys['epa_revision_automated'])) {
+      unset($revision_metadata_keys['epa_revision_automated']);
+      $entity_type->set('revision_metadata_keys', $revision_metadata_keys);
+      $definition_update_manager->updateEntityType($entity_type);
+    }
+  }
+
+  $database = \Drupal::database();
+  if ($database->schema()->fieldExists($entity_revision_table, 'epa_revision_automated')) {
+    $database->update($entity_revision_table)
+      ->fields(['epa_revision_automated' => NULL])
+      ->execute();
+  }
+
+}
