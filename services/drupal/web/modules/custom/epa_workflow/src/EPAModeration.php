@@ -164,7 +164,7 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   protected function setReviewDeadline($reset = FALSE) {
     // Stop if content doesn't use a review deadline.
-    if (!$this->contentEntityRevision->hasField('field_review_deadline') || !$this->contentEntityRevision->get('field_review_deadline')->isEmpty()) {
+    if (!$this->contentEntityRevision->hasField('field_review_deadline')) {
       return;
     }
 
