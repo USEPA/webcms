@@ -1,6 +1,6 @@
 ---
-el: .usa-header
-title: Header
+el: .usa-header--extended
+title: Extended Header
 state: inprogress
 ---
 See [https://designsystem.digital.gov/components/header/]() and
