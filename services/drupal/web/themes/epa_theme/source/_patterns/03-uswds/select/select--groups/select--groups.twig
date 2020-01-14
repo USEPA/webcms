@@ -1,0 +1,11 @@
+{% extends "@uswds/select/select.twig" %}
+
+{% block option_list %}
+  {% for group in dropdown_options %}
+    <optgroup label="{{ group.group_label }}">
+      {% for option in group.items %}
+        <option value="{{ option.value }}"{% if option.disabled %} disabled{% endif %}>{{ option.label }}</option>
+      {% endfor %}
+    </optgroup>
+  {% endfor %}
+{% endblock %}

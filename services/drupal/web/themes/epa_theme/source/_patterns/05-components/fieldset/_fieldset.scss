@@ -1,85 +1,10 @@
 // @file
 // Styles for form fieldsets.
 
-$fieldset-legend-offset: rem(line-height($theme-body-font-family, $theme-body-line-height) * gesso-base-font-size()) !default;
-
-.fieldset {
-  margin-bottom: gesso-spacing(3) + (rem(line-height($theme-body-font-family, $theme-body-line-height) * gesso-base-font-size()));
-  padding: 0;
-  position: relative;
-  top: $fieldset-legend-offset; // Offsets the negative margin of legends.
-}
+.fieldset {}
 
 .fieldset__legend {
-  box-sizing: content-box;
-  display: block;
-  left: -1px; // LTR
-  position: absolute;
-  text-indent: 0;
-  top: -$fieldset-legend-offset;
-  width: 100%;
-
-  @if $support-for-rtl {
-    [dir='rtl'] & {
-      left: auto;
-      right: -1px;
-    }
-  }
-}
-
-.fieldset__legend-text {
-  display: block;
-}
-
-.fieldset__legend-link {
-  display: block;
-}
-
-// .fieldset__content {}
-
-.fieldset__description {
-  color: gesso-color(text, secondary);
-  font-size: font-size(body, sm);
-
-  > :last-child {
-    margin-bottom: 0;
-  }
-}
-
-.fieldset--default {
-  background: #fff;
-  border: 1px solid gesso-color(form, border);
-  margin: rem(gesso-spacing(2)) 0 (rem(gesso-spacing(2)) + rem(12px));
-  padding: 0 1em;
-
-  .fieldset__legend {
-    background: gesso-color(form, border);
-    border: 1px solid gesso-color(form, border);
-    border-bottom: 0;
-    color: #212121;
-    height: 2em;
-    line-height: 2;
-    padding: 0;
-    text-shadow: 0 1px 0 #fff;
-  }
-
-  .fieldset__legend-text {
-    padding-left: 1em; // LTR
-
-    @if $support-for-rtl {
-      [dir='rtl'] & {
-        padding-left: 0;
-        padding-right: 1em;
-      }
-    }
-  }
-
-  .fieldset__content {
-    margin-top: 2.5em;
-  }
-
-  .fieldset__description {
-    font-style: italic;
-    margin: rem(gesso-spacing(2)) 0;
-  }
+  @extend .usa-label;
+  margin-bottom: gesso-spacing('05');
+  margin-top: 0;
 }

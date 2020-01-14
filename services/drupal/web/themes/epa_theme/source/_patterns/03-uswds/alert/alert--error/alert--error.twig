@@ -1,0 +1,11 @@
+{% set classes = [
+  'usa-alert--error',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@uswds/alert/alert.twig' with {
+  'modifier_classes': classes,
+  'role': role,
+  'title': title,
+  'content': content,
+} %}

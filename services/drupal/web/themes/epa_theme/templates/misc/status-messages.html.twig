@@ -12,19 +12,38 @@
   *
   */
 #}
-
 {% for type, messages in message_list %}
-  {% set classes = [
-    'message',
-    'message--' ~ type,
-  ] %}
+  {% set message_content %}
+    {% if messages|length > 1 %}
+      <ul>
+        {% for message in messages -%}
+          <li>{{ message }}</li>
+        {%- endfor %}
+      </ul>
+    {% else %}
+      <p class="usa-alert__text">{{ messages|first }}</p>
+    {% endif %}
+  {% endset %}
 
-  {% set attributes = attributes.addClass(classes)|without('role', 'aria-label') %}
-
-  {% include '@components/message/message.twig' with {
-    'type': type,
-    'heading': status_headings[type],
-    'messages': messages
-  } %}
-
+  {% if type == 'status' %}
+    {% include '@uswds/alert/alert--success/alert--success.twig' with {
+      'title': status_headings[type],
+      'content': message_content
+    } %}
+  {% elseif type == 'error' %}
+    {% include '@uswds/alert/alert--error/alert--error.twig' with {
+      'title': status_headings[type],
+      'content': message_content
+    } %}
+  {% elseif type == 'warning' %}
+    {% include '@uswds/alert/alert--warning/alert--warning.twig' with {
+      'title': status_headings[type],
+      'content': message_content
+    } %}
+  {% else %}
+    {% include '@uswds/alert/alert--info/alert--info.twig' with {
+      'title': status_headings[type],
+      'content': message_content
+    } %}
+  {% endif %}
 {% endfor %}

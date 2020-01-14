@@ -3,6 +3,8 @@ el: .button--danger
 title: Danger Button
 ---
 
+Drupal outputs this class on buttons that can delete content.
+
 __Variables:__
 * is_button_tag: [boolean] Whether to output as a button element.
 * is_demo: [boolean] Whether to show extra demo examples.

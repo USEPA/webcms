@@ -1,0 +1,11 @@
+<fieldset class="usa-fieldset"{% if description and description_id %} aria-describedby="{{ description_id }}"{% endif %}>
+  {% if legend %}
+    <legend class="usa-legend{% if legend_modifier_classes %} {{ legend_modifier_classes }}{% endif %}">{{ legend }}</legend>
+  {% endif %}
+  {% if description %}
+    <div class="usa-hint"{% if description_id %} id="{{ description_id }}"{% endif %}>{{ description }}</div>
+  {% endif %}
+  {% block fieldset_content %}
+    Fieldset content.
+  {% endblock %}
+</fieldset>

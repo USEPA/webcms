@@ -1,0 +1,18 @@
+<section class="usa-hero" style="background-image:url({{ background_image }})">
+  <div class="grid-container">
+    <div class="usa-hero__callout">
+      <h1 class="usa-hero__heading">
+        {% if callout %}
+          <span class="usa-hero__heading--alt">{{ callout }}</span>
+        {% endif %}
+        {{ title }}
+      </h1>
+      {% if paragraph %}
+        <p>{{ paragraph }}</p>
+      {% endif %}
+      {% if button_text and button_url %}
+        <a class="usa-button" href="{{ button_url }}">{{ button_text }}</a>
+      {% endif %}
+    </div>
+  </div>
+</section>

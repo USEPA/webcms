@@ -1,0 +1,11 @@
+{% set classes = [
+  'usa-button--outline',
+  'usa-button--inverse',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@uswds/button/button.twig' with {
+  'url': url,
+  'text': text,
+  'modifier_classes': classes,
+} %}

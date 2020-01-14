@@ -1,0 +1,21 @@
+{% set classes = [
+  'usa-alert',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}"{% if role %} role="{{ role }}"{% endif %}>
+  <div class="usa-alert__body">
+    {% if title -%}
+      <h3 class="usa-alert__heading">{{ title }}</h3>
+    {%- endif %}
+    <p class="usa-alert__text">{{ content }}</p>
+  </div>
+</div>
+
+{% if is_demo %}
+  <div class="{{ classes }}"{% if role %} role="{{ role }}"{% endif %}>
+    <div class="usa-alert__body">
+      {{ content }}
+    </div>
+  </div>
+{% endif %}
