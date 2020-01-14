@@ -3,30 +3,27 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.image.field_caption
     - field.field.media.image.field_directory
+    - field.field.media.image.field_keywords
     - field.field.media.image.field_media_image
+    - image.style.media_library
     - media.type.image
   module:
     - image
-    - text
+    - media_inline_embed
+third_party_settings:
+  media_inline_embed:
+    embed_inline: false
 id: media.image.default
 targetEntityType: media
 bundle: image
 mode: default
 content:
-  field_caption:
-    weight: 2
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
   field_media_image:
     weight: 1
     label: hidden
     settings:
-      image_style: ''
+      image_style: media_library
       image_link: ''
     third_party_settings: {  }
     type: image
@@ -42,5 +39,6 @@ content:
 hidden:
   created: true
   field_directory: true
+  field_keywords: true
   thumbnail: true
   uid: true

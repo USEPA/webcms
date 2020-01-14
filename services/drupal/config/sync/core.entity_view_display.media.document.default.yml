@@ -3,51 +3,46 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.document.field_filename
+    - field.field.media.document.field_keywords
     - field.field.media.document.field_media_file
-    - image.style.thumbnail
+    - field.field.media.document.field_num_of_pages
+    - field.field.media.document.field_publication_date
+    - field.field.media.document.field_publication_number
     - media.type.document
   module:
     - file
-    - image
-    - user
+    - media_inline_embed
+third_party_settings:
+  media_inline_embed:
+    embed_inline: false
 id: media.document.default
 targetEntityType: media
 bundle: document
 mode: default
 content:
-  created:
-    label: hidden
-    type: timestamp
-    weight: 0
-    region: content
-    settings:
-      date_format: medium
-      custom_date_format: ''
-      timezone: ''
-    third_party_settings: {  }
   field_media_file:
-    weight: 6
-    label: above
+    weight: 1
+    label: hidden
     settings:
       use_description_as_link_text: true
     third_party_settings: {  }
     type: file_default
     region: content
-  thumbnail:
-    type: image
-    weight: 5
-    label: hidden
-    settings:
-      image_style: thumbnail
-      image_link: ''
-    region: content
-    third_party_settings: {  }
-  uid:
-    label: hidden
-    type: author
+  name:
+    type: string
     weight: 0
     region: content
-    settings: {  }
+    label: hidden
+    settings:
+      link_to_entity: false
     third_party_settings: {  }
 hidden:
-  name: true
+  created: true
+  field_filename: true
+  field_keywords: true
+  field_num_of_pages: true
+  field_publication_date: true
+  field_publication_number: true
+  thumbnail: true
+  uid: true

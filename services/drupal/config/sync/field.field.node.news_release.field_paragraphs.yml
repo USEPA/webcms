@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_paragraphs
     - node.type.news_release
+    - paragraphs.paragraphs_type.press_officers
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -25,8 +26,9 @@ default_value_callback: ''
 settings:
   handler: 'default:paragraph'
   handler_settings:
-    negate: 0
-    target_bundles: null
+    negate: 1
+    target_bundles:
+      press_officers: press_officers
     target_bundles_drag_drop:
       applicants_or_respondents:
         weight: 12
@@ -40,6 +42,9 @@ settings:
       frc:
         weight: 15
         enabled: false
+      box:
+        weight: 16
+        enabled: false
       from_library:
         weight: 16
         enabled: false
@@ -49,16 +54,22 @@ settings:
       legal_authorities:
         weight: 18
         enabled: false
+      dynamic_list:
+        weight: 19
+        enabled: false
       link_list:
         weight: 19
         enabled: false
       locations_of_prop_actions:
         weight: 20
         enabled: false
-      node_list:
-        weight: 21
+      header:
+        weight: 22
         enabled: false
       press_officers:
+        enabled: true
         weight: 22
+      slideshow:
+        weight: 28
         enabled: false
 field_type: entity_reference_revisions
