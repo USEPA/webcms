@@ -31,6 +31,11 @@ class EPAPublishedNeedsReview extends EPAModeration {
         $this->logger->warning('An expiration transition for %title could not be set because no review deadline is available.', ['%title' => $this->contentEntityRevision->label()]);
       }
     }
+    else {
+      $this->sendManualNotification();
+      // I am not sure this was part of the D7 site.
+      $this->clearScheduledTransitions();
+    }
   }
 
 }

@@ -1,7 +1,12 @@
 uuid: fe4580f9-a168-4357-a76d-83ed862dc126
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    manual_only: false
 id: epa_content_needs_review
 workflow: epa_default
 transitions:
@@ -11,6 +16,7 @@ group_type: web_area
 group_use: false
 group_roles:
   web_area-30cda0a61: '0'
+  web_area-396316984: '0'
   web_area-a1df8f829: '0'
   web_area-a416e6833: '0'
   web_area-a57c51304: '0'
@@ -24,6 +30,6 @@ site_mail: true
 emails: ''
 subject: 'EPA Content Needs Review: [node:group:title] > [node:title]'
 body:
-  value: "<p>The following EPA page is in need of review. It will be unpublished and removed from the site if not reviewed.</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>[node:group:title] &gt; [node:title]</p>\r\n\r\n<p><a href=\"[node:edit-url]\">[node:edit-url]</a></p>\r\n"
+  value: "<p>Hi, you have received this email because you are member of the [node:group:title] web area in EPA's Web Content Management System.</p>\r\n\r\n<p>If this [node:group:title] web page is not reviewed and republished by [node:field_review_deadline] , it will no longer be visible to the public.</p>\r\n\r\n<p>If you are the content owner, or you help keep this page updated, please ensure it is up-to-date, edit if needed, and republish the page.</p>\r\n\r\n<p>Log in with your LAN ID and password to review this web page.</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>[node:title]: <a href=\"[node:edit-url]\">[node:edit-url]</a></p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Unsure of what to do? Please see <a class=\"external-link\" href=\"https://www.epa.gov/drupaltraining/i-just-got-epa-content-about-expire-email-what-do-i-do\" rel=\"nofollow\">https://www.epa.gov/drupaltraining/i-just-got-epa-content-about-expire-email-what-do-i-do</a></p>\r\n\r\n<p>&nbsp;</p>\r\n"
   format: filtered_html
 label: 'EPA Content Needs Review'

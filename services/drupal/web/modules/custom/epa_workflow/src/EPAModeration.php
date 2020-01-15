@@ -3,6 +3,8 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation_notifications\NotificationInformationInterface;
+use Drupal\content_moderation_notifications\NotificationInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -30,7 +32,7 @@ abstract class EPAModeration implements EPAModerationInterface {
   /**
    * The content entity revision pulled from moderation state.
    *
-   * @var Drupal\Core\Entity\ContentEntityInterface
+   * @var \Drupal\Core\Entity\ContentEntityInterface
    */
   protected $contentEntityRevision;
 
@@ -63,17 +65,37 @@ abstract class EPAModeration implements EPAModerationInterface {
   protected $workflowStorage;
 
   /**
+   * The workflow storage.
+   *
+   * @var \Drupal\content_moderation_notifications\NotificationInterface
+   */
+  protected $notification;
+
+  /**
+   * The workflow storage.
+   *
+   * @var \Drupal\content_moderation_notifications\NotificationInformationInterface
+   */
+  protected $notificationInformation;
+
+  /**
    * Constructs EPAModeration.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger channel factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\content_moderation_notifications\NotificationInterface $notification
+   *   The content moderation notification service.
+   * @param \Drupal\content_moderation_notifications\NotificationInformationInterface $notification_information
+   *   The content moderation notification information service.
    */
-  public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager, NotificationInterface $notification, NotificationInformationInterface $notification_information) {
     $this->logger = $logger_factory->get('epa_workflow');
     $this->entityTypeManager = $entity_type_manager;
     $this->workflowStorage = $entity_type_manager->getStorage('workflow');
+    $this->notification = $notification;
+    $this->notificationInformation = $notification_information;
   }
 
   /**
@@ -243,6 +265,14 @@ abstract class EPAModeration implements EPAModerationInterface {
       $moderation_state = $this->moderationEntity->moderation_state->value;
     }
     return $workflow->getTypePlugin()->getState($moderation_state)->label();
+  }
+
+  /**
+   * Send manual notification.
+   */
+  protected function sendManualNotification() {
+    $notifications = $this->notificationInformation->getNotifications($this->contentEntityRevision, TRUE);
+    $this->notification->sendNotification($this->contentEntityRevision, $notifications);
   }
 
 }

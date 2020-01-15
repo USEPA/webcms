@@ -6,9 +6,11 @@
  */
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -62,12 +64,31 @@ function epa_workflow_content_moderation_state_update(ContentModerationStateInte
  *
  * @todo This should probably be contributed back.
  */
-function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
+function epa_workflow_form_content_moderation_notification_form_alter(array &$form, FormStateInterface $form_state) {
   $workflow_id = $form['workflow']['#default_value'];
   $workflow = \Drupal::entityTypeManager()->getStorage('workflow')->load($workflow_id);
   $entity_types = $workflow->getTypePlugin()->getEntityTypes();
   $entity_types[] = 'content_moderation_notifications';
   $form['body']['token_tree_link']['#token_types'] = array_unique(array_merge($form['body']['token_tree_link']['#token_types'], $entity_types));
+
+  $notification = $form_state->getFormObject()->getEntity();
+  $manual_only = $notification->getThirdPartySetting('epa_workflow', 'manual_only', FALSE);
+
+  $form['manual_only'] = [
+    '#type' => 'checkbox',
+    '#title' => t('Manual Notification Only'),
+    '#description' => t('If checked, this notification will only be sent with manual transitions.'),
+    '#default_value' => $manual_only,
+  ];
+  $form['#entity_builders']['epa_workflow'] = '_epa_workflow_moderation_form_entity_builder';
+}
+
+/**
+ * Entity builder for content_moderation_notification_form.
+ */
+function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentModerationNotificationInterface $notification, &$form, FormStateInterface &$form_state) {
+  $manual_only = (bool) $form_state->getValue('manual_only', FALSE);
+  $notification->setThirdPartySetting('epa_workflow', 'manual_only', $manual_only);
 }
 
 /**
@@ -91,6 +112,8 @@ function epa_workflow_mail_alter(&$message) {
 function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
   $eic_notifications = [
     'epa_content_has_been_approved',
+    'epa_content_needs_review',
+    'epa_content_needs_review_manual',
     'epa_content_about_to_expire',
     'epa_content_has_expired',
     'epa_content_will_expire',
