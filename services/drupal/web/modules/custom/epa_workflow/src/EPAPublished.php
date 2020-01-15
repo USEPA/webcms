@@ -31,7 +31,7 @@ class EPAPublished extends EPAModeration {
       $transition_date->sub(new \DateInterval("P3W"));
       $this->scheduleTransition($transition_date, 'published_needs_review');
     }
-    else {
+    elseif (!$this->contentHasFieldValue('field_review_deadline')) {
       $this->logger->warning('A review transition for %title could not be set because no review deadline is available.', ['%title' => $this->contentEntityRevision->label()]);
     }
   }

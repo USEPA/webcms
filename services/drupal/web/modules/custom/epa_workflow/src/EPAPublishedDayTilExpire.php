@@ -2,18 +2,17 @@
 
 namespace Drupal\epa_workflow;
 
-use DateInterval;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 
 /**
- * Processes published content.
+ * Processes published day til expiring content.
  */
-class EPAPublishedNeedsReview extends EPAModeration {
+class EPAPublishedDayTilExpire extends EPAModeration {
 
   /**
    * {@inheritdoc}
    */
-  protected $moderationName = 'published_needs_review';
+  protected $moderationName = 'published_day_til_expire';
 
   /**
    * {@inheritdoc}
@@ -25,11 +24,10 @@ class EPAPublishedNeedsReview extends EPAModeration {
         && $this->contentHasFieldValue('field_review_deadline')
     ) {
       $transition_date = $this->contentEntityRevision->field_review_deadline->date;
-      $transition_date = $transition_date->sub(new DateInterval('P1W'));
-      $this->scheduleTransition($transition_date, 'published_expiring');
+      $this->scheduleTransition($transition_date, 'unpublished');
     }
     elseif (!$this->contentHasFieldValue('field_review_deadline')) {
-      $this->logger->warning('An expiration transition for %title could not be set because no review deadline is available.', ['%title' => $this->contentEntityRevision->label()]);
+      $this->logger->warning('An unpublish transition for %title could not be set because no review deadline is available.', ['%title' => $this->contentEntityRevision->label()]);
     }
   }
 

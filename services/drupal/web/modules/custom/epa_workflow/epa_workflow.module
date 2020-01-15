@@ -93,6 +93,7 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
     'epa_content_has_been_approved',
     'epa_content_about_to_expire',
     'epa_content_has_expired',
+    'epa_content_will_expire',
   ];
   if (in_array($data['notification']->id, $eic_notifications)) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($entity);

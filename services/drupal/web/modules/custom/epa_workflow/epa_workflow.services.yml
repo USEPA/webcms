@@ -41,6 +41,11 @@ services:
     parent: epa_workflow.default_moderation
     tags:
       - { name: epa_workflow_moderation_manager }
+  epa_workflow.published_day_til_expire_moderation:
+    class: Drupal\epa_workflow\EPAPublishedDayTilExpire
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
   epa_workflow.unpublished_moderation:
     class: Drupal\epa_workflow\EPAUnpublished
     parent: epa_workflow.default_moderation
