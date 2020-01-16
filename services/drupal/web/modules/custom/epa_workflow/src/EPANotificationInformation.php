@@ -37,8 +37,10 @@ class EPANotificationInformation extends NotificationInformation {
   /**
    * {@inheritdoc}
    */
-  public function getNotifications(EntityInterface $entity, $manual_only = NULL) {
+  public function getNotifications(EntityInterface $entity) {
     $notifications = [];
+
+    $exclude_process = !empty($entity->epa_revision_automated) && $entity->epa_revision_automated->value ? 'manual' : 'automatic';
 
     if ($this->isModeratedEntity($entity)) {
       $workflow = $this->getWorkflow($entity);
@@ -49,7 +51,7 @@ class EPANotificationInformation extends NotificationInformation {
           ->condition('workflow', $workflow->id())
           ->condition('status', 1)
           ->condition('transitions.' . $transition->id(), $transition->id())
-          ->condition('third_party_settings.epa_workflow.manual_only', $manual_only);
+          ->condition('third_party_settings.epa_workflow.workflow_process', $exclude_process, '<>');
 
         $notification_ids = $query->execute();
 

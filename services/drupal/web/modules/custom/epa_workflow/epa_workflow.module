@@ -72,14 +72,21 @@ function epa_workflow_form_content_moderation_notification_form_alter(array &$fo
   $form['body']['token_tree_link']['#token_types'] = array_unique(array_merge($form['body']['token_tree_link']['#token_types'], $entity_types));
 
   $notification = $form_state->getFormObject()->getEntity();
-  $manual_only = $notification->getThirdPartySetting('epa_workflow', 'manual_only', FALSE);
-
-  $form['manual_only'] = [
-    '#type' => 'checkbox',
-    '#title' => t('Manual Notification Only'),
-    '#description' => t('If checked, this notification will only be sent with manual transitions.'),
-    '#default_value' => $manual_only,
+  $workflow_process = $notification->getThirdPartySetting('epa_workflow', 'workflow_process', 'any');
+  $workflow_options = [
+    'any' => t('Any'),
+    'automatic' => t('Automatic'),
+    'manual' => t('Manual'),
   ];
+
+  $form['workflow_process'] = [
+    '#type' => 'radios',
+    '#title' => t('Workflow Process'),
+    '#options' => $workflow_options,
+    '#description' => t('Notification will react to the selected trigger.'),
+    '#default_value' => $workflow_process,
+  ];
+
   $form['#entity_builders']['epa_workflow'] = '_epa_workflow_moderation_form_entity_builder';
 }
 
@@ -87,8 +94,8 @@ function epa_workflow_form_content_moderation_notification_form_alter(array &$fo
  * Entity builder for content_moderation_notification_form.
  */
 function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentModerationNotificationInterface $notification, &$form, FormStateInterface &$form_state) {
-  $manual_only = (bool) $form_state->getValue('manual_only', FALSE);
-  $notification->setThirdPartySetting('epa_workflow', 'manual_only', $manual_only);
+  $workflow_process = $form_state->getValue('workflow_process', 'any');
+  $notification->setThirdPartySetting('epa_workflow', 'workflow_process', $workflow_process);
 }
 
 /**

@@ -32,7 +32,6 @@ class EPAPublishedNeedsReview extends EPAModeration {
       }
     }
     else {
-      $this->sendManualNotification();
       // I am not sure this was part of the D7 site.
       $this->clearScheduledTransitions();
     }

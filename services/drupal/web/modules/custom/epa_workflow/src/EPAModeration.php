@@ -267,12 +267,4 @@ abstract class EPAModeration implements EPAModerationInterface {
     return $workflow->getTypePlugin()->getState($moderation_state)->label();
   }
 
-  /**
-   * Send manual notification.
-   */
-  protected function sendManualNotification() {
-    $notifications = $this->notificationInformation->getNotifications($this->contentEntityRevision, TRUE);
-    $this->notification->sendNotification($this->contentEntityRevision, $notifications);
-  }
-
 }
