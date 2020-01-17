@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.event.field_event_cancellation
     - field.field.node.event.field_event_host
     - field.field.node.event.field_event_type
+    - field.field.node.event.field_expiration_date
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_hublinks
     - field.field.node.event.field_is_searchable_collection
@@ -22,7 +23,9 @@ dependencies:
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_page_head
     - field.field.node.event.field_paragraphs
+    - field.field.node.event.field_publish_date
     - field.field.node.event.field_review_deadline
+    - field.field.node.event.field_scheduled_transition
     - field.field.node.event.field_type
     - node.type.event
   module:
@@ -32,6 +35,7 @@ dependencies:
     - entity_reference_revisions
     - link
     - options
+    - scheduled_publish
     - user
 id: node.event.default
 targetEntityType: node
@@ -121,6 +125,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_expiration_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 37
+    region: content
   field_geographic_locations:
     weight: 19
     label: above
@@ -205,6 +218,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
+  field_publish_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 35
+    region: content
   field_review_deadline:
     weight: 10
     label: above
@@ -213,6 +235,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_scheduled_transition:
+    label: above
+    type: scheduled_publish_generic_formatter
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    weight: 36
     region: content
   field_type:
     weight: 7

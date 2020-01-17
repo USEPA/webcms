@@ -1,6 +1,7 @@
 ---
 el: .details
 title: Details
+state: inprogress
 ---
 
 __Variables:__

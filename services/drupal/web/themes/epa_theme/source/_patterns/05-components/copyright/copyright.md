@@ -1,6 +1,7 @@
 ---
 el: .copyright
 title: Copyright
+state: inprogress
 ---
 
 __Variables:__

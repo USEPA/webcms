@@ -1,6 +1,7 @@
 ---
 el: .list--inline
 title: Inline List
+state: inprogress
 ---
 
 __Variables:__

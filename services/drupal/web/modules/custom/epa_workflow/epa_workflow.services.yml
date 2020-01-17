@@ -1,0 +1,48 @@
+services:
+  epa_workflow.content_moderation_notifications.notification:
+    class: Drupal\epa_workflow\EPANotification
+    decorates: content_moderation_notifications.notification
+    decoration_priority: 5
+    public: false
+    arguments: ['@epa_workflow.content_moderation_notifications.notification.inner', '@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@content_moderation_notifications.notification_information', '@?token.entity_mapper']
+  epa_workflow.scheduled_publish.update:
+    class: Drupal\epa_workflow\EPAScheduledPublishCron
+    decorates: scheduled_publish.update
+    decoration_priority: 5
+    public: false
+    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time', '@tempstore.private']
+
+  epa_workflow.moderation_manager:
+    class: Drupal\epa_workflow\EPAModerationManager
+    arguments: ['@entity_type.manager', '@content_moderation.moderation_information']
+    tags:
+      - { name: service_collector, call: addModeration, tag: epa_workflow_moderation_manager }
+  epa_workflow.default_moderation:
+    arguments: ['@logger.factory', '@entity_type.manager']
+    public: false
+    abstract: true
+  epa_workflow.draft_approved_moderation:
+    class: Drupal\epa_workflow\EPADraftApproved
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
+  epa_workflow.published_moderation:
+    class: Drupal\epa_workflow\EPAPublished
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
+  epa_workflow.published_needs_review_moderation:
+    class: Drupal\epa_workflow\EPAPublishedNeedsReview
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
+  epa_workflow.published_expiring_moderation:
+    class: Drupal\epa_workflow\EPAPublishedExpiring
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
+  epa_workflow.unpublished_moderation:
+    class: Drupal\epa_workflow\EPAUnpublished
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }

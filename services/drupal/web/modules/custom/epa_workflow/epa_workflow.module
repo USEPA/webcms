@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_workflow.module.
+ */
+
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  $config_syncing = \Drupal::isConfigSyncing();
+  if ($entity_type->id() == 'node' && !$config_syncing) {
+    $fields['epa_revision_automated'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Moderation automated'))
+      ->setDescription(t('When true current moderation state is automated.'))
+      ->setRevisionable(TRUE)
+      ->setDefaultValue(NULL);
+  }
+  return $fields;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  if ($epa_moderation->isModeratedEntity($entity)) {
+    $epa_moderation->processModeration($entity);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @see Drupal\group\Entity\GroupContent::postSave
+ * @see https://www.drupal.org/project/group/issues/2872697
+ * @see https://www.drupal.org/project/drupal/issues/2803717
+ */
+function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  // Group will trigger an update after insert.
+  // Check to see if entity is moderated.
+  // Check to see if content revision id has changed.
+  // Also, check that the moderation state isn't looping over itself.
+  if ($epa_moderation->isModeratedEntity($entity)
+      && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
+      && $entity->getRevisionId() != $entity->getLoadedRevisionId()
+  ) {
+    $epa_moderation->processModeration($entity);
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * @todo This should probably be contributed back.
+ */
+function epa_workflow_form_content_moderation_notification_form_alter(&$form) {
+  $workflow_id = $form['workflow']['#default_value'];
+  $workflow = \Drupal::entityTypeManager()->getStorage('workflow')->load($workflow_id);
+  $entity_types = $workflow->getTypePlugin()->getEntityTypes();
+  $entity_types[] = 'content_moderation_notifications';
+  $form['body']['token_tree_link']['#token_types'] = array_unique(array_merge($form['body']['token_tree_link']['#token_types'], $entity_types));
+}
+
+/**
+ * Implements hook_mail_alter().
+ *
+ * Sets header content type to html.
+ * Can also achieve by installing mailsystem and add a module specific
+ * configuration for content_moderation_notifications.
+ *
+ * @see https://www.drupal.org/project/content_moderation_notifications/issues/2903550
+ */
+function epa_workflow_mail_alter(&$message) {
+  if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
+    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+  }
+}
+
+/**
+ * Implements hook_content_moderation_notification_mail_data_alter().
+ */
+function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
+  $eic_notifications = [
+    'epa_content_has_been_approved',
+    'epa_content_about_to_expire',
+    'epa_content_has_expired',
+  ];
+  if (in_array($data['notification']->id, $eic_notifications)) {
+    $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($entity);
+    foreach ($groups as $group) {
+      $eic_email = $group->field_editor_in_chief->entity->mail->value;
+      if (!in_array($eic_email, $data['to'])) {
+        $data['to'][] = $eic_email;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function epa_workflow_field_formatter_info_alter(array &$info) {
+  if (!empty($info['scheduled_publish_generic_formatter'])) {
+    $info['scheduled_publish_generic_formatter']['class'] = 'Drupal\epa_workflow\Plugin\Field\FieldFormatter\EPAScheduledPublishGenericFormatter';
+  }
+}

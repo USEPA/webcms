@@ -635,9 +635,7 @@ display:
           group_type: group
           admin_label: ''
           operator: in
-          value:
-            editorial-draft: editorial-draft
-            editorial-archived: editorial-archived
+          value: {  }
           group: 1
           exposed: true
           expose:
@@ -646,6 +644,8 @@ display:
             description: ''
             use_operator: false
             operator: moderation_state_op
+            operator_limit_selection: false
+            operator_list: {  }
             identifier: moderation_state
             required: false
             remember: false
@@ -653,10 +653,11 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              system_editor: '0'
+              metadata_administrator: '0'
+              system_webmaster: '0'
               administrator: '0'
-            reduce: true
-            operator_limit_selection: false
-            operator_list: {  }
+            reduce: false
           is_grouped: false
           group_info:
             label: ''
@@ -714,47 +715,6 @@ display:
           entity_type: node
           entity_field: langcode
           plugin_id: language
-        moderation_state_1:
-          id: moderation_state_1
-          table: node_field_revision
-          field: moderation_state
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: 'not in'
-          value:
-            editorial-published: editorial-published
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-            reduce: false
-            operator_limit_selection: false
-            operator_list: {  }
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: node
-          plugin_id: moderation_state_filter
       sorts: {  }
       title: 'Moderated content'
       header: {  }
@@ -801,7 +761,7 @@ display:
         groups:
           1: AND
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -809,7 +769,8 @@ display:
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:workflow_list'
   moderated_content:
     display_plugin: page
     id: moderated_content
@@ -820,7 +781,7 @@ display:
       path: admin/content/moderated
       display_description: ''
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -828,4 +789,5 @@ display:
         - url.query_args
         - 'user.node_grants:view'
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:workflow_list'

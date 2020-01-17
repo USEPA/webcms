@@ -1,6 +1,7 @@
 ---
 el: .site-slogan
 title: Site Slogan
+state: inprogress
 ---
 
 __Variables:__

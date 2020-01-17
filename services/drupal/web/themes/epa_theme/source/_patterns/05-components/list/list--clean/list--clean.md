@@ -1,6 +1,7 @@
 ---
 el: .list--clean
 title: Clean List
+state: inprogress
 ---
 
 __Variables:__

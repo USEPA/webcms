@@ -1,0 +1,25 @@
+{% set constrain_classes = [
+  'l-constrain',
+  constrain_modifier_classes ? constrain_modifier_classes,
+]|join(' ')|trim %}
+
+{% set content %}
+  {% if has_constrain %}
+    <div class="{{ constrain_classes }}">
+  {% endif %}
+
+  {% if section_title %}
+    <{{ section_title_element ?: 'h2' }}>{{ section_title }}</{{ section_title_element ?: 'h2' }}>
+  {% endif %}
+
+  {{ section_content }}
+
+  {% if has_constrain %}
+    </div>
+  {% endif %}
+{% endset %}
+
+{% include '@uswds/section/section--dark/section--dark.twig' with {
+  'modifier_classes': modifier_classes,
+  'content': content,
+} %}

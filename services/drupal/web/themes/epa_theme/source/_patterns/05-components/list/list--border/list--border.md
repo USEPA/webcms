@@ -1,6 +1,7 @@
 ---
 el: .list--border
 title: Border List
+state: inprogress
 ---
 
 __Variables:__
