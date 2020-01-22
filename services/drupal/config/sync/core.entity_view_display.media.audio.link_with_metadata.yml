@@ -1,0 +1,75 @@
+uuid: 4fef2880-cdcb-42fc-aee5-1a28555ff948
+langcode: en
+status: false
+dependencies:
+  config:
+    - core.entity_view_mode.media.link_with_metadata
+    - field.field.media.audio.field_author
+    - field.field.media.audio.field_keywords
+    - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.field_running_time
+    - field.field.media.audio.field_transcript
+    - media.type.audio
+  module:
+    - file
+    - layout_builder
+    - media_inline_embed
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+  media_inline_embed:
+    embed_inline: true
+id: media.audio.link_with_metadata
+targetEntityType: media
+bundle: audio
+mode: link_with_metadata
+content:
+  field_author:
+    weight: 4
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_keywords:
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_media_audio_file:
+    type: file_audio
+    label: visually_hidden
+    weight: 0
+    settings:
+      controls: true
+      autoplay: false
+      loop: false
+      multiple_file_display_type: tags
+    third_party_settings: {  }
+    region: content
+  field_running_time:
+    weight: 3
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_transcript:
+    weight: 2
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    type: file_default
+    region: content
+hidden:
+  created: true
+  name: true
+  thumbnail: true
+  uid: true
