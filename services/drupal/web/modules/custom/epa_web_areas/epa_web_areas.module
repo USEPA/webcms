@@ -206,12 +206,10 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
   // Get the added media.
   $media_items = $form_state->get('media') ?: [];
 
-  // Get the media library state.
+  // Check for the media library state.
   $form_storage = $form_state->getStorage();
   if (!empty($form_storage['media_library_state'])) {
-    // If the group id is added to the opener parameters,
-    // add media to group. Else, check if the group is directly
-    // added to the modal url.
+    // Get group id from the opener parameters or from the form action.
     $opener_parameters = $form_storage['media_library_state']->getOpenerParameters();
     if (!empty($opener_parameters['group'])) {
       $group_id = $opener_parameters['group'];
