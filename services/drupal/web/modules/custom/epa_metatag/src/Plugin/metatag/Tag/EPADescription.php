@@ -14,7 +14,7 @@ use Drupal\metatag\Plugin\metatag\Tag\MetaPropertyBase;
  *   name = "DC.description",
  *   group = "epa",
  *   weight = 1,
- *   type = "label",
+ *   type = "text",
  *   secure = FALSE,
  *   multiple = FALSE
  * )
