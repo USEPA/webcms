@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.page.field_channel
     - field.field.node.page.field_description
-    - field.field.node.page.field_documents
     - field.field.node.page.field_env_laws_regs_and_treaties
     - field.field.node.page.field_expiration_date
     - field.field.node.page.field_geographic_locations
@@ -28,7 +27,6 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - file
     - layout_builder
     - layout_discovery
     - layout_library
@@ -100,22 +98,6 @@ third_party_settings:
                 type: datetime_default
             additional: {  }
             weight: 3
-          f099d613-c212-4b39-a032-614cc1869f4a:
-            uuid: f099d613-c212-4b39-a032-614cc1869f4a
-            region: content
-            configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              id: 'field_block:node:page:field_documents'
-              formatter:
-                label: above
-                settings:
-                  use_description_as_link_text: true
-                third_party_settings: {  }
-                type: file_default
-            additional: {  }
-            weight: 4
           0b7da3ef-cf5e-486f-84ed-c2417a18d14e:
             uuid: 0b7da3ef-cf5e-486f-84ed-c2417a18d14e
             region: content
@@ -403,14 +385,6 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: basic_string
-    region: content
-  field_documents:
-    weight: 104
-    label: above
-    settings:
-      use_description_as_link_text: true
-    third_party_settings: {  }
-    type: file_default
     region: content
   field_env_laws_regs_and_treaties:
     weight: 112
