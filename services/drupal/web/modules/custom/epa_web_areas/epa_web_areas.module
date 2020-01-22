@@ -8,6 +8,7 @@
 use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
@@ -102,6 +103,113 @@ function epa_web_areas_preprocess_menu(&$variables) {
   if ($variables['menu_name'] == 'admin') {
     if (admin_toolbar_links_access_filter_user_has_admin_role($variables['user'])) {
       admin_toolbar_links_access_filter_filter_non_accessible_links($variables['items']);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ *
+ * @todo Create helper to get group.
+ */
+function epa_web_areas_field_widget_form_alter($element, FormStateInterface $form_state, $context) {
+  $plugin_type = $context['widget']->getPluginId();
+  if (!empty($plugin_type)
+      && $plugin_type == 'media_library_widget'
+      && $form_state->getFormObject() instanceof EntityForm
+  ) {
+    // Get group node is associated with.
+    $entity = $form_state->getformObject()->getEntity();
+    if ($entity->id()) {
+      $group_contents = GroupContent::loadByEntity($entity);
+      foreach ($group_contents as $group_content) {
+        $group = $group_content->getGroup();
+      }
+    }
+    elseif (isset($form_state->getStorage()['group'])) {
+      $group = $form_state->getStorage()['group'];
+    }
+    $media_library_state = $element['open_button']['#media_library_state'];
+    $opener_parameters = $media_library_state->getOpenerParameters();
+    if (!empty($group)) {
+      $opener_parameters['group'] = $group->id();
+      $media_library_state->set('media_library_opener_parameters', $opener_parameters);
+      $media_library_state->set('hash', $media_library_state->getHash());
+      $element['open_button']['#media_library_state'] = $media_library_state;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function epa_web_areas_form_media_library_add_form_alter(&$form, FormStateInterface $form_state) {
+  if (!empty($form['actions'])) {
+    $form['#submit'][] = 'epa_web_areas_group_media_submit';
+  }
+}
+
+/**
+ * Implements hook_editor_js_settings_alter().
+ */
+function epa_web_areas_editor_js_settings_alter(&$settings) {
+  $parameters = \Drupal::routeMatch()->getParameters()->all();
+  if (!empty($parameters)) {
+    foreach ($parameters as $parameter) {
+      if ($parameter instanceof EntityInterface) {
+        $entity = $parameter;
+        break;
+      }
+    }
+  }
+  if (isset($entity)) {
+    foreach ($settings['editor']['formats'] as $format => $setting) {
+      foreach ($setting['editorSettings'] as $key => $value) {
+        if (strpos($key, 'MediaLibrary_url')) {
+          $group_contents = GroupContent::loadByEntity($entity);
+          foreach ($group_contents as $group_content) {
+            $group = $group_content->getGroup();
+          }
+          $settings['editor']['formats'][$format]['editorSettings'][$key] = $value . "&group=" . $group->id();
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Custom submit handler for media.
+ */
+function epa_web_areas_group_media_submit($form, FormStateInterface $form_state) {
+  // Get the added media.
+  $media_items = $form_state->get('media') ?: [];
+
+  // Get the media library state.
+  $form_storage = $form_state->getStorage();
+  if (!empty($form_storage['media_library_state'])) {
+    // If the group id is added to the opener parameters,
+    // add media to group. Else, check if the group is directly
+    // added to the dialog url.
+    $opener_parameters = $form_storage['media_library_state']->getOpenerParameters();
+    if (!empty($opener_parameters['group'])) {
+      $group_id = $opener_parameters['group'];
+    }
+    else {
+      $complete_form = $form_state->getCompleteForm();
+      $path = $complete_form['#action'];
+      $parts = parse_url($path);
+      parse_str($parts['query'], $query);
+      if (!empty($query['group'])) {
+        $group_id = $query['group'];
+      }
+    }
+
+    if (isset($group_id)) {
+      $entity_type_manager = \Drupal::entityTypeManager();
+      foreach ($media_items as $media) {
+        $group = $entity_type_manager->getStorage('group')->load($group_id);
+        $group->addContent($media, 'group_media:' . $media->bundle());
+      }
     }
   }
 }
