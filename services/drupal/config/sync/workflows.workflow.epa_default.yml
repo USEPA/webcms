@@ -38,6 +38,11 @@ type_settings:
       published: true
       default_revision: true
       weight: -1
+    published_day_til_expire:
+      published: true
+      default_revision: true
+      label: 'Published, one day until expiration'
+      weight: 2
     published_expiring:
       published: true
       default_revision: true
@@ -52,7 +57,7 @@ type_settings:
       published: false
       default_revision: true
       label: Unpublished
-      weight: 2
+      weight: 3
   transitions:
     approve_leave_unpublished:
       label: 'Approve; leave unpublished'
@@ -61,18 +66,18 @@ type_settings:
         - draft_approved
         - draft_needs_review
       to: draft_approved
-      weight: 3
+      weight: -3
     content_reviewed_republish:
       label: 'Content reviewed; republish'
       from:
         - published_needs_review
         - published_expiring
       to: published
-      weight: 6
+      weight: 0
     create_new_draft:
       label: 'Create New Draft'
       to: draft
-      weight: 0
+      weight: -6
       from:
         - draft
         - draft_approved
@@ -80,10 +85,16 @@ type_settings:
         - published_expiring
         - published_needs_review
         - unpublished
+    prepare_for_expiration:
+      label: 'Prepare for expiration'
+      from:
+        - published_expiring
+      to: published_day_til_expire
+      weight: 3
     publish:
       label: Publish
       to: published
-      weight: 1
+      weight: -5
       from:
         - draft
         - draft_approved
@@ -95,39 +106,40 @@ type_settings:
       from:
         - draft_needs_review
       to: draft
-      weight: 5
+      weight: -1
     send_for_review:
       label: 'Send for review'
       from:
         - draft
       to: draft_needs_review
-      weight: 2
+      weight: -4
     send_to_author_for_review:
       label: 'Send to author for review'
       from:
         - published
       to: published_needs_review
-      weight: 7
+      weight: 1
     send_to_editor_s_for_review:
       label: 'Send to editor(s) for review'
       from:
         - published_needs_review
       to: published_expiring
-      weight: 8
+      weight: 2
     unapprove_return_to_draft:
       label: 'Unapprove; return to draft'
       from:
         - draft_approved
       to: draft
-      weight: 4
+      weight: -2
     unpublish:
       label: Unpublish
       from:
         - published
-        - published_needs_review
+        - published_day_til_expire
         - published_expiring
+        - published_needs_review
       to: unpublished
-      weight: 9
+      weight: 4
   entity_types:
     node:
       - event
