@@ -5,12 +5,17 @@ services:
     decoration_priority: 5
     public: false
     arguments: ['@epa_workflow.content_moderation_notifications.notification.inner', '@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@content_moderation_notifications.notification_information', '@?token.entity_mapper']
+  epa_workflow.content_moderation_notifications.notification_information:
+    class: Drupal\epa_workflow\EPANotificationInformation
+    decorates: content_moderation_notifications.notification_information
+    decoration_priority: 5
+    arguments: ['@epa_workflow.content_moderation_notifications.notification_information.inner', '@entity_type.manager', '@content_moderation.moderation_information']
   epa_workflow.scheduled_publish.update:
     class: Drupal\epa_workflow\EPAScheduledPublishCron
     decorates: scheduled_publish.update
     decoration_priority: 5
     public: false
-    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time', '@tempstore.private']
+    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time']
 
   epa_workflow.moderation_manager:
     class: Drupal\epa_workflow\EPAModerationManager
@@ -18,7 +23,7 @@ services:
     tags:
       - { name: service_collector, call: addModeration, tag: epa_workflow_moderation_manager }
   epa_workflow.default_moderation:
-    arguments: ['@logger.factory', '@entity_type.manager']
+    arguments: ['@logger.factory', '@entity_type.manager', '@content_moderation_notifications.notification', '@content_moderation_notifications.notification_information']
     public: false
     abstract: true
   epa_workflow.draft_approved_moderation:
@@ -38,6 +43,11 @@ services:
       - { name: epa_workflow_moderation_manager }
   epa_workflow.published_expiring_moderation:
     class: Drupal\epa_workflow\EPAPublishedExpiring
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
+  epa_workflow.published_day_til_expire_moderation:
+    class: Drupal\epa_workflow\EPAPublishedDayTilExpire
     parent: epa_workflow.default_moderation
     tags:
       - { name: epa_workflow_moderation_manager }
