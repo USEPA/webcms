@@ -12,6 +12,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupInterface;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -113,12 +114,16 @@ function epa_web_areas_preprocess_menu(&$variables) {
  * @todo Create helper to get group.
  */
 function epa_web_areas_field_widget_form_alter($element, FormStateInterface $form_state, $context) {
+  // Get the widget for media library.
   $plugin_type = $context['widget']->getPluginId();
   if (!empty($plugin_type)
       && $plugin_type == 'media_library_widget'
       && $form_state->getFormObject() instanceof EntityForm
   ) {
-    // Get group node is associated with.
+    // Get group entity is associated with.
+    // If the entity is unavailable, the group should be provided
+    // given the entity is added via the group
+    // e.g. group/{group_id}/{entity}/add.
     $entity = $form_state->getformObject()->getEntity();
     if ($entity->id()) {
       $group_contents = GroupContent::loadByEntity($entity);
@@ -129,6 +134,11 @@ function epa_web_areas_field_widget_form_alter($element, FormStateInterface $for
     elseif (isset($form_state->getStorage()['group'])) {
       $group = $form_state->getStorage()['group'];
     }
+
+    // Grab the media library state from the widget.
+    // When a modal is opened, the group id will be included
+    // as a query parameter. Though, we can extract the group id
+    // directly from the media library state later.
     $media_library_state = $element['open_button']['#media_library_state'];
     $opener_parameters = $media_library_state->getOpenerParameters();
     if (!empty($group)) {
@@ -144,6 +154,7 @@ function epa_web_areas_field_widget_form_alter($element, FormStateInterface $for
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function epa_web_areas_form_media_library_add_form_alter(&$form, FormStateInterface $form_state) {
+  // Add a custom submit handler that runs after media is added and saved.
   if (!empty($form['actions'])) {
     $form['#submit'][] = 'epa_web_areas_group_media_submit';
   }
@@ -153,24 +164,35 @@ function epa_web_areas_form_media_library_add_form_alter(&$form, FormStateInterf
  * Implements hook_editor_js_settings_alter().
  */
 function epa_web_areas_editor_js_settings_alter(&$settings) {
+  // Get entity object from route if provided.
+  // If entity is not provided, group should be provided
+  // given the entity is added via the group
+  // e.g. group/{group_id}/{entity}/add.
   $parameters = \Drupal::routeMatch()->getParameters()->all();
   if (!empty($parameters)) {
     foreach ($parameters as $parameter) {
-      if ($parameter instanceof EntityInterface) {
-        $entity = $parameter;
+      if ($parameter instanceof GroupInterface) {
+        $group = $parameter;
+        break;
+      }
+      elseif ($parameter instanceof EntityInterface) {
+        $group_contents = GroupContent::loadByEntity($parameter);
+        foreach ($group_contents as $group_content) {
+          $group = $group_content->getGroup();
+        }
         break;
       }
     }
-  }
-  if (isset($entity)) {
-    foreach ($settings['editor']['formats'] as $format => $setting) {
-      foreach ($setting['editorSettings'] as $key => $value) {
-        if (strpos($key, 'MediaLibrary_url')) {
-          $group_contents = GroupContent::loadByEntity($entity);
-          foreach ($group_contents as $group_content) {
-            $group = $group_content->getGroup();
+
+    // If we have a group object, tack the group id as a query parameter
+    // at the end of url strings for media library ckeditor widgets.
+    // The url will be parsed on submit.
+    if (isset($group)) {
+      foreach ($settings['editor']['formats'] as $format => $setting) {
+        foreach ($setting['editorSettings'] as $key => $value) {
+          if (strpos($key, 'MediaLibrary_url')) {
+            $settings['editor']['formats'][$format]['editorSettings'][$key] = $value . "&group=" . $group->id();
           }
-          $settings['editor']['formats'][$format]['editorSettings'][$key] = $value . "&group=" . $group->id();
         }
       }
     }
@@ -189,7 +211,7 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
   if (!empty($form_storage['media_library_state'])) {
     // If the group id is added to the opener parameters,
     // add media to group. Else, check if the group is directly
-    // added to the dialog url.
+    // added to the modal url.
     $opener_parameters = $form_storage['media_library_state']->getOpenerParameters();
     if (!empty($opener_parameters['group'])) {
       $group_id = $opener_parameters['group'];
@@ -204,6 +226,7 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
       }
     }
 
+    // Add group content for the media and create a relationship to the group.
     if (isset($group_id)) {
       $entity_type_manager = \Drupal::entityTypeManager();
       foreach ($media_items as $media) {
