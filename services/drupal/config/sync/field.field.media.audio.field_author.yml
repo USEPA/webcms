@@ -1,10 +1,11 @@
-uuid: ab4ea168-495e-45e6-adfe-31bc4d84940c
+uuid: 87c23bf3-945e-4fe0-89ea-b47156c5d553
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.media.field_author
     - media.type.audio
+    - taxonomy.vocabulary.epa_organization
   module:
     - custom_add_another
 third_party_settings:
@@ -21,5 +22,14 @@ required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
-settings: {  }
-field_type: string
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      epa_organization: epa_organization
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
