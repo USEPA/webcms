@@ -1,0 +1,21 @@
+uuid: 65a5c973-0346-486b-8ed0-5d8e0e09bfba
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: dashboard_overview
+label: 'Dashboard Overview'
+description: ''
+use_admin_theme: true
+path: /admin
+access_logic: and
+access_conditions:
+  -
+    id: user_role
+    roles:
+      authenticated: authenticated
+    negate: false
+    context_mapping:
+      user: current_user
+parameters: {  }
