@@ -10,11 +10,48 @@ dependencies:
     - field.field.media.audio.field_running_time
     - field.field.media.audio.field_transcript
     - media.type.audio
+  module:
+    - file
 id: media.audio.media_library
 targetEntityType: media
 bundle: audio
 mode: media_library
 content:
+  field_author:
+    type: entity_reference_autocomplete
+    weight: 4
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_keywords:
+    type: entity_reference_autocomplete
+    weight: 2
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_running_time:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_transcript:
+    type: file_generic
+    weight: 1
+    region: content
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
   name:
     type: string_textfield
     settings:
@@ -25,11 +62,7 @@ content:
     region: content
 hidden:
   created: true
-  field_author: true
-  field_keywords: true
   field_media_audio_file: true
-  field_running_time: true
-  field_transcript: true
   path: true
   status: true
   uid: true
