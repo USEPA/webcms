@@ -158,8 +158,8 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
 
       // custom date format handling
       if(stripos($name, 'default-revision-created') !== false) {
-        $name = 'default-revision-created';
-        $names = explode(':', trim($original, "[]"), 4);
+        $parts = explode(':', $name);
+        $name = $parts[0];
       }
 
       switch ($name) {
@@ -167,7 +167,7 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
           $replacements[$original] = _epa_core_get_machine_name_alias($entity);
           break;
         case 'default-revision-created':
-          $replacements[$original] = _epa_core_get_default_revision_created($entity, $names[2], $names[3]);
+          $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
           break;
       }
     }
