@@ -1,0 +1,32 @@
+uuid: b3178a32-ab94-4344-9c06-9005d7bb7581
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_transcript
+    - media.type.audio
+  module:
+    - custom_add_another
+    - file
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: media.audio.field_transcript
+field_name: field_transcript
+entity_type: media
+bundle: audio
+label: Transcript
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: 'transcripts/[date:custom:Ymd]'
+  file_extensions: txt
+  max_filesize: ''
+  description_field: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file
