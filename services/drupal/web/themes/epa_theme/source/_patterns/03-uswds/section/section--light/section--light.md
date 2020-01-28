@@ -1,7 +1,7 @@
 ---
 el: .usa-section--light
 title: Light Section
-state: inreview
+state: complete
 ---
 See
 [https://components.designsystem.digital.gov/components/detail/graphic-list.html]().
