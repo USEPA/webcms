@@ -80,13 +80,14 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 /**
  * Element validation: new release description field.
  */
-function epa_core_new_release_description_validate(&$element, FormStateInterface $form_state, $form) {
+function epa_core_new_release_description_validate($element, FormStateInterface &$form_state, $form) {
   if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
     $node = $form_state->getFormObject()->getEntity();
     $node_langcode = $node->language()->getId();
     $title = $form_state->getValue('title');
     $description = t('EPA News Release: @title', ['@title' => $title[0]['value']], ['langcode' => $node_langcode]);
-    $form_state->setValueforElement($element, [['value' => $description->render()]]);
+    $element[0]['value']['#value'] = $description->render();
+    $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
   }
 
   epa_admin_required_fields_validate($element, $form_state);
