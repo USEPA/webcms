@@ -1,7 +1,7 @@
 ---
 el: .usa-alert--no-icon
 title: No Icon Alert
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/alert/] and
 [https://components.designsystem.digital.gov/components/detail/alerts--no-icon.html]().
