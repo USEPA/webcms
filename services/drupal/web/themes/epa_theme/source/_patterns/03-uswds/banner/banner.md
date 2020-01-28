@@ -1,7 +1,7 @@
 ---
 el: .usa-banner
 title: Government Banner
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/banner/](),
 [https://components.designsystem.digital.gov/components/detail/banner.html](),

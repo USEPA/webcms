@@ -1,7 +1,7 @@
 ---
 el: .button
 title: Button
-state: inreview
+state: complete
 ---
 
 __Variables:__

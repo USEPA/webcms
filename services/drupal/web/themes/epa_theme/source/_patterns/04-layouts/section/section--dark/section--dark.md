@@ -1,7 +1,7 @@
 ---
 el: .l-section
 title: Section Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

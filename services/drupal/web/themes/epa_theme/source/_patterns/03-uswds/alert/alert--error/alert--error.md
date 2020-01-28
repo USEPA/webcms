@@ -1,7 +1,7 @@
 ---
 el: .usa-alert--error
 title: Error Alert
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/alert/] and
 [https://components.designsystem.digital.gov/components/detail/alerts--error.html]().
