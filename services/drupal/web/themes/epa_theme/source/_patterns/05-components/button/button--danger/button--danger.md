@@ -1,7 +1,7 @@
 ---
 el: .button--danger
 title: Danger Button
-state: inreview
+state: complete
 ---
 
 Drupal outputs this class on buttons that can delete content.
