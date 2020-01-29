@@ -1,0 +1,22 @@
+// @file
+// Styles for a sortable table.
+
+.usa-table--sortable {
+  /* stylelint-disable-next-line */
+  html.js & thead th {
+    @include svg-background(sort);
+    background-position: 0.25rem 50%;
+    background-repeat: no-repeat;
+    background-size: 0.5rem;
+
+    /* stylelint-disable-next-line */
+    &[aria-sort="ascending"] {
+      @include svg-background(sort-up);
+    }
+
+    /* stylelint-disable-next-line */
+    &[aria-sort="descending"] {
+      @include svg-background(sort-down);
+    }
+  }
+}
