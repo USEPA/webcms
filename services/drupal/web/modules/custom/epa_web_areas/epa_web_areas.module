@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -178,8 +179,16 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         $group = $parameter;
         break;
       }
-      elseif ($parameter instanceof EntityInterface) {
-        $group_contents = GroupContent::loadByEntity($parameter);
+      elseif ($parameter instanceof EntityInterface || $parameter instanceof OverridesSectionStorage) {
+        // If in layout builder, grab the entity from section storage.
+        if ($parameter instanceof OverridesSectionStorage) {
+          $contexts = $parameter->getContexts();
+          $entity = $contexts['entity']->getContextData()->getValue();
+        }
+        else {
+          $entity = $parameter;
+        }
+        $group_contents = GroupContent::loadByEntity($entity);
         foreach ($group_contents as $group_content) {
           $group = $group_content->getGroup();
         }
