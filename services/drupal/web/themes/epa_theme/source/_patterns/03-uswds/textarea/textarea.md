@@ -1,7 +1,7 @@
 ---
 el: .usa-textarea
 title: Textarea
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/form-controls/]() and
 [https://components.designsystem.digital.gov/components/detail/text-input.html]().
