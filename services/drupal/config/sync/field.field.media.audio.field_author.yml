@@ -1,0 +1,35 @@
+uuid: 87c23bf3-945e-4fe0-89ea-b47156c5d553
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_author
+    - media.type.audio
+    - taxonomy.vocabulary.epa_organization
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: media.audio.field_author
+field_name: field_author
+entity_type: media
+bundle: audio
+label: Author
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      epa_organization: epa_organization
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

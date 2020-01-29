@@ -1,7 +1,7 @@
 ---
 el: .usa-button--unstyled
 title: Unstyled Button
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/button/]().
 

@@ -1,7 +1,7 @@
 ---
 el: .usa-button--secondary
 title: Secondary Button
-state: inreview
+state: complete
 ---
 See [https://designsystem.digital.gov/components/button/]() and
 [https://components.designsystem.digital.gov/components/detail/buttons--secondary.html]().

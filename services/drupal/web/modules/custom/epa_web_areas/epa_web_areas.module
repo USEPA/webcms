@@ -18,7 +18,7 @@ use Drupal\group\Entity\GroupInterface;
  * Implements hook_form_FORM_BASE_ID_alter().
  *
  * - Used to hide field_hublinks if content belongs to group using
- * sidebar navigation as its naviagtion style.
+ * sidebar navigation as its navigation style.
  */
 function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if ($form_state->getFormObject() instanceof EntityForm) {
@@ -39,6 +39,9 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : FALSE;
       $form['field_hublinks']['#access'] = $has_hublinks;
     }
+
+    // Add group label to form
+    $form['group_info']['#markup'] = '<strong>Web Area: </strong> '. $group->toLink(NULL,'canonical',['attributes' => ['target' => '_blank']])->toString();
   }
 }
 
@@ -215,8 +218,7 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
       $group_id = $opener_parameters['group'];
     }
     else {
-      $complete_form = $form_state->getCompleteForm();
-      $path = $complete_form['#action'];
+      $path = $form['#action'];
       $parts = parse_url($path);
       parse_str($parts['query'], $query);
       if (!empty($query['group'])) {
