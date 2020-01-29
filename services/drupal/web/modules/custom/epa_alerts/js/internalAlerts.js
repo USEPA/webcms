@@ -4,12 +4,11 @@
 
       $.ajax({
       url: '/views/ajax',
-      type: 'post',
       data: {
         view_name: 'internal_alerts',
         view_display_id: 'default',
+        view_dom_id: 'js-view-dom-id-internal_alerts_default',
       },
-      dataType: 'json',
       success: function (response) {
         var results = $.grep(response, function(obj){
           return obj.method === "replaceWith";
