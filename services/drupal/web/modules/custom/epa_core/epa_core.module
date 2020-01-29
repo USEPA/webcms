@@ -168,7 +168,9 @@ function epa_core_tokens($type, $tokens, $data = [], $options = []) {
           $replacements[$original] = _epa_core_get_machine_name_alias($entity);
           break;
         case 'default-revision-created':
-          $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
+          if ($type == 'node') {
+            $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
+          }
           break;
       }
     }
