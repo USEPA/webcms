@@ -3,11 +3,12 @@ langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.media.full
-    - core.entity_view_mode.media.large
+    - core.entity_view_mode.media.full_width
+    - core.entity_view_mode.media.half_width
     - core.entity_view_mode.media.link
     - core.entity_view_mode.media.link_with_metadata
-    - core.entity_view_mode.media.medium
+    - core.entity_view_mode.media.original
+    - core.entity_view_mode.media.thumbnail
   module:
     - linkit
     - media
@@ -39,14 +40,15 @@ filters:
     settings:
       default_view_mode: default
       allowed_media_types:
-        audio: audio
         image: image
         remote_video: remote_video
       allowed_view_modes:
         default: default
-        full: full
-        large: large
-        medium: medium
+        full_width: full_width
+        half_width: half_width
+        link: link
+        original: original
+        thumbnail: thumbnail
   linkit:
     id: linkit
     provider: linkit
@@ -64,8 +66,6 @@ filters:
       allowed_media_types:
         audio: audio
         document: document
-        image: image
-        other: other
       allowed_view_modes:
         link: link
         link_with_metadata: link_with_metadata
