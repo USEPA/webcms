@@ -41,6 +41,10 @@
 
   .is-disabled > & {
     color: color('disabled');
+
+    .usa-hint {
+      color: color('disabled');
+    }
   }
 }
 
@@ -72,13 +76,32 @@
 .form-item__week {
   @extend .usa-input;
 
+  &:disabled {
+    background-color: color($theme-color-disabled-light);
+    background-image: none;
+    border-color: color($theme-color-disabled);
+    color: color($theme-color-disabled-dark);
+  }
+
   .is-full-width > & {
     max-width: 100%;
   }
 }
 
+.form-item__select {
+  &[multiple] {
+    background-image: none;
+  }
+}
+
 .form-item__textarea {
   @extend .usa-textarea;
+
+  &:disabled {
+    background-color: color($theme-color-disabled-light);
+    border-color: color($theme-color-disabled);
+    color: color($theme-color-disabled-dark);
+  }
 }
 
 .form-item__checkbox {
@@ -95,6 +118,12 @@
 
 .form-item__range {
   @extend .usa-range;
+  padding: 0;
+
+  &:disabled {
+    background: transparent;
+    opacity: 0.5;
+  }
 }
 
 .form-item__select {
