@@ -6,6 +6,7 @@
       data: {
         view_name: 'public_alerts',
         view_display_id: 'default',
+        view_dom_id: 'js-view-dom-id-public_alerts_default',
       },
       success: function (response) {
         var results = $.grep(response, function(obj){
