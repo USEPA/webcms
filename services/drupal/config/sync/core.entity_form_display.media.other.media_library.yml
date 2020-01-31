@@ -1,0 +1,38 @@
+uuid: 9c1d0b79-d3c8-4b88-b6e5-c3b92c12040f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.media.media_library
+    - field.field.media.other.field_keywords
+    - field.field.media.other.field_media_file_1
+    - media.type.other
+id: media.other.media_library
+targetEntityType: media
+bundle: other
+mode: media_library
+content:
+  field_keywords:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  name:
+    type: string_textfield
+    settings:
+      size: 60
+      placeholder: ''
+    weight: 0
+    third_party_settings: {  }
+    region: content
+hidden:
+  created: true
+  field_media_file_1: true
+  path: true
+  status: true
+  uid: true
