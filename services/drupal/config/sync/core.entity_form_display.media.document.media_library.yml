@@ -16,6 +16,47 @@ targetEntityType: media
 bundle: document
 mode: media_library
 content:
+  field_filename:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_keywords:
+    type: entity_reference_autocomplete
+    weight: 2
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_num_of_pages:
+    type: number
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_publication_date:
+    type: string_textfield
+    weight: 4
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_publication_number:
+    type: string_textfield
+    weight: 5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
   name:
     type: string_textfield
     settings:
@@ -26,12 +67,7 @@ content:
     region: content
 hidden:
   created: true
-  field_filename: true
-  field_keywords: true
   field_media_file: true
-  field_num_of_pages: true
-  field_publication_date: true
-  field_publication_number: true
   path: true
   status: true
   uid: true
