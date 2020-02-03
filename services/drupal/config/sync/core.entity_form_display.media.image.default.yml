@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_directory
+    - field.field.media.image.field_file_accessibility
     - field.field.media.image.field_keywords
     - field.field.media.image.field_media_image
     - image.style.thumbnail
@@ -19,12 +20,12 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 6
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
   field_directory:
-    weight: 3
+    weight: 2
     settings:
       create_new_items: false
       create_new_levels: false
@@ -33,8 +34,14 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_file_accessibility:
+    weight: 7
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
   field_keywords:
-    weight: 4
+    weight: 3
     settings:
       match_operator: CONTAINS
       match_limit: 10
@@ -61,7 +68,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 7
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -74,7 +81,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 4
     region: content
     settings:
       match_operator: CONTAINS

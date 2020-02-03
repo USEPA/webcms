@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.media.remote_video.field_caption
     - field.field.media.remote_video.field_directory
+    - field.field.media.remote_video.field_file_accessibility
     - field.field.media.remote_video.field_keywords
     - field.field.media.remote_video.field_media_oembed_video
     - media.type.remote_video
@@ -20,12 +21,12 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 7
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
   field_caption:
-    weight: 3
+    weight: 2
     settings:
       rows: 5
       placeholder: ''
@@ -33,7 +34,7 @@ content:
     type: text_textarea
     region: content
   field_directory:
-    weight: 4
+    weight: 3
     settings:
       display_node_count: false
       create_new_items: false
@@ -42,8 +43,14 @@ content:
     third_party_settings: {  }
     type: options_shs
     region: content
+  field_file_accessibility:
+    weight: 8
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
+    region: content
   field_keywords:
-    weight: 5
+    weight: 4
     settings:
       match_operator: CONTAINS
       match_limit: 10
@@ -54,7 +61,7 @@ content:
     region: content
   field_media_oembed_video:
     type: oembed_textfield
-    weight: 2
+    weight: 1
     settings:
       size: 60
       placeholder: ''
@@ -70,7 +77,7 @@ content:
     third_party_settings: {  }
   path:
     type: path
-    weight: 8
+    weight: 7
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -83,7 +90,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 6
+    weight: 5
     region: content
     settings:
       match_operator: CONTAINS
