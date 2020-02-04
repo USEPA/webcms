@@ -89,8 +89,8 @@ display:
           columns:
             media_bulk_form: media_bulk_form
             thumbnail__target_id: thumbnail__target_id
-            field_filename: field_filename
             name: name
+            field_filename: field_filename
             bundle: bundle
             uid: uid
             status: status
@@ -109,14 +109,14 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            field_filename:
-              sortable: false
+            name:
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
               responsive: ''
-            name:
+            field_filename:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -290,8 +290,8 @@ display:
           label: Filename
           exclude: true
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '({{ field_filename }})'
             make_link: false
             path: ''
             absolute: false
@@ -353,15 +353,15 @@ display:
           label: 'Media name'
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '{{ name }}     {{ field_filename }}'
             make_link: false
             path: ''
             absolute: false
             external: false
             replace_spaces: false
             path_case: none
-            trim_whitespace: false
+            trim_whitespace: true
             alt: ''
             rel: ''
             link_class: ''
@@ -742,7 +742,7 @@ display:
           exposed: true
           expose:
             operator_id: combine_op
-            label: 'Media Name'
+            label: 'Media Name (or filename)'
             description: ''
             use_operator: false
             operator: combine_op
@@ -755,6 +755,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
               metadata_administrator: '0'
               system_webmaster: '0'
@@ -779,8 +780,8 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           fields:
-            field_filename: field_filename
             name: name
+            field_filename: field_filename
           plugin_id: combine
         field_keywords_target_id:
           id: field_keywords_target_id
@@ -969,49 +970,6 @@ display:
           plugin_id: boolean
           entity_type: media
           entity_field: status
-        langcode:
-          id: langcode
-          table: media_field_data
-          field: langcode
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: langcode_op
-            label: Language
-            description: ''
-            use_operator: false
-            operator: langcode_op
-            identifier: langcode
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              administrator: '0'
-            reduce: false
-            operator_limit_selection: false
-            operator_list: {  }
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: media
-          entity_field: langcode
-          plugin_id: language
         status_extra:
           group_info:
             widget: select

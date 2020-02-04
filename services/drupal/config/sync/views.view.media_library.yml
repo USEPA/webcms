@@ -337,7 +337,7 @@ display:
           exposed: true
           expose:
             operator_id: combine_op
-            label: 'Media Name'
+            label: 'Media Name (or filename)'
             description: ''
             use_operator: false
             operator: combine_op
@@ -350,6 +350,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
               metadata_administrator: '0'
               system_webmaster: '0'
@@ -374,8 +375,8 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           fields:
-            field_filename: field_filename
             name: name
+            field_filename: field_filename
           plugin_id: combine
         field_keywords_target_id:
           id: field_keywords_target_id
@@ -1377,7 +1378,7 @@ display:
           exclude: true
           alter:
             alter_text: false
-            text: ''
+            text: '({{ field_filename }})'
             make_link: false
             path: ''
             absolute: false
@@ -1521,7 +1522,7 @@ display:
           exposed: true
           expose:
             operator_id: combine_op
-            label: 'Media Name'
+            label: 'Media Name (or filename)'
             description: ''
             use_operator: false
             operator: combine_op
@@ -1534,6 +1535,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
               metadata_administrator: '0'
               system_webmaster: '0'
@@ -2041,44 +2043,6 @@ display:
           entity_type: media
           entity_field: thumbnail
           plugin_id: field
-        name:
-          id: name
-          label: Name
-          table: media_field_data
-          field: name
-          relationship: none
-          type: string
-          entity_type: media
-          entity_field: name
-          plugin_id: field
-          settings:
-            link_to_entity: false
-        uid:
-          id: uid
-          label: Author
-          table: media_field_revision
-          field: uid
-          relationship: none
-          type: entity_reference_label
-          entity_type: media
-          entity_field: uid
-          plugin_id: field
-          settings:
-            link: true
-        changed:
-          id: changed
-          label: Updated
-          table: media_field_data
-          field: changed
-          relationship: none
-          type: timestamp
-          entity_type: media
-          entity_field: changed
-          plugin_id: field
-          settings:
-            date_format: short
-            custom_date_format: ''
-            timezone: ''
         field_filename:
           id: field_filename
           table: media__field_filename
@@ -2089,8 +2053,8 @@ display:
           label: Filename
           exclude: true
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '({{ field_filename }})'
             make_link: false
             path: ''
             absolute: false
@@ -2142,6 +2106,97 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
+        name:
+          id: name
+          table: media_field_data
+          field: name
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: Name
+          exclude: false
+          alter:
+            alter_text: true
+            text: '{{ name }}  {{ field_filename }}'
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: media
+          entity_field: name
+          plugin_id: field
+        uid:
+          id: uid
+          label: Author
+          table: media_field_revision
+          field: uid
+          relationship: none
+          type: entity_reference_label
+          entity_type: media
+          entity_field: uid
+          plugin_id: field
+          settings:
+            link: true
+        changed:
+          id: changed
+          label: Updated
+          table: media_field_data
+          field: changed
+          relationship: none
+          type: timestamp
+          entity_type: media
+          entity_field: changed
+          plugin_id: field
+          settings:
+            date_format: short
+            custom_date_format: ''
+            timezone: ''
       access:
         type: perm
         options:
@@ -2160,7 +2215,7 @@ display:
           exposed: true
           expose:
             operator_id: combine_op
-            label: 'Media Name'
+            label: 'Media Name (or filename)'
             description: ''
             use_operator: false
             operator: combine_op
@@ -2173,6 +2228,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
               metadata_administrator: '0'
               system_webmaster: '0'
