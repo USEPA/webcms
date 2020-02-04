@@ -70,8 +70,9 @@ type_settings:
     content_reviewed_republish:
       label: 'Content reviewed; republish'
       from:
-        - published_needs_review
+        - published_day_til_expire
         - published_expiring
+        - published_needs_review
       to: published
       weight: 0
     create_new_draft:
@@ -82,6 +83,7 @@ type_settings:
         - draft
         - draft_approved
         - published
+        - published_day_til_expire
         - published_expiring
         - published_needs_review
         - unpublished
