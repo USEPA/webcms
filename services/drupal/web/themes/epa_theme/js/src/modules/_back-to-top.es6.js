@@ -1,7 +1,9 @@
 /**
  * Additional functionality for Back to Top button.
- * @param threshold
- * @param smoothScroll
+ * @param {integer} threshold - Distance the user must scroll down the page
+ *   before the back to top button is displayed.
+ * @param {boolean} smoothScroll - Whether to animate the user's scroll back
+ *   to the top.
  */
 export default function(threshold = 200, smoothScroll = true) {
   const backToTop = document.querySelector('.back-to-top');
