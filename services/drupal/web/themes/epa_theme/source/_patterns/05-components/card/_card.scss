@@ -21,17 +21,17 @@ $card-padding: rem(gesso-spacing(3)) !default;
 }
 
 .card__date {
+  @include vertical-spacing(rem(gesso-spacing(2)));
   font-size: font-size(body, 3xs);
 }
 
 .card__title {
+  @include vertical-spacing(rem(gesso-spacing(2)));
   font-size: font-size(heading, lg);
+  margin: 0;
 
   a {
-    @include link(
-      $card-link-color,
-      $card-link-color-hover
-    );
+    @include link($card-link-color, $card-link-color-hover);
   }
 }
 
@@ -39,16 +39,16 @@ $card-padding: rem(gesso-spacing(3)) !default;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 0 $card-padding 0;
+  padding: $card-padding;
+}
 
-  p:last-child {
-    margin-bottom: 0;
-  }
+.card__header {
+  @include vertical-spacing(rem(gesso-spacing(3)));
 }
 
 .card__date {
+  @include vertical-spacing(rem(gesso-spacing(2)));
   color: $card-meta-color;
-  margin-bottom: rem(gesso-spacing(2));
 }
 
 .card__content {
@@ -56,7 +56,6 @@ $card-padding: rem(gesso-spacing(3)) !default;
 }
 
 .card__media {
-  margin-bottom: rem(gesso-spacing(3));
   order: -1;
 
   a {
@@ -72,15 +71,10 @@ $card-padding: rem(gesso-spacing(3)) !default;
 
 .card__footer {
   margin-top: auto;
-  padding: 0 0 $card-padding;
+}
 
-  > div {
-    margin-bottom: rem(gesso-spacing(2));
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+.card__tags {
+  @include vertical-spacing(rem(gesso-spacing(2)));
 }
 
 .card__readmore {
@@ -88,13 +82,8 @@ $card-padding: rem(gesso-spacing(3)) !default;
 }
 
 .card--feature {
-  .card__body {
-    padding-top: $card-padding;
-  }
-
   .card__media {
     flex-grow: 1;
-    margin-bottom: 0;
   }
 
   @include breakpoint(gesso-breakpoint(mobile-lg)) {
@@ -106,7 +95,7 @@ $card-padding: rem(gesso-spacing(3)) !default;
 
     .card__body {
       max-width: 600px;
-      padding: $card-padding 2vw 0;
+      padding: $card-padding 2vw;
     }
 
     .card__media {
