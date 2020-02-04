@@ -10,7 +10,7 @@
   </thead>
   <tbody>
     {# Base font value should be a pixel value or unitless value #}
-    {% for name, unit in gesso.spacing %}
+    {% for name, unit in gesso.spacing|keysort %}
       {% if unit is iterable %}
         {% set unit_label = unit['sass'] %}
         {% set unit = unit['sass'] is empty ? unit['sass'] : unit['fallback'] %}
