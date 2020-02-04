@@ -1,4 +1,9 @@
-export default function(threshold = 200) {
+/**
+ * Additional functionality for Back to Top button.
+ * @param threshold
+ * @param smoothScroll
+ */
+export default function(threshold = 200, smoothScroll = true) {
   const backToTop = document.querySelector('.back-to-top');
   if (backToTop) {
     if (!isNaN(threshold)) {
@@ -22,6 +27,20 @@ export default function(threshold = 200) {
           clearTimeout(stillScrolling);
         }
         stillScrolling = setTimeout(scrollHandler, 60);
+      });
+    }
+    if (smoothScroll) {
+      backToTop.addEventListener('click', event => {
+        const targetId = backToTop.getAttribute('href');
+        const target = document.querySelector(targetId);
+        if (target) {
+          event.preventDefault();
+          const coords = target.getBoundingClientRect();
+          window.scrollTo({
+            top: coords.top,
+            behavior: 'smooth',
+          });
+        }
       });
     }
   }
