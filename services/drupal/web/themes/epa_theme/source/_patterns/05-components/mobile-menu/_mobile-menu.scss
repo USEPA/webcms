@@ -1,16 +1,40 @@
 // @file
 // Styles for the mobile menu.
 
-$mobile-menu-fallback-bg-color: gesso-color(ui, generic, background-light) !default;
-$mobile-menu-bg-color: rgba(gesso-color(ui, generic, background-light), 0.98) !default;
+$mobile-menu-fallback-bg-color: gesso-color(
+  ui,
+  generic,
+  background-light
+) !default;
+$mobile-menu-bg-color: rgba(
+  gesso-color(ui, generic, background-light),
+  0.98
+) !default;
 $mobile-menu-link-color: gesso-color(ui, generic, text-dark) !default;
 $mobile-menu-link-hover-color: gesso-color(ui, generic, text-darker) !default;
-$mobile-menu-submenu-fallback-bg-color: gesso-color(ui, generic, background-lighter) !default;
-$mobile-menu-submenu-bg-color: rgba(gesso-color(ui, generic, background-lighter), 0.98) !default;
+$mobile-menu-submenu-fallback-bg-color: gesso-color(
+  ui,
+  generic,
+  background-lighter
+) !default;
+$mobile-menu-submenu-bg-color: rgba(
+  gesso-color(ui, generic, background-lighter),
+  0.98
+) !default;
 $mobile-menu-submenu-link-color: gesso-color(ui, generic, text-dark) !default;
-$mobile-menu-submenu-link-hover-color: gesso-color(ui, generic, text-darker) !default;
+$mobile-menu-submenu-link-hover-color: gesso-color(
+  ui,
+  generic,
+  text-darker
+) !default;
 $mobile-menu-button-height: rem(54px);
-$mobile-menu-button-width: 44px;
+$mobile-menu-submenu-link-hover-color: gesso-color(
+  ui,
+  generic,
+  text-darker
+) !default;
+$mobile-menu-button-height: rem(54px);
+$mobile-menu-button-width: rem(44px);
 $mobile-menu-font-size: font-size(ui, md);
 $mobile-menu-line-height: line-height(ui, $theme-body-line-height);
 
@@ -46,7 +70,11 @@ $mobile-menu-line-height: line-height(ui, $theme-body-line-height);
   font-weight: gesso-font-weight(bold);
   line-height: $mobile-menu-line-height;
   margin: 0;
-  padding: ($mobile-menu-button-height - ($mobile-menu-font-size * $mobile-menu-line-height) / 2) gesso-spacing(2);
+  padding: (
+      $mobile-menu-button-height -
+        ($mobile-menu-font-size * $mobile-menu-line-height) / 2
+    )
+    gesso-spacing(2);
   text-align: left;
   text-decoration: none;
   white-space: normal;
@@ -95,12 +123,13 @@ $mobile-menu-line-height: line-height(ui, $theme-body-line-height);
     }
   }
 
-  &[aria-expanded="true"] {
+  &[aria-expanded='true'] {
     @include svg-background-inline(mobile-arrow-up);
   }
 }
 
 .mobile-menu__subnav {
+  @include vertical-spacing(0);
   background-color: $mobile-menu-submenu-fallback-bg-color;
   background-color: $mobile-menu-submenu-bg-color;
   display: none;
