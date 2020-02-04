@@ -1,24 +1,33 @@
 .back-to-top {
-  align-items: center;
-  background-color: gesso-color(button, back-to-top, background);
-  border-radius: 50%;
-  bottom: rem(gesso-spacing(205));
-  color: gesso-color(button, back-to-top, color);
-  display: flex;
-  height: rem(70px);
-  justify-content: center;
-  position: fixed;
-  right: rem(gesso-spacing(205));
-  width: rem(70px);
+  display: none;
 
-  &:hover,
-  &:focus {
-    background-color: gesso-color(button, back-to-top, background-hover);
-    color: gesso-color(button, back-to-top, color-hover);
-  }
-
-  &:visited {
+  @include breakpoint(gesso-breakpoint(mobile-lg)) {
+    align-items: center;
+    background-color: gesso-color(button, back-to-top, background);
+    border-radius: 50%;
+    bottom: rem(gesso-spacing(205));
     color: gesso-color(button, back-to-top, color);
+    display: flex;
+    height: rem(70px);
+    justify-content: center;
+    position: fixed;
+    right: rem(gesso-spacing(205));
+    transition: opacity 150ms ease-in-out;
+    width: rem(70px);
+
+    &:hover,
+    &:focus {
+      background-color: gesso-color(button, back-to-top, background-hover);
+      color: gesso-color(button, back-to-top, color-hover);
+    }
+
+    &:visited {
+      color: gesso-color(button, back-to-top, color);
+    }
+
+    &[aria-hidden='true'] {
+      opacity: 0;
+    }
   }
 }
 

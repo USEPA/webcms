@@ -8,6 +8,7 @@ import accordion from 'uswds/src/js/components/accordion.js';
 import navigation from './modules/navigation';
 import banner from 'uswds/src/js/components/banner.js';
 import tablesort from './modules/tablesort';
+import backToTop from './modules/_back-to-top';
 
 (function() {
   'use strict';
@@ -34,5 +35,6 @@ import tablesort from './modules/tablesort';
     banner.on(document.body);
     navigation(); // If used with the USWDS accordion component, the navigation must run after it.
     tablesort();
+    backToTop();
   });
 })();
