@@ -1,0 +1,14 @@
+{% set classes = [
+  'usa-hero--reversed',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include "@uswds/hero/hero.twig" with {
+  callout: callout,
+  title: title,
+  paragraph: paragraph,
+  button_url: button_url,
+  button_text: button_text,
+  background_image: background_image,
+  modifier_classes: classes
+}%}
