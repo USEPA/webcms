@@ -1,148 +1,129 @@
-{% extends '@layouts/site-container/site-container.twig' %}
-  {% block site_content %}
-
-    {% include '@uswds/banner/banner.twig' with {
-      'banner_text': 'An official website of the United States government',
-      'has_expanded': true,
-      'banner_action': 'Here’s how you know',
-      'expanded_blocks': [
-        {
-          'icon': '../../../images/icon-dot-gov.svg',
-          'icon_alt': 'Dot gov',
-          'heading': 'The .gov means it’s official.',
-          'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.'
-        },
-        {
-          'icon': '../../../images/icon-https.svg',
-          'icon_alt': 'HTTPS',
-          'heading': 'The site is secure.',
-          'content': 'The <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.'
-        }
-      ]
-    }%}
-    {% embed '@uswds/header/header.twig' with {
-      'is_extended': true
+{% include '@uswds/banner/banner.twig' with {
+  'banner_text': 'An official website of the United States government',
+  'has_expanded': true,
+  'banner_action': 'Here’s how you know',
+  'expanded_blocks': [
+    {
+      'icon': '../../../images/icon-dot-gov.svg',
+      'icon_alt': 'Dot gov',
+      'heading': 'The .gov means it’s official.',
+      'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.'
+    },
+    {
+      'icon': '../../../images/icon-https.svg',
+      'icon_alt': 'HTTPS',
+      'heading': 'The site is secure.',
+      'content': 'The <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.'
+    }
+  ]
+}%}
+{% embed '@uswds/header/header.twig' with {
+  'is_extended': true
+} %}
+  {% block content %}
+    {% include '@uswds/navbar/navbar.twig' %}
+    {% embed '@uswds/nav/nav.twig' with {
+      'label': 'Primary navigation',
+      'extended': true
     } %}
       {% block content %}
-        {% include '@uswds/navbar/navbar.twig' %}
-        {% embed '@uswds/nav/nav.twig' with {
-          'label': 'Primary navigation',
-          'extended': true
+        {% include '@components/menu/menu.twig' with {
+          'menu_name': 'main',
+          'items': [
+            { 'title': 'Home', 'url': '#' },
+            { 'title': 'About', 'url': '#', 'below': [
+              { 'title': 'Submenu item one', 'url': '#' },
+              { 'title': 'Submenu item two', 'url': '#', 'below': [
+                { 'title': 'Submenu item one', 'url': '#' },
+                { 'title': 'Submenu item two', 'url': '#' },
+                { 'title': 'Submenu item three', 'url': '#' }
+              ]},
+              { 'title': 'Submenu item three', 'url': '#' }
+            ]},
+            { 'title': 'Resources', 'url': '#', 'below': [
+              { 'title': 'Submenu item one', 'url': '#' },
+              { 'title': 'Submenu item two', 'url': '#' }
+            ]},
+            { 'title': 'Contact', 'url': '#' }
+          ]
         } %}
+        {% embed '@uswds/nav/_secondary.twig' %}
           {% block content %}
             {% include '@components/menu/menu.twig' with {
-              'menu_name': 'main',
+              'menu_name': 'account',
               'items': [
-                { 'title': 'Home', 'url': '#' },
-                { 'title': 'About', 'url': '#', 'below': [
-                  { 'title': 'Submenu item one', 'url': '#' },
-                  { 'title': 'Submenu item two', 'url': '#', 'below': [
-                    { 'title': 'Submenu item one', 'url': '#' },
-                    { 'title': 'Submenu item two', 'url': '#' },
-                    { 'title': 'Submenu item three', 'url': '#' }
-                  ]},
-                  { 'title': 'Submenu item three', 'url': '#' }
-                ]},
-                { 'title': 'Resources', 'url': '#', 'below': [
-                  { 'title': 'Submenu item one', 'url': '#' },
-                  { 'title': 'Submenu item two', 'url': '#' }
-                ]},
-                { 'title': 'Contact', 'url': '#' }
+                { 'title': 'My Account', 'url': '#' },
+                { 'title': 'Logout', 'url': '#' }
               ]
             } %}
-            {% embed '@uswds/nav/_secondary.twig' %}
-              {% block content %}
-                {% include '@components/menu/menu.twig' with {
-                  'menu_name': 'account',
-                  'items': [
-                    { 'title': 'My Account', 'url': '#' },
-                    { 'title': 'Logout', 'url': '#' }
-                  ]
-                } %}
-              {% endblock %}
-            {% endembed %}
           {% endblock %}
         {% endembed %}
       {% endblock %}
     {% endembed %}
+  {% endblock %}
+{% endembed %}
 
-    {% embed '@layouts/breadcrumb/breadcrumb.twig' with {
-      'has_constrain': false
-    } %}
-      {% block content %}
-        {% include '@components/breadcrumb/breadcrumb.twig' with {
-          'breadcrumb': [
-            { 'url': '#', 'text': 'Home' },
-            { 'url': '#', 'text': 'About' },
-            { 'text': 'Current Page' }
-          ]
-        } %}
-      {% endblock %}
-    {% endembed %}
-
-    {% embed '@layouts/region/region.twig' with {
-      'region_name': 'highlighted',
-      'has_constrain': true
-    } %}
-      {% block content %}
-
-      {% endblock %}
-    {% endembed %}
-
-    {% embed '@layouts/region/region.twig' with {
-      'region_name': 'help',
-      'has_constrain': true
-    } %}
-      {% block content %}
-
-      {% endblock %}
-    {% endembed %}
-
-    <main id="main" class="main" role="main" tabindex="-1">
-      {% embed '@layouts/region/region.twig' with {
-        'region_name': 'preface',
-        'has_constrain': true
-      } %}
-        {% block content %}
-
-        {% endblock %}
-      {% endembed %}
-
-      {% embed '@layouts/content/content.twig' with {
-        'has_constrain': true
-      } %}
-        {% block content %}
-          {{ content }}
-        {% endblock %}
-      {% endembed %}
-
-      {% embed '@layouts/region/region.twig' with {
-        'region_name': 'postscript',
-        'has_constrain': true
-      } %}
-        {% block content %}
-
-        {% endblock %}
-      {% endembed %}
-    </main>
-
-    {% embed '@uswds/footer/footer.twig' with {
-      'has_back_to_top': true
-    } %}
-      {% block primary %}
-        {% include '@components/menu/menu--footer/menu--footer.twig' with {
-          'menu_name': 'footer',
-          'items': [
-            { 'title': 'Careers', 'url': '#' },
-            { 'title': 'Contact', 'url': '#' },
-            { 'title': 'Credits', 'url': '#' },
-            { 'title': 'Terms of Use', 'url': '#' }
-          ],
-        } %}
-      {% endblock %}
-      {% block secondary %}
-        {% include '@components/copyright/copyright.twig' %}
-      {% endblock %}
-    {% endembed %}
+{% embed '@layouts/region/region.twig' with {
+  'region_name': 'highlighted',
+  'has_constrain': true
+} %}
+  {% block content %}
 
   {% endblock %}
+{% endembed %}
+
+{% embed '@layouts/region/region.twig' with {
+  'region_name': 'help',
+  'has_constrain': true
+} %}
+  {% block content %}
+
+  {% endblock %}
+{% endembed %}
+
+<main id="main" class="main" role="main" tabindex="-1">
+  {% embed '@layouts/region/region.twig' with {
+    'region_name': 'preface',
+    'has_constrain': true
+  } %}
+    {% block content %}
+
+    {% endblock %}
+  {% endembed %}
+
+  {% embed '@layouts/content/content.twig' with {
+    'has_constrain': true
+  } %}
+    {% block content %}
+      {{ content }}
+    {% endblock %}
+  {% endembed %}
+
+  {% embed '@layouts/region/region.twig' with {
+    'region_name': 'postscript',
+    'has_constrain': true
+  } %}
+    {% block content %}
+
+    {% endblock %}
+  {% endembed %}
+</main>
+
+{% embed '@uswds/footer/footer.twig' with {
+  'has_back_to_top': true
+} %}
+  {% block primary %}
+    {% include '@components/menu/menu--footer/menu--footer.twig' with {
+      'menu_name': 'footer',
+      'items': [
+        { 'title': 'Careers', 'url': '#' },
+        { 'title': 'Contact', 'url': '#' },
+        { 'title': 'Credits', 'url': '#' },
+        { 'title': 'Terms of Use', 'url': '#' }
+      ],
+    } %}
+  {% endblock %}
+  {% block secondary %}
+    {% include '@components/copyright/copyright.twig' %}
+  {% endblock %}
+{% endembed %}
