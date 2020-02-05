@@ -20,7 +20,7 @@ function epa_theme_preprocess_html(&$vars, $hook) {
     ],
     'x_ua_compatible',
   ];
-  $vars['icon_path'] = '/' . $vars['directory'] . '/images';
+  $vars['image_path'] = '/' . $vars['directory'] . '/images';
 }
 
 /**
