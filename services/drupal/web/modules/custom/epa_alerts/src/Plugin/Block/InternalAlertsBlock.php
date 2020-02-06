@@ -21,10 +21,9 @@ class InternalAlertsBlock extends BlockBase {
 
     $build = [];
 
-    $build['internal_alerts_block'] = [
-      '#theme' => 'epa_alerts__internal',
-      '#attached' => ['library' => 'epa_alerts/internalAlerts'],
-    ];
+    $build['#theme'][] = 'epa_alerts__internal';
+    $build['#attached']['library'][] = 'epa_alerts/epaAlerts';
+    $build['#attached']['drupalSettings']['epaAlerts']['context'] = 'internal';
 
     return $build;
   }
