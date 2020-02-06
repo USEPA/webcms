@@ -1,3 +1,7 @@
-<a class="site-logo" href="{{ url }}" title="{{ 'Home'|t }}" rel="home">
-  <img class="site-logo__image" src="{{ site_logo }}" alt="{{ 'Home'|t }}" />
+<a class="site-logo" href="{{ url }}" aria-label="{{ 'Home'|t }}" title="{{ 'Home'|t }}" rel="home">
+  <span class="site-logo__image">
+    {% include '@components/icon/icon--logo/icon--logo.twig' with {
+      'is_hidden': true,
+    } %}
+  </span>
 </a>

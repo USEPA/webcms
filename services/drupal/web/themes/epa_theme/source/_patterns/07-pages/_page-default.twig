@@ -21,7 +21,13 @@
   'is_extended': true
 } %}
   {% block content %}
-    {% include '@uswds/navbar/navbar.twig' %}
+    {% embed '@uswds/navbar/navbar.twig' %}
+      {% block content %}
+        {% include "@components/site-logo/site-logo.twig" with {
+          'url': '/',
+        } %}
+      {% endblock %}
+    {% endembed %}
     {% embed '@uswds/nav/nav.twig' with {
       'label': 'Primary navigation',
       'extended': true

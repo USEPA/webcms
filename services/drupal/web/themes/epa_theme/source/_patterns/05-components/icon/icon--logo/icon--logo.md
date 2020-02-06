@@ -1,6 +1,6 @@
 ---
-el: .icon
-title: Icon
+el: .icon--logo
+title: Logo Icon
 state: inreview
 ---
 
