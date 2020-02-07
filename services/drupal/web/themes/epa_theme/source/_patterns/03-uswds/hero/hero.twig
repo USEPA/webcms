@@ -1,4 +1,9 @@
-<section class="usa-hero" style="background-image:url({{ background_image }})">
+{% set classes = [
+  'usa-hero',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<section class="{{ classes }}" style="background-image:url({{ background_image }})">
   <div class="grid-container">
     <div class="usa-hero__callout">
       <h1 class="usa-hero__heading">
