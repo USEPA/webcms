@@ -33,26 +33,7 @@
       'extended': true
     } %}
       {% block content %}
-        {% include '@components/menu/menu.twig' with {
-          'menu_name': 'main',
-          'items': [
-            { 'title': 'Home', 'url': '#' },
-            { 'title': 'About', 'url': '#', 'below': [
-              { 'title': 'Submenu item one', 'url': '#' },
-              { 'title': 'Submenu item two', 'url': '#', 'below': [
-                { 'title': 'Submenu item one', 'url': '#' },
-                { 'title': 'Submenu item two', 'url': '#' },
-                { 'title': 'Submenu item three', 'url': '#' }
-              ]},
-              { 'title': 'Submenu item three', 'url': '#' }
-            ]},
-            { 'title': 'Resources', 'url': '#', 'below': [
-              { 'title': 'Submenu item one', 'url': '#' },
-              { 'title': 'Submenu item two', 'url': '#' }
-            ]},
-            { 'title': 'Contact', 'url': '#' }
-          ]
-        } %}
+        {% include '@components/menu/menu--main/menu--main.twig' %}
         {% embed '@uswds/nav/_secondary.twig' %}
           {% block content %}
             {% include '@components/menu/menu.twig' with {
