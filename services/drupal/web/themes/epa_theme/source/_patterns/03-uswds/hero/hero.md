@@ -13,3 +13,4 @@ __Variables:__
 * button_url: [string] URL of optional call-to-action button.
 * button_text: [string] Text of optional call-to-action button.
 * background_image: [string] URL of hero background image.
+* modifier_classes: [string] Optional additional CSS classes.

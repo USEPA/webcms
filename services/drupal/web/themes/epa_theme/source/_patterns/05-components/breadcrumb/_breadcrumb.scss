@@ -11,8 +11,8 @@ $breadcrumb-text-color: gesso-color(text, on-dark) !default;
   background-color: $breadcrumb-background-color;
   color: $breadcrumb-text-color;
   font-size: font-size(body, 3xs);
-  margin: rem(gesso-spacing(2)) 0;
   min-height: rem(gesso-spacing(5));
+  padding-bottom: rem(gesso-spacing(2));
   padding-top: rem(gesso-spacing(2));
 }
 
@@ -22,6 +22,7 @@ $breadcrumb-text-color: gesso-color(text, on-dark) !default;
 
 .breadcrumb__list {
   @include list-inline();
+  margin-top: 0;
 }
 
 .breadcrumb__item {
@@ -42,6 +43,7 @@ $breadcrumb-text-color: gesso-color(text, on-dark) !default;
 .breadcrumb__list .breadcrumb__item {
   @include breakpoint(max-width gesso-breakpoint(tablet)) {
     display: none;
+
     &:nth-last-child(2) {
       display: block;
 
