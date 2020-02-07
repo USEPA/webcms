@@ -21,10 +21,10 @@ class PublicAlertsBlock extends BlockBase {
 
     $build = [];
 
-    $build['public_alerts_block'] = [
-      '#theme' => 'epa_alerts__public',
-      '#attached' => ['library' => 'epa_alerts/publicAlerts'],
-    ];
+    $build['#theme'][] = 'epa_alerts';
+    $build['#alertContext'] = 'public';
+    $build['#attached']['library'][] = 'epa_alerts/epaAlerts';
+    $build['#attached']['drupalSettings']['epaAlerts']['context'] = 'public';
 
     return $build;
   }

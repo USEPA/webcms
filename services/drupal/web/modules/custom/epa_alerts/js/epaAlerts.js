@@ -1,0 +1,37 @@
+(function ($, Drupal) {
+
+  Drupal.behaviors.epaAlerts = {
+    attach: function (context, settings) {
+      $('body', context).once('loadEpaAlerts').each(function() {
+        // Context is set in the custom blocks. The two options are:
+        // 1. internal
+        // 2. public
+        var alertContext = drupalSettings.epaAlerts.context;
+
+        var viewInfo = {
+          view_name: `${alertContext}_alerts`,
+          view_display_id: 'default',
+          view_dom_id: `js-view-dom-id-${alertContext}_alerts_default`,
+        };
+
+        var ajaxSettings = {
+          submit: viewInfo,
+          url: '/views/ajax'
+        };
+
+        var getAlerts = Drupal.ajax(ajaxSettings);
+
+        getAlerts.commands.insert = function (ajax, response, status) {
+          $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).hide().html(response.data).slideDown();
+        };
+
+        getAlerts.commands.destroyObject = function (ajax, response, status) {
+          Drupal.ajax.instances[this.instanceIndex] = null;
+        }
+
+        getAlerts.execute();
+      });
+    }
+  };
+})(jQuery, Drupal);
+
