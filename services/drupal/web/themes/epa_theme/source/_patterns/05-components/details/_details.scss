@@ -11,7 +11,7 @@ $details-text-color: gesso-color(text, on-light) !default;
 // class is limited to only the details element
 /* stylelint-disable-next-line selector-no-qualifying-type */
 details.details {
-  margin: 0 0 rem(gesso-spacing(3));
+  @include vertical-spacing(rem(gesso-spacing(3)));
 
   // Fallback for browsers that don’t support details.
   /* stylelint-disable-next-line selector-no-qualifying-type */
@@ -57,6 +57,10 @@ details.details {
   &::-webkit-details-marker {
     display: none;
   }
+
+  &::before {
+    display: none; // remove icon added by polyfill
+  }
 }
 
 .details__fallback-link {
@@ -71,18 +75,10 @@ details.details {
   border: 3px solid $details-background-color;
   border-top: 0;
   padding: $details-padding;
-
-  > :last-child {
-    margin-bottom: 0;
-  }
 }
 
 .details__description {
+  @include vertical-spacing(rem(gesso-spacing(2)));
   color: $details-text-color;
   font-size: font-size(body, sm);
-  margin-bottom: rem(gesso-spacing(2));
-
-  > :last-child {
-    margin-bottom: 0;
-  }
 }

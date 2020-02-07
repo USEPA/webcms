@@ -13,6 +13,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
+use Drupal\media_library\MediaLibraryState;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -40,8 +42,8 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $form['field_hublinks']['#access'] = $has_hublinks;
     }
 
-    // Add group label to form
-    $form['group_info']['#markup'] = '<strong>Web Area: </strong> '. $group->toLink(NULL,'canonical',['attributes' => ['target' => '_blank']])->toString();
+    // Add group label to form.
+    $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
   }
 }
 
@@ -178,8 +180,16 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         $group = $parameter;
         break;
       }
-      elseif ($parameter instanceof EntityInterface) {
-        $group_contents = GroupContent::loadByEntity($parameter);
+      elseif ($parameter instanceof EntityInterface || $parameter instanceof OverridesSectionStorage) {
+        // If in layout builder, grab the entity from section storage.
+        if ($parameter instanceof OverridesSectionStorage) {
+          $contexts = $parameter->getContexts();
+          $entity = $contexts['entity']->getContextData()->getValue();
+        }
+        else {
+          $entity = $parameter;
+        }
+        $group_contents = GroupContent::loadByEntity($entity);
         foreach ($group_contents as $group_content) {
           $group = $group_content->getGroup();
         }
@@ -187,14 +197,20 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
       }
     }
 
-    // If we have a group object, tack the group id as a query parameter
-    // at the end of url strings for media library ckeditor widgets.
-    // The url will be parsed on submit.
+    // If we have a group object, add group id as a query parameter
+    // to the opener parameters and rebuild query for media library
+    // ckeditor widgets. The MediaLibraryState will preserve the group id.
     if (isset($group)) {
       foreach ($settings['editor']['formats'] as $format => $setting) {
         foreach ($setting['editorSettings'] as $key => $value) {
           if (strpos($key, 'MediaLibrary_url')) {
-            $settings['editor']['formats'][$format]['editorSettings'][$key] = $value . "&group=" . $group->id();
+            $parts = parse_url($value);
+            parse_str($parts['query'], $query);
+            $query['media_library_opener_parameters']['group'] = $group->id();
+            $query['hash'] = MediaLibraryState::create($query['media_library_opener_id'], $query['media_library_allowed_types'], $query['media_library_selected_type'], $query['media_library_remaining'], $query['media_library_opener_parameters'])->getHash();
+            $query = http_build_query($query);
+            $url = implode('?', [$parts['path'], $query]);
+            $settings['editor']['formats'][$format]['editorSettings'][$key] = $url;
           }
         }
       }
@@ -216,14 +232,6 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
     $opener_parameters = $form_storage['media_library_state']->getOpenerParameters();
     if (!empty($opener_parameters['group'])) {
       $group_id = $opener_parameters['group'];
-    }
-    else {
-      $path = $form['#action'];
-      $parts = parse_url($path);
-      parse_str($parts['query'], $query);
-      if (!empty($query['group'])) {
-        $group_id = $query['group'];
-      }
     }
 
     // Add group content for the media and create a relationship to the group.

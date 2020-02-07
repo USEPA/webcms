@@ -1,0 +1,46 @@
+uuid: ee352dea-772d-4ce9-80ce-bf8fe4b3ac54
+langcode: en
+status: true
+dependencies:
+  config:
+    - block_content.type.alert
+    - field.field.block_content.alert.field_date_range
+    - field.field.block_content.alert.field_formatted_long_text
+    - field.field.block_content.alert.field_type
+  module:
+    - datetime_range
+    - text
+id: block_content.alert.default
+targetEntityType: block_content
+bundle: alert
+mode: default
+content:
+  field_date_range:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: daterange_default
+    region: content
+  field_formatted_long_text:
+    weight: 2
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_type:
+    weight: 3
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  info:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden: {  }
