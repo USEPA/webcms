@@ -11,6 +11,7 @@ dependencies:
     - field.field.media.audio.field_transcript
     - media.type.audio
   module:
+    - duration_field
     - file
 id: media.audio.media_library
 targetEntityType: media
@@ -38,12 +39,11 @@ content:
       placeholder: ''
     third_party_settings: {  }
   field_running_time:
-    type: string_textfield
+    type: duration_widget
     weight: 3
     region: content
     settings:
-      size: 60
-      placeholder: ''
+      duration: ''
     third_party_settings: {  }
   field_transcript:
     type: file_generic
