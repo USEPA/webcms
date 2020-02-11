@@ -3,3 +3,6 @@ services:
     class: Drupal\epa_core\Routing\RouteSubscriber
     tags:
       - { name: event_subscriber }
+  epa_core.private_file_download:
+    class: Drupal\epa_core\EPAFileDownload
+    arguments: ['@current_user', '@stream_wrapper_manager', '@entity_type.manager']
