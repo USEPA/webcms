@@ -1,0 +1,16 @@
+uuid: f43f8b18-73bf-4d5e-b1a2-574db8dbaf9d
+langcode: en
+status: true
+dependencies:
+  config:
+    - workflows.workflow.epa_default
+  module:
+    - content_moderation
+    - node
+id: set_to_published_needs_review
+label: 'Set to Published, needs review'
+type: node
+plugin: 'moderation_state_change:node'
+configuration:
+  workflow: epa_default
+  state: published_needs_review
