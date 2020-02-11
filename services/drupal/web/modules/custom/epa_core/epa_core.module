@@ -234,7 +234,7 @@ function epa_core_file_download($uri) {
       $media = $entity_type_manager->getStorage('media')->load($file->id());
 
       // Throw 404 if file accessibility is true else serve the file.
-      if (isset($media) && $media->hasField('field_file_accessibility') && !empty($media->field_file_accessibility->value)) {
+      if (isset($media) && $media->hasField('field_limit_file_accessibility') && !empty($media->field_limit_file_accessibility->value)) {
         throw new NotFoundHttpException();
       }
     }
