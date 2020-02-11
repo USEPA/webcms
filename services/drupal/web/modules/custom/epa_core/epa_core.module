@@ -5,6 +5,7 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\node\Entity\Node;
@@ -203,4 +204,15 @@ function _epa_core_get_machine_name_alias($entity) {
 function _epa_core_get_default_revision_created($node, $type = 'medium', $format = NULL) {
   $node = $node->isDefaultRevision() ? $node : Node::load($node->id());
   return \Drupal::service('date.formatter')->format($node->getRevisionCreationTime(), $type, $format);
+}
+
+
+/**
+ * Implements hook_entity_revision_delete().
+ * Invalidate cache tags for a node when its revision is deleted.
+ */
+function epa_core_entity_revision_delete(Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'node') {
+    Cache::invalidateTags(['node:' . $entity->id()]);
+  }
 }
