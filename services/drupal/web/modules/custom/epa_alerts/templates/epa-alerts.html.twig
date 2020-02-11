@@ -1,1 +1,7 @@
-<div class="js-view-dom-id-epa-alerts--{{ alertContext }}"></div>
+<div class="js-view-dom-id-epa-alerts--{{ alertContext }}">
+{% if alertContext is sameas('public') %}
+  <noscript>
+    <p>JavaScript appears to be disabled on this computer. Please <a href="/alerts">click here to see any active alerts</a>.</p>
+  </noscript>
+{% endif %}
+</div>
