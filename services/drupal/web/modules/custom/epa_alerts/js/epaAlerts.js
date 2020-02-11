@@ -22,7 +22,14 @@
         var getAlerts = Drupal.ajax(ajaxSettings);
 
         getAlerts.commands.insert = function (ajax, response, status) {
-          $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).hide().html(response.data).slideDown();
+          if (response.selector == `.js-view-dom-id-js-view-dom-id-${alertContext}_alerts_default`) {
+            var responseHTML = $.parseHTML(response.data);
+            var noResults = $(responseHTML).find('.view__empty').length > 0 ? true : false;
+
+            if (!noResults) {
+              $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).hide().html(response.data).slideDown();
+            }
+          }
         };
 
         getAlerts.commands.destroyObject = function (ajax, response, status) {

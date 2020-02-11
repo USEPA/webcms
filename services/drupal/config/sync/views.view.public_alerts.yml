@@ -289,13 +289,43 @@ display:
       sorts: {  }
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content:
+            value: '<p>There are no active alerts at this time.</p>'
+            format: filtered_html
+          plugin_id: text
       relationships: {  }
       arguments: {  }
       display_extenders:
         views_ajax_get:
           ajax_get: true
       use_ajax: true
+      title: 'www.epa.gov Alerts'
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+      tags: {  }
+  page_1:
+    display_plugin: page
+    id: page_1
+    display_title: Page
+    position: 1
+    display_options:
+      display_extenders:
+        views_ajax_get:
+          ajax_get: true
+      path: alerts
     cache_metadata:
       max-age: -1
       contexts:
