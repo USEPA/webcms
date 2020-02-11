@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.media.audio.field_author
+    - field.field.media.audio.field_limit_file_accessibility
     - field.field.media.audio.field_keywords
     - field.field.media.audio.field_media_audio_file
     - field.field.media.audio.field_running_time
@@ -33,6 +34,12 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_limit_file_accessibility:
+    weight: 9
+    settings: {  }
+    third_party_settings: {  }
+    type: options_buttons
     region: content
   field_keywords:
     weight: 3
@@ -83,7 +90,7 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 9
+    weight: 10
     region: content
     third_party_settings: {  }
   uid:
