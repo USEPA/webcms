@@ -8,8 +8,10 @@
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Utility\Token;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -211,8 +213,30 @@ function _epa_core_get_default_revision_created($node, $type = 'medium', $format
  * Implements hook_entity_revision_delete().
  * Invalidate cache tags for a node when its revision is deleted.
  */
-function epa_core_entity_revision_delete(Drupal\Core\Entity\EntityInterface $entity) {
+function epa_core_entity_revision_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'node') {
     Cache::invalidateTags(['node:' . $entity->id()]);
+  }
+}
+
+/**
+ * Implements hook_file_download.
+ */
+function epa_core_file_download($uri) {
+  if (\Drupal::currentUser()->isAnonymous()) {
+    $scheme = file_uri_scheme($uri);
+    $entity_type_manager = \Drupal::entityTypeManager();
+
+    if (\Drupal::service('stream_wrapper_manager')->isValidScheme($scheme) && file_exists($uri)) {
+      // We should only get one result.
+      $files = $entity_type_manager->getStorage('file')->loadByProperties(['uri' => $uri]);
+      $file = reset($files);
+      $media = $entity_type_manager->getStorage('media')->load($file->id());
+
+      // Throw 404 if file accessibility is true else serve the file.
+      if (isset($media) && $media->hasField('field_file_accessibility') && !empty($media->field_file_accessibility->value)) {
+        throw new NotFoundHttpException();
+      }
+    }
   }
 }
