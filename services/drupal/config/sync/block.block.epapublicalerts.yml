@@ -4,6 +4,7 @@ status: true
 dependencies:
   module:
     - epa_alerts
+    - system
   theme:
     - epa_theme
 id: epapublicalerts
@@ -17,4 +18,9 @@ settings:
   label: 'EPA public alerts'
   provider: epa_alerts
   label_display: '0'
-visibility: {  }
+visibility:
+  request_path:
+    id: request_path
+    pages: /alerts
+    negate: true
+    context_mapping: {  }
