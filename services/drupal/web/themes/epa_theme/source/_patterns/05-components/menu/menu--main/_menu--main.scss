@@ -91,17 +91,29 @@ $button-width: rem(gesso-spacing(4));
   .menu__subnav {
     @include list-clean();
     background: gesso-grayscale(gray-1);
-    color: gesso-brand(blue, base);
     width: 100%;
 
     @include at-media($theme-header-min-width) {
-      left: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       position: absolute;
-      right: 0;
+      width: auto;
+
+      &[hidden] {
+        display: none;
+      }
     }
 
     .menu__item {
       border: 0;
+      display: block;
+      margin-right: 0;
+
+      @include at-media($theme-header-min-width) {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 12rem;
+      }
     }
 
     .menu__link {
@@ -124,6 +136,10 @@ $button-width: rem(gesso-spacing(4));
         background: gesso-grayscale(gray-2);
         border-color: gesso-brand(blue, base);
         color: gesso-brand(blue, base);
+      }
+
+      @include at-media($theme-header-min-width) {
+        display: block;
       }
     }
   }
