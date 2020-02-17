@@ -1,7 +1,7 @@
 // @file
 // Styles for the main menu.
 
-$button-width: rem(48px);
+$button-width: rem(gesso-spacing(4));
 
 .menu--main {
   @include list-clean();
@@ -20,7 +20,8 @@ $button-width: rem(48px);
     margin: 0;
 
     @include at-media($theme-header-min-width) {
-      display: initial;
+      display: inline-block;
+      margin-right: gesso-spacing(3);
     }
   }
 
@@ -31,7 +32,7 @@ $button-width: rem(48px);
     font-size: font-size(heading, sm);
     font-weight: bold;
     line-height: units(2) / font-size(heading, sm);
-    padding: gesso-spacing(2) gesso-spacing(3);
+    padding: gesso-spacing(2) gesso-spacing(1);
     text-decoration: none;
     width: calc(100% - #{$button-width});
 
@@ -46,6 +47,7 @@ $button-width: rem(48px);
 
     @include at-media($theme-header-min-width) {
       display: inline-block;
+      vertical-align: top;
       width: auto;
     }
   }
@@ -59,6 +61,7 @@ $button-width: rem(48px);
     cursor: pointer;
     display: inline-flex;
     justify-content: center;
+    padding: 0 gesso-spacing(1);
     width: $button-width;
 
     &[aria-expanded='true'] {
@@ -70,6 +73,11 @@ $button-width: rem(48px);
     &:hover,
     &:focus {
       background: gesso-brand(blue, dark);
+    }
+
+    @include at-media($theme-header-min-width) {
+      height: 100%;
+      vertical-align: top;
     }
   }
 
