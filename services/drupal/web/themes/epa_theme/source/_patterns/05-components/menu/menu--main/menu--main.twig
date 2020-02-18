@@ -19,7 +19,7 @@
       } %}
       <ul {{ add_attributes(additional_attributes) }}>
     {% else %}
-      <ul class="menu menu__subnav" hidden>
+      <ul class="menu menu__subnav">
     {% endif %}
     {% for item in items %}
 
@@ -63,19 +63,14 @@
       {% spaceless %}
         <li {{ add_attributes(additional_item_attributes) }}>
           {% if item.below and menu_level == 0 %}
-            {% set button_attributes = {
-              "class": [
-                'menu__button',
+            {% set button_attributes = link_attributes|merge({
+              'class': link_attributes['class']|merge([
                 'usa-nav__link'
-              ],
-              "aria-expanded": "false"
-            } %}
-            {{ link(item.title, item.url, link_attributes) }}
+              ]),
+              'aria-expanded': 'false'
+            }) %}
             <button {{ create_attribute(button_attributes) }}>
-              <svg class="menu__button-icon" aria-hidden="true">
-                <use xlink:href="../../../images/sprite.artifact.svg#arrow"></use>
-              </svg>
-              <span class="visually-hidden">Toggle Menu</span>
+              {{ item.title }}
             </button>
             {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
           {% else %}

@@ -1,8 +1,6 @@
 // @file
 // Styles for the main menu.
 
-$button-width: rem(gesso-spacing(4));
-
 .menu--main {
   @include list-clean();
   background: gesso-brand(blue, base);
@@ -13,79 +11,90 @@ $button-width: rem(gesso-spacing(4));
   }
 
   .menu__item {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    display: block;
     margin: 0;
-
-    @include at-media($theme-header-min-width) {
-      display: inline-block;
-      margin-right: gesso-spacing(3);
-    }
   }
 
   .menu__link {
+    appearance: none;
+    background: transparent;
+    border: 0;
     color: gesso-grayscale(white);
-    display: block;
+    cursor: pointer;
+    display: flex;
     font-family: font-family(heading);
     font-size: font-size(heading, sm);
     font-weight: bold;
+    justify-content: space-between;
     line-height: units(2) / font-size(heading, sm);
-    padding: gesso-spacing(2) gesso-spacing(1);
+    padding: gesso-spacing(2) gesso-spacing(3);
+    text-align: left;
     text-decoration: none;
-    width: calc(100% - #{$button-width});
+    width: 100%;
 
     &:visited {
       color: gesso-grayscale(white);
     }
 
     &:hover,
-    &:focus {
+    &:focus,
+    &[aria-expanded='true'] {
       background: gesso-brand(blue, dark);
     }
 
     @include at-media($theme-header-min-width) {
-      display: inline-block;
-      vertical-align: top;
       width: auto;
     }
-  }
 
-  .menu__button {
-    align-items: center;
-    appearance: none;
-    background: transparent;
-    border: 0;
-    color: gesso-grayscale(white);
-    cursor: pointer;
-    display: inline-flex;
-    justify-content: center;
-    padding: 0 gesso-spacing(1);
-    width: $button-width;
+    &.has-subnav {
+      &::after {
+        @include svg-background(main-menu-arrow);
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        color: #fff;
+        content: '';
+        display: inline-block;
+        height: 1em;
+        margin-left: rem(gesso-spacing(1));
+        transform: rotate(-180deg);
+        transition: transform gesso-duration(standard) gesso-easing(ease-out);
+        width: 1em;
+      }
 
-    &[aria-expanded='true'] {
-      .menu__button-icon {
+      &[aria-expanded='true']::after {
         transform: rotate(0deg);
       }
     }
-
-    &:hover,
-    &:focus {
-      background: gesso-brand(blue, dark);
-    }
-
-    @include at-media($theme-header-min-width) {
-      height: 100%;
-      vertical-align: top;
-    }
   }
 
-  .menu__button-icon {
-    fill: currentColor;
-    height: 1em;
-    transform: rotate(-180deg);
-    width: 1em;
+  // CSS dropdown fallback for when JS is disabled.
+  // stylelint-disable
+  html.no-js & {
+    > .menu__item:hover {
+      > .menu__link {
+        background: gesso-brand(blue, dark);
+
+        &::after {
+          transform: rotate(0deg);
+        }
+      }
+
+      @include at-media($theme-header-min-width) {
+        > .menu__subnav .menu__link {
+          @include visually-hidden-off;
+        }
+      }
+    }
+
+    .menu__subnav .menu__link {
+      @include visually-hidden;
+
+      &:focus {
+        @include visually-hidden-off;
+      }
+    }
   }
+  // stylelint-enable
 
   .menu__subnav {
     @include list-clean();
@@ -98,7 +107,8 @@ $button-width: rem(gesso-spacing(4));
       position: absolute;
       width: auto;
 
-      &[hidden] {
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.js &[hidden] {
         display: none;
       }
     }

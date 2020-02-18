@@ -3,6 +3,7 @@ import navigation from 'uswds/src/js/components/navigation.js';
 export default function() {
   const subnav = document.querySelectorAll('.menu__subnav');
   subnav.forEach((menu, index) => {
+    menu.setAttribute('hidden', true);
     const button = menu.previousElementSibling;
     if (button.classList.contains('usa-nav__link')) {
       const id = `extended-nav-section-${index}`;
