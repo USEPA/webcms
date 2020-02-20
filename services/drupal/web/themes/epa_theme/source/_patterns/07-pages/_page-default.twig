@@ -17,34 +17,23 @@
     }
   ]
 }%}
-{% embed '@uswds/header/header.twig' with {
-  'is_extended': true
-} %}
-  {% block content %}
-    {% embed '@uswds/navbar/navbar.twig' %}
-      {% block content %}
-        {% include "@components/site-logo/site-logo.twig" with {
-          'url': '/',
-        } %}
-      {% endblock %}
-    {% endembed %}
-    {% embed '@uswds/nav/nav.twig' with {
+
+{% embed '@layouts/header/header.twig' %}
+  {% block logo %}
+    {% include "@components/site-logo/site-logo.twig" with {
+      'url': '/',
+    } %}
+  {% endblock %}
+  {% block navigation %}
+    {% embed '@components/nav/nav--epa/nav--epa.twig' with {
       'label': 'Primary navigation',
       'extended': true
     } %}
-      {% block content %}
+      {% block menu %}
         {% include '@components/menu/menu--main/menu--main.twig' %}
-        {% embed '@uswds/nav/_secondary.twig' %}
-          {% block content %}
-            {% include '@components/menu/menu.twig' with {
-              'menu_name': 'account',
-              'items': [
-                { 'title': 'My Account', 'url': '#' },
-                { 'title': 'Logout', 'url': '#' }
-              ]
-            } %}
-          {% endblock %}
-        {% endembed %}
+      {% endblock %}
+      {% block search %}
+        {% include '@uswds/search/search--small/search--small.twig' %}
       {% endblock %}
     {% endembed %}
   {% endblock %}
