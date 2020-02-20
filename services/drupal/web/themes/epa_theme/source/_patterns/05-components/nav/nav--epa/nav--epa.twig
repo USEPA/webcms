@@ -1,0 +1,21 @@
+<nav class="usa-nav usa-nav--epa" role="navigation" aria-label="{{ label }}">
+  <div class="usa-nav__inner">
+    <button class="usa-nav__close" aria-label="{{ 'Close'|t }}">
+      {% include '@components/icon/icon.twig' with {
+        'modifier_classes': 'icon--nav-close',
+        'is_hidden': true,
+        'icon_name': 'close'
+      } %}
+    </button>
+    <div class="usa-nav__menu">
+      {% block menu %}
+        {% include '@components/menu/menu--main/menu--main.twig' %}
+      {% endblock %}
+    </div>
+    <div class="usa-nav__search">
+      {% block search %}
+        {% include '@uswds/search/search--small/search--small.twig' %}
+      {% endblock %}
+    </div>
+  </div>
+</nav>
