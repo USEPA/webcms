@@ -6,13 +6,14 @@ dependencies:
     - field.field.group.web_area.field_contact_us_form
     - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_homepage
+    - field.field.group.web_area.field_homepage_pub_date
     - field.field.group.web_area.field_long_name
     - field.field.group.web_area.field_machine_name
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
+    - field.field.group.web_area.field_web_area_comments
+    - field.field.group.web_area.field_web_council_representative
     - group.type.web_area
-  module:
-    - path
 id: group.web_area.default
 targetEntityType: group
 bundle: web_area
@@ -57,7 +58,7 @@ content:
     type: string_textfield
     region: content
   field_machine_name:
-    weight: 8
+    weight: 9
     settings:
       size: 60
       placeholder: ''
@@ -80,6 +81,24 @@ content:
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
+  field_web_area_comments:
+    weight: 8
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textarea
+    region: content
+  field_web_council_representative:
+    weight: 7
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
   label:
     type: string_textfield
     weight: 0
@@ -89,5 +108,6 @@ content:
       placeholder: ''
     third_party_settings: {  }
 hidden:
+  field_homepage_pub_date: true
   path: true
   uid: true
