@@ -1,9 +1,8 @@
 ---
 el: .site-logo
 title: Site Logo
-state: inprogress
+state: inreview
 ---
 
 __Variables:__
-* url: [string] URL of the site logo link.
-* site_logo: [string] Source of the site logo image.
+* url: [string] URL of the site name link.
