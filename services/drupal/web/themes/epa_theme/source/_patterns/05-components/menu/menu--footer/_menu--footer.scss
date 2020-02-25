@@ -2,20 +2,26 @@
 // Styles for the footer menu.
 
 .menu--footer {
-  @include grid-row;
-  @include grid-gap;
-  list-style: none;
+  list-style-type: none;
+  padding: 0;
 
   .menu__item {
-    @extend .usa-footer__primary-content;
-    @include grid-col(6);
-
-    @include breakpoint(gesso-breakpoint(desktop)) {
-      @include grid-col(auto);
-    }
+    margin: 0 0 rem(gesso-spacing(2));
+    padding-left: 0;
   }
 
   .menu__link {
-    @extend .usa-footer__primary-link;
+    display: block;
+    font-family: gesso-font-family(heading);
+    font-size: font-size(heading, md);
+    font-weight: gesso-font-weight(bold);
+    line-height: gesso-line-height(2);
+    text-decoration: none;
+
+    &:hover,
+    &:focus,
+    &:active {
+      text-decoration: underline;
+    }
   }
 }
