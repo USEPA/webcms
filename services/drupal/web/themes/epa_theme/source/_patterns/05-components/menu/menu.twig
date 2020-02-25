@@ -26,8 +26,6 @@
       {% set item_classes = ['menu__item'] %}
       {% if menu_level == 0 and menu_class_prefix %}
         {% set item_classes = item_classes|merge([menu_class_prefix ~ '-item']) %}
-      {% elseif menu_level > 0 %}
-        {% set item_classes = item_classes|merge(['usa-nav__submenu-item']) %}
       {% endif %}
       {% set link_classes = ['menu__link'] %}
       {% if link_class %}
@@ -63,17 +61,9 @@
       } %}
 
       <li {{ add_attributes(additional_item_attributes) }}>
-        {% if item.below and menu_level == 0 %}
-          {% set link_attributes = link_attributes|merge({
-            "class": link_attributes["class"]|merge([
-              'usa-nav__link'
-            ]),
-            "aria-expanded": "false"
-          }) %}
-          <button {{ create_attribute(link_attributes) }}><span>{{ item.title }}</span></button>
+        {{ link(item.title, item.url, link_attributes) }}
+        {% if item.below %}
           {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
-        {% else %}
-          {{ link(item.title, item.url, link_attributes) }}
         {% endif %}
       </li>
     {% endfor %}

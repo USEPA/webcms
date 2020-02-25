@@ -5,14 +5,18 @@
 
 {% if is_demo %}
   {% set icons = [
-    'facebook',
-    'linkedin',
-    'twitter',
+    'arrow',
+    'close',
+    'facebook-square',
+    'flickr-square',
+    'instagram-square',
+    'twitter-square',
+    'youtube-square'
    ] %}
   {% for icon in icons %}
     <p>
       <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}>
-        <use xlink:href="{{ image_path }}/sprite.artifact.svg#{{ icon }}"></use>
+        <use xlink:href="{{ image_path }}sprite.artifact.svg#{{ icon }}"></use>
       </svg>
       {{ icon }}
     </p>
@@ -20,7 +24,7 @@
 {%- else -%}
   {% spaceless %}
     <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}>
-      <use xlink:href="{{ image_path }}/sprite.artifact.svg#{{ icon_name }}"></use>
+      <use xlink:href="{{ image_path }}sprite.artifact.svg#{{ icon_name }}"></use>
     </svg>
   {% endspaceless %}
 {%- endif -%}

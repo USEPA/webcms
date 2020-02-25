@@ -1,4 +1,84 @@
-{% include '@components/menu/menu.twig' with {
-  'menu_name': menu_name,
-  'items': items
-} %}
+{% import _self as menus %}
+
+{{ menus.menu_links(items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class) }}
+
+{% macro menu_links(items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class) %}
+  {% import _self as menus %}
+  {% if items %}
+    {% if menu_level == 0 %}
+      {# double quotes around class using menu_name needed for interpolation #}
+      {% set additional_classes = [
+        'menu',
+        "menu--#{menu_name}"
+      ] %}
+      {% if menu_class %}
+        {% set additional_classes = additional_classes|merge(menu_class) %}
+      {% endif %}
+      {% set additional_attributes = {
+        'class': additional_classes
+      } %}
+      <ul {{ add_attributes(additional_attributes) }}>
+    {% else %}
+      <ul class="menu menu__subnav">
+    {% endif %}
+    {% for item in items %}
+
+      {% set item_classes = ['menu__item'] %}
+      {% if menu_level == 0 and menu_class_prefix %}
+        {% set item_classes = item_classes|merge([menu_class_prefix ~ '-item']) %}
+      {% endif %}
+      {% set link_classes = ['menu__link'] %}
+      {% if link_class %}
+        {% set link_classes = link_classes|merge(link_class) %}
+      {% endif %}
+
+      {% if item.below %}
+        {% set item_classes = item_classes|merge(['has-subnav']) %}
+        {% set link_classes = link_classes|merge(['has-subnav']) %}
+      {% endif %}
+      {% if item.in_active_trail %}
+        {% set item_classes = item_classes|merge(['is-active-trail']) %}
+        {% set link_classes = link_classes|merge(['is-active-trail']) %}
+      {% endif %}
+      {% if item.is_collapsed %}
+        {% set item_classes = item_classes|merge(['is-collapsed']) %}
+        {% set link_classes = link_classes|merge(['is-collapsed']) %}
+      {% endif %}
+      {% if item.is_expanded %}
+        {% set item_classes = item_classes|merge(['is-expanded']) %}
+        {% set link_classes = link_classes|merge(['is-expanded']) %}
+      {% endif %}
+      {% if item['original_link'].options.attributes.class %}
+        {% set link_classes = link_classes|merge([item['original_link'].options.attributes.class]) %}
+      {% endif %}
+
+      {% set additional_item_attributes = {
+        'class': item_classes
+      } %}
+
+      {% set link_attributes = {
+        'class': link_classes
+      } %}
+
+      {% spaceless %}
+        <li {{ add_attributes(additional_item_attributes) }}>
+          {% if item.below and menu_level == 0 %}
+            {% set button_attributes = link_attributes|merge({
+              'class': link_attributes['class']|merge([
+                'usa-nav__link'
+              ]),
+              'aria-expanded': 'false'
+            }) %}
+            <button {{ create_attribute(button_attributes) }}>
+              {{ item.title }}
+            </button>
+            {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
+          {% else %}
+            {{ link(item.title, item.url, link_attributes) }}
+          {% endif %}
+        </li>
+      {% endspaceless %}
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

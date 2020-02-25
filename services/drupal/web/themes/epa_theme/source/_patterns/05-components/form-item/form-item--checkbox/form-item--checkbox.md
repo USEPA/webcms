@@ -1,7 +1,7 @@
 ---
 el: .form-item--checkbox
 title: Checkbox Form Item
-state: inreview
+state: complete
 ---
 
 __Variables:__

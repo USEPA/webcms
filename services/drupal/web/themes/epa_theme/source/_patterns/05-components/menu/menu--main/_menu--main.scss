@@ -2,10 +2,168 @@
 // Styles for the main menu.
 
 .menu--main {
-  @extend .usa-accordion;
-  @extend .usa-nav__primary;
+  @include list-clean();
+  background: gesso-brand(blue, base);
+  color: gesso-grayscale(white);
+
+  @include at-media($theme-header-min-width) {
+    display: flex;
+  }
 
   .menu__item {
-    @extend .usa-nav__primary-item;
+    display: block;
+    margin: 0;
+  }
+
+  .menu__link {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: gesso-grayscale(white);
+    cursor: pointer;
+    display: flex;
+    font-family: font-family(heading);
+    font-size: font-size(heading, sm);
+    font-weight: bold;
+    justify-content: space-between;
+    line-height: units(2) / font-size(heading, sm);
+    padding: gesso-spacing(2) gesso-spacing(3);
+    text-align: left;
+    text-decoration: none;
+    width: 100%;
+
+    &:visited {
+      color: gesso-grayscale(white);
+    }
+
+    &:hover,
+    &:focus,
+    &[aria-expanded='true'] {
+      background: gesso-brand(blue, dark);
+    }
+
+    @include at-media($theme-header-min-width) {
+      width: auto;
+    }
+
+    &.has-subnav {
+      &::after {
+        @include svg-background(main-menu-arrow);
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        color: #fff;
+        content: '';
+        display: inline-block;
+        height: 1em;
+        margin-left: rem(gesso-spacing(1));
+        transform: rotate(-180deg);
+        transition: transform gesso-duration(standard) gesso-easing(ease-out);
+        width: 1em;
+      }
+
+      &[aria-expanded='true']::after {
+        transform: rotate(0deg);
+      }
+    }
+  }
+
+  // CSS dropdown fallback for when JS is disabled.
+  // stylelint-disable
+  html.no-js & {
+    > .menu__item:hover {
+      > .menu__link {
+        background: gesso-brand(blue, dark);
+
+        &::after {
+          transform: rotate(0deg);
+        }
+      }
+
+      @include at-media($theme-header-min-width) {
+        > .menu__subnav .menu__link {
+          @include visually-hidden-off;
+        }
+      }
+    }
+
+    .menu__subnav .menu__link {
+      @include visually-hidden;
+
+      &:focus {
+        @include visually-hidden-off;
+      }
+    }
+  }
+  // stylelint-enable
+
+  .menu__subnav {
+    @include list-clean();
+    background: gesso-grayscale(gray-1);
+    width: 100%;
+
+    @include at-media($theme-header-min-width) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: absolute;
+      width: auto;
+      z-index: 1;
+
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.js &[hidden] {
+        display: none;
+      }
+    }
+
+    .menu__item {
+      border: 0;
+      display: block;
+      margin-right: 0;
+
+      @include at-media($theme-header-min-width) {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 12rem;
+      }
+
+      // Last menu item is for section overview page.
+      &:last-child {
+        grid-column: 1 / span 2;
+        width: auto;
+
+        // stylelint-disable-next-line
+        .menu__link {
+          border-top: 1px solid gesso-grayscale(gray-2);
+          font-style: italic;
+          text-align: center;
+        }
+      }
+    }
+
+    .menu__link {
+      border-color: transparent;
+      border-style: solid;
+      border-width: 0 units(0.5);
+      color: gesso-brand(blue, base);
+      font-family: font-family(body);
+      font-size: font-size(body, xs);
+      font-weight: normal;
+      line-height: gesso-line-height(2);
+      width: 100%;
+
+      &:visited {
+        color: gesso-brand(blue, base);
+      }
+
+      &:hover,
+      &:focus {
+        background: gesso-grayscale(gray-2);
+        border-color: gesso-brand(blue, base);
+        color: gesso-brand(blue, base);
+      }
+
+      @include at-media($theme-header-min-width) {
+        display: block;
+      }
+    }
   }
 }

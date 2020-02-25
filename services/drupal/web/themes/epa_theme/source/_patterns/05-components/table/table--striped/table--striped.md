@@ -1,7 +1,7 @@
 ---
 el: .usa-table--striped
 title: Striped Table
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -1,4 +1,44 @@
 // @file
-// Styles for Site logo.
+// Styles for a Site Logo.
 
-// .site-logo {}
+$logo-height: 147px;
+$logo-width: 1059.7px;
+
+.site-logo {
+  color: gesso-brand(blue, base);
+  display: block;
+  margin: rem(gesso-spacing(2)) rem(gesso-spacing(2)) rem(gesso-spacing(2))
+    rem(gesso-spacing(1) * -1);
+  max-width: 100%;
+  min-width: rem(200px);
+  padding: rem(gesso-spacing(1));
+  width: rem(300px);
+
+  &:visited {
+    color: gesso-brand(blue, base);
+  }
+
+  &:hover,
+  &:focus {
+    color: gesso-brand(blue, dark);
+  }
+
+  @media print {
+    &[href]::after {
+      content: '';
+    }
+  }
+}
+
+.site-logo__image {
+  display: block;
+  padding-bottom: $logo-height / $logo-width * 100%;
+  position: relative;
+  width: 100%;
+}
+
+.site-logo__svg {
+  fill: currentColor;
+  height: 100%;
+  position: absolute;
+}
