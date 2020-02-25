@@ -1,7 +1,7 @@
 ---
 el: .usa-header
 title: Header
-state: inprogress
+state: complete
 ---
 See [https://designsystem.digital.gov/components/header/]() and
 [https://components.designsystem.digital.gov/components/detail/header--default.html]().

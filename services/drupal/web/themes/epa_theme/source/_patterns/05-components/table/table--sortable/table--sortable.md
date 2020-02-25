@@ -1,7 +1,7 @@
 ---
 el: .usa-table--sortable
 title: Sortable Table
-state: inreview
+state: complete
 ---
 
 __Variables:__
