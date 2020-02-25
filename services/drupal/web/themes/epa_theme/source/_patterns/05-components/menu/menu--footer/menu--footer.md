@@ -1,7 +1,7 @@
 ---
 el: .menu--footer
 title: Footer Menu
-state: inprogress
+state: inreview
 ---
 
 __Variables:__

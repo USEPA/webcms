@@ -10,9 +10,11 @@ dependencies:
     - core.entity_view_mode.media.original
     - core.entity_view_mode.media.thumbnail
   module:
+    - editor
     - linkit
     - media
     - media_inline_embed
+    - token_filter
 name: 'Filtered HTML'
 format: filtered_html
 weight: 0
@@ -21,22 +23,22 @@ filters:
     id: filter_htmlcorrector
     provider: filter
     status: true
-    weight: 10
+    weight: -44
     settings: {  }
   filter_html:
     id: filter_html
     provider: filter
-    status: false
-    weight: -10
+    status: true
+    weight: -49
     settings:
-      allowed_html: '<a href hreflang> <em> <strong> <cite> <blockquote cite> <code> <ul type> <ol type start> <li> <dl> <dt> <dd> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <p> <h1> <pre> <sup> <sub> <hr> <table> <caption> <tbody> <thead> <tfoot> <th> <td> <tr> <img src alt data-entity-type data-entity-uuid>'
+      allowed_html: '<@ accesskey class id style tabindex title data> <a href hreflang data-entity-type data-entity-uuid title> <article> <div> <pre> <br> <p> <blockquote cite> <hr> <figure> <figcaption> <ol reversed start type style> <ul type> <li> <dl> <dt> <dd> <address> <hgroup> <h2> <h3> <h4> <h5> <h6> <em> <i> <strong> <b> <small> <s> <section> <span> <sub> <sup> <mark> <abbr !title> <q cite> <cite> <ins data-date> <del cite datetime> <time datetime pubdate> <var> <samp> <code> <kbd> <wbr> <bdo dir> <bdi> <ruby> <rt> <rp> <table summary> <colgroup span> <col span> <caption> <tbody> <thead> <tfoot> <tr> <#th colspan headers rowspan scope> <#td colspan headers rowspan scope> <details open> <summary> <form> <fieldset disabled form name> <legend> <label for form> <input> <textarea> <meter min max low high optimum form value> <select> <optgroup disabled label> <option> <output for form name> <button> <datalist> <keygen autofocus challenge disabled form keytype name> <progress max value> <img alt crossorigin height longdesc !src width usemap> <embed height src type width> <object data form height name type usemap width> <param name value> <iframe allowfullscreen height name sandbox scrolling seamless src srcdoc width> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media !src type> <track default kind label src srclang> <canvas height width> <map name> <area alt coords href hreflang media rel shape target type> <drupal-media data-entity-type data-entity-uuid>'
       filter_html_help: true
       filter_html_nofollow: false
   media_embed:
     id: media_embed
     provider: media
     status: true
-    weight: 100
+    weight: -46
     settings:
       default_view_mode: default
       allowed_media_types:
@@ -53,14 +55,14 @@ filters:
     id: linkit
     provider: linkit
     status: true
-    weight: 0
+    weight: -50
     settings:
       title: true
   media_inline_embed:
     id: media_inline_embed
     provider: media_inline_embed
     status: true
-    weight: 100
+    weight: -45
     settings:
       default_view_mode: link_with_metadata
       allowed_media_types:
@@ -73,5 +75,49 @@ filters:
     id: filter_caption
     provider: filter
     status: true
-    weight: 0
+    weight: -47
     settings: {  }
+  editor_file_reference:
+    id: editor_file_reference
+    provider: editor
+    status: false
+    weight: -40
+    settings: {  }
+  filter_html_image_secure:
+    id: filter_html_image_secure
+    provider: filter
+    status: false
+    weight: -37
+    settings: {  }
+  filter_url:
+    id: filter_url
+    provider: filter
+    status: false
+    weight: -42
+    settings:
+      filter_url_length: 72
+  filter_autop:
+    id: filter_autop
+    provider: filter
+    status: false
+    weight: -38
+    settings: {  }
+  filter_align:
+    id: filter_align
+    provider: filter
+    status: false
+    weight: -39
+    settings: {  }
+  filter_html_escape:
+    id: filter_html_escape
+    provider: filter
+    status: false
+    weight: -41
+    settings: {  }
+  token_filter:
+    id: token_filter
+    provider: token_filter
+    status: true
+    weight: -48
+    settings:
+      replace_empty: '0'
