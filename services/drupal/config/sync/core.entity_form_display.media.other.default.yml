@@ -3,26 +3,19 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.other.field_limit_file_accessibility
     - field.field.media.other.field_keywords
+    - field.field.media.other.field_limit_file_accessibility
     - field.field.media.other.field_media_file_1
     - media.type.other
   module:
     - file
-    - path
 id: media.other.default
 targetEntityType: media
 bundle: other
 mode: default
 content:
-  created:
-    type: datetime_timestamp
-    weight: 4
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_keywords:
-    weight: 2
+    weight: 3
     settings:
       match_operator: CONTAINS
       match_limit: 10
@@ -32,7 +25,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_limit_file_accessibility:
-    weight: 6
+    weight: 4
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
@@ -52,27 +45,13 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  path:
-    type: path
-    weight: 5
+  replace_file:
+    weight: 2
     region: content
     settings: {  }
     third_party_settings: {  }
-  status:
-    type: boolean_checkbox
-    settings:
-      display_label: true
-    weight: 7
-    region: content
-    third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 3
-    settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-      match_limit: 10
-    region: content
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  created: true
+  path: true
+  status: true
+  uid: true

@@ -4,14 +4,10 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.media.media_library
-    - field.field.media.image.field_directory
-    - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_keywords
+    - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_media_image
-    - image.style.thumbnail
     - media.type.image
-  module:
-    - image
 _core:
   default_config_hash: BMLrK4zKp8-FFnMseBdT_6h6YipUsKRfbDf_3WUB5HA
 id: media.image.media_library
@@ -19,19 +15,9 @@ targetEntityType: media
 bundle: image
 mode: media_library
 content:
-  field_directory:
-    type: entity_reference_autocomplete
-    weight: 2
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete
-    weight: 3
+    weight: 1
     region: content
     settings:
       match_operator: CONTAINS
@@ -41,17 +27,9 @@ content:
     third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
-    weight: 4
+    weight: 2
     region: content
     settings: {  }
-    third_party_settings: {  }
-  field_media_image:
-    type: image_image
-    weight: 1
-    region: content
-    settings:
-      progress_indicator: throbber
-      preview_image_style: thumbnail
     third_party_settings: {  }
   name:
     type: string_textfield
@@ -63,6 +41,8 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
+  field_media_image: true
   path: true
+  replace_file: true
   status: true
   uid: true

@@ -5,8 +5,8 @@ dependencies:
   config:
     - core.entity_form_mode.media.media_library
     - field.field.media.audio.field_author
-    - field.field.media.audio.field_limit_file_accessibility
     - field.field.media.audio.field_keywords
+    - field.field.media.audio.field_limit_file_accessibility
     - field.field.media.audio.field_media_audio_file
     - field.field.media.audio.field_running_time
     - field.field.media.audio.field_transcript
@@ -21,7 +21,7 @@ mode: media_library
 content:
   field_author:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 3
     region: content
     settings:
       match_operator: CONTAINS
@@ -31,7 +31,7 @@ content:
     third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete
-    weight: 2
+    weight: 4
     region: content
     settings:
       match_operator: CONTAINS
@@ -47,7 +47,7 @@ content:
     third_party_settings: {  }
   field_running_time:
     type: duration_widget
-    weight: 3
+    weight: 2
     region: content
     settings:
       duration: ''
