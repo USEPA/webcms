@@ -1,7 +1,7 @@
 ---
 el: .back-to-top
 title: Back to Top
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -1,4 +1,4 @@
 ---
 title: Hero Image
-state: inreview
+state: complete
 ---
