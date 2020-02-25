@@ -4,11 +4,13 @@ status: true
 dependencies:
   config:
     - block_content.type.alert
+    - field.storage.block_content.field_formatted_long_text
     - user.role.authenticated
   module:
     - block_content
     - datetime
     - options
+    - text
     - user
 id: internal_alerts
 label: 'Internal Alerts'
@@ -68,13 +70,10 @@ display:
           separator: ''
           hide_empty: false
       fields:
-        info:
-          table: block_content_field_data
-          field: info
-          id: info
-          entity_type: null
-          entity_field: info
-          plugin_id: field
+        field_formatted_long_text:
+          id: field_formatted_long_text
+          table: block_content__field_formatted_long_text
+          field: field_formatted_long_text
           relationship: none
           group_type: group
           admin_label: ''
@@ -111,7 +110,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -120,7 +119,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: value
-          type: string
+          type: text_default
           settings: {  }
           group_column: value
           group_columns: {  }
@@ -132,6 +131,7 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+          plugin_id: field
       filters:
         status:
           value: '1'
@@ -305,4 +305,5 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - user.roles
-      tags: {  }
+      tags:
+        - 'config:field.storage.block_content.field_formatted_long_text'
