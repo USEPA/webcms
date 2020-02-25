@@ -1,0 +1,21 @@
+{% set classes = [
+  'usa-search',
+  'usa-search--small',
+  'usa-search--epa',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<form class="{{ classes }}" method="get" action="https://search.epa.gov/epasearch">
+  <div role="search">
+    <label class="usa-sr-only" for="search-box">{{ 'Search'|t }}</label>
+    <input class="usa-input" id="search-box" type="search" name="querytext" placeholder="Search EPA.gov">
+    <button class="usa-button" type="submit">
+      <span class="usa-sr-only">{{ 'Search'|t }}</span>
+    </button>
+    <input type="hidden" name="areaname" value="">
+    <input type="hidden" name="areacontacts" value="">
+    <input type="hidden" name="areasearchurl" value="">
+    <input type="hidden" name="typeofsearch" value="epa">
+    <input type="hidden" name="result_template" value="2col.ftl">
+  </div>
+</form>

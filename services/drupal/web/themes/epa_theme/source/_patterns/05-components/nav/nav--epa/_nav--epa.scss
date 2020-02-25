@@ -1,0 +1,43 @@
+// @file
+// Styles for EPA Nav.
+
+.usa-nav--epa {
+  width: 18rem;
+
+  @include at-media($theme-header-min-width) {
+    background: gesso-brand(blue, base);
+    float: none;
+    width: auto;
+  }
+
+  .usa-nav__inner {
+    position: relative;
+
+    @include at-media($theme-header-min-width) {
+      @include layout-constrain;
+    }
+  }
+
+  .usa-nav__close {
+    color: gesso-grayscale(gray-5);
+    font-size: rem(gesso-spacing(2));
+    margin: rem(gesso-spacing(1) * -1);
+    margin-bottom: rem(gesso-spacing(1));
+  }
+
+  .usa-nav__menu {
+    margin: rem(gesso-spacing(3)) rem(gesso-spacing(2) * -1);
+
+    @include at-media($theme-header-min-width) {
+      margin: 0;
+    }
+  }
+
+  .usa-nav__search {
+    @include at-media($theme-header-min-width) {
+      position: absolute;
+      right: rem(gesso-spacing(3));
+      top: rem(gesso-spacing(7) * -1);
+    }
+  }
+}
