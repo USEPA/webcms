@@ -65,7 +65,7 @@ display:
       row:
         type: fields
         options:
-          default_field_elements: true
+          default_field_elements: false
           inline: {  }
           separator: ''
           hide_empty: false
@@ -311,6 +311,24 @@ display:
         views_ajax_get:
           ajax_get: true
       use_ajax: true
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - user.roles
+      tags:
+        - 'config:field.storage.block_content.field_formatted_long_text'
+  block_1:
+    display_plugin: block
+    id: block_1
+    display_title: Block
+    position: 1
+    display_options:
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      block_hide_empty: true
     cache_metadata:
       max-age: -1
       contexts:
