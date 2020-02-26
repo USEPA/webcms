@@ -26,10 +26,17 @@ $bp-footer-columns: 700px;
 }
 
 .footer__epa-seal {
-  margin-bottom: rem(gesso-spacing(5));
+  float: left;
+  margin: 0 rem(gesso-spacing(5)) rem(gesso-spacing(5)) 0;
+
+  @include breakpoint($bp-footer-columns) {
+    margin-right: (rem(gesso-spacing(5)) / rem($bp-footer-columns)) * 100%;
+  }
 }
 
 .footer__content {
+  display: inline-block;
+
   @include breakpoint($bp-footer-columns) {
     display: flex;
     justify-content: space-between;
@@ -42,6 +49,10 @@ $bp-footer-columns: 700px;
   @include breakpoint($bp-footer-columns) {
     margin-bottom: 0;
     width: 30%;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
   }
 }
 
