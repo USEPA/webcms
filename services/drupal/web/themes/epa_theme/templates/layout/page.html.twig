@@ -35,47 +35,16 @@
   */
 #}
 
-{% extends '@layouts/site-container/site-container.twig' %}
-  {% block site_content %}
+{{ page.header }}
+{{ page.navigation }}
+{{ page.breadcrumb }}
+{{ page.highlighted }}
+{{ page.help }}
 
-    {% embed "@uswds/header/header.twig" with {
-      'is_extended': page.secondary.content is empty
-    }
-    %}
-      {% block content %}
-        {{ page.header }}
-        {% embed '@uswds/nav/nav.twig' with {
-          'label': 'Primary navigation',
-          'is_extended': page.secondary.content is empty
-        } %}
-          {% block content %}
-            {{ page.navigation }}
-            {{ page.secondary }}
-          {% endblock %}
-        {% endembed %}
-      {% endblock %}
-    {% endembed %}
+<main id="main" class="main" role="main" tabindex="-1">
+  {{ page.preface }}
+  {{ page.content }}
+  {{ page.postscript }}
+</main>
 
-    {{ page.breadcrumb }}
-
-    {{ page.highlighted }}
-
-    {{ page.help }}
-
-    <main id="main" class="main" role="main" tabindex="-1">
-      {{ page.preface }}
-      {{ page.content }}
-      {{ page.postscript }}
-    </main>
-
-    {% embed '@uswds/footer/footer.twig' with {
-      has_back_to_top: true
-    } %}
-      {% block primary %}
-        {{ page.footer }}
-      {% endblock %}
-      {% block secondary %}
-        {{ page.subfooter }}
-      {% endblock %}
-    {% endembed %}
-  {% endblock %}
+{{ page.footer }}
