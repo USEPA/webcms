@@ -103,8 +103,9 @@ type_settings:
         - published
         - unpublished
     return_to_author:
-      label: 'Return to author'
+      label: 'Return to draft'
       from:
+        - draft_approved
         - draft_needs_review
       to: draft
       weight: -1
@@ -112,6 +113,7 @@ type_settings:
       label: 'Send for review'
       from:
         - draft
+        - draft_needs_review
       to: draft_needs_review
       weight: -4
     send_to_author_for_review:
@@ -126,12 +128,6 @@ type_settings:
         - published_needs_review
       to: published_expiring
       weight: 2
-    unapprove_return_to_draft:
-      label: 'Unapprove; return to draft'
-      from:
-        - draft_approved
-      to: draft
-      weight: -2
     unpublish:
       label: Unpublish
       from:
