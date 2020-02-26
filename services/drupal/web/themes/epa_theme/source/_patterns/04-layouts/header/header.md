@@ -6,4 +6,5 @@ state: inreview
 
 __Blocks:__
 * logo: Twig block for site logo.
-* navigation: Twig block for navigation.
+* navigation: Twig block for search input.
+* navigation: Twig block for main menu.

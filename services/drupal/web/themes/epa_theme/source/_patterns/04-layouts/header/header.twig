@@ -2,11 +2,19 @@
 <header class="l-header">
   <div class="l-constrain">
     <div class="l-header__navbar">
-      {% block logo %}
-        <div style="background:#333;color:#fff;padding:1em;margin:0;">Logo</div>
-      {% endblock %}
-      <button class="usa-menu-btn">{{ 'Menu'|t }}</button>
+      <div class="l-header__branding">
+        {% block logo %}
+          <div style="background:#333;color:#fff;padding:1em;margin:0;">Logo</div>
+        {% endblock %}
+        <button class="usa-menu-btn">{{ 'Menu'|t }}</button>
+      </div>
+      <div class="l-header__search">
+        {% block search %}
+          <div style="background:#333;color:#fff;padding:1em;margin:0;">Search</div>
+        {% endblock %}
+      </div>
     </div>
+
   </div>
   <div class="l-header__nav">
     {% block navigation %}
