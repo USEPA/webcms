@@ -1,6 +1,6 @@
 uuid: f4bc2c4c-e99a-41a9-8654-461512cb19a0
 langcode: en
-status: false
+status: true
 dependencies:
   config:
     - image.style.thumbnail
@@ -665,10 +665,10 @@ display:
           entity_type: media
           plugin_id: entity_operations
       filters:
-        combine:
-          id: combine
-          table: views
-          field: combine
+        name:
+          id: name
+          table: media_field_data
+          field: name
           relationship: none
           group_type: group
           admin_label: ''
@@ -677,14 +677,14 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: combine_op
-            label: 'Media Name (or filename)'
+            operator_id: name_op
+            label: Name
             description: ''
             use_operator: false
-            operator: combine_op
+            operator: name_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: combine
+            identifier: name
             required: false
             remember: false
             multiple: false
@@ -693,13 +693,13 @@ display:
               anonymous: '0'
               layout_editor: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             placeholder: ''
             autocomplete_filter: 0
             autocomplete_min_chars: '0'
             autocomplete_items: '10'
+            autocomplete_field: name
             autocomplete_raw_suggestion: 1
             autocomplete_raw_dropdown: 1
             autocomplete_dependent: 0
@@ -715,10 +715,9 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          fields:
-            name: name
-            field_filename: field_filename
-          plugin_id: combine
+          entity_type: media
+          entity_field: name
+          plugin_id: views_autocomplete_filters_string
         field_keywords_target_id:
           id: field_keywords_target_id
           table: media__field_keywords
