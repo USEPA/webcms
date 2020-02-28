@@ -24,6 +24,9 @@
       'url': '/',
     } %}
   {% endblock %}
+  {% block search %}
+    {% include '@components/search/search--epa/search--epa.twig' %}
+  {% endblock %}
   {% block navigation %}
     {% embed '@components/nav/nav--epa/nav--epa.twig' with {
       'label': 'Primary navigation',
@@ -31,9 +34,6 @@
     } %}
       {% block menu %}
         {% include '@components/menu/menu--main/menu--main.twig' %}
-      {% endblock %}
-      {% block search %}
-        {% include '@components/search/search--epa/search--epa.twig' %}
       {% endblock %}
     {% endembed %}
   {% endblock %}

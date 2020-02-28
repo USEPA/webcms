@@ -2,16 +2,28 @@
 // Styles for Header Layout.
 
 .l-header {
-  border-bottom: 1px solid gesso-grayscale(gray-2);
-  margin-bottom: rem(gesso-spacing(2));
-
-  @include at-media($theme-header-min-width) {
-    border-bottom-width: 0;
-  }
+  margin-bottom: rem(gesso-spacing(3));
 }
 
 .l-header__navbar {
+  @include at-media($theme-header-min-width) {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+.l-header__branding {
   align-items: center;
   display: flex;
   justify-content: space-between;
+}
+
+.l-header__menu-button {
+  margin-right: 0 !important;
+  width: auto !important;
+
+  @include at-media($theme-header-min-width) {
+    display: none !important;
+  }
 }
