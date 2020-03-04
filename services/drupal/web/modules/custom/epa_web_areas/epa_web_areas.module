@@ -15,6 +15,8 @@ use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\media_library\MediaLibraryState;
+use Drupal\views\Plugin\views\query\Sql;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -241,6 +243,36 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
         $group = $entity_type_manager->getStorage('group')->load($group_id);
         $group->addContent($media, 'group_media:' . $media->bundle());
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_post_execute().
+ * Removes duplicate items from view results with multi-value entity reference fields.
+ */
+function epa_web_areas_views_post_execute(ViewExecutable $view) {
+  $views = [
+    'group_publishers',
+  ];
+
+  if (in_array($view->id(), $views)) {
+
+    if (!$view->getQuery() instanceof Sql) {
+      return;
+    }
+
+    if ($view->getQuery()->distinct) {
+      $row_ids = [];
+      $distinct_results = [];
+      foreach ($view->result as $row) {
+        $row_id = $row->_entity->id();
+        if (!in_array($row_id, $row_ids)) {
+          $row_ids[] = $row_id;
+          $distinct_results[] = $row;
+        }
+      }
+      $view->result = $distinct_results;
     }
   }
 }
