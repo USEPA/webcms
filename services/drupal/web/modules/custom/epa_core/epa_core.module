@@ -9,8 +9,11 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Utility\Token;
+use Drupal\Core\Link;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -136,15 +139,22 @@ function epa_core_token_info() {
     'description' => t('The published revision\'s creation date.'),
     'type' => 'date'
   ];
+  $contact_us_link = [
+    'name' => t('Contact Us Link'),
+    'description' => t('The link to a Web Area\'s contact form.'),
+  ];
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
       'default-revision-created' => $default_revision_created_token,
+      'contact-us-link' => $contact_us_link,
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
-      'default-revision-created' => $default_revision_created_token,
     ],
+    'current-page' => [
+      'contact-us-link' => $contact_us_link,
+    ]
   ];
   return $tokens;
 }
@@ -152,33 +162,47 @@ function epa_core_token_info() {
 /**
  * Implements hook_tokens().
  */
-function epa_core_tokens($type, $tokens, $data = [], $options = []) {
+function epa_core_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
 
   $replacements = [];
 
-  if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
-    $entity = $data[$type];
-    foreach ($tokens as $name => $original) {
+  $entity = $data[$type];
+  foreach ($tokens as $name => $original) {
 
-      // custom date format handling
-      if(stripos($name, 'default-revision-created') !== false) {
-        $parts = explode(':', $name);
-        $name = $parts[0];
-      }
+    // custom date format handling
+    if (stripos($name, 'default-revision-created') !== FALSE) {
+      $parts = explode(':', $name);
+      $name = $parts[0];
+    }
 
-      switch ($name) {
-        case 'machine-name-alias':
+    switch ($name) {
+      case 'machine-name-alias':
+        if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
           $replacements[$original] = _epa_core_get_machine_name_alias($entity);
-          break;
-        case 'default-revision-created':
-          if ($type == 'node') {
-            $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
+        }
+        break;
+      case 'default-revision-created':
+        if ($type == 'node') {
+          $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
+        }
+        break;
+      case 'contact-us-link':
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if (isset($node)) {
+          // load the group's contact form information
+          $groups = \Drupal::service('epa_web_areas.web_areas_helper')
+            ->getNodeReferencingGroups($node);
+          foreach ($groups as $group) {
+            $contact_form = $group->field_contact_us_form->target_id;
+            $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
+            $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
+              ->toString() : $replacements[$original];
+            $bubbleable_metadata->addCacheableDependency($group->id());
           }
-          break;
-      }
+        }
+        break;
     }
   }
-
   return $replacements;
 }
 
