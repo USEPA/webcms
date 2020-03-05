@@ -1,15 +1,13 @@
 ---
 el: .article
 title: Article
-state: inprogress
+state: inreview
 ---
 
 __Variables:__
-* article_page_title: [string] Title of the article.
-* has_footer: [boolean] Whether to display article footer.
-* content: [object] Content of the article.
+* title: [string] Title of the article.
+* body: [object] Body content of the article.
 
 __Blocks:__
 * title: Twig block for title.
-* footer: Twig block for footer.
-* main: Twig block for main content.
+* content: Twig block for main content.

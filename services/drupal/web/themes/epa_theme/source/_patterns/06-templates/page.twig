@@ -1,5 +1,7 @@
-{% include '@components/article/article.twig' with {
-  'article_page_title': page_title,
-  'has_footer': false,
-  'content': page_content
+{% embed '@components/article/article.twig' with {
+  'title': title,
 } %}
+  {% block content %}
+    {{ body }}
+  {% endblock %}
+{% endembed %}
