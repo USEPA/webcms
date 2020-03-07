@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityInterface;
@@ -262,5 +263,35 @@ function epa_core_file_download($uri) {
         throw new NotFoundHttpException();
       }
     }
+  }
+}
+
+
+/**
+ * Implements hook_entity_view_alter().
+ */
+function epa_core_entity_view_alter(array &$build, Drupal\Core\Entity\EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Add a link to the parent group as the first item in the hublinks field.
+  if ($entity->hasField('field_hublinks')) {
+    $groups = \Drupal::service('epa_web_areas.web_areas_helper')
+      ->getNodeReferencingGroups($entity);
+    foreach ($groups as $group) {
+      $show_hublinks = \Drupal::service('epa_web_areas.web_areas_helper')
+        ->checkNavigationStyle($group);
+      if ($show_hublinks) {
+        $new_hublinks[] = $group->id();
+        $old_hublinks = $entity->field_hublinks->getValue();
+
+        foreach ($old_hublinks as $delta => $hublink) {
+          $new_hublinks[] = $hublink->target_id;
+        }
+        foreach ($new_hublinks as $new_hublink) {
+          $entity->get('field_hublinks')
+            ->appendItem(['target_id' => $new_hublink]);
+        }
+      }
+    }
+    $build['field_hublinks'] = $entity->get('field_hublinks')
+      ->view($build['#view_mode']);
   }
 }
