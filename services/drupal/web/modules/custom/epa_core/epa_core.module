@@ -303,12 +303,12 @@ function epa_core_rebuild() {
     'f76834c2-f52a-4081-bac9-3a97a3ac68e6' => [
       'type' => 'custom_html',
       'info' => 'Web Area Header',
-      'fields' => ['body' => '[current-page:contact-us-link]'],
+      'fields' => ['body' => ['value' => '[current-page:contact-us-link]', 'format' => 'filtered_html']],
     ],
     '46bbc4b7-ffa1-4db8-8209-64c37fa0fcd7' => [
       'type' => 'custom_html',
       'info' => 'Web Area Footer',
-      'fields' => ['body' => '[current-page:contact-us-link] to ask a question, provide feedback, or report a problem.'],
+      'fields' => ['body' => ['value' => '[current-page:contact-us-link] to ask a question, provide feedback, or report a problem.', 'format' => 'filtered_html']],
     ]
   ];
 
@@ -320,7 +320,7 @@ function epa_core_rebuild() {
         'uuid' => $uuid,
       ]);
       foreach ($info['fields'] as $field => $field_data) {
-        $block_content->set($field, $field_data);
+        $block_content->$field->setValue($field_data);
       }
       $block_content->save();
     }
