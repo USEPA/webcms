@@ -15,6 +15,7 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Link;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\block_content\Entity\BlockContent;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -290,5 +291,38 @@ function epa_core_entity_view_alter(array &$build, Drupal\Core\Entity\EntityInte
     }
     $build['field_hublinks'] = $entity->get('field_hublinks')
       ->view($build['#view_mode']);
+  }
+}
+
+/**
+ * Implements hook_rebuild()
+ */
+function epa_core_rebuild() {
+  // Ensure some default blocks are created
+  $block_content = [
+    'f76834c2-f52a-4081-bac9-3a97a3ac68e6' => [
+      'type' => 'custom_html',
+      'info' => 'Web Area Header',
+      'fields' => ['body' => '[current-page:contact-us-link]'],
+    ],
+    '46bbc4b7-ffa1-4db8-8209-64c37fa0fcd7' => [
+      'type' => 'custom_html',
+      'info' => 'Web Area Footer',
+      'fields' => ['body' => '[current-page:contact-us-link] to ask a question, provide feedback, or report a problem.'],
+    ]
+  ];
+
+  foreach ($block_content as $uuid => $info) {
+    if ((!$block_content = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid))) {
+      $block_content = BlockContent::create([
+        'type' => $info['type'],
+        'info' => $info['info'],
+        'uuid' => $uuid,
+      ]);
+      foreach ($info['fields'] as $field => $field_data) {
+        $block_content->set($field, $field_data);
+      }
+      $block_content->save();
+    }
   }
 }
