@@ -197,7 +197,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
             $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
               ->toString() : $replacements[$original];
-            $bubbleable_metadata->addCacheableDependency($group->id());
           }
         }
         break;
