@@ -190,8 +190,15 @@ data "aws_iam_policy_document" "task_parameter_access" {
     resources = [
       aws_ssm_parameter.db_app_username.arn,
       aws_ssm_parameter.db_app_password.arn,
+      aws_ssm_parameter.db_app_database.arn,
     ]
   }
+}
+
+resource "aws_iam_policy" "task_parameter_access" {
+  name = "WebCMSTaskParameterAccess"
+
+  policy = data.aws_iam_policy_document.task_parameter_access.json
 }
 
 data "aws_iam_policy_document" "drupal_execution_assume_role" {
@@ -226,11 +233,11 @@ resource "aws_iam_role" "drupal_execution_role" {
 # Attach the AWS-managed default task execution policy
 resource "aws_iam_role_policy_attachment" "drupal_execution_tasks" {
   role       = aws_iam_role.drupal_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
 # Grant access to the app's username & password parameters
-resource "aws_iam_role_policy" "drupal_execution_parameters" {
-  role   = aws_iam_role.drupal_execution_role.name
-  policy = data.aws_iam_policy_document.task_parameter_access.json
+resource "aws_iam_role_policy_attachment" "drupal_execution_parameters" {
+  role       = aws_iam_role.drupal_execution_role.name
+  policy_arn = aws_iam_policy.task_parameter_access.arn
 }

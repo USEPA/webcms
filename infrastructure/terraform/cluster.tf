@@ -199,7 +199,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # to launch tasks
   depends_on = [
     aws_iam_role_policy_attachment.drupal_execution_tasks,
-    aws_iam_role_policy.drupal_execution_parameters
+    aws_iam_role_policy_attachment.drupal_execution_parameters
   ]
 }
 
