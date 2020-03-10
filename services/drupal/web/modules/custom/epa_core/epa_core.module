@@ -166,7 +166,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
 
   $replacements = [];
 
-  $entity = $data[$type];
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
@@ -178,12 +177,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
     switch ($name) {
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
-          $replacements[$original] = _epa_core_get_machine_name_alias($entity);
+          $replacements[$original] = _epa_core_get_machine_name_alias($data[$type]);
         }
         break;
       case 'default-revision-created':
         if ($type == 'node') {
-          $replacements[$original] = _epa_core_get_default_revision_created($entity, $parts[1], $parts[2]);
+          $replacements[$original] = _epa_core_get_default_revision_created($data['node'], $parts[1], $parts[2]);
         }
         break;
       case 'contact-us-link':

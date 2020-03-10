@@ -133,7 +133,7 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   public function logTransition() {
     $moderation_label = strtolower($this->getModerationLabel());
-    $this->logger->notice('Content was transitioned to %moderation_label', ['%moderation_label' => $moderation_label]);
+    $this->logger->notice('%title was transitioned to %moderation_label. Node ID: %nid  Revision ID: %vid.', ['%title' => $this->contentEntityRevision->label(), '%moderation_label' => $moderation_label, '%nid' => $this->contentEntityRevision->id(), '%vid' => $this->contentEntityRevision->getRevisionId()]);
   }
 
   /**

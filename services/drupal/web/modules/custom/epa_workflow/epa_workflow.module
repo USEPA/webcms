@@ -110,6 +110,11 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
 function epa_workflow_mail_alter(&$message) {
   if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
     $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+
+    // Log here to avoid having to create our own mail service
+    $logger = \Drupal::logger('epa_workflow');
+    $transition = \Drupal::service('content_moderation_notifications.notification_information')->getTransition($message['params']['context']['node']);
+    $logger->info('Notification email with subject: %subject was sent to: %to  when the %transition transition was executed on revision %vid', ['%to' => $message['params']['headers']['Bcc'], '%subject' => $message['subject'], '%vid' => $message['params']['context']['node']->getRevisionId(), '%transition' => $transition->label()]);
   }
 }
 
