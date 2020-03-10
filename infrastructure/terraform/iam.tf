@@ -100,12 +100,12 @@ resource "aws_iam_role_policy" "ec2_instance_cluster" {
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_cluster" {
-  role      = aws_iam_role.ec2_server_role.name
+  role       = aws_iam_role.ec2_server_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
 resource "aws_iam_role_policy_attachment" "ec2_instance_registry" {
-  role      = aws_iam_role.ec2_server_role.name
+  role       = aws_iam_role.ec2_server_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
@@ -177,4 +177,60 @@ resource "aws_iam_role_policy" "drupal_container_policy" {
   name   = "WebCMSDrupalContainerPolicy"
   role   = aws_iam_role.drupal_container_role.name
   policy = data.aws_iam_policy_document.drupal_container_policy.json
+}
+
+data "aws_iam_policy_document" "task_parameter_access" {
+  version = "2012-10-17"
+
+  statement {
+    sid     = "allowParameterAccess"
+    effect  = "Allow"
+    actions = ["ssm:GetParameters"]
+
+    resources = [
+      aws_ssm_parameter.db_app_username.arn,
+      aws_ssm_parameter.db_app_password.arn,
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "drupal_execution_assume_role" {
+  version = "2012-10-17"
+
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+# ECS assumes the task execution role in order to pull container images and access the
+# parameter secrets we've identified in the Drupal task definitions. This is not the same
+# as the task role itself, which is how Drupal itself is identified.
+resource "aws_iam_role" "drupal_execution_role" {
+  name        = "WebCMSDrupalTaskExecutionRole"
+  description = "Task execution role for Drupal containers"
+
+  assume_role_policy = data.aws_iam_policy_document.drupal_execution_assume_role.json
+
+  tags = {
+    Application = "WebCMS"
+  }
+}
+
+# Attach the AWS-managed default task execution policy
+resource "aws_iam_role_policy_attachment" "drupal_execution_tasks" {
+  role       = aws_iam_role.drupal_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Grant access to the app's username & password parameters
+resource "aws_iam_role_policy" "drupal_execution_parameters" {
+  role   = aws_iam_role.drupal_execution_role.name
+  policy = data.aws_iam_policy_document.task_parameter_access.json
 }

@@ -98,9 +98,10 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # The 1-or-0 count here is a Terraform idiom for conditionally creating a resource
   count = var.image-tag-nginx != null && var.image-tag-drupal != null ? 1 : 0
 
-  family        = "webcms-drupal"
-  network_mode  = "awsvpc"
-  task_role_arn = aws_iam_role.drupal_container_role.arn
+  family             = "webcms-drupal"
+  network_mode       = "awsvpc"
+  task_role_arn      = aws_iam_role.drupal_container_role.arn
+  execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
@@ -122,6 +123,19 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true,
+
+      # Inject the S3 information needed to connect for s3fs
+      environment = [
+        { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
+        { name = "WEBCMS_S3_REGION", value = data.aws_caller_identity.current.region },
+      ],
+
+      # Inject the DB credentials needed
+      secrets = [
+        { name = "WEBCMS_DB_USER", valueFrom = aws_ssm_parameter.db_app_username.arn },
+        { name = "WEBCMS_DB_PASS", valueFrom = aws_ssm_parameter.db_app_password.arn },
+        { name = "WEBCMS_DB_NAME", valueFrom = aws_ssm_parameter.db_app_database.arn },
+      ],
 
       # Expose port 9000 inside the task. This is a FastCGI port, not an HTTP one, so it
       # won't be of use to anyone save for nginx. Most importantly, this means that this
@@ -180,6 +194,13 @@ resource "aws_ecs_task_definition" "drupal_task" {
     Name        = "WebCMS Task - Drupal"
     Application = "WebCMS"
   }
+
+  # Explicitly depend on IAM permissions: if we don't, the ECS service may not be able
+  # to launch tasks
+  depends_on = [
+    aws_iam_role_policy_attachment.drupal_execution_tasks,
+    aws_iam_role_policy.drupal_execution_parameters
+  ]
 }
 
 # Create the actual ECS service that serves Drupal traffic. This uses the Drupal task
