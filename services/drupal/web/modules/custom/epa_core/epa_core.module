@@ -264,36 +264,6 @@ function epa_core_file_download($uri) {
   }
 }
 
-
-/**
- * Implements hook_entity_view_alter().
- */
-function epa_core_entity_view_alter(array &$build, Drupal\Core\Entity\EntityInterface $entity, EntityViewDisplayInterface $display) {
-  // Add a link to the parent group as the first item in the hublinks field.
-  if ($entity->hasField('field_hublinks')) {
-    $groups = \Drupal::service('epa_web_areas.web_areas_helper')
-      ->getNodeReferencingGroups($entity);
-    foreach ($groups as $group) {
-      $show_hublinks = \Drupal::service('epa_web_areas.web_areas_helper')
-        ->checkNavigationStyle($group);
-      if ($show_hublinks) {
-        $new_hublinks[] = $group->id();
-        $old_hublinks = $entity->field_hublinks->getValue();
-
-        foreach ($old_hublinks as $delta => $hublink) {
-          $new_hublinks[] = $hublink->target_id;
-        }
-        foreach ($new_hublinks as $new_hublink) {
-          $entity->get('field_hublinks')
-            ->appendItem(['target_id' => $new_hublink]);
-        }
-      }
-    }
-    $build['field_hublinks'] = $entity->get('field_hublinks')
-      ->view($build['#view_mode']);
-  }
-}
-
 /**
  * Implements hook_rebuild()
  */
@@ -323,6 +293,36 @@ function epa_core_rebuild() {
         $block_content->$field->setValue($field_data);
       }
       $block_content->save();
+    }
+  }
+}
+
+
+/**
+ * Implements hook_node_presave().
+ */
+function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->hasField('field_hublinks')) {
+    $groups = \Drupal::service('epa_web_areas.web_areas_helper')
+      ->getNodeReferencingGroups($entity);
+    foreach ($groups as $group) {
+      $new_hublinks[]['target_id'] = $group->id();
+      // check if group is the first item in the list. if not, insert it:
+      if ($new_hublinks[0]['target_id'] != $entity->field_hublinks->get(0)->target_id) {
+        $old_hublinks = $entity->field_hublinks->getValue();
+        $new_hublinks = array_merge($new_hublinks, $old_hublinks);
+      }
+
+      foreach ($new_hublinks as $delta => $hublink) {
+        if ($entity->field_hublinks->get($delta)) {
+          $entity->get('field_hublinks')
+            ->set($delta, $new_hublinks[$delta]['target_id']);
+        }
+        else {
+          $entity->get('field_hublinks')
+            ->appendItem(['target_id' => $hublink['target_id']]);
+        }
+      }
     }
   }
 }
