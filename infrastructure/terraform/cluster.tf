@@ -127,7 +127,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # Inject the S3 information needed to connect for s3fs
       environment = [
         { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
-        { name = "WEBCMS_S3_REGION", value = data.aws_caller_identity.current.region },
+        { name = "WEBCMS_S3_REGION", value = var.aws-region },
       ],
 
       # Inject the DB credentials needed

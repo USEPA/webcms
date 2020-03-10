@@ -179,7 +179,7 @@ data "aws_vpc_endpoint_service" "ssm" {
 
 resource "aws_vpc_endpoint" "ssm" {
   vpc_id              = aws_vpc.main.id
-  service_name        = data.aws_vpc_endpoint_service.ssm.name
+  service_name        = data.aws_vpc_endpoint_service.ssm.service_name
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.interface.id]

@@ -76,7 +76,7 @@ resource "aws_route53_record" "private_cache" {
 
 # Alias each memcache node as "memcache-$N"
 resource "aws_route53_record" "private_cache_nodes" {
-  count = length(aws_elasticache_cluster.cache.cache_nodes)
+  count = var.cache-instance-count
 
   zone_id = aws_route53_zone.public.id
   name    = "memcache-${count.index}"
