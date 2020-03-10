@@ -253,6 +253,7 @@ resource "aws_ecs_service" "drupal" {
     security_groups = [
       aws_security_group.drupal_task.id,
       aws_security_group.database_access.id,
+      aws_security_group.cache_access.id,
     ]
   }
 

@@ -63,3 +63,25 @@ resource "aws_route53_record" "private_rds" {
 
   records = [aws_db_instance.db.address]
 }
+
+# Alias the ElastiCache cluster as "memcache"
+resource "aws_route53_record" "private_cache" {
+  zone_id = aws_route53_zone.public.id
+  name    = "memcache"
+  type    = "CNAME"
+  ttl     = 60
+
+  records = [aws_elasticache_cluster.cache.cluster_address]
+}
+
+# Alias each memcache node as "memcache-$N"
+resource "aws_route53_record" "private_cache_nodes" {
+  count = length(aws_elasticache_cluster.cache.cache_nodes)
+
+  zone_id = aws_route53_zone.public.id
+  name    = "memcache-${count.index}"
+  type    = "CNAME"
+  ttl     = 60
+
+  records = [aws_elasticache_cluster.cache.cache_nodes[count.index].address]
+}

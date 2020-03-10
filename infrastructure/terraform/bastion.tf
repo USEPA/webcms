@@ -18,6 +18,7 @@ resource "aws_instance" "bastion" {
 
     # Grant access from the utility server for administrative tasks
     aws_security_group.database_access.id,
+    aws_security_group.cache.id
   ]
 
   tags = {

@@ -274,28 +274,43 @@ resource "aws_security_group_rule" "drupal_lb_ingress" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-# Rule: ingress to RDS from Drupal
-resource "aws_security_group_rule" "db_task_ingress" {
-  description = "Allow incoming connections from Drupal tasks to RDS"
+resource "aws_security_group" "cache" {
+  name        = "webcms-cache-sg"
+  description = "Security group for ElastiCache servers"
 
-  security_group_id = aws_security_group.database.id
+  vpc_id = aws_vpc.main.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 3306
-  to_port                  = 3306
-  source_security_group_id = aws_security_group.drupal_task.id
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS ElastiCache"
+  }
 }
 
-# Rule: ingress to RDS from bastion server
-resource "aws_security_group_rule" "db_bastion_ingress" {
-  description = "Allow incoming connections from the SSH bastion to RDS"
+resource "aws_security_group" "cache_access" {
+  name        = "webcms-cache-access-sg"
+  description = "Security group for access to ElastiCache"
 
-  security_group_id = aws_security_group.database.id
+  vpc_id = aws_vpc.main.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 3306
-  to_port                  = 3306
-  source_security_group_id = aws_security_group.bastion.id
+  egress {
+    description = "Allow outgoing connections to ElastiCache"
+
+    protocol        = "tcp"
+    from_port       = 11211
+    to_port         = 11211
+    security_groups = [aws_security_group.cache.id]
+  }
+}
+
+resource "aws_security_group_rule" "cache_access_ingress" {
+  description = "Allow incoming connections to ElastiCache"
+
+  security_group_id = aws_security_group.cache.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 11211
+  to_port   = 11211
+
+  source_security_group_id = aws_security_group.cache_access.id
 }
