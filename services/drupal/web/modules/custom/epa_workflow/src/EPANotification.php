@@ -58,5 +58,4 @@ class EPANotification extends Notification {
     }
     parent::processEntity($entity);
   }
-
 }
