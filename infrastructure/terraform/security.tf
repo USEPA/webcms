@@ -39,7 +39,7 @@ resource "aws_security_group" "load_balancer" {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.alb-ingress
   }
 
   ingress {
@@ -48,7 +48,7 @@ resource "aws_security_group" "load_balancer" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.alb-ingress
   }
 
   tags = {

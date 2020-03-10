@@ -14,6 +14,14 @@ variable "vpc-az-count" {
   type        = number
 }
 
+# ALB
+# cf. alb.tf security.tf
+
+variable "alb-ingress" {
+  description = "List of CIDR ranges for which ingress is allowed (e.g., to only allow Akamai servers)"
+  type        = list(string)
+}
+
 # Server-related variables
 # cf. servers.tf
 
@@ -76,8 +84,21 @@ variable "db-password" {
   type        = string
 }
 
+# Cache variables
+# cf. cache.tf
+
+variable "cache-instance-type" {
+  description = "Instance type of ElastiCache nodes"
+  type        = string
+}
+
+variable "cache-instance-count" {
+  description = "Number of ElastiCache nodes in this cluster"
+  type        = number
+}
+
 # Bastion SSH server (optional)
-# cf. bastion.tf
+# cf. bastion.tf security.tf
 
 variable "bastion-create" {
   description = "Whether or not to create a public-facing SSH bastion"
