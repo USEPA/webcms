@@ -42,11 +42,26 @@ module.exports = mode => {
           use: [
             {
               loader: 'babel-loader',
+              options: {
+                configFile: path.resolve(__dirname, 'babel.config.json'),
+              },
             },
             {
               loader: 'eslint-loader',
               options: {
                 configFile: path.resolve(__dirname, '.eslintrc.js'),
+              },
+            },
+          ],
+        },
+        {
+          test: /\.js?$/,
+          include: /node_modules\/uswds/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                configFile: path.resolve(__dirname, 'babel.config.json'),
               },
             },
           ],
