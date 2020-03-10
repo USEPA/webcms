@@ -1,5 +1,5 @@
 resource "aws_elasticache_subnet_group" "default" {
-  name       = "webcms_default"
+  name       = "webcms-default"
   subnet_ids = aws_subnet.private.*.id
 }
 

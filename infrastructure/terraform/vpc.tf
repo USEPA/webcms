@@ -183,8 +183,7 @@ resource "aws_vpc_endpoint" "ssm" {
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.interface.id]
-
-  route_table_ids = concat(aws_route_table.private.*.id, [aws_route_table.public.id])
+  subnet_ids          = aws_subnet.private.*.id
 
   tags = {
     Application = "WebCMS"

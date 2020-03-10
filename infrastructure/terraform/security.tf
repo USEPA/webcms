@@ -2,6 +2,8 @@ resource "aws_security_group" "interface" {
   name        = "webcms-interface-sg"
   description = "Security group for AWS interface endpoints"
 
+  vpc_id = aws_vpc.main.id
+
   # Permissively allow ingress to VPC interface endpoints.
   # We allow this for a few reasons:
   # 1. Interface endpoints resolve to AWS services, which we consider trustworthy
@@ -157,7 +159,7 @@ resource "aws_security_group_rule" "server_bastion_ingress" {
 
 resource "aws_security_group" "database" {
   name        = "webcms-database-sg"
-  description = "Security group for the RDS database server"
+  description = "Security group for the RDS database"
 
   vpc_id = aws_vpc.main.id
 
