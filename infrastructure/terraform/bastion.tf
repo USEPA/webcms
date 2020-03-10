@@ -12,7 +12,13 @@ resource "aws_instance" "bastion" {
   instance_type               = "t3a.micro"
   key_name                    = var.bastion-key
   subnet_id                   = aws_subnet.public[0].id
-  vpc_security_group_ids      = [aws_security_group.bastion.id]
+
+  vpc_security_group_ids = [
+    aws_security_group.bastion.id,
+
+    # Grant access from the utility server for administrative tasks
+    aws_security_group.database_access.id,
+  ]
 
   tags = {
     Application = "WebCMS"

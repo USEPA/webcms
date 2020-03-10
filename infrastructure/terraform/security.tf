@@ -123,7 +123,7 @@ resource "aws_security_group_rule" "server_bastion_ingress" {
 
 resource "aws_security_group" "database" {
   name        = "webcms-database-sg"
-  description = "Security group for the RDS database"
+  description = "Security group for the RDS database server"
 
   vpc_id = aws_vpc.main.id
 
@@ -131,6 +131,44 @@ resource "aws_security_group" "database" {
     Application = "WebCMS"
     Name        = "WebCMS RDS"
   }
+}
+
+# The security group for access to the DB servers is separate from the application-specific
+# security group since it's used twice: once for Drupal tasks and again for the utility
+# server. We also anticipate that it will help triage networking issues
+resource "aws_security_group" "database_access" {
+  name        = "webcms-database-access-sg"
+  description = "Security group for access to database servers"
+
+  vpc_id = aws_vpc.main.id
+
+  egress {
+    description = "Allows outgoing connections to MySQL"
+
+    protocol        = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    security_groups = [aws_security_group.database.id]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS DB Access"
+  }
+}
+
+# Created as a separate rule to avoid cycles in the Terraform graph
+resource "aws_security_group_rule" "database_access_ingress" {
+  description = "Allows incoming connections to MySQL"
+
+  security_group_id = aws_security_group.database.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.database_access.id
 }
 
 # Because Drupal tasks are run in the AWSVPC networking mode, we are able to assign
@@ -158,18 +196,6 @@ resource "aws_security_group" "drupal_task" {
     from_port   = 443
     to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # The corresponding ingress rule for RDS is at the end of this file. We use this here
-  # because for some reason, the egress list attached to this resource is somewhat
-  # brittle, so we can't create a separate aws_security_group_rule like we normally do.
-  egress {
-    description = "Allow outgoing connections to RDS"
-
-    protocol        = "tcp"
-    from_port       = 3306
-    to_port         = 3306
-    security_groups = [aws_security_group.database.id]
   }
 
   tags = {

@@ -228,7 +228,11 @@ resource "aws_ecs_service" "drupal" {
   network_configuration {
     subnets          = aws_subnet.private.*.id
     assign_public_ip = false
-    security_groups  = [aws_security_group.drupal_task.id]
+
+    security_groups = [
+      aws_security_group.drupal_task.id,
+      aws_security_group.database_access.id,
+    ]
   }
 
   # Ask ECS to prioritize spreading tasks across available EC2 instances before running
