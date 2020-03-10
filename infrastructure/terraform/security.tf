@@ -1,3 +1,30 @@
+resource "aws_security_group" "interface" {
+  name        = "webcms-interface-sg"
+  description = "Security group for AWS interface endpoints"
+
+  # Permissively allow ingress to VPC interface endpoints.
+  # We allow this for a few reasons:
+  # 1. Interface endpoints resolve to AWS services, which we consider trustworthy
+  # 2. The service on the other end has its own permissions system (IAM) to prevent
+  #    unauthorized access.
+  # 3. Security group rules here will not actually prevent access to the AWS services
+  #    in question; anyone can resolve the service endpoint using public DNS and make
+  #    API requests.
+  ingress {
+    description = "Allow incoming connections"
+
+    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Interfaces"
+  }
+}
+
 resource "aws_security_group" "load_balancer" {
   name        = "webcms-alb-sg"
   description = "Security group for the WebCMS load balancers"
@@ -57,6 +84,15 @@ resource "aws_security_group" "server" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    description = "Allow access to VPC endpoint services"
+
+    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 0
+    security_groups = [aws_security_group.interface.id]
+  }
+
   tags = {
     Application = "WebCMS"
     Name        = "WebCMS Cluster Server"
@@ -69,7 +105,7 @@ resource "aws_security_group" "bastion" {
 
   vpc_id = aws_vpc.main.id
 
-  # We only allow inbound SSH connections from the IP ranges specified in bastion-ingress
+  # We only allow inbound SSH connections from the IP ranges specified in bastion-ingress.
   # This limits security risk of a public-facing bastion server since we assume that the
   # allowed IPs are associated with, e.g., a VPN or jump box.
   ingress {
@@ -91,15 +127,13 @@ resource "aws_security_group" "bastion" {
     security_groups = [aws_security_group.server.id]
   }
 
-  # For administration purposes, we allow access to the RDS instance from the SSH bastion
-  # to allow users to run queries against RDS.
   egress {
-    description = "Allow outgoing MySQL connections"
+    description = "Allow access to VPC endpoint services"
 
     protocol        = "tcp"
-    from_port       = 3306
-    to_port         = 3306
-    security_groups = [aws_security_group.server.id]
+    from_port       = 0
+    to_port         = 0
+    security_groups = [aws_security_group.interface.id]
   }
 
   tags = {
@@ -196,6 +230,15 @@ resource "aws_security_group" "drupal_task" {
     from_port   = 443
     to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow access to VPC endpoint services"
+
+    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 0
+    security_groups = [aws_security_group.interface.id]
   }
 
   tags = {
