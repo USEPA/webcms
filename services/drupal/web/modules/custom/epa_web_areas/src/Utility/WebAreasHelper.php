@@ -48,7 +48,7 @@ class WebAreasHelper {
 
     // Only act if there are group content types for this node type.
     $group_content_types = GroupContentType::loadByContentPluginId($plugin_id);
-    if (empty($group_content_types)) {
+    if (empty($group_content_types) || empty($node->id())) {
       return [];
     }
 
