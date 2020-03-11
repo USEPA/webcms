@@ -1,0 +1,29 @@
+uuid: 979927e8-51b0-40f5-9858-d0337a7ac643
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.banner.field_banner_slides
+    - paragraphs.paragraphs_type.banner
+  module:
+    - paragraphs
+id: paragraph.banner.default
+targetEntityType: paragraph
+bundle: banner
+mode: default
+content:
+  field_banner_slides:
+    type: entity_reference_paragraphs
+    weight: 0
+    settings:
+      title: Slide
+      title_plural: Slides
+      edit_mode: preview
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: banner_slide
+    third_party_settings: {  }
+    region: content
+hidden:
+  created: true
+  status: true

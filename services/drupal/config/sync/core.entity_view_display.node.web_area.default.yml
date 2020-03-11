@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.node.web_area.field_aside_block
+    - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
     - field.field.node.web_area.field_env_laws_regs_and_treaties
@@ -30,7 +30,6 @@ dependencies:
     - layout_builder
     - options
     - scheduled_publish
-    - text
     - user
 third_party_settings:
   layout_builder:
@@ -139,6 +138,25 @@ third_party_settings:
               context_mapping: {  }
             additional: {  }
             weight: 5
+          c4773fed-913e-40df-bef9-ce01bdca1295:
+            uuid: c4773fed-913e-40df-bef9-ce01bdca1295
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_banner'
+              label: Banner
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: above
+                type: entity_reference_revisions_entity_view
+                settings:
+                  view_mode: default
+                third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 6
         third_party_settings: {  }
 id: node.web_area.default
 targetEntityType: node
@@ -149,13 +167,6 @@ content:
     weight: -20
     settings: {  }
     third_party_settings: {  }
-    region: content
-  field_aside_block:
-    weight: 104
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
     region: content
   field_channel:
     weight: 107
@@ -269,4 +280,5 @@ content:
     third_party_settings: {  }
     region: content
 hidden:
+  field_banner: true
   layout_builder__layout: true
