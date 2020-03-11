@@ -301,9 +301,10 @@ function epa_core_rebuild() {
  * Implements hook_node_presave().
  */
 function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) {
-  if ($entity->hasField('field_hublinks')) {
+  if ($entity->hasField('field_hublinks') && $entity->id()) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')
       ->getNodeReferencingGroups($entity);
+    
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
       $hublinks = $entity->field_hublinks->getValue();
