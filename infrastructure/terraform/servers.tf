@@ -98,7 +98,7 @@ resource "aws_autoscaling_group" "servers" {
 
   # Only launch into the private VPC subnet - this will require that all traffic goes
   # through the ALB.
-  vpc_zone_identifier  = aws_subnet.private.*.id
+  vpc_zone_identifier = aws_subnet.private.*.id
 
   launch_template {
     id      = aws_launch_template.servers.id
