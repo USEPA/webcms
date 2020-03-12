@@ -9,7 +9,3 @@ output "ecr-nginx" {
 output "s3-bucket" {
   value = aws_s3_bucket.uploads.bucket_regional_domain_name
 }
-
-output "dns-nameservers" {
-  value = aws_route53_zone.public.name_servers
-}

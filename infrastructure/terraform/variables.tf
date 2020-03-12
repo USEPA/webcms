@@ -22,6 +22,16 @@ variable "alb-ingress" {
   type        = list(string)
 }
 
+variable "alb-certificate" {
+  description = "ARN of the ACM certificate to secure the load balancer."
+  type        = string
+}
+
+variable "alb-hostname" {
+  description = "Hostname for the ALB to identify legitimate requests."
+  type        = string
+}
+
 # Server-related variables
 # cf. servers.tf
 
@@ -117,42 +127,6 @@ variable "bastion-ingress" {
   description = "List of CIDR ranges from which SSH is allowed (e.g., jumpbox, VPN address, etc.)"
   type        = list(string)
   default     = []
-}
-
-# DNS
-# cf. dns.tf alb.tf
-
-# We separate the root domain and subdomains in order to make managing DNS somewhat easier.
-# These variables will impact two parts of the configuration:
-#
-# The load balancer will be configured to listen to one of two hosts:
-# 1. If dns-subdomain is set, the Host header must match "${dns-subdomain}.${dns-root-domain}"
-# 2. Otherwise, the host header must match dns-root-domain.
-#
-# The ACM certificate will be generated to match these variables:
-# 1. If dns-subdomain is set, the cert will be generated for "${dns-subdomain}.${dns-root-domain}"
-# 2. Otherwise, the cert will be generated for dns-root-domain.
-#
-# The main benefit of separating these two variables is that it opens up the public-facing
-# Route 53 zone to manage other records for site DNS from within Terraform or the AWS
-# console, rather than having to delegate a single DNS zone to this account.
-#
-# When using these variables, note that while dns-root-domain is a full domain, the dns-subdomain
-# string is just a domain part. That is, to have the ALB listen to "dev.example.com", you
-# would specify these variables:
-#
-# dns-root-domain = "example.com"
-# dns-subdomain = "dev"
-
-variable "dns-root-domain" {
-  description = "Root DNS name of the zone to manage (e.g., example.org or dev.example.com)"
-  type        = string
-}
-
-variable "dns-subdomain" {
-  description = "Subdomain of the dns-root-domain variable on which to listen to requests"
-  type        = string
-  default     = null
 }
 
 # Image tag variables
