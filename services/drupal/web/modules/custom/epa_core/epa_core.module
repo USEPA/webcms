@@ -144,6 +144,11 @@ function epa_core_token_info() {
     'name' => t('Contact Us Link'),
     'description' => t('The link to a Web Area\'s contact form.'),
   ];
+  $footer_last_updated = [
+    'name' => t('Last updated'),
+    'description' => t('The current entity\'s latest updated date.'),
+    'type' => 'date'
+  ];
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
@@ -154,6 +159,7 @@ function epa_core_token_info() {
     ],
     'current-page' => [
       'contact-us-link' => $contact_us_link,
+      'footer-last-updated' => $footer_last_updated,
     ]
   ];
   return $tokens;
@@ -169,7 +175,8 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
-    if (stripos($name, 'default-revision-created') !== FALSE) {
+    if (stripos($name, 'default-revision-created') !== FALSE
+      || stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
       $name = $parts[0];
     }
@@ -197,6 +204,14 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
               ->toString() : $replacements[$original];
           }
+        }
+        break;
+      case 'footer-last-updated':
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if (isset($node)) {
+          $date = \Drupal::service('date.formatter')
+            ->format($node->revision_timestamp->value, $parts[1], $parts[2]);
+          $replacements[$original] = $date;
         }
         break;
     }
