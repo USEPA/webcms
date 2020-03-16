@@ -5,13 +5,11 @@ data "aws_ssm_parameter" "bastion-ami" {
 
 # Create an SSH bastion server if requested
 resource "aws_instance" "bastion" {
-  count = var.bastion-create ? 1 : 0
-
   ami                         = data.aws_ssm_parameter.bastion-ami.value
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   instance_type               = "t3a.micro"
-  key_name                    = var.bastion-key
-  subnet_id                   = aws_subnet.public[0].id
+  subnet_id                   = aws_subnet.private[0].id
+  iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
 
   vpc_security_group_ids = [
     aws_security_group.bastion.id,

@@ -2,6 +2,8 @@
 # and scheduled Drush cron scripts for a few reasons (such as avoiding spawning nginx),
 # so we share the values here.
 
+data "aws_caller_identity" "current" {}
+
 locals {
   # Plaintext environment variables for Drupal containers
   drupal-environment = [

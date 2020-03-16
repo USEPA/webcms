@@ -52,12 +52,6 @@ resource "aws_launch_template" "servers" {
     }
   }
 
-  # Note that while we always assign an EC2 keypair to the launch template, this will only
-  # have an effect if BOTH are true:
-  # 1. The user specified bastion-key as something other than `null` (the default), and
-  # 2.
-  key_name = var.bastion-key
-
   # 1. Explicitly identify which cluster we're joining
   # 2. Don't allow access to the EC2 metadata service - instead, we have task-specific IAM
   #    roles

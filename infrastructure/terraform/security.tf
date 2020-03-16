@@ -107,28 +107,6 @@ resource "aws_security_group" "bastion" {
 
   vpc_id = aws_vpc.main.id
 
-  # We only allow inbound SSH connections from the IP ranges specified in bastion-ingress.
-  # This limits security risk of a public-facing bastion server since we assume that the
-  # allowed IPs are associated with, e.g., a VPN or jump box.
-  ingress {
-    description = "Allow incoming SSH connections"
-
-    protocol    = "tcp"
-    from_port   = 22
-    to_port     = 22
-    cidr_blocks = var.bastion-ingress
-  }
-
-  # This rule allows accessing an ECS instance from the bastion server
-  egress {
-    description = "Allow outgoing SSH connections"
-
-    protocol        = "tcp"
-    from_port       = 22
-    to_port         = 22
-    security_groups = [aws_security_group.server.id]
-  }
-
   egress {
     description = "Allow access to VPC endpoint services"
 
@@ -142,19 +120,6 @@ resource "aws_security_group" "bastion" {
     Application = "WebCMS"
     Name        = "WebCMS Bastion"
   }
-}
-
-# This server->bastion rule is separate to avoid loops in the Terraform dependency graph
-resource "aws_security_group_rule" "server_bastion_ingress" {
-  description = "Allow SSH connections to EC2 servers from bastion hosts"
-
-  type              = "ingress"
-  protocol          = "tcp"
-  from_port         = 22
-  to_port           = 22
-  security_group_id = aws_security_group.server.id
-
-  source_security_group_id = aws_security_group.bastion.id
 }
 
 resource "aws_security_group" "database" {

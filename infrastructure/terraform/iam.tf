@@ -31,6 +31,74 @@ resource "aws_iam_role" "ecs_cluster_role" {
 #   policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AmazonECSServiceRolePolicy"
 # }
 
+# SSM-related S3 permissions
+
+data "aws_iam_policy_document" "ssm_s3_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid     = "allowReadAccess"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+
+    # cf. https://docs.aws.amazon.com/systems-manager/latest/userguide/ssm-agent-minimum-s3-permissions.html
+    resources = [
+      "arn:aws:s3:::aws-ssm-${var.aws-region}/*",
+      "arn:aws:s3:::amazon-ssm-${var.aws-region}/*",
+      "arn:aws:s3:::${var.aws-region}-birdwatcher-prod/*",
+      "arn:aws:s3:::aws-ssm-document-attachments-${var.aws-region}/*",
+      "arn:aws:s3:::patch-baseline-snapshot-${var.aws-region}/*",
+
+      # Ignored buckets:
+      # We're not on Windows: arn:aws:s3:::aws-windows-downloads-$REGION/*
+      # We're not using older SSM agents: arn:aws:s3:::amazon-ssm-packages-$REGION/*
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ssm_s3_policy" {
+  name        = "WebCMSAccessPolicyForSSMAndS3"
+  description = "Policy to grant access to SSM-related S3 buckets"
+  policy      = data.aws_iam_policy_document.ssm_s3_policy.json
+}
+
+data "aws_iam_policy_document" "ssm_session_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "allowMessaging"
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "ssmmessages:CreateControlChannel",
+      "ssmmessages:CreateDataChannel",
+      "ssmmessages:OpenControlChannel",
+      "ssmmessages:OpenDataChannel"
+    ]
+  }
+
+  statement {
+    sid       = "allowGetConfiguration"
+    effect    = "Allow"
+    actions   = ["s3:GetEncryptionConfiguration"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "allowDecryption"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [var.ssm-customer-key]
+  }
+}
+
+resource "aws_iam_policy" "ssm_session_policy" {
+  name        = "WebCMSSessionPolicyForSSM"
+  description = "Policy to grant servers access to SSM sessions"
+  policy      = data.aws_iam_policy_document.ssm_session_policy.json
+}
+
 # EC2 service role
 # Provides IAM permissions for the EC2 instances (and, presumably, the ECS agent)
 
@@ -107,6 +175,22 @@ resource "aws_iam_role_policy_attachment" "ec2_instance_cluster" {
 resource "aws_iam_role_policy_attachment" "ec2_instance_registry" {
   role       = aws_iam_role.ec2_server_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+# Allow cluster servers to interact with SSM
+resource "aws_iam_role_policy_attachment" "ec2_ssm" {
+  role       = aws_iam_role.ec2_server_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_ssm_s3" {
+  role       = aws_iam_role.ec2_server_role.name
+  policy_arn = aws_iam_policy.ssm_s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_ssm_session" {
+  role       = aws_iam_role.ec2_server_role.name
+  policy_arn = aws_iam_policy.ssm_session_policy.arn
 }
 
 resource "aws_iam_instance_profile" "ec2_servers" {
@@ -240,4 +324,182 @@ resource "aws_iam_role_policy_attachment" "drupal_execution_tasks" {
 resource "aws_iam_role_policy_attachment" "drupal_execution_parameters" {
   role       = aws_iam_role.drupal_execution_role.name
   policy_arn = aws_iam_policy.task_parameter_access.arn
+}
+
+data "aws_iam_policy_document" "bastion_assume" {
+  version = "2012-10-17"
+
+  statement {
+    sid     = "1"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "bastion_role" {
+  name        = "WebCMSBastionRole"
+  description = "IAM role for the utility EC2 instance"
+
+  assume_role_policy = data.aws_iam_policy_document.bastion_assume.json
+
+  tags = {
+    Application = "WebCMS"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_ssm" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_ssm_s3" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = aws_iam_policy.ssm_s3_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_ssm_session" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = aws_iam_policy.ssm_session_policy.arn
+}
+
+resource "aws_iam_instance_profile" "bastion_profile" {
+  name = "WebCMSUtilityInstanceProfile"
+  role = aws_iam_role.bastion_role.name
+}
+
+# SSM role
+
+data "aws_iam_policy_document" "ssm_assume" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "1"
+
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ssm.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ssm" {
+  name               = "WebCMSSystemsManagerRole"
+  description        = "Role for the Systems Manager service"
+  assume_role_policy = data.aws_iam_policy_document.ssm_assume.json
+}
+
+data "aws_iam_policy_document" "ssm_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "ssmPolicy"
+
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "iam:CreateInstanceProfile",
+      "iam:ListInstanceProfilesForRole",
+      "iam:PassRole",
+      "ec2:DescribeIamInstanceProfileAssociations",
+      "iam:GetInstanceProfile",
+      "ec2:DisassociateIamInstanceProfile",
+      "ec2:AssociateIamInstanceProfile",
+      "iam:AddRoleToInstanceProfile"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ssm_policy" {
+  name        = "WebCMSPolicyForSystemsManager"
+  description = "Grants permission to perform Systems Manager functions"
+  policy      = data.aws_iam_policy_document.ssm_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.ssm.name
+  policy_arn = aws_iam_policy.ssm_policy.arn
+}
+
+# User-level policies for interacting with AWS SSM
+
+data "aws_iam_policy_document" "user_ssm_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "startSession"
+
+    effect    = "Allow"
+    actions   = ["ssm:StartSession", "ssm:SendCommand"]
+    resources = ["arn:aws:ec2:*:*:instance/*"]
+
+    # Limit this policy only to WebCMS EC2 instances
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/Application"
+      values   = ["WebCMS"]
+    }
+  }
+
+  statement {
+    sid = "sessionManagement"
+
+    effect    = "Allow"
+    resources = ["*"]
+
+    actions = [
+      "ssm:DescribeSessions",
+      "ssm:GetConnectionStatus",
+      "ssm:DescribeInstanceInformation",
+      "ssm:DescribeInstanceProperties",
+      "ec2:DescribeInstances"
+    ]
+  }
+
+  statement {
+    sid = "endSession"
+
+    effect    = "Allow"
+    actions   = ["ssm:TerminateSession"]
+    resources = ["arn:aws:ssm:*:*:session/$${aws:username}-*"]
+  }
+
+  statement {
+    sid = "allowGetDocument"
+
+    effect  = "Allow"
+    actions = ["ssm:GetDocument"]
+
+    resources = [
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell"
+    ]
+
+    condition {
+      test     = "BoolIfExists"
+      variable = "ssm:SessionDocumentAccessCheck"
+      values   = ["true"]
+    }
+  }
+
+  statement {
+    sid = "allowSessionEncryption"
+
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey"]
+    resources = [var.ssm-customer-key]
+  }
+}
+
+resource "aws_iam_policy" "user_ssm_policy" {
+  name        = "WebCMSUserAccessPolicyForSSM"
+  description = "Grants Session Manager access for users"
+  policy      = data.aws_iam_policy_document.user_ssm_policy.json
 }

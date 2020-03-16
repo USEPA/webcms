@@ -172,14 +172,22 @@ resource "aws_vpc_endpoint" "s3" {
   }
 }
 
-# Place Systems Manager as an interface to prevent sending its traffic outside the VPC
+locals {
+  # Place Systems Manager endpoints into the VPC in order to further secure the connection
+  ssm-endpoints = ["ssm", "ec2", "ec2messages", "ssmmessages"]
+}
+
 data "aws_vpc_endpoint_service" "ssm" {
-  service = "ssm"
+  for_each = toset(local.ssm-endpoints)
+
+  service = each.value
 }
 
 resource "aws_vpc_endpoint" "ssm" {
+  for_each = toset(local.ssm-endpoints)
+
   vpc_id              = aws_vpc.main.id
-  service_name        = data.aws_vpc_endpoint_service.ssm.service_name
+  service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.interface.id]
@@ -187,6 +195,6 @@ resource "aws_vpc_endpoint" "ssm" {
 
   tags = {
     Application = "WebCMS"
-    Name        = "WebCMS SSM Interface"
+    Name        = "WebCMS SSM Interface: ${each.value}"
   }
 }

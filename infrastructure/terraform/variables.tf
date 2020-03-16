@@ -21,6 +21,14 @@ variable "vpc-az-count" {
   type        = number
 }
 
+# Systems Manager
+# cf. iam.tf ssm.tf
+
+variable "ssm-customer-key" {
+  description = "AWS customer key (CMK) used to encrypt SSM sessions"
+  type        = string
+}
+
 # ALB
 # cf. alb.tf security.tf
 
@@ -123,28 +131,6 @@ variable "cache-instance-type" {
 variable "cache-instance-count" {
   description = "Number of ElastiCache nodes in this cluster"
   type        = number
-}
-
-# Bastion SSH server (optional)
-# cf. bastion.tf security.tf
-
-variable "bastion-create" {
-  description = "Whether or not to create a public-facing SSH bastion"
-  type        = bool
-  default     = false
-}
-
-variable "bastion-key" {
-  description = "EC2 keypair name for the SSH bastion server"
-  type        = string
-  default     = null
-}
-
-# NB. Since this is in CIDR notation, use 1.2.3.4/32 to specify a single address
-variable "bastion-ingress" {
-  description = "List of CIDR ranges from which SSH is allowed (e.g., jumpbox, VPN address, etc.)"
-  type        = list(string)
-  default     = []
 }
 
 # Image tag variables
