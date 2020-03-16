@@ -124,18 +124,11 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true,
 
-      # Inject the S3 information needed to connect for s3fs
-      environment = [
-        { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
-        { name = "WEBCMS_S3_REGION", value = var.aws-region },
-      ],
+      # Inject the S3 information needed to connect for s3fs (cf. shared.tf)
+      environment = local.drupal-environment,
 
-      # Inject the DB credentials needed
-      secrets = [
-        { name = "WEBCMS_DB_USER", valueFrom = aws_ssm_parameter.db_app_username.arn },
-        { name = "WEBCMS_DB_PASS", valueFrom = aws_ssm_parameter.db_app_password.arn },
-        { name = "WEBCMS_DB_NAME", valueFrom = aws_ssm_parameter.db_app_database.arn },
-      ],
+      # Inject the DB credentials needed (cf. shared.tf)
+      secrets = local.drupal-secrets,
 
       # Expose port 9000 inside the task. This is a FastCGI port, not an HTTP one, so it
       # won't be of use to anyone save for nginx. Most importantly, this means that this
@@ -250,11 +243,7 @@ resource "aws_ecs_service" "drupal" {
     subnets          = aws_subnet.private.*.id
     assign_public_ip = false
 
-    security_groups = [
-      aws_security_group.drupal_task.id,
-      aws_security_group.database_access.id,
-      aws_security_group.cache_access.id,
-    ]
+    security_groups = local.drupal-security-groups
   }
 
   # Ask ECS to prioritize spreading tasks across available EC2 instances before running

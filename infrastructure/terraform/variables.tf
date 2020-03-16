@@ -6,6 +6,13 @@ variable "aws-region" {
   type        = string
 }
 
+# Global/sitewide variables
+
+variable "site-hostname" {
+  description = "Domain name of the WebCMS."
+  type        = string
+}
+
 # VPC
 # cf. vpc.tf
 
@@ -28,8 +35,9 @@ variable "alb-certificate" {
 }
 
 variable "alb-hostname" {
-  description = "Hostname for the ALB to identify legitimate requests."
+  description = "Hostname for the ALB to listen to, in case it differs from the site-hostname variable."
   type        = string
+  default     = null
 }
 
 # Server-related variables

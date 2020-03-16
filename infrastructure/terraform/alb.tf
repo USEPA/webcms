@@ -71,7 +71,10 @@ resource "aws_lb_listener_rule" "frontend_https" {
 
   condition {
     host_header {
-      values = [var.alb-hostname]
+      # If the alb-hostname var isn't set, use the site hostname (this matters in cases
+      # where we're behind a CDN and the ALB's domain name is different from the
+      # public-facing domain name.)
+      values = [var.alb-hostname == null ? var.site-hostname : var.alb-hostname]
     }
   }
 }
