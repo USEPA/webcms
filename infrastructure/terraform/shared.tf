@@ -22,4 +22,12 @@ locals {
     aws_security_group.database_access.id,
     aws_security_group.cache_access.id,
   ]
+
+  # Database name for the WebCMS
+  database-name = "webcms"
+
+  # User for the WebCMS. This is *not* the master username that is specified
+  # in Terraform! It's the app-level user that only needs permissions to modify
+  # the WebCMS's database.
+  database-user = "webcms"
 }

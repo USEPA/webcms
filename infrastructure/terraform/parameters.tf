@@ -40,7 +40,7 @@ resource "aws_ssm_parameter" "db_root_password" {
 resource "aws_ssm_parameter" "db_app_username" {
   name        = "/webcms/db_app/username"
   description = "Username for the WebCMS DB user"
-  value       = "webcms"
+  value       = local.database-name
   type        = "String"
 
   tags = {
@@ -68,7 +68,7 @@ resource "aws_ssm_parameter" "db_app_password" {
 resource "aws_ssm_parameter" "db_app_database" {
   name        = "/webcms/db_app/database"
   description = "Name of the WebCMS DB schema"
-  value       = "webcms"
+  value       = local.database-user
   type        = "String"
 
   tags = {

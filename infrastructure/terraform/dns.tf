@@ -16,15 +16,15 @@ resource "aws_route53_zone" "private" {
   }
 }
 
-# Alias the RDS instance as the hostname "mysql" in order to avoid having to update the
-# address should the instance ever be changed
+# Alias the Aurora cluster as the hostname "mysql" in order to avoid having to update the
+# address should the endpoint ever change
 resource "aws_route53_record" "private_rds" {
   zone_id = aws_route53_zone.private.id
   name    = "mysql"
   type    = "CNAME"
   ttl     = 60
 
-  records = [aws_db_instance.db.address]
+  records = [aws_rds_cluster.db.endpoint]
 }
 
 # Alias the ElastiCache discovery endpoint as "memcache.cfg"
