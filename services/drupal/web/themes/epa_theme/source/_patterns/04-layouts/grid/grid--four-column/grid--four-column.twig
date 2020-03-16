@@ -1,4 +1,8 @@
+{% set classes = [
+  'l-grid--4col',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
 {% include '@layouts/grid/grid.twig' with {
-  'modifier_classes': modifier_classes,
-  'content': content
+  'modifier_classes': classes,
 } %}
