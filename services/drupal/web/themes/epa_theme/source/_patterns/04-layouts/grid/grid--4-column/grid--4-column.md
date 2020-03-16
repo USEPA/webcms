@@ -1,6 +1,6 @@
 ---
-el: .l-grid--2col
-title: Two Column Grid Layout
+el: .l-grid--4-col
+title: Four Column Grid Layout
 state: inreview
 ---
 

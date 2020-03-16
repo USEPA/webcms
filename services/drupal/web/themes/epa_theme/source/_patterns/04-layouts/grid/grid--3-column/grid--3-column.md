@@ -1,5 +1,5 @@
 ---
-el: .l-grid--3col
+el: .l-grid--3-col
 title: Three Column Grid Layout
 state: inreview
 ---

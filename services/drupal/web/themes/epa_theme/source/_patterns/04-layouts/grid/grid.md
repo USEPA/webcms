@@ -12,4 +12,4 @@ __Blocks:__
 
 __Usage:__
 To create a grid, include the grid.twig file and pass it a class via the
-modifier_classes variables (e.g., l-grid--3col).
+modifier_classes variables (e.g., l-grid--3-col).
