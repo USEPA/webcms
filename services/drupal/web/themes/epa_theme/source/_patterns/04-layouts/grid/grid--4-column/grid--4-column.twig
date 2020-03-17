@@ -1,10 +1,6 @@
-{% set classes = [
-  'l-grid--4-col',
-  modifier_classes ? modifier_classes,
-]|join(' ')|trim %}
-
 {% embed '@layouts/grid/grid.twig' with {
-  'modifier_classes': classes,
+  'modifier_classes': modifier_classes,
+  'num_of_cols': 4,
 } %}
   {% block content %}
     {% include '@layouts/_sample-content/sample-content.twig' with {
