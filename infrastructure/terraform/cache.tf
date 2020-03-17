@@ -3,23 +3,27 @@ resource "aws_elasticache_subnet_group" "default" {
   subnet_ids = aws_subnet.private.*.id
 }
 
-resource "aws_elasticache_cluster" "cache" {
-  cluster_id = "webcms-cache"
+resource "aws_elasticache_replication_group" "cache" {
+  replication_group_id          = "webcms-redis"
+  replication_group_description = "Replication group for the WebCMS cache"
+  automatic_failover_enabled    = true
 
-  engine               = "memcached"
-  engine_version       = "1.5.16"
-  parameter_group_name = "default.memcached1.5"
+  node_type = var.cache-instance-type
 
-  node_type       = var.cache-instance-type
-  num_cache_nodes = var.cache-instance-count
-  az_mode         = var.cache-instance-count > 1 ? "cross-az" : "single-az"
+  port                       = 6379
+  engine                     = "redis"
+  engine_version             = "5.0.6"
+  auto_minor_version_upgrade = true
+  parameter_group_name       = "default.redis5.0.cluster.on"
 
-  security_group_ids = [aws_security_group.cache.id]
   subnet_group_name  = aws_elasticache_subnet_group.default.name
-  port               = 11211
+  security_group_ids = [aws_security_group.cache.id]
 
-  tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Cache"
+  cluster_mode {
+    # Since we're using Redis as a cache backend instead of a data store, we don't
+    # worry too much about the number of cluster shards and instead use cluster mode
+    # for the availability guarantees.
+    num_node_groups         = 1
+    replicas_per_node_group = var.cache-replica-count
   }
 }

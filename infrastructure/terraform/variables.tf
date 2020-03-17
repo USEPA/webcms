@@ -128,8 +128,8 @@ variable "cache-instance-type" {
   type        = string
 }
 
-variable "cache-instance-count" {
-  description = "Number of ElastiCache nodes in this cluster"
+variable "cache-replica-count" {
+  description = "Number of ElastiCache read replicas in this cluster"
   type        = number
 }
 

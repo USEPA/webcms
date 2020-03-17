@@ -27,25 +27,12 @@ resource "aws_route53_record" "private_rds" {
   records = [aws_rds_cluster.db.endpoint]
 }
 
-# Alias the ElastiCache discovery endpoint as "memcache.cfg"
-# cf. https://docs.aws.amazon.com/AmazonElastiCache/latest/mem-ug/AutoDiscovery.html
+# Alias the ElastiCache cluster as the hostname "redis" for the same reasons as above
 resource "aws_route53_record" "private_cache" {
   zone_id = aws_route53_zone.private.id
-  name    = "memcache.cfg"
+  name    = "redis"
   type    = "CNAME"
   ttl     = 60
 
-  records = [aws_elasticache_cluster.cache.cluster_address]
-}
-
-# Alias each memcache node as "memcache-$N"
-resource "aws_route53_record" "private_cache_nodes" {
-  count = var.cache-instance-count
-
-  zone_id = aws_route53_zone.private.id
-  name    = "memcache-${count.index}"
-  type    = "CNAME"
-  ttl     = 60
-
-  records = [aws_elasticache_cluster.cache.cache_nodes[count.index].address]
+  records = [aws_elasticache_replication_group.cache.configuration_endpoint_address]
 }
