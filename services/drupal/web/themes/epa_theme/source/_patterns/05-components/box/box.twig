@@ -1,0 +1,24 @@
+{% set classes = [
+  'box',
+  modifier_classes ? modifier_classes,
+  image.src ? 'has-image-header',
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  {% if title.text %}
+    <{{ title.tag }} class="box__title">{{ title.text }}</{{ title.tag }}>
+  {% endif %}
+  {% if image.src %}
+    {% include '@base/images/box-header.twig' with {
+      'custom_classes': 'box__image',
+      'src': image.src,
+      'alt': image.alt,
+    } %}
+  {% endif %}
+  <div class="box__content">{{ content }}</div>
+  {% if footer.text %}
+    <div class="box__footer">
+      <a class="box__footer-link" href="{{ footer.url }}">{{ footer.text }}</a>
+    </div>
+  {% endif %}
+</div>

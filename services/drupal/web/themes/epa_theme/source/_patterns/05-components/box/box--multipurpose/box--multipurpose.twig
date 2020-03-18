@@ -1,0 +1,14 @@
+{% set classes = [
+  'box--multipurpose',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/box/box.twig' with {
+  'modifier_classes': classes,
+  'title_tag': title_tag,
+  'title': title,
+  'content': content,
+  'footer': footer,
+  'footer_link': footer_link,
+  'footer_link_url': footer_link_url,
+} %}
