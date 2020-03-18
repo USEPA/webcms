@@ -1,0 +1,13 @@
+{% embed '@layouts/grid/grid.twig' with {
+  'modifier_classes': modifier_classes,
+  'num_of_cols': 2,
+} %}
+  {% block content %}
+    {% include '@layouts/_sample-content/sample-content.twig' with {
+      'content': 'Grid Item 1',
+    } %}
+    {% include '@layouts/_sample-content/sample-content.twig' with {
+      'content': 'Grid Item 2',
+    } %}
+  {% endblock %}
+{% endembed %}

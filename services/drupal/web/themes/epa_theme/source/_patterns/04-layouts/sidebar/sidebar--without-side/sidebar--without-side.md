@@ -1,6 +1,6 @@
 ---
 el: .l-sidebar
-title: Sidebar Layout
+title: Sidebar Layout without Sidebar
 state: inreview
 ---
 
