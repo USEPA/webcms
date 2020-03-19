@@ -1,13 +1,15 @@
 // @file
 // Styles for a Box.
 
+$image-header-width: 300px;
+
 .box {
   margin-bottom: rem(units(3));
 
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.is-aligned-left,
     &.is-aligned-right {
-      max-width: 45%;
+      width: rem($image-header-width);
     }
 
     &.is-aligned-left {
@@ -22,7 +24,7 @@
   }
 
   &.has-image-header {
-    max-width: rem(300px);
+    max-width: rem($image-header-width);
   }
 }
 
