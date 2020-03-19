@@ -1,0 +1,9 @@
+{% set classes = [
+  'l-sidebar--reversed',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@layouts/sidebar/sidebar.twig' with {
+  'has_sidebar': has_sidebar,
+  'modifier_classes': classes,
+} %}
