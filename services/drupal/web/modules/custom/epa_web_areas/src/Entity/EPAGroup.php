@@ -5,6 +5,7 @@ namespace Drupal\epa_web_areas\Entity;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\group\Entity\Group;
 use Drupal\node\Entity\Node;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Extends entity for group.
@@ -37,11 +38,22 @@ class EPAGroup extends Group {
         && $bundle == 'web_area'
         && $this->get('field_homepage')->isEmpty()
     ) {
+      // Create body paragraph
+      $paragraph = Paragraph::create([
+        'type' => 'html',
+        'field_body' => [
+          'value'  =>  '',
+          'format' => 'filtered_html'
+        ],
+      ]);
+      $paragraph->save();
+
       // Create node.
       $node = Node::create([
         'type' => 'web_area',
         'title' => $this->label(),
       ]);
+      $node->field_paragraphs->appendItem($paragraph);
       $node->save();
 
       // Add node to group via entity reference and as group content.
