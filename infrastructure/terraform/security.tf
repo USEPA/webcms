@@ -17,7 +17,7 @@ resource "aws_security_group" "interface" {
 
     protocol    = "tcp"
     from_port   = 0
-    to_port     = 0
+    to_port     = 65535
     cidr_blocks = [aws_vpc.main.cidr_block]
   }
 
@@ -112,8 +112,44 @@ resource "aws_security_group" "bastion" {
 
     protocol        = "tcp"
     from_port       = 0
-    to_port         = 0
+    to_port         = 65535
     security_groups = [aws_security_group.interface.id]
+  }
+
+  # We have to allow HTTP access to the gateway from the utility server because we install
+  # the mariadb package.
+  # The reason for this is that Amazon Linux 2 yum repositories are configured to use
+  # the domain amazonlinux.us-east-1.amazonaws.com, which is a CNAME for the domain
+  # s3.dualstack.us-east-1.amazonaws.com.
+  # Over HTTP, this is perfectly acceptable. But over HTTPS, the TLS verification step
+  # fails because the amazonlinux subdomain isn't in the SNI domain list.
+  # Until we can find an alternate means of installing the package, we're stuck with
+  # allowing unencrypted access to S3 from this host.
+  egress {
+    description = "Allow access to the S3 gateway"
+
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
+  }
+
+  egress {
+    description = "Allow access to the S3 gateway"
+
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
+  }
+
+  ingress {
+    description = "SSH"
+
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
+    cidr_blocks = ["52.72.16.231/32"]
   }
 
   tags = {

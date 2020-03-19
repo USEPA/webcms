@@ -443,8 +443,8 @@ data "aws_iam_policy_document" "user_ssm_policy" {
 
     # Limit this policy only to WebCMS EC2 instances
     condition {
-      test     = "StringEquals"
-      variable = "aws:ResourceTag/Application"
+      test     = "StringLike"
+      variable = "ssm:resourceTag/Application"
       values   = ["WebCMS"]
     }
   }
@@ -479,14 +479,15 @@ data "aws_iam_policy_document" "user_ssm_policy" {
     actions = ["ssm:GetDocument"]
 
     resources = [
-      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell"
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/SSM-SessionManagerRunShell",
+      "arn:aws:ssm:*:*:document/AWS-StartSSHSession"
     ]
 
-    condition {
-      test     = "BoolIfExists"
-      variable = "ssm:SessionDocumentAccessCheck"
-      values   = ["true"]
-    }
+    # condition {
+    #   test     = "BoolIfExists"
+    #   variable = "ssm:SessionDocumentAccessCheck"
+    #   values   = ["true"]
+    # }
   }
 
   statement {
