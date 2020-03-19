@@ -4,9 +4,29 @@
   image.src ? 'has-image-header',
 ]|join(' ')|trim %}
 
+{% set title_icon %}
+  {% if title.icon %}
+    {% include '@components/icon/icon.twig' with {
+      'is_hidden': true,
+      'modifier_classes': 'is-spaced-after',
+      'icon_name': title.icon,
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set footer_icon %}
+  {% if footer.icon %}
+    {% include '@components/icon/icon.twig' with {
+      'is_hidden': true,
+      'modifier_classes': 'is-spaced-after',
+      'icon_name': footer.icon,
+    } %}
+  {% endif %}
+{% endset %}
+
 <div class="{{ classes }}">
   {% if title.text %}
-    <{{ title.tag }} class="box__title">{{ title.text }}</{{ title.tag }}>
+    <{{ title.tag }} class="box__title">{{ title_icon }}{{ title.text }}</{{ title.tag }}>
   {% endif %}
   {% if image.src %}
     {% include '@base/images/box-header.twig' with {
@@ -18,7 +38,7 @@
   <div class="box__content">{{ content }}</div>
   {% if footer.text %}
     <div class="box__footer">
-      <a class="box__footer-link" href="{{ footer.url }}">{{ footer.text }}</a>
+      <a class="box__footer-link" href="{{ footer.url }}">{{ footer_icon }}{{ footer.text }}</a>
     </div>
   {% endif %}
 </div>
