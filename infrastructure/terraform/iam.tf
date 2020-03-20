@@ -228,7 +228,7 @@ resource "aws_iam_role" "drupal_container_role" {
   }
 }
 
-data "aws_iam_policy_document" "drupal_container_policy" {
+data "aws_iam_policy_document" "uploads_access" {
   version = "2012-10-17"
 
   statement {
@@ -257,10 +257,18 @@ data "aws_iam_policy_document" "drupal_container_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "drupal_container_policy" {
-  name   = "WebCMSDrupalContainerPolicy"
-  role   = aws_iam_role.drupal_container_role.name
-  policy = data.aws_iam_policy_document.drupal_container_policy.json
+resource "aws_iam_policy" "uploads_access" {
+  name        = "WebCMSUploadsAccess"
+  description = "Grants read/write access to the WebCMS' uploads bucket"
+
+  policy = data.aws_iam_policy_document.uploads_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "drupal_uploads_access" {
+  role       = aws_iam_role.drupal_container_role.name
+  policy_arn = aws_iam_policy.uploads_access.arn
+}
+
 }
 
 data "aws_iam_policy_document" "task_parameter_access" {
