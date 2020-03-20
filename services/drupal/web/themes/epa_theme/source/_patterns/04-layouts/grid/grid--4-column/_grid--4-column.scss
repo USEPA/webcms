@@ -1,0 +1,18 @@
+// @file
+// Styles for a 4 Column Grid Layout.
+
+.l-grid--4-col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(500px 1000px) {
+    > * {
+      @include grid-col(6);
+    }
+  }
+
+  @include breakpoint(1000px) {
+    > * {
+      @include grid-col(3);
+    }
+  }
+}

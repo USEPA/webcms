@@ -1,6 +1,6 @@
 ---
-el: .l-sidebar
-title: Sidebar Layout
+el: .l-sidebar--reversed
+title: Reversed Sidebar Layout
 state: inreview
 ---
 
