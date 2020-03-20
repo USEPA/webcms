@@ -279,16 +279,20 @@ data "aws_iam_policy_document" "task_parameter_access" {
     effect  = "Allow"
     actions = ["ssm:GetParameters"]
 
+    # This policy does not - and should not - grant access to the master DB username/password
+    # parameter. Drupal doesn't need it.
     resources = [
       aws_ssm_parameter.db_app_username.arn,
       aws_ssm_parameter.db_app_password.arn,
       aws_ssm_parameter.db_app_database.arn,
+      aws_ssm_parameter.hash_salt.arn,
     ]
   }
 }
 
 resource "aws_iam_policy" "task_parameter_access" {
-  name = "WebCMSTaskParameterAccess"
+  name        = "WebCMSTaskParameterAccess"
+  description = "Grants read access to the WebCMS's parameters"
 
   policy = data.aws_iam_policy_document.task_parameter_access.json
 }

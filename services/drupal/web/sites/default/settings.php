@@ -280,7 +280,7 @@ $config_directories = [];
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = getenv('DRUPAL_HASH_SALT');
+$settings['hash_salt'] = getenv('WEBCMS_HASH_SALT');
 
 /**
  * Deployment identifier.

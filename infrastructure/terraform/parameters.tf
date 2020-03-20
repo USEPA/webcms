@@ -75,3 +75,20 @@ resource "aws_ssm_parameter" "db_app_database" {
     Application = "WebCMS"
   }
 }
+
+resource "aws_ssm_parameter" "hash_salt" {
+  name = "/webcms/drupal/hash_salt"
+  description = "Drupal hash salt"
+  value = "changeme"
+  type = "SecureString"
+
+  tags = {
+    Application = "WebCMS"
+  }
+
+  # Ignore changes to this sensitive parameter: as with other sensitive values, this is
+  # only here because we need the ARN.
+  lifecycle {
+    ignore_changes = [value]
+  }
+}

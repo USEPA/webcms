@@ -9,6 +9,7 @@ locals {
   drupal-environment = [
     { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
     { name = "WEBCMS_S3_REGION", value = var.aws-region },
+    { name = "WEBCMS_SITE_URL", value = var.site-hostname }
   ]
 
   # Parameter store bindings for Drupal containers
@@ -16,6 +17,7 @@ locals {
     { name = "WEBCMS_DB_USER", valueFrom = aws_ssm_parameter.db_app_username.arn },
     { name = "WEBCMS_DB_PASS", valueFrom = aws_ssm_parameter.db_app_password.arn },
     { name = "WEBCMS_DB_NAME", valueFrom = aws_ssm_parameter.db_app_database.arn },
+    { name = "WEBCMS_HASH_SALT", valueFrom = aws_ssm_parameter.hash_salt.arn },
   ]
 
   # Security groups used by Drupal containers
