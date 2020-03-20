@@ -4,13 +4,17 @@
     <div class="l-header__navbar">
       <div class="l-header__branding">
         {% block logo %}
-          <div style="background:#333;color:#fff;padding:1em;margin:0;">Logo</div>
+          {% include '@layouts/_sample-content/sample-content.twig' with {
+            'content': 'Logo',
+          } %}
         {% endblock %}
         <button class="usa-menu-btn usa-button l-header__menu-button">{{ 'Menu'|t }}</button>
       </div>
       <div class="l-header__search">
         {% block search %}
-          <div style="background:#333;color:#fff;padding:1em;margin:0;">Search</div>
+          {% include '@layouts/_sample-content/sample-content.twig' with {
+            'content': 'Search',
+          } %}
         {% endblock %}
       </div>
     </div>
@@ -18,7 +22,9 @@
   </div>
   <div class="l-header__nav">
     {% block navigation %}
-      <div style="background:#333;color:#fff;padding:1em;margin:0;">Navigation</div>
+      {% include '@layouts/_sample-content/sample-content.twig' with {
+        'content': 'Navigation',
+      } %}
     {% endblock %}
   </div>
 </header>

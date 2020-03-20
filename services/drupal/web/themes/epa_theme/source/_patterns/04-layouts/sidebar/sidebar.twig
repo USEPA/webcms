@@ -1,50 +1,24 @@
-{% set additional_attributes = {
-  'class': [
-    'l-sidebar',
-    has_multiple_sidebar ? ' l-sidebar--multi-2',
-    modifier_classes
-  ],
-} %}
+{% set classes = [
+  'l-sidebar',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
 
-{% set additional_header_region_attributes = {
-  'class': ['l-sidebar__full'],
-} %}
+<div class="{{ classes }}">
+  <div class="l-sidebar__main">
+    {% block main_content %}
+      {% include '@layouts/_sample-content/sample-content.twig' with {
+        'content': 'Main Content',
+      } %}
+    {% endblock %}
+  </div>
 
-{% set additional_sidebar_first_region_attributes = {
-  'class': ['l-sidebar__sidebar'],
-} %}
-
-{% set additional_main_region_attributes = {
-  'class': ['l-sidebar__main'],
-} %}
-
-{% set additional_sidebar_second_region_attributes = {
-  'class': ['l-sidebar__sidebar'],
-} %}
-
-<div {{ add_attributes(additional_attributes) }}>
-
-  {% if header_content %}
-    <div {{ add_attributes(additional_header_region_attributes, 'region_attributes.header') }}>
-      {{ header_content }}
+  {% if has_sidebar %}
+    <div class="l-sidebar__sidebar">
+      {% block sidebar %}
+        {% include '@layouts/_sample-content/sample-content.twig' with {
+          'content': 'Sidebar Content',
+        } %}
+      {% endblock %}
     </div>
-  {% endif %}
-
-   {% if sidebar_first_content %}
-    <aside {{ add_attributes(additional_sidebar_first_region_attributes, 'region_attributes.sidebar_first') }}>
-      {{ sidebar_first_content }}
-    </aside>
-  {% endif %}
-
-  {% if main_content %}
-    <div {{ add_attributes(additional_main_region_attributes, 'region_attributes.main') }}>
-      {{ main_content }}
-    </div>
-  {% endif %}
-
-  {% if sidebar_second_content %}
-    <aside {{ add_attributes(additional_sidebar_second_region_attributes, 'region_attributes.sidebar_second') }}>
-      {{ sidebar_second_content }}
-    </aside>
   {% endif %}
 </div>
