@@ -36,3 +36,13 @@ resource "aws_route53_record" "private_cache" {
 
   records = [aws_elasticache_replication_group.cache.configuration_endpoint_address]
 }
+
+# Alias Elasticsearch as "elasticsearch"
+resource "aws_route53_record" "private_search" {
+  zone_id = aws_route53_zone.private.id
+  name    = "elasticsearch"
+  type    = "CNAME"
+  ttl     = 60
+
+  records = [aws_elasticsearch_domain.es.endpoint]
+}
