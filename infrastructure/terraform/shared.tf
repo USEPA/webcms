@@ -25,6 +25,7 @@ locals {
     aws_security_group.drupal_task.id,
     aws_security_group.database_access.id,
     aws_security_group.cache_access.id,
+    aws_security_group.search_access.id,
   ]
 
   # Database name for the WebCMS

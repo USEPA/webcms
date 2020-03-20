@@ -120,6 +120,39 @@ variable "db-max-capacity" {
   type        = number
 }
 
+# Search variables
+# cf. search.tf
+
+variable "search-instance-type" {
+  description = "Type of instance to deploy in the Elasticsearch cluster"
+  type        = string
+}
+
+variable "search-instance-count" {
+  description = "Number of instances to deploy in the Elasticsearch cluster"
+  type        = number
+}
+
+variable "search-instance-storage" {
+  description = "Capacity (in GB) to allocate to each search instance"
+  type        = number
+}
+
+variable "search-dedicated-node-type" {
+  description = "Type of dedicated master nodes to deploy in the Elasticseach cluster"
+  type        = string
+}
+
+variable "search-dedicated-node-count" {
+  description = "Number of dedicatd master nodes to deploy in the Elasticsearch cluster. Set to 0 to disable dedicated nodes."
+  type        = number
+}
+
+variable "search-availability-zones" {
+  description = "Number of availability zones to use for the search cluster. Valid values are 2 or 3"
+  type        = number
+}
+
 # Cache variables
 # cf. cache.tf
 

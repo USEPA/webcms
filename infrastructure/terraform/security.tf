@@ -317,3 +317,49 @@ resource "aws_security_group_rule" "cache_access_ingress" {
 
   source_security_group_id = aws_security_group.cache_access.id
 }
+
+resource "aws_security_group" "search" {
+  name        = "webcms-search-sg"
+  description = "Security group for search servers"
+
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Elasticsearch"
+  }
+}
+
+resource "aws_security_group" "search_access" {
+  name        = "webcms-search-access-sg"
+  description = "Security group for access to search servers"
+
+  vpc_id = aws_vpc.main.id
+
+  egress {
+    description = "Allow access to Elasticsearch"
+
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    security_groups = [aws_security_group.search.id]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Elasticsearch Access"
+  }
+}
+
+resource "aws_security_group_rule" "search_access_ingress" {
+  description = "Allows ingress from the search acess group"
+
+  security_group_id = aws_security_group.search.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.search_access.id
+}

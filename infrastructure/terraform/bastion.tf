@@ -32,7 +32,8 @@ resource "aws_instance" "utility" {
 
     # Grant access from the utility server for administrative tasks
     aws_security_group.database_access.id,
-    aws_security_group.cache.id
+    aws_security_group.cache_access.id,
+    aws_security_group.search_access.id
   ]
 
   tags = {

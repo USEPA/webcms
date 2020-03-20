@@ -269,6 +269,41 @@ resource "aws_iam_role_policy_attachment" "drupal_uploads_access" {
   policy_arn = aws_iam_policy.uploads_access.arn
 }
 
+# This is a policy for read/write access to the cluster's data, but not for
+# cluster management.
+data "aws_iam_policy_document" "es_access" {
+  version = "2012-10-17"
+
+  statement {
+    sid    = "allowSearchAccess"
+    effect = "Allow"
+
+    actions = [
+      "es:ESHttpDelete",
+      "es:ESHttpGet",
+      "es:ESHttpHead",
+      "es:ESHttpPost",
+      "es:ESHttpPut",
+      "es:ESHttpPatch",
+    ]
+
+    # Only allow access to the configured domain
+    resources = ["${aws_elasticsearch_domain.es.arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "es_access" {
+  name        = "WebCMSElasticsearchAccess"
+  description = "Grants read/write access to Elasticsearch"
+
+  policy = data.aws_iam_policy_document.es_access.json
+}
+
+
+# Grant read/write access to the Elasticsearch cluster
+resource "aws_iam_role_policy_attachment" "drupal_es_access" {
+  role       = aws_iam_role.drupal_container_role.name
+  policy_arn = aws_iam_policy.es_access.arn
 }
 
 data "aws_iam_policy_document" "task_parameter_access" {
