@@ -6,7 +6,7 @@ use Drupal\node\Plugin\migrate\source\d7\Node;
 use Drupal\migrate\Row;
 
 /**
- * EPA Drupal 7 node source from database.
+ * Load nodes that will be migrated into fields.
  *
  * @MigrateSource(
  *   id = "epa_node",

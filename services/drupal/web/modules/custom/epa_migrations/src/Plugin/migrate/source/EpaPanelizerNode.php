@@ -5,7 +5,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\source;
 use Drupal\node\Plugin\migrate\source\d7\Node;
 
 /**
- * Load the latest revision of Nodes that have Panelizer displays in Drupal 7.
+ * Load Nodes that will be migrated into Layout Builder.
  *
  * @MigrateSource(
  *   id = "epa_panelizer_node",
