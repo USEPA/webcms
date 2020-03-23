@@ -1,0 +1,41 @@
+{% embed '@layouts/sidebar/sidebar.twig' with {
+  'has_sidebar': has_sidebar,
+  'modifier_classes': modifier_classes,
+} %}
+  {% block main_content %}
+    {{ main_top }}
+
+    {% embed '@layouts/grid/grid.twig' with {
+      'num_of_cols': num_of_cols_a,
+    } %}
+      {% block content %}
+        {% if a1 %}<div>{{ a1 }}</div>{% endif %}
+        {% if a2 %}<div>{{ a2 }}</div>{% endif %}
+      {% endblock %}
+    {% endembed %}
+
+    {% embed '@layouts/grid/grid.twig' with {
+      'num_of_cols': num_of_cols_b,
+    } %}
+      {% block content %}
+        {% if b1 %}<div>{{ b1 }}</div>{% endif %}
+        {% if b2 %}<div>{{ b2 }}</div>{% endif %}
+      {% endblock %}
+    {% endembed %}
+
+    {% embed '@layouts/grid/grid.twig' with {
+      'num_of_cols': num_of_cols_c,
+    } %}
+      {% block content %}
+        {% if c1 %}<div>{{ c1 }}</div>{% endif %}
+        {% if c2 %}<div>{{ c2 }}</div>{% endif %}
+      {% endblock %}
+    {% endembed %}
+
+    {{ main_bottom }}
+  {% endblock %}
+
+  {% block sidebar %}
+    {{ sidebar }}
+  {% endblock %}
+{% endembed %}

@@ -1,0 +1,13 @@
+{% set page_content %}
+  {# include page template #}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'title': page_title,
+    'body': content,
+    'has_sidebar': has_sidebar,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}

@@ -1,0 +1,24 @@
+// @file
+// Styles for a 6 Column Grid Layout.
+
+.l-grid--6-col {
+  @include grid-gap($grid-gutter);
+
+  @include breakpoint(333px 500px) {
+    > * {
+      @include grid-col(6);
+    }
+  }
+
+  @include breakpoint(500px 1000px) {
+    > * {
+      @include grid-col(4);
+    }
+  }
+
+  @include breakpoint(1000px) {
+    > * {
+      @include grid-col(2);
+    }
+  }
+}
