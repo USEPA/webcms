@@ -69,6 +69,7 @@ class EpaNode extends Node {
 
     // If this node does not use panelizer or it is using the 'onecol_page' or
     // 'twocol_page' layout, then we will migrate it.
+    $row->setSourceProperty('layout', $layout);
     parent::prepareRow($row);
   }
 
