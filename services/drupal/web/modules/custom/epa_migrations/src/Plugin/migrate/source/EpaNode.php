@@ -25,9 +25,11 @@ class EpaNode extends Node {
     }
 
     // We're going to skip nodes that use panelizer and have a layout other than
-    // onecol_page or twocol_page. Those nodes will be migrated using the
-    // epa_panelizer_node source plugin.
-
+    // onecol_page or twocol_page. For nodes that use twocol_page and have a
+    // pane in the sidebar panel, we'll add 'did' source property so we can
+    // process the sidebar content into a paragraph referenced from
+    // field_sidebar.
+    //
     // Get the display ID for the current revision.
     $did = $this->select('panelizer_entity', 'pe')
       ->fields('pe', ['did'])
@@ -45,10 +47,11 @@ class EpaNode extends Node {
 
       if (!in_array($layout, ['onecol_page', 'twocol_page'])) {
         // Skip this row if this node uses a panelizer layout other than
-        // onecol_page or twocol_page.
+        // onecol_page or twocol_page. We'll migrate these nodes with the
+        // epa_panelizer source plugin.
         return FALSE;
       }
-      else {
+      elseif ($layout == 'twocol_page') {
         // Check if this row has content in the Sidebar pane. If so, add the
         // Display ID so we can process that content during the migration.
         $sidebar_panes = $this->select('panels_pane', 'pp')
