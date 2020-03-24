@@ -1,3 +1,12 @@
+# Create a custom Drush container repo
+resource "aws_ecr_repository" "drush" {
+  name = "webcms-drush"
+
+  tags = {
+    Application = "WebCMS"
+  }
+}
+
 data "aws_iam_policy_document" "events_assume_role_policy" {
   version = "2012-10-17"
 
@@ -24,10 +33,10 @@ resource "aws_iam_role" "events" {
   }
 }
 
-# This task definition depends on a built and published Drupal image, so we have to
+# This task definition depends on a built and published Drush image, so we have to
 # conditionally create it the same way we did for drupal_task.
 resource "aws_ecs_task_definition" "drush_task" {
-  count = var.image-tag-drupal != null ? 1 : 0
+  count = var.image-tag-drush != null ? 1 : 0
 
   family             = "webcms-drush"
   network_mode       = "awsvpc"
@@ -38,7 +47,7 @@ resource "aws_ecs_task_definition" "drush_task" {
   container_definitions = jsonencode([
     {
       name  = "drush"
-      image = "${aws_ecr_repository.drupal.repository_url}:${var.image-tag-drupal}"
+      image = "${aws_ecr_repository.drush.repository_url}:${var.image-tag-drush}"
 
       cpu    = 1024
       memory = 1024
@@ -49,6 +58,8 @@ resource "aws_ecs_task_definition" "drush_task" {
       # script that runs "drush updb".
       entryPoint = []
       command    = []
+
+      workingDirectory = "/var/www/html"
 
       # Use shared bindings so that Drush tasks can connect the same way Drupal does
       environment = local.drupal-environment
@@ -162,7 +173,7 @@ resource "aws_cloudwatch_event_target" "cron" {
         name = "drush"
         command = [
           "/var/www/html/vendor/bin/drush",
-          "--uri", var.site-hostname,
+          "--uri", "https://${var.site-hostname}",
           "cron"
         ]
       }
