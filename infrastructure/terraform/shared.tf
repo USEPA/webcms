@@ -9,7 +9,12 @@ locals {
   drupal-environment = [
     { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
     { name = "WEBCMS_S3_REGION", value = var.aws-region },
-    { name = "WEBCMS_SITE_URL", value = var.site-hostname }
+    { name = "WEBCMS_SITE_URL", value = "https://${var.site-hostname}" },
+    { name = "WEBCMS_ENV_STATE", value = var.site-env-state },
+    { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
+
+    # Injected host names
+    { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443/" },
   ]
 
   # Parameter store bindings for Drupal containers
@@ -17,7 +22,13 @@ locals {
     { name = "WEBCMS_DB_USER", valueFrom = aws_ssm_parameter.db_app_username.arn },
     { name = "WEBCMS_DB_PASS", valueFrom = aws_ssm_parameter.db_app_password.arn },
     { name = "WEBCMS_DB_NAME", valueFrom = aws_ssm_parameter.db_app_database.arn },
+
     { name = "WEBCMS_HASH_SALT", valueFrom = aws_ssm_parameter.hash_salt.arn },
+
+    { name = "WEBCMS_MAIL_USER", valueFrom = aws_ssm_parameter.mail_user.arn },
+    { name = "WEBCMS_MAIL_PASS", valueFrom = aws_ssm_parameter.mail_pass.arn },
+    { name = "WEBCMS_MAIL_FROM", valueFrom = aws_ssm_parameter.mail_from.arn },
+    { name = "WEBCMS_MAIL_HOST", valueFrom = aws_ssm_parameter.mail_host.arn },
   ]
 
   # Security groups used by Drupal containers

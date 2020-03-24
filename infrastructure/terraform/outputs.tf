@@ -19,3 +19,14 @@ output "alb-zone-id" {
 output "alb-domain" {
   value = aws_lb.frontend.dns_name
 }
+
+# Network configuration for Drush tasks, when using the ECS RunTask API
+output "drush-task-config" {
+  value = jsonencode({
+    awsvpcConfiguration = {
+      subnets = aws_subnet.private.*.id
+      securityGroups = local.drupal-security-groups
+      assignPublicIp = "DISABLED"
+    }
+  })
+}

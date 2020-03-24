@@ -13,6 +13,16 @@ variable "site-hostname" {
   type        = string
 }
 
+variable "site-env-state" {
+  description = "Indicates the bootstrap state of Drupal. Should be either the string 'run' or 'build'"
+  type        = string
+}
+
+variable "site-env-name" {
+  description = "Environment name of this deployment. Should be 'prod' in production."
+  type        = string
+}
+
 # VPC
 # cf. vpc.tf
 
@@ -166,6 +176,24 @@ variable "cache-replica-count" {
   type        = number
 }
 
+# Mail
+# cf. parameters.tf
+
+variable "email-auth-user" {
+  description = "Username for SMTP authentication"
+  type        = string
+}
+
+variable "email-from" {
+  description = "From address for site mail"
+  type        = string
+}
+
+variable "email-host" {
+  description = "SMTP hostname to connect to"
+  type        = string
+}
+
 # Image tag variables
 # cf. cluster.tf
 
@@ -181,6 +209,12 @@ variable "image-tag-nginx" {
 
 variable "image-tag-drupal" {
   description = "Tag of the Drupal image to deploy"
+  type        = string
+  default     = null
+}
+
+variable "image-tag-drush" {
+  description = "Tag of the Drush image to deploy"
   type        = string
   default     = null
 }

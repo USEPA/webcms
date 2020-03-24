@@ -160,6 +160,13 @@ resource "aws_ecs_task_definition" "drupal_task" {
       cpu    = 256, # = 0.25 vCPU
       memory = 256,
 
+      environment = [
+        # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
+        # the region and bucket name because in us-east-1, the domain isn't easy to
+        # construct via "$bucket.s3-$region.amazonaws.com".
+        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name }
+      ]
+
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true,
 

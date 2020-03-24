@@ -77,10 +77,10 @@ resource "aws_ssm_parameter" "db_app_database" {
 }
 
 resource "aws_ssm_parameter" "hash_salt" {
-  name = "/webcms/drupal/hash_salt"
+  name        = "/webcms/drupal/hash_salt"
   description = "Drupal hash salt"
-  value = "changeme"
-  type = "SecureString"
+  value       = "changeme"
+  type        = "SecureString"
 
   tags = {
     Application = "WebCMS"
@@ -90,5 +90,56 @@ resource "aws_ssm_parameter" "hash_salt" {
   # only here because we need the ARN.
   lifecycle {
     ignore_changes = [value]
+  }
+}
+
+# Mail-related parameters
+
+resource "aws_ssm_parameter" "mail_user" {
+  name        = "/webcms/mail/username"
+  description = "Username for SMTP auth"
+  value       = var.email-auth-user
+  type        = "String"
+
+  tags = {
+    Application = "WebCMS"
+  }
+}
+
+resource "aws_ssm_parameter" "mail_pass" {
+  name        = "/webcms/mail/password"
+  description = "Password for SMTP auth"
+  value       = "changeme"
+  type        = "SecureString"
+
+  tags = {
+    Application = "WebCMS"
+  }
+
+  # Another sensitive parameter
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "mail_from" {
+  name        = "/webcms/mail/from"
+  description = "From address for site email"
+  value       = var.email-from
+  type        = "String"
+
+  tags = {
+    Application = "WebCMS"
+  }
+}
+
+resource "aws_ssm_parameter" "mail_host" {
+  name        = "/webcms/mail/host"
+  description = "SMTP hostname to connect to"
+  value       = var.email-host
+  type        = "String"
+
+  tags = {
+    Application = "WebCMS"
   }
 }

@@ -324,6 +324,10 @@ data "aws_iam_policy_document" "task_parameter_access" {
       aws_ssm_parameter.db_app_password.arn,
       aws_ssm_parameter.db_app_database.arn,
       aws_ssm_parameter.hash_salt.arn,
+      aws_ssm_parameter.mail_user.arn,
+      aws_ssm_parameter.mail_pass.arn,
+      aws_ssm_parameter.mail_from.arn,
+      aws_ssm_parameter.mail_host.arn,
     ]
   }
 }
@@ -533,6 +537,7 @@ data "aws_iam_policy_document" "user_ssm_policy" {
       "arn:aws:ssm:*:*:document/AWS-StartSSHSession"
     ]
 
+    # TODO: Validate that this won't break user access
     # condition {
     #   test     = "BoolIfExists"
     #   variable = "ssm:SessionDocumentAccessCheck"
