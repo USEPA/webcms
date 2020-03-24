@@ -39,4 +39,10 @@ resource "aws_rds_cluster" "db" {
     Application = "WebCMS"
     Name        = "WebCMS DB"
   }
+
+  # Ignore changes to the master password since it's stored in the Terraform state.
+  # Instead, the value in Parameter Store should be treated as the sole source of truth.
+  lifecycle {
+    ignore_changes = [master_password]
+  }
 }
