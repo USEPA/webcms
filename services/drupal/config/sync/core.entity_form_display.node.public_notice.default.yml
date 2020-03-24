@@ -10,7 +10,6 @@ dependencies:
     - field.field.node.public_notice.field_computed_comments_due_date
     - field.field.node.public_notice.field_description
     - field.field.node.public_notice.field_docket_numbers
-    - field.field.node.public_notice.field_documents
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
     - field.field.node.public_notice.field_expiration_date
     - field.field.node.public_notice.field_extension_date
@@ -29,6 +28,7 @@ dependencies:
     - field.field.node.public_notice.field_programs_or_statutes
     - field.field.node.public_notice.field_publication_date
     - field.field.node.public_notice.field_publish_date
+    - field.field.node.public_notice.field_related_documents
     - field.field.node.public_notice.field_review_deadline
     - field.field.node.public_notice.field_scheduled_transition
     - field.field.node.public_notice.field_type
@@ -39,7 +39,7 @@ dependencies:
     - content_moderation
     - datetime
     - field_group
-    - file
+    - media_library
     - paragraphs
     - shs
     - text
@@ -200,13 +200,6 @@ content:
         collapse_edit_all: collapse_edit_all
     third_party_settings: {  }
     region: content
-  field_documents:
-    weight: 11
-    settings:
-      progress_indicator: throbber
-    third_party_settings: {  }
-    type: file_generic
-    region: content
   field_env_laws_regs_and_treaties:
     weight: 15
     settings:
@@ -351,6 +344,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_related_documents:
+    type: media_library_widget
+    weight: 50
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
     region: content
   field_type:
     weight: 12
