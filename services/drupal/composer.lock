@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c9865673f4dbe9aab0510a145caafc58",
+    "content-hash": "296672bf278bd3a3d1a3a9b279ad178e",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3613,22 +3613,22 @@
         },
         {
             "name": "drupal/elasticsearch_connector",
-            "version": "5.0.0-alpha3",
+            "version": "7.0.0-alpha2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/elasticsearch_connector.git",
-                "reference": "8.x-5.0-alpha3"
+                "reference": "8.x-7.0-alpha2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/elasticsearch_connector-8.x-5.0-alpha3.zip",
-                "reference": "8.x-5.0-alpha3",
-                "shasum": "51e4faaa3950fdd1fdb16f703aa89dd252ef7453"
+                "url": "https://ftp.drupal.org/files/projects/elasticsearch_connector-8.x-7.0-alpha2.zip",
+                "reference": "8.x-7.0-alpha2",
+                "shasum": "e0f4becdd2b495c310028da5c9d2451deba16219"
             },
             "require": {
                 "drupal/core": "~8.0",
                 "makinacorpus/php-lucene": "^1.0.2",
-                "nodespark/des-connector": "5.x-dev"
+                "nodespark/des-connector": "7.x-dev"
             },
             "require-dev": {
                 "behat/mink-selenium2-driver": "^1.3",
@@ -3642,11 +3642,11 @@
             "type": "drupal-module",
             "extra": {
                 "branch-alias": {
-                    "dev-5.x": "5.x-dev"
+                    "dev-7.x": "7.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-5.0-alpha3",
-                    "datestamp": "1538850780",
+                    "version": "8.x-7.0-alpha2",
+                    "datestamp": "1565156585",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Project has not opted into security advisory coverage!"
@@ -3665,20 +3665,12 @@
                     "role": "Creator and Maintainer"
                 },
                 {
-                    "name": "Prateek Sachan",
-                    "homepage": "http://prateek.sachan.co",
-                    "email": "ps@prateeksachan.com",
-                    "role": "Maintainer"
-                },
-                {
-                    "name": "Lachezar Valchev",
-                    "homepage": "https://drupal.org/u/lachezar.valchev",
-                    "email": "lachezar.valchev@gmail.com",
-                    "role": "Maintainer"
-                },
-                {
                     "name": "See other contributors",
                     "homepage": "https://www.drupal.org/node/2159059/committers"
+                },
+                {
+                    "name": "ygerasimov",
+                    "homepage": "https://www.drupal.org/user/257311"
                 }
             ],
             "description": "Elasticsearch Connector module for Drupal.",
@@ -5103,7 +5095,8 @@
                     }
                 },
                 "patches_applied": {
-                    "Allow using 'localhost' for CNAME": "https://www.drupal.org/files/issues/2019-08-19/s3fs-localhost-3075876-2-D8.patch"
+                    "Allow using 'localhost' for CNAME": "https://www.drupal.org/files/issues/2019-08-19/s3fs-localhost-3075876-2-D8.patch",
+                    "Module should initialize default credentials provider instead of instance profile when use_instance_profile is TRUE": "https://www.drupal.org/files/issues/2020-03-24/3122091-2-s3fs-default-provider.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -6166,31 +6159,33 @@
         },
         {
             "name": "elasticsearch/elasticsearch",
-            "version": "v5.5.0",
+            "version": "v7.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/elastic/elasticsearch-php.git",
-                "reference": "48b8a90e2b97b4d69ce42851c1b9e59f8054661a"
+                "reference": "d4f24bc43c2af60aece3df20eb689d322f9c8acf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/48b8a90e2b97b4d69ce42851c1b9e59f8054661a",
-                "reference": "48b8a90e2b97b4d69ce42851c1b9e59f8054661a",
+                "url": "https://api.github.com/repos/elastic/elasticsearch-php/zipball/d4f24bc43c2af60aece3df20eb689d322f9c8acf",
+                "reference": "d4f24bc43c2af60aece3df20eb689d322f9c8acf",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/ringphp": "~1.0",
-                "php": "^5.6|^7.0",
+                "ext-json": ">=1.3.7",
+                "ezimuel/ringphp": "^1.1.2",
+                "php": "^7.1",
                 "psr/log": "~1.0"
             },
             "require-dev": {
-                "cpliakas/git-wrapper": "~1.0",
-                "doctrine/inflector": "^1.1",
-                "mockery/mockery": "0.9.4",
-                "phpunit/phpunit": "^4.7|^5.4",
-                "sami/sami": "~3.2",
-                "symfony/finder": "^2.8",
-                "symfony/yaml": "^2.8"
+                "cpliakas/git-wrapper": "~2.0",
+                "doctrine/inflector": "^1.3",
+                "mockery/mockery": "^1.2",
+                "phpstan/phpstan": "^0.12",
+                "phpunit/phpunit": "^7.5",
+                "squizlabs/php_codesniffer": "^3.4",
+                "symfony/finder": "~4.0",
+                "symfony/yaml": "~4.0"
             },
             "suggest": {
                 "ext-curl": "*",
@@ -6198,6 +6193,9 @@
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "src/autoload.php"
+                ],
                 "psr-4": {
                     "Elasticsearch\\": "src/Elasticsearch/"
                 }
@@ -6209,6 +6207,9 @@
             "authors": [
                 {
                     "name": "Zachary Tong"
+                },
+                {
+                    "name": "Enrico Zimuel"
                 }
             ],
             "description": "PHP Client for Elasticsearch",
@@ -6217,7 +6218,108 @@
                 "elasticsearch",
                 "search"
             ],
-            "time": "2019-07-18T15:11:30+00:00"
+            "time": "2020-02-15T00:09:00+00:00"
+        },
+        {
+            "name": "ezimuel/guzzlestreams",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezimuel/guzzlestreams.git",
+                "reference": "abe3791d231167f14eb80d413420d1eab91163a8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezimuel/guzzlestreams/zipball/abe3791d231167f14eb80d413420d1eab91163a8",
+                "reference": "abe3791d231167f14eb80d413420d1eab91163a8",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Stream\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Fork of guzzle/streams (abandoned) to be used with elasticsearch-php",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "Guzzle",
+                "stream"
+            ],
+            "time": "2020-02-14T23:11:50+00:00"
+        },
+        {
+            "name": "ezimuel/ringphp",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezimuel/ringphp.git",
+                "reference": "0b78f89d8e0bb9e380046c31adfa40347e9f663b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezimuel/ringphp/zipball/0b78f89d8e0bb9e380046c31adfa40347e9f663b",
+                "reference": "0b78f89d8e0bb9e380046c31adfa40347e9f663b",
+                "shasum": ""
+            },
+            "require": {
+                "ezimuel/guzzlestreams": "^3.0.1",
+                "php": ">=5.4.0",
+                "react/promise": "~2.0"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "phpunit/phpunit": "~4.0"
+            },
+            "suggest": {
+                "ext-curl": "Guzzle will use specific adapters if cURL is present"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Ring\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Fork of guzzle/RingPHP (abandoned) to be used with elasticsearch-php",
+            "time": "2020-02-14T23:51:21+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -6549,109 +6651,6 @@
             "time": "2019-07-01T23:21:34+00:00"
         },
         {
-            "name": "guzzlehttp/ringphp",
-            "version": "1.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/RingPHP.git",
-                "reference": "5e2a174052995663dd68e6b5ad838afd47dd615b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/5e2a174052995663dd68e6b5ad838afd47dd615b",
-                "reference": "5e2a174052995663dd68e6b5ad838afd47dd615b",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/streams": "~3.0",
-                "php": ">=5.4.0",
-                "react/promise": "~2.0"
-            },
-            "require-dev": {
-                "ext-curl": "*",
-                "phpunit/phpunit": "~4.0"
-            },
-            "suggest": {
-                "ext-curl": "Guzzle will use specific adapters if cURL is present"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Ring\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
-            "abandoned": true,
-            "time": "2018-07-31T13:22:33+00:00"
-        },
-        {
-            "name": "guzzlehttp/streams",
-            "version": "3.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/guzzle/streams.git",
-                "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/streams/zipball/47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
-                "reference": "47aaa48e27dae43d39fc1cea0ccf0d84ac1a2ba5",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "GuzzleHttp\\Stream\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
-                    "homepage": "https://github.com/mtdowling"
-                }
-            ],
-            "description": "Provides a simple abstraction over streams of data",
-            "homepage": "http://guzzlephp.org/",
-            "keywords": [
-                "Guzzle",
-                "stream"
-            ],
-            "abandoned": true,
-            "time": "2014-10-12T19:18:40+00:00"
-        },
-        {
             "name": "jakub-onderka/php-console-color",
             "version": "v0.2",
             "source": {
@@ -6738,6 +6737,53 @@
             ],
             "description": "Highlight PHP code in terminal",
             "time": "2018-09-29T18:48:56+00:00"
+        },
+        {
+            "name": "jsq/amazon-es-php",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jeskew/amazon-es-php.git",
+                "reference": "6f1ae9044c25c69b9c706ecb0906b45574cae589"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jeskew/amazon-es-php/zipball/6f1ae9044c25c69b9c706ecb0906b45574cae589",
+                "reference": "6f1ae9044c25c69b9c706ecb0906b45574cae589",
+                "shasum": ""
+            },
+            "require": {
+                "aws/aws-sdk-php": "^3.0",
+                "elasticsearch/elasticsearch": "^2.1|^5.0|^6.0|^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35|^5.4.0|^6.0.0|^7.0.0|^8.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aws\\ElasticsearchService\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Eskew",
+                    "email": "jonathan@jeskew.net"
+                }
+            ],
+            "description": "Support for using IAM authentication with the official Elasticsearch PHP client",
+            "keywords": [
+                "aws",
+                "client",
+                "elasticsearch",
+                "iam",
+                "search"
+            ],
+            "time": "2019-07-20T01:13:04+00:00"
         },
         {
             "name": "kub-at/php-simple-html-dom-parser",
@@ -7104,20 +7150,21 @@
         },
         {
             "name": "nodespark/des-connector",
-            "version": "5.x-dev",
+            "version": "7.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nodespark/des-connector.git",
-                "reference": "104948f8e116a5bbad570c6d1129d22d4694d661"
+                "reference": "bd6a566ea2d44c638281510fc5f8ab016a0df844"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nodespark/des-connector/zipball/104948f8e116a5bbad570c6d1129d22d4694d661",
-                "reference": "104948f8e116a5bbad570c6d1129d22d4694d661",
+                "url": "https://api.github.com/repos/nodespark/des-connector/zipball/bd6a566ea2d44c638281510fc5f8ab016a0df844",
+                "reference": "bd6a566ea2d44c638281510fc5f8ab016a0df844",
                 "shasum": ""
             },
             "require": {
-                "elasticsearch/elasticsearch": "~5.0"
+                "php": "^7.0",
+                "ruflin/elastica": "dev-master"
             },
             "require-dev": {
                 "phpunit/phpunit": "^6.3"
@@ -7135,20 +7182,20 @@
             "authors": [
                 {
                     "name": "Nikolay Ignatov",
-                    "role": "Creator and Maintainer",
                     "email": "nignatov@nodespark.com",
-                    "homepage": "http://www.nodespark.com"
+                    "homepage": "http://www.nodespark.com",
+                    "role": "Creator and Maintainer"
                 },
                 {
                     "name": "Lachezar Valchev",
-                    "role": "Maintainer",
                     "email": "lachezar.valchev@gmail.com",
-                    "homepage": "https://drupal.org/u/lachezar.valchev"
+                    "homepage": "https://drupal.org/u/lachezar.valchev",
+                    "role": "Maintainer"
                 }
             ],
             "description": "An abstraction library for Elasticsearch Connector module for Drupal.",
             "homepage": "https://github.com/nodespark/des-connector",
-            "time": "2018-11-09T13:19:56+00:00"
+            "time": "2019-08-06T06:19:40+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -7762,6 +7809,65 @@
                 "promises"
             ],
             "time": "2019-01-07T21:25:54+00:00"
+        },
+        {
+            "name": "ruflin/elastica",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ruflin/Elastica.git",
+                "reference": "0d45eda7456ce74b0b71a799aaf2145b0bf3116f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ruflin/Elastica/zipball/0d45eda7456ce74b0b71a799aaf2145b0bf3116f",
+                "reference": "0d45eda7456ce74b0b71a799aaf2145b0bf3116f",
+                "shasum": ""
+            },
+            "require": {
+                "elasticsearch/elasticsearch": "^7.1.1 !=7.4.0",
+                "ext-json": "*",
+                "php": "^7.2",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "^3.0",
+                "guzzlehttp/guzzle": "^6.3"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow using IAM authentication with Amazon ElasticSearch Service",
+                "egeloen/http-adapter": "Allow using httpadapter transport",
+                "guzzlehttp/guzzle": "Allow using guzzle 6 as the http transport",
+                "monolog/monolog": "Logging request"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "7.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Elastica\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Ruflin",
+                    "homepage": "http://ruflin.com/"
+                }
+            ],
+            "description": "Elasticsearch Client",
+            "homepage": "http://elastica.io/",
+            "keywords": [
+                "client",
+                "search"
+            ],
+            "time": "2020-03-23T15:41:48+00:00"
         },
         {
             "name": "stack/builder",
