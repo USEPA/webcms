@@ -1,6 +1,6 @@
 ---
-title: Thumbnail Image
-state: inprogress
+title: Box Header
+state: inreview
 ---
 
 __Variables:__
