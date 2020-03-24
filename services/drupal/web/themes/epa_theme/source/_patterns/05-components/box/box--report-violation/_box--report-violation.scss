@@ -1,0 +1,32 @@
+// @file
+// Styles for a Report a Violation Box.
+
+$image-height: 76px;
+$image-width: 75px;
+
+.box--report-violation {
+  background-image: url('../images/report-a-violation.png');
+  background-repeat: no-repeat;
+  min-height: rem($image-height);
+  padding-top: rem($image-height) + gesso-spacing(2);
+
+  @include breakpoint(240px) {
+    padding-left: rem($image-width) + gesso-spacing(2);
+    padding-top: 0;
+  }
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    &.u-align-left,
+    &.u-align-right {
+      width: rem(300px);
+    }
+  }
+
+  .box__title {
+    font-weight: gesso-font-weight(bold);
+  }
+
+  .box__content {
+    font-size: 80%;
+  }
+}

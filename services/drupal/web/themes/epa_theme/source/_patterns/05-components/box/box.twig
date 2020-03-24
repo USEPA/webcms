@@ -26,7 +26,15 @@
 
 <div class="{{ classes }}">
   {% if title.text %}
-    <{{ title.tag }} class="box__title">{{ title_icon }}{{ title.text }}</{{ title.tag }}>
+    <{{ title.tag }} class="box__title">
+      {% if title.url %}
+        <a class="box__title-link" href="title.url">
+      {% endif %}
+      {{ title_icon }}{{ title.text }}
+      {% if title.url %}
+        </a>
+      {% endif %}
+    </{{ title.tag }}>
   {% endif %}
   {% if image.src %}
     {% include '@base/images/box-header.twig' with {
