@@ -144,6 +144,11 @@ function epa_core_token_info() {
     'name' => t('Contact Us Link'),
     'description' => t('The link to a Web Area\'s contact form.'),
   ];
+  $footer_last_updated = [
+    'name' => t('Last updated'),
+    'description' => t('The current entity\'s latest updated date.'),
+    'type' => 'date'
+  ];
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
@@ -154,6 +159,7 @@ function epa_core_token_info() {
     ],
     'current-page' => [
       'contact-us-link' => $contact_us_link,
+      'footer-last-updated' => $footer_last_updated,
     ]
   ];
   return $tokens;
@@ -169,7 +175,8 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
-    if (stripos($name, 'default-revision-created') !== FALSE) {
+    if (stripos($name, 'default-revision-created') !== FALSE
+      || stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
       $name = $parts[0];
     }
@@ -197,6 +204,16 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
               ->toString() : $replacements[$original];
           }
+        }
+        break;
+      case 'footer-last-updated':
+        $node = \Drupal::routeMatch()->getParameter('node');
+        $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
+        if (isset($node)) {
+          $replacements[$original] = t('Last updated on @date', ['@date' => _epa_core_get_default_revision_created($node, $parts[1], $parts[2])]);
+        }
+        else {
+          $replacements[$original] = '';
         }
         break;
     }
@@ -264,47 +281,13 @@ function epa_core_file_download($uri) {
 }
 
 /**
- * Implements hook_rebuild()
- */
-function epa_core_rebuild() {
-  // Ensure some default blocks are created
-  $block_content = [
-    'f76834c2-f52a-4081-bac9-3a97a3ac68e6' => [
-      'type' => 'custom_html',
-      'info' => 'Web Area Header',
-      'fields' => ['body' => ['value' => '[current-page:contact-us-link]', 'format' => 'filtered_html']],
-    ],
-    '46bbc4b7-ffa1-4db8-8209-64c37fa0fcd7' => [
-      'type' => 'custom_html',
-      'info' => 'Web Area Footer',
-      'fields' => ['body' => ['value' => '[current-page:contact-us-link] to ask a question, provide feedback, or report a problem.', 'format' => 'filtered_html']],
-    ]
-  ];
-
-  foreach ($block_content as $uuid => $info) {
-    if ((!$block_content = \Drupal::service('entity.repository')->loadEntityByUuid('block_content', $uuid))) {
-      $block_content = BlockContent::create([
-        'type' => $info['type'],
-        'info' => $info['info'],
-        'uuid' => $uuid,
-      ]);
-      foreach ($info['fields'] as $field => $field_data) {
-        $block_content->$field->setValue($field_data);
-      }
-      $block_content->save();
-    }
-  }
-}
-
-
-/**
  * Implements hook_node_presave().
  */
 function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) {
   if ($entity->hasField('field_hublinks') && $entity->id()) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')
       ->getNodeReferencingGroups($entity);
-    
+
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
       $hublinks = $entity->field_hublinks->getValue();
