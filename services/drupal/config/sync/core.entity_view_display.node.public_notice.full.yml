@@ -1,0 +1,165 @@
+uuid: 15525d63-e8ad-4fbe-ade6-a121db368392
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.public_notice.body
+    - field.field.node.public_notice.field_applicants_or_respondents
+    - field.field.node.public_notice.field_channel
+    - field.field.node.public_notice.field_comments_due_date
+    - field.field.node.public_notice.field_computed_comments_due_date
+    - field.field.node.public_notice.field_description
+    - field.field.node.public_notice.field_docket_numbers
+    - field.field.node.public_notice.field_documents
+    - field.field.node.public_notice.field_env_laws_regs_and_treaties
+    - field.field.node.public_notice.field_expiration_date
+    - field.field.node.public_notice.field_extension_date
+    - field.field.node.public_notice.field_federal_register_citations
+    - field.field.node.public_notice.field_geographic_locations
+    - field.field.node.public_notice.field_how_to_comment
+    - field.field.node.public_notice.field_hublinks
+    - field.field.node.public_notice.field_is_searchable_collection
+    - field.field.node.public_notice.field_keywords
+    - field.field.node.public_notice.field_language
+    - field.field.node.public_notice.field_locations_of_prop_actions
+    - field.field.node.public_notice.field_machine_name
+    - field.field.node.public_notice.field_notice_sort_date
+    - field.field.node.public_notice.field_page_head
+    - field.field.node.public_notice.field_permit_number
+    - field.field.node.public_notice.field_programs_or_statutes
+    - field.field.node.public_notice.field_publication_date
+    - field.field.node.public_notice.field_publish_date
+    - field.field.node.public_notice.field_review_deadline
+    - field.field.node.public_notice.field_scheduled_transition
+    - field.field.node.public_notice.field_type
+    - field.field.node.public_notice.field_type_of_proposed_action
+    - node.type.public_notice
+  module:
+    - datetime
+    - entity_reference_revisions
+    - file
+    - layout_builder
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.public_notice.full
+targetEntityType: node
+bundle: public_notice
+mode: full
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_applicants_or_respondents:
+    type: entity_reference_revisions_entity_view
+    weight: 5
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_comments_due_date:
+    weight: 1
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: short_no_time
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_docket_numbers:
+    type: entity_reference_revisions_entity_view
+    weight: 6
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_documents:
+    type: file_default
+    weight: 9
+    region: content
+    label: hidden
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+  field_extension_date:
+    weight: 2
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: short_no_time
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_federal_register_citations:
+    type: entity_reference_revisions_entity_view
+    weight: 7
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_how_to_comment:
+    weight: 3
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_permit_number:
+    type: string
+    weight: 8
+    region: content
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_publication_date:
+    weight: 4
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: short_no_time
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+hidden:
+  content_moderation_control: true
+  field_channel: true
+  field_computed_comments_due_date: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_locations_of_prop_actions: true
+  field_machine_name: true
+  field_notice_sort_date: true
+  field_page_head: true
+  field_programs_or_statutes: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_type: true
+  field_type_of_proposed_action: true
+  links: true
