@@ -38,6 +38,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - file
     - layout_builder
     - text
     - user
@@ -59,8 +60,8 @@ content:
     region: content
   field_applicants_or_respondents:
     type: entity_reference_revisions_entity_view
-    weight: 6
-    label: above
+    weight: 5
+    label: hidden
     settings:
       view_mode: default
       link: ''
@@ -68,16 +69,7 @@ content:
     region: content
   field_comments_due_date:
     weight: 1
-    label: inline
-    settings:
-      timezone_override: ''
-      format_type: short_no_time
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_computed_comments_due_date:
-    weight: 2
-    label: inline
+    label: hidden
     settings:
       timezone_override: ''
       format_type: short_no_time
@@ -86,16 +78,24 @@ content:
     region: content
   field_docket_numbers:
     type: entity_reference_revisions_entity_view
-    weight: 7
-    label: inline
+    weight: 6
+    label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
+  field_documents:
+    type: file_default
+    weight: 9
+    region: content
+    label: hidden
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
   field_extension_date:
-    weight: 3
-    label: inline
+    weight: 2
+    label: hidden
     settings:
       timezone_override: ''
       format_type: short_no_time
@@ -104,15 +104,15 @@ content:
     region: content
   field_federal_register_citations:
     type: entity_reference_revisions_entity_view
-    weight: 9
-    label: inline
+    weight: 7
+    label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
   field_how_to_comment:
-    weight: 4
+    weight: 3
     label: hidden
     settings: {  }
     third_party_settings: {  }
@@ -127,13 +127,13 @@ content:
     type: string
     weight: 8
     region: content
-    label: inline
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
   field_publication_date:
-    weight: 5
-    label: inline
+    weight: 4
+    label: hidden
     settings:
       timezone_override: ''
       format_type: short_no_time
@@ -143,8 +143,8 @@ content:
 hidden:
   content_moderation_control: true
   field_channel: true
+  field_computed_comments_due_date: true
   field_description: true
-  field_documents: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
