@@ -24,13 +24,22 @@ class EpaNode extends Node {
       return FALSE;
     }
 
-    // We're going to skip nodes that use panelizer and have a layout other than
-    // onecol_page or twocol_page. For nodes that use twocol_page and have a
-    // pane in the sidebar panel, we'll add 'did' source property so we can
-    // process the sidebar content into a paragraph referenced from
-    // field_sidebar.
+    // To prepare rows for import into fields, we're going to:
     //
-    // Get the display ID for the current revision.
+    // 1. Skip nodes that use panelizer and have a layout other than
+    // onecol_page or twocol_page.
+    //
+    // 2. Add a 'did' source property that can be used during the process phase.
+    //
+    // 3. Add a 'layout' source property to populate the 'field_layout'.
+    //
+    // First, initialize the 'did' and 'layout' source properties as NULL so we
+    // can properly process nodes that do not have a record in the
+    // 'panelizer_entith' table.
+    $row->setSourceProperty('did', NULL);
+    $row->setSourceProperty('layout', NULL);
+
+    // Get the Display ID for the current revision.
     $did = $this->select('panelizer_entity', 'pe')
       ->fields('pe', ['did'])
       ->condition('pe.revision_id', $row->getSourceProperty('vid'))
@@ -51,25 +60,13 @@ class EpaNode extends Node {
         // epa_panelizer source plugin.
         return FALSE;
       }
-      elseif ($layout == 'twocol_page') {
-        // Check if this row has content in the Sidebar pane. If so, add the
-        // Display ID so we can process that content during the migration.
-        $sidebar_panes = $this->select('panels_pane', 'pp')
-          ->fields('pp', ['panel'])
-          ->condition('pp.did', $did)
-          ->condition('pp.panel', 'sidebar')
-          ->execute()
-          ->fetchField();
-
-        if ($sidebar_panes) {
-          $row->setSourceProperty('did', $did);
-        }
+      else {
+        // Update the 'did' and 'layout' properties to their stored values.
+        $row->setSourceProperty('did', $did);
+        $row->setSourceProperty('layout', $layout);
       }
     }
 
-    // If this node does not use panelizer or it is using the 'onecol_page' or
-    // 'twocol_page' layout, then we will migrate it.
-    $row->setSourceProperty('layout', $layout);
     parent::prepareRow($row);
   }
 
