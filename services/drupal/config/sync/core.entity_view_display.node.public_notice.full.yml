@@ -11,7 +11,6 @@ dependencies:
     - field.field.node.public_notice.field_computed_comments_due_date
     - field.field.node.public_notice.field_description
     - field.field.node.public_notice.field_docket_numbers
-    - field.field.node.public_notice.field_documents
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
     - field.field.node.public_notice.field_expiration_date
     - field.field.node.public_notice.field_extension_date
@@ -30,6 +29,7 @@ dependencies:
     - field.field.node.public_notice.field_programs_or_statutes
     - field.field.node.public_notice.field_publication_date
     - field.field.node.public_notice.field_publish_date
+    - field.field.node.public_notice.field_related_documents
     - field.field.node.public_notice.field_review_deadline
     - field.field.node.public_notice.field_scheduled_transition
     - field.field.node.public_notice.field_type
@@ -38,7 +38,6 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - file
     - layout_builder
     - text
     - user
@@ -85,14 +84,6 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  field_documents:
-    type: file_default
-    weight: 9
-    region: content
-    label: hidden
-    settings:
-      use_description_as_link_text: true
-    third_party_settings: {  }
   field_extension_date:
     weight: 2
     label: hidden
@@ -140,6 +131,14 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
+  field_related_documents:
+    type: entity_reference_label
+    weight: 9
+    region: content
+    label: hidden
+    settings:
+      link: true
+    third_party_settings: {  }
 hidden:
   content_moderation_control: true
   field_channel: true
