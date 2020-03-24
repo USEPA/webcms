@@ -1,0 +1,145 @@
+uuid: ca4f5ef2-8fc7-4438-9509-f34812ab8fff
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.regulation.field_additional_resources
+    - field.field.node.regulation.field_cfr
+    - field.field.node.regulation.field_channel
+    - field.field.node.regulation.field_compliance
+    - field.field.node.regulation.field_description
+    - field.field.node.regulation.field_docket_numbers
+    - field.field.node.regulation.field_effective_dates
+    - field.field.node.regulation.field_env_laws_regs_and_treaties
+    - field.field.node.regulation.field_expiration_date
+    - field.field.node.regulation.field_federal_register_citations
+    - field.field.node.regulation.field_geographic_locations
+    - field.field.node.regulation.field_hublinks
+    - field.field.node.regulation.field_is_searchable_collection
+    - field.field.node.regulation.field_keywords
+    - field.field.node.regulation.field_language
+    - field.field.node.regulation.field_legal_authorities
+    - field.field.node.regulation.field_machine_name
+    - field.field.node.regulation.field_page_head
+    - field.field.node.regulation.field_publish_date
+    - field.field.node.regulation.field_review_deadline
+    - field.field.node.regulation.field_rule_history
+    - field.field.node.regulation.field_rule_summary
+    - field.field.node.regulation.field_scheduled_transition
+    - field.field.node.regulation.field_type
+    - field.field.node.regulation.field_wide_template
+    - node.type.regulation
+  module:
+    - datetime_range
+    - entity_reference_revisions
+    - layout_builder
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.regulation.full
+targetEntityType: node
+bundle: regulation
+mode: full
+content:
+  field_additional_resources:
+    weight: 7
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_cfr:
+    type: entity_reference_revisions_entity_view
+    weight: 2
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_compliance:
+    weight: 8
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_docket_numbers:
+    weight: 3
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+  field_effective_dates:
+    weight: 4
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: short_no_time
+      separator: ''
+    third_party_settings: {  }
+    type: daterange_default
+    region: content
+  field_federal_register_citations:
+    weight: 1
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+  field_legal_authorities:
+    type: entity_reference_revisions_entity_view
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_rule_history:
+    weight: 6
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_rule_summary:
+    weight: 5
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+hidden:
+  content_moderation_control: true
+  field_channel: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_machine_name: true
+  field_page_head: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_type: true
+  field_wide_template: true
+  links: true

@@ -1,0 +1,12 @@
+{% set classes = [
+  'box--rss',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/box/box.twig' with {
+  'modifier_classes': classes,
+  'title': title,
+  'image': image,
+  'content': content,
+  'footer': footer,
+} %}
