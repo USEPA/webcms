@@ -1,6 +1,6 @@
 ---
-el: .box.is-aligned-left
-title: Left-aligned Box
+el: .box--report-violation
+title: Report a Violation Box
 state: inreview
 ---
 
