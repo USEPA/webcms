@@ -284,8 +284,8 @@ function epa_core_file_download($uri) {
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-  $test = 'test';
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
+    $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
   }
 }
