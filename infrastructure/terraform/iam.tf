@@ -237,6 +237,7 @@ data "aws_iam_policy_document" "uploads_access" {
     actions = [
       "s3:HeadBucket",
       "s3:ListBucket",
+      "s3:ListBucketVersions",
     ]
     resources = [
       "arn:aws:s3:::${aws_s3_bucket.uploads.bucket}"
@@ -249,7 +250,9 @@ data "aws_iam_policy_document" "uploads_access" {
     actions = [
       "s3:DeleteObject",
       "s3:GetObject",
+      "s3:GetObjectAcl",
       "s3:PutObject",
+      "s3:PutObjectAcl",
     ]
     resources = [
       "arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/*"
