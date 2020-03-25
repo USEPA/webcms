@@ -10,7 +10,6 @@ dependencies:
     - field.field.node.public_notice.field_computed_comments_due_date
     - field.field.node.public_notice.field_description
     - field.field.node.public_notice.field_docket_numbers
-    - field.field.node.public_notice.field_documents
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
     - field.field.node.public_notice.field_expiration_date
     - field.field.node.public_notice.field_extension_date
@@ -29,6 +28,7 @@ dependencies:
     - field.field.node.public_notice.field_programs_or_statutes
     - field.field.node.public_notice.field_publication_date
     - field.field.node.public_notice.field_publish_date
+    - field.field.node.public_notice.field_related_documents
     - field.field.node.public_notice.field_review_deadline
     - field.field.node.public_notice.field_scheduled_transition
     - field.field.node.public_notice.field_type
@@ -37,7 +37,6 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - file
     - options
     - scheduled_publish
     - text
@@ -109,14 +108,6 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    region: content
-  field_documents:
-    weight: 109
-    label: above
-    settings:
-      use_description_as_link_text: true
-    third_party_settings: {  }
-    type: file_default
     region: content
   field_env_laws_regs_and_treaties:
     weight: 112
@@ -272,6 +263,15 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     weight: 136
+    region: content
+  field_related_documents:
+    type: entity_reference_entity_view
+    weight: 139
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
     region: content
   field_review_deadline:
     weight: 110

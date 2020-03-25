@@ -1,0 +1,212 @@
+uuid: 983b4bd7-19ea-45ca-9041-5a2ec7fd65e1
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.web_area.field_banner
+    - field.field.node.web_area.field_channel
+    - field.field.node.web_area.field_description
+    - field.field.node.web_area.field_env_laws_regs_and_treaties
+    - field.field.node.web_area.field_expiration_date
+    - field.field.node.web_area.field_geographic_locations
+    - field.field.node.web_area.field_keywords
+    - field.field.node.web_area.field_language
+    - field.field.node.web_area.field_page_head
+    - field.field.node.web_area.field_paragraphs
+    - field.field.node.web_area.field_publish_date
+    - field.field.node.web_area.field_review_deadline
+    - field.field.node.web_area.field_scheduled_transition
+    - field.field.node.web_area.field_type
+    - field.field.node.web_area.layout_builder__layout
+    - node.type.web_area
+  module:
+    - datetime
+    - entity_reference_revisions
+    - epa_layouts
+    - layout_builder
+    - layout_library
+    - options
+    - scheduled_publish
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: true
+    sections:
+      -
+        layout_id: epa_one_column
+        layout_settings:
+          label: ''
+        components:
+          109d08e9-cfe1-4f99-bf9d-c1a353384298:
+            uuid: 109d08e9-cfe1-4f99-bf9d-c1a353384298
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_banner'
+              label: Banner
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: entity_reference_revisions_entity_view
+                settings:
+                  view_mode: default
+                third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 0
+        third_party_settings: {  }
+      -
+        layout_id: epa_resource_directory
+        layout_settings:
+          label: ''
+        components:
+          e1bf93bf-0b96-4135-8764-02655e49b17a:
+            uuid: e1bf93bf-0b96-4135-8764-02655e49b17a
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_paragraphs'
+              label: Body
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: entity_reference_revisions_entity_view
+                settings:
+                  view_mode: default
+                third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 0
+        third_party_settings: {  }
+  layout_library:
+    enable: false
+id: node.web_area.full
+targetEntityType: node
+bundle: web_area
+mode: full
+content:
+  content_moderation_control:
+    weight: -20
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_channel:
+    weight: 107
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_description:
+    weight: 128
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_env_laws_regs_and_treaties:
+    weight: 112
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_expiration_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 133
+    region: main
+  field_geographic_locations:
+    weight: 115
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_keywords:
+    weight: 118
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_language:
+    weight: 125
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
+  field_page_head:
+    weight: 129
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
+  field_paragraphs:
+    type: entity_reference_revisions_entity_view
+    weight: 130
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_publish_date:
+    label: above
+    type: datetime_default
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    weight: 131
+    region: main
+  field_review_deadline:
+    weight: 103
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_scheduled_transition:
+    label: above
+    type: scheduled_publish_generic_formatter
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    weight: 132
+    region: main
+  field_type:
+    weight: 106
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  field_banner: true
+  layout_builder__layout: true
