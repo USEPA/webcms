@@ -79,19 +79,22 @@ process:
     -
       plugin: get
       source: comment
-  _html_body_paragraphs:
-    -
-      plugin: migration_lookup
-      migration: upgrade_d7_node_page_body_paragraph
-      source: nid
   field_paragraphs:
     -
+      plugin: skip_on_empty
+      method: process
+      source: main_col_panes
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_paragraphs
+    -
+      plugin: multiple_values
+    -
       plugin: sub_process
-      source:
-        - '@_html_body_paragraphs'
       process:
-        target_id: '0'
-        target_revision_id: '1'
+        target_id: 'target_id'
+        target_revision_id: 'target_revision_id'
   # _sidebar_paragraphs:
   #   -
   #     plugin: skip_on_empty
@@ -279,10 +282,17 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  layout_selection:
+    -
+      plugin: static_map
+      source: layout
+      map:
+        onecol_page: basic_one_column
+        twocol_page: basic_two_column
+
 destination:
   plugin: 'entity:node'
   default_bundle: page
 migration_dependencies:
   required: { }
-    #- upgrade_d7_node_page_body_paragraph
   optional: { }
