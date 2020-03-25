@@ -15,14 +15,14 @@ class EpaNodeContentPaneToParagraph extends EpaPaneToParagraph {
   public function createParagraph($row, $record, $configuration) {
     $body_field = $row->get('body');
 
-    $htmlParagraph = Paragraph::create(['type' => 'html']);
-    $htmlParagraph->set('field_body', $body_field);
-    $htmlParagraph->isNew();
-    $htmlParagraph->save();
+    $html_paragraph = Paragraph::create(['type' => 'html']);
+    $html_paragraph->set('field_body', $body_field);
+    $html_paragraph->isNew();
+    $html_paragraph->save();
 
     return [
-      'target_id' => $htmlParagraph->id(),
-      'target_revision_id' => $htmlParagraph->getRevisionId(),
+      'target_id' => $html_paragraph->id(),
+      'target_revision_id' => $html_paragraph->getRevisionId(),
     ];
   }
 
