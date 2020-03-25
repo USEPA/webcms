@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# This script downloads AWS Parameter Store values and saves them as files to the checkout
+# prior to the Buildkite command step executing, making it ideal to load configuration
+# files.
+
+set -euo pipefail
+
+echo "~~~ :aws: Loading parameters..."
+
+i=0
+while true; do
+  prefix="BUILDKITE_PLUGIN_AWS_PARAMETERS_PARAMS_${i}"
+  name_key="${prefix}_NAME"
+
+  if ! [[ -v "$name_key" ]]; then
+    break
+  fi
+
+  name="${!name_key}"
+
+  file_key="${prefix}_FILE"
+  if test -z "${!file_key:-}"; then
+    echo "+++ No 'file' option specified for parameter $name" >&2
+    exit 1
+  fi
+
+  file_name="${!file_key}"
+
+  parameter="$(aws ssm get-parameter --name "$name" | jq -r '.Parameter.Value')"
+
+  echo "$parameter" >"$file_name"
+
+  echo "Loaded parameter $name into $file_name"
+
+  i=$((i + 1))
+done
