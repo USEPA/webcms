@@ -32,7 +32,7 @@ arn="$(
     --cluster webcms-cluster \
     --overrides "$overrides" \
     --network-configuration "$(cat drushvpc.json)" \
-    --started-by "$started_by" \
+    --started-by "$started_by" |
     jq -r '.tasks[0].arn'
 )"
 
