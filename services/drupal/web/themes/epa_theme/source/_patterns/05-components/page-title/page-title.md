@@ -1,7 +1,7 @@
 ---
 el: .page-title
 title: Page Title
-state: inprogress
+state: complete
 ---
 
 __Variables:__

@@ -1,7 +1,7 @@
 ---
 el: .usa-media-block
 title: Media Block
-state: inprogress
+state: complete
 ---
 
 __Variables:__

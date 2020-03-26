@@ -1,7 +1,7 @@
 ---
 el: .l-header
 title: Header Layout
-state: inreview
+state: complete
 ---
 
 __Blocks:__
