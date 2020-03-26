@@ -13,7 +13,7 @@ function build() {
   local repo="webcms-$target"
   local tag="$WEBCMS_REPO_URL/$repo:$WEBCMS_IMAGE_TAG"
 
-  echo ":docker: $target:$WEBCMS_IMAGE_TAG"
+  echo "--- :docker: $target:$WEBCMS_IMAGE_TAG"
 
   docker build services/drupal \
     --target "$target" \
