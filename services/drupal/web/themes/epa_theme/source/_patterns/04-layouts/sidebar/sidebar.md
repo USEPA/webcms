@@ -1,13 +1,13 @@
 ---
 el: .l-sidebar
 title: Sidebar Layout
-state: inprogress
+state: inreview
 ---
 
 __Variables:__
-* has_multiple_sidebar: [boolean] Whether component has multiple sidebars.
+* has_sidebar: [boolean] Whether component has a sidebar.
 * modifier_classes: [string] Classes to modify the default component styling.
-* header_content: [object] Content of the header.
-* sidebar_first_content: [object] First content of the sidebar.
-* sidebar_main_content: [object] Main content.
-* sidebar_second_content: [object] Second content of the sidebar.
+
+__Blocks:__
+* main_content: Twig block for main content.
+* sidebar: Twig block for sidebar content.

@@ -3,9 +3,21 @@
 
 p {
   @include typeset-p;
+  max-width: unset;
 
   @media print {
     orphans: 3;
     widows: 3;
+  }
+
+  li > & {
+    margin-bottom: 1em;
+  }
+
+  // Hide empty paragraphs except in WYSIWYG editor.
+  @if $not-wysiwyg {
+    &:empty {
+      margin: 0 !important;
+    }
   }
 }

@@ -1,7 +1,7 @@
 ---
 el: .usa-logo
 title: Logo
-state: inprogress
+state: complete
 ---
 
 __Variables:__

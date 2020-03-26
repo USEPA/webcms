@@ -8,6 +8,7 @@ started_by="build/$WEBCMS_IMAGE_TAG"
 # shellcheck disable=SC2016
 script='drush --uri="$WEBCMS_SITE_URL" updb -y
 drush --uri="$WEBCMS_SITE_URL" cim -y
+drush --uri="$WEBCMS_SITE_URL" ib --choice safe
 drush --uri="$WEBCMS_SITE_URL" cr'
 
 # Use jq to format the container overrides in a way that plays nicely with

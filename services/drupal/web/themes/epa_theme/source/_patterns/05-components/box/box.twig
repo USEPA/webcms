@@ -1,0 +1,52 @@
+{% set classes = [
+  'box',
+  modifier_classes ? modifier_classes,
+  image.src ? 'has-image-header',
+]|join(' ')|trim %}
+
+{% set title_icon %}
+  {% if title.icon %}
+    {% include '@components/icon/icon.twig' with {
+      'is_hidden': true,
+      'modifier_classes': 'is-spaced-after',
+      'icon_name': title.icon,
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set footer_icon %}
+  {% if footer.icon %}
+    {% include '@components/icon/icon.twig' with {
+      'is_hidden': true,
+      'modifier_classes': 'is-spaced-after',
+      'icon_name': footer.icon,
+    } %}
+  {% endif %}
+{% endset %}
+
+<div class="{{ classes }}">
+  {% if title.text %}
+    <{{ title.tag }} class="box__title">
+      {% if title.url %}
+        <a class="box__title-link" href="title.url">
+      {% endif %}
+      {{ title_icon }}{{ title.text }}
+      {% if title.url %}
+        </a>
+      {% endif %}
+    </{{ title.tag }}>
+  {% endif %}
+  {% if image.src %}
+    {% include '@base/images/box-header.twig' with {
+      'custom_classes': 'box__image',
+      'src': image.src,
+      'alt': image.alt,
+    } %}
+  {% endif %}
+  <div class="box__content">{{ content }}</div>
+  {% if footer.text %}
+    <div class="box__footer">
+      <a class="box__footer-link" href="{{ footer.url }}">{{ footer_icon }}{{ footer.text }}</a>
+    </div>
+  {% endif %}
+</div>
