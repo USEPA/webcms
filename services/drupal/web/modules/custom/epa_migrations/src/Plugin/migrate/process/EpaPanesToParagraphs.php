@@ -43,6 +43,7 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
         $pane_classes = [
           'node_content' => '\\Drupal\epa_migrations\EpaNodeContentPaneToParagraph',
           'epa_core_html_pane' => '\\Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph',
+          'epa_core_node_list_pane' => '\\Drupal\epa_migrations\EpaCoreNodeListPaneToParagraph',
         ];
 
         $pane_class = $pane_classes[$type];
