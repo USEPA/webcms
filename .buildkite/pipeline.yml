@@ -29,7 +29,7 @@ steps:
     key: deploy
 
     # Only build on the master branch, and only if this isn't a pull request
-    if: build.branch == 'master' && build.pull_request.id == null
+    if: build.branch == "EPAD8-432-setup-continued" && build.pull_request.id == null
 
     # Only allow one deployment at a time
     concurrency_group: epa-webcms-d8/deploy
@@ -77,7 +77,7 @@ steps:
     command: bash .buildkite/run-drush.sh
 
     # Only build on the master branch, and only if this isn't a pull request
-    if: build.branch == "master" && build.pull_request.id == null
+    if: build.branch == "EPAD8-432-setup-continued" && build.pull_request.id == null
 
     # Run only if the previous deploy step succeeded
     depends_on: deploy
