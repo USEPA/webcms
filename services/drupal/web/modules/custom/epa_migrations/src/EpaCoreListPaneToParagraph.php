@@ -5,9 +5,12 @@ namespace Drupal\epa_migrations;
 use Drupal\paragraphs\Entity\Paragraph;
 
 /**
- * Create a Box paragraph from an epa_core_node_list pane.
+ * Create a Box paragraph from panes that contain lists of links.
+ *
+ * Convert epa_core_link_list_pane and epa_core_node_link panes to link_list
+ * paragraphs.
  */
-class EpaCoreNodeListPaneToParagraph extends EpaPaneToParagraph {
+class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
 
   /**
    * {@inheritDoc}
@@ -26,27 +29,41 @@ class EpaCoreNodeListPaneToParagraph extends EpaPaneToParagraph {
     }
 
     // Create and save child HTML paragraph.
-    $body_field = $configuration['node_list_body'];
+    $body_field = $configuration['node_list_body'] ?? $configuration['link_list_body'];
 
     $html_paragraph = Paragraph::create(['type' => 'html']);
     $html_paragraph->set('field_body', $body_field);
     $html_paragraph->isNew();
     $html_paragraph->save();
 
-    // Format list of links as 'entity:node/${nid}.
-    $node_list = $configuration['node_field'];
-    $node_list_links = [];
-    foreach ($node_list as $item) {
-      $node_list_links[] = [
-        'uri' => 'entity:node/' . $item['node'],
-        'title' => '',
-        'options' => [],
-      ];
+    // Get links from Pane configuration.
+    $list_links = [];
+    if (isset($configuration['node_field'])) {
+      // Format list of links as 'entity:node/${nid}.
+      $node_list = $configuration['node_field'];
+      foreach ($node_list as $item) {
+        $list_links[] = [
+          'uri' => 'entity:node/' . $item['node'],
+          'title' => '',
+          'options' => [],
+        ];
+      }
+    }
+    elseif (isset($configuration['link_field'])) {
+      // Pull titles and uris from links.
+      $link_list = $configuration['link_field'];
+      foreach ($link_list as $item) {
+        $list_links[] = [
+          'uri' => $item['link'],
+          'title' => $item['title'],
+          'options' => [],
+        ];
+      }
     }
 
     // Create and save child link_list paragraph.
     $link_list_paragraph = Paragraph::create(['type' => 'link_list']);
-    $link_list_paragraph->set('field_links', $node_list_links);
+    $link_list_paragraph->set('field_links', $list_links);
     $link_list_paragraph->isNew();
     $link_list_paragraph->save();
 
@@ -73,4 +90,5 @@ class EpaCoreNodeListPaneToParagraph extends EpaPaneToParagraph {
       'target_revision_id' => $box_paragraph->getRevisionId(),
     ];
   }
+
 }
