@@ -36,8 +36,10 @@ arn="$(
     jq -r '.tasks[0].arn'
 )"
 
+echo "--- Waiting on task ARN $arn"
+
 while true; do
-  output="$(aws ecs describe-tasks --include "$arn")"
+  output="$(aws ecs describe-tasks --tasks "$arn")"
 
   if "$(jq '.failures | length' <<<"$output")" -gt 0; then
     jq '.failures' <<<"$output" >&2
