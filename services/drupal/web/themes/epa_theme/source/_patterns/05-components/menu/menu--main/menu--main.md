@@ -1,7 +1,7 @@
 ---
 el: .menu--main
 title: Main Menu
-state: inreview
+state: complete
 ---
 
 __Variables:__

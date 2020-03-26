@@ -1,7 +1,7 @@
 ---
 el: .site-logo
 title: Site Logo
-state: inreview
+state: complete
 ---
 
 __Variables:__
