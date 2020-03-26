@@ -16,11 +16,12 @@ steps:
 
     plugins:
       # Assume cross-account build role
-      # See comments as to why this is an in-repo plugin
-      - ./.buildkite/plugins/aws-assume-role:
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
       # Log in to ECR repositories
-      - ecr#v2.1.0:
+      # NB. This is not the latest version of the plugin, but we have to downgrade in order
+      # to play nice with aws-assume-role.
+      - ecr#v1.2.0:
           login: true
           no-include-email: true
 
@@ -39,7 +40,7 @@ steps:
 
     plugins:
       # Assume the Terraform role for maximum permissions
-      - ./.buildkite/plugins/aws-assume-role:
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
           # Use a 30-minute duration for credentials to minimize the time spent in this
           # nearly-administrative role
@@ -89,5 +90,6 @@ steps:
       # Download the Drush AWSVPC configuration
       - artifacts#v1.3.0:
           download: drushvpc.json
-      - ./.buildkite/plugins/aws-assume-role:
+      # Assume our ECS task management role
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
