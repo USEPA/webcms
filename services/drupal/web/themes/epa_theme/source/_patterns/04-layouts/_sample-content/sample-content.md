@@ -1,6 +1,6 @@
 ---
 title: Sample Content
-state: inreview
+state: complete
 ---
 
 __Variables:__

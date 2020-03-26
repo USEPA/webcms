@@ -1,4 +1,4 @@
 ---
 title: Ordered List
-state: inreview
+state: complete
 ---
