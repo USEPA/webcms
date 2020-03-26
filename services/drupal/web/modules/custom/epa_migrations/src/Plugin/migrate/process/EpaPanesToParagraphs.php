@@ -48,7 +48,11 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
 
         $pane_class = $pane_classes[$type];
         $pane_transformer = new $pane_class();
-        $paragraph_ids[] = $pane_transformer->createParagraph($row, $pane, $configuration);
+        $transformed_paragraph_ids = $pane_transformer->createParagraph($row, $pane, $configuration);
+        if ($transformed_paragraph_ids) {
+          $paragraph_ids[] = $transformed_paragraph_ids;
+        }
+
       }
 
     }
