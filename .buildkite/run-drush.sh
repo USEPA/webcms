@@ -33,13 +33,13 @@ arn="$(
     --overrides "$overrides" \
     --network-configuration "$(cat drushvpc.json)" \
     --started-by "$started_by" |
-    jq -r '.tasks[0].arn'
+    jq -r '.tasks[0].taskArn'
 )"
 
 echo "--- Waiting on task ARN $arn"
 
 while true; do
-  output="$(aws ecs describe-tasks --tasks "$arn")"
+  output="$(aws ecs describe-tasks --tasks "$arn" --cluster webcms-cluster)"
 
   if "$(jq '.failures | length' <<<"$output")" -gt 0; then
     jq '.failures' <<<"$output" >&2
@@ -50,6 +50,11 @@ while true; do
   case "$status" in
   STOPPING | STOPPED)
     echo "Task exited. Check logs in CloudWatch for more details."
+    exit_code="$(jq '.tasks[0].containers[0].exitCode' <<<"$output")"
+    if test "$exit_code" -ne 0; then
+      echo "Drush exited with non-zero exit code $exit_code" >&2
+      exit 1
+    fi
     break
     ;;
 
