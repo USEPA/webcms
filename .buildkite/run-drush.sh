@@ -41,12 +41,12 @@ echo "--- Waiting on task ARN $arn"
 while true; do
   output="$(aws ecs describe-tasks --tasks "$arn" --cluster webcms-cluster)"
 
-  if "$(jq '.failures | length' <<<"$output")" -gt 0; then
+  if test "$(jq '.failures | length' <<<"$output")" -gt 0; then
     jq '.failures' <<<"$output" >&2
     exit 1
   fi
 
-  status="$(jq '.tasks[0].lastStatus' <<<"$output")"
+  status="$(jq -r '.tasks[0].lastStatus' <<<"$output")"
   case "$status" in
   STOPPING | STOPPED)
     echo "Task exited. Check logs in CloudWatch for more details."
