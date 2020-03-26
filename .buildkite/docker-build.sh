@@ -11,7 +11,7 @@ set -euo pipefail
 function build() {
   local target="$1"
   local repo="webcms-$target"
-  local tag="$WEBCMS_REPO_URL/$repo-$WEBCMS_IMAGE_TAG"
+  local tag="$WEBCMS_REPO_URL/$repo:$WEBCMS_IMAGE_TAG"
 
   echo ":docker: $target:$WEBCMS_IMAGE_TAG"
 
