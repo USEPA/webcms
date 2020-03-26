@@ -14,7 +14,7 @@ drush --uri="$WEBCMS_SITE_URL" cr'
 # AWS ECS' character count limitations on JSON input, as well as avoids
 # potential issues with quoting
 overrides="$(
-  cat <<EOF | jq -cn --arg script "$script"
+  jq -cn --arg script "$script" '
 {
   "containerOverrides": [
     {
@@ -23,7 +23,7 @@ overrides="$(
     }
   ]
 }
-EOF
+'
 )"
 
 arn="$(
