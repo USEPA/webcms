@@ -13,4 +13,11 @@ p {
   li > & {
     margin-bottom: 1em;
   }
+
+  // Hide empty paragraphs except in WYSIWYG editor.
+  @if $not-wysiwyg {
+    &:empty {
+      margin: 0 !important;
+    }
+  }
 }
