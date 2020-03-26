@@ -58,7 +58,7 @@ steps:
       - docker#v3.5.0:
           image: hashicorp/terraform:0.12.24
           entrypoint: /bin/sh
-          command: .buildkite/deploy-terraform.sh
+          command: [.buildkite/deploy-terraform.sh]
           environment:
             # Forward image tag
             - WEBCMS_IMAGE_TAG
