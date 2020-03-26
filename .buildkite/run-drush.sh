@@ -19,7 +19,7 @@ overrides="$(
   "containerOverrides": [
     {
       "name": "drush",
-      "command": ["/bin/sh", $script]
+      "command": ["/bin/sh", "-ec", $script]
     }
   ]
 }
