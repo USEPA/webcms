@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# This script is a lighter version of https://github.com/cultureamp/aws-assume-role-buildkite-plugin,
+# which we can't use because the ECR plugin moved to the environment hook phase.
+
+set -euo pipefail
+
+echo "~~~ Assuming role $BUILDKITE_PLUGIN_AWS_ASSUME_ROLE_ROLE"
+
+result="$(
+  aws sts assume-role \
+    --role-arn "$BUILDKITE_PLUGIN_AWS_ASSUME_ROLE_ROLE" \
+    --role-session-name "$BUILDKITE_PIPELINE_SLUG@$BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER" \
+    --duration-seconds "${BUILDKITE_PLUGIN_AWS_ASSUME_ROLE_DURATION:-3600}"
+)"
+
+assumed_role_id="$(echo "$result" | jq -r .AssumedRoleUser.AssumedRoleId)"
+expiration="$(echo "$result" | jq -r .Credentials.Expiration)"
+
+AWS_ACCESS_KEY_ID="$(echo "$result" | jq -r .Credentials.AccessKeyId)"
+AWS_SECRET_ACCESS_KEY="$(echo "$result" | jq -r .Credentials.SecretAccessKey)"
+AWS_SESSION_TOKEN="$(echo "$result" | jq -r .Credentials.SessionToken)"
+
+echo "Assumed role $assumed_role_id until $expiration"
+
+export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
