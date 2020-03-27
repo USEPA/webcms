@@ -130,7 +130,7 @@ resource "aws_route_table" "private" {
 
   tags = {
     Application = "WebCMS"
-    Name        = "WebCMS Private Routes-${count.index}"
+    Name        = "WebCMS Private Routes ${count.index}"
   }
 }
 
@@ -147,8 +147,9 @@ data "aws_vpc_endpoint_service" "s3" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id       = aws_vpc.main.id
-  service_name = data.aws_vpc_endpoint_service.s3.service_name
+  vpc_id            = aws_vpc.main.id
+  service_name      = data.aws_vpc_endpoint_service.s3.service_name
+  vpc_endpoint_type = "Gateway"
 
   route_table_ids = concat(aws_route_table.private.*.id, [aws_route_table.public.id])
 
@@ -164,4 +165,36 @@ resource "aws_vpc_endpoint" "s3" {
       }
     ]
   })
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS S3 Gateway"
+  }
+}
+
+locals {
+  # Place Systems Manager endpoints into the VPC in order to further secure the connection
+  ssm-endpoints = ["ssm", "ec2", "ec2messages", "ssmmessages"]
+}
+
+data "aws_vpc_endpoint_service" "ssm" {
+  for_each = toset(local.ssm-endpoints)
+
+  service = each.value
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  for_each = toset(local.ssm-endpoints)
+
+  vpc_id              = aws_vpc.main.id
+  service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  security_group_ids  = [aws_security_group.interface.id]
+  subnet_ids          = aws_subnet.private.*.id
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS SSM Interface: ${each.value}"
+  }
 }

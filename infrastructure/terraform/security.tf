@@ -1,3 +1,32 @@
+resource "aws_security_group" "interface" {
+  name        = "webcms-interface-sg"
+  description = "Security group for AWS interface endpoints"
+
+  vpc_id = aws_vpc.main.id
+
+  # Permissively allow ingress to VPC interface endpoints.
+  # We allow this for a few reasons:
+  # 1. Interface endpoints resolve to AWS services, which we consider trustworthy
+  # 2. The service on the other end has its own permissions system (IAM) to prevent
+  #    unauthorized access.
+  # 3. Security group rules here will not actually prevent access to the AWS services
+  #    in question; anyone can resolve the service endpoint using public DNS and make
+  #    API requests.
+  ingress {
+    description = "Allow incoming connections"
+
+    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 65535
+    cidr_blocks = [aws_vpc.main.cidr_block]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Interfaces"
+  }
+}
+
 resource "aws_security_group" "load_balancer" {
   name        = "webcms-alb-sg"
   description = "Security group for the WebCMS load balancers"
@@ -12,7 +41,7 @@ resource "aws_security_group" "load_balancer" {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.alb-ingress
   }
 
   ingress {
@@ -21,7 +50,7 @@ resource "aws_security_group" "load_balancer" {
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.alb-ingress
   }
 
   tags = {
@@ -57,6 +86,15 @@ resource "aws_security_group" "server" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    description = "Allow access to VPC endpoint services"
+
+    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 0
+    security_groups = [aws_security_group.interface.id]
+  }
+
   tags = {
     Application = "WebCMS"
     Name        = "WebCMS Cluster Server"
@@ -69,56 +107,55 @@ resource "aws_security_group" "bastion" {
 
   vpc_id = aws_vpc.main.id
 
-  # We only allow inbound SSH connections from the IP ranges specified in bastion-ingress
-  # This limits security risk of a public-facing bastion server since we assume that the
-  # allowed IPs are associated with, e.g., a VPN or jump box.
+  egress {
+    description = "Allow access to VPC endpoint services"
+
+    protocol        = "tcp"
+    from_port       = 0
+    to_port         = 65535
+    security_groups = [aws_security_group.interface.id]
+  }
+
+  # We have to allow HTTP access to the gateway from the utility server because we install
+  # the mariadb package.
+  # The reason for this is that Amazon Linux 2 yum repositories are configured to use
+  # the domain amazonlinux.us-east-1.amazonaws.com, which is a CNAME for the domain
+  # s3.dualstack.us-east-1.amazonaws.com.
+  # Over HTTP, this is perfectly acceptable. But over HTTPS, the TLS verification step
+  # fails because the amazonlinux subdomain isn't in the SNI domain list.
+  # Until we can find an alternate means of installing the package, we're stuck with
+  # allowing unencrypted access to S3 from this host.
+  egress {
+    description = "Allow access to the S3 gateway"
+
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
+  }
+
+  egress {
+    description = "Allow access to the S3 gateway"
+
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
+  }
+
   ingress {
-    description = "Allow incoming SSH connections"
+    description = "SSH"
 
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = var.bastion-ingress
-  }
-
-  # This rule allows accessing an ECS instance from the bastion server
-  egress {
-    description = "Allow outgoing SSH connections"
-
-    protocol        = "tcp"
-    from_port       = 22
-    to_port         = 22
-    security_groups = [aws_security_group.server.id]
-  }
-
-  # For administration purposes, we allow access to the RDS instance from the SSH bastion
-  # to allow users to run queries against RDS.
-  egress {
-    description = "Allow outgoing MySQL connections"
-
-    protocol        = "tcp"
-    from_port       = 3306
-    to_port         = 3306
-    security_groups = [aws_security_group.server.id]
+    cidr_blocks = ["52.72.16.231/32"]
   }
 
   tags = {
     Application = "WebCMS"
     Name        = "WebCMS Bastion"
   }
-}
-
-# This server->bastion rule is separate to avoid loops in the Terraform dependency graph
-resource "aws_security_group_rule" "server_bastion_ingress" {
-  description = "Allow SSH connections to EC2 servers from bastion hosts"
-
-  type              = "ingress"
-  protocol          = "tcp"
-  from_port         = 22
-  to_port           = 22
-  security_group_id = aws_security_group.server.id
-
-  source_security_group_id = aws_security_group.bastion.id
 }
 
 resource "aws_security_group" "database" {
@@ -131,6 +168,44 @@ resource "aws_security_group" "database" {
     Application = "WebCMS"
     Name        = "WebCMS RDS"
   }
+}
+
+# The security group for access to the DB servers is separate from the application-specific
+# security group since it's used twice: once for Drupal tasks and again for the utility
+# server. We also anticipate that it will help triage networking issues
+resource "aws_security_group" "database_access" {
+  name        = "webcms-database-access-sg"
+  description = "Security group for access to database servers"
+
+  vpc_id = aws_vpc.main.id
+
+  egress {
+    description = "Allows outgoing connections to MySQL"
+
+    protocol        = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    security_groups = [aws_security_group.database.id]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS DB Access"
+  }
+}
+
+# Created as a separate rule to avoid cycles in the Terraform graph
+resource "aws_security_group_rule" "database_access_ingress" {
+  description = "Allows incoming connections to MySQL"
+
+  security_group_id = aws_security_group.database.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.database_access.id
 }
 
 # Because Drupal tasks are run in the AWSVPC networking mode, we are able to assign
@@ -160,16 +235,13 @@ resource "aws_security_group" "drupal_task" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # The corresponding ingress rule for RDS is at the end of this file. We use this here
-  # because for some reason, the egress list attached to this resource is somewhat
-  # brittle, so we can't create a separate aws_security_group_rule like we normally do.
   egress {
-    description = "Allow outgoing connections to RDS"
+    description = "Allow access to VPC endpoint services"
 
     protocol        = "tcp"
-    from_port       = 3306
-    to_port         = 3306
-    security_groups = [aws_security_group.database.id]
+    from_port       = 0
+    to_port         = 0
+    security_groups = [aws_security_group.interface.id]
   }
 
   tags = {
@@ -205,28 +277,89 @@ resource "aws_security_group_rule" "drupal_lb_ingress" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
-# Rule: ingress to RDS from Drupal
-resource "aws_security_group_rule" "db_task_ingress" {
-  description = "Allow incoming connections from Drupal tasks to RDS"
+resource "aws_security_group" "cache" {
+  name        = "webcms-cache-sg"
+  description = "Security group for ElastiCache servers"
 
-  security_group_id = aws_security_group.database.id
+  vpc_id = aws_vpc.main.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 3306
-  to_port                  = 3306
-  source_security_group_id = aws_security_group.drupal_task.id
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS ElastiCache"
+  }
 }
 
-# Rule: ingress to RDS from bastion server
-resource "aws_security_group_rule" "db_bastion_ingress" {
-  description = "Allow incoming connections from the SSH bastion to RDS"
+resource "aws_security_group" "cache_access" {
+  name        = "webcms-cache-access-sg"
+  description = "Security group for access to ElastiCache"
 
-  security_group_id = aws_security_group.database.id
+  vpc_id = aws_vpc.main.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 3306
-  to_port                  = 3306
-  source_security_group_id = aws_security_group.bastion.id
+  egress {
+    description = "Allow outgoing connections to ElastiCache"
+
+    protocol        = "tcp"
+    from_port       = 6379
+    to_port         = 6379
+    security_groups = [aws_security_group.cache.id]
+  }
+}
+
+resource "aws_security_group_rule" "cache_access_ingress" {
+  description = "Allow incoming connections to ElastiCache"
+
+  security_group_id = aws_security_group.cache.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 6379
+  to_port   = 6379
+
+  source_security_group_id = aws_security_group.cache_access.id
+}
+
+resource "aws_security_group" "search" {
+  name        = "webcms-search-sg"
+  description = "Security group for search servers"
+
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Elasticsearch"
+  }
+}
+
+resource "aws_security_group" "search_access" {
+  name        = "webcms-search-access-sg"
+  description = "Security group for access to search servers"
+
+  vpc_id = aws_vpc.main.id
+
+  egress {
+    description = "Allow access to Elasticsearch"
+
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    security_groups = [aws_security_group.search.id]
+  }
+
+  tags = {
+    Application = "WebCMS"
+    Name        = "WebCMS Elasticsearch Access"
+  }
+}
+
+resource "aws_security_group_rule" "search_access_ingress" {
+  description = "Allows ingress from the search acess group"
+
+  security_group_id = aws_security_group.search.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.search_access.id
 }
