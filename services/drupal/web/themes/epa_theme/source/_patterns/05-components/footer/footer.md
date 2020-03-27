@@ -1,7 +1,7 @@
 ---
 el: .footer
 title: Footer
-state: inreview
+state: complete
 ---
 
 __Variables:__

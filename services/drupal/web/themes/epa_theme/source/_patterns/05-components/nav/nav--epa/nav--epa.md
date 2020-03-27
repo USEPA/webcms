@@ -1,7 +1,7 @@
 ---
 el: .usa-nav--epa
 title: EPA Nav
-state: inreview
+state: complete
 ---
 
 __Blocks:__

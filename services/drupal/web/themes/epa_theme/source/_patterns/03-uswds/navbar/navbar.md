@@ -1,7 +1,7 @@
 ---
 el: .usa-navbar
 title: Navbar
-state: inprogress
+state: complete
 ---
 
 Part of the USWDS Header component.

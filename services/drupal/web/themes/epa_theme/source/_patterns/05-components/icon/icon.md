@@ -1,7 +1,7 @@
 ---
 el: .icon
 title: Icon
-state: inreview
+state: complete
 ---
 
 __Variables:__
