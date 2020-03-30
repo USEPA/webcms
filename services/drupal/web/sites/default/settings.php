@@ -280,7 +280,7 @@ $config_directories = [];
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = getenv('DRUPAL_HASH_SALT');
+$settings['hash_salt'] = getenv('WEBCMS_HASH_SALT');
 
 /**
  * Deployment identifier.
@@ -763,58 +763,41 @@ $settings['entity_update_batch_size'] = 50;
  */
 $settings['entity_update_backup'] = TRUE;
 
-// CloudFoundry service bindings
-$cf_service_bindings = json_decode(getenv('VCAP_SERVICES'));
-if (json_last_error() !== 0) {
-  // If we failed to parse the $VCAP_SERVICES environment variable, crash noisily
-  // (it's a fatal error - we can't connect to the DB without this value).
-  throw new \Exception(json_last_error_msg());
-}
+$databases['default']['default'] = [
+  'database' => getenv('WEBCMS_DB_NAME'),
+  'username' => getenv('WEBCMS_DB_USER'),
+  'password' => getenv('WEBCMS_DB_PASS'),
+  'driver' => 'mysql',
+  'collation' => 'utf8mb4_general_ci',
+  // In ECS, the host 'mysql' resolves to an alias to the Aurora cluster
+  'host' => 'mysql',
+  'port' => 3306,
+];
 
-if (isset($cf_service_bindings->{'aws-rds'})) {
-  list($rds_settings) = $cf_service_bindings->{'aws-rds'};
-  $rds_credentials = $rds_settings->credentials;
+// Use instance credentials since we're in an AWS environment
+$config['s3fs.settings']['use_instance_profile'] = TRUE;
+$config['s3fs.settings']['bucket'] = getenv('WEBCMS_S3_BUCKET');
+$config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
-  $databases['default']['default'] = [
-    'database' => $rds_credentials->db_name,
-    'username' => $rds_credentials->username,
-    'password' => $rds_credentials->password,
-    'host' => $rds_credentials->host,
-    'port' => $rds_credentials->port,
-    'driver' => 'mysql',
-    'collation' => 'utf8mb4_general_ci',
-  ];
-}
+$settings['s3fs.use_s3_for_public'] = TRUE;
+$settings['s3fs.use_s3_for_private'] = TRUE;
 
-if (isset($cf_service_bindings->s3)) {
-  list($s3_settings) = $cf_service_bindings->s3;
-  $s3_credentials = $s3_settings->credentials;
+$settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
-  $settings['s3fs.access_key'] = $s3_credentials->access_key_id;
-  $settings['s3fs.secret_key'] = $s3_credentials->secret_access_key;
+$env_name = getenv('WEBCMS_ENV_NAME');
+$env_state = getenv('WEBCMS_ENV_STATE');
 
-  $config['s3fs.settings']['bucket'] = $s3_credentials->bucket;
-  $config['s3fs.settings']['region'] = $s3_credentials->region;
-
-  $settings['s3fs.use_s3_for_public'] = TRUE;
-  $settings['s3fs.use_s3_for_private'] = TRUE;
-
-  $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
-}
-
-if (isset($cf_service_bindings->redis32)) {
-  list($redis_settings) = $cf_service_bindings->redis32;
-  $redis_credentials = $redis_settings->credentials;
-
+// Only activate Redis if we're in the 'run' ENV_STATE. We need to do this because
+// setting the cache backend before the Redis module is installed, Drupal will throw an
+// exception.
+if ($env_state === 'run') {
   $settings['redis.connection'] = [
     'interface' => 'Predis',
-    'host' => $redis_credentials->hostname,
-    'port' => $redis_credentials->port,
+    // Like the database above, the hostname 'redis' resolves to the ElastiCache
+    // cluster in production.
+    'host' => 'redis',
+    'port' => 6379,
   ];
-
-  if (isset($redis_credentials->password)) {
-    $settings['redis.connection']['password'] = $redis_credentials->password;
-  }
 
   $settings['cache']['default'] = 'cache.backend.redis';
   $settings['cache']['bins']['form'] = 'cache.backend.database';
@@ -822,36 +805,20 @@ if (isset($cf_service_bindings->redis32)) {
   $settings['container_yamls'][] = 'modules/redis/example.services.yml';
 }
 
-if (isset($cf_service_bindings->elasticsearch56)) {
-  list($es_settings) = $cf_service_bindings->elasticsearch56;
-  $es_credentials = $es_settings->credentials;
-  $es_url = 'http://' . $es_credentials->hostname . ':' . $es_credentials->port;
+// We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
+// is made.
+$config['elasticsearch_connector.cluster.elasticsearch']['url'] = getenv('WEBCMS_SEARCH_HOST');
+$config['elasticsearch_connector.cluster.elasticsearch']['use_authentication'] = FALSE;
 
-  $config['elasticsearch_connector.cluster.elasticsearch']['url'] = $es_url;
-  $config['elasticsearch_connector.cluster.elasticsearch']['options']['username'] = $es_credentials->username;
-  $config['elasticsearch_connector.cluster.elasticsearch']['options']['password'] = $es_credentials->password;
-}
+$config['smtp.settings']['smtp_username'] = getenv('WEBCMS_MAIL_USER');
+$config['smtp.settings']['smtp_password'] = getenv('WEBCMS_MAIL_PASS');
+$config['smtp.settings']['smtp_from'] = getenv('WEBCMS_MAIL_FROM');
+$config['smtp.settings']['smtp_host'] = getenv('WEBCMS_MAIL_HOST');
 
-$user_services = [];
-
-if (isset($cf_service_bindings->{'user-provided'})) {
-  foreach ($cf_service_bindings->{'user-provided'} as $user_service) {
-    $user_services[$user_service->instance_name] = $user_service;
-  }
-}
-
-if (isset($user_services['epa-smtp'])) {
-  $smtp_credentials = $user_services['epa-smtp']->credentials;
-  $config['smtp.settings']['smtp_username'] = $smtp_credentials->smtp_username;
-  $config['smtp.settings']['smtp_password'] = $smtp_credentials->smtp_password;
-  $config['smtp.settings']['smtp_from'] = $smtp_credentials->smtp_from;
-}
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 $config_directories['sync'] = '../config/sync';
 
-$env_name = getenv('ENV_NAME');
-$env_state = getenv('ENV_STATE');
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }

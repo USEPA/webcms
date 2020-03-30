@@ -4,12 +4,32 @@
 version: "3.7"
 
 services:
-  # The Drupal service is the main entrypoint into the application. It runs both
-  # nginx and PHP.
+  nginx:
+    image: nginx:mainline-alpine
+    depends_on:
+      - drupal
+    ports:
+      - 8080:80
+      - 8443:443
+    volumes:
+      - ${F1_TLS_CERT}:/etc/nginx/ssl/local.crt:ro,cached
+      - ${F1_TLS_KEY}:/etc/nginx/ssl/local.key:ro,cached
+      - ./services/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,cached
+      - ./services/drupal/web:/var/www/html/web:cached
+      - type: volume
+        source: fs-data
+        target: /var/www/html/web/sites/default/files
+      - type: volume
+        source: gesso-pattern-lab
+        target: /var/www/html/web/themes/epa_theme/pattern-lab
+      - type: volume
+        source: gesso-css
+        target: /var/www/html/web/themes/epa_theme/css
+
   drupal:
     build:
       context: ./services/drupal
-      dockerfile: dev.Dockerfile
+      target: dev
     # This command line detects if the F1_XDEBUG parameter was set by `f1 up --xdebug',
     # and enables XDebug accordingly. We do not do this by default due to the significant
     # performance penalty imposed by XDebug.
@@ -18,112 +38,20 @@ services:
       - -c
       - |
         set -e
-        chmod a+w /var/www/html/web/sites/default/files
+        chmod -R a+w /var/www/html/web/sites/default/files
         if test ! -z "${F1_XDEBUG:-}"; then
           docker-php-ext-enable xdebug
           echo 'xdebug.remote_enable=1' > /usr/local/etc/php/conf.d/xdebug.ini
         fi
 
-        # Create a copy of default.conf to allow `sed -i' to work.
-        mkdir -p /etc/nginx/conf.d
-        cp /mnt/conf/nginx.conf /etc/nginx/conf.d/default.conf
-
-        # Execute regular entrypoint script now that we've checked for XDebug.
-        exec sh /entrypoint.sh
+        exec php-fpm
     depends_on:
       - mysql
     environment:
-      # In production, this would be an actually secure string.
-      DRUPAL_HASH_SALT: abcdefg
-
-      # Identify this container instance as being the zeroth - this signals that we should
-      # be running Drush cron tasks in this container.
-      CF_INSTANCE_INDEX: '0'
-
-      # Route SMTP mail to MailHog
-      SMTPHOST: mailhog:1025
-
       # This enables connecting back to the user's computer during an XDebug session.
       XDEBUG_CONFIG: remote_host=${F1_XDEBUG_REMOTE:-127.0.0.1}
-
-      # The VCAP_SERVICES we inject here are a subset of the VCAP_SERVICES
-      # offered by a CloudFoundry service binding. For the most part, we only
-      # concern ourselves with the access credentials.
-      #
-      # The service keys come from inspecting CloudFoundry service bindings.
-      #
-      # Further reading: https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#VCAP-SERVICES
-      #
-      # Remember to keep this value in sync with the drush container's VCAP_SERVICES
-      # environment variable (see docker-compose.cli.yml).
-      VCAP_SERVICES: |
-        {
-          "aws-rds": [
-            {
-              "credentials": {
-                "db_name": "web",
-                "host": "mysql",
-                "password": "web",
-                "port": "3306",
-                "username": "web"
-              }
-            }
-          ],
-          "s3": [
-            {
-              "provider": "minio",
-              "credentials": {
-                "access_key_id": "minio_access",
-                "secret_access_key": "minio_secret",
-                "region": "us-east-1",
-                "bucket": "drupal",
-                "additional_buckets": []
-              }
-            }
-          ],
-          "redis32": [
-            {
-              "credentials": {
-                "hostname": "redis",
-                "password": null,
-                "port": "6379"
-              }
-            }
-          ],
-          "elasticsearch56": [
-            {
-              "credentials": {
-                "hostname": "elasticsearch",
-                "username": "root",
-                "password": "",
-                "port": "9200"
-              }
-            }
-          ]
-        }
-
-      # The VCAP_APPLICATION environment variable governs attributes of the running app.
-      # As with VCAP_SERVICES above, we only inject a subset of the data that CloudFoundry
-      # makes available to us.
-      #
-      # Further reading: https://docs.cloudfoundry.org/devguide/deploy-apps/environment-variable.html#VCAP-APPLICATION
-      #
-      # This value must be kept in sync with the drush container's VCAP_APPLICATION variable
-      # in docker-compose.cli.yml.
-      VCAP_APPLICATION: |
-        {
-          "application_uris": [
-            "localhost:8080"
-          ]
-        }
-    ports:
-      - 8080:80
-      - 8443:443
     volumes:
-      - ${F1_TLS_CERT}:/run/secrets/local.crt:ro,cached
-      - ${F1_TLS_KEY}:/run/secrets/local.key:ro,cached
       - ./services/drupal:/var/www/html:cached
-      - ./services/nginx/default.conf:/mnt/conf/nginx.conf:ro,cached
       - type: volume
         source: fs-data
         target: /var/www/html/web/sites/default/files
@@ -192,28 +120,27 @@ services:
 
   # Redis with persistence enabled
   redis:
-    image: redis:3.2-alpine
+    image: redis:5.0-alpine
     entrypoint:
       - redis-server
       - --appendonly
-      - 'yes'
+      - "yes"
     volumes:
       - type: volume
         source: redis-data
         target: /data
 
-  # ElasticSearch 5.6
+  # Elasticsearch 7.4
   elasticsearch:
-    # Found in https://github.com/18F/kubernetes-broker/blob/master/catalogData/elasticsearch56/medium/k8s/deployment.json
-    image: 18fgsa/k8s-elasticsearch:5.6.5
+    image: elasticsearch:7.4.2
     environment:
       CLUSTER_NAME: elasticsearch
       DISCOVERY_SERVICE: elasticsearch
-      MINIMUM_MASTER_NODES: '1'
-      EXPECTED_MASTER_NODES: '1'
-      EXPECTED_DATA_NODES: '1'
-      RECOVER_AFTER_MASTER_NODES: '1'
-      RECOVER_AFTER_DATA_NODES: '1'
+      MINIMUM_MASTER_NODES: "1"
+      EXPECTED_MASTER_NODES: "1"
+      EXPECTED_DATA_NODES: "1"
+      RECOVER_AFTER_MASTER_NODES: "1"
+      RECOVER_AFTER_DATA_NODES: "1"
       ES_JAVA_OPTS: -Djava.net.preferIPv4Stack=true -Xms512m -Xmx512m
       discovery.type: single-node
     volumes:
