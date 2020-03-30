@@ -4,6 +4,8 @@ namespace Drupal\epa_wysiwyg\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
+use Drupal\Core\Url;
+use Drupal\Core\Link;
 
 /**
  * Plugin implementation of the 'file_with_extension' formatter.
@@ -25,22 +27,15 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
     $elements = [];
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
-      $item = $file->_referringItem;
-      $elements[$delta] = [
-        '#theme' => 'file_link',
-        '#file' => $file,
-        '#cache' => [
-          'tags' => $file->getCacheTags(),
-        ],
-      ];
-      // Pass field item attributes to the theme function.
-      if (isset($item->_attributes)) {
-        $elements[$delta] += ['#attributes' => []];
-        $elements[$delta]['#attributes'] += $item->_attributes;
-        // Unset field item attributes since they have been included in the
-        // formatter output and should not be rendered in the field template.
-        unset($item->_attributes);
-      }
+      $mimetype = $file->getMimeType();
+      $extension = explode('/', $mimetype)[1]; // does not work perfectly for every mimetype.
+      $options = [];
+      $options['attributes']['type'] = $mimetype . '; length=' . $file->getSize();
+      $options['attributes']['title'] = $file->getFilename();
+      $url = Url::fromUri($file->createFileUrl(FALSE), $options);
+      $link = Link::fromTextAndUrl(t($file->label() . '(' . $extension . ')'), $url)->toRenderable();
+
+      $elements[$delta] = $link;
     }
 
     return $elements;
