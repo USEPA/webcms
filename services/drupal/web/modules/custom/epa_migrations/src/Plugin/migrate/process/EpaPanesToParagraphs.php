@@ -14,8 +14,8 @@ use Drupal\migrate\Row;
  *   id = "epa_panes_to_paragraphs"
  * )
  *
- * To get an array of panes converted to paragraph entity ids for a field, do
- * the following:
+ * To convert a an array of panes to paragraph entity ids for a field, do the
+ * following:
  *
  * @code
  * field_paragraphs:
@@ -47,11 +47,18 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
           'epa_core_link_list_pane' => '\\Drupal\epa_migrations\EpaCoreListPaneToParagraph',
         ];
 
-        $pane_class = $pane_classes[$type];
-        $pane_transformer = new $pane_class();
-        $transformed_paragraph_ids = $pane_transformer->createParagraph($row, $pane, $configuration);
-        if ($transformed_paragraph_ids) {
-          $paragraph_ids[] = $transformed_paragraph_ids;
+        $pane_class = $pane_classes[$type] ?? NULL;
+
+        if ($pane_class) {
+          $pane_transformer = new $pane_class();
+          $transformed_paragraph_ids = $pane_transformer->createParagraph($row, $pane, $configuration);
+
+          if ($transformed_paragraph_ids) {
+            $paragraph_ids[] = $transformed_paragraph_ids;
+          }
+        }
+        else {
+          $migrate_executable->saveMessage("WARNING: No pane transformer was found for pane type '{$type}' with pid {$pane['pid']}. This pane is used in the '{$pane['panel']}' panel. This pane was not migrated.", 3);
         }
 
       }
