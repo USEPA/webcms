@@ -24,3 +24,13 @@ $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default
 if ($env_state == 'build') {
   unset($settings['cache']['default']);
 }
+
+// Connect to Drupal 7 database in Vagrant.
+$databases['drupal_7']['default'] = [
+  'database' => 'web',
+  'username' => 'web',
+  'password' => 'web',
+  'host' => 'host.docker.internal',
+  'port' => '13306',
+  'driver' => 'mysql',
+];
