@@ -33,11 +33,16 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
       $options['attributes']['type'] = $file->getMimeType() . '; length=' . $file->getSize();
       $options['attributes']['title'] = $file->getFilename();
       $url = Url::fromUri($file->createFileUrl(FALSE), $options);
-      $link = Link::fromTextAndUrl($media->getName() . ' (' . $extension . ')', $url)
-        ->toRenderable();
+      $link = Link::fromTextAndUrl($media->getName(), $url)->toString();
 
-      $elements[$delta] = $link;
-      $elements[$delta]['#cache']['tags'] = $file->getCacheTags();
+      $markup = [
+        '#type' => 'markup',
+        '#markup' => '<p>' . $link . ' (' . $extension . ')</p>', //
+        '#cache' => [
+          'tags' => $file->getCacheTags(),
+        ],
+      ];
+      $elements[$delta] = $markup;
     }
     return $elements;
   }
