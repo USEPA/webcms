@@ -15,6 +15,19 @@ use Drupal\migrate\Row;
 class EpaNode extends Node {
 
   /**
+   * {@inheritdoc}
+   */
+  public function query() {
+    // Get the default Node query.
+    $query = parent::query();
+
+    // Limit results to specific nid.
+    $query->condition('n.nid', [35871, 5], 'IN');
+
+    return $query;
+  }
+
+  /**
    * {@inheritDoc}
    */
   public function prepareRow(Row $row) {

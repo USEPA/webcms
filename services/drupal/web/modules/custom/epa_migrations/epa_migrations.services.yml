@@ -1,0 +1,14 @@
+services:
+  epa_migrations.epa_pane_to_paragraph:
+    class: Drupal\epa_migrations\EpaPaneToParagraph
+    factory: Drupal\Core\Database\Database::getConnection
+    arguments: ['drupal_7']
+  epa_migrations.node_content_pane_to_paragraph:
+    class: Drupal\epa_migrations\EpaNodeContentPaneToParagraph
+    arguments: ['@epa_migrations.epa_pane_to_paragraph']
+  epa_migrations.core_html_pane_to_paragraph:
+    class: Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph
+    arguments: ['@epa_migrations.epa_pane_to_paragraph']
+  epa_migrations.core_list_pane_to_paragraph:
+    class: Drupal\epa_migrations\EpaCoreListPaneToParagraph
+    arguments: ['@epa_migrations.epa_pane_to_paragraph']
