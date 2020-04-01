@@ -98,9 +98,10 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # The 1-or-0 count here is a Terraform idiom for conditionally creating a resource
   count = var.image-tag-nginx != null && var.image-tag-drupal != null ? 1 : 0
 
-  family        = "webcms-drupal"
-  network_mode  = "awsvpc"
-  task_role_arn = aws_iam_role.drupal_container_role.arn
+  family             = "webcms-drupal"
+  network_mode       = "awsvpc"
+  task_role_arn      = aws_iam_role.drupal_container_role.arn
+  execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
@@ -122,6 +123,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true,
+
+      # Inject the S3 information needed to connect for s3fs (cf. shared.tf)
+      environment = local.drupal-environment,
+
+      # Inject the DB credentials needed (cf. shared.tf)
+      secrets = local.drupal-secrets,
 
       # Expose port 9000 inside the task. This is a FastCGI port, not an HTTP one, so it
       # won't be of use to anyone save for nginx. Most importantly, this means that this
@@ -153,6 +160,13 @@ resource "aws_ecs_task_definition" "drupal_task" {
       cpu    = 256, # = 0.25 vCPU
       memory = 256,
 
+      environment = [
+        # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
+        # the region and bucket name because in us-east-1, the domain isn't easy to
+        # construct via "$bucket.s3-$region.amazonaws.com".
+        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name }
+      ]
+
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true,
 
@@ -180,6 +194,13 @@ resource "aws_ecs_task_definition" "drupal_task" {
     Name        = "WebCMS Task - Drupal"
     Application = "WebCMS"
   }
+
+  # Explicitly depend on IAM permissions: if we don't, the ECS service may not be able
+  # to launch tasks
+  depends_on = [
+    aws_iam_role_policy_attachment.drupal_execution_tasks,
+    aws_iam_role_policy_attachment.drupal_execution_parameters
+  ]
 }
 
 # Create the actual ECS service that serves Drupal traffic. This uses the Drupal task
@@ -228,7 +249,8 @@ resource "aws_ecs_service" "drupal" {
   network_configuration {
     subnets          = aws_subnet.private.*.id
     assign_public_ip = false
-    security_groups  = [aws_security_group.drupal_task.id]
+
+    security_groups = local.drupal-security-groups
   }
 
   # Ask ECS to prioritize spreading tasks across available EC2 instances before running

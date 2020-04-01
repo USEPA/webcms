@@ -8,35 +8,41 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
-resource "aws_db_instance" "db" {
-  identifier = "webcms-db"
+resource "aws_rds_cluster" "db" {
+  cluster_identifier = "webcms-db"
 
-  # Engine & version params
-  engine         = "mysql"
-  engine_version = "5.7"
+  # Aurora Serverless doesn't support engine versions (for MySQL, it's fixed at 5.6)
+  engine      = "aurora"
+  engine_mode = "serverless"
 
-  # Request a multi-AZ instance
-  multi_az = true
+  database_name   = local.database-name
+  master_username = var.db-username
+  master_password = var.db-password
 
-  # Instance/storage params
-  instance_class          = var.db-instance-type
-  storage_type            = "gp2"
-  allocated_storage       = var.db-storage-size
-  storage_encrypted       = true
-  backup_retention_period = 30
-  skip_final_snapshot     = true
+  backup_retention_period      = 30
+  preferred_backup_window      = "04:00-06:00"
+  preferred_maintenance_window = "sun:06:00-sun:08:00"
 
-  # Networking/VPC
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]
+  # We don't set the availability zones manually here - Aurora auto-assigns 3 AZs which
+  # should be sufficient.
 
-  # DB params
-  name     = "webcms"
-  username = var.db-username
-  password = var.db-password
+  scaling_configuration {
+    auto_pause               = var.db-auto-pause
+    min_capacity             = var.db-min-capacity
+    max_capacity             = var.db-max-capacity
+    seconds_until_auto_pause = 21600 # 6 * 3600 = 6 hours
+  }
 
   tags = {
     Application = "WebCMS"
     Name        = "WebCMS DB"
+  }
+
+  # Ignore changes to the master password since it's stored in the Terraform state.
+  # Instead, the value in Parameter Store should be treated as the sole source of truth.
+  lifecycle {
+    ignore_changes = [master_password]
   }
 }
