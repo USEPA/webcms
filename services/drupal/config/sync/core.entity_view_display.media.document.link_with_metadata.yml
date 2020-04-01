@@ -8,12 +8,11 @@ dependencies:
     - field.field.media.document.field_keywords
     - field.field.media.document.field_limit_file_accessibility
     - field.field.media.document.field_media_file
-    - field.field.media.document.field_num_of_pages
     - field.field.media.document.field_publication_date
     - field.field.media.document.field_publication_number
     - media.type.document
   module:
-    - file
+    - epa_wysiwyg
     - layout_builder
     - media_inline_embed
 third_party_settings:
@@ -30,41 +29,17 @@ content:
   field_media_file:
     weight: 0
     label: hidden
-    settings:
-      use_description_as_link_text: true
+    settings: {  }
     third_party_settings: {  }
-    type: file_default
-    region: content
-  field_num_of_pages:
-    weight: 2
-    label: hidden
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
-    type: number_integer
-    region: content
-  field_publication_date:
-    type: string
-    weight: 3
-    region: content
-    label: hidden
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-  field_publication_number:
-    weight: 4
-    label: hidden
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
+    type: file_with_extension
     region: content
 hidden:
   created: true
   field_description: true
   field_keywords: true
   field_limit_file_accessibility: true
+  field_publication_date: true
+  field_publication_number: true
   name: true
   thumbnail: true
   uid: true
