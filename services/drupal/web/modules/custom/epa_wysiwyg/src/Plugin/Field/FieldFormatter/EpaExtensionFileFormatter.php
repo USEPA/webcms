@@ -25,9 +25,9 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $media = $items->getEntity();
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
-      $media = $items->getEntity();
       $extension = pathinfo($file->getFilename(), PATHINFO_EXTENSION);
       $options = [];
       $options['attributes']['type'] = $file->getMimeType() . '; length=' . $file->getSize();
@@ -37,7 +37,7 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
 
       $markup = [
         '#type' => 'markup',
-        '#markup' => '<p>' . $link . ' (' . $extension . ')</p>', //
+        '#markup' => $link . ' (' . $extension . ')',
         '#cache' => [
           'tags' => $file->getCacheTags(),
         ],
