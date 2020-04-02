@@ -9,9 +9,64 @@
  * @see https://www.drupal.org/node/2217931
  */
 
-/**
- *
- */
-function epa_content_tracker_entity_update() {
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\epa_content_tracker\Logger\EpaContentTrackerLogger;
+use Drupal\Core\Url;
 
+/**
+ * Implements hook_entity_insert().
+ */
+function epa_content_tracker_entity_insert(EntityInterface $entity) {
+  if ('node' == $entity->getEntitytypeId()) {
+    $id = $entity->id();
+    $entity_type = $entity->getEntityTypeId();
+    $alias = $entity->toUrl()->toString();
+    $changed = $entity->getChangedTime();
+    $logger = new EpaContentTrackerLogger();
+    $logger->insert($entity_type, $id, $alias, $changed);
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function epa_content_tracker_entity_update(EntityInterface $entity) {
+  if ('node' == $entity->getEntitytypeId()) {
+    $id = $entity->id();
+    $entity_type = $entity->getEntityTypeId();
+    $alias = $entity->toUrl()->toString();
+    $changed = $entity->getChangedTime();
+    $logger= new EpaContentTrackerLogger();
+    $logger->insert($entity_type, $id, $alias, $changed);
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function epa_content_tracker_entity_delete(EntityInterface $entity) {
+  if ('node' == $entity->getEntitytypeId()) {
+    $id = $entity->id();
+    $entity_type = $entity->getEntityTypeId();
+    $alias = $entity->toUrl()->toString();
+    $changed = $entity->getChangedTime();
+    $logger = new EpaContentTrackerLogger();
+    $logger->delete($entity_type, $id, $alias, $changed);
+  }
+}
+
+/**
+ * Implements hook_path_update().
+ * @param $path
+ */
+function epa_content_tracker_path_update($path) {
+  if ($path['alias'] != $path['original']['alias']) {
+//    \Drupal::database()
+//      ->update('mytable')
+//      ->fields([
+//        'alias' => $path['alias'],
+//      ])
+//      ->condition('pid', $path['pid'])
+//      ->execute();
+  }
 }
