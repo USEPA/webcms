@@ -25,18 +25,12 @@ steps:
           login: true
           no-include-email: true
 
-  - label: ":terraform: Deploy templates"
-    key: deploy
+  - label: ":terraform: Plan"
+    key: plan
 
-    # Only build on the master branch, and only if this isn't a pull request
-    if: build.branch == "master" && build.pull_request.id == null
-
-    # Only allow one deployment at a time
-    concurrency_group: epa-webcms-d8/deploy
+    # Only allow one plan at a time, per branch
+    concurrency_group: epa-webcms-d8/plan-$BUILDKITE_BRANCH
     concurrency: 1
-
-    # Run only if the build step succeeded
-    depends_on: build
 
     plugins:
       # Assume the Terraform role for maximum permissions
@@ -58,7 +52,7 @@ steps:
       - docker#v3.5.0:
           image: hashicorp/terraform:0.12.24
           entrypoint: /bin/sh
-          command: [.buildkite/deploy-terraform.sh]
+          command: [.buildkite/terraform-plan.sh]
           environment:
             # Forward image tag
             - WEBCMS_IMAGE_TAG
@@ -67,22 +61,62 @@ steps:
             - AWS_SECRET_ACCESS_KEY
             - AWS_SESSION_TOKEN
       - artifacts#v1.3.0:
+          # Upload the Terraform plan as a build artifact
+          upload: infrastructure/terraform/out.plan
+
+  - label: ":terraform: Apply"
+    key: apply
+
+    # Only allow one apply at a time, regardless of branch
+    concurrency_group: epa-webcms-d8/apply
+    concurrency: 1
+
+    # Only deploy after the first two steps have completed
+    depends_on:
+      - step: build
+      - step: plan
+
+    # Only build on commits (not pull requests) to the master branch
+    if: build.branch == "master" && build.pull_request.id == null
+
+    # See the previous plan step for most of these values
+    plugins:
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
+          duration: 1800
+      - ./.buildkite/plugins/aws-parameters:
+          params:
+            # Since we are using plan data, we don't need to load the Terraform variables
+            - name: /buildkite/terraform/backend-config
+              file: infrastructure/terraform/backend.config
+      - docker#v3.5.0:
+          image: hashicorp/terraform:0.12.24
+          entrypoint: /bin/sh
+          command: [.buildkite/terraform-apply.sh]
+          environment:
+            - WEBCMS_IMAGE_TAG
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_SESSION_TOKEN
+      - artifacts#v1.3.0:
+          # Retrieve the Terraform plan in order to apply it exactly
+          download: infrastructure/terraform/out.plan
+
+          # Upload the generated AWSVPC configuration for the next Drush step
           upload:
-            - from: infrastructure/terraform/out.plan
-              to: out.plan
             - from: infrastructure/terraform/drushvpc.json
               to: drushvpc.json
 
   - label: ":ecs: Run Drush updates"
     command: bash .buildkite/run-drush.sh
 
-    # Only build on the master branch, and only if this isn't a pull request
+    # Only build on commits (not pull requests) to the master branch
     if: build.branch == "master" && build.pull_request.id == null
 
     # Run only if the previous deploy step succeeded
-    depends_on: deploy
+    depends_on: apply
 
-    # Only allow one Drush update at a time
+    # Only allow one Drush update at a time, regardless of branch
     concurrency_group: epa-webcms-d8/update
     concurrency: 1
 
