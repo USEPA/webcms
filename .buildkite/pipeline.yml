@@ -1,3 +1,20 @@
+# The build pipeline for this project consists of four steps. The first two are executed
+# in parallel for all branches and commits, and the latter two are executed in serial as
+# deployment steps.
+#
+# 1. Docker image builds. We build and push three Docker images (Drupal, Drush, and nginx)
+#    to our account, and tag them with based on the branch and build number (see the env:
+#    below). Images are always pushed to ECR, but are not deployed to infrastructure during
+#    this step.
+# 2. Terraform plan. We use the `terraform plan` command to view upcoming changes to
+#    infrastructure that may occur as a result of this change. The plan is saved as
+#    an artifact, but is otherwise not used.
+# 3. Terraform apply. This step must occur after both the builds and plan have finished.
+#    We use the plan from the previous step to deploy the images from the first step.
+# 4. A Drush update script. After Terraform has finished applying changes, we run a Drush
+#    task to run maintenance commands (config imports, DB updates, cache clear, etc.)
+#    against the environment.
+
 env:
   # Common image tag used across steps
   WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
