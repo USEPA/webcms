@@ -11,6 +11,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EpaPaneToParagraph implements EpaPaneToParagraphInterface, ContainerInjectionInterface {
 
+  use EpaBoxWrapperTrait;
+  use EpaCreateParagraphsTrait;
+
   /**
    * The drupal_7 database connection.
    *
@@ -33,7 +36,7 @@ class EpaPaneToParagraph implements EpaPaneToParagraphInterface, ContainerInject
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('database')
+      $container->get('epa_migrations.epa_pane_to_paragraph')
     );
   }
 
