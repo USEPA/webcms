@@ -86,6 +86,7 @@ class EPAAddDefinitions extends CKEditorPluginBase {
   public function getLibraries(Editor $editor) {
     return [
       'epa_wysiwyg/epa-add-definitions-admin',
+      'epa_wysiwyg/epa-add-definitions',
     ];
   }
 

@@ -11,7 +11,6 @@ var CKEditorAddDefinitions = (function(my) {
     {
       init: function(editor) {
         // module settings. enable all by default
-        editor.config.contentsCss = this.path + 'epaAddDefinitions.css';
         my.dictionaryModulePath = this.path;
         my.glossaryFilterEnabled = editor.config.glossaryFilterEnabled;
         my.undoRedoEnabled = editor.config.undoRedoEnabled;
