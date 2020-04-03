@@ -1,0 +1,27 @@
+{#
+/**
+ * @file
+ * Theme override to display a media item.
+ *
+ * Available variables:
+ * - name: Name of the media.
+ * - content: Media content.
+ *
+ * @see template_preprocess_media()
+ *
+ * @ingroup themeable
+ */
+#}
+{% set classes = [
+  ('figure--' ~ view_mode)|clean_class,
+  attributes.hasClass('align-center') ? 'is-centered',
+  attributes.hasClass('align-left') ? 'u-align-left',
+  attributes.hasClass('align-right') ? 'u-align-right',
+]|join(' ')|trim %}
+
+{% include '@components/figure/figure.twig' with {
+  'is_demo': false,
+  'modifier_classes': classes,
+  'media': content.field_media_image|field_value,
+  'caption': '',
+} %}
