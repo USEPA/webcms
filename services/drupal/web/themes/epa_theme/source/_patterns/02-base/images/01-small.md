@@ -1,5 +1,5 @@
 ---
-title: Box Header
+title: Small
 state: inreview
 ---
 
