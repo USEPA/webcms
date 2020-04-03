@@ -19,9 +19,8 @@ interface EpaPaneToParagraphInterface {
    * @param object $configuration
    *   The unserialized configuration object from the record.
    *
-   * @return array|null
-   *   An array of destination ids for the Paragraph, keyed by destination id
-   *   key, or NULL if the pane will not be migrated.
+   * @return \Drupal\paragraphs\Entity\Paragraph[]|\Drupal\paragraphs\Entity\Paragraph|null
+   *   A paragraph, an array of paragraphs, or null.
    */
   public function createParagraph(Row $row, array $record, object $configuration);
 

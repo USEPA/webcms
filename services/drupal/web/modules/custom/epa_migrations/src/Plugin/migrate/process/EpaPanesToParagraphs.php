@@ -103,7 +103,13 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
 
       if ($shown) {
         $type = $pane['type'];
-        $configuration = unserialize($pane['configuration']);
+
+        // The configuration (box style) we need for fieldable panels panes is
+        // stored in the 'style' column. For all other panes we need to pull
+        // it from configuration.
+        $type == 'fieldable_panels_pane' ?
+          $configuration = unserialize($pane['style']) :
+          $configuration = unserialize($pane['configuration']);
 
         $pane_transformer_services = [
           'node_content' => 'epaNodeContentTransformer',
@@ -120,10 +126,17 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
         $pane_transformer_service = $pane_transformer_services[$type] ?? NULL;
 
         if ($pane_transformer_service) {
-          $transformed_paragraph_ids = $this->$pane_transformer_service->createParagraph($row, $pane, $configuration);
+          $transformed_paragraphs = $this->$pane_transformer_service->createParagraph($row, $pane, $configuration);
 
-          if ($transformed_paragraph_ids) {
-            $paragraph_ids[] = $transformed_paragraph_ids;
+          if ($transformed_paragraphs) {
+            // Convert transformed_paragraphs to an array if it's not already.
+            $transformed_paragraphs = is_array($transformed_paragraphs) ?: [$transformed_paragraphs];
+            foreach ($transformed_paragraphs as $paragraph) {
+              $paragraph_ids[] = [
+                'target_id' => $paragraph->id(),
+                'target_revision_id' => $paragraph->getRevisionId(),
+              ];
+            }
           }
         }
         else {
