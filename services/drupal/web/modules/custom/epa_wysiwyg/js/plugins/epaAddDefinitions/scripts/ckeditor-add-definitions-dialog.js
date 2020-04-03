@@ -212,7 +212,7 @@ var CKEditorAddDefinitions = (function(my) {
           }
 
           var content = '<!DOCTYPE html><head><link type="text/css" rel="stylesheet" href="' + my.dictionaryModulePath
-            + 'css/epaAddDefinitions.css"></link></head><body><div id="preview_pane" class="clearfix"></div></body></html>';
+            + 'epaAddDefinitions.css"></link></head><body><div id="preview_pane" class="clearfix"></div></body></html>';
 
           my.previewIframe = document.getElementById('preview_iframe');
           my.innerDoc = my.previewIframe.contentWindow.document || my.previewIframe.contentDocument;
