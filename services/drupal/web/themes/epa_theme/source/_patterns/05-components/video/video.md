@@ -6,4 +6,4 @@ state: inreview
 
 __Variables:__
 * modifier_classes: [string] Classes to modify the default component styling.
-* youtube_embed: [string] YouTube embed ID
+* iframe_src: [string] Source for the video iframe (e.g., YouTube embed code)
