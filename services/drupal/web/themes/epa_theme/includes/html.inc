@@ -5,6 +5,9 @@
  * HTML template functions.
  */
 
+use Drupal\Component\Utility\Html;
+use Drupal\filter\Render\FilteredMarkup;
+
 /**
  * Implements hook_preprocess_html().
  */
@@ -40,4 +43,22 @@ function epa_theme_preprocess_maintenance_page(&$vars, $hook) {
  * Implements hook_preprocess_page().
  */
 function epa_theme_preprocess_page(&$vars, $hook) {
+}
+
+
+function epa_theme_preprocess_filter_caption(&$vars) {
+  $dom = Html::load($vars['node']);
+  // Make captions available in media templates
+  foreach ($dom->getElementsByTagName('drupal-media') as $node) {
+    $new_node = $node->cloneNode(TRUE);
+    $new_node->setAttribute('data-caption', $vars['caption']);
+    $node->parentNode->replaceChild($new_node,$node);
+  }
+  $vars['node'] = FilteredMarkup::create(Html::serialize($dom));
+}
+
+function epa_theme_preprocess_media(&$vars) {
+  if (isset($vars['attributes']['data-caption'])) {
+    $vars['caption'] = $vars['attributes']['data-caption'];
+  }
 }

@@ -1,5 +1,5 @@
 ---
-title: Hero Image
+title: Hero
 state: complete
 ---
 
