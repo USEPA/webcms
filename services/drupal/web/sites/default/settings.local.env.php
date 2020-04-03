@@ -26,11 +26,11 @@ if ($env_state == 'build') {
 }
 
 // Connect to Drupal 7 database in Vagrant.
-$databases['drupal_7']['default'] = [
-  'database' => 'web',
-  'username' => 'web',
-  'password' => 'web',
-  'host' => 'host.docker.internal',
-  'port' => '13306',
+$databases['drupal7']['default'] = [
+  'database' => getenv('MYSQL_D7_DATABASE'),
+  'username' => getenv('MYSQL_D7_USER'),
+  'password' => getenv('MYSQL_D7_PASSWORD'),
+  'host' => getenv('MYSQL_D7_HOST'),
+  'port' => getenv('MYSQL_D7_PORT'),
   'driver' => 'mysql',
 ];
