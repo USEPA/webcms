@@ -11,6 +11,7 @@
  *
  * @ingroup themeable
  */
+ 'media': content.field_media_oembed_video|field_value,
 #}
 {% set classes = [
   view_mode != 'default' ? ('figure--' ~ view_mode)|clean_class,
@@ -22,6 +23,6 @@
 {% include '@components/figure/figure.twig' with {
   'is_demo': false,
   'modifier_classes': classes,
-  'media': content.field_media_image|field_value,
+  'media': content,
   'caption': '',
 } %}
