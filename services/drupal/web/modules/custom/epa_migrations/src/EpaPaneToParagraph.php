@@ -13,6 +13,7 @@ class EpaPaneToParagraph implements EpaPaneToParagraphInterface, ContainerInject
 
   use EpaBoxWrapperTrait;
   use EpaCreateParagraphsTrait;
+  use EpaParagraphsLibraryTrait;
 
   /**
    * The drupal_7 database connection.

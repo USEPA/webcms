@@ -30,7 +30,12 @@ process:
     -
       plugin: default_value
       source: language
-      default_value: und
+      default_value: en
+    -
+      plugin: str_replace
+      search: 'und'
+      replace: 'en'
+
   title:
     -
       plugin: get
@@ -84,6 +89,22 @@ process:
       plugin: skip_on_empty
       method: process
       source: main_col_panes
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_paragraphs
+    -
+      plugin: multiple_values
+    -
+      plugin: sub_process
+      process:
+        target_id: 'target_id'
+        target_revision_id: 'target_revision_id'
+  field_paragraphs_1:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: sidebar_panes
     -
       plugin: single_value
     -
