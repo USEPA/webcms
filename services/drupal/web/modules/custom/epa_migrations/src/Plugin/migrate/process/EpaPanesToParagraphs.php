@@ -5,7 +5,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\process;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph;
 use Drupal\epa_migrations\EpaCoreListPaneToParagraph;
-use Drupal\migrate\MigrateException;
+use Drupal\epa_migrations\EpaFieldablePanelsPaneToParagraph;
 use Drupal\epa_migrations\EpaNodeContentPaneToParagraph;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
@@ -51,7 +51,12 @@ class EpaPanesToParagraphs extends ProcessPluginBase implements ContainerFactory
    */
   protected $epaCoreListPaneTransformer;
 
-class EpaPanesToParagraphs extends ProcessPluginBase {
+  /**
+   * The service to transform fieldable_panels_pane panes.
+   *
+   * @var \Drupal\epa_migrations\EpaFieldablePanelsPaneToParagraph
+   */
+  protected $epaFieldablePanelsPaneTransformer;
 
   /**
    * Construct an epa_panes_to_paragraphs process plugin.
@@ -68,12 +73,15 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
    *   The service to transform epa_core_html_pane panes.
    * @param \Drupal\epa_migrations\EpaCoreListPaneToParagraph $epa_core_list_pane_transformer
    *   The service to transform epa_core_*_list_pane panes.
+   * @param \Drupal\epa_migrations\EpaFieldablePanelsPaneToParagraph $epa_fieldable_panels_pane_transformer
+   *   The service to transform fieldable_panels_pane panes.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EpaNodeContentPaneToParagraph $epa_node_content_transformer, EpaCoreHtmlPaneToParagraph $epa_core_html_pane_transformer, EpaCoreListPaneToParagraph $epa_core_list_pane_transformer, EpaFieldablePanelsPaneToParagraph $epa_fieldable_panels_pane_transformer) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->epaNodeContentTransformer = $epa_node_content_transformer;
     $this->epaCoreHtmlPaneTransformer = $epa_core_html_pane_transformer;
     $this->epaCoreListPaneTransformer = $epa_core_list_pane_transformer;
+    $this->epaFieldablePanelsPaneTransformer = $epa_fieldable_panels_pane_transformer;
   }
 
   /**
@@ -87,6 +95,7 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
       $container->get('epa_migrations.node_content_pane_to_paragraph'),
       $container->get('epa_migrations.core_html_pane_to_paragraph'),
       $container->get('epa_migrations.core_list_pane_to_paragraph'),
+      $container->get('epa_migrations.fieldable_panels_pane_to_paragraph')
     );
   }
 
@@ -116,11 +125,7 @@ class EpaPanesToParagraphs extends ProcessPluginBase {
           'epa_core_html_pane' => 'epaCoreHtmlPaneTransformer',
           'epa_core_node_list_pane' => 'epaCoreListPaneTransformer',
           'epa_core_link_list_pane' => 'epaCoreListPaneTransformer',
-        $pane_classes = [
-          'node_content' => '\\Drupal\epa_migrations\EpaNodeContentPaneToParagraph',
-          'epa_core_html_pane' => '\\Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph',
-          'epa_core_node_list_pane' => '\\Drupal\epa_migrations\EpaCoreListPaneToParagraph',
-          'epa_core_link_list_pane' => '\\Drupal\epa_migrations\EpaCoreListPaneToParagraph',
+          'fieldable_panels_pane' => 'epaFieldablePanelsPaneTransformer',
         ];
 
         $pane_transformer_service = $pane_transformer_services[$type] ?? NULL;

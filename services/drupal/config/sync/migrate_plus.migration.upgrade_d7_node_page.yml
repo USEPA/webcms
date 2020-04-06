@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: VNva9YcP4pUGmvIQNYzamBxRO41RE2BM3YD49ZwZPWM
+  default_config_hash: fKViWQCBFr7vHiLa3_UkxZ4iA8ZZkMJqLa6C3lRm0rU
 id: upgrade_d7_node_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -32,7 +32,11 @@ process:
     -
       plugin: default_value
       source: language
-      default_value: und
+      default_value: en
+    -
+      plugin: str_replace
+      search: und
+      replace: en
   title:
     -
       plugin: get
@@ -82,6 +86,22 @@ process:
       plugin: skip_on_empty
       method: process
       source: main_col_panes
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_paragraphs
+    -
+      plugin: multiple_values
+    -
+      plugin: sub_process
+      process:
+        target_id: target_id
+        target_revision_id: target_revision_id
+  field_paragraphs_1:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: sidebar_panes
     -
       plugin: single_value
     -
