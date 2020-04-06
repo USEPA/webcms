@@ -5,8 +5,10 @@ $video-aspect-ratio: (9 / 16); // 16:9
 
 .video {
   height: 0;
+  max-width: 100%;
   padding-bottom: $video-aspect-ratio * 100%;
   position: relative;
+  width: rem(960px);
 
   > iframe {
     height: 100%;
@@ -14,5 +16,11 @@ $video-aspect-ratio: (9 / 16); // 16:9
     position: absolute;
     top: 0;
     width: 100%;
+  }
+
+  // Tweak styling in WYSIWYG editor.
+  @if $wysiwyg {
+    display: block;
+    margin-top: rem(units('05'));
   }
 }
