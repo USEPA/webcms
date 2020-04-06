@@ -20,9 +20,11 @@
   attributes.hasClass('align-right') ? 'u-align-right',
 ]|join(' ')|trim %}
 
+{{ title_suffix.contextual_links }}
+
 {% include '@components/figure/figure.twig' with {
   'is_demo': false,
   'modifier_classes': classes,
   'media': content,
-  'caption': '',
+  'caption': caption,
 } %}
