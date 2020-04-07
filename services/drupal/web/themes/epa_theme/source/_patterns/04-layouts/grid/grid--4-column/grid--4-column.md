@@ -1,7 +1,7 @@
 ---
 el: .l-grid--4-col
 title: Four Column Grid Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

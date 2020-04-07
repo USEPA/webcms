@@ -1,7 +1,7 @@
 ---
 el: .box--blog
 title: Blog Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

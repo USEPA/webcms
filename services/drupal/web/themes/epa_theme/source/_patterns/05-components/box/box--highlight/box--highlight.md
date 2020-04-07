@@ -1,7 +1,7 @@
 ---
 el: .box--highlight
 title: Highlight Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

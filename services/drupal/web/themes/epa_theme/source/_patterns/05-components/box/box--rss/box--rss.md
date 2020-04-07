@@ -1,7 +1,7 @@
 ---
 el: .box--rss
 title: RSS Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

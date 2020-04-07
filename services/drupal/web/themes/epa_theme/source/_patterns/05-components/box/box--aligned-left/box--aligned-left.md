@@ -1,7 +1,7 @@
 ---
 el: .box.is-aligned-left
 title: Left-aligned Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

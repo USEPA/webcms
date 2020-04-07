@@ -1,7 +1,7 @@
 ---
 el: .box--alert
 title: Alert Box
-state: inreview
+state: complete
 ---
 
 __Variables:__
