@@ -1,7 +1,7 @@
 ---
 el: .box--news
 title: News Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

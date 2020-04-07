@@ -1,0 +1,28 @@
+// @file
+// Styles for a pull quote.
+
+$border-width: units(1);
+
+.pull-quote {
+  background-color: gesso-grayscale(white);
+  border-left: rem(units(1)) solid gesso-brand(aqua, base);
+  clear: both;
+  padding: rem(units($theme-alert-padding-x)) 0
+    rem(units($theme-alert-padding-x)) rem(units($theme-alert-padding-x));
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    &.u-align-left,
+    &.u-align-right {
+      margin-top: 0;
+      max-width: 50%;
+    }
+  }
+}
+
+.pull-quote__cite {
+  text-align: left;
+}
