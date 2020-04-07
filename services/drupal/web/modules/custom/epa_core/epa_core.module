@@ -251,6 +251,8 @@ function _epa_core_get_default_revision_created($node, $type = 'medium', $format
 /**
  * Implements hook_entity_revision_delete().
  * Invalidate cache tags for a node when its revision is deleted.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  */
 function epa_core_entity_revision_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'node') {
@@ -270,8 +272,10 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
 
 /**
  * Implements hook_entity_delete().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  */
-function epa_core_entity_delete(Drupal\Core\Entity\EntityInterface $entity) {
+function epa_core_entity_delete(EntityInterface $entity) {
   $t_args = [
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
     '@type' => $entity->bundle() ? $entity->bundle() : NULL,
