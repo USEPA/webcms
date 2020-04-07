@@ -22,8 +22,11 @@ use Drupal\block_content\Entity\BlockContent;
  *
  * - Used to hide auto generate descriptions and keywords for news releases.
  * - Hide path field.
+ * - Validation to prevent cloned nodes from saving without title changes.
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['title']['widget']['#element_validate'] = ['epa_core_cloned_node_validate'];
+
   switch ($form_id) {
     case 'node_news_release_form':
     case 'node_news_release_edit_form':
@@ -81,6 +84,17 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // @todo element validation for keywords.
 
       break;
+  }
+}
+
+/**
+ * Prevent cloned nodes from saving without title changes.
+ */
+function epa_core_cloned_node_validate($element, FormStateInterface &$form_state, $form) {
+  $node = $form_state->getFormObject()->getEntity();
+  $cloned = strlen($node->getTitle()) >= strlen('- Cloned') && (substr_compare($node->getTitle(), '- Cloned', -strlen('- Cloned')) === 0) ? TRUE : FALSE;
+  if ($cloned) {
+    $form_state->setError($element, t('This content has been cloned. Please rename the %field field.', ['%field' => $element['#title']]));
   }
 }
 
