@@ -1,7 +1,7 @@
 ---
 el: .box--multipurpose
 title: Multipurpose Box without Title
-state: inreview
+state: complete
 ---
 
 __Variables:__

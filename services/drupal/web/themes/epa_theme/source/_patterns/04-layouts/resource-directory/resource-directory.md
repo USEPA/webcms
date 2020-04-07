@@ -1,6 +1,6 @@
 ---
 title: Resource Directory Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

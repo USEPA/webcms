@@ -1,7 +1,7 @@
 ---
 el: .l-grid
 title: Grid Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

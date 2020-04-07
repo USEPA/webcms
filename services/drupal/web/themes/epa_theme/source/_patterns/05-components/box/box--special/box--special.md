@@ -1,7 +1,7 @@
 ---
 el: .box--special
 title: Special Box
-state: inreview
+state: complete
 ---
 
 __Variables:__
