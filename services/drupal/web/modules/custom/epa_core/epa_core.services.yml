@@ -1,0 +1,8 @@
+services:
+  # Name of this service.
+  epa_core.entity_clone_subscriber:
+    # Event subscriber class that will listen for the events.
+    class: '\Drupal\epa_core\EventSubscriber\EPAEntityCloneSubscriber'
+    # Tagged as an event_subscriber to register this subscriber with the event_dispatch service.
+    tags:
+      - { name: 'event_subscriber' }
