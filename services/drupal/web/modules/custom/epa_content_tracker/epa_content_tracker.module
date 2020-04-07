@@ -49,7 +49,7 @@ function epa_content_tracker_entity_update(EntityInterface $entity) {
     $alias = $entity->toUrl()->toString();
     $changed = $entity->getChangedTime();
     $logger= new EpaContentTrackerLogger();
-    
+
     $lang = $entity->get('langcode')->value;
     $translated_entity = $entity->getTranslation($lang);
     $mod_state=$translated_entity->get('moderation_state')->getValue();
@@ -98,4 +98,118 @@ function epa_content_tracker_path_update($path) {
 //      ->condition('pid', $path['pid'])
 //      ->execute();
   }
+}
+
+/**
+ * Implements hook_views_data().
+ */
+function epa_content_tracker_views_data() {
+  $data = [];
+
+  // Expose the epa_content_tracker table to Views
+  $data['epa_content_tracker'] = [];
+
+  $data['epa_content_tracker']['table'] = [];
+  $data['epa_content_tracker']['table']['group'] = t('EPA Content Tracker');
+  $data['epa_content_tracker']['table']['provider'] = 'epa_content_tracker';
+
+  $data['epa_content_tracker']['table']['base'] = [
+    'field' => 'qiid',
+    'title' => t('EPA content changes'),
+    'help' => t('This table lists changes that have occurred to content.'),
+  ];
+
+  $data['epa_content_tracker']['qiid'] = [
+    'title' => t('Queue item ID'),
+    'help' => t('Index of this item in the content tracker queue.'),
+    'field' => ['id' => 'numeric'],
+    'argument' => ['id' => 'numeric'],
+    'filter' => ['id' => 'numeric'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['entity_type'] = [
+    'title' => t('Entity type'),
+    'help' => t('The type of entity that was changed or deleted.'),
+    'field' => ['id' => 'standard'],
+    'filter' => ['id' => 'string'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['entity_id'] = [
+    'title' => t('Entity ID'),
+    'help' => t('The ID of the entity that was changed or deleted.'),
+    'field' => ['id' => 'numeric'],
+    'filter' => ['id' => 'numeric'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['alias'] = [
+    'title' => t('Entity alias'),
+    'help' => t('The path alias of the entity that was changed or deleted.'),
+    'field' => ['id' => 'standard'],
+    'filter' => ['id' => 'string'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['deleted'] = [
+    'title' => t('Deleted'),
+    'help' => t('Whether or not the entity was deleted.'),
+    'field' => ['id' => 'boolean'],
+    'filter' => ['id' => 'boolean'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['changed'] = [
+    'title' => t('Changed timestamp'),
+    'help' => t('Time of the most recent change.'),
+    'field' => ['id' => 'date'],
+    'filter' => ['id' => 'date'],
+    'sort' => ['id' => 'date'],
+  ];
+
+  // Relationship field for nodes that were changed
+  $data['epa_content_tracker']['related_node'] = [
+    'title' => t('Affected node'),
+    'help' => t('Data for the node that was changed.'),
+
+    'relationship' => [
+      'base' => 'node_field_data',
+      'base field' => 'nid',
+      'field' => 'entity_id',
+      'id' => 'standard',
+      'label' => t('Affected node'),
+
+      // Limit this join only to node entities
+      'extra' => [
+        0 => [
+          'left_field' => 'entity_type',
+          'value' => 'node',
+        ],
+      ],
+    ],
+  ];
+
+  $data['epa_content_tracker']['related_media'] = [
+    'title' => t('Affected media'),
+    'help' => t('Data for the media entity that was changed.'),
+
+    'relationship' => [
+      'base' => 'media_field_data',
+      'base field' => 'mid',
+      'field' => 'entity_id',
+      'id' => 'standard',
+      'label' => t('Affected media'),
+
+      // As with the node case above, limit this join to media entities
+      'extra' => [
+        0 => [
+          'left_field' => 'entity_type',
+          'value' => 'media',
+        ],
+      ],
+    ],
+  ];
+
+  return $data;
 }
