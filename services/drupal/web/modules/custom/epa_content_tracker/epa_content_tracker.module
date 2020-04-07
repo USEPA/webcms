@@ -17,13 +17,24 @@ use Drupal\Core\Url;
  * Implements hook_entity_insert().
  */
 function epa_content_tracker_entity_insert(EntityInterface $entity) {
+  static $processed = FALSE;
   if ('node' == $entity->getEntitytypeId()) {
     $id = $entity->id();
     $entity_type = $entity->getEntityTypeId();
     $alias = $entity->toUrl()->toString();
     $changed = $entity->getChangedTime();
     $logger = new EpaContentTrackerLogger();
-    $logger->insert($entity_type, $id, $alias, $changed);
+
+    $lang = $entity->get('langcode')->value;
+    $translated_entity = $entity->getTranslation($lang);
+    $mod_state=$translated_entity->get('moderation_state')->getValue();
+    if (isset($mod_state[0]['value']) && FALSE == $processed) {
+      // If the node is published and the current moderation revision, add it to the table.
+      if ('published' == $mod_state[0]['value']) {
+        $logger->insert($entity_type, $id, $alias, $changed);
+        $processed = TRUE;
+      }
+    }
   }
 }
 
@@ -31,23 +42,40 @@ function epa_content_tracker_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function epa_content_tracker_entity_update(EntityInterface $entity) {
+  static $processed = FALSE;
   if ('node' == $entity->getEntitytypeId()) {
     $id = $entity->id();
     $entity_type = $entity->getEntityTypeId();
     $alias = $entity->toUrl()->toString();
     $changed = $entity->getChangedTime();
     $logger= new EpaContentTrackerLogger();
-    $logger->insert($entity_type, $id, $alias, $changed);
+    
+    $lang = $entity->get('langcode')->value;
+    $translated_entity = $entity->getTranslation($lang);
+    $mod_state=$translated_entity->get('moderation_state')->getValue();
+    if (isset($mod_state[0]['value']) && FALSE == $processed) {
+      // If the node is published and the current moderation revision, add it to the table.
+      if ('published' == $mod_state[0]['value']) {
+        $logger->insert($entity_type, $id, $alias, $changed);
+        $processed = TRUE;
+      }
+      // If the node is unpublished and the current moderation revision, add a delete record to the table.
+      elseif ('unpublished' == $mod_state[0]['value']) {
+        $logger->delete($entity_type, $id, $alias, $changed);
+        $processed = TRUE;
+      }
+    }
   }
 }
 
 /**
  * Implements hook_entity_delete().
  */
-function epa_content_tracker_entity_delete(EntityInterface $entity) {
+function epa_content_tracker_entity_predelete(EntityInterface $entity) {
   if ('node' == $entity->getEntitytypeId()) {
     $id = $entity->id();
     $entity_type = $entity->getEntityTypeId();
+    // todo: must get the previous alias before the node was deleted
     $alias = $entity->toUrl()->toString();
     $changed = $entity->getChangedTime();
     $logger = new EpaContentTrackerLogger();
@@ -61,6 +89,7 @@ function epa_content_tracker_entity_delete(EntityInterface $entity) {
  */
 function epa_content_tracker_path_update($path) {
   if ($path['alias'] != $path['original']['alias']) {
+
 //    \Drupal::database()
 //      ->update('mytable')
 //      ->fields([
