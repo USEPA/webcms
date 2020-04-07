@@ -1,7 +1,7 @@
 ---
 el: .box--report-violation
 title: Report a Violation Box
-state: inreview
+state: complete
 ---
 
 __Variables:__
