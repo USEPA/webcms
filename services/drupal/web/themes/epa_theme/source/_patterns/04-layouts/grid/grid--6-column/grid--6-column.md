@@ -1,7 +1,7 @@
 ---
 el: .l-grid--6-col
 title: Six Column Grid Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__
