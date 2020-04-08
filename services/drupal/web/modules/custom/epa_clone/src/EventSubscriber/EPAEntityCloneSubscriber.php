@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\epa_core\EventSubscriber;
+namespace Drupal\epa_clone\EventSubscriber;
 
 use Drupal\entity_clone\Event\EntityCloneEvent;
 use Drupal\entity_clone\Event\EntityCloneEvents;
