@@ -264,10 +264,10 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
     '@type' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
     '@vid' => $entity->getRevisionId() ? $entity->getRevisionId() : NULL,
-    '@label' => $entity->label() ? $entity->label() : NULL,
+    '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity revision deleted. (Entity type: @type; Entity ID: @id; Revision ID: @vid; Entity label: @label)', $t_args));
+    ->notice(t('@typeid entity revision deleted. (Entity type: @type; Entity ID: @id; Revision ID: @vid; Entity label: %label)', $t_args));
 }
 
 /**
@@ -280,10 +280,10 @@ function epa_core_entity_delete(EntityInterface $entity) {
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
     '@type' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
-    '@label' => $entity->label() ? $entity->label() : NULL,
+    '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: @label)', $t_args));
+    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**
