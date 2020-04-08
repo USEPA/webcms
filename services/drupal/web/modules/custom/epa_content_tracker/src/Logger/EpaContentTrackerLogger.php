@@ -107,7 +107,7 @@ class EpaContentTrackerLogger {
    * @param EntityInterface $entity
    * @return string|null
    */
-  public function getAliasFromMedia(EntityInterface $entity) {
+  public function getAliasFromMedia(EntityInterface $media) {
     $file_id = $media->field_media_file[0]->target_id;
     $file = File::load($file_id);
 
