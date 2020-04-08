@@ -1,7 +1,7 @@
 ---
 el: .l-grid--2-col
 title: Two Column Grid Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

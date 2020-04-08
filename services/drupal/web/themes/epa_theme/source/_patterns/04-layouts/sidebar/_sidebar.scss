@@ -11,6 +11,10 @@ $l-sidebar-bp: 900px;
 
 .l-sidebar__main {
   flex-grow: 1;
+
+  @include breakpoint($l-sidebar-bp) {
+    max-width: calc(75% - #{rem(gesso-get-map(gutter-width))});
+  }
 }
 
 .l-sidebar__sidebar {

@@ -1,7 +1,7 @@
 ---
 el: .l-sidebar
 title: Sidebar Layout without Sidebar
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -265,11 +265,39 @@ function _epa_core_get_default_revision_created($node, $type = 'medium', $format
 /**
  * Implements hook_entity_revision_delete().
  * Invalidate cache tags for a node when its revision is deleted.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
  */
 function epa_core_entity_revision_delete(EntityInterface $entity) {
   if ($entity->getEntityTypeId() == 'node') {
     Cache::invalidateTags(['node:' . $entity->id()]);
   }
+
+  $t_args = [
+    '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
+    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@id' => $entity->id() ? $entity->id() : NULL,
+    '@vid' => $entity->getRevisionId() ? $entity->getRevisionId() : NULL,
+    '%label' => $entity->label() ? $entity->label() : NULL,
+  ];
+  \Drupal::logger('epa_core')
+    ->notice(t('@typeid entity revision deleted. (Entity type: @type; Entity ID: @id; Revision ID: @vid; Entity label: %label)', $t_args));
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ */
+function epa_core_entity_delete(EntityInterface $entity) {
+  $t_args = [
+    '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
+    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@id' => $entity->id() ? $entity->id() : NULL,
+    '%label' => $entity->label() ? $entity->label() : NULL,
+  ];
+  \Drupal::logger('epa_core')
+    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**

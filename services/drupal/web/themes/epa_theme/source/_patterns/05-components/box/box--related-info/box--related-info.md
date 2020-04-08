@@ -1,7 +1,7 @@
 ---
 el: .box--related-info
 title: Related Info Box
-state: inreview
+state: complete
 ---
 
 __Variables:__

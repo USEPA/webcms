@@ -1,7 +1,7 @@
 ---
 el: .box--multipurpose
 title: Multipurpose Box with Image Header
-state: inreview
+state: complete
 ---
 
 __Variables:__
