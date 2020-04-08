@@ -9,62 +9,53 @@
  * @see https://www.drupal.org/node/2217931
  */
 
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\epa_content_tracker\Logger\EpaContentTrackerLogger;
-use Drupal\Core\Url;
 
 /**
- * Implements hook_entity_insert().
+ * Implements hook_ENTITY_TYPE_insert().
  */
-function epa_content_tracker_entity_insert(EntityInterface $entity) {
-  static $processed = FALSE;
-  if ('node' == $entity->getEntitytypeId()) {
-    $id = $entity->id();
-    $entity_type = $entity->getEntityTypeId();
-    $alias = $entity->toUrl()->toString();
-    $changed = $entity->getChangedTime();
-    $logger = new EpaContentTrackerLogger();
-
-    $lang = $entity->get('langcode')->value;
-    $translated_entity = $entity->getTranslation($lang);
-    $mod_state=$translated_entity->get('moderation_state')->getValue();
-    if (isset($mod_state[0]['value']) && FALSE == $processed) {
-      // If the node is published and the current moderation revision, add it to the table.
-      if ('published' == $mod_state[0]['value']) {
-        $logger->insert($entity_type, $id, $alias, $changed);
-        $processed = TRUE;
-      }
-    }
+function epa_content_tracker_content_moderation_state_insert(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  if ($epa_moderation->isModeratedEntity($entity)) {
+    _epa_content_tracker_process_moderated_entity($entity);
   }
 }
 
 /**
- * Implements hook_entity_update().
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @see Drupal\group\Entity\GroupContent::postSave
+ * @see https://www.drupal.org/project/group/issues/2872697
+ * @see https://www.drupal.org/project/drupal/issues/2803717
  */
-function epa_content_tracker_entity_update(EntityInterface $entity) {
-  static $processed = FALSE;
-  if ('node' == $entity->getEntitytypeId()) {
-    $id = $entity->id();
-    $entity_type = $entity->getEntityTypeId();
-    $alias = $entity->toUrl()->toString();
-    $changed = $entity->getChangedTime();
-    $logger= new EpaContentTrackerLogger();
+function epa_content_tracker_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  // Group will trigger an update after insert.
+  // Check to see if entity is moderated.
+  // Check to see if content revision id has changed.
+  // Also, check that the moderation state isn't looping over itself.
+  if ($epa_moderation->isModeratedEntity($entity)
+    && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
+    && $entity->getRevisionId() != $entity->getLoadedRevisionId()
+  ) {
+    _epa_content_tracker_process_moderated_entity($entity);
+  }
+}
 
-    $lang = $entity->get('langcode')->value;
-    $translated_entity = $entity->getTranslation($lang);
-    $mod_state=$translated_entity->get('moderation_state')->getValue();
-    if (isset($mod_state[0]['value']) && FALSE == $processed) {
-      // If the node is published and the current moderation revision, add it to the table.
-      if ('published' == $mod_state[0]['value']) {
-        $logger->insert($entity_type, $id, $alias, $changed);
-        $processed = TRUE;
-      }
-      // If the node is unpublished and the current moderation revision, add a delete record to the table.
-      elseif ('unpublished' == $mod_state[0]['value']) {
-        $logger->delete($entity_type, $id, $alias, $changed);
-        $processed = TRUE;
-      }
-    }
+function _epa_content_tracker_process_moderated_entity(ContentModerationStateInterface $moderated_entity) {
+  $id = $moderated_entity->content_entity_id->value;
+  $entity_type = $moderated_entity->content_entity_type_id->value;
+  $node = $node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value);
+  $alias = $node->toUrl()->toString();
+  $changed = $node->getChangedTime();
+  $logger = new EpaContentTrackerLogger();
+  if ('published' == $moderated_entity->moderation_state->value) {
+    $logger->insert($entity_type, $id, $alias, $changed);
+  }
+  elseif ('unpublished' == $moderated_entity->moderation_state->value) {
+    $logger->delete($entity_type, $id, $alias, $changed);
   }
 }
 
