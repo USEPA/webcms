@@ -4,15 +4,38 @@ namespace Drupal\epa_clone\EventSubscriber;
 
 use Drupal\entity_clone\Event\EntityCloneEvent;
 use Drupal\entity_clone\Event\EntityCloneEvents;
+use Drupal\node\Entity\Node;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
 class EPAEntityCloneSubscriber implements EventSubscriberInterface {
 
   public static function getSubscribedEvents() {
+    $events[EntityCloneEvents::POST_CLONE][] = ['formatClonedSignifier', -1000];
     $events[EntityCloneEvents::POST_CLONE][] = ['generateGroupContent', -1000];
     $events[EntityCloneEvents::POST_CLONE][] = ['clearMachineName', -1000];
     return $events;
+  }
+
+  /**
+   * - Prepend a "Cloned: " signifier to the title of cloned nodes.
+   * - Remove the appended " - Cloned" signifier to the title of cloned nodes.
+   *
+   * @param \Drupal\entity\Event\EntityCloneEvent $event
+   *   The entity_clone event.
+   */
+  public function formatClonedSignifier(EntityCloneEvent $event) {
+    $cloned_entity = $event->getClonedEntity();
+    if ($cloned_entity instanceof Node) {
+      $old_signifier = ' - Cloned';
+      $new_signifier = 'Cloned: ';
+      $old_pos = strpos($cloned_entity->getTitle(), $old_signifier);
+      $new_title = $old_pos !== FALSE ?
+        $new_signifier . substr($cloned_entity->getTitle(), 0, $old_pos) :
+        $new_signifier . $cloned_entity->getTitle();
+      $cloned_entity->setTitle($new_title);
+      $cloned_entity->save();
+    }
   }
 
   /**

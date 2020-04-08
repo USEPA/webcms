@@ -17,7 +17,7 @@ function epa_clone_form_node_form_alter(&$form, FormStateInterface $form_state, 
  */
 function epa_clone_cloned_node_validate($element, FormStateInterface &$form_state, $form) {
   $title = $element[0]['value']['#value'];
-  $clonedTitleUnchanged = strlen($title) >= strlen('- Cloned') && (substr_compare($title, '- Cloned', -strlen('- Cloned')) === 0);
+  $clonedTitleUnchanged = strpos($title, 'Cloned: ') === 0;
   if ($clonedTitleUnchanged) {
     $form_state->setError($element, t('This content has been cloned. Please update the %field field to remove the "Cloned" signifier.', ['%field' => $element['#title']]));
   }
