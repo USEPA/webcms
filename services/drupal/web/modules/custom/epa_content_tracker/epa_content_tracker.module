@@ -92,6 +92,37 @@ function epa_content_tracker_path_update($path) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_insert() for media entities.
+ */
+function epa_content_tracker_media_insert(EntityInterface $entity) {
+  $logger = new EpaContentTrackerLogger();
+  $logger->mediaInsert($media);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for media entities.
+ */
+function epa_content_tracker_media_presave(EntityInterface $entity) {
+  $logger = new EpaContentTrackerLogger();
+
+  // Conceptually, this hook is an update hook, but we need to run as a presave hook in
+  // order to compare differences between $entity and $entity->original.
+  if (!$entity->isNew()) {
+    $logger->mediaUpdate($entity);
+  }
+
+  // The $entity->isNew() case is handled implicitly by the media_insert hook above this.
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_predelete() for media entities.
+ */
+function epa_content_tracker_media_predelete(EntityInterface $entity) {
+  $logger = new EpaContentTrackerLogger();
+  $logger->mediaDelete($entity);
+}
+
+/**
  * Implements hook_views_data().
  */
 function epa_content_tracker_views_data() {
