@@ -85,8 +85,7 @@ class EpaContentTrackerLogger {
    * @throws \Exception
    */
   public function insert($entity_type, $id, $alias, $changed) {
-    $deleted = 0;
-    $this->log($entity_type, $id, $alias, $changed, $deleted);
+    $this->log($entity_type, $id, $alias, $changed, self::UPDATED);
   }
 
   /**
@@ -97,8 +96,7 @@ class EpaContentTrackerLogger {
    * @throws \Exception
    */
   public function delete($entity_type, $id, $alias, $changed) {
-    $deleted = 1;
-    $this->log($entity_type, $id, $alias, $changed, $deleted);
+    $this->log($entity_type, $id, $alias, $changed, self::DELETED);
   }
 
   /**

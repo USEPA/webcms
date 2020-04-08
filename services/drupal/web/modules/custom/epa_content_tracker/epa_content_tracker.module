@@ -14,16 +14,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\epa_content_tracker\Logger\EpaContentTrackerLogger;
 
 /**
- * Implements hook_ENTITY_TYPE_insert().
- */
-function epa_content_tracker_content_moderation_state_insert(ContentModerationStateInterface $entity) {
-  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
-  if ($epa_moderation->isModeratedEntity($entity)) {
-    _epa_content_tracker_process_moderated_entity($entity);
-  }
-}
-
-/**
  * Implements hook_ENTITY_TYPE_update().
  *
  * @see Drupal\group\Entity\GroupContent::postSave
@@ -44,23 +34,32 @@ function epa_content_tracker_content_moderation_state_update(ContentModerationSt
   }
 }
 
+/**
+ * @param \Drupal\content_moderation\Entity\ContentModerationStateInterface $moderated_entity
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityMalformedException
+ * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
+ */
 function _epa_content_tracker_process_moderated_entity(ContentModerationStateInterface $moderated_entity) {
   $id = $moderated_entity->content_entity_id->value;
   $entity_type = $moderated_entity->content_entity_type_id->value;
-  $node = $node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value);
-  $alias = $node->toUrl()->toString();
-  $changed = $node->getChangedTime();
-  $logger = new EpaContentTrackerLogger();
-  if ('published' == $moderated_entity->moderation_state->value) {
-    $logger->insert($entity_type, $id, $alias, $changed);
-  }
-  elseif ('unpublished' == $moderated_entity->moderation_state->value) {
-    $logger->delete($entity_type, $id, $alias, $changed);
+  if ($node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value)) {
+    $alias = $node->toUrl()->toString();
+    $changed = $node->getChangedTime();
+    $logger = new EpaContentTrackerLogger();
+    if ('published' == $moderated_entity->moderation_state->value) {
+      $logger->insert($entity_type, $id, $alias, $changed);
+    }
+    elseif ('unpublished' == $moderated_entity->moderation_state->value) {
+      $logger->delete($entity_type, $id, $alias, $changed);
+    }
   }
 }
 
 /**
- * Implements hook_entity_delete().
+ * Implements hook_entity_predelete().
  */
 function epa_content_tracker_entity_predelete(EntityInterface $entity) {
   if ('node' == $entity->getEntitytypeId()) {
@@ -75,19 +74,74 @@ function epa_content_tracker_entity_predelete(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_path_insert().
+ * @param $path
+ */
+function epa_content_tracker_path_insert($path) {
+  // We don't need to track content_tracker_entity_insert because it's covered here.
+  $changed = time();
+  _epa_content_tracker_process_path($path, $changed, EpaContentTrackerLogger::UPDATED);
+}
+
+/**
  * Implements hook_path_update().
  * @param $path
  */
 function epa_content_tracker_path_update($path) {
-  if ($path['alias'] != $path['original']['alias']) {
+  if ($path['alias'] != $path['original']['alias'] ||
+    $path['source'] != $path['original']['source']) {
 
-//    \Drupal::database()
-//      ->update('mytable')
-//      ->fields([
-//        'alias' => $path['alias'],
-//      ])
-//      ->condition('pid', $path['pid'])
-//      ->execute();
+    $changed = time();
+    $old_path = $path['original'];
+
+    // Always log a delete record for the old alias
+    _epa_content_tracker_process_path($old_path, $changed, EpaContentTrackerLogger::DELETED);
+    // Only log an insert record for the new alias if the node is published
+    _epa_content_tracker_process_path($path, $changed, EpaContentTrackerLogger::UPDATED);
+  }
+}
+
+/**
+ * Implements hook_path_update().
+ * @param $path
+ */
+function epa_content_tracker_path_delete($path) {
+  $changed = time();
+  _epa_content_tracker_process_path($path, $changed, EpaContentTrackerLogger::DELETED);
+}
+
+/**
+ * @param $path
+ * @param $changed
+ * @param int $delete
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _epa_content_tracker_process_path($path, $changed, $delete=EpaContentTrackerLogger::UPDATED) {
+  // We only care about node alias changes.
+  if (preg_match('/^\/node\/[0-9]+$/', $path['source'])) {
+    $logger = new EpaContentTrackerLogger();
+    $parts = explode('/', $path['source']);
+    $entity_id = array_pop($parts);
+    $entity_type = array_pop($parts);
+    $alias = $path['alias'];
+    // Always log a delete record for the old alias
+    if ($delete == EpaContentTrackerLogger::DELETED) {
+      $logger->delete($entity_type, $entity_id, $alias, $changed);
+    }
+    // Only log an insert record for the new alias if the node is published
+    else {
+      if ('node' == $entity_type) {
+        $node = \Drupal::entityTypeManager()
+          ->getStorage($entity_type)
+          ->load($entity_id);
+        if (!$node || 'published' != $node->moderation_state->value) {
+          return;
+        }
+        $logger->insert($entity_type, $entity_id, $alias, $changed);
+      }
+    }
   }
 }
 
