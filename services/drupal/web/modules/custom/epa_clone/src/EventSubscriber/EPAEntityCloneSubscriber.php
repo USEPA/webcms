@@ -34,6 +34,9 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
         $new_signifier . substr($cloned_entity->getTitle(), 0, $old_pos) :
         $new_signifier . $cloned_entity->getTitle();
       $cloned_entity->setTitle($new_title);
+      if ($cloned_entity->bundle() == 'faq') {
+        $cloned_entity->set('field_question', $new_title);
+      }
       $cloned_entity->save();
     }
   }

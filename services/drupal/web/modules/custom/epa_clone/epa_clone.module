@@ -9,7 +9,12 @@ use Drupal\Core\Form\FormStateInterface;
  * @param $form_id
  */
 function epa_clone_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $form['title']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->bundle() == 'faq') {
+    $form['field_question']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  } else {
+    $form['title']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  }
 }
 
 /**
