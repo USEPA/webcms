@@ -1,9 +1,9 @@
-uuid: 594527f9-92bb-476b-a4d9-81e5567106e2
+uuid: 8e4202ab-a960-4191-895b-f5156e4cb55f
 langcode: en
 status: false
 dependencies:
   config:
-    - core.entity_view_mode.media.full_width
+    - core.entity_view_mode.media.small
     - field.field.media.remote_video.field_caption
     - field.field.media.remote_video.field_directory
     - field.field.media.remote_video.field_keywords
@@ -15,25 +15,25 @@ dependencies:
     - media
     - media_inline_embed
 third_party_settings:
+  media_inline_embed:
+    embed_inline: false
   layout_builder:
     allow_custom: false
     enabled: false
-  media_inline_embed:
-    embed_inline: false
-id: media.remote_video.full_width
+id: media.remote_video.small
 targetEntityType: media
 bundle: remote_video
-mode: full_width
+mode: small
 content:
   field_media_oembed_video:
     type: oembed
     weight: 0
+    region: content
     label: hidden
     settings:
       max_width: 1020
       max_height: 0
     third_party_settings: {  }
-    region: content
 hidden:
   created: true
   field_caption: true
