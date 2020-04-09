@@ -40,6 +40,9 @@ arn="$(
 
 echo "--- Waiting on task ARN $arn"
 
+# Define a last_status variable for output
+last_status=
+
 while true; do
   output="$(aws ecs describe-tasks --tasks "$arn" --cluster webcms-cluster)"
 
@@ -65,8 +68,12 @@ while true; do
     ;;
 
   *)
-    # Indicate progress to avoid looking like we've stalled
-    echo "Drush status: $status"
+    # To avoid spamming the console, we only output the status when we detect a change
+    if test "$last_status" != "$status"; then
+      echo "--- Drush status: $status"
+      last_status="$status"
+    fi
+
     sleep 5
     ;;
   esac
