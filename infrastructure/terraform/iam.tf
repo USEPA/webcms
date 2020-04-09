@@ -309,34 +309,29 @@ resource "aws_iam_role_policy_attachment" "drupal_es_access" {
   policy_arn = aws_iam_policy.es_access.arn
 }
 
-data "aws_iam_policy_document" "task_parameter_access" {
+data "aws_iam_policy_document" "task_secrets_access" {
   version = "2012-10-17"
 
   statement {
-    sid     = "allowParameterAccess"
+    sid     = "allowSecretAccess"
     effect  = "Allow"
-    actions = ["ssm:GetParameters"]
+    actions = ["secretsmanager:GetSecretValue"]
 
-    # This policy does not - and should not - grant access to the master DB username/password
-    # parameter. Drupal doesn't need it.
+    # This policy does not - and should not - grant access to the root DB password.
+    # Drupal doesn't need it.
     resources = [
-      aws_ssm_parameter.db_app_username.arn,
-      aws_ssm_parameter.db_app_password.arn,
-      aws_ssm_parameter.db_app_database.arn,
-      aws_ssm_parameter.hash_salt.arn,
-      aws_ssm_parameter.mail_user.arn,
-      aws_ssm_parameter.mail_pass.arn,
-      aws_ssm_parameter.mail_from.arn,
-      aws_ssm_parameter.mail_host.arn,
+      aws_secretsmanager_secret.db_app_password.arn,
+      aws_secretsmanager_secret.hash_salt.arn,
+      aws_secretsmanager_secret.mail_pass.arn,
     ]
   }
 }
 
-resource "aws_iam_policy" "task_parameter_access" {
-  name        = "WebCMSTaskParameterAccess"
-  description = "Grants read access to the WebCMS's parameters"
+resource "aws_iam_policy" "task_secrets_access" {
+  name        = "WebCMSTaskSecretsAccess"
+  description = "Grants read access to the WebCMS's secrets"
 
-  policy = data.aws_iam_policy_document.task_parameter_access.json
+  policy = data.aws_iam_policy_document.task_secrets_access.json
 }
 
 data "aws_iam_policy_document" "drupal_execution_assume_role" {
@@ -355,8 +350,8 @@ data "aws_iam_policy_document" "drupal_execution_assume_role" {
 }
 
 # ECS assumes the task execution role in order to pull container images and access the
-# parameter secrets we've identified in the Drupal task definitions. This is not the same
-# as the task role itself, which is how Drupal itself is identified.
+# secrets we've identified in the Drupal task definitions. This is not the same as the
+# task role itself, which is how Drupal itself is identified.
 resource "aws_iam_role" "drupal_execution_role" {
   name        = "WebCMSDrupalTaskExecutionRole"
   description = "Task execution role for Drupal containers"
@@ -374,10 +369,10 @@ resource "aws_iam_role_policy_attachment" "drupal_execution_tasks" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-# Grant access to the app's username & password parameters
+# Grant access to the app's secrets
 resource "aws_iam_role_policy_attachment" "drupal_execution_parameters" {
   role       = aws_iam_role.drupal_execution_role.name
-  policy_arn = aws_iam_policy.task_parameter_access.arn
+  policy_arn = aws_iam_policy.task_secrets_access.arn
 }
 
 data "aws_iam_policy_document" "bastion_assume" {

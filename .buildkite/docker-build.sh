@@ -10,9 +10,14 @@ set -euo pipefail
 # are named according to the same scheme (the drupal target can be pushed to webcms-drupal).
 function build() {
   local target="$1"
+
+  # Full repo name
   local repo="webcms-$target"
+
+  # Full tag (for docker push)
   local tag="$WEBCMS_REPO_URL/$repo:$WEBCMS_IMAGE_TAG"
 
+  # Output status line for Buildkite
   echo "--- :docker: $target:$WEBCMS_IMAGE_TAG"
 
   docker build services/drupal \

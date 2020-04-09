@@ -13,22 +13,24 @@ locals {
     { name = "WEBCMS_ENV_STATE", value = var.site-env-state },
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
 
+    # DB values
+    { name = "WEBCMS_DB_USER", value = local.database-user },
+    { name = "WEBCMS_DB_NAME", value = local.database-name },
+
+    # Mail
+    { name = "WEBCMS_MAIL_USER", value = var.email-auth-user },
+    { name = "WEBCMS_MAIL_FROM", value = var.email-from },
+    { name = "WEBCMS_MAIL_HOST", value = var.email-host },
+
     # Injected host names
     { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443/" },
   ]
 
-  # Parameter store bindings for Drupal containers
+  # Secrets Manager bindings for Drupal containers
   drupal-secrets = [
-    { name = "WEBCMS_DB_USER", valueFrom = aws_ssm_parameter.db_app_username.arn },
-    { name = "WEBCMS_DB_PASS", valueFrom = aws_ssm_parameter.db_app_password.arn },
-    { name = "WEBCMS_DB_NAME", valueFrom = aws_ssm_parameter.db_app_database.arn },
-
-    { name = "WEBCMS_HASH_SALT", valueFrom = aws_ssm_parameter.hash_salt.arn },
-
-    { name = "WEBCMS_MAIL_USER", valueFrom = aws_ssm_parameter.mail_user.arn },
-    { name = "WEBCMS_MAIL_PASS", valueFrom = aws_ssm_parameter.mail_pass.arn },
-    { name = "WEBCMS_MAIL_FROM", valueFrom = aws_ssm_parameter.mail_from.arn },
-    { name = "WEBCMS_MAIL_HOST", valueFrom = aws_ssm_parameter.mail_host.arn },
+    { name = "WEBCMS_DB_PASS", valueFrom = aws_secretsmanager_secret.db_app_password.arn },
+    { name = "WEBCMS_HASH_SALT", valueFrom = aws_secretsmanager_secret.hash_salt.arn },
+    { name = "WEBCMS_MAIL_PASS", valueFrom = aws_secretsmanager_secret.mail_pass.arn },
   ]
 
   # Security groups used by Drupal containers
