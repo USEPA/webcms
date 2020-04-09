@@ -324,14 +324,6 @@ data "aws_iam_policy_document" "task_secrets_access" {
       aws_secretsmanager_secret.hash_salt.arn,
       aws_secretsmanager_secret.mail_pass.arn,
     ]
-
-    # Only allow access to the current version of the secret
-    # (i.e., don't leak rotated values)
-    condition {
-      test     = "ForAnyValue:StringEquals"
-      variable = "secretsmanager:VersionStage"
-      values   = ["AWSCURRENT"]
-    }
   }
 }
 
