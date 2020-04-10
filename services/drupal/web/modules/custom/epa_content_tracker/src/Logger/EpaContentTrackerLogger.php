@@ -65,14 +65,13 @@ class EpaContentTrackerLogger {
           $this->log($entity_type, $id, $alias_to_consolidate, self::DELETED);
         }
       }
-      else {
-        // Clear all records corresponding to the given $alias, which the external system
-        // treats as a unique key. The entity_type and entity_id columns are used primarily
-        // for querying on the Drupal end at the XML endpoints.
-        $this->connection->delete($this->table)
-          ->condition('alias', $alias)
-          ->execute();
-      }
+
+      // Clear all records corresponding to the given $alias, which the external system
+      // treats as a unique key. The entity_type and entity_id columns are used primarily
+      // for querying on the Drupal end at the XML endpoints.
+      $this->connection->delete($this->table)
+        ->condition('alias', $alias)
+        ->execute();
 
       $id = $this->connection->insert($this->table)
         ->fields([
