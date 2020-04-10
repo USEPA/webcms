@@ -41,29 +41,45 @@ class EpaContentTrackerLogger {
    * @param $entity_type
    * @param $id
    * @param $alias
-   * @param $changed
    * @param $deleted
+   * @param bool $consolidate_aliases Marks all other active (not-flagged-as-deleted) alias records for this entity as deleted
+   *
    * @return \Drupal\Core\Database\StatementInterface|int|null
-   * @throws \Exception
    */
-  public function log($entity_type, $id, $alias, $changed, $deleted) {
+  public function log($entity_type, $id, $alias, $deleted, $consolidate_aliases = FALSE) {
 
     // The transaction opens here.
     $transaction = $this->connection->startTransaction();
     try {
-      // Clear all records corresponding to the given $alias, which the external system
-      // treats as a unique key. The entity_type and entity_id columns are used primarily
-      // for querying on the Drupal end at the XML endpoints.
-      $this->connection->delete($this->table)
-        ->condition('alias', $alias)
-        ->execute();
+      if ($consolidate_aliases) {
+        $aliases = $this->connection
+          ->select($this->table)
+          ->fields('epa_content_tracker', ['alias'])
+          ->condition('entity_id', $id)
+          ->condition('entity_type', $entity_type)
+          ->condition('deleted', 0)
+          ->execute()
+          ->fetchCol();
+
+        foreach ($aliases as $alias_to_consolidate) {
+          $this->log($entity_type, $id, $alias_to_consolidate, self::DELETED);
+        }
+      }
+      else {
+        // Clear all records corresponding to the given $alias, which the external system
+        // treats as a unique key. The entity_type and entity_id columns are used primarily
+        // for querying on the Drupal end at the XML endpoints.
+        $this->connection->delete($this->table)
+          ->condition('alias', $alias)
+          ->execute();
+      }
 
       $id = $this->connection->insert($this->table)
         ->fields([
           'entity_type' => $entity_type,
           'entity_id' => $id,
           'alias' => $alias,
-          'changed' => $changed,
+          'changed' => time(),
           'deleted' => $deleted
         ])
         ->execute();
@@ -77,27 +93,48 @@ class EpaContentTrackerLogger {
     return NULL;
   }
 
-  /**
-   * @param $entity_type
-   * @param $id
-   * @param $alias
-   * @param $changed
-   * @throws \Exception
-   */
-  public function insert($entity_type, $id, $alias, $changed) {
-    $this->log($entity_type, $id, $alias, $changed, self::UPDATED);
+  public function entityIsTracked(EntityInterface $entity) {
+    // Only record changes to document media entities and nodes
+    $entity_type = $entity->getEntityTypeId();
+    return ($entity_type === 'node' || ($entity_type === 'media' && $entity->bundle() === 'document'));
   }
 
-  /**
-   * @param $entity_type
-   * @param $id
-   * @param $alias
-   * @param $changed
-   * @throws \Exception
-   */
-  public function delete($entity_type, $id, $alias, $changed) {
-    $this->log($entity_type, $id, $alias, $changed, self::DELETED);
+  public function update(EntityInterface $entity) {
+    if (!$this->entityIsTracked($entity)) {
+      return;
+    }
+
+    switch($entity->getEntityTypeId()) {
+      case 'node':
+        $alias = $entity->toUrl()->toString();
+        break;
+      case 'media':
+        $alias = $this->getAliasFromMedia($entity);
+        break;
+    }
+
+    if (!empty($alias)) {
+      $this->log($entity->getEntityTypeId(),$entity->id(), $alias, self::UPDATED, TRUE);
+    }
   }
+
+  public function delete(EntityInterface $entity) {
+    if (!$this->entityIsTracked($entity)) {
+      return;
+    }
+
+    // Check to see if there is a non-deleted existing alias for this entity. If
+    // not, then it means that we never recorded an insert/update (e.g., because
+    // it was always private or never published), so we shouldn't record a
+    // delete event either.
+    $original_alias = $this->getTrackerAliasForEntity($entity);
+    if (empty($original_alias)) {
+      return;
+    }
+
+    $this->log($entity->getEntityTypeId(), $entity->id(), $original_alias,self::DELETED, TRUE);
+  }
+
 
   /**
    * Determines the the alias for a media entity from its file's URL.
@@ -121,9 +158,9 @@ class EpaContentTrackerLogger {
    * @param EntityInterface $entity
    * @return string|bool
    */
-  public function getAliasForEntity(EntityInterface $entity) {
-    return Database::getConnection()
-      ->select('epa_content_tracker')
+  public function getTrackerAliasForEntity(EntityInterface $entity) {
+    return $this->connection
+      ->select($this->table)
       ->fields('epa_content_tracker', ['alias'])
       ->condition('entity_id', $entity->id())
       ->condition('entity_type', $entity->getEntityType()->id())
@@ -132,77 +169,19 @@ class EpaContentTrackerLogger {
       ->fetchField();
   }
 
-  /**
-   * @param EntityInterface $entity
-   * @param bool $deleted
-   * @param string $alias_override Optional override to specify the alias for this entity.
-   */
-  public function mediaLog(EntityInterface $media, $deleted, $alias_override = null) {
-    $alias = $alias_override;
 
-    // Default to generating an alias if there was no explicit one set.
-    if (empty($alias)) {
-      $alias = $this->getAliasFromMedia($media);
-    }
-
-    $this->log($media->getEntityType()->id(), $media->id(), $alias, $media->getChangedTime(), $deleted);
-  }
-
-  public function mediaInsert(EntityInterface $media) {
-    // Don't record changes to non-document media entities
-    if ($media->bundle() !== 'document') {
-      return;
-    }
-
-    // If the user specified that the file attached to this media is private,
-    // then don't log any changes.
-    if ($media->field_limit_file_accessibility->value) {
-      return;
-    }
-
-    $this->mediaLog($media, self::UPDATED);
-  }
-
-  public function mediaDelete(EntityInterface $media) {
-    // Don't record changes to non-document media entities
-    if ($media->bundle() !== 'document') {
-      return;
-    }
-
-    // Check to see if there is an existing alias for this entity. If not, then it means
-    // that we never recorded an insert/update (e.g., because it was always private), so
-    // we shouldn't record a delete event either.
-    $original_alias = $this->getAliasForEntity($media);
-    if (empty($original_alias)) {
-      return;
-    }
-
-    $this->mediaLog($media, self::DELETED);
-  }
 
   public function mediaUpdate(EntityInterface $media) {
-    // As above, don't record changes to non-document entities
-    if ($media->bundle() !== 'document') {
+    if (!$this->entityIsTracked($media)) {
       return;
     }
 
-    $original = $media->original;
-
-    $current_alias = $this->getAliasFromMedia($media);
-    $original_alias = $this->getAliasForEntity($original);
-
-    // If the file path changed, then we need to record a delete for the previous alias
-    if ($original_alias && $current_alias !== $original_alias) {
-      $this->mediaLog($original, self::DELETED, $original_alias);
-    }
-
-    // Record a delete if this file is private. Otherwise, record an update to trigger
-    // reindexing.
+    // Record a delete if this file is private. Otherwise, record an update
     $current_privacy = $media->field_limit_file_accessibility->value;
     if ($current_privacy) {
-      $this->mediaDelete($media);
+      $this->delete($media);
     } else {
-      $this->mediaInsert($media);
+      $this->update($media);
     }
   }
 }
