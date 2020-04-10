@@ -21,6 +21,13 @@ function epa_theme_preprocess_html(&$vars, $hook) {
     'x_ua_compatible',
   ];
   $vars['image_path'] = '/' . $vars['directory'] . '/images';
+
+  // Add wide template body class.
+  if ($node = \Drupal::request()->attributes->get('node')) {
+    if ($node->hasField('field_wide_template') && $node->field_wide_template->value) {
+      $vars['attributes']['class'][] = 'has-wide-template';
+    }
+  }
 }
 
 /**
