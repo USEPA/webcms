@@ -72,10 +72,19 @@ variable "server-max-capacity" {
   type        = number
 }
 
-variable "server-instance-type" {
-  description = "EC2 instance type to use for the WebCMS cluster"
-  type        = string
+# Since we can't use iteration in a nested override block, we have to pick a number of
+# instances. We choose 3 for no particular reason other than it corresponds to AWS'
+# generic instance types: t2, t3, and t3a.
+variable "server-instance-types" {
+  description = "Instance types to use with the WebCMS' servers (spot and on-demand)"
+
+  type = object({
+    primary   = string
+    secondary = string
+    tertiary  = string
+  })
 }
+
 
 # Cluster variables
 # cf. cluster.tf

@@ -167,6 +167,29 @@ resource "aws_iam_role_policy" "ec2_instance_cluster" {
   policy = data.aws_iam_policy_document.ec2_instance_profile.json
 }
 
+# This policy is used by container instances on start-up to assign attributes to
+# themselves based on whether or not they're spot instances so that we can avoid running
+# Drush on the more volatile spot instances.
+data "aws_iam_policy_document" "ec2_attributes" {
+  version = "2012-10-17"
+
+  # EC2 instance metadata doesn't inform us if our instance is spot or on-demand, so we
+  # use the EC2 API to describe instances. Even though we can't limit this in the policy,
+  # the instance bootstrap (see servers.tf) hook will only ever use its own instance ID.
+  statement {
+    sid       = "allowInstanceRead"
+    effect    = "Allow"
+    actions   = ["ec2:DescribeInstances"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ec2_attributes" {
+  name   = "WebCMSInstanceAttributesPolicy"
+  role   = aws_iam_role.ec2_server_role.name
+  policy = data.aws_iam_policy_document.ec2_attributes.json
+}
+
 resource "aws_iam_role_policy_attachment" "ec2_instance_cluster" {
   role       = aws_iam_role.ec2_server_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
