@@ -1,0 +1,248 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for EPA Content Tracker module.
+ *
+ * @DCG
+ * This file is no longer required in Drupal 8.
+ * @see https://www.drupal.org/node/2217931
+ */
+
+use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\epa_content_tracker\Logger\EpaContentTrackerLogger;
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ *
+ * @see Drupal\group\Entity\GroupContent::postSave
+ * @see https://www.drupal.org/project/group/issues/2872697
+ * @see https://www.drupal.org/project/drupal/issues/2803717
+ */
+function epa_content_tracker_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
+  // Group will trigger an update after insert.
+  // Check to see if entity is moderated.
+  // Check to see if content revision id has changed.
+  // Also, check that the moderation state isn't looping over itself.
+  if ($epa_moderation->isModeratedEntity($entity)
+    && $entity->content_entity_revision_id->value != $entity->original->content_entity_revision_id->value
+    && $entity->getRevisionId() != $entity->getLoadedRevisionId()
+  ) {
+    _epa_content_tracker_process_moderated_entity($entity);
+  }
+}
+
+/**
+ * @param \Drupal\content_moderation\Entity\ContentModerationStateInterface $moderated_entity
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityMalformedException
+ * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
+ */
+function _epa_content_tracker_process_moderated_entity(ContentModerationStateInterface $moderated_entity) {
+  $id = $moderated_entity->content_entity_id->value;
+  $entity_type = $moderated_entity->content_entity_type_id->value;
+  if ($node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value)) {
+    $logger = new EpaContentTrackerLogger();
+    if ('published' == $moderated_entity->moderation_state->value) {
+      $logger->update($node);
+    }
+    elseif ('unpublished' == $moderated_entity->moderation_state->value) {
+      $logger->delete($node);
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function epa_content_tracker_entity_delete(EntityInterface $entity) {
+  $logger = new EpaContentTrackerLogger();
+  $logger->delete($entity);
+}
+
+/**
+ * Implements hook_path_alias_insert().
+ * @param $path
+ */
+function epa_content_tracker_path_alias_insert($path) {
+  _epa_content_tracker_process_path($path);
+}
+
+/**
+ * Implements hook_path_alias_update().
+ * @param $path
+ */
+function epa_content_tracker_path_alias_update($path) {
+  _epa_content_tracker_process_path($path);
+}
+
+/**
+ * Implements hook_path_alias_delete().
+ * @param $path
+ */
+function epa_content_tracker_path_alias_delete($path) {
+  _epa_content_tracker_process_path($path);
+}
+
+/**
+ * @param $path
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _epa_content_tracker_process_path($path) {
+  // We only care about node aliases.
+  $router = \Drupal::service('router.no_access_checks');
+  $result = $router->match($path->getPath());
+  if (!empty($result) && $result['_route'] == 'entity.node.canonical') {
+    // Only log changes if the node is published
+    $node = $result['node'];
+    if (!$node || !$node->isPublished()) {
+      return;
+    }
+
+    // It does not appear that we need to clear the cache to ensure we get
+    // correct canonical alias for our nodes, but leaving this here just in case
+    // we later discover we do.
+//    $alias_manager = \Drupal::service('path_alias.manager');
+//    $alias_manager->cacheClear($path->getPath());
+    $logger = new EpaContentTrackerLogger();
+    // This will ensure the canonical path for this alias is set and re-indexed.
+    // Any old paths will be marked as deleted as part of this.
+    $logger->update($node);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for media entities.
+ */
+function epa_content_tracker_media_insert(EntityInterface $entity) {
+  epa_content_tracker_media_update($entity);
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for media entities.
+ */
+function epa_content_tracker_media_update(EntityInterface $entity) {
+  $logger = new EpaContentTrackerLogger();
+  $logger->mediaUpdate($entity);
+}
+
+
+/**
+ * Implements hook_views_data().
+ */
+function epa_content_tracker_views_data() {
+  $data = [];
+
+  // Expose the epa_content_tracker table to Views
+  $data['epa_content_tracker'] = [];
+
+  $data['epa_content_tracker']['table'] = [];
+  $data['epa_content_tracker']['table']['group'] = t('EPA Content Tracker');
+  $data['epa_content_tracker']['table']['provider'] = 'epa_content_tracker';
+
+  $data['epa_content_tracker']['table']['base'] = [
+    'field' => 'qiid',
+    'title' => t('EPA content changes'),
+    'help' => t('This table lists changes that have occurred to content.'),
+  ];
+
+  $data['epa_content_tracker']['qiid'] = [
+    'title' => t('Queue item ID'),
+    'help' => t('Index of this item in the content tracker queue.'),
+    'field' => ['id' => 'numeric'],
+    'argument' => ['id' => 'numeric'],
+    'filter' => ['id' => 'numeric'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['entity_type'] = [
+    'title' => t('Entity type'),
+    'help' => t('The type of entity that was changed or deleted.'),
+    'field' => ['id' => 'standard'],
+    'filter' => ['id' => 'string'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['entity_id'] = [
+    'title' => t('Entity ID'),
+    'help' => t('The ID of the entity that was changed or deleted.'),
+    'field' => ['id' => 'numeric'],
+    'filter' => ['id' => 'numeric'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['alias'] = [
+    'title' => t('Entity alias'),
+    'help' => t('The path alias of the entity that was changed or deleted.'),
+    'field' => ['id' => 'standard'],
+    'filter' => ['id' => 'string'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['deleted'] = [
+    'title' => t('Deleted'),
+    'help' => t('Whether or not the entity was deleted.'),
+    'field' => ['id' => 'boolean'],
+    'filter' => ['id' => 'boolean'],
+    'sort' => ['id' => 'standard'],
+  ];
+
+  $data['epa_content_tracker']['changed'] = [
+    'title' => t('Changed timestamp'),
+    'help' => t('Time of the most recent change.'),
+    'field' => ['id' => 'date'],
+    'filter' => ['id' => 'date'],
+    'sort' => ['id' => 'date'],
+  ];
+
+  // Relationship field for nodes that were changed
+  $data['epa_content_tracker']['related_node'] = [
+    'title' => t('Affected node'),
+    'help' => t('Data for the node that was changed.'),
+
+    'relationship' => [
+      'base' => 'node_field_data',
+      'base field' => 'nid',
+      'field' => 'entity_id',
+      'id' => 'standard',
+      'label' => t('Affected node'),
+
+      // Limit this join only to node entities
+      'extra' => [
+        0 => [
+          'left_field' => 'entity_type',
+          'value' => 'node',
+        ],
+      ],
+    ],
+  ];
+
+  $data['epa_content_tracker']['related_media'] = [
+    'title' => t('Affected media'),
+    'help' => t('Data for the media entity that was changed.'),
+
+    'relationship' => [
+      'base' => 'media_field_data',
+      'base field' => 'mid',
+      'field' => 'entity_id',
+      'id' => 'standard',
+      'label' => t('Affected media'),
+
+      // As with the node case above, limit this join to media entities
+      'extra' => [
+        0 => [
+          'left_field' => 'entity_type',
+          'value' => 'media',
+        ],
+      ],
+    ],
+  ];
+
+  return $data;
+}

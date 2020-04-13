@@ -38,7 +38,7 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
   public function clearMachineName(EntityCloneEvent $event) {
     $entity = $event->getEntity();
     $cloned_entity = $event->getClonedEntity();
-    if ($entity->hasField('field_machine_name') && !empty($entity->get('field_machine_name'))) {
+    if ($entity->getEntityTypeId() === 'node' && $entity->hasField('field_machine_name') && !empty($entity->get('field_machine_name'))) {
       $cloned_entity->set('field_machine_name', '');
     }
     $cloned_entity->save();
