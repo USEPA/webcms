@@ -65,26 +65,26 @@ function epa_content_tracker_entity_delete(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_path_insert().
+ * Implements hook_path_alias_insert().
  * @param $path
  */
-function epa_content_tracker_path_insert($path) {
+function epa_content_tracker_path_alias_insert($path) {
   _epa_content_tracker_process_path($path);
 }
 
 /**
- * Implements hook_path_update().
+ * Implements hook_path_alias_update().
  * @param $path
  */
-function epa_content_tracker_path_update($path) {
+function epa_content_tracker_path_alias_update($path) {
   _epa_content_tracker_process_path($path);
 }
 
 /**
- * Implements hook_path_delete().
+ * Implements hook_path_alias_delete().
  * @param $path
  */
-function epa_content_tracker_path_delete($path) {
+function epa_content_tracker_path_alias_delete($path) {
   _epa_content_tracker_process_path($path);
 }
 
@@ -95,23 +95,25 @@ function epa_content_tracker_path_delete($path) {
  * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
 function _epa_content_tracker_process_path($path) {
-  // We only care about node alias changes.
-  if (preg_match('/^\/node\/[0-9]+$/', $path['source'])) {
-    $parts = explode('/', $path['source']);
-    $entity_id = array_pop($parts);
-    $entity_type = array_pop($parts);
-
+  // We only care about node aliases.
+  $router = \Drupal::service('router.no_access_checks');
+  $result = $router->match($path->getPath());
+  if (!empty($result) && $result['_route'] == 'entity.node.canonical') {
     // Only log changes if the node is published
-    if ('node' == $entity_type) {
-      $node = \Drupal\node\Entity\Node::load($entity_id);
-      if (!$node || !$node->isPublished()) {
-        return;
-      }
-      $logger = new EpaContentTrackerLogger();
-      // This will ensure the canonical path for this alias is set and re-indexed.
-      // Any old paths will be marked as deleted as part of this.
-      $logger->update($node);
+    $node = $result['node'];
+    if (!$node || !$node->isPublished()) {
+      return;
     }
+
+    // It does not appear that we need to clear the cache to ensure we get
+    // correct canonical alias for our nodes, but leaving this here just in case
+    // we later discover we do.
+//    $alias_manager = \Drupal::service('path_alias.manager');
+//    $alias_manager->cacheClear($path->getPath());
+    $logger = new EpaContentTrackerLogger();
+    // This will ensure the canonical path for this alias is set and re-indexed.
+    // Any old paths will be marked as deleted as part of this.
+    $logger->update($node);
   }
 }
 
