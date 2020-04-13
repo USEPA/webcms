@@ -21,9 +21,6 @@ class EpaNode extends Node {
     // Get the default Node query.
     $query = parent::query();
 
-    // Limit results to specific nid.
-    $query->condition('n.nid', [35871, 5], 'IN');
-
     return $query;
   }
 
