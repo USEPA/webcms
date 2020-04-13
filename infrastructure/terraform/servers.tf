@@ -58,7 +58,7 @@ data "template_cloudinit_config" "servers" {
     # request (hence the query for the request ID)
     spot_request="$(
       aws ec2 describe-instances \
-        --instance-ids "$instance" \
+        --instance-ids "$instance_id" \
         --query 'Reservations[0].Instances[0].SpotInstanceRequestId'
     )"
 
