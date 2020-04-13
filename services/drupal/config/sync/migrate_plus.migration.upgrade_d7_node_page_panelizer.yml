@@ -1,0 +1,164 @@
+uuid: 5d06be2d-6bda-47c1-ba83-2008f8046b55
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - epa_migrations
+_core:
+  default_config_hash: W7tcugIgd4fm0Htu8gdboikI5G_g0v5nHYQHVDaNOB4
+id: upgrade_d7_node_page_panelizer
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Panelizer Nodes (Basic page)'
+source:
+  plugin: epa_panelizer_node
+  node_type: page
+process:
+  nid:
+    -
+      plugin: get
+      source: tnid
+  vid:
+    -
+      plugin: get
+      source: vid
+  langcode:
+    -
+      plugin: default_value
+      source: language
+      default_value: und
+  title:
+    -
+      plugin: get
+      source: title
+  uid:
+    -
+      plugin: default_value
+      default_value: 1
+  status:
+    -
+      plugin: get
+      source: status
+  created:
+    -
+      plugin: get
+      source: created
+  changed:
+    -
+      plugin: get
+      source: changed
+  promote:
+    -
+      plugin: get
+      source: promote
+  sticky:
+    -
+      plugin: get
+      source: sticky
+  revision_uid:
+    -
+      plugin: get
+      source: revision_uid
+  revision_log:
+    -
+      plugin: get
+      source: log
+  revision_timestamp:
+    -
+      plugin: get
+      source: timestamp
+  comment_node_page/0/status:
+    -
+      plugin: get
+      source: comment
+  layout_builder__layout:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: panes
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_lb_section
+      layout: layout
+    -
+      plugin: multiple_values
+  field_description:
+    -
+      plugin: get
+      source: field_description
+  field_expiration_date:
+    -
+      plugin: sub_process
+      source: field_expiration_date
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: Y-m-d
+          source: value
+  field_language:
+    -
+      plugin: get
+      source: field_language
+  field_machine_name:
+    -
+      plugin: get
+      source: field_machine_name
+  field_page_head:
+    -
+      plugin: get
+      source: field_page_head
+  field_type:
+    -
+      plugin: static_map
+      source: field_type
+      map:
+        1: 130
+        3: 131
+        5: 132
+        7: 138
+        9: 139
+        11: 140
+        13: 141
+        15: 142
+  field_wide_template:
+    -
+      plugin: get
+      source: field_wide_template
+  field_publish_date:
+    -
+      plugin: sub_process
+      source: field_publish_date
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: 'Y-m-d\TH:i:s'
+          source: value
+  field_review_deadline:
+    -
+      plugin: sub_process
+      source: field_review_deadline
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: 'Y-m-d\TH:i:s'
+          source: value
+  field_metatag:
+    -
+      plugin: d7_metatag_entities
+      source: pseudo_d7_metatag_entities
+destination:
+  plugin: 'entity:node'
+  default_bundle: page
+migration_dependencies:
+  required: {  }
+  optional: {  }
