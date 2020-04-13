@@ -46,6 +46,7 @@ trait EpaCreateParagraphsTrait {
     switch ($link_type) {
       case "entity":
         foreach ($links as $item) {
+          $item = is_object($item) ?: (array) $item;
           $list_links[] = [
             'uri' => 'entity:node/' . $item['node'],
             'title' => '',
@@ -56,8 +57,9 @@ trait EpaCreateParagraphsTrait {
 
       case "uri":
         foreach ($links as $item) {
+          $item = is_array($item) ?: (array) $item;
           $list_links[] = [
-            'uri' => $item['link'],
+            'uri' => preg_replace('@^/?node/(.*)@', 'entity:node/$1', $item['link']),
             'title' => $item['title'],
             'options' => [],
           ];

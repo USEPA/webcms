@@ -2,8 +2,6 @@
 
 namespace Drupal\epa_migrations;
 
-use Drupal\paragraphs\Entity\Paragraph;
-
 /**
  * Create an HTML Paragraph from a node_content pane.
  */
