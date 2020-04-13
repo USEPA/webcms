@@ -2,8 +2,6 @@
 
 namespace Drupal\epa_migrations;
 
-use Drupal\paragraphs\Entity\Paragraph;
-
 /**
  * Create a Box paragraph from panes that contain lists of links.
  *
@@ -28,8 +26,8 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
         $this->createHtmlParagraph($body_field),
         $this->createLinkListParagraph($link_type, $links),
       ],
-      $configuration['title'],
-      $configuration['box_style']
+      $configuration['title'] ?? '',
+      $configuration['box_style'] ?? 'none'
     );
 
   }

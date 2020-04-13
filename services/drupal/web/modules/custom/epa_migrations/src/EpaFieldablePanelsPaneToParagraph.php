@@ -119,7 +119,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
-          $body_field = $body_field_query->execute()->fetchAssoc();
+          $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
 
           $links_query = $this->d7Connection->select('field_data_field_epa_link_list_links', 'fpp_links')
             ->condition("fpp_links.{$id_type}", $id, '=');
