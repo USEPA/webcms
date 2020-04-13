@@ -168,7 +168,7 @@ resource "aws_autoscaling_group" "servers" {
     launch_template {
       launch_template_specification {
         launch_template_id = aws_launch_template.servers.id
-        version            = "$LATEST"
+        version            = "$Latest"
       }
 
       override {

@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "drush_task" {
 
   placement_constraints {
     type = "memberOf"
-    expression = "webcms.type == on-demand"
+    expression = "attribute:webcms.type == on-demand"
   }
 
   # See cluster.tf for more information on these parameters
