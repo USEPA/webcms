@@ -25,6 +25,7 @@ data "template_cloudinit_config" "servers" {
     content      = <<-CONFIG
     packages:
       - awscli
+      - jq
     CONFIG
   }
 
@@ -49,15 +50,21 @@ data "template_cloudinit_config" "servers" {
     #!/bin/bash
     set -euo pipefail
 
-    # Obtain instance ID from the EC2 metadata service
+    # Obtain identity document from the EC2 metadata service - this document contains
+    # both the instance's ID and the region in which it is launched
     token="$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 30" http://169.254.169.254/latest/api/token)"
-    instance_id="$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/instance-id)"
+    identity="$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document)"
+
+    # Read out the fields we're interested in - we need the region in order to pass it to
+    # the AWS CLI.
+    instance_id="$(jq -r .instanceId <<<"$identity")"
+    region="$(jq -r .region <<<"$identity")"
 
     # We can't directly determine if an instance is spot or on-demand through the metadata
     # service, but we can determine it by seeing if it's associated with a spot instance
     # request (hence the query for the request ID)
     spot_request="$(
-      aws ec2 describe-instances \
+      aws --region "$region" ec2 describe-instances \
         --instance-ids "$instance_id" \
         --query 'Reservations[0].Instances[0].SpotInstanceRequestId'
     )"
