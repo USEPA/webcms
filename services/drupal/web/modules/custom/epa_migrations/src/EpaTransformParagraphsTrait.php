@@ -24,7 +24,7 @@ trait EpaTransformParagraphsTrait {
    *   The transformed paragraph ids.
    */
   protected function transformParagraphs(array $pane, Row $row, MigrateExecutableInterface $migrate_executable) {
-    $paragraph_ids = [];
+    $paragraphs = [];
 
     $type = $pane['type'];
 
@@ -52,10 +52,7 @@ trait EpaTransformParagraphsTrait {
         // Convert transformed_paragraphs to an array if it's not already.
         $transformed_paragraphs = is_array($transformed_paragraphs) ?: [$transformed_paragraphs];
         foreach ($transformed_paragraphs as $paragraph) {
-          $paragraph_ids[] = [
-            'target_id' => $paragraph->id(),
-            'target_revision_id' => $paragraph->getRevisionId(),
-          ];
+          $paragraphs[] = $paragraph;
         }
 
       }
@@ -64,7 +61,7 @@ trait EpaTransformParagraphsTrait {
       $migrate_executable->saveMessage("WARNING: No pane transformer was found for pane type '{$type}' with pid {$pane['pid']}. This pane is used in the '{$pane['panel']}' panel. This pane was not migrated.", 3);
     }
 
-    return $paragraph_ids;
+    return $paragraphs;
   }
 
 }

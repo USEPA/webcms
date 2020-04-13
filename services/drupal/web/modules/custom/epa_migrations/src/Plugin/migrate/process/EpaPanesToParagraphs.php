@@ -7,6 +7,7 @@ use Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph;
 use Drupal\epa_migrations\EpaCoreListPaneToParagraph;
 use Drupal\epa_migrations\EpaFieldablePanelsPaneToParagraph;
 use Drupal\epa_migrations\EpaNodeContentPaneToParagraph;
+use Drupal\epa_migrations\EpaTransformParagraphsTrait;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -29,6 +30,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @endcode
  */
 class EpaPanesToParagraphs extends ProcessPluginBase implements ContainerFactoryPluginInterface {
+  // Helper function to transform paragraphs to panes.
+  use EpaTransformParagraphsTrait;
 
   /**
    * The service to transform node_content panes.
@@ -111,45 +114,15 @@ class EpaPanesToParagraphs extends ProcessPluginBase implements ContainerFactory
       $shown = $pane['shown'];
 
       if ($shown) {
-        $type = $pane['type'];
+        $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
 
-        // The configuration (box style) we need for fieldable panels panes is
-        // stored in the 'style' column. For all other panes we need to pull
-        // it from configuration.
-        $type == 'fieldable_panels_pane' ?
-          $configuration = unserialize($pane['style']) :
-          $configuration = unserialize($pane['configuration']);
-
-        $pane_transformer_services = [
-          'node_content' => 'epaNodeContentTransformer',
-          'epa_core_html_pane' => 'epaCoreHtmlPaneTransformer',
-          'epa_core_node_list_pane' => 'epaCoreListPaneTransformer',
-          'epa_core_link_list_pane' => 'epaCoreListPaneTransformer',
-          'fieldable_panels_pane' => 'epaFieldablePanelsPaneTransformer',
-        ];
-
-        $pane_transformer_service = $pane_transformer_services[$type] ?? NULL;
-
-        if ($pane_transformer_service) {
-          $transformed_paragraphs = $this->$pane_transformer_service->createParagraph($row, $pane, $configuration);
-
-          if ($transformed_paragraphs) {
-            // Convert transformed_paragraphs to an array if it's not already.
-            $transformed_paragraphs = is_array($transformed_paragraphs) ?: [$transformed_paragraphs];
-            foreach ($transformed_paragraphs as $paragraph) {
-              $paragraph_ids[] = [
-                'target_id' => $paragraph->id(),
-                'target_revision_id' => $paragraph->getRevisionId(),
-              ];
-            }
-          }
+        foreach ($paragraphs as $paragraph) {
+          $paragraph_ids[] = [
+            'target_id' => $paragraph->id(),
+            'target_revision_id' => $paragraph->getRevisionId(),
+          ];
         }
-        else {
-          $migrate_executable->saveMessage("WARNING: No pane transformer was found for pane type '{$type}' with pid {$pane['pid']}. This pane is used in the '{$pane['panel']}' panel. This pane was not migrated.", 3);
-        }
-
       }
-
     }
     return $paragraph_ids;
 
