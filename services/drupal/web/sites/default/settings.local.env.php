@@ -1,5 +1,14 @@
 <?php
 
+// Override SMTP settings
+$config['smtp.settings']['smtp_port'] = 1025;
+$config['smtp.settings']['smtp_protocol'] = 'standard';
+
+// Replace profile credentials with Minio-specific secrets
+unset($config['s3fs.settings']['use_instance_profile']);
+$settings['s3fs.access_key'] = 'minio_access';
+$settings['s3fs.secret_key'] = 'minio_secret';
+
 // Override the endpoint used by s3fs in order to talk to Minio.
 $config['s3fs.settings']['use_customhost'] = TRUE;
 $config['s3fs.settings']['hostname'] = 'minio:9000';

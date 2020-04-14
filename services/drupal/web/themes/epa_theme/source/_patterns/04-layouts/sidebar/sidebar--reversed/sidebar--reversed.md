@@ -1,7 +1,7 @@
 ---
 el: .l-sidebar--reversed
 title: Reversed Sidebar Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__

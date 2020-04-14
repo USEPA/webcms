@@ -1,21 +1,24 @@
 uuid: b0823331-1196-4a47-aca8-fd50632f79fb
 langcode: en
-status: false
+status: true
 dependencies:
   config:
     - core.entity_view_mode.media.large
     - field.field.media.image.field_keywords
     - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_media_image
-    - image.style.large
     - media.type.image
+    - responsive_image.styles.responsive_large
   module:
-    - image
     - layout_builder
+    - media_inline_embed
+    - responsive_image
 third_party_settings:
   layout_builder:
     allow_custom: false
     enabled: false
+  media_inline_embed:
+    embed_inline: false
 id: media.image.large
 targetEntityType: media
 bundle: image
@@ -25,10 +28,10 @@ content:
     weight: 0
     label: hidden
     settings:
-      image_style: large
+      responsive_image_style: responsive_large
       image_link: ''
     third_party_settings: {  }
-    type: image
+    type: responsive_image
     region: content
 hidden:
   created: true

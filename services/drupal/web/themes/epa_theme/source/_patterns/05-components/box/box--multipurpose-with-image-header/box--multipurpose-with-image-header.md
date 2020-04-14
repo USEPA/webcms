@@ -1,7 +1,7 @@
 ---
 el: .box--multipurpose
 title: Multipurpose Box with Image Header
-state: inreview
+state: complete
 ---
 
 __Variables:__
@@ -11,9 +11,12 @@ __Variables:__
   * url: [string] URL for title link.
   * icon: [string] Name of icon to the left of the title.
   * text: [string] Title text.
-* image: [array] Image properties.
-  * src: [string] Image source.
-  * alt: [string] Alt text for image.
+* img: [array] Image properties.
+  * small: [array] Small image properties.
+    * src: [string] Small image source.
+    * alt: [string] Alt text for image.
+  * medium: [array] Medium image properties.
+    * src: [string] Medium image source.
 * content: [object] Content of the box.
 * footer: [array] Footer properties.
   * url: [string] URL for footer link.

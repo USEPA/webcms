@@ -1,0 +1,13 @@
+{% set classes = [
+  'pull-quote',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<blockquote class="{{ classes }}">
+  {{ quote }}
+  {% if cite %}
+    <cite class="pull-quote__cite">
+      {{ cite }}
+    </cite>
+  {% endif %}
+</blockquote>

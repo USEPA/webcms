@@ -1,0 +1,10 @@
+{% set classes = [
+  'figure--large',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/figure/figure.twig' with {
+  'modifier_classes': classes,
+  'media': media,
+  'caption': caption,
+} %}

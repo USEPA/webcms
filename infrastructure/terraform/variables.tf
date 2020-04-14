@@ -6,12 +6,56 @@ variable "aws-region" {
   type        = string
 }
 
+# Global/sitewide variables
+
+variable "site-hostname" {
+  description = "Domain name of the WebCMS."
+  type        = string
+}
+
+variable "site-env-state" {
+  description = "Indicates the bootstrap state of Drupal. Should be either the string 'run' or 'build'"
+  type        = string
+}
+
+variable "site-env-name" {
+  description = "Environment name of this deployment. Should be 'prod' in production."
+  type        = string
+}
+
 # VPC
 # cf. vpc.tf
 
 variable "vpc-az-count" {
   description = "Number of availability zones to use when creating the VPC"
   type        = number
+}
+
+# Systems Manager
+# cf. iam.tf ssm.tf
+
+variable "ssm-customer-key" {
+  description = "AWS customer key (CMK) used to encrypt SSM sessions"
+  type        = string
+}
+
+# ALB
+# cf. alb.tf security.tf
+
+variable "alb-ingress" {
+  description = "List of CIDR ranges for which ingress is allowed (e.g., to only allow Akamai servers)"
+  type        = list(string)
+}
+
+variable "alb-certificate" {
+  description = "ARN of the ACM certificate to secure the load balancer."
+  type        = string
+}
+
+variable "alb-hostname" {
+  description = "Hostname for the ALB to listen to, in case it differs from the site-hostname variable."
+  type        = string
+  default     = null
 }
 
 # Server-related variables
@@ -28,10 +72,19 @@ variable "server-max-capacity" {
   type        = number
 }
 
-variable "server-instance-type" {
-  description = "EC2 instance type to use for the WebCMS cluster"
-  type        = string
+# Since we can't use iteration in a nested override block, we have to pick a number of
+# instances. We choose 3 for no particular reason other than it corresponds to AWS'
+# generic instance types: t2, t3, and t3a.
+variable "server-instance-types" {
+  description = "Instance types to use with the WebCMS' servers (spot and on-demand)"
+
+  type = object({
+    primary   = string
+    secondary = string
+    tertiary  = string
+  })
 }
+
 
 # Cluster variables
 # cf. cluster.tf
@@ -56,16 +109,6 @@ variable "cluster-max-capacity" {
 # Database variables
 # cf. rds.tf
 
-variable "db-instance-type" {
-  description = "Instance class to use for the WebCMS database"
-  type        = string
-}
-
-variable "db-storage-size" {
-  description = "Storage to allocate to the WebCMS database"
-  type        = number
-}
-
 variable "db-username" {
   description = "Username of the database's root user"
   type        = string
@@ -76,62 +119,88 @@ variable "db-password" {
   type        = string
 }
 
-# Bastion SSH server (optional)
-# cf. bastion.tf
-
-variable "bastion-create" {
-  description = "Whether or not to create a public-facing SSH bastion"
+variable "db-auto-pause" {
+  description = "Whether or not to enable cluster auto-pause"
   type        = bool
   default     = false
 }
 
-variable "bastion-key" {
-  description = "EC2 keypair name for the SSH bastion server"
-  type        = string
-  default     = null
+# Capacity is specified in Aurora Capacity Units (ACUs) - these should be powers of two
+# from 1 to 256.
+# cf. https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html#aurora-serverless.how-it-works.auto-scaling
+variable "db-min-capacity" {
+  description = "Minimum capacity for the database cluster"
+  type        = number
+  default     = 1
 }
 
-# NB. Since this is in CIDR notation, use 1.2.3.4/32 to specify a single address
-variable "bastion-ingress" {
-  description = "List of CIDR ranges from which SSH is allowed (e.g., jumpbox, VPN address, etc.)"
-  type        = list(string)
-  default     = []
+variable "db-max-capacity" {
+  description = "Maximum capacity for the database cluster"
+  type        = number
 }
 
-# DNS
-# cf. dns.tf alb.tf
+# Search variables
+# cf. search.tf
 
-# We separate the root domain and subdomains in order to make managing DNS somewhat easier.
-# These variables will impact two parts of the configuration:
-#
-# The load balancer will be configured to listen to one of two hosts:
-# 1. If dns-subdomain is set, the Host header must match "${dns-subdomain}.${dns-root-domain}"
-# 2. Otherwise, the host header must match dns-root-domain.
-#
-# The ACM certificate will be generated to match these variables:
-# 1. If dns-subdomain is set, the cert will be generated for "${dns-subdomain}.${dns-root-domain}"
-# 2. Otherwise, the cert will be generated for dns-root-domain.
-#
-# The main benefit of separating these two variables is that it opens up the public-facing
-# Route 53 zone to manage other records for site DNS from within Terraform or the AWS
-# console, rather than having to delegate a single DNS zone to this account.
-#
-# When using these variables, note that while dns-root-domain is a full domain, the dns-subdomain
-# string is just a domain part. That is, to have the ALB listen to "dev.example.com", you
-# would specify these variables:
-#
-# dns-root-domain = "example.com"
-# dns-subdomain = "dev"
-
-variable "dns-root-domain" {
-  description = "Root DNS name of the zone to manage (e.g., example.org or dev.example.com)"
+variable "search-instance-type" {
+  description = "Type of instance to deploy in the Elasticsearch cluster"
   type        = string
 }
 
-variable "dns-subdomain" {
-  description = "Subdomain of the dns-root-domain variable on which to listen to requests"
+variable "search-instance-count" {
+  description = "Number of instances to deploy in the Elasticsearch cluster"
+  type        = number
+}
+
+variable "search-instance-storage" {
+  description = "Capacity (in GB) to allocate to each search instance"
+  type        = number
+}
+
+variable "search-dedicated-node-type" {
+  description = "Type of dedicated master nodes to deploy in the Elasticseach cluster"
   type        = string
-  default     = null
+}
+
+variable "search-dedicated-node-count" {
+  description = "Number of dedicatd master nodes to deploy in the Elasticsearch cluster. Set to 0 to disable dedicated nodes."
+  type        = number
+}
+
+variable "search-availability-zones" {
+  description = "Number of availability zones to use for the search cluster. Valid values are 2 or 3"
+  type        = number
+}
+
+# Cache variables
+# cf. cache.tf
+
+variable "cache-instance-type" {
+  description = "Instance type of ElastiCache nodes"
+  type        = string
+}
+
+variable "cache-replica-count" {
+  description = "Number of ElastiCache read replicas in this cluster"
+  type        = number
+}
+
+# Mail
+# cf. parameters.tf
+
+variable "email-auth-user" {
+  description = "Username for SMTP authentication"
+  type        = string
+}
+
+variable "email-from" {
+  description = "From address for site mail"
+  type        = string
+}
+
+variable "email-host" {
+  description = "SMTP hostname to connect to"
+  type        = string
 }
 
 # Image tag variables
@@ -149,6 +218,12 @@ variable "image-tag-nginx" {
 
 variable "image-tag-drupal" {
   description = "Tag of the Drupal image to deploy"
+  type        = string
+  default     = null
+}
+
+variable "image-tag-drush" {
+  description = "Tag of the Drush image to deploy"
   type        = string
   default     = null
 }

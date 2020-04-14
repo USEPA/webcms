@@ -12,65 +12,6 @@ services:
     entrypoint:
       - /var/www/html/vendor/bin/drush
       - --root=/var/www/html/web
-    environment:
-      DRUPAL_HASH_SALT: abcdefg
-      SMTPHOST: mailhog:1025
-
-      # See the comments in the main docker-compose.yml file for what this does. Remember
-      # to keep this in sync with the Drupal container's own bindings!
-      VCAP_SERVICES: |
-        {
-          "aws-rds": [
-            {
-              "credentials": {
-                "db_name": "web",
-                "host": "mysql",
-                "password": "web",
-                "port": "3306",
-                "username": "web"
-              }
-            }
-          ],
-          "s3": [
-            {
-              "credentials": {
-                "access_key_id": "minio_access",
-                "secret_access_key": "minio_secret",
-                "region": "us-east-1",
-                "bucket": "drupal",
-                "additional_buckets": []
-              }
-            }
-          ],
-          "redis32": [
-            {
-              "credentials": {
-                "hostname": "redis",
-                "password": null,
-                "port": "6379"
-              }
-            }
-          ],
-          "elasticsearch56": [
-            {
-              "credentials": {
-                "hostname": "elasticsearch",
-                "username": "root",
-                "password": "",
-                "port": "9200"
-              }
-            }
-          ]
-        }
-
-      # See the docker-compose.yml for why we use this variable. Keep it in sync with
-      # the Drupal container's value!
-      VCAP_APPLICATION: |
-        {
-          "application_uris": [
-            "localhost:8080"
-          ]
-        }
     volumes:
       - ./services/drupal:/var/www/html:cached
       - type: volume
@@ -99,7 +40,7 @@ services:
 
   # redis-cli, for connecting to Redis
   redis-cli:
-    image: redis:3.2-alpine
+    image: redis:5.0-alpine
     entrypoint:
       - redis-cli
       - -h

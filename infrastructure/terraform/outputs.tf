@@ -10,6 +10,23 @@ output "s3-bucket" {
   value = aws_s3_bucket.uploads.bucket_regional_domain_name
 }
 
-output "dns-nameservers" {
-  value = aws_route53_zone.public.name_servers
+# The ALB zone ID can be used in Route 53 alias records, but...
+output "alb-zone-id" {
+  value = aws_lb.frontend.zone_id
+}
+
+# ... if Route 53 isn't being used, then use the dns_name to create a CNAME record.
+output "alb-domain" {
+  value = aws_lb.frontend.dns_name
+}
+
+# Network configuration for Drush tasks, when using the ECS RunTask API
+output "drush-task-config" {
+  value = jsonencode({
+    awsvpcConfiguration = {
+      subnets = aws_subnet.private.*.id
+      securityGroups = local.drupal-security-groups
+      assignPublicIp = "DISABLED"
+    }
+  })
 }

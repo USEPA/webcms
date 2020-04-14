@@ -3,6 +3,7 @@
 namespace Drupal\epa_wysiwyg\Plugin\CKEditorPlugin;
 
 use Drupal\ckeditor\CKEditorPluginBase;
+use Drupal\ckeditor\CKEditorPluginCssInterface;
 use Drupal\editor\Entity\Editor;
 
 /**
@@ -17,7 +18,7 @@ use Drupal\editor\Entity\Editor;
  *   label = @Translation("EPA Add Definitions Icon")
  * )
  */
-class EPAAddDefinitions extends CKEditorPluginBase {
+class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssInterface {
 
   /**
    * Allow glossary to be filtered.
@@ -85,7 +86,7 @@ class EPAAddDefinitions extends CKEditorPluginBase {
    */
   public function getLibraries(Editor $editor) {
     return [
-      'epa_wysiwyg/epa-add-definitions-admin',
+      'epa_wysiwyg/epa-add-definitions',
     ];
   }
 
@@ -98,6 +99,18 @@ class EPAAddDefinitions extends CKEditorPluginBase {
       'undoRedoEnabled' => self::UNDO_REDO_ENABLED,
       'firstOccurrenceOnly' => self::FIRST_OCCURRENCE_ONLY,
       'serviceEndpoint' => self::SERVICE_ENDPOINT,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Improve this in https://www.drupal.org/project/drupal/issues/3072063
+   */
+  public function getCssFiles(Editor $editor) {
+    return [
+      drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.css',
+      drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.admin.css',
     ];
   }
 

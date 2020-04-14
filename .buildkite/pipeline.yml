@@ -1,59 +1,146 @@
-env:
-  DOCKER_REPOSITORY: 192850101482.dkr.ecr.us-east-1.amazonaws.com/epa-webcms
-steps:
-  - label: Build Docker image
-    command: bash .buildkite/docker-build.sh
-    plugins:
-      - seek-oss/aws-sm#v2.0.0:
-          env:
-            AWS_SECRET_ACCESS_KEY:
-              secret-id: epa/stage/app
-              json-key: .AWS_SECRET_ACCESS_KEY
+# The build pipeline for this project consists of four steps. The first two are executed
+# in parallel for all branches and commits, and the latter two are executed in serial as
+# deployment steps.
+#
+# 1. Docker image builds. We build and push three Docker images (Drupal, Drush, and nginx)
+#    to our account, and tag them with based on the branch and build number (see the env:
+#    below). Images are always pushed to ECR, but are not deployed to infrastructure during
+#    this step.
+# 2. Terraform plan. We use the `terraform plan` command to view upcoming changes to
+#    infrastructure that may occur as a result of this change. The plan is saved as
+#    an artifact, but is otherwise not used.
+# 3. Terraform apply. This step must occur after both the builds and plan have finished.
+#    We use the plan from the previous step to deploy the images from the first step.
+# 4. A Drush update script. After Terraform has finished applying changes, we run a Drush
+#    task to run maintenance commands (config imports, DB updates, cache clear, etc.)
+#    against the environment.
 
-      # NB. This value *MUST* be read last. After this value is placed into the
-      # env, we no longer have access to the Buildkite server's IAM permissions
-      # -- that is, the permissions needed to obtain secrets from the secrets
-      # manager -- and have switched over to the credentials needed to read and
-      # write to ECR.
-      #
-      # We read this out as the last step in order to avoid unspecified evaluation order
-      # of the plugin variables.
-      - seek-oss/aws-sm#v2.0.0:
-          env:
-            AWS_ACCESS_KEY_ID:
-              secret-id: epa/stage/app
-              json-key: .AWS_ACCESS_KEY_ID
-      # Authorize against ECR to allow `docker push' to succeed
-      - ecr#v2.0.0:
+env:
+  # Common image tag used across steps
+  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
+
+  # Base URL for image repositories
+  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-1.amazonaws.com
+
+steps:
+  - label: ":docker: Build images"
+    command: bash .buildkite/docker-build.sh
+    key: build
+
+    # Limit build concurrency to 1 per branch: this throttles overlapping builds
+    concurrency_group: epa-webcms-d8/build-$BUILDKITE_BRANCH
+    concurrency: 1
+
+    plugins:
+      # Assume cross-account build role
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+      # Log in to ECR repositories
+      # NB. This is not the latest version of the plugin, but we have to downgrade in order
+      # to play nice with aws-assume-role.
+      - ecr#v1.2.0:
           login: true
           no-include-email: true
 
-  - wait: ~
+  - label: ":terraform: Plan"
+    key: plan
 
-  - label: Deploy to CloudFoundry
-    command: bash .buildkite/cf-push.sh
-    branches: master
+    # Only allow one plan at a time, per branch
+    concurrency_group: epa-webcms-d8/plan-$BUILDKITE_BRANCH
+    concurrency: 1
+
     plugins:
-      - seek-oss/aws-sm#v2.0.0:
-          env:
-            # The CF_USERNAME and CF_PASSWORD environment variables are the credentials
-            # for a Cloud.gov space deployer account.
-            #
-            # Further reading: https://cloud.gov/docs/services/cloud-gov-service-account/
-            CF_USERNAME:
-              secret-id: epa/stage/app
-              json-key: .CF_USERNAME
-            CF_PASSWORD:
-              secret-id: epa/stage/app
-              json-key: .CF_PASSWORD
+      # Assume the Terraform role for maximum permissions
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
+          # Use a 30-minute duration for credentials to minimize the time spent in this
+          # nearly-administrative role
+          duration: 1800
+      # Load AWS parameters: we do this here because hashicorp/terraform does not include
+      # the AWS CLI, so we need to obtain these configuration values before executing
+      # Terraform in Docker.
+      - ./.buildkite/plugins/aws-parameters:
+          params:
+            - name: /buildkite/terraform/backend-config
+              file: infrastructure/terraform/backend.config
+            - name: /buildkite/terraform/variables
+              file: infrastructure/terraform/terraform.tfvars
+      # Perform a Terraform apply in the provided Docker image
+      - docker#v3.5.0:
+          image: hashicorp/terraform:0.12.24
+          entrypoint: /bin/sh
+          command: [.buildkite/terraform-plan.sh]
+          environment:
+            # Forward image tag
+            - WEBCMS_IMAGE_TAG
+            # Forward STS-assumed credentials
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_SESSION_TOKEN
+      - artifacts#v1.3.0:
+          # Upload the Terraform plan as a build artifact
+          upload: infrastructure/terraform/out.plan
 
-            AWS_SECRET_ACCESS_KEY:
-              secret-id: epa/stage/app
-              json-key: .AWS_SECRET_ACCESS_KEY
+  - label: ":terraform: Apply"
+    key: apply
 
-      # Obtain this secret last - see the comments in the above pipeline step for why.
-      - seek-oss/aws-sm#v2.0.0:
-          env:
-            AWS_ACCESS_KEY_ID:
-              secret-id: epa/stage/app
-              json-key: .AWS_ACCESS_KEY_ID
+    # Only allow one apply at a time, regardless of branch
+    concurrency_group: epa-webcms-d8/apply
+    concurrency: 1
+
+    # Only deploy after the first two steps have completed
+    depends_on:
+      - step: build
+      - step: plan
+
+    # Only build on commits (not pull requests) to the master branch
+    if: build.branch == "master" && build.pull_request.id == null
+
+    # See the previous plan step for most of these values
+    plugins:
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
+          duration: 1800
+      - ./.buildkite/plugins/aws-parameters:
+          params:
+            # Since we are using plan data, we don't need to load the Terraform variables
+            - name: /buildkite/terraform/backend-config
+              file: infrastructure/terraform/backend.config
+      - docker#v3.5.0:
+          image: hashicorp/terraform:0.12.24
+          entrypoint: /bin/sh
+          command: [.buildkite/terraform-apply.sh]
+          environment:
+            - WEBCMS_IMAGE_TAG
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_SESSION_TOKEN
+      - artifacts#v1.3.0:
+          # Retrieve the Terraform plan in order to apply it exactly
+          download: infrastructure/terraform/out.plan
+
+          # Upload the generated AWSVPC configuration for the next Drush step
+          upload:
+            - from: infrastructure/terraform/drushvpc.json
+              to: drushvpc.json
+
+  - label: ":ecs: Run Drush updates"
+    command: bash .buildkite/run-drush.sh
+
+    # Only build on commits (not pull requests) to the master branch
+    if: build.branch == "master" && build.pull_request.id == null
+
+    # Run only if the previous deploy step succeeded
+    depends_on: apply
+
+    # Only allow one Drush update at a time, regardless of branch
+    concurrency_group: epa-webcms-d8/update
+    concurrency: 1
+
+    plugins:
+      # Download the Drush AWSVPC configuration
+      - artifacts#v1.3.0:
+          download: drushvpc.json
+      # Assume our ECS task management role
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks

@@ -4,10 +4,14 @@
 $horizontal-rule-color: gesso-color(ui, generic, border);
 
 hr {
-  @include vertical-spacing(rem(gesso-spacing(2)));
   border: 1px solid $horizontal-rule-color;
   box-sizing: content-box;
   height: 0;
-  margin: 0;
+  margin: 0 0 rem(gesso-spacing(2));
   padding-bottom: -1px;
+
+  // Add top margin when preceded by another element.
+  * + & {
+    margin-top: rem(gesso-spacing(2));
+  }
 }

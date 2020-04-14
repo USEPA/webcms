@@ -1,0 +1,23 @@
+// @file
+// Overrides for USWDS typography mixins
+
+@mixin typeset-heading {
+  @include u-margin-y(0);
+  clear: both;
+  margin-bottom: rem(gesso-spacing(2));
+
+  * + & {
+    margin-top: 1em;
+  }
+}
+
+@mixin typeset-p {
+  line-height: line-height($theme-body-font-family, $theme-body-line-height);
+  margin-bottom: rem(gesso-spacing(2));
+  margin-top: 0;
+  max-width: measure($theme-text-measure);
+
+  * + & {
+    margin-top: rem(gesso-spacing(2));
+  }
+}

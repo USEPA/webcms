@@ -1,7 +1,7 @@
 // @file
 // Styles for a Box.
 
-$image-header-width: 240px;
+$image-header-width: 320px;
 
 .box {
   margin-bottom: rem(units(3));
@@ -10,7 +10,7 @@ $image-header-width: 240px;
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
     &.u-align-right {
-      width: 30.556%;
+      width: 33%;
     }
   }
 
@@ -40,7 +40,8 @@ $image-header-width: 240px;
   }
 
   .box__title {
-    @extend %h3;
+    @extend %h4;
+    margin-bottom: 0;
     text-align: center;
   }
 
@@ -56,6 +57,10 @@ $image-header-width: 240px;
   .box__content {
     border-bottom-width: rem(units('05'));
     margin: 0;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
   }
 
   .box__footer {
