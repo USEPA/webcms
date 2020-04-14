@@ -1,0 +1,47 @@
+<?php
+
+namespace Drupal\epa_migrations;
+
+use Drupal\paragraphs\Entity\Paragraph;
+
+/**
+ * Helper to wrap child paragraphs in Box paragraphs.
+ */
+trait EpaBoxWrapperTrait {
+
+  /**
+   * Surrounds the passed-in paragraphs in a specific box style.
+   *
+   * @param array $children
+   *   An array of Paragraphs to wrap.
+   * @param string $title
+   *   The title for the box.
+   * @param string $box_style
+   *   The box style to use.
+   *
+   * @return paragraph
+   *   The saved box paragraph.
+   */
+  public function addBoxWrapper(array $children, string $title, string $box_style) {
+    // Create Box paragraph container.
+    $box_paragraph = Paragraph::create(['type' => 'box']);
+
+    if ($title) {
+      $box_paragraph->set('field_title', $title);
+    }
+
+    if ($box_style) {
+      $box_paragraph->set('field_style', $box_style);
+    }
+
+    if ($children) {
+      $box_paragraph->set('field_paragraphs', $children);
+    }
+
+    $box_paragraph->isNew();
+    $box_paragraph->save();
+
+    return $box_paragraph;
+  }
+
+}
