@@ -21,9 +21,9 @@ class EpaPanelizerNode extends Node {
     // Get the default Node query.
     $query = parent::query();
 
-    // Limit results to nodes that use a layout other than onecol_page or
-    // twocol_page because these are the only nodes that will need special
-    // processing and migration into Layout Builder.
+    // Limit results to nodes that use a layout other than onecol_page,
+    // twocol_page, or six_pack because these are the only nodes that will need
+    // special processing and migration into Layout Builder.
     $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id');
     $query->innerJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->condition('pe.did', 0, '<>');
