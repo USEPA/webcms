@@ -1,0 +1,14 @@
+{% set classes = [
+  'highlight',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% if is_demo %}
+  <h2 class="{{ classes }}">H2 {{ text }}</h2>
+  <h3 class="{{ classes }}">H3 {{ text }}</h3>
+  <h4 class="{{ classes }}">H4 {{ text }}</h4>
+  <h5 class="{{ classes }}">H5 {{ text }}</h5>
+  <h6 class="{{ classes }}">H6 {{ text }}</h6>
+{% else %}
+  <{{ tag }} class="{{ classes }}">{{ text }}</{{ tag }}>
+{% endif %}
