@@ -1,0 +1,5 @@
+<img {% if modifier_classes %}class="{{ modifier_classes }}" {% endif %}src="{{ img.small.src }}" alt="{{ img.small.alt }}"{% if img.small.height %} height="{{ img.small.height }}"{% endif %}{% if img.small.width %} width="{{ img.small.width }}"{% endif %}
+  sizes="(max-width: {{ img.small.width }}px) calc(100vw - 2rem),
+    {{ img.small.width }}px"
+  srcset="{{ img.small.src }} {{ img.small.width }}w,
+    {{ img.medium.src }} {{ img.medium.width }}w">
