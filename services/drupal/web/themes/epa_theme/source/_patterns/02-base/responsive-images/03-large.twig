@@ -1,0 +1,8 @@
+<img {% if modifier_classes %}class="{{ modifier_classes }}" {% endif %}src="{{ img.large.src }}" alt="{{ img.large.alt }}"{% if img.large.height %} height="{{ img.large.height }}"{% endif %}{% if img.large.width %} width="{{ img.large.width }}"{% endif %}
+  sizes="(max-width: {{ img.large.width }}px) calc(100vw - 4rem),
+    {{ img.large.width }}px"
+  srcset="{{ img.small.src }} {{ img.small.width }}w,
+    {{ img.medium.src }} {{ img.medium.width }}w,
+    {{ img.large.src }} {{ img.large.width }}w,
+    {{ img.huge.src }} {{ img.huge.width }}w,
+    {{ img.colossal.src }} {{ img.colossal.width }}w">

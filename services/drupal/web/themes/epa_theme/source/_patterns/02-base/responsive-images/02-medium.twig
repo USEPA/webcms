@@ -1,0 +1,7 @@
+<img {% if modifier_classes %}class="{{ modifier_classes }}" {% endif %}src="{{ img.medium.src }}" alt="{{ img.medium.alt }}"{% if img.medium.height %} height="{{ img.medium.height }}"{% endif %}{% if img.medium.width %} width="{{ img.medium.width }}"{% endif %}
+  sizes="(max-width: {{ img.medium.width }}px) calc(100vw - 4rem),
+    {{ img.medium.width }}px"
+  srcset="{{ img.small.src }} {{ img.small.width }}w,
+    {{ img.medium.src }} {{ img.medium.width }}w,
+    {{ img.large.src }} {{ img.large.width }}w,
+    {{ img.huge.src }} {{ img.huge.width }}w">
