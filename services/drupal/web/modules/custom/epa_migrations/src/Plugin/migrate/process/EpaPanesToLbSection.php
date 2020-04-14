@@ -136,7 +136,7 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
 
     $layout = $row->getSourceProperty('layout');
-    if ($layout == 'flexgrid') {
+    if ($layout === 'flexgrid') {
       // If the D7 layout is 'flexible_grid', inspect pane panels so we can
       // determine how many columns there are and which layout builder layout to
       // use. The possible panels for this layout are labeled a1..d4.
@@ -187,33 +187,89 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
           $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
 
           if ($paragraphs) {
-            // Build a  Block entity.
-            $block = $this->entityTypeManager->getStorage('block_content')
-              ->create([
-                'info' => 'Paragraph Block',
-                'type' => 'paragraph',
-                'reusable' => 0,
-                'field_paragraphs' => $paragraphs,
-              ]
-            );
-
-            // Create Block embedded in a Section Component. Passing a serialized
-            // Block entity is the key to making this work.
-            $component = new SectionComponent($this->uuid->generate(), $region, [
-              'id' => 'inline_block:paragraph',
-              'label' => 'Paragraph Block',
-              'label_display' => 'false',
-              'block_serialized' => serialize($block),
-              'context_mapping' => [],
-            ]);
+            $component = $this->buildSectionComponent($paragraphs, $region);
             $section->appendComponent($component);
           }
         }
       }
+
       return $section;
-
     }
+    elseif ($layout === 'rd_homepage') {
+      // If the D7 layout is 'rd_homepage', we have only one destination layout.
+      // The panel names from D7 will map 1:1 to a region in Layout Builder.
+      $panel_names = array_column($value, 'panel');
 
+      $regions_by_panel_name = [
+        'main_col' => 'main',
+        'rda1' => 'a1',
+        'rda2' => 'a2',
+        'rdb1' => 'b1',
+        'rdb2' => 'b2',
+        'rdc1' => 'c1',
+        'rdc2' => 'c2',
+        'bottom' => 'bottom',
+        'sidebar' => 'sidebar',
+      ];
+
+      $layout = 'epa_resource_directory';
+
+      // Create paragraph inline content blocks from each pane and wrap them in
+      // SectionComponents to be assigned to the overall Section.
+      $section = new Section($layout);
+
+      foreach ($value as $pane) {
+        $shown = $pane['shown'];
+
+        if ($shown) {
+          $region = $regions_by_panel_name[$pane['panel']];
+
+          $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
+
+          if ($paragraphs) {
+            $component = $this->buildSectionComponent($paragraphs, $region);
+            $section->appendComponent($component);
+          }
+        }
+      }
+
+      return $section;
+    }
+  }
+
+  /**
+   * Given an array of paragraphs, build a Section Component.
+   *
+   * @param array $paragraphs
+   *   The paragraphs to assign this component.
+   * @param string $region
+   *   The region where the Section Component should be placed.
+   *
+   * @return \Drupal\layout_builder\SectionComponent
+   *   The Section Component with an inline content block.
+   */
+  private function buildSectionComponent(array $paragraphs, string $region) {
+    // Build a  Block entity.
+    $block = $this->entityTypeManager->getStorage('block_content')
+      ->create([
+        'info' => 'Paragraph Block',
+        'type' => 'paragraph',
+        'reusable' => 0,
+        'field_paragraphs' => $paragraphs,
+      ]
+    );
+
+    // Create Block embedded in a Section Component. Passing a serialized
+    // Block entity is the key to making this work.
+    $component = new SectionComponent($this->uuid->generate(), $region, [
+      'id' => 'inline_block:paragraph',
+      'label' => 'Paragraph Block',
+      'label_display' => 'false',
+      'block_serialized' => serialize($block),
+      'context_mapping' => [],
+    ]);
+
+    return $component;
   }
 
 }
