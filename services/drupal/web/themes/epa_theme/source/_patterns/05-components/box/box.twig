@@ -1,7 +1,7 @@
 {% set classes = [
   'box',
   modifier_classes ? modifier_classes,
-  image.src ? 'has-image-header',
+  img.small.src ? 'has-image-header',
 ]|join(' ')|trim %}
 
 {% set title_icon %}
@@ -36,11 +36,9 @@
       {% endif %}
     </{{ title.tag }}>
   {% endif %}
-  {% if image.src %}
-    {% include '@base/images/04-box-header.twig' with {
-      'custom_classes': 'box__image',
-      'src': image.src,
-      'alt': image.alt,
+  {% if img.small.src %}
+    {% include '@base/responsive-images/01-small.twig' with {
+      'modifier_classes': 'box__image',
     } %}
   {% endif %}
   <div class="box__content">{{ content }}</div>
