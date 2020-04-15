@@ -13,8 +13,15 @@
     width: 0.65em;
   }
 
+  &:visited {
+    &::after {
+      @include svg-background(external-link--violet);
+    }
+  }
+
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     &::after {
       @include svg-background(external-link--blue-dark);
     }
