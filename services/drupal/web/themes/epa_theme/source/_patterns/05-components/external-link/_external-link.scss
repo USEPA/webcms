@@ -1,0 +1,26 @@
+// @file
+// Styles for an External Link.
+
+.external-link {
+  &::after {
+    @include svg-background(external-link--blue-base);
+    background-repeat: no-repeat;
+    content: '';
+    display: inline-block;
+    height: 0.65em;
+    margin-bottom: -1px;
+    margin-left: rem(units(0.5));
+    width: 0.65em;
+  }
+
+  &:hover,
+  &:focus {
+    &::after {
+      @include svg-background(external-link--blue-dark);
+    }
+  }
+}
+
+a:not([href*='.gov'], [href^='#'], [href^='/'], [href^='.']) {
+  @extend .external-link;
+}
