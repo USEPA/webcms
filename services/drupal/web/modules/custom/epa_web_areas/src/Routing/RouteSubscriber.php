@@ -60,11 +60,19 @@ class RouteSubscriber extends RouteSubscriberBase {
     }
 
     // Ensure Group admin pages use the admin theme
-    $route_names = ['entity.group.canonical','view.group_nodes.page_1', 'view.group_media.page_1', 'view.group_members.page_1', 'view.group_publishers.page_1', 'entity.group.menu'];
+    $route_names = [
+      'entity.group.canonical',
+      'view.group_nodes.page_1',
+      'view.group_media.page_1',
+      'view.group_members.page_1',
+      'view.group_publishers.page_1',
+      'entity.group.menu',
+    ];
     foreach ($route_names as $route_name) {
       if ($route = $collection->get($route_name)) {
         $route->addOptions(['_admin_route' => TRUE]);
       }
     }
   }
+
 }
