@@ -50,14 +50,22 @@ process:
       source: field_keywords
       process:
         target_id: tid
-  og_group_ref:
-    -
-      plugin: get
-      source: og_group_ref
   field_metatag:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_description:
+    -
+      plugin: get
+      source: field_document_description
+  field_publication_date:
+    -
+      plugin: get
+      source: field_document_date_text
+  field_publication_number:
+    -
+      plugin: get
+      source: field_publication_number
 destination:
   plugin: 'entity:media'
   bundle: document
