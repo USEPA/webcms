@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 7gDy1i4mgy1vzLVAACRfYvNoyTOQqiyhNgI45o4B8Jw
+  default_config_hash: Yw9ENMhy-WdRBum0GZwpjtSiM3CeSOYZvmfza6gqugA
 id: upgrade_d7_file_entity_image
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -44,56 +44,28 @@ process:
     -
       plugin: get
       source: fid
-  field_media_image/width:
-    -
-      plugin: get
-      source: width
-  field_media_image/height:
-    -
-      plugin: get
-      source: height
-  thumbnail/target_id:
-    -
-      plugin: get
-      source: fid
-  thumbnail/width:
-    -
-      plugin: get
-      source: width
-  thumbnail/height:
-    -
-      plugin: get
-      source: height
   field_keywords:
     -
       plugin: sub_process
       source: field_keywords
       process:
         target_id: tid
-  field_file_image_alt_text:
+  field_media_image/alt:
     -
       plugin: get
-      source: field_file_image_alt_text
-  field_file_image_title_text:
+      source: field_file_image_alt_text/0/value
+  field_media_image/title:
     -
       plugin: get
       source: field_file_image_title_text
-  field_caption:
+  field_legacy_caption:
     -
       plugin: get
       source: field_caption
-  field_image_alignment:
+  field_legacy_image_alignment:
     -
       plugin: get
       source: field_image_alignment
-  field_original_image_link:
-    -
-      plugin: get
-      source: field_original_image_link
-  og_group_ref:
-    -
-      plugin: get
-      source: og_group_ref
   field_metatag:
     -
       plugin: d7_metatag_entities
