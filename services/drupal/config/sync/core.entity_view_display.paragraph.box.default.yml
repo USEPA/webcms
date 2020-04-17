@@ -3,18 +3,32 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
     - paragraphs.paragraphs_type.box
   module:
     - entity_reference_revisions
+    - link
     - options
 id: paragraph.box.default
 targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_link:
+    weight: 3
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link_separate
+    region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
     weight: 1
