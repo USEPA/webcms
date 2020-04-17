@@ -9,16 +9,21 @@ use Drupal\Core\Form\FormStateInterface;
  * @param $form_id
  */
 function epa_clone_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $form['title']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->bundle() == 'faq') {
+    $form['field_question']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  } else {
+    $form['title']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
+  }
 }
 
 /**
  * Prevent cloned nodes from saving without title changes.
  */
 function epa_clone_cloned_node_validate($element, FormStateInterface &$form_state, $form) {
-  $node = $form_state->getFormObject()->getEntity();
-  $cloned = strlen($node->getTitle()) >= strlen('- Cloned') && (substr_compare($node->getTitle(), '- Cloned', -strlen('- Cloned')) === 0);
-  if ($cloned) {
+  $title = $element[0]['value']['#value'];
+  $clonedTitleUnchanged = strpos($title, 'Cloned: ') === 0;
+  if ($clonedTitleUnchanged) {
     $form_state->setError($element, t('This content has been cloned. Please update the %field field to remove the "Cloned" signifier.', ['%field' => $element['#title']]));
   }
 }
