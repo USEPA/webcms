@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_media_s3fs.install.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function epa_media_s3fs_install() {
+  // Re-run the media modules installation now that the S3FS module is ensured
+  // to be ready. This will restore any missing default icons provided by the
+  // core media module if they were lost after S3FS was enabled.
+  module_load_install('media');
+  media_install();
+}
