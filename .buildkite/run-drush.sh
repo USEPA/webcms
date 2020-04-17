@@ -11,29 +11,58 @@ drush --uri="$WEBCMS_SITE_URL" cim -y
 drush --uri="$WEBCMS_SITE_URL" ib --choice safe
 drush --uri="$WEBCMS_SITE_URL" cr'
 
-# Use jq to format the container overrides in a way that plays nicely with
-# AWS ECS' character count limitations on JSON input, as well as avoids
-# potential issues with quoting
+# Use jq to format the container overrides in a way that plays nicely with AWS ECS'
+# character count limitations on JSON input, as well as avoids potential issues with
+# quoting. We pass -x to see the update script as it runs in the logs.
 overrides="$(
   jq -cn --arg script "$script" '
 {
   "containerOverrides": [
     {
       "name": "drush",
-      "command": ["/bin/sh", "-ec", $script]
+      "command": ["/bin/sh", "-exc", $script]
     }
   ]
 }
 '
 )"
 
+network_configuration="$(cat drushvpc.json)"
+
+task_definition="webcms-drush"
+cluster="webcms-cluster"
+
+# The lines using $(jq . | sed) are doing pretty-printing with indentation:
+# - jq . tells jq to just copy the input JSON object to stdout, and it will pretty-print
+#   the result by default
+# - the <<<"FOO" notation is bash shorthand for replacing the standard input with the
+#   string "FOO" (note that this is distinct from <<EOF, which is a multi-line string).
+# - sed -e s/^/.../ matches the start of the string and "replaces" it with the ... string
+
+# Output all of the information we need to know what we've passed on to AWS
+cat <<EOF
+--- Running Drush
+Task definition: $task_definition
+Cluster: $cluster
+Started by: $started_by
+
+Task overrides:
+$(jq . <<<"$overrides" | sed -e 's/^/  /')
+
+Task networking:
+$(jq . <<<"$network_configuration" | sed -e 's/^/  /')
+
+Update script:
+$script
+EOF
+
 # Run a Drush task, capturing the task's ARN for later (that's the jq line at the end)
 arn="$(
   aws ecs run-task \
-    --task-definition webcms-drush \
-    --cluster webcms-cluster \
+    --task-definition "$task_definition" \
+    --cluster "$cluster" \
     --overrides "$overrides" \
-    --network-configuration "$(cat drushvpc.json)" \
+    --network-configuration "$network_configuration" \
     --started-by "$started_by" |
     jq -r '.tasks[0].taskArn'
 )"
