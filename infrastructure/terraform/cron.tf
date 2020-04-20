@@ -43,10 +43,6 @@ resource "aws_ecs_task_definition" "drush_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
-  placement_constraints {
-    type = "memberOf"
-    expression = "attribute:webcms.type == on-demand"
-  }
 
   # See cluster.tf for more information on these parameters
   container_definitions = jsonencode([
