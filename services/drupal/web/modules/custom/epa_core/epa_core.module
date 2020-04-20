@@ -17,6 +17,9 @@ use Drupal\Core\Link;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Field\FieldFilteredMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -341,5 +344,49 @@ function epa_core_node_presave(NodeInterface $node) {
       }
     }
     $node->set('field_geographic_locations', $geo_location_terms);
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function epa_core_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+  $plugin_id = $context['widget']->getPluginId();
+  // If the field is a datetime or daterange field, then add a note to the
+  // field's description indicating that times must be entered according to the
+  // user's configured timezone. Since the "created" field suppresses the
+  // container-level description, add it to the field directly in that case.
+  if (strpos($plugin_id, 'datetime_') !== FALSE || strpos($plugin_id, 'daterange') !== FALSE) {
+    $field_name = $context['items']->getName();
+    if ($field_name == 'created') {
+      _epa_core_augment_datetime_description($element['value']['#description']);
+    }
+    else {
+      if (empty($element['#description'])) {
+        $element['#description'] = '';
+      }
+      _epa_core_augment_datetime_description($element['#description']);
+    }
+  }
+}
+
+/**
+ * Helper function to generate user's timezone description for datetime fields.
+ */
+function _epa_core_augment_datetime_description(&$field_description) {
+  $date = new DrupalDateTime();
+  $timezone = $date->format('T');
+  $timezone_description = t('<strong>Note:</strong> Specify time in @timezone', ['@timezone' => $timezone])->render();
+  if (!empty($field_description)) {
+    if ($field_description instanceof FieldFilteredMarkup) {
+      $field_description = $field_description->__toString();
+    }
+    elseif ($field_description instanceof TranslatableMarkup) {
+      $field_description = $field_description->render();
+    }
+    $field_description .= '<br/>' . $timezone_description;
+  }
+  else {
+    $field_description = $timezone_description;
   }
 }
