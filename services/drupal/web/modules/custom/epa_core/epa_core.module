@@ -16,6 +16,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Core\Link;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -311,9 +312,34 @@ function epa_core_file_download($uri) {
 /**
  * Implements hook_form_alter().
  */
-function epa_core_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function epa_core_node_presave(NodeInterface $node) {
+  if ($node->bundle() == 'public_notice') {
+    // Automatically populate notice's field_geographic_locations field with
+    // data from field_location_of_prop_action to avoid making users enter it
+    // twice.
+    $geo_location_terms = [];
+    if (!$node->field_locations_of_prop_actions->isEmpty()) {
+      foreach ($node->field_locations_of_prop_actions as $item) {
+        if (is_object($item->entity)) {
+          $location = $item->entity;
+          if (!$location->field_state_or_territory->isEmpty()) {
+            $geo_location_terms[] = [
+              'target_id' => $location->field_state_or_territory->target_id,
+            ];
+          }
+        }
+      }
+    }
+    $node->set('field_geographic_locations', $geo_location_terms);
   }
 }
