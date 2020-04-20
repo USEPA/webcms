@@ -3,17 +3,27 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
     - paragraphs.paragraphs_type.box
   module:
+    - link
     - paragraphs
 id: paragraph.box.default
 targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_link:
+    weight: 3
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
   field_paragraphs:
     type: paragraphs
     weight: 1
