@@ -81,7 +81,7 @@ data "template_cloudinit_config" "servers" {
     ECS_CLUSTER=${var.cluster-name}
     ECS_AWSVPC_BLOCK_IMDS=true
     ECS_RESERVED_MEMORY=128
-    ECS_CONTAINER_ATTRIBUTES={"webcms.type","$type"}
+    ECS_CONTAINER_ATTRIBUTES={"webcms.type":"$type"}
     EOF
     USERDATA
   }
