@@ -1,0 +1,10 @@
+{% set classes = [
+  'external-link--inverse',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/external-link/external-link.twig' with {
+  'modifier_classes': classes,
+  'url': url,
+  'text': text,
+} %}
