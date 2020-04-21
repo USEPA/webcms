@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 8ETWR6udIJZiOLMwF3jKZOZ_1E8cpYWcmlY8nPlvpeA
+  default_config_hash: T4Fdu5eoVTB1hgBq2ueVg0fY5i5dzi4jidjVJvfg7ao
 id: upgrade_d7_file_entity_other
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -44,20 +44,12 @@ process:
     -
       plugin: get
       source: fid
-  field_document_date_text:
-    -
-      plugin: get
-      source: field_document_date_text
   field_keywords:
     -
       plugin: sub_process
       source: field_keywords
       process:
         target_id: tid
-  field_publication_number:
-    -
-      plugin: get
-      source: field_publication_number
   og_group_ref:
     -
       plugin: get
