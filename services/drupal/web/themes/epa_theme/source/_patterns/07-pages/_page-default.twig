@@ -18,6 +18,21 @@
   ]
 }%}
 
+{% if show_sitewide_alerts %}
+  {% include '@components/sitewide-alert/sitewide-alert--emergency/sitewide-alert--emergency.twig' with {
+    'show_close': false,
+    'content': '<p>This is an <strong>emergency</strong> alert.</p>',
+  } %}
+  {% include '@components/sitewide-alert/sitewide-alert--warning/sitewide-alert--warning.twig' with {
+    'show_close': true,
+    'content': '<p>This is a <strong>warning</strong> alert.</p>',
+  } %}
+  {% include '@components/sitewide-alert/sitewide-alert--info/sitewide-alert--info.twig' with {
+    'show_close': true,
+    'content': '<p>We’ve made some changes to <a href="/">EPA.gov</a>. If the information you are looking for is not here, you may be able to find it on the <a href="https://archive.epa.gov/">EPA Web Archive</a> or the <a href="https://19january2017snapshot.epa.gov/">January 19, 2017 Web Snapshot</a>.</p>',
+  } %}
+{% endif %}
+
 {% embed '@layouts/header/header.twig' %}
   {% block logo %}
     {% include "@components/site-logo/site-logo.twig" with {

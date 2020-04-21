@@ -1,0 +1,55 @@
+// @file
+// Styles for a Sitewide Alert.
+
+.sitewide-alert {
+  background-color: gesso-grayscale('gray-1');
+  font-size: font-size(body, 3xs);
+  line-height: gesso-line-height(2);
+  padding: units(2) 0;
+  position: relative;
+
+  &::before {
+    background-color: gesso-grayscale('gray-3');
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: units(1);
+  }
+
+  p {
+    line-height: gesso-line-height(2);
+  }
+}
+
+.sitewide-alert__body {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sitewide-alert__content {
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sitewide-alert__close {
+  background: transparent;
+  border: 0;
+  color: gesso-grayscale('gray-5');
+  flex-shrink: 0;
+  height: units(4);
+  margin: units(-1) 0 units(-1) units(3);
+  padding: 0;
+  width: units(4);
+}
+
+%sitewide-alert--with-icon {
+  .sitewide-alert__content {
+    background-repeat: no-repeat;
+    background-size: units(2);
+    min-height: units(2);
+    padding-left: units(3);
+  }
+}
