@@ -21,6 +21,8 @@ class EpaFile extends File {
     // Get the parent query.
     $query = parent::query();
 
+    $query->condition('f.type', 'video', '!=');
+
     $query->innerJoin('file_usage', 'fu', 'f.fid = fu.fid');
     $query->distinct();
 
