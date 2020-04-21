@@ -22,7 +22,7 @@ class EpaFileEntityItem extends FileEntityItem {
    */
   public function query() {
     // Duplicating the parent query here because they didn't use table aliases
-    // when specifying field condtions.
+    // when specifying field conditions.
     $query = $this->select('file_managed', 'f')
       ->fields('f')
       ->orderBy('f.timestamp');
