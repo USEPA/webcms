@@ -1,0 +1,11 @@
+{% set classes = [
+  'button-group--outline',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/button-group/button-group.twig' with {
+  'modifier_classes': classes,
+  'heading': heading,
+  'active_label': active_label,
+  'buttons': buttons,
+} %}

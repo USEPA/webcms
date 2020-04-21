@@ -1,0 +1,41 @@
+// @file
+// Styles for an Outline Button Group.
+
+.button-group--outline {
+  .button-group__item {
+    border: 0;
+    margin: -1px 0;
+
+    @include breakpoint(gesso-breakpoint(tablet)) {
+      margin: 0 -1px;
+    }
+
+    &:first-child {
+      margin-top: 0;
+
+      @include breakpoint(gesso-breakpoint(tablet)) {
+        margin-left: 0;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+
+      @include breakpoint(gesso-breakpoint(tablet)) {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .button-group__link {
+    @extend .usa-button--outline;
+
+    &:focus {
+      @extend .usa-button--outline:hover;
+    }
+
+    &.is-active {
+      @extend .usa-button--outline:active;
+    }
+  }
+}
