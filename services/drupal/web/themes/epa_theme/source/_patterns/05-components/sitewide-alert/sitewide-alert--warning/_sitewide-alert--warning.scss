@@ -1,0 +1,15 @@
+// @file
+// Styles for a Warning Sitewide Alert.
+
+.sitewide-alert--warning {
+  @extend %sitewide-alert--with-icon;
+  background-color: color($theme-color-warning-lighter);
+
+  &::before {
+    background-color: color($theme-color-warning);
+  }
+
+  .sitewide-alert__content {
+    @include add-background-svg('alerts/warning');
+  }
+}
