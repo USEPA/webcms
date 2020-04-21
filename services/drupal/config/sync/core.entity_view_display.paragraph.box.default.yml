@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.box.field_link
+    - field.field.paragraph.box.field_media_image
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
@@ -18,8 +19,8 @@ bundle: box
 mode: default
 content:
   field_link:
-    weight: 3
-    label: above
+    weight: 4
+    label: hidden
     settings:
       trim_length: 80
       url_only: false
@@ -29,25 +30,34 @@ content:
     third_party_settings: {  }
     type: link_separate
     region: content
+  field_media_image:
+    type: entity_reference_entity_view
+    weight: 1
+    label: hidden
+    settings:
+      view_mode: medium
+      link: false
+    third_party_settings: {  }
+    region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 1
-    label: above
+    weight: 2
+    label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 2
-    label: above
+    weight: 3
+    label: hidden
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_title:
     weight: 0
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
