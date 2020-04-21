@@ -7,12 +7,12 @@ dependencies:
     - field.field.media.image.field_keywords
     - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_media_image
-    - image.style.box_header
     - media.type.image
+    - responsive_image.styles.responsive_high_quality_small
   module:
-    - image
     - layout_builder
     - media_inline_embed
+    - responsive_image
 third_party_settings:
   media_inline_embed:
     embed_inline: false
@@ -28,9 +28,10 @@ content:
     weight: 0
     label: hidden
     settings:
-      image_style: box_header
+      responsive_image_style: responsive_high_quality_small
+      image_link: ''
     third_party_settings: {  }
-    type: image_url
+    type: responsive_image
     region: content
 hidden:
   created: true
