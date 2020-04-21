@@ -269,3 +269,20 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
     $entity->field_hublinks->setValue($hublinks);
   }
 }
+
+/**
+ * Implements hook_views_pre_build().
+ *
+ * Alter the view to return content for the current user's group.
+ */
+function epa_web_areas_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
+
+  if ($view->id() === 'my_group_moderated_content') {
+
+    // Get the current User.
+    $user = User::load(Drupal::currentUser()->id());
+
+    // Pass the hublink ID to the view as a filter.
+    $args[0] = $user->get('field_hublinks')->entity->id();
+  }
+}
