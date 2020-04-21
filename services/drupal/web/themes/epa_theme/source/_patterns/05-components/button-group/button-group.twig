@@ -12,7 +12,7 @@
           button.active ? 'is-active',
         ]|join(' ')|trim %}
 
-        <li class="button-group__item">
+        <li class="button-group__item{% if button.active %} is-active{% endif %}">
           {% block link %}
             <a href="{{ button.url }}" class="{{ button_classes }}">
               {{ button.text }}
