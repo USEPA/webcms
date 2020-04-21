@@ -14,6 +14,7 @@ dependencies:
     - linkit
     - media
     - media_inline_embed
+    - pathologic
     - token_filter
 name: 'Filtered HTML'
 format: filtered_html
@@ -120,3 +121,13 @@ filters:
     weight: -48
     settings:
       replace_empty: '0'
+  filter_pathologic:
+    id: filter_pathologic
+    provider: pathologic
+    status: true
+    weight: 50
+    settings:
+      settings_source: global
+      local_settings:
+        protocol_style: full
+        local_paths: ''
