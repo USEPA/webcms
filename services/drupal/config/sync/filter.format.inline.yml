@@ -5,6 +5,7 @@ dependencies:
   module:
     - media
     - media_inline_embed
+    - pathologic
     - token_filter
 name: Inline
 format: inline
@@ -32,6 +33,16 @@ filters:
     weight: 0
     settings:
       replace_empty: '0'
+  filter_pathologic:
+    id: filter_pathologic
+    provider: pathologic
+    status: true
+    weight: 50
+    settings:
+      settings_source: global
+      local_settings:
+        protocol_style: full
+        local_paths: ''
   media_embed:
     id: media_embed
     provider: media
