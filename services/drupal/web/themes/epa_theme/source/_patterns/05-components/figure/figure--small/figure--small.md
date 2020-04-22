@@ -1,6 +1,7 @@
 ---
 el: .figure--small
 title: Small Figure
+state: complete
 ---
 
 __Variables:__
