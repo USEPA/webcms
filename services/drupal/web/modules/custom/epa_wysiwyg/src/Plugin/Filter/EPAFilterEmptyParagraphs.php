@@ -14,7 +14,7 @@ use Drupal\filter\Plugin\FilterBase;
  *   description = @Translation("Removes empty paragraphs from html output."),
  *   type = Drupal\filter\Plugin\FilterInterface::TYPE_MARKUP_LANGUAGE,
  * )
- * @package Drupal\your_module\Plugin\Filter
+ * @package Drupal\epa_wysiwyg\Plugin\Filter
  */
 class EPAFilterEmptyParagraphs extends FilterBase {
 
