@@ -1,6 +1,7 @@
 ---
 el: .figure--medium
 title: Medium Figure
+state: complete
 ---
 
 __Variables:__
