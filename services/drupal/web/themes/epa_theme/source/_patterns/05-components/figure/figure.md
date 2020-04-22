@@ -1,7 +1,7 @@
 ---
 el: .figure
 title: Figure
-state: inreview
+state: complete
 ---
 
 __Variables:__
