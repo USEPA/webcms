@@ -66,6 +66,7 @@ class RouteSubscriber extends RouteSubscriberBase {
       'view.group_media.page_1',
       'view.group_members.page_1',
       'view.group_publishers.page_1',
+      'view.group_moderated_content.page_1',
       'entity.group.menu',
     ];
     foreach ($route_names as $route_name) {
