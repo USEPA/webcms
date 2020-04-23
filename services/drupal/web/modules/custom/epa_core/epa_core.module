@@ -344,6 +344,34 @@ function epa_core_node_presave(NodeInterface $node) {
       }
     }
     $node->set('field_geographic_locations', $geo_location_terms);
+
+    // Set computed date based on extension and due date. If neither are set, clear it.
+    // If only extension date is set, do nothing.
+    $due_date = $node->field_comments_due_date->value;
+    $extension_date = $node->field_comments_extension_date->value;
+
+    if ($due_date) {
+      if ($extension_date) {
+        $node->set('field_computed_comments_due_date', $extension_date);
+      }
+      else {
+        $node->set('field_computed_comments_due_date', $due_date);
+      }
+    }
+    elseif (!$extension_date) {
+      $node->set('field_computed_comments_due_date', NULL);
+    }
+
+    // If computed date was set, use it. Otherwise set a date 90 days out.
+    if($computed_date = $node->field_computed_comments_due_date->value) {
+      $node->set('field_notice_sort_date', $computed_date);
+    } else {
+      $date = new DateObject();
+      $date->add(new DateInterval("P90D"));
+
+      // Set field value
+      $node->set('field_notice_sort_date', $date->format('U'));
+    }
   }
 }
 
