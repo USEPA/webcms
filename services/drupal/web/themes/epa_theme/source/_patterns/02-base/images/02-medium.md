@@ -1,6 +1,6 @@
 ---
 title: Medium
-state: inreview
+state: complete
 ---
 
 __Variables:__
