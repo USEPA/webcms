@@ -1,7 +1,7 @@
 ---
 el: .usa-tag--accent
 title: Accent Tag
-state: inreview
+state: complete
 ---
 
 Used for non-links (e.g., New! icon)
