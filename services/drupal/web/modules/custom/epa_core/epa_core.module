@@ -366,11 +366,11 @@ function epa_core_node_presave(NodeInterface $node) {
     if($computed_date = $node->field_computed_comments_due_date->value) {
       $node->set('field_notice_sort_date', $computed_date);
     } else {
-      $date = new DateObject();
+      $date = new DrupalDateTime();
       $date->add(new DateInterval("P90D"));
 
       // Set field value
-      $node->set('field_notice_sort_date', $date->format('U'));
+      $node->set('field_notice_sort_date', $date->format('Y-m-d'));
     }
   }
 }
