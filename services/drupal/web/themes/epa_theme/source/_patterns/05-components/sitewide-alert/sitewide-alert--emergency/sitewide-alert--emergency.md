@@ -1,7 +1,7 @@
 ---
 el: .sitewide-alert--emergency
 title: Emergency Sitewide Alert
-state: inreview
+state: complete
 ---
 
 __Variables:__
