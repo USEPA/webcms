@@ -28,7 +28,7 @@ trait EpaMediaWysiwygTransformTrait {
       'teaser' => 'small',
       'media_small' => 'small',
       'thumbnail' => 'small',
-      'block_header' => 'medium',
+      'block_header' => 'small',
       'small' => 'small',
     ];
 
