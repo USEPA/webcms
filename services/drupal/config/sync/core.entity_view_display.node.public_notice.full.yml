@@ -8,12 +8,12 @@ dependencies:
     - field.field.node.public_notice.field_applicants_or_respondents
     - field.field.node.public_notice.field_channel
     - field.field.node.public_notice.field_comments_due_date
+    - field.field.node.public_notice.field_comments_extension_date
     - field.field.node.public_notice.field_computed_comments_due_date
     - field.field.node.public_notice.field_description
     - field.field.node.public_notice.field_docket_numbers
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
     - field.field.node.public_notice.field_expiration_date
-    - field.field.node.public_notice.field_extension_date
     - field.field.node.public_notice.field_federal_register_citations
     - field.field.node.public_notice.field_geographic_locations
     - field.field.node.public_notice.field_how_to_comment
@@ -84,15 +84,6 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
-  field_extension_date:
-    weight: 2
-    label: hidden
-    settings:
-      timezone_override: ''
-      format_type: short_no_time
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_federal_register_citations:
     type: entity_reference_revisions_entity_view
     weight: 7
@@ -142,6 +133,7 @@ content:
 hidden:
   content_moderation_control: true
   field_channel: true
+  field_comments_extension_date: true
   field_computed_comments_due_date: true
   field_description: true
   field_env_laws_regs_and_treaties: true
