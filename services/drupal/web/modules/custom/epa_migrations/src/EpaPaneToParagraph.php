@@ -4,6 +4,7 @@ namespace Drupal\epa_migrations;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,13 +24,23 @@ class EpaPaneToParagraph implements EpaPaneToParagraphInterface, ContainerInject
   protected $d7Connection;
 
   /**
+   * The entity type manager server.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs an EpaPaneToParagraph object.
    *
    * @param Drupal\Core\Database\Connection $database
    *   The injected database service.
+   * @param Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   *   The entity type manager service.
    */
-  public function __construct(Connection $database) {
+  public function __construct(Connection $database, EntityTypeManager $entity_type_manager) {
     $this->d7Connection = $database;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -37,7 +48,8 @@ class EpaPaneToParagraph implements EpaPaneToParagraphInterface, ContainerInject
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('epa_migrations.epa_pane_to_paragraph')
+      $container->get('epa_migrations.epa_pane_to_paragraph'),
+      $container->get('entity_type.manager')
     );
   }
 

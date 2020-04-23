@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Create paragraphs from a fieldable_panels_pane (fpp) pane.
  */
 class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
+  use EpaMediaWysiwygTransformTrait;
 
   /**
    * The drupal_7 database connection.
@@ -102,7 +103,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
+          // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc();
+          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
 
           $paragraph = $this->addBoxWrapper(
             [
@@ -119,7 +122,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
+          // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
+          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
 
           $links_query = $this->d7Connection->select('field_data_field_epa_link_list_links', 'fpp_links')
             ->condition("fpp_links.{$id_type}", $id, '=');
@@ -144,7 +149,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
+          // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
+          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
 
           $links_query = $this->d7Connection->select('field_data_field_epa_node_list_ref', 'fpp_links')
             ->condition("fpp_links.{$id_type}", $id, '=');
