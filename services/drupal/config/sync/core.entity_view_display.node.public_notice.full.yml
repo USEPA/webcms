@@ -8,12 +8,12 @@ dependencies:
     - field.field.node.public_notice.field_applicants_or_respondents
     - field.field.node.public_notice.field_channel
     - field.field.node.public_notice.field_comments_due_date
+    - field.field.node.public_notice.field_comments_extension_date
     - field.field.node.public_notice.field_computed_comments_due_date
     - field.field.node.public_notice.field_description
     - field.field.node.public_notice.field_docket_numbers
     - field.field.node.public_notice.field_env_laws_regs_and_treaties
     - field.field.node.public_notice.field_expiration_date
-    - field.field.node.public_notice.field_comments_extension_date
     - field.field.node.public_notice.field_federal_register_citations
     - field.field.node.public_notice.field_geographic_locations
     - field.field.node.public_notice.field_how_to_comment
@@ -75,15 +75,6 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  field_docket_numbers:
-    type: entity_reference_revisions_entity_view
-    weight: 6
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    region: content
   field_comments_extension_date:
     weight: 2
     label: hidden
@@ -92,6 +83,24 @@ content:
       format_type: short_no_time
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_computed_comments_due_date:
+    type: datetime_default
+    weight: 10
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_docket_numbers:
+    type: entity_reference_revisions_entity_view
+    weight: 6
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
     region: content
   field_federal_register_citations:
     type: entity_reference_revisions_entity_view
@@ -114,6 +123,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
+  field_notice_sort_date:
+    type: datetime_default
+    weight: 11
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_permit_number:
     type: string
     weight: 8
@@ -142,7 +160,6 @@ content:
 hidden:
   content_moderation_control: true
   field_channel: true
-  field_computed_comments_due_date: true
   field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
@@ -153,7 +170,6 @@ hidden:
   field_language: true
   field_locations_of_prop_actions: true
   field_machine_name: true
-  field_notice_sort_date: true
   field_page_head: true
   field_programs_or_statutes: true
   field_publish_date: true
