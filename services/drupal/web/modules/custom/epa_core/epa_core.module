@@ -282,12 +282,12 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
 function epa_core_entity_delete(EntityInterface $entity) {
   $t_args = [
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
-    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@bundle' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
     '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
+    ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**
