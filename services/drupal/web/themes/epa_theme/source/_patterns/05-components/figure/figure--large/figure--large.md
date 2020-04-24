@@ -1,6 +1,7 @@
 ---
 el: .figure--large
 title: Large Figure
+state: complete
 ---
 
 __Variables:__

@@ -1,6 +1,7 @@
 ---
 el: .figure
 title: Figure with Video
+state: complete
 ---
 
 __Variables:__

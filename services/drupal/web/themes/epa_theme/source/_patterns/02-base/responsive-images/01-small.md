@@ -1,6 +1,6 @@
 ---
 title: Small
-state: inreview
+state: complete
 ---
 
 __Variables:__

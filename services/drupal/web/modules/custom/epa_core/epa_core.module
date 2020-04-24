@@ -282,34 +282,12 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
 function epa_core_entity_delete(EntityInterface $entity) {
   $t_args = [
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
-    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@bundle' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
     '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
-}
-
-/**
- * Implements hook_file_download.
- */
-function epa_core_file_download($uri) {
-  if (\Drupal::currentUser()->isAnonymous()) {
-    $scheme = file_uri_scheme($uri);
-    $entity_type_manager = \Drupal::entityTypeManager();
-
-    if (\Drupal::service('stream_wrapper_manager')->isValidScheme($scheme) && file_exists($uri)) {
-      // We should only get one result.
-      $files = $entity_type_manager->getStorage('file')->loadByProperties(['uri' => $uri]);
-      $file = reset($files);
-      $media = $entity_type_manager->getStorage('media')->load($file->id());
-
-      // Throw 404 if file accessibility is true else serve the file.
-      if (isset($media) && $media->hasField('field_limit_file_accessibility') && !empty($media->field_limit_file_accessibility->value)) {
-        throw new NotFoundHttpException();
-      }
-    }
-  }
+    ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**
@@ -344,6 +322,35 @@ function epa_core_node_presave(NodeInterface $node) {
       }
     }
     $node->set('field_geographic_locations', $geo_location_terms);
+
+    // Set computed date based on extension and due date. If neither are set, clear it.
+    // If only extension date is set, do nothing.
+    $due_date = $node->field_comments_due_date->value;
+    $extension_date = $node->field_comments_extension_date->value;
+
+    if ($due_date) {
+      if ($extension_date) {
+        $node->set('field_computed_comments_due_date', $extension_date);
+      }
+      else {
+        $node->set('field_computed_comments_due_date', $due_date);
+      }
+    }
+    elseif (!$extension_date) {
+      $node->set('field_computed_comments_due_date', NULL);
+    }
+
+    // If computed date was set, use it. Otherwise set a date 90 days out.
+    if ($computed_date = $node->field_computed_comments_due_date->value) {
+      $node->set('field_notice_sort_date', $computed_date);
+    }
+    else {
+      $date = new DrupalDateTime();
+      $date->add(new DateInterval("P90D"));
+
+      // Set field value
+      $node->set('field_notice_sort_date', $date->format('Y-m-d'));
+    }
   }
 }
 

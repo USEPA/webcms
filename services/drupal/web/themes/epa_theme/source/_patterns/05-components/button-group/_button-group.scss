@@ -1,0 +1,89 @@
+// @file
+// Styles for a Button Group.
+
+.button-group {
+  display: flex;
+  margin-bottom: units(3);
+}
+
+.button-group__list {
+  @include list-clean;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.button-group__item {
+  border-color: color('primary-dark');
+  border-style: solid;
+  border-width: 1px 0;
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    border-width: 0 1px;
+  }
+
+  &.is-active {
+    z-index: 1;
+  }
+
+  &:focus-within,
+  &:hover {
+    z-index: 2;
+  }
+
+  .button-group__link {
+    border-radius: 0;
+  }
+
+  &:first-child {
+    border-top: 0;
+
+    @include breakpoint(gesso-breakpoint(tablet)) {
+      border-left: 0;
+    }
+
+    .button-group__link {
+      border-top-left-radius: radius($theme-button-border-radius);
+      border-top-right-radius: radius($theme-button-border-radius);
+
+      @include breakpoint(gesso-breakpoint(tablet)) {
+        border-bottom-left-radius: radius($theme-button-border-radius);
+        border-top-right-radius: 0;
+      }
+    }
+  }
+
+  &:last-child {
+    border-bottom: 0;
+
+    @include breakpoint(gesso-breakpoint(tablet)) {
+      border-right: 0;
+    }
+
+    .button-group__link {
+      border-bottom-left-radius: radius($theme-button-border-radius);
+      border-bottom-right-radius: radius($theme-button-border-radius);
+
+      @include breakpoint(gesso-breakpoint(tablet)) {
+        border-bottom-left-radius: 0;
+        border-top-right-radius: radius($theme-button-border-radius);
+      }
+    }
+  }
+}
+
+.button-group__link {
+  @extend .button;
+  border-radius: 0;
+  margin: 0;
+  width: 100%;
+
+  &.is-active {
+    @extend .usa-button:active;
+  }
+}
