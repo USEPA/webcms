@@ -363,9 +363,10 @@ function epa_core_node_presave(NodeInterface $node) {
     }
 
     // If computed date was set, use it. Otherwise set a date 90 days out.
-    if($computed_date = $node->field_computed_comments_due_date->value) {
+    if ($computed_date = $node->field_computed_comments_due_date->value) {
       $node->set('field_notice_sort_date', $computed_date);
-    } else {
+    }
+    else {
       $date = new DrupalDateTime();
       $date->add(new DateInterval("P90D"));
 
