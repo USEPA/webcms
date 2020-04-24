@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.web_area.field_aside_block
     - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
@@ -30,6 +31,7 @@ dependencies:
     - layout_builder
     - options
     - scheduled_publish
+    - text
     - user
 third_party_settings:
   layout_builder:
@@ -157,6 +159,21 @@ third_party_settings:
                 view_mode: view_mode
             additional: {  }
             weight: 6
+          95d407fa-3f5a-40d7-bd7b-4394095672b2:
+            uuid: 95d407fa-3f5a-40d7-bd7b-4394095672b2
+            region: main
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:web_area:field_aside_block'
+              formatter:
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+                type: text_default
+            additional: {  }
+            weight: 7
         third_party_settings: {  }
 id: node.web_area.default
 targetEntityType: node
@@ -168,6 +185,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
+  field_aside_block:
+    weight: 134
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: main
   field_channel:
     weight: 107
     label: above
