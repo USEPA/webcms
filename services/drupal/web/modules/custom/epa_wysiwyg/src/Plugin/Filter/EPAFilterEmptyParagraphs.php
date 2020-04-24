@@ -33,7 +33,7 @@ class EPAFilterEmptyParagraphs extends FilterBase {
    * @see \Drupal\filter\FilterProcessResult
    */
   public function process($text, $langcode) {
-    $regex = '/<p[^>]*>(&nbsp;|\s)*<\/p>/ui';
+    $regex = '/<p( [^>]*)?>(&nbsp;|\s)*<\/p>/ui';
     $text = preg_replace($regex, '', $text);
     return new FilterProcessResult($text);
   }
