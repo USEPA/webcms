@@ -75,6 +75,24 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
+  field_comments_extension_date:
+    weight: 2
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: short_no_time
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_computed_comments_due_date:
+    type: datetime_default
+    weight: 10
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_docket_numbers:
     type: entity_reference_revisions_entity_view
     weight: 6
@@ -105,6 +123,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
+  field_notice_sort_date:
+    type: datetime_default
+    weight: 11
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_permit_number:
     type: string
     weight: 8
@@ -133,8 +160,6 @@ content:
 hidden:
   content_moderation_control: true
   field_channel: true
-  field_comments_extension_date: true
-  field_computed_comments_due_date: true
   field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
@@ -145,7 +170,6 @@ hidden:
   field_language: true
   field_locations_of_prop_actions: true
   field_machine_name: true
-  field_notice_sort_date: true
   field_page_head: true
   field_programs_or_statutes: true
   field_publish_date: true

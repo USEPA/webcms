@@ -282,12 +282,12 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
 function epa_core_entity_delete(EntityInterface $entity) {
   $t_args = [
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
-    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@bundle' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
     '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
+    ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**
@@ -341,9 +341,10 @@ function epa_core_node_presave(NodeInterface $node) {
     }
 
     // If computed date was set, use it. Otherwise set a date 90 days out.
-    if($computed_date = $node->field_computed_comments_due_date->value) {
+    if ($computed_date = $node->field_computed_comments_due_date->value) {
       $node->set('field_notice_sort_date', $computed_date);
-    } else {
+    }
+    else {
       $date = new DrupalDateTime();
       $date->add(new DateInterval("P90D"));
 
