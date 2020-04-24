@@ -1,7 +1,7 @@
 ---
 el: .sitewide-alert--warning
 title: Warning Sitewide Alert
-state: inreview
+state: complete
 ---
 
 __Variables:__
