@@ -3,7 +3,6 @@
 namespace Drupal\epa_media\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber;
-use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -27,7 +26,12 @@ class EPAMediaExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
     $attributes = $request->attributes;
     // If a private file is throwing a 403, then obscure the file's existence
     // by instead throwing a 404.
-    if ($attributes->get('scheme') == 'private' && $attributes->get('_route') == 'system.files') {
+    $restricted_routes = [
+      'system.files',
+      'system.private_file_download',
+      'image.style_private',
+    ];
+    if ($attributes->get('scheme') == 'private' && in_array($attributes->get('_route'), $restricted_routes)) {
       $event->setException(new NotFoundHttpException());
     }
   }
