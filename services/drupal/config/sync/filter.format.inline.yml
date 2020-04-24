@@ -3,6 +3,9 @@ langcode: en
 status: true
 dependencies:
   module:
+    - editor
+    - epa_wysiwyg
+    - linkit
     - media
     - media_inline_embed
     - pathologic
@@ -15,7 +18,7 @@ filters:
     id: filter_html
     provider: filter
     status: true
-    weight: -10
+    weight: -50
     settings:
       allowed_html: '<@ accesskey class data-date dir id lang style tabindex title name data> <a> <br> <span> <em> <i> <strong> <b> <small> <s> <sub> <sup> <mark> <abbr !title> <q cite> <cite> <ins> <del cite datetime> <time datetime pubdate> <var> <samp> <code> <details open> <summary> <label for form> <input> <textarea> <meter min max low high optimum form value> <select> <optgroup disabled label> <option> <output for form name> <button> <datalist> <keygen autofocus challenge disabled form keytype name> <progress max value> <img alt crossorigin height longdesc !src width usemap> <embed height src type width> <object data form height name type usemap width> <param name value> <source media !src type> <track default kind label src srclang> <map name> <area alt coords href hreflang media rel shape target type>'
       filter_html_help: true
@@ -24,20 +27,20 @@ filters:
     id: filter_autop
     provider: filter
     status: true
-    weight: 0
+    weight: -49
     settings: {  }
   token_filter:
     id: token_filter
     provider: token_filter
     status: false
-    weight: 0
+    weight: -40
     settings:
       replace_empty: '0'
   media_embed:
     id: media_embed
     provider: media
     status: false
-    weight: 100
+    weight: -37
     settings:
       default_view_mode: default
       allowed_media_types: {  }
@@ -46,7 +49,7 @@ filters:
     id: media_inline_embed
     provider: media_inline_embed
     status: false
-    weight: 100
+    weight: -36
     settings:
       default_view_mode: default
       allowed_media_types: {  }
@@ -55,9 +58,65 @@ filters:
     id: filter_pathologic
     provider: pathologic
     status: true
-    weight: 50
+    weight: -47
     settings:
       settings_source: global
       local_settings:
         protocol_style: full
         local_paths: ''
+  editor_file_reference:
+    id: editor_file_reference
+    provider: editor
+    status: false
+    weight: -45
+    settings: {  }
+  epa_filter_empty_paragraphs:
+    id: epa_filter_empty_paragraphs
+    provider: epa_wysiwyg
+    status: true
+    weight: -48
+    settings: {  }
+  filter_html_image_secure:
+    id: filter_html_image_secure
+    provider: filter
+    status: false
+    weight: -39
+    settings: {  }
+  filter_url:
+    id: filter_url
+    provider: filter
+    status: false
+    weight: -42
+    settings:
+      filter_url_length: 72
+  filter_align:
+    id: filter_align
+    provider: filter
+    status: false
+    weight: -44
+    settings: {  }
+  filter_caption:
+    id: filter_caption
+    provider: filter
+    status: false
+    weight: -43
+    settings: {  }
+  filter_htmlcorrector:
+    id: filter_htmlcorrector
+    provider: filter
+    status: false
+    weight: -38
+    settings: {  }
+  filter_html_escape:
+    id: filter_html_escape
+    provider: filter
+    status: false
+    weight: -46
+    settings: {  }
+  linkit:
+    id: linkit
+    provider: linkit
+    status: false
+    weight: -41
+    settings:
+      title: true
