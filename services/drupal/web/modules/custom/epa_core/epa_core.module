@@ -291,28 +291,6 @@ function epa_core_entity_delete(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_file_download.
- */
-function epa_core_file_download($uri) {
-  if (\Drupal::currentUser()->isAnonymous()) {
-    $scheme = file_uri_scheme($uri);
-    $entity_type_manager = \Drupal::entityTypeManager();
-
-    if (\Drupal::service('stream_wrapper_manager')->isValidScheme($scheme) && file_exists($uri)) {
-      // We should only get one result.
-      $files = $entity_type_manager->getStorage('file')->loadByProperties(['uri' => $uri]);
-      $file = reset($files);
-      $media = $entity_type_manager->getStorage('media')->load($file->id());
-
-      // Throw 404 if file accessibility is true else serve the file.
-      if (isset($media) && $media->hasField('field_limit_file_accessibility') && !empty($media->field_limit_file_accessibility->value)) {
-        throw new NotFoundHttpException();
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
