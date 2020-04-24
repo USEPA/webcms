@@ -1,6 +1,6 @@
 ---
 title: Colossal
-state: inreview
+state: complete
 ---
 
 __Variables:__

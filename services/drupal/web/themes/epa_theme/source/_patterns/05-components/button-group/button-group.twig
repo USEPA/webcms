@@ -1,0 +1,30 @@
+{% set classes = [
+  'button-group',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% if buttons %}
+  <nav class="{{ classes }}" aria-label="{{ (heading|default('Tasks'))|t }}">
+    <ul class="button-group__list">
+      {% for button in buttons %}
+        {% set button_classes = [
+          'button-group__link',
+          button_modifier_classes ? button_modifier_classes,
+          button.modifier_classes ? button.modifier_classes,
+          button.active ? 'is-active',
+        ]|join(' ')|trim %}
+
+        <li class="button-group__item{% if button.active %} is-active{% endif %}">
+          {% block link %}
+            <a href="{{ button.url }}" class="{{ button_classes }}">
+              {{ button.text }}
+              {% if button.active %}
+                <span class="visually-hidden">{{ (active_label|default('(active)'))|t }}</span>
+              {% endif %}
+            </a>
+          {% endblock link %}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+{% endif %}

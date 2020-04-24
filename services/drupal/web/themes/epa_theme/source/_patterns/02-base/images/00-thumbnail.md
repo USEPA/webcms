@@ -1,6 +1,6 @@
 ---
 title: Thumbnail
-state: inreview
+state: complete
 ---
 
 __Variables:__
