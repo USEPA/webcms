@@ -1,0 +1,10 @@
+{% set classes = [
+  'audio',
+  'mediaelementjs',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<audio class="{{ classes }}" controls="controls">
+  <source src="{{ source }}">
+  <p><a href="{{ source }}">{{ download_text }}</a></p>
+</audio>
