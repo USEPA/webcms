@@ -100,7 +100,7 @@ class EpaMediaWysiwygFilter extends ProcessPluginBase implements ContainerFactor
     // Extract content in case this is an array with value and format keys.
     $value['value'] ? $content = $value['value'] : $content = $value;
 
-    $this->transformWysiwyg($content, $this->entityTypeManager);
+    return $this->transformWysiwyg($content, $this->entityTypeManager);
   }
 
 }
