@@ -1,7 +1,7 @@
 ---
 el: .button-group--outline
 title: Outline Button Group
-state: inreview
+state: complete
 ---
 
 __Variables:__

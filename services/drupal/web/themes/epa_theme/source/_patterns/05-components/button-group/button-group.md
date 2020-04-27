@@ -1,7 +1,7 @@
 ---
 el: .button-group
 title: Button Group
-state: inreview
+state: complete
 ---
 
 __Variables:__

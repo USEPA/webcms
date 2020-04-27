@@ -1,7 +1,7 @@
 ---
 el: .external-link
 title: External Link
-state: inreview
+state: complete
 ---
 
 __Variables:__
