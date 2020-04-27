@@ -243,6 +243,41 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
 
       return $section;
     }
+    elseif ($layout === 'twocol_page') {
+      // If the D7 layout is 'twocol_page', we have only one destination layout.
+      // For most node types this layout is migrated into fields. For web_areas
+      // it is migrated into Layout Builder.
+      // The panel names from D7 will map 1:1 to a region in Layout Builder.
+      $panel_names = array_column($value, 'panel');
+
+      $regions_by_panel_name = [
+        'main_col' => 'main',
+        'sidebar' => 'sidebar',
+      ];
+
+      $layout = 'epa_one_column_sidebar';
+
+      // Create paragraph inline content blocks from each pane and wrap them in
+      // SectionComponents to be assigned to the overall Section.
+      $section = new Section($layout);
+
+      foreach ($value as $pane) {
+        $shown = $pane['shown'];
+
+        if ($shown) {
+          $region = $regions_by_panel_name[$pane['panel']];
+
+          $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
+
+          if ($paragraphs) {
+            $component = $this->buildSectionComponent($paragraphs, $region);
+            $section->appendComponent($component);
+          }
+        }
+      }
+
+      return $section;
+    }
   }
 
   /**
