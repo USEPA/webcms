@@ -1,7 +1,7 @@
 ---
 el: .button-group--unstyled
 title: Unstyled Button Group
-state: inreview
+state: complete
 ---
 
 __Variables:__

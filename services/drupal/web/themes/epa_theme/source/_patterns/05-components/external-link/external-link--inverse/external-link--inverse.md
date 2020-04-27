@@ -1,7 +1,7 @@
 ---
 el: .external-link--inverse
 title: Inverse External Link
-state: inreview
+state: complete
 ---
 
 __Variables:__
