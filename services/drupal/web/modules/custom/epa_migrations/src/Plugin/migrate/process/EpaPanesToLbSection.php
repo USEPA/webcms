@@ -29,9 +29,17 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * section, do the following:
  *
  * @code
- * field_paragraphs:
- *   plugin: epa_panes_to_lb_section
- *   source: panes
+ * layout_builder__layout:
+ *   -
+ *     plugin: skip_on_empty
+ *     method: process
+ *     source: panes
+ *   -
+ *     plugin: single_value
+ *   -
+ *     plugin: epa_panes_to_lb_section
+ *   -
+ *     plugin: multiple_values
  * @endcode
  */
 class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryPluginInterface {
