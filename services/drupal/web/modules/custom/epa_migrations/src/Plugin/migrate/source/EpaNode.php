@@ -52,6 +52,9 @@ class EpaNode extends Node {
       ->execute()
       ->fetchField();
 
+    // Get the node type from configuration.
+    $type = $row->getSourceProperty('type');
+
     if ($did) {
       // Get the Panelizer layout for this display.
       $layout = $this->select('panels_display', 'pd')
@@ -60,10 +63,14 @@ class EpaNode extends Node {
         ->execute()
         ->fetchField();
 
-      if (!in_array($layout, ['onecol_page', 'twocol_page'])) {
-        // Skip this row if this node uses a panelizer layout other than
-        // onecol_page or twocol_page. We'll migrate these nodes with the
-        // epa_panelizer_node source plugin.
+      // Determine whether to skip this row, or add data.
+      if (!in_array($layout, ['onecol_page', 'twocol_page']) ||
+         ($type === 'web_area' && $layout === 'twocol_page')) {
+        // Skip this row if:
+        // 1. the node uses a panelizer layout other than onecol_page or
+        // twocol_page.
+        // 2. the node type is web_area and it's using twcol_page layout
+        // We'll migrate these nodes with the epa_panelizer_node source plugin.
         return FALSE;
       }
       else {

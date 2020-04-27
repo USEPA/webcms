@@ -21,15 +21,22 @@ class EpaPanelizerNode extends Node {
     // Get the default Node query.
     $query = parent::query();
 
-    // Limit results to nodes that use a layout other than onecol_page,
-    // twocol_page, or six_pack because these are the only nodes that will need
-    // special processing and migration into Layout Builder.
+    // For all node types, exclude nodes that use these layouts:
+    // * onecol_page
+    // * six_pack
+    // Exclude nodes that use the twocol_page layout for all node types except
+    // web_area.
     $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id');
     $query->innerJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->condition('pe.did', 0, '<>');
     $query->condition('pd.layout', 'onecol_page', '<>');
-    $query->condition('pd.layout', 'twocol_page', '<>');
     $query->condition('pd.layout', 'six_pack', '<>');
+
+    if ($this->configuration['node_type'] !== 'web_area') {
+      $query->condition('pd.layout', 'twocol_page', '<>');
+    }
+
+    $query->condition('n.nid', [53047], 'IN');
 
     return $query;
   }

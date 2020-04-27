@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.web_area.field_aside_block
     - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
@@ -19,12 +20,14 @@ dependencies:
     - field.field.node.web_area.field_type
     - field.field.node.web_area.layout_builder__layout
     - node.type.web_area
+    - workflows.workflow.epa_default
   module:
     - content_moderation
     - datetime
     - field_group
     - paragraphs
     - shs
+    - text
 third_party_settings:
   field_group:
     group_metadata:
@@ -97,6 +100,14 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_aside_block:
+    weight: 3
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
   field_banner:
     type: entity_reference_paragraphs
     weight: 1
@@ -175,7 +186,7 @@ content:
     region: content
   field_paragraphs:
     type: paragraphs
-    weight: 3
+    weight: 2
     settings:
       title: Paragraph
       title_plural: Paragraphs

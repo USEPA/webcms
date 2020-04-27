@@ -1,0 +1,72 @@
+uuid: 1067858d-3b9f-436d-a039-c6f65571f31f
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: RNUe0RsTmhPdY5V-77WpkgYfoXRWYmcYyzm8xjmyox4
+id: upgrade_d7_group_web_area
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Groups (Web Area)'
+source:
+  plugin: d7_node
+  node_type: web_area
+process:
+  langcode:
+    -
+      plugin: default_value
+      source: language
+      default_value: en
+    -
+      plugin: str_replace
+      search: und
+      replace: en
+  label:
+    -
+      plugin: get
+      source: title
+  created:
+    -
+      plugin: get
+      source: created
+  changed:
+    -
+      plugin: get
+      source: changed
+  field_contact_us_form:
+    -
+      plugin: get
+      source: field_contact_us_form
+  field_homepage:
+    -
+      plugin: get
+      source: nid
+  field_homepage_pub_date:
+    -
+      plugin: sub_process
+      source: field_publish_date
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: 'Y-m-d\TH:i:s'
+          source: value
+  field_long_name:
+    -
+      plugin: get
+      source: field_long_name
+  field_machine_name:
+    -
+      plugin: get
+      source: field_machine_name
+destination:
+  plugin: 'entity:group'
+  default_bundle: web_area
+migration_dependencies:
+  required: {  }
+  optional: {  }

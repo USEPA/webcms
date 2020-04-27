@@ -70,7 +70,7 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
         $this->createHtmlParagraph($body_field),
         $this->createLinkListParagraph($link_type, $links),
       ],
-      $configuration['title'] ?? '',
+      $configuration['title'] ?? $configuration['override_title_text'] ?? '',
       $configuration['box_style'] ?? 'none'
     );
 

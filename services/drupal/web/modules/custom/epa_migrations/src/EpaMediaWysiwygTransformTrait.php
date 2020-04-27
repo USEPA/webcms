@@ -48,7 +48,7 @@ TEMPLATE;
 <drupal-inline-media
   data-align="center"
   data-entity-type="media"
-  data-entity-uuid="%s"></drupal-media>
+  data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 
     $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes) {
