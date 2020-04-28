@@ -1,6 +1,6 @@
 ---
 el: .article
-title: Article
+title: Article with Admin
 state: inreview
 ---
 

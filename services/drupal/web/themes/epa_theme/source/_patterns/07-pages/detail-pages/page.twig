@@ -1,8 +1,16 @@
+{% set page_tasks %}
+  {% if show_local_tasks %}
+    {% include '@components/button-group/button-group--base/button-group--base.twig' with {
+      'buttons': local_tasks,
+    } %}
+  {% endif %}
+{% endset %}
+
 {% set page_content %}
-  {# include page template #}
   {% include '@templates/detail-pages/page.twig' with {
     'title': page_title,
-    'body': content
+    'body': content,
+    'tasks': page_tasks,
   } %}
 {% endset %}
 

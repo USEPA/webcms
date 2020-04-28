@@ -9,6 +9,14 @@
     } %}
   {% endblock %}
 
+  {% block local_tasks %}
+    {% if show_local_tasks %}
+      {% include '@components/button-group/button-group--base/button-group--base.twig' with {
+        'buttons': local_tasks,
+      } %}
+    {% endif %}
+  {% endblock %}
+
   {% block content %}
     {{ body }}
   {% endblock %}
