@@ -54,10 +54,17 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
-  # field_editor_in_chief:
-  #   -
-  #     plugin:
-  #     source: field_editor_email_address
+  field_editor_in_chief:
+    -
+      plugin: extract
+      source: field_editor_email_address
+      index:
+        - 0
+        - value
+    -
+      plugin: entity_lookup
+      value_key: mail
+      entity_type: user
   field_long_name:
     -
       plugin: get
