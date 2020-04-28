@@ -20,6 +20,8 @@ $config['s3fs.settings']['domain'] = 'localhost:8888/drupal';
 // Map twig cache onto shared filesystem to allow drush to clear and write twig cache for local development.
 $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default/files/tmp/cache/twig';
 
+$config['system.logging']['error_level'] = 'all';
+
 // Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
 if ($env_state == 'build') {
   unset($settings['cache']['default']);

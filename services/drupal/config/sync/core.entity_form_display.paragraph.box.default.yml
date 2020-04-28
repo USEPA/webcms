@@ -3,20 +3,41 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_image
+    - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
+    - image.style.thumbnail
     - paragraphs.paragraphs_type.box
   module:
+    - image
+    - link
     - paragraphs
 id: paragraph.box.default
 targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_image:
+    weight: 1
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: image_image
+    region: content
+  field_link:
+    weight: 3
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
   field_paragraphs:
     type: paragraphs
-    weight: 1
+    weight: 2
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -33,7 +54,7 @@ content:
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 2
+    weight: 4
     settings: {  }
     third_party_settings: {  }
     type: options_select

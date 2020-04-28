@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_media.module.
+ */
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Session\AccountInterface;
+
+/**
+ * Implements hook_entity_access().
+ */
+function epa_media_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  // Prevent private media from being rendered to the screen. This access check
+  // also affects files attached to the affected media. Therefore this single
+  // access check covers the media view mode output and any direct file views
+  // either of the original file or of image style generated files.
+  if ($operation == 'view' && $entity->getEntityTypeId() == 'media' && !$account->hasPermission('access private epa_media')) {
+    if ($entity->hasField('field_limit_file_accessibility') && !empty($entity->field_limit_file_accessibility->value)) {
+      return AccessResult::forbidden();
+    }
+  }
+  return AccessResult::neutral();
+}

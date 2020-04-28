@@ -1,0 +1,22 @@
+{% set classes = [
+  'sitewide-alert',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  <div class="l-constrain">
+    <div class="sitewide-alert__body">
+      <div class="sitewide-alert__content">
+        {{ content }}
+      </div>
+      {% if show_close %}
+        <button class="sitewide-alert__close" aria-label="{{ 'Close'|t }}">
+          {% include '@components/icon/icon.twig' with {
+            'is_hidden': true,
+            'icon_name': 'close'
+          } %}
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

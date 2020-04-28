@@ -3,37 +3,63 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_image
+    - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
     - paragraphs.paragraphs_type.box
+    - responsive_image.styles.responsive_high_quality_small
   module:
     - entity_reference_revisions
+    - link
     - options
+    - responsive_image
 id: paragraph.box.default
 targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_image:
+    weight: 1
+    label: hidden
+    settings:
+      responsive_image_style: responsive_high_quality_small
+      image_link: ''
+    third_party_settings: {  }
+    type: responsive_image
+    region: content
+  field_link:
+    weight: 4
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link_separate
+    region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 1
-    label: above
+    weight: 2
+    label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 2
-    label: above
+    weight: 3
+    label: hidden
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_title:
     weight: 0
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }

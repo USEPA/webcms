@@ -1,7 +1,7 @@
 ---
 el: .pull-quote
 title: Pull Quote
-state: inreview
+state: complete
 ---
 
 __Variables:__

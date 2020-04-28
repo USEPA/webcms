@@ -16,6 +16,10 @@ use Drupal\node\Entity\Node;
 use Drupal\Core\Link;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Drupal\block_content\Entity\BlockContent;
+use Drupal\node\NodeInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Field\FieldFilteredMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -278,42 +282,118 @@ function epa_core_entity_revision_delete(EntityInterface $entity) {
 function epa_core_entity_delete(EntityInterface $entity) {
   $t_args = [
     '@typeid' => $entity->getEntityTypeId() ? $entity->getEntityTypeId() : NULL,
-    '@type' => $entity->bundle() ? $entity->bundle() : NULL,
+    '@bundle' => $entity->bundle() ? $entity->bundle() : NULL,
     '@id' => $entity->id() ? $entity->id() : NULL,
     '%label' => $entity->label() ? $entity->label() : NULL,
   ];
   \Drupal::logger('epa_core')
-    ->notice(t('@typeid entity deleted. (Entity type: @type; Entity ID: @id; Entity label: %label)', $t_args));
-}
-
-/**
- * Implements hook_file_download.
- */
-function epa_core_file_download($uri) {
-  if (\Drupal::currentUser()->isAnonymous()) {
-    $scheme = file_uri_scheme($uri);
-    $entity_type_manager = \Drupal::entityTypeManager();
-
-    if (\Drupal::service('stream_wrapper_manager')->isValidScheme($scheme) && file_exists($uri)) {
-      // We should only get one result.
-      $files = $entity_type_manager->getStorage('file')->loadByProperties(['uri' => $uri]);
-      $file = reset($files);
-      $media = $entity_type_manager->getStorage('media')->load($file->id());
-
-      // Throw 404 if file accessibility is true else serve the file.
-      if (isset($media) && $media->hasField('field_limit_file_accessibility') && !empty($media->field_limit_file_accessibility->value)) {
-        throw new NotFoundHttpException();
-      }
-    }
-  }
+    ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
 }
 
 /**
  * Implements hook_form_alter().
  */
-function epa_core_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function epa_core_node_presave(NodeInterface $node) {
+  if ($node->bundle() == 'public_notice') {
+    // Automatically populate notice's field_geographic_locations field with
+    // data from field_location_of_prop_action to avoid making users enter it
+    // twice.
+    $geo_location_terms = [];
+    if (!$node->field_locations_of_prop_actions->isEmpty()) {
+      foreach ($node->field_locations_of_prop_actions as $item) {
+        if (is_object($item->entity)) {
+          $location = $item->entity;
+          if (!$location->field_state_or_territory->isEmpty()) {
+            $geo_location_terms[] = [
+              'target_id' => $location->field_state_or_territory->target_id,
+            ];
+          }
+        }
+      }
+    }
+    $node->set('field_geographic_locations', $geo_location_terms);
+
+    // Set computed date based on extension and due date. If neither are set, clear it.
+    // If only extension date is set, do nothing.
+    $due_date = $node->field_comments_due_date->value;
+    $extension_date = $node->field_comments_extension_date->value;
+
+    if ($due_date) {
+      if ($extension_date) {
+        $node->set('field_computed_comments_due_date', $extension_date);
+      }
+      else {
+        $node->set('field_computed_comments_due_date', $due_date);
+      }
+    }
+    elseif (!$extension_date) {
+      $node->set('field_computed_comments_due_date', NULL);
+    }
+
+    // If computed date was set, use it. Otherwise set a date 90 days out.
+    if ($computed_date = $node->field_computed_comments_due_date->value) {
+      $node->set('field_notice_sort_date', $computed_date);
+    }
+    else {
+      $date = new DrupalDateTime();
+      $date->add(new DateInterval("P90D"));
+
+      // Set field value
+      $node->set('field_notice_sort_date', $date->format('Y-m-d'));
+    }
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function epa_core_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+  $plugin_id = $context['widget']->getPluginId();
+  // If the field is a datetime or daterange field, then add a note to the
+  // field's description indicating that times must be entered according to the
+  // user's configured timezone. Since the "created" field suppresses the
+  // container-level description, add it to the field directly in that case.
+  if (strpos($plugin_id, 'datetime_') !== FALSE || strpos($plugin_id, 'daterange') !== FALSE) {
+    $field_name = $context['items']->getName();
+    if ($field_name == 'created') {
+      _epa_core_augment_datetime_description($element['value']['#description']);
+    }
+    else {
+      if (empty($element['#description'])) {
+        $element['#description'] = '';
+      }
+      _epa_core_augment_datetime_description($element['#description']);
+    }
+  }
+}
+
+/**
+ * Helper function to generate user's timezone description for datetime fields.
+ */
+function _epa_core_augment_datetime_description(&$field_description) {
+  $date = new DrupalDateTime();
+  $timezone = $date->format('T');
+  $timezone_description = t('<strong>Note:</strong> Specify time in @timezone', ['@timezone' => $timezone])->render();
+  if (!empty($field_description)) {
+    if ($field_description instanceof FieldFilteredMarkup) {
+      $field_description = $field_description->__toString();
+    }
+    elseif ($field_description instanceof TranslatableMarkup) {
+      $field_description = $field_description->render();
+    }
+    $field_description .= '<br/>' . $timezone_description;
+  }
+  else {
+    $field_description = $timezone_description;
   }
 }
