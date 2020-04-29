@@ -95,6 +95,15 @@ resource "aws_security_group" "server" {
     security_groups = [aws_security_group.interface.id]
   }
 
+  egress {
+    description = "Allow access SMTP servers for email"
+
+    protocol        = "tcp"
+    from_port       = 587
+    to_port         = 587
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = {
     Application = "WebCMS"
     Name        = "WebCMS Cluster Server"
