@@ -7,15 +7,35 @@
   view_mode ? 'node--display-mode-' ~ view_mode|clean_class,
 ] %}
 
+{% set header_info %}
+  <h4>Header Info</h4>
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
 {% set local_tasks %}
-  {{ drupal_entity('block', 'gesso_local_tasks', check_access=false) }}
-  {{ drupal_entity('block', 'gesso_local_actions', check_access=false) }}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+{% endset %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
 {% set attributes = attributes.addClass(classes) %}
 
 {% include '@templates/detail-pages/page.twig' with {
+  'header_info': header_info,
+  'contact_link': contact_link,
   'title': label,
-  'body': content,
+  'messages': messages,
   'tasks': local_tasks,
+  'body': content,
+  'footer': footer,
 } %}
