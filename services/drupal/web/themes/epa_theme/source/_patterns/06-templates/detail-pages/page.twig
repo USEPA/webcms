@@ -1,21 +1,10 @@
 {% embed '@layouts/detail-header/detail-header.twig' %}
   {% block info %}
-    {% include '@components/hublinks/hublinks.twig' with {
-      'links': [
-        {
-          "url": "#",
-          "text": "First Link"
-        },
-        {
-          "url": "#",
-          "text": "Second Link"
-        }
-      ],
-    } %}
+    {{ header_info }}
   {% endblock %}
 
   {% block contact %}
-    <a href="#">Contact Us</a>
+    {{ contact_link }}
   {% endblock %}
 {% endembed %}
 
@@ -27,10 +16,14 @@
   {% block local_tasks %}
     {{ tasks }}
   {% endblock %}
+
+  {% block content %}
+    {{ body }}
+  {% endblock %}
 {% endembed %}
 
 {% embed '@layouts/detail-footer/detail-footer.twig' %}
   {% block content %}
-    <p><a href="#">Contact Us</a> to ask a question, provide feedback, or report a problem.</p>
+    {{ footer }}
   {% endblock %}
 {% endembed %}
