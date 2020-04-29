@@ -1,5 +1,14 @@
+{% set page_messages %}
+  {% if show_admin_info %}
+    {% include '@uswds/alert/alert--success/alert--success.twig' with {
+      'title': 'Status message',
+      'content': '<p class="usa-alert__text">Basic page <em class="placeholder"><a href="#" hreflang="en">' ~ page_title ~ '</a></em> has been updated.</p>',
+    } %}
+  {% endif %}
+{% endset %}
+
 {% set page_tasks %}
-  {% if show_local_tasks %}
+  {% if show_admin_info %}
     {% include '@components/button-group/button-group--base/button-group--base.twig' with {
       'buttons': local_tasks,
     } %}
@@ -9,8 +18,9 @@
 {% set page_content %}
   {% include '@templates/detail-pages/page.twig' with {
     'title': page_title,
-    'body': content,
+    'messages': page_messages,
     'tasks': page_tasks,
+    'body': content,
   } %}
 {% endset %}
 
