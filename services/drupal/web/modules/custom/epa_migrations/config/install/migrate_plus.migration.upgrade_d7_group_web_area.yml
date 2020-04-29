@@ -12,7 +12,7 @@ migration_tags:
 migration_group: migrate_drupal_7
 label: 'Groups (Web Area)'
 source:
-  plugin: d7_node
+  plugin: epa_web_area
   node_type: web_area
 process:
   langcode:
@@ -44,16 +44,15 @@ process:
     -
       plugin: get
       source: nid
-  field_homepage_pub_date:
-  -
-      plugin: sub_process
-      source: field_publish_date
-      process:
-        value:
-          plugin: format_date
-          from_format: 'Y-m-d H:i:s'
-          to_format: 'Y-m-d\TH:i:s'
-          source: value
+  field_homepage_pub_date/value:
+    -
+      plugin: skip_on_empty
+      source: oldest_timestamp
+      method: process
+    -
+      plugin: format_date
+      from_format: 'U'
+      to_format: 'Y-m-d\TH:i:s'
   field_editor_in_chief:
     -
       plugin: extract

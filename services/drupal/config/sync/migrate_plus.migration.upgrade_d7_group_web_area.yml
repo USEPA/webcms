@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: NRMjyYFKAptn9rOzARos9_vj9wY3_M9RSUHa03BJOSE
+  default_config_hash: _PxSkG5uBvad61VLdInw9Mi5mao2753oriBiw7n3QRc
 id: upgrade_d7_group_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -14,7 +14,7 @@ migration_tags:
 migration_group: migrate_drupal_7
 label: 'Groups (Web Area)'
 source:
-  plugin: d7_node
+  plugin: epa_web_area
   node_type: web_area
 process:
   langcode:
@@ -46,16 +46,15 @@ process:
     -
       plugin: get
       source: nid
-  field_homepage_pub_date:
+  field_homepage_pub_date/value:
     -
-      plugin: sub_process
-      source: field_publish_date
-      process:
-        value:
-          plugin: format_date
-          from_format: 'Y-m-d H:i:s'
-          to_format: 'Y-m-d\TH:i:s'
-          source: value
+      plugin: skip_on_empty
+      source: oldest_timestamp
+      method: process
+    -
+      plugin: format_date
+      from_format: U
+      to_format: 'Y-m-d\TH:i:s'
   field_editor_in_chief:
     -
       plugin: extract
