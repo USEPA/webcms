@@ -4,7 +4,6 @@ namespace Drupal\epa_workflow;
 
 use DateTime;
 use DateTimeZone;
-use Drupal;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -219,7 +218,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
     if ($entity->getLoadedRevisionId() != $last_revision_id) {
       $last_revision->setNewRevision();
       $last_revision->isDefaultRevision(FALSE);
-      $last_revision->setRevisionCreationTime(Drupal::time()->getRequestTime());
+      $last_revision->setRevisionCreationTime($this->dateTime->getRequestTime());
       $last_revision->save();
     }
   }
