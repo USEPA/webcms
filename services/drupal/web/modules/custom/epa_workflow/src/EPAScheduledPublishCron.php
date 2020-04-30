@@ -203,9 +203,10 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @todo Use a better key.
    */
   private function updateEntity(ContentEntityBase $entity, string $moderationState, string $scheduledPublishField, $scheduledValue): void {
-    $revision_ids = Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
+    $storage = $this->entityTypeManager->getStorage('node');
+    $revision_ids = $storage->revisionIds($entity);
     $last_revision_id = end($revision_ids);
-    $last_revision = node_revision_load($last_revision_id);
+    $last_revision = $storage->loadRevision($last_revision_id);
 
     $entity->set($scheduledPublishField, $scheduledValue);
     $entity->set('moderation_state', $moderationState);
