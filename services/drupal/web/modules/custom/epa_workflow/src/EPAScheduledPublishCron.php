@@ -4,6 +4,7 @@ namespace Drupal\epa_workflow;
 
 use DateTime;
 use DateTimeZone;
+use Drupal;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -202,10 +203,24 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @todo Use a better key.
    */
   private function updateEntity(ContentEntityBase $entity, string $moderationState, string $scheduledPublishField, $scheduledValue): void {
+    $revision_ids = Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
+    $last_revision_id = end($revision_ids);
+    $last_revision = node_revision_load($last_revision_id);
+
     $entity->set($scheduledPublishField, $scheduledValue);
     $entity->set('moderation_state', $moderationState);
     $entity->set('epa_revision_automated', 1);
+
     $entity->save();
+
+    // If the current revision is not the latest, we have a forward revision and
+    // we need to leap frog it to the front so the user doesn't get confused.
+    if ($entity->getLoadedRevisionId() != $last_revision_id) {
+      $last_revision->setNewRevision();
+      $last_revision->isDefaultRevision(FALSE);
+      $last_revision->setRevisionCreationTime(Drupal::time()->getRequestTime());
+      $last_revision->save();
+    }
   }
 
 }
