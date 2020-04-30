@@ -1,4 +1,4 @@
 ---
-title: Page
+title: Regulation
 state: inreview
 ---
