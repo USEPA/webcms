@@ -1,7 +1,33 @@
+{% embed '@layouts/detail-header/detail-header.twig' %}
+  {% block info %}
+    {{ header_info }}
+  {% endblock %}
+
+  {% block contact %}
+    {{ contact_link }}
+  {% endblock %}
+{% endembed %}
+
 {% embed '@components/article/article.twig' with {
   'title': title,
+  'content': body,
 } %}
+
+  {% block messages %}
+    {{ messages }}
+  {% endblock %}
+
+  {% block local_tasks %}
+    {{ tasks }}
+  {% endblock %}
+
   {% block content %}
     {{ body }}
+  {% endblock %}
+{% endembed %}
+
+{% embed '@layouts/detail-footer/detail-footer.twig' %}
+  {% block content %}
+    {{ footer }}
   {% endblock %}
 {% endembed %}
