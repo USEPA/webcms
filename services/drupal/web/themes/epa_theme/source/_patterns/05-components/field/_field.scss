@@ -6,25 +6,20 @@
 }
 
 .field__label {
+  @extend %h4;
   display: block;
-  font-size: font-size(body, sm);
-  font-weight: gesso-font-weight(bold);
   margin-bottom: 0;
 
   &.is-inline {
     display: inline-block;
-    margin-right: 0.1em;
+    margin-right: 0.25rem;
 
-    + .field__item {
-      display: inline;
+    &::after {
+      content: ':';
     }
 
-    + .field__items {
+    + .field__content {
       display: inline;
-
-      .field__item {
-        display: inline;
-      }
     }
   }
 }
