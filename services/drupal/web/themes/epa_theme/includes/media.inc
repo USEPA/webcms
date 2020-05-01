@@ -30,3 +30,11 @@ function epa_theme_preprocess_media(&$vars) {
     $vars['caption'] = $vars['attributes']['data-caption'];
   }
 }
+
+/**
+ * Implements hook_preprocess_responsive_image().
+ */
+function epa_theme_preprocess_responsive_image(&$vars) {
+  // We want the width attribute added in case they upload small images.
+  $vars['img_element']['#attributes']['width'] = $vars['width'];
+}
