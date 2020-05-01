@@ -26,6 +26,14 @@
     {% endif %}
   {% endblock %}
 
+  {% block intro %}
+    {% if intro %}
+      {% include '@uswds/intro/intro.twig' with {
+        'intro': intro,
+      } %}
+    {% endif %}
+  {% endblock %}
+
   {% block content %}
     {{ body }}
   {% endblock %}
