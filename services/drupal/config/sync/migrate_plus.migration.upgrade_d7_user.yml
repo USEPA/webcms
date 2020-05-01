@@ -1,0 +1,92 @@
+uuid: 7f9106a5-3084-4980-8ef6-9ff9ff6fc0fe
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - epa_migrations
+_core:
+  default_config_hash: H2KoZVO2E_OmmbGOd51hkKWqlagtOn66XZFIJ7ej_l4
+id: upgrade_d7_user
+class: Drupal\user\Plugin\migrate\User
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'User accounts'
+source:
+  plugin: d7_user
+process:
+  uid:
+    -
+      plugin: get
+      source: uid
+  name:
+    -
+      plugin: get
+      source: name
+  pass:
+    -
+      plugin: get
+      source: pass
+  mail:
+    -
+      plugin: get
+      source: mail
+  created:
+    -
+      plugin: get
+      source: created
+  access:
+    -
+      plugin: get
+      source: access
+  login:
+    -
+      plugin: get
+      source: login
+  status:
+    -
+      plugin: get
+      source: status
+  timezone:
+    -
+      plugin: get
+      source: timezone
+  langcode:
+    -
+      plugin: user_langcode
+      source: entity_language
+      fallback_to_site_default: false
+  preferred_langcode:
+    -
+      plugin: user_langcode
+      source: language
+      fallback_to_site_default: true
+  preferred_admin_langcode:
+    -
+      plugin: user_langcode
+      source: language
+      fallback_to_site_default: true
+  init:
+    -
+      plugin: get
+      source: init
+  roles:
+    -
+      plugin: static_map
+      source: roles
+      map:
+        1: anonymous
+        2: authenticated
+        5: administrator
+        11: system_webmaster
+        13: system_editor
+      bypass: true
+destination:
+  plugin: 'entity:user'
+migration_dependencies:
+  required: {  }
+  optional: {  }
