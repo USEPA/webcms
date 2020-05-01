@@ -15,6 +15,8 @@
   {% block main_content %}
     {% embed '@components/article/article.twig' with {
       'title': title,
+      'intro': intro,
+      'content': body,
     } %}
 
       {% block messages %}
@@ -23,10 +25,6 @@
 
       {% block local_tasks %}
         {{ tasks }}
-      {% endblock %}
-
-      {% block content %}
-        {{ body }}
       {% endblock %}
     {% endembed %}
   {% endblock %}
