@@ -1,12 +1,19 @@
 {% set type = '' %}
 {% if file.mime == 'application/pdf' %}
-  {% set type = ' (PDF)' %}
+  {% set type = ' (pdf)' %}
 {% elseif file.mime == 'application/msword' or file.mime == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' %}
-  {% set type = ' (DOC)' %}
+  {% set type = ' (doc)' %}
 {% elseif file.mime == 'application/vnd.ms-powerpoint' or file.mime == 'application/vnd.openxmlformats-officedocument.presentationml.presentation' %}
-  {% set type = ' (PPT)' %}
+  {% set type = ' (ppt)' %}
 {% elseif file.mime == 'application/rtf' %}
-  {% set type = ' (RTF)' %}
+  {% set type = ' (rtf)' %}
 {% endif %}
 
-<a href="#" class="file">{{ file.name }}{{ type }}</a>
+<a href="#" class="file">
+  {%- include '@components/icon/icon.twig' with {
+    'modifier_classes': 'icon--file is-spaced-after',
+    'is_hidden': true,
+    'icon_name': file.icon,
+  } -%}
+  {{- file.name }}{{ type -}}
+</a>
