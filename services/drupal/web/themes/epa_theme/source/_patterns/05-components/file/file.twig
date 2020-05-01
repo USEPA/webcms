@@ -9,4 +9,11 @@
   {% set type = ' (rtf)' %}
 {% endif %}
 
-<a href="#" class="file">{{ file.name }}{{ type }}</a>
+<a href="#" class="file">
+  {%- include '@components/icon/icon.twig' with {
+    'modifier_classes': 'icon--file is-spaced-after',
+    'is_hidden': true,
+    'icon_name': file.icon,
+  } -%}
+  {{- file.name }}{{ type -}}
+</a>
