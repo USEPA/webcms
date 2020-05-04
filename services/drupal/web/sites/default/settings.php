@@ -819,6 +819,10 @@ $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 $config_directories['sync'] = '../config/sync';
 
+// Set all managed files to be marked as "temporary" and therefore subject to
+// garbage collection when their usage drops to zero.
+$config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
+
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
