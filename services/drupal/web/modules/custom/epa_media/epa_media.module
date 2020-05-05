@@ -10,6 +10,26 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function epa_media_theme() {
+  return [
+    'epa_media_image_link' => [
+      'variables' => [
+        'image' => NULL,
+        'url' => NULL,
+      ],
+    ],
+    'epa_media_responsive_image_link' => [
+      'variables' => [
+        'responsive_image' => NULL,
+        'url' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
  * Implements hook_entity_access().
  */
 function epa_media_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
