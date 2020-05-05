@@ -1,0 +1,36 @@
+{% set classes = [
+  'teaser--public-notice',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set metadata %}
+ {% include '@components/field/field.twig' with {
+   'label_display': 'inline',
+   'label_element': 'div',
+   'label': 'Comments Due'|t,
+   'field_items': [
+     {
+       'content': date,
+     },
+   ],
+ } %}
+ {% include '@components/field/field.twig' with {
+   'label_display': 'inline',
+   'label_element': 'div',
+   'label': 'Location'|t,
+   'field_items': [
+     {
+       'content': location,
+     },
+   ],
+ } %}
+{% endset %}
+
+{% include '@components/teaser/teaser.twig' with {
+  'modifier_classes': classes,
+  'url': url,
+  'title': title,
+  'subtitle': null,
+  'metadata': metadata,
+  'summary': summary,
+} %}
