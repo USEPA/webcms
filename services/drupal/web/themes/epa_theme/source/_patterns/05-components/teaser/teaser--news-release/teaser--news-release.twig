@@ -1,0 +1,26 @@
+{% set classes = [
+  'teaser--news-release',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set metadata %}
+ {% include '@components/field/field.twig' with {
+   'label_display': 'inline',
+   'label_element': 'div',
+   'label': 'Release Date'|t,
+   'field_items': [
+     {
+       'content': date,
+     },
+   ],
+ } %}
+{% endset %}
+
+{% include '@components/teaser/teaser.twig' with {
+  'modifier_classes': classes,
+  'url': url,
+  'title': title,
+  'subtitle': subtitle,
+  'metadata': metadata,
+  'summary': summary,
+} %}
