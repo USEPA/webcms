@@ -1,0 +1,45 @@
+uuid: 47ef9b01-30f4-424e-b7bd-499168c6970f
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.link_with_metadata
+    - field.field.media.audio.field_author
+    - field.field.media.audio.field_keywords
+    - field.field.media.audio.field_limit_file_accessibility
+    - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.field_running_time
+    - field.field.media.audio.field_transcript
+    - media.type.audio
+  module:
+    - epa_wysiwyg
+    - layout_builder
+    - media_inline_embed
+third_party_settings:
+  media_inline_embed:
+    embed_inline: true
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: media.audio.link_with_metadata
+targetEntityType: media
+bundle: audio
+mode: link_with_metadata
+content:
+  field_media_audio_file:
+    type: file_with_extension
+    label: hidden
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden:
+  created: true
+  field_author: true
+  field_keywords: true
+  field_limit_file_accessibility: true
+  field_running_time: true
+  field_transcript: true
+  name: true
+  thumbnail: true
+  uid: true

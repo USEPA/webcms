@@ -1,0 +1,46 @@
+uuid: 7f561a24-34ab-455d-a80d-5a6128991c29
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.link
+    - field.field.media.document.field_description
+    - field.field.media.document.field_keywords
+    - field.field.media.document.field_limit_file_accessibility
+    - field.field.media.document.field_media_file
+    - field.field.media.document.field_publication_date
+    - field.field.media.document.field_publication_number
+    - media.type.document
+  module:
+    - file
+    - layout_builder
+    - media_inline_embed
+third_party_settings:
+  media_inline_embed:
+    embed_inline: true
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: media.document.link
+targetEntityType: media
+bundle: document
+mode: link
+content:
+  field_media_file:
+    weight: 0
+    label: hidden
+    settings:
+      use_description_as_link_text: false
+    third_party_settings: {  }
+    type: file_default
+    region: content
+hidden:
+  created: true
+  field_description: true
+  field_keywords: true
+  field_limit_file_accessibility: true
+  field_publication_date: true
+  field_publication_number: true
+  name: true
+  thumbnail: true
+  uid: true
