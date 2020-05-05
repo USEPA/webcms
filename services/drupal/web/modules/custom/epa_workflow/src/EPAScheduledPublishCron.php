@@ -110,7 +110,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
           $query->condition($entityType === 'media' ? 'bundle' : 'type', $bundleName);
           $query->condition($scheduledField, NULL, 'IS NOT NULL');
           $query->accessCheck(FALSE);
-          $query->latestRevision();
+          $query->allRevisions();
           $entities = $query->execute();
           foreach ($entities as $entityRevision => $entityId) {
             $entity = $this->entityTypeManager->getStorage($entityType)
