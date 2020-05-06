@@ -155,7 +155,6 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
  */
 function epa_workflow_node_presave(EntityInterface $entity) {
 
-  // TODO Work in progress to unset schedule transition when a new revision is created on an existing node.
   if (!$entity->isNew() && $entity->isNewRevision()) {
     $entity->set('field_scheduled_transition', NULL);
   }
