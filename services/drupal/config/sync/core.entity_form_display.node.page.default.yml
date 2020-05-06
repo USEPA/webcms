@@ -23,20 +23,17 @@ dependencies:
     - field.field.node.page.field_wide_template
     - field.field.node.page.layout_builder__layout
     - node.type.page
-    - workflows.workflow.epa_default
   module:
-    - content_moderation
     - datetime
     - field_group
     - paragraphs
     - shs
+    - workflow_buttons
 third_party_settings:
   field_group:
     group_additional_fields:
       children:
         - group_metadata
-        - group_topics
-        - group_facets
         - group_javascript
         - group_other_metadata
       parent_name: ''
@@ -252,9 +249,10 @@ content:
     type: boolean_checkbox
     region: content
   moderation_state:
-    type: moderation_state_default
+    type: workflow_buttons
     weight: 13
-    settings: {  }
+    settings:
+      show_current_state: false
     region: content
     third_party_settings: {  }
   promote:

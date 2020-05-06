@@ -256,11 +256,10 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
   if ($entity->hasField('field_hublinks') && $entity->id()) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')
       ->getNodeReferencingGroups($entity);
+    $hublinks = $entity->field_hublinks->getValue();
 
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
-      $hublinks = $entity->field_hublinks->getValue();
-
       if (FALSE === array_search($group_hublink, $hublinks)) {
         array_unshift($hublinks, $group_hublink);
       }
