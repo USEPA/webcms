@@ -151,10 +151,12 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
 }
 
 /**
- * Implements hook_entity_revision_create().
+ * Implements hook_ENTITY_TYPE_presave().
  */
-function epa_workflow_entity_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
+function epa_workflow_node_presave(EntityInterface $entity) {
 
-  // remove any schedule field settings from the previous revision
-  $new_revision->set('field_scheduled_transition', NULL);
+  // TODO Work in progress to unset schedule transition when a new revision is created on an existing node.
+  if (!$entity->isNew() && $entity->isNewRevision()) {
+    $entity->set('field_scheduled_transition', NULL);
+  }
 }
