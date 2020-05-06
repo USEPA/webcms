@@ -11,14 +11,16 @@ use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
 /**
  * Implements hook_theme().
  */
-function media_inline_embed_theme() {
+function media_inline_embed_theme($existing, $type, $theme, $path) {
   return [
     'media__inline_embed' => [
       'template' => 'media--inline-embed',
+      'path' => $path .'/templates',
       'base hook' => 'media',
     ],
-    'field__media__document__inline_embed' => [
-      'template' => 'field--media--document--inline-media',
+    'field__inline_embed' => [
+      'template' => 'field--inline-media',
+      'path' => $path .'/templates',
       'base hook' => 'field',
     ],
   ];
@@ -53,6 +55,8 @@ function media_inline_embed_theme_suggestions_alter(array &$suggestions, array $
 
       // If parent view mode is embedded inline add theme suggestion for field.
       if ($embed_info['embed_inline']) {
+        $suggestions[] = $hook . '__inline_embed';
+        $suggestions[] = $hook . '__' . $elements['#entity_type'] . '__inline_embed';
         $suggestions[] = $hook . '__' . $elements['#entity_type'] . '__' . $elements['#bundle'] . '__inline_embed';
       }
       break;
