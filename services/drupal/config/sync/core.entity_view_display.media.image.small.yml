@@ -10,15 +10,15 @@ dependencies:
     - media.type.image
     - responsive_image.styles.responsive_small
   module:
-    - epa_media
     - layout_builder
     - media_inline_embed
+    - responsive_image
 third_party_settings:
-  media_inline_embed:
-    embed_inline: false
   layout_builder:
     allow_custom: false
     enabled: false
+  media_inline_embed:
+    embed_inline: false
 id: media.image.small
 targetEntityType: media
 bundle: image
@@ -29,8 +29,9 @@ content:
     label: hidden
     settings:
       responsive_image_style: responsive_small
+      image_link: file
     third_party_settings: {  }
-    type: epa_media_responsive_image_link
+    type: responsive_image
     region: content
 hidden:
   created: true
