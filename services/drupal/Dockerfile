@@ -32,6 +32,7 @@ RUN mkdir web
 
 COPY ./scripts scripts
 COPY ./console console
+COPY ./patches patches
 COPY composer.json composer.lock composer.patches.json ./
 
 RUN composer install \
