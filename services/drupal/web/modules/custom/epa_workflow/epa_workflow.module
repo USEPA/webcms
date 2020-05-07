@@ -137,6 +137,17 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
       if (!in_array($eic_email, $data['to'])) {
         $data['to'][] = $eic_email;
       }
+
+      // Add editors for all notifications except Published needs review.
+      if ($data['notification']->id != 'epa_content_needs_review') {
+        $members = $group->getMembers('editor');
+        foreach ($members as $member) {
+          $editor_email = $member->getUser()->getEmail();
+          if (!in_array($editor_email, $data['to'])) {
+            $data['to'][] = $editor_email;
+          }
+        }
+      }
     }
   }
 }
@@ -148,4 +159,12 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
   if (!empty($info['scheduled_publish_generic_formatter'])) {
     $info['scheduled_publish_generic_formatter']['class'] = 'Drupal\epa_workflow\Plugin\Field\FieldFormatter\EPAScheduledPublishGenericFormatter';
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_revision_create().
+ */
+function epa_workflow_node_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
+  // remove any schedule field settings from the previous revision
+  $new_revision->set('field_scheduled_transition', NULL);
 }
