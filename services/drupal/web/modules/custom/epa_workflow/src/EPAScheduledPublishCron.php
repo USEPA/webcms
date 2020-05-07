@@ -105,17 +105,21 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
       $scheduledFields = $this->getScheduledFields($entityType, $bundleName);
       if (\count($scheduledFields) > 0) {
         foreach ($scheduledFields as $scheduledField) {
-          $query = $this->entityTypeManager->getStorage($entityType)
-            ->getQuery('AND');
-          $query->condition($entityType === 'media' ? 'bundle' : 'type', $bundleName);
-          $query->condition($scheduledField, NULL, 'IS NOT NULL');
-          $query->accessCheck(FALSE);
-          $query->allRevisions();
-          $entities = $query->execute();
-          foreach ($entities as $entityRevision => $entityId) {
-            $entity = $this->entityTypeManager->getStorage($entityType)
-              ->loadRevision($entityRevision);
-            $this->updateEntityField($entity, $scheduledField);
+          // We need to process both the latest and current revisions since
+          // either one could have relevant transitions scheduled.
+          foreach (['latestRevision','currentRevision'] as $revisionLimiter) {
+            $query = $this->entityTypeManager->getStorage($entityType)
+              ->getQuery('AND');
+            $query->condition($entityType === 'media' ? 'bundle' : 'type', $bundleName);
+            $query->condition($scheduledField, NULL, 'IS NOT NULL');
+            $query->accessCheck(FALSE);
+            $query->$revisionLimiter();
+            $entities = $query->execute();
+            foreach ($entities as $entityRevision => $entityId) {
+              $entity = $this->entityTypeManager->getStorage($entityType)
+                ->loadRevision($entityRevision);
+              $this->updateEntityField($entity, $scheduledField);
+            }
           }
         }
       }
