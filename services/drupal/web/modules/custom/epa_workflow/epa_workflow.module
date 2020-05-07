@@ -137,6 +137,17 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
       if (!in_array($eic_email, $data['to'])) {
         $data['to'][] = $eic_email;
       }
+
+      // Add editors for all notifications except Published needs review.
+      if ($data['notification']->id != 'epa_content_needs_review') {
+        $members = $group->getMembers('editor');
+        foreach ($members as $member) {
+          $editor_email = $member->getUser()->getEmail();
+          if (!in_array($editor_email, $data['to'])) {
+            $data['to'][] = $editor_email;
+          }
+        }
+      }
     }
   }
 }
