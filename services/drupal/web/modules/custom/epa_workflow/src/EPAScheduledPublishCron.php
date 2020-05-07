@@ -227,6 +227,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
       $last_revision->setNewRevision();
       $last_revision->isDefaultRevision(FALSE);
       $last_revision->setRevisionCreationTime($this->dateTime->getRequestTime());
+      $last_revision->setChangedTime($this->dateTime->getRequestTime());
       $last_revision->save();
     }
   }
