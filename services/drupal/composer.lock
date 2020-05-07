@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7315816430242e9a93c9f32b0a628bae",
+    "content-hash": "bfdfa406d87dc54c329627a5fd870730",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3150,7 +3150,8 @@
                 "patches_applied": {
                     "Allow end date to be optional": "https://www.drupal.org/files/issues/2019-10-23/drupal-make_end_date_optional-2794481-81.patch",
                     "Dynamically provide action plugins for every moderation state change": "https://www.drupal.org/files/issues/2020-01-25/2797583-149.patch",
-                    "Provide token for node publication status": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch"
+                    "Provide token for node publication status": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch",
+                    "Make revisioning UI use more consistent terminology": "https://www.drupal.org/files/issues/2020-04-29/2899719-25.patch"
                 }
             },
             "autoload": {
@@ -4234,11 +4235,17 @@
         },
         {
             "name": "drupal/group",
-            "version": "dev-1.x",
+            "version": "1.0.0-rc5",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/group.git",
-                "reference": "d3ee2908476473c08bcff1cba6ecbaa256d6f3b0"
+                "reference": "8.x-1.0-rc5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/group-8.x-1.0-rc5.zip",
+                "reference": "8.x-1.0-rc5",
+                "shasum": "234831baa8816d98d1093a37e5c66bb993a271eb"
             },
             "require": {
                 "drupal/core": "^8.6",
@@ -4246,25 +4253,21 @@
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-1.0-rc4+2-dev",
-                    "datestamp": "1570888985",
+                    "version": "8.x-1.0-rc5",
+                    "datestamp": "1576854190",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "message": "RC releases are not covered by Drupal security advisories."
                     }
                 },
                 "patches_applied": {
                     "Media enabler": "https://www.drupal.org/files/issues/2019-05-30/media-enabler-2984315-31.patch",
-                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2019-10-17/group-support_string_entity_ids-2797793-171.patch",
-                    "Get a token of a node's parent group to create a pathauto pattern": "https://www.drupal.org/files/issues/2018-12-19/group-2774827-41-gnode-tokens.patch",
-                    "admin/group view (groups list) is not found": "https://www.drupal.org/files/issues/2019-08-02/group-3062380-15.patch",
+                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2019-12-23/group-support_string_entity_ids-2797793-188.patch",
+                    "Get a token of a node's parent group to create a pathauto pattern": "https://www.drupal.org/files/issues/2020-02-21/group-gnode_tokens-2774827-62.patch",
                     "Node update hook is triggered upon group content create": "https://www.drupal.org/files/issues/2019-09-13/group-2872697-33.patch",
                     "Fix user permissions on creating new content but not associating existing content": "https://www.drupal.org/files/issues/2019-01-04/2842630-20.patch",
-                    "Set content moderation permissions on the groups level": "https://www.drupal.org/files/issues/2019-11-26/group-2906085-55.patch",
+                    "Set content moderation permissions on the groups level": "https://www.drupal.org/files/issues/2020-04-27/group--2906085--59.patch",
                     "Ensure entity exists when deriving label": "https://www.drupal.org/files/issues/2020-03-03/group-3053524-14.patch"
                 }
             },
@@ -4289,8 +4292,7 @@
             "support": {
                 "source": "https://git.drupalcode.org/project/group",
                 "issues": "https://drupal.org/project/issues/group"
-            },
-            "time": "2019-10-12T14:11:49+00:00"
+            }
         },
         {
             "name": "drupal/groupmenu",
@@ -5783,6 +5785,64 @@
             }
         },
         {
+            "name": "drupal/simple_sitemap",
+            "version": "3.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/simple_sitemap.git",
+                "reference": "8.x-3.6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/simple_sitemap-8.x-3.6.zip",
+                "reference": "8.x-3.6",
+                "shasum": "37fc0ae98a4ccb23316cb089ae4839913e80cbf6"
+            },
+            "require": {
+                "drupal/core": "^8 || ^9",
+                "ext-xmlwriter": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "8.x-3.6",
+                    "datestamp": "1586469908",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                },
+                "drush": {
+                    "services": {
+                        "drush.services.yml": "^9 || ^10"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Pawel Ginalski (gbyte.co)",
+                    "homepage": "https://www.drupal.org/u/gbyte.co",
+                    "email": "contact@gbyte.co",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "gbyte.co",
+                    "homepage": "https://www.drupal.org/user/2381352"
+                }
+            ],
+            "description": "Creates a standard conform hreflang XML sitemap of the site content and provides a framework for developing other sitemap types.",
+            "homepage": "https://drupal.org/project/simple_sitemap",
+            "support": {
+                "source": "https://cgit.drupalcode.org/simple_sitemap",
+                "issues": "https://drupal.org/project/issues/simple_sitemap",
+                "irc": "irc://irc.freenode.org/drupal-contribute"
+            }
+        },
+        {
             "name": "drupal/smtp",
             "version": "1.0.0-beta6",
             "source": {
@@ -6477,6 +6537,69 @@
                 "issues": "https://www.drupal.org/project/issues/webform?version=8.x",
                 "docs": "https://www.drupal.org/docs/8/modules/webform",
                 "forum": "https://drupal.stackexchange.com/questions/tagged/webform"
+            }
+        },
+        {
+            "name": "drupal/workflow_buttons",
+            "version": "1.0.0-beta1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/workflow_buttons.git",
+                "reference": "8.x-1.0-beta1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/workflow_buttons-8.x-1.0-beta1.zip",
+                "reference": "8.x-1.0-beta1",
+                "shasum": "b5443afd8368f75b98bbfa9c01c85defe326d081"
+            },
+            "require": {
+                "drupal/core": "*"
+            },
+            "require-dev": {
+                "drupal/workbench_moderation": "*"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "8.x-1.0-beta1",
+                    "datestamp": "1587135587",
+                    "security-coverage": {
+                        "status": "not-covered",
+                        "message": "Beta releases are not covered by Drupal security advisories."
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "cedewey",
+                    "homepage": "https://www.drupal.org/user/38694"
+                },
+                {
+                    "name": "gnuget",
+                    "homepage": "https://www.drupal.org/user/992990"
+                },
+                {
+                    "name": "mlncn",
+                    "homepage": "https://www.drupal.org/user/64383"
+                }
+            ],
+            "description": "Provide workflow buttons for content moderation instead of a select dropdown of states.",
+            "homepage": "https://www.drupal.org/project/workflow_buttons",
+            "keywords": [
+                "content",
+                "content moderation",
+                "drupal",
+                "editor",
+                "workflow"
+            ],
+            "support": {
+                "source": "https://git.drupalcode.org/project/workflow_buttons.git",
+                "issues": "https://www.drupal.org/project/issues/workflow_buttons"
             }
         },
         {
@@ -10882,7 +11005,7 @@
         "drupal/entity_clone": 10,
         "drupal/entity_usage": 10,
         "drupal/filter_html_plus": 15,
-        "drupal/group": 20,
+        "drupal/group": 5,
         "drupal/groupmenu": 10,
         "drupal/layout_library": 10,
         "drupal/linkit": 20,
@@ -10897,7 +11020,8 @@
         "drupal/shs": 15,
         "drupal/smtp": 10,
         "drupal/subpathauto": 5,
-        "drupal/views_ajax_get": 5
+        "drupal/views_ajax_get": 5,
+        "drupal/workflow_buttons": 10
     },
     "prefer-stable": true,
     "prefer-lowest": false,

@@ -24,3 +24,14 @@ function epa_media_entity_access(EntityInterface $entity, $operation, AccountInt
   }
   return AccessResult::neutral();
 }
+
+/**
+ * Preprocess function that suppresses broken media for unauthenticated users.
+ */
+function epa_media_preprocess_media_embed_error(array &$vars) {
+  if (!$vars['logged_in']) {
+    $vars['#cache']['contexts'][] = 'user.roles:anonymous';
+    unset($vars['message']);
+    $vars['attributes']['class'] = [];
+  }
+}
