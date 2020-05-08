@@ -165,6 +165,58 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
  * Implements hook_ENTITY_TYPE_revision_create().
  */
 function epa_workflow_node_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
-  // remove any schedule field settings from the previous revision
-  $new_revision->set('field_scheduled_transition', NULL);
+  // Remove any schedule field settings from the previous revision.
+  if ($new_revision->hasField('field_scheduled_transition')) {
+    $new_revision->set('field_scheduled_transition', NULL);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if (!empty($form['moderation_state'])) {
+    // Load the form's dependencies and check of "workflow_buttons" is among
+    // them.
+    $form_storage = $form_state->getStorage();
+    if (isset($form_storage['form_display'])) {
+      $form_display = $form_storage['form_display'];
+      $dependencies = $form_display->getDependencies();
+      if (!empty($dependencies['module']) && array_search('workflow_buttons', $dependencies['module'], TRUE)) {
+        $form['moderation_state']['widget'][0]['#process'][] = 'epa_workflow_process_workflow_buttons';
+      }
+    }
+  }
+}
+
+/**
+ * Filters workflow buttons displayed on the page and customizes styling.
+ */
+function epa_workflow_process_workflow_buttons($element, FormStateInterface $form_state, array &$form) {
+  // Add description text denoting transition types that will result in a
+  // default state when the content is transitioned.
+  $entity = $form_state->getformObject()->getEntity();
+  $states = $form['moderation_state']['widget'][0]['#options'];
+  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
+  $default_states = $moderation_manager->filterTransitionOptions($entity, $states);
+  $default_states_keys = array_keys($default_states);
+  array_walk($default_states_keys, function (&$state_name) {
+    $state_name = 'moderation_state_' . $state_name;
+  });
+  $buttons = $form['actions'];
+  foreach ($buttons as $state_machine_name => &$state_array) {
+    if (isset($state_array['#access']) && $state_array['#access'] && strpos($state_machine_name, 'moderation_state') !== FALSE && !in_array($state_machine_name, $default_states_keys)) {
+      $state_array['#access'] = FALSE;
+    }
+    if ($state_machine_name == 'moderation_state_published') {
+      $state_array['#attached'] = [
+        'library' => [
+          'epa_workflow/epa_workflow',
+        ],
+      ];
+    }
+  }
+  $buttons['#attributes']['class'][] = 'actions-wrapper';
+  $form['actions'] = $buttons;
+  $form['actions_top'] = $buttons;
 }
