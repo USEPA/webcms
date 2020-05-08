@@ -1,0 +1,13 @@
+{% set classes = [
+  'teaser--title',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/teaser/teaser.twig' with {
+  'modifier_classes': classes,
+  'url': url,
+  'title': title,
+  'subtitle': null,
+  'metadata': null,
+  'summary': null,
+} %}
