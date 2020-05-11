@@ -4,7 +4,14 @@
 ]|join(' ')|trim %}
 
 <article class="{{ classes }}" role="article">
-  <h2><a href="{{ url }}">{{ title }}</a></h2>
-  {{ date }}
-  {{ summary }}
+  <div class="teaser__title"><a href="{{ url }}">{{ title }}</a></div>
+  {% if subtitle %}
+    <div class="teaser__subtitle">{{ subtitle }}</div>
+  {% endif %}
+  {% if metadata %}
+    <div class="teaser__metadata">{{ metadata }}</div>
+  {% endif %}
+  {% if summary %}
+    <div class="teaser__summary">{{ summary }}</div>
+  {% endif %}
 </article>

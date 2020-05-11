@@ -28,6 +28,7 @@ dependencies:
     - entity_reference_revisions
     - epa_layouts
     - layout_builder
+    - layout_builder_restrictions
     - options
     - scheduled_publish
     - user
@@ -158,6 +159,44 @@ third_party_settings:
             additional: {  }
             weight: 6
         third_party_settings: {  }
+  layout_builder_restrictions:
+    allowed_block_categories:
+      - 'Chaos Tools'
+      - 'Content fields'
+      - 'Custom block types'
+      - 'Custom blocks'
+      - 'EPA Alerts'
+      - Forms
+      - Group
+      - 'Group Menu Block'
+      - 'Inline blocks'
+      - 'Lists (Views)'
+      - Menus
+      - System
+      - User
+      - Webform
+      - core
+    entity_view_mode_restriction:
+      whitelisted_blocks:
+        'Chaos Tools': {  }
+        'Content fields':
+          - 'field_block:node:web_area:field_paragraphs'
+        'Custom block types': {  }
+        'Custom blocks': {  }
+        'EPA Alerts': {  }
+        Forms: {  }
+        Group: {  }
+        'Group Menu Block': {  }
+        'Inline blocks':
+          - 'inline_block:paragraph'
+        'Lists (Views)': {  }
+        Menus: {  }
+        System: {  }
+        User: {  }
+        Webform: {  }
+        core: {  }
+      blacklisted_blocks: {  }
+      allowed_layouts: {  }
 id: node.web_area.default
 targetEntityType: node
 bundle: web_area
