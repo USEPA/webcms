@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 9zZFUPt3tJcNOLOtggkdKzhNiNauTZRN_3vc2m8CGYg
+  default_config_hash: WCPptmns15CSO3u_TVtyWLWm83ll7RsKCmdmxahUolQ
 id: upgrade_d7_node_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -127,6 +127,10 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
+  field_keywords:
+    -
+      plugin: epa_keywords
+      source: nid
   field_language:
     -
       plugin: get
