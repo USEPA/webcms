@@ -187,18 +187,31 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       }
     }
   }
+
+  if ($form_id === 'content_moderation_entity_moderation_form') {
+    // Filter the allows transition states to those that wouldn't result in a
+    // new default revision and show the Publish transition if the user has
+    // permission to use it.
+    $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
+  }
+}
+
+/**
+ * Given an entity, and its current transition states, filter out those that
+ * would result in a default revision (other than "Published"). The $states
+ * array should have the machine name of the states as its keys.
+ */
+function epa_workflow_get_entity_moderation_states(EntityInterface $entity, array $states) {
+  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
+  return $moderation_manager->filterTransitionOptions($entity, $states);
 }
 
 /**
  * Filters workflow buttons displayed on the page and customizes styling.
  */
 function epa_workflow_process_workflow_buttons($element, FormStateInterface $form_state, array &$form) {
-  // Add description text denoting transition types that will result in a
-  // default state when the content is transitioned.
-  $entity = $form_state->getformObject()->getEntity();
   $states = $form['moderation_state']['widget'][0]['#options'];
-  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
-  $default_states = $moderation_manager->filterTransitionOptions($entity, $states);
+  $default_states = epa_workflow_get_entity_moderation_states($form_state->getFormObject()->getEntity(), $states);
   $default_states_keys = array_keys($default_states);
   array_walk($default_states_keys, function (&$state_name) {
     $state_name = 'moderation_state_' . $state_name;
