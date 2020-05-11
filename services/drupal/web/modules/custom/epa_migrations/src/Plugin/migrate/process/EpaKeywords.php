@@ -99,15 +99,15 @@ class EpaKeywords extends ProcessPluginBase implements ContainerFactoryPluginInt
         ->execute()
         ->fetchAll();
 
+      $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+
       foreach ($tids as $tid) {
         // Check if this term has already been migrated.
-        $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
-        $existing_term = $term_storage->loadByProperties(['field_legacy_d7_tid' => $tid]);
+        $existing_term = $term_storage->load($tid);
 
         if ($existing_term) {
-          // Add this D8 term id to our return array and we're done.
-          $existing_term = array_pop($existing_term);
-          $return_ids[] = $existing_term->id();
+          // Add this term id to our return array and we're done.
+          $return_ids[] = $tid;
         }
         else {
           // Find the object for this term.
@@ -145,8 +145,8 @@ class EpaKeywords extends ProcessPluginBase implements ContainerFactoryPluginInt
             // Create a new term in the keywords vocabulary and add the id to
             // the list of ids we'll return.
             $new_term = $term_storage->create([
+              'tid' => $tid,
               'vid' => 'keywords',
-              'field_legacy_d7_tid' => $tid,
               'name' => $compound_name,
             ]);
 
