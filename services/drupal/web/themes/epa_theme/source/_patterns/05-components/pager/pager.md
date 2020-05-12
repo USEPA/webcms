@@ -1,13 +1,14 @@
 ---
 el: .pager
 title: Pager
-state: inprogress
+state: inreview
 ---
 
 __Variables:__
 * modifier_classes: [string] Classes to modify the default component styling.
 * heading: [string] Accessible heading of the pager.
-* items: [array] Pager items.
+* current: [string] Number of current page.
+* pager_items: [array] Pager items.
   * pages: [array] Pager pages. Each item is an object containing:
     * href: [string] Page item href.
     * attributes: [array] Page item attributes.
