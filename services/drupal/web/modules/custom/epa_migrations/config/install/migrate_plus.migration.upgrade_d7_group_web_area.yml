@@ -76,12 +76,12 @@ process:
     -
       plugin: get
       source: field_machine_name
-  # field_publisher:
-  #   -
-  #     plugin: sub_process
-  #     source: field_publisher_term
-  #     process:
-  #       target_id: tid
+  field_publisher:
+    -
+      plugin: sub_process
+      source: field_publisher_term
+      process:
+        target_id: tid
 destination:
   plugin: 'entity:group'
   default_bundle: web_area
