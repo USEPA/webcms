@@ -87,64 +87,22 @@ process:
     -
       plugin: get
       source: comment
-  # field_agency_function:
-  #   -
-  #     plugin: sub_process
-  #     source: field_agency_function
-  #     process:
-  #       target_id: tid
-  field_aside_block:
-    0:
-      plugin: get
-      source: field_aside_block
-    media_wysiwyg:
-      plugin: epa_media_wysiwyg_filter
-  # field_audiences:
-  #   -
-  #     plugin: sub_process
-  #     source: field_audiences
-  #     process:
-  #       target_id: tid
-  # field_channel:
-  #   -
-  #     plugin: sub_process
-  #     source: field_channel
-  #     process:
-  #       target_id: tid
-  # field_cooperation_and_assistance:
-  #   -
-  #     plugin: sub_process
-  #     source: field_cooperation_and_assistance
-  #     process:
-  #       target_id: tid
+  field_channel:
+    -
+      plugin: sub_process
+      source: field_channel
+      process:
+        target_id: tid
   field_description:
     -
       plugin: get
       source: field_description
-  # field_emergencies_and_cleanup:
-  #   -
-  #     plugin: sub_process
-  #     source: field_emergencies_and_cleanup
-  #     process:
-  #       target_id: tid
-  # field_env_laws_regs_and_treaties:
-  #   -
-  #     plugin: sub_process
-  #     source: field_env_laws_regs_and_treaties
-  #     process:
-  #       target_id: tid
-  # field_environmental_media:
-  #   -
-  #     plugin: sub_process
-  #     source: field_environmental_media
-  #     process:
-  #       target_id: tid
-  # field_epa_operations:
-  #   -
-  #     plugin: sub_process
-  #     source: field_epa_operations
-  #     process:
-  #       target_id: tid
+  field_env_laws_regs_and_treaties:
+    -
+      plugin: sub_process
+      source: field_env_laws_regs_and_treaties
+      process:
+        target_id: tid
   field_expiration_date:
     -
       plugin: sub_process
@@ -155,30 +113,16 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
-  # field_geographic_locations:
-  #   -
-  #     plugin: sub_process
-  #     source: field_geographic_locations
-  #     process:
-  #       target_id: tid
-  # field_health:
-  #   -
-  #     plugin: sub_process
-  #     source: field_health
-  #     process:
-  #       target_id: tid
-  # field_industries:
-  #   -
-  #     plugin: sub_process
-  #     source: field_industries
-  #     process:
-  #       target_id: tid
-  # field_keywords:
-  #   -
-  #     plugin: sub_process
-  #     source: field_keywords
-  #     process:
-  #       target_id: tid
+  field_geographic_locations:
+    -
+      plugin: sub_process
+      source: field_geographic_locations
+      process:
+        target_id: tid
+  field_keywords:
+    -
+      plugin: epa_keywords
+      source: nid
   field_language:
     -
       plugin: get
@@ -187,36 +131,12 @@ process:
     -
       plugin: get
       source: field_page_head
-  # field_pollution_prevention:
-  #   -
-  #     plugin: sub_process
-  #     source: field_pollution_prevention
-  #     process:
-  #       target_id: tid
-  # field_r_and_a_and_technology:
-  #   -
-  #     plugin: sub_process
-  #     source: field_r_and_a_and_technology
-  #     process:
-  #       target_id: tid
-  # field_regulatory_and_industrial:
-  #   -
-  #     plugin: sub_process
-  #     source: field_regulatory_and_industrial
-  #     process:
-  #       target_id: tid
-  # field_substances:
-  #   -
-  #     plugin: sub_process
-  #     source: field_substances
-  #     process:
-  #       target_id: tid
-  # field_type:
-  #   -
-  #     plugin: sub_process
-  #     source: field_type
-  #     process:
-  #       target_id: tid
+  field_type:
+    -
+      plugin: sub_process
+      source: field_type
+      process:
+        target_id: tid
   # field_web_area_slideshow:
   #   -
   #     plugin: get
@@ -241,12 +161,6 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
-  # field_publisher_term:
-  #   -
-  #     plugin: sub_process
-  #     source: field_publisher_term
-  #     process:
-  #       target_id: tid
   field_metatag:
     -
       plugin: d7_metatag_entities
