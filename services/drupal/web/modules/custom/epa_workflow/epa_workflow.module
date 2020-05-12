@@ -246,3 +246,31 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
     $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
   }
 }
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
+  // Level 0 links are tabs and level 1 are subtabs.
+  $override_link_titles = [
+    [
+      'epa_web_areas.group_content' => 'Content',
+    ],
+    [
+      'content_moderation.content' => 'Current Revisions',
+      'epa_web_areas.sub_group_content' => 'Current Revisions',
+      'content_moderation.moderated_content' => 'Latest Revisions',
+      'epa_web_areas.moderated_group_content' => 'Latest Revisions',
+    ],
+  ];
+
+  foreach ($override_link_titles as $level => $link_overrides) {
+  if (isset($data['tabs'][$level])) {
+      foreach ($link_overrides as $link_name => $link_title) {
+        if (isset($data['tabs'][$level][$link_name])) {
+          $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+        }
+      }
+    }
+  }
+}
