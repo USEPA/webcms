@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: jC-WdJOpTh-ROZHB5SZye3WtXrgKZ_KLqj5U9L4EOyI
+  default_config_hash: 86xp6pzUbZ7K0k5-VAI0U6KNF_l4eRs6e2eCoyHCWC8
 id: upgrade_d7_group_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -78,6 +78,12 @@ process:
     -
       plugin: get
       source: field_machine_name
+  field_publisher:
+    -
+      plugin: sub_process
+      source: field_publisher_term
+      process:
+        target_id: tid
 destination:
   plugin: 'entity:group'
   default_bundle: web_area
