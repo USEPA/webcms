@@ -1,0 +1,26 @@
+{% set classes = [
+  'teaser--frequent-quesstion',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set metadata %}
+ {% include '@components/field/field.twig' with {
+   'label_display': 'inline',
+   'label_element': 'div',
+   'label': 'Date Updated'|t,
+   'field_items': [
+     {
+       'content': date,
+     },
+   ],
+ } %}
+{% endset %}
+
+{% include '@components/teaser/teaser.twig' with {
+  'modifier_classes': classes,
+  'url': url,
+  'title': title,
+  'subtitle': null,
+  'metadata': metadata,
+  'summary': summary,
+} %}
