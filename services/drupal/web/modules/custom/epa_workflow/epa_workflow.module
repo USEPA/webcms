@@ -6,7 +6,9 @@
  */
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -189,7 +191,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   }
 
   if ($form_id === 'content_moderation_entity_moderation_form') {
-    // Filter the allows transition states to those that wouldn't result in a
+    // Filter the allowed transition states to those that wouldn't result in a
     // new default revision and show the Publish transition if the user has
     // permission to use it.
     $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
@@ -232,4 +234,15 @@ function epa_workflow_process_workflow_buttons($element, FormStateInterface $for
   $buttons['#attributes']['class'][] = 'actions-wrapper';
   $form['actions'] = $buttons;
   $form['actions_top'] = $buttons;
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function epa_workflow_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Add the moderation form to the view mode of a node for authenticated
+  // users.
+  if ($entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
+    $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+  }
 }
