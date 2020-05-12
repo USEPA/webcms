@@ -42,10 +42,8 @@ process:
       source: title
   uid:
     -
-      plugin: default_value
-      default_value: 1
-      # plugin: get
-      # source: uid
+      plugin: get
+      source: uid
   status:
     -
       plugin: get
@@ -68,10 +66,8 @@ process:
       source: sticky
   revision_uid:
     -
-      plugin: default_value
-      default_value: 1
-      # plugin: get
-      # source: revision_uid
+      plugin: get
+      source: revision_uid
   revision_log:
     -
       plugin: get
@@ -116,22 +112,22 @@ process:
       process:
         target_id: 'target_id'
         target_revision_id: 'target_revision_id'
-  # field_channel:
-  #   -
-  #     plugin: sub_process
-  #     source: field_channel
-  #     process:
-  #       target_id: tid
+  field_channel:
+    -
+      plugin: sub_process
+      source: field_channel
+      process:
+        target_id: tid
   field_description:
     -
       plugin: get
       source: field_description
-  # field_env_laws_regs_and_treaties:
-  #   -
-  #     plugin: sub_process
-  #     source: field_env_laws_regs_and_treaties
-  #     process:
-  #       target_id: tid
+  field_env_laws_regs_and_treaties:
+    -
+      plugin: sub_process
+      source: field_env_laws_regs_and_treaties
+      process:
+        target_id: tid
   field_expiration_date:
     -
       plugin: sub_process
@@ -142,12 +138,12 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
-  # field_geographic_locations:
-  #   -
-  #     plugin: sub_process
-  #     source: field_geographic_locations
-  #     process:
-  #       target_id: tid
+  field_geographic_locations:
+    -
+      plugin: sub_process
+      source: field_geographic_locations
+      process:
+        target_id: tid
   field_keywords:
     -
       plugin: epa_keywords
@@ -164,27 +160,16 @@ process:
     -
       plugin: get
       source: field_page_head
-  # field_resource_directories:
-  #   -
-  #     plugin: get
-  #     source: field_resource_directories
   field_searchable_collection:
     -
       plugin: get
       source: field_searchable_collection
   field_type:
     -
-      plugin: static_map
+      plugin: sub_process
       source: field_type
-      map:
-        1: 130 # Announcements and Schedules
-        3: 131 # Collections and Lists
-        5: 132 # Contact Information
-        7: 138 # Data and Tools
-        9: 139 # Overviews and Factsheets
-        11: 140 # Policies and Guidance
-        13: 141 # Reports and Assessments
-        15: 142 # Speeches, Testimony and Transcripts
+      process:
+        target_id: tid
   field_wide_template:
     -
       plugin: get
