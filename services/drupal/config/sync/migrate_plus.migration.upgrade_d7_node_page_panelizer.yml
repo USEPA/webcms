@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: a0w9kkguf5BJIjtdvQqqCeXL7oQgfS18x3Gz2ZSpeYc
+  default_config_hash: 3e9pF7pfXSRuJ58so17FGuXTAsekI5xgh7Yxk7Obr-c
 id: upgrade_d7_node_page_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -178,6 +178,10 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_hublinks:
+    -
+      plugin: get
+      source: field_resource_directories
 destination:
   plugin: 'entity:node'
   default_bundle: page

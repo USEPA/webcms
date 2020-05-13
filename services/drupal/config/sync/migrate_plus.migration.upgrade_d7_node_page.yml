@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: wWbsaXBU1AjqysReqc-e-Uz57di7vj2FLeZH4_pRzlQ
+  default_config_hash: ajYmIw5zqBnwkZXRE9tx153Ov5uDnb5YcNE5pYvDlWI
 id: upgrade_d7_node_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -199,6 +199,10 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_hublinks:
+    -
+      plugin: get
+      source: field_resource_directories
   layout_selection:
     -
       plugin: static_map
