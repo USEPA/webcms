@@ -6,11 +6,14 @@
  */
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -165,6 +168,157 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
  * Implements hook_ENTITY_TYPE_revision_create().
  */
 function epa_workflow_node_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
-  // remove any schedule field settings from the previous revision
-  $new_revision->set('field_scheduled_transition', NULL);
+  // Remove any schedule field settings from the previous revision.
+  if ($new_revision->hasField('field_scheduled_transition')) {
+    $new_revision->set('field_scheduled_transition', NULL);
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if (!empty($form['moderation_state'])) {
+    // Load the form's dependencies and check of "workflow_buttons" is among
+    // them.
+    $form_storage = $form_state->getStorage();
+    if (isset($form_storage['form_display'])) {
+      $form_display = $form_storage['form_display'];
+      $dependencies = $form_display->getDependencies();
+      if (!empty($dependencies['module']) && array_search('workflow_buttons', $dependencies['module'], TRUE)) {
+        $form['moderation_state']['widget'][0]['#process'][] = 'epa_workflow_process_workflow_buttons';
+      }
+    }
+  }
+
+  if ($form_id === 'content_moderation_entity_moderation_form') {
+    // Filter the allowed transition states to those that wouldn't result in a
+    // new default revision and show the Publish transition if the user has
+    // permission to use it.
+    $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
+  }
+}
+
+/**
+ * Given an entity, and its current transition states, filter out those that
+ * would result in a default revision (other than "Published"). The $states
+ * array should have the machine name of the states as its keys.
+ */
+function epa_workflow_get_entity_moderation_states(EntityInterface $entity, array $states) {
+  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
+  return $moderation_manager->filterTransitionOptions($entity, $states);
+}
+
+/**
+ * Filters workflow buttons displayed on the page and customizes styling.
+ */
+function epa_workflow_process_workflow_buttons($element, FormStateInterface $form_state, array &$form) {
+  $states = $form['moderation_state']['widget'][0]['#options'];
+  $default_states = epa_workflow_get_entity_moderation_states($form_state->getFormObject()->getEntity(), $states);
+  $default_states_keys = array_keys($default_states);
+  array_walk($default_states_keys, function (&$state_name) {
+    $state_name = 'moderation_state_' . $state_name;
+  });
+  $buttons = $form['actions'];
+  foreach ($buttons as $state_machine_name => &$state_array) {
+    if (isset($state_array['#access']) && $state_array['#access'] && strpos($state_machine_name, 'moderation_state') !== FALSE && !in_array($state_machine_name, $default_states_keys)) {
+      $state_array['#access'] = FALSE;
+    }
+    if ($state_machine_name == 'moderation_state_published') {
+      $state_array['#attached'] = [
+        'library' => [
+          'epa_workflow/epa_workflow',
+        ],
+      ];
+    }
+  }
+  $buttons['#attributes']['class'][] = 'actions-wrapper';
+  $form['actions'] = $buttons;
+  $form['actions_top'] = $buttons;
+}
+
+/**
+ * Implements hook_entity_view().
+ */
+function epa_workflow_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
+  // Add the moderation form to the view mode of a node for authenticated
+  // users.
+  if ($entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
+    $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+  }
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
+  // Level 0 links are tabs and level 1 are subtabs.
+  $override_link_titles = [
+    [
+      'epa_web_areas.group_content' => 'Content',
+    ],
+    [
+      'content_moderation.content' => 'Current Revisions',
+      'epa_web_areas.sub_group_content' => 'Current Revisions',
+      'content_moderation.moderated_content' => 'Latest Revisions',
+      'epa_web_areas.moderated_group_content' => 'Latest Revisions',
+    ],
+  ];
+
+  foreach ($override_link_titles as $level => $link_overrides) {
+  if (isset($data['tabs'][$level])) {
+      foreach ($link_overrides as $link_name => $link_title) {
+        if (isset($data['tabs'][$level][$link_name])) {
+          $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function epa_workflow_node_update(NodeInterface $node) {
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $revision_ids = $node_storage->revisionIds($node);
+  $last_revision_id = array_pop($revision_ids);
+
+  // This is the revision that was right before the one that was just saved. Use
+  // this one when determining if this was a "skip" or not.
+  $next_to_last_revision_id = array_pop($revision_ids);
+
+  // In most cases this will be the default revision or "current" revision.
+  $original = $node->original;
+  $current_default_revision_id = $original->get('vid')->value;
+
+  // The revision that was used to create the latest revision.
+  $loaded_revision_id = $node->getLoadedRevisionId();
+
+  // If the current revision (the active default revision) is not the latest,
+  // we have a forward revision and we need to restore (aka leap frog) a copy of
+  // the latest revision to the front so the user doesn't get confused and any
+  // pending changes aren't lost in the revision log history.
+  // The first condition checks that this isn't a basic, linear revision change.
+  // The second condition checks that the current revision isn't the same as the
+  // revision that was loaded from the $node object. This prevents infinite
+  // loops when saving revisions.
+  if ($loaded_revision_id + 1 != $last_revision_id && $current_default_revision_id != $loaded_revision_id) {
+    $latest_revision = $node_storage->loadRevision($last_revision_id);
+    $next_to_last_revision = $node_storage->loadRevision($next_to_last_revision_id);
+    if ($latest_revision->isDefaultRevision() && !$next_to_last_revision->isDefaultRevision()) {
+      $request_time = \Drupal::time()->getRequestTime();
+      $next_to_last_revision->setNewRevision();
+      $next_to_last_revision->isDefaultRevision(FALSE);
+      $next_to_last_revision->setRevisionLogMessage(t('Restoring the latest revision after an automated publishing process was performed.'));
+      $next_to_last_revision->setRevisionCreationTime($request_time);
+      $next_to_last_revision->setChangedTime($request_time);
+
+      // Setting this to ensure it doesn't end up being NULL. If this is NULL
+      // the the resultant revision doesn't appear in the /revisions tab.
+      $next_to_last_revision->set('revision_translation_affected', 1);
+
+      $next_to_last_revision->save();
+    }
+  }
 }
