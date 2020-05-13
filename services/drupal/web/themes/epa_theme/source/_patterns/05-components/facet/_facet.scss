@@ -1,0 +1,55 @@
+// @file
+// Styles for a Facet.
+
+.facet {
+  color: gesso-color(text, primary);
+  display: block;
+  line-height: gesso-line-height(2);
+  padding-left: units($input-select-margin-right + $theme-input-select-size);
+  position: relative;
+  text-decoration: none;
+
+  &:hover {
+    color: gesso-color(text, primary);
+  }
+
+  &::before {
+    @include u-square($theme-input-select-size);
+    background-color: color('white');
+    border-radius: radius($theme-checkbox-border-radius);
+    box-shadow: 0 0 0 units($theme-input-select-border-width) color('base');
+    content: '\a0';
+    display: inline-block;
+    left: 0;
+    line-height: 1;
+    position: absolute;
+  }
+
+  &.is-active::before {
+    @include add-background-svg('correct8');
+    background-color: color('primary');
+    background-position: center center;
+    background-size: units(1.5) auto;
+    box-shadow: 0 0 0 units($theme-input-select-border-width) color('primary');
+
+    @media print {
+      background-color: color('white');
+      background-image: none;
+      box-shadow: inset 0 0 0 units($theme-input-select-border-width)
+          color('white'),
+        inset 0 0 0 units(2) color('primary'),
+        0 0 0 units($theme-input-select-border-width) color('primary');
+      content: url('#{$theme-image-path}/checkbox-check-print.svg');
+      text-indent: 0;
+    }
+  }
+}
+
+.facet__content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.facet__count {
+  margin-left: rem(gesso-spacing(2));
+}
