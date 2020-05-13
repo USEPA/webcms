@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e42bd539c660a26b0634ea82ebe3066e",
+    "content-hash": "12d72d721d6f95216151408510900c45",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3908,9 +3908,6 @@
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
                     "version": "8.x-1.0-beta3",
                     "datestamp": "1551868984",
@@ -3920,7 +3917,10 @@
                     }
                 },
                 "patches_applied": {
-                    "Circular dependencies of not cloned child should return the original entity": "https://www.drupal.org/files/issues/2019-10-21/entity_clone-circular-dependencies-original-entity-3089111-2.diff"
+                    "Circular dependencies of not cloned child should return the original entity": "https://www.drupal.org/files/issues/2019-10-21/entity_clone-circular-dependencies-original-entity-3089111-2.diff",
+                    "The entity does not have an ID": "https://www.drupal.org/files/issues/2020-03-11/entity_id-3119137-3.patch",
+                    "Do not recurse into entities that need not be cloned": "https://www.drupal.org/files/issues/2019-03-22/entity_clone-avoid_unnecessary_recursion_3010626-5.patch",
+                    "Support referencing another entity twice": "https://www.drupal.org/files/issues/2019-05-27/3057448-cant-clone-nodes-that-reference-another-node-twice-3.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -4977,6 +4977,22 @@
             "homepage": "https://www.drupal.org/project/media_entity_file_replace",
             "support": {
                 "source": "https://git.drupalcode.org/project/media_entity_file_replace"
+            }
+        },
+        {
+            "name": "drupal/media_inline_embed",
+            "version": "8.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/sandbox/gbeezus-3094282.git",
+                "reference": "refs/heads/@branch"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "patches_applied": {
+                    "Provide inline field templates for all media types": "https://www.drupal.org/files/issues/2020-05-13/media_inline_embed-field_template-3136216-2.patch",
+                    "More generic type hinting": "https://www.drupal.org/files/issues/2020-05-13/media_inline_embed-type_hint-3136246-2.patch"
+                }
             }
         },
         {
