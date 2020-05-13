@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -271,6 +272,53 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
           $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
         }
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function epa_workflow_node_update(NodeInterface $node) {
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $revision_ids = $node_storage->revisionIds($node);
+  $last_revision_id = array_pop($revision_ids);
+
+  // This is the revision that was right before the one that was just saved. Use
+  // this one when determining if this was a "skip" or not.
+  $next_to_last_revision_id = array_pop($revision_ids);
+
+  // In most cases this will be the default revision or "current" revision.
+  $original = $node->original;
+  $current_default_revision_id = $original->get('vid')->value;
+
+  // The revision that was used to create the latest revision.
+  $loaded_revision_id = $node->getLoadedRevisionId();
+
+  // If the current revision (the active default revision) is not the latest,
+  // we have a forward revision and we need to restore (aka leap frog) a copy of
+  // the latest revision to the front so the user doesn't get confused and any
+  // pending changes aren't lost in the revision log history.
+  // The first condition checks that this isn't a basic, linear revision change.
+  // The second condition checks that the current revision isn't the same as the
+  // revision that was loaded from the $node object. This prevents infinite
+  // loops when saving revisions.
+  if ($loaded_revision_id + 1 != $last_revision_id && $current_default_revision_id != $loaded_revision_id) {
+    $latest_revision = $node_storage->loadRevision($last_revision_id);
+    $next_to_last_revision = $node_storage->loadRevision($next_to_last_revision_id);
+    if ($latest_revision->isDefaultRevision() && !$next_to_last_revision->isDefaultRevision()) {
+      $request_time = \Drupal::time()->getRequestTime();
+      $next_to_last_revision->setNewRevision();
+      $next_to_last_revision->isDefaultRevision(FALSE);
+      $next_to_last_revision->setRevisionLogMessage(t('Restoring the latest revision after an automated publishing process was performed.'));
+      $next_to_last_revision->setRevisionCreationTime($request_time);
+      $next_to_last_revision->setChangedTime($request_time);
+
+      // Setting this to ensure it doesn't end up being NULL. If this is NULL
+      // the the resultant revision doesn't appear in the /revisions tab.
+      $next_to_last_revision->set('revision_translation_affected', 1);
+
+      $next_to_last_revision->save();
     }
   }
 }
