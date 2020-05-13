@@ -1,0 +1,9 @@
+{% set classes = [
+  'l-sidebar-first--reversed',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@layouts/sidebar-first/sidebar-first.twig' with {
+  'has_sidebar': has_sidebar,
+  'modifier_classes': classes,
+} %}
