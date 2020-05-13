@@ -1,13 +1,8 @@
-uuid: 485f90d8-8474-4160-97d3-3b4801bfafc9
+uuid: e219afa4-523a-4925-a757-09812ffdb4f8
 langcode: en
 status: true
-dependencies:
-  enforced:
-    module:
-      - epa_migrations
-_core:
-  default_config_hash: ajYmIw5zqBnwkZXRE9tx153Ov5uDnb5YcNE5pYvDlWI
-id: upgrade_d7_node_page
+dependencies: {  }
+id: upgrade_d7_node_document
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -15,10 +10,10 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Nodes (Basic page)'
+label: 'Nodes (Document)'
 source:
   plugin: epa_node
-  node_type: page
+  node_type: document
 process:
   nid:
     -
@@ -35,8 +30,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: und
-      replace: en
+      search: 'und'
+      replace: 'en'
   title:
     -
       plugin: get
@@ -44,7 +39,7 @@ process:
   uid:
     -
       plugin: get
-      source: uid
+      source: node_uid
   status:
     -
       plugin: get
@@ -77,7 +72,7 @@ process:
     -
       plugin: get
       source: timestamp
-  comment_node_page/0/status:
+  comment_node_document/0/status:
     -
       plugin: get
       source: comment
@@ -95,8 +90,8 @@ process:
     -
       plugin: sub_process
       process:
-        target_id: target_id
-        target_revision_id: target_revision_id
+        target_id: 'target_id'
+        target_revision_id: 'target_revision_id'
   field_paragraphs_1:
     -
       plugin: skip_on_empty
@@ -111,8 +106,8 @@ process:
     -
       plugin: sub_process
       process:
-        target_id: target_id
-        target_revision_id: target_revision_id
+        target_id: 'target_id'
+        target_revision_id: 'target_revision_id'
   field_channel:
     -
       plugin: sub_process
@@ -157,10 +152,10 @@ process:
     -
       plugin: get
       source: field_machine_name
-  field_page_head:
+  field_hublinks:
     -
       plugin: get
-      source: field_page_head
+      source: field_resource_directories
   field_searchable_collection:
     -
       plugin: get
@@ -171,10 +166,6 @@ process:
       source: field_type
       process:
         target_id: tid
-  field_wide_template:
-    -
-      plugin: get
-      source: field_wide_template
   field_publish_date:
     -
       plugin: sub_process
@@ -195,22 +186,14 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+  field_page_head:
+    -
+      plugin: get
+      source: field_page_head
   field_metatag:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
-  field_hublinks:
-    -
-      plugin: get
-      source: field_resource_directories
-  layout_selection:
-    -
-      plugin: static_map
-      source: layout
-      map:
-        onecol_page: basic_one_column
-        twocol_page: basic_two_column
-        six_pack: basic_two_column
 destination:
   plugin: 'entity:node'
   default_bundle: page
