@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e42bd539c660a26b0634ea82ebe3066e",
+    "content-hash": "56517e67f34503b4d4a460e524f6d969",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3146,7 +3146,8 @@
                     "Allow end date to be optional": "https://www.drupal.org/files/issues/2019-10-23/drupal-make_end_date_optional-2794481-81.patch",
                     "Dynamically provide action plugins for every moderation state change": "https://www.drupal.org/files/issues/2020-01-25/2797583-149.patch",
                     "Provide token for node publication status": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch",
-                    "Make revisioning UI use more consistent terminology": "https://www.drupal.org/files/issues/2020-04-29/2899719-25.patch"
+                    "Make revisioning UI use more consistent terminology": "https://www.drupal.org/files/issues/2020-04-29/2899719-25.patch",
+                    "Avoid undefined offset in menu code": "https://www.drupal.org/files/issues/2019-09-17/2950729-14.patch"
                 }
             },
             "autoload": {
@@ -3908,9 +3909,6 @@
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
                     "version": "8.x-1.0-beta3",
                     "datestamp": "1551868984",
@@ -3920,7 +3918,10 @@
                     }
                 },
                 "patches_applied": {
-                    "Circular dependencies of not cloned child should return the original entity": "https://www.drupal.org/files/issues/2019-10-21/entity_clone-circular-dependencies-original-entity-3089111-2.diff"
+                    "Circular dependencies of not cloned child should return the original entity": "https://www.drupal.org/files/issues/2019-10-21/entity_clone-circular-dependencies-original-entity-3089111-2.diff",
+                    "The entity does not have an ID": "https://www.drupal.org/files/issues/2020-03-11/entity_id-3119137-3.patch",
+                    "Do not recurse into entities that need not be cloned": "https://www.drupal.org/files/issues/2019-03-22/entity_clone-avoid_unnecessary_recursion_3010626-5.patch",
+                    "Support referencing another entity twice": "https://www.drupal.org/files/issues/2019-05-27/3057448-cant-clone-nodes-that-reference-another-node-twice-3.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -4978,6 +4979,17 @@
             "support": {
                 "source": "https://git.drupalcode.org/project/media_entity_file_replace"
             }
+        },
+        {
+            "name": "drupal/media_inline_embed",
+            "version": "8.x-1.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/sandbox/gbeezus-3094282.git",
+                "reference": "refs/heads/8.x-1.x"
+            },
+            "type": "drupal-module",
+            "time": "2020-05-13T18:51:43+00:00"
         },
         {
             "name": "drupal/mediaelement",
@@ -11087,6 +11099,7 @@
         "drupal/login_destination": 15,
         "drupal/masquerade": 10,
         "drupal/media_entity_file_replace": 10,
+        "drupal/media_inline_embed": 20,
         "drupal/mediaelement": 15,
         "drupal/page_manager": 10,
         "drupal/pathologic": 15,
