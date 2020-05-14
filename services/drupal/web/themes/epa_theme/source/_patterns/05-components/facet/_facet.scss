@@ -4,8 +4,9 @@
 .facet {
   color: gesso-color(text, primary);
   display: block;
+  font-size: font-size(body, 2xs);
   line-height: gesso-line-height(2);
-  padding-left: units($input-select-margin-right + $theme-input-select-size);
+  padding-left: rem(gesso-spacing(3));
   position: relative;
   text-decoration: none;
 
@@ -20,16 +21,19 @@
     box-shadow: 0 0 0 units($theme-input-select-border-width) color('base');
     content: '\a0';
     display: inline-block;
+    height: 0.9em;
     left: 0;
     line-height: 1;
     position: absolute;
+    top: 2px;
+    width: 0.9em;
   }
 
   &.is-active::before {
     @include add-background-svg('correct8');
     background-color: color('primary');
     background-position: center center;
-    background-size: units(1.5) auto;
+    background-size: units(1) auto;
     box-shadow: 0 0 0 units($theme-input-select-border-width) color('primary');
 
     @media print {
