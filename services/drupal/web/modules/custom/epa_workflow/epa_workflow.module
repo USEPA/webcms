@@ -192,11 +192,42 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   }
 
   if ($form_id === 'content_moderation_entity_moderation_form') {
-    // Filter the allowed transition states to those that wouldn't result in a
-    // new default revision and show the Publish transition if the user has
-    // permission to use it.
-    $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
+    $request = \Drupal::request();
+    $route = $request->attributes->get('_route');
+    if ($route == 'entity.node.latest_version') {
+      // Filter the allowed transition states to those that wouldn't result in a
+      // new default revision and show the Publish transition if the user has
+      // permission to use it.
+      $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
+    }
+    elseif ($route == 'entity.node.canonical') {
+      $form['#submit'] = [
+        '_epa_workflow_node_view_moderation_form_submit',
+      ];
+    }
   }
+}
+
+/**
+ * Custom submit handler for the content moderation form when placed on node
+ * view pages.
+ */
+function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateInterface $form_state) {
+  $node = $form_state->getStorage()['entity'];
+  $vid = $node->get('vid')->value;
+  $values = $form_state->getValues();
+  $request_time = \Drupal::time()->getRequestTime();
+  $message = !empty($values['revision_log']) ? $values['revision_log'] . ' ' : '';
+  $node->setNewRevision();
+  $node->setRevisionCreationTime($request_time);
+  $node->setChangedTime($request_time);
+  $node->setRevisionLogMessage(t('@messageThis is a new default revision based on revision @vid.', [
+    '@message' => $message,
+    '@vid' => $vid,
+  ]));
+  $node->set('revision_translation_affected', 1);
+  $node->set('moderation_state', $values['new_state']);
+  $node->save();
 }
 
 /**
@@ -303,7 +334,7 @@ function epa_workflow_node_update(NodeInterface $node) {
   // The second condition checks that the current revision isn't the same as the
   // revision that was loaded from the $node object. This prevents infinite
   // loops when saving revisions.
-  if ($loaded_revision_id + 1 != $last_revision_id && $current_default_revision_id != $loaded_revision_id) {
+  if ($loaded_revision_id + 1 != $last_revision_id && $current_default_revision_id != $last_revision_id) {
     $latest_revision = $node_storage->loadRevision($last_revision_id);
     $next_to_last_revision = $node_storage->loadRevision($next_to_last_revision_id);
     if ($latest_revision->isDefaultRevision() && !$next_to_last_revision->isDefaultRevision()) {
