@@ -1,0 +1,18 @@
+{% set classes = [
+  'facet',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% spaceless %}
+  <a class="{{ classes }}" href="{{ url }}">
+    <span class="facet__content">
+      {{- title -}}
+      {%- if show_count %}
+        <span class="facet__count">
+          {{- count -}}
+          <span class="u-visually-hidden"> items</span>
+        </span>
+      {%- endif -%}
+    </span>
+  </a>
+{% endspaceless %}
