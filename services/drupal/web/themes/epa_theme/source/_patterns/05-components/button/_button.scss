@@ -3,9 +3,15 @@
 
 .button {
   @extend .usa-button;
+  margin-bottom: gesso-spacing(1);
+  margin-right: 0;
 
   &:focus {
     @extend .usa-button:hover;
     z-index: 1;
+  }
+
+  @include breakpoint(gesso-breakpoint(mobile-lg)) {
+    margin-right: gesso-spacing(1);
   }
 }
