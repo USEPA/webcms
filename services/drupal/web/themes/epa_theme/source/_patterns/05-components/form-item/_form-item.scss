@@ -33,7 +33,14 @@
 
   &.is-inline {
     display: inline-block;
-    margin-right: gesso-spacing(1);
+    margin-bottom: gesso-spacing(1);
+    margin-right: 0;
+    width: 100%;
+
+    @include breakpoint(gesso-breakpoint(mobile-lg)) {
+      margin-right: gesso-spacing(1);
+      width: auto;
+    }
   }
 }
 

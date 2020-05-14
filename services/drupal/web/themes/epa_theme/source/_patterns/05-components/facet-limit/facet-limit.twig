@@ -1,0 +1,13 @@
+{% set classes = [
+  'facet-limit',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<button class="{{ classes }}">
+  {%- include '@components/icon/icon.twig' with {
+    'modifier_classes': 'icon--facet-limit is-spaced-after',
+    'is_hidden': true,
+    'icon_name': icon,
+  } -%}
+  {{- text -}}
+</button>
