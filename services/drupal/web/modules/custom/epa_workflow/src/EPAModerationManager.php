@@ -4,6 +4,7 @@ namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -92,6 +93,15 @@ class EPAModerationManager {
     $content_entity_revision = $this->entityTypeManager->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
 
     return $content_entity_revision;
+  }
+
+  public function filterTransitionOptions(EntityInterface $entity, array $states) {
+    $workflow = $this->moderationInformation->getWorkflowForEntity($entity);
+    $workflow_states = $workflow->get('type_settings')['states'];
+    $default_states = array_filter($workflow_states, function ($state, $key) {
+      return $key === 'published' || !$state['default_revision'];
+    }, ARRAY_FILTER_USE_BOTH);
+    return array_intersect_key($states, $default_states);
   }
 
 }
