@@ -3,54 +3,45 @@
 
 .facet {
   color: gesso-color(text, primary);
-  display: block;
+  display: flex;
   font-size: font-size(body, 2xs);
   line-height: gesso-line-height(2);
-  padding-left: rem(gesso-spacing(3));
-  position: relative;
   text-decoration: none;
 
   &:hover {
     color: gesso-color(text, primary);
   }
+}
 
-  &::before {
-    @include u-square($theme-input-select-size);
-    background-color: color('white');
-    border-radius: radius($theme-checkbox-border-radius);
-    box-shadow: 0 0 0 units($theme-input-select-border-width) color('base');
-    content: '\a0';
-    display: inline-block;
-    height: 0.9em;
-    left: units($theme-input-select-border-width);
-    line-height: 1;
-    position: absolute;
-    top: units($theme-input-select-border-width);
-    width: 0.9em;
+.facet__icon {
+  flex-shrink: 0;
+  height: 1.2em !important;
+  left: -1px;
+  margin-right: rem(gesso-spacing(1));
+  top: 0 !important;
+  width: 1.2 em !important;
+}
+
+.facet__icon--empty {
+  color: gesso-grayscale(gray-3);
+
+  .facet.is-active > & {
+    display: none !important;
   }
+}
 
-  &.is-active::before {
-    @include add-background-svg('correct8');
-    background-color: color('primary');
-    background-position: center center;
-    background-size: units(1) auto;
-    box-shadow: 0 0 0 units($theme-input-select-border-width) color('primary');
+.facet__icon--selected {
+  color: gesso-brand(blue, base);
+  display: none !important;
 
-    @media print {
-      background-color: color('white');
-      background-image: none;
-      box-shadow: inset 0 0 0 units($theme-input-select-border-width)
-          color('white'),
-        inset 0 0 0 units(2) color('primary'),
-        0 0 0 units($theme-input-select-border-width) color('primary');
-      content: url('#{$theme-image-path}/checkbox-check-print.svg');
-      text-indent: 0;
-    }
+  .facet.is-active > & {
+    display: inline-block !important;
   }
 }
 
 .facet__content {
   display: flex;
+  flex-grow: 1;
   justify-content: space-between;
 }
 
