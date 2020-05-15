@@ -3,6 +3,15 @@
 
 .teaser {
   margin-bottom: rem(gesso-spacing(3));
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  & + & {
+    border-top: 1px solid gesso-grayscale(gray-2);
+    padding-top: rem(gesso-spacing(3));
+  }
 }
 
 .teaser__title {
@@ -12,7 +21,7 @@
 
 .teaser__subtitle {
   @extend %h4;
-  margin: 0 0 rem(gesso-spacing('05'));
+  margin: rem(gesso-spacing(1)) 0 rem(gesso-spacing('05'));
 }
 
 .teaser__metadata {
@@ -24,7 +33,7 @@
 }
 
 .teaser__summary {
-  margin-top: rem(gesso-spacing('05'));
+  margin-bottom: rem(gesso-spacing('05'));
 
   > :last-child {
     margin-bottom: 0;

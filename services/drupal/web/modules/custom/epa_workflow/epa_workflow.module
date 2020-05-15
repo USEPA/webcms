@@ -175,22 +175,21 @@ function epa_workflow_node_revision_create(EntityInterface $new_revision, Entity
 }
 
 /**
+ * Implements hook_field_widget_form_alter().
+ */
+function epa_workflow_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+  $plugin_id = $context['widget']->getPluginId();
+
+  if ('workflow_buttons' === $plugin_id) {
+    $element['#process'][] = 'epa_workflow_process_workflow_buttons';
+  }
+}
+
+
+/**
  * Implements hook_form_alter().
  */
 function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
-  if (!empty($form['moderation_state'])) {
-    // Load the form's dependencies and check of "workflow_buttons" is among
-    // them.
-    $form_storage = $form_state->getStorage();
-    if (isset($form_storage['form_display'])) {
-      $form_display = $form_storage['form_display'];
-      $dependencies = $form_display->getDependencies();
-      if (!empty($dependencies['module']) && array_search('workflow_buttons', $dependencies['module'], TRUE)) {
-        $form['moderation_state']['widget'][0]['#process'][] = 'epa_workflow_process_workflow_buttons';
-      }
-    }
-  }
-
   if ($form_id === 'content_moderation_entity_moderation_form') {
     $request = \Drupal::request();
     $route = $request->attributes->get('_route');
