@@ -18,7 +18,7 @@ resource "aws_lb_target_group" "drupal_target_group" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = local.vpc-id
 }
 
 # Listener for HTTP requests. We unconditionally upgrade all HTTP requests to HTTPS because

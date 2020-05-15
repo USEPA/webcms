@@ -1,6 +1,9 @@
 data "aws_availability_zones" "available" {}
 
+# Conditionally create a VPC if there isn't an existing one provided
 resource "aws_vpc" "main" {
+  count = var.vpc-existing-vpc == null ? 1 : 0
+
   cidr_block = "10.0.0.0/16"
 
   enable_dns_hostnames = true
@@ -12,20 +15,24 @@ resource "aws_vpc" "main" {
   }
 }
 
-# Enable private DNS (see dns.tf)
-resource "aws_vpc_dhcp_options" "main" {
-  domain_name         = "epa.local"
-  domain_name_servers = ["AmazonProvidedDNS"]
+# If there was an existing VPC provided, read out its properties
+data "aws_vpc" "existing" {
+  count = var.vpc-existing-vpc != null ? 1 : 0
 
-  tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS DHCP"
-  }
+  id = var.vpc-existing-vpc
 }
 
-resource "aws_vpc_dhcp_options_association" "main" {
-  vpc_id          = aws_vpc.main.id
-  dhcp_options_id = aws_vpc_dhcp_options.main.id
+locals {
+  # ID of the VPC in use - used to avoid copying/pasting this expression over and over again
+  vpc-id = length(aws_vpc.main) == 1 ? aws_vpc.main[0].id : data.aws_vpc.existing[0].id
+
+  # Save the local VPC's CIDR block (see security.tf for how this is used)
+  vpc-cidr-block = length(aws_vpc.main) == 1 ? aws_vpc.main[0].cidr_block : data.aws_vpc.existing[0].cidr_block
+
+  # This is the CIDR range used for subnetting: if there is an explicit vpc-subnet-block
+  # variable, we use that - but fall back to the VPC's full CIDR block if it's not
+  # present.
+  vpc-subnet-block = var.vpc-subnet-block != null ? var.vpc-subnet-block : local.vpc-cidr-block
 }
 
 # Create one public subnet for each availability zone that this VPC spans. Anything
@@ -34,9 +41,9 @@ resource "aws_vpc_dhcp_options_association" "main" {
 resource "aws_subnet" "public" {
   count = var.vpc-az-count
 
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  cidr_block              = cidrsubnet(local.vpc-subnet-block, var.vpc-subnet-bits, count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = local.vpc-id
   map_public_ip_on_launch = true
 
   tags = {
@@ -51,9 +58,9 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count = var.vpc-az-count
 
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 128)
+  cidr_block              = cidrsubnet(local.vpc-subnet-block, var.vpc-subnet-bits, count.index + var.vpc-subnet-offset)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = local.vpc-id
   map_public_ip_on_launch = false
 
   tags = {
@@ -62,8 +69,11 @@ resource "aws_subnet" "private" {
   }
 }
 
+# As with VPCs, we create a new internet gateway if one hasn't been provided.
 resource "aws_internet_gateway" "gateway" {
-  vpc_id = aws_vpc.main.id
+  count = var.vpc-existing-gateway == null ? 1 : 0
+
+  vpc_id = local.vpc-id
 
   tags = {
     Application = "WebCMS"
@@ -71,13 +81,18 @@ resource "aws_internet_gateway" "gateway" {
   }
 }
 
+locals {
+  # As with the vpc-id local, save this here to avoid needless repetition
+  gateway-id = length(aws_internet_gateway.gateway) == 1 ? aws_internet_gateway.gateway[0].id : var.vpc-existing-gateway
+}
+
 # We only need one route table since there is only a single internet gateway
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gateway.id
+    gateway_id = local.gateway-id
   }
 
   tags = {
@@ -121,7 +136,7 @@ resource "aws_nat_gateway" "nat" {
 resource "aws_route_table" "private" {
   count = var.vpc-az-count
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -147,7 +162,7 @@ data "aws_vpc_endpoint_service" "s3" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = aws_vpc.main.id
+  vpc_id            = local.vpc-id
   service_name      = data.aws_vpc_endpoint_service.s3.service_name
   vpc_endpoint_type = "Gateway"
 
@@ -186,7 +201,7 @@ data "aws_vpc_endpoint_service" "ssm" {
 resource "aws_vpc_endpoint" "ssm" {
   for_each = toset(local.ssm-endpoints)
 
-  vpc_id              = aws_vpc.main.id
+  vpc_id              = local.vpc-id
   service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true

@@ -26,8 +26,41 @@ variable "site-env-name" {
 # VPC
 # cf. vpc.tf
 
+variable "vpc-existing-vpc" {
+  description = "ID of an existing VPC to use. Null implies a new VPC should be created."
+  type        = string
+  default     = null
+}
+
+variable "vpc-existing-gateway" {
+  description = "ID of an existing internet gateway to use. Null implies a new gateway should be created."
+  type        = string
+  default     = null
+}
+
+variable "vpc-subnet-block" {
+  description = "CIDR block to use when allocating subnets. Defaults to using the full CIDR range of the VPC."
+  type        = string
+  default     = null
+}
+
+# This variable corresponds to the "newbits" parameter of the cidrsubnet function
+# cf. https://www.terraform.io/docs/configuration/functions/cidrsubnet.html
+variable "vpc-subnet-bits" {
+  description = "Value to add to the VPC's CIDR block when creating a subnet's IP range."
+  type        = number
+}
+
+# We use the offset to separate the public and private CIDR blocks from each other - the
+# offset should be at least the number of AZs (vpc-az-count), but could be larger to give
+# room to add more AZs in the future.
+variable "vpc-subnet-offset" {
+  description = "Number of subnets to skip when creating private subnets."
+  type        = number
+}
+
 variable "vpc-az-count" {
-  description = "Number of availability zones to use when creating the VPC"
+  description = "Number of availability zones to use when creating the VPC's subnets"
   type        = number
 }
 
@@ -75,6 +108,13 @@ variable "server-max-capacity" {
 # Since we can't use iteration in a nested override block, we have to pick a number of
 # instances. We choose 3 for no particular reason other than it corresponds to AWS'
 # generic instance types: t2, t3, and t3a.
+#
+# Note that limitations in Terraform's ability to handle dynamic lists means that we have
+# to fix the number of instance types at 3. These can vary by generation (as mentioned
+# above, the dev site uses the same size across the t2, t3, and t3a generations), but they
+# could also vary by instance size (e.g., medium, large, and xlarge). We assume that the
+# dynamics of the spot instance market will defray the costs incurred by using older
+# generation (or larger size) instances.
 variable "server-instance-types" {
   description = "Instance types to use with the WebCMS' servers (spot and on-demand)"
 
@@ -84,7 +124,6 @@ variable "server-instance-types" {
     tertiary  = string
   })
 }
-
 
 # Cluster variables
 # cf. cluster.tf
