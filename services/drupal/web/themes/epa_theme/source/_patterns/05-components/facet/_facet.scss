@@ -1,0 +1,50 @@
+// @file
+// Styles for a Facet.
+
+.facet {
+  color: gesso-color(text, primary);
+  display: flex;
+  font-size: font-size(body, 2xs);
+  line-height: gesso-line-height(2);
+  text-decoration: none;
+
+  &:hover {
+    color: gesso-color(text, primary);
+  }
+}
+
+.facet__icon {
+  flex-shrink: 0;
+  height: 1.2em !important;
+  left: -1px;
+  margin-right: rem(gesso-spacing(1));
+  top: 0 !important;
+  width: 1.2 em !important;
+}
+
+.facet__icon--empty {
+  color: gesso-grayscale(gray-3);
+
+  .facet.is-active > & {
+    display: none !important;
+  }
+}
+
+.facet__icon--selected {
+  color: gesso-brand(blue, base);
+  display: none !important;
+
+  .facet.is-active > & {
+    display: inline-block !important;
+  }
+}
+
+.facet__content {
+  display: flex;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+
+.facet__count {
+  margin-left: rem(gesso-spacing(2));
+}

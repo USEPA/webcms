@@ -1,0 +1,12 @@
+{% set classes = [
+  'is-active',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/facet/facet.twig' with {
+  'modifier_classes': classes,
+  'title': title,
+  'url': url,
+  'show_count': show_count,
+  'count': count,
+} %}

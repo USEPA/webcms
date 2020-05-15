@@ -7,9 +7,19 @@
   {% set icons = [
     'arrow',
     'close',
-    'rss',
     'warning',
+    'angle-double-left',
+    'angle-double-right',
+    'angle-left',
+    'angle-right',
     'file',
+    'rss',
+    'chevron-circle-left',
+    'chevron-circle-right',
+    'minus-circle',
+    'plus-circle',
+    'square',
+    'check-square',
     'facebook-square',
     'flickr-square',
     'instagram-square',
@@ -18,7 +28,7 @@
    ] %}
   {% for icon in icons %}
     <p>
-      <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}>
+      <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} aria-label="{{ label }}"{% endif %}>
         <use xlink:href="{{ image_path }}sprite.artifact.svg#{{ icon }}"></use>
       </svg>
       {{ icon }}
@@ -26,7 +36,7 @@
   {% endfor %}
 {%- else -%}
   {% spaceless %}
-    <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}>
+    <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} aria-label="{{ label }}"{% endif %}>
       <use xlink:href="{{ image_path }}sprite.artifact.svg#{{ icon_name }}"></use>
     </svg>
   {% endspaceless %}
