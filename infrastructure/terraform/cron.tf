@@ -3,7 +3,7 @@ resource "aws_ecr_repository" "drush" {
   name = "webcms-drush"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_iam_role" "events" {
   assume_role_policy = data.aws_iam_policy_document.events_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -80,8 +80,8 @@ resource "aws_ecs_task_definition" "drush_task" {
   ])
 
   tags = {
-    Name        = "WebCMS Task - Drush"
-    Application = "WebCMS"
+    Name  = "WebCMS Task - Drush"
+    Group = "webcms"
   }
 
   # Like the Drupal task, we ensure that ECS will be able to launch this task when it

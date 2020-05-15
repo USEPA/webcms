@@ -45,8 +45,8 @@ resource "aws_elasticsearch_domain" "es" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch"
   }
 
   depends_on = [

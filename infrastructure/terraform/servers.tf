@@ -129,8 +129,8 @@ resource "aws_launch_template" "servers" {
   user_data = data.template_cloudinit_config.servers.rendered
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Launch Template"
+    Group = "webcms"
+    Name  = "WebCMS Launch Template"
   }
 
   lifecycle {

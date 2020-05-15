@@ -10,8 +10,8 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS VPC"
+    Group = "webcms"
+    Name  = "WebCMS VPC"
   }
 }
 
@@ -47,8 +47,8 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Public ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Public ${count.index}"
   }
 }
 
@@ -64,8 +64,8 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Private ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Private ${count.index}"
   }
 }
 
@@ -76,8 +76,8 @@ resource "aws_internet_gateway" "gateway" {
   vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Gateway"
+    Group = "webcms"
+    Name  = "WebCMS Gateway"
   }
 }
 
@@ -96,8 +96,8 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Public Routes"
+    Group = "webcms"
+    Name  = "WebCMS Public Routes"
   }
 }
 
@@ -114,8 +114,8 @@ resource "aws_eip" "ip" {
   vpc = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS EIP ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS EIP ${count.index}"
   }
 }
 
@@ -126,8 +126,8 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.ip[count.index].id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Nat ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Nat ${count.index}"
   }
 }
 
@@ -144,8 +144,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Private Routes ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Private Routes ${count.index}"
   }
 }
 
@@ -182,8 +182,8 @@ resource "aws_vpc_endpoint" "s3" {
   })
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS S3 Gateway"
+    Group = "webcms"
+    Name  = "WebCMS S3 Gateway"
   }
 }
 
@@ -209,7 +209,7 @@ resource "aws_vpc_endpoint" "ssm" {
   subnet_ids          = aws_subnet.private.*.id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS SSM Interface: ${each.value}"
+    Group = "webcms"
+    Name  = "WebCMS SSM Interface: ${each.value}"
   }
 }

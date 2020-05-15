@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "uploads" {
   bucket = "webcms-uploads"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 

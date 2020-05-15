@@ -22,7 +22,7 @@ resource "aws_iam_role" "ecs_cluster_role" {
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -124,7 +124,7 @@ resource "aws_iam_role" "ec2_server_role" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -247,7 +247,7 @@ resource "aws_iam_role" "drupal_container_role" {
   assume_role_policy = data.aws_iam_policy_document.drupal_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -382,7 +382,7 @@ resource "aws_iam_role" "drupal_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.drupal_execution_assume_role.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -420,7 +420,7 @@ resource "aws_iam_role" "bastion_role" {
   assume_role_policy = data.aws_iam_policy_document.bastion_assume.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 

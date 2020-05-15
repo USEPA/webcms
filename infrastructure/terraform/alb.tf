@@ -7,7 +7,7 @@ resource "aws_lb" "frontend" {
   subnets            = aws_subnet.public.*.id
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 

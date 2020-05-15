@@ -22,8 +22,8 @@ resource "aws_security_group" "interface" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Interfaces"
+    Group = "webcms"
+    Name  = "WebCMS Interfaces"
   }
 }
 
@@ -54,8 +54,8 @@ resource "aws_security_group" "load_balancer" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Load Balancer"
+    Group = "webcms"
+    Name  = "WebCMS Load Balancer"
   }
 }
 
@@ -96,8 +96,8 @@ resource "aws_security_group" "server" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Cluster Server"
+    Group = "webcms"
+    Name  = "WebCMS Cluster Server"
   }
 }
 
@@ -153,8 +153,8 @@ resource "aws_security_group" "bastion" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Bastion"
+    Group = "webcms"
+    Name  = "WebCMS Bastion"
   }
 }
 
@@ -165,8 +165,8 @@ resource "aws_security_group" "database" {
   vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS RDS"
+    Group = "webcms"
+    Name  = "WebCMS RDS"
   }
 }
 
@@ -189,8 +189,8 @@ resource "aws_security_group" "database_access" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS DB Access"
+    Group = "webcms"
+    Name  = "WebCMS DB Access"
   }
 }
 
@@ -254,8 +254,8 @@ resource "aws_security_group" "drupal_task" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Drupal Containers"
+    Group = "webcms"
+    Name  = "WebCMS Drupal Containers"
   }
 }
 
@@ -293,8 +293,8 @@ resource "aws_security_group" "cache" {
   vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS ElastiCache"
+    Group = "webcms"
+    Name  = "WebCMS ElastiCache"
   }
 }
 
@@ -334,8 +334,8 @@ resource "aws_security_group" "search" {
   vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch"
   }
 }
 
@@ -355,8 +355,8 @@ resource "aws_security_group" "search_access" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch Access"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch Access"
   }
 }
 
