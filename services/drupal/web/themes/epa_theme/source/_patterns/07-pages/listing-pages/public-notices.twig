@@ -1,3 +1,156 @@
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Public Notices',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set search %}
+  <form class="margin-y-3">
+    <div class="form-item form-item--textfield is-inline">
+      <label class="form-item__label u-visually-hidden" for="listing-search">
+        Search
+      </label>
+      <input class="form-item__text" id="listing-search" type="text" size="30" maxlength="128">
+    </div>
+    <button class="button">Search</button>
+  </form>
+{% endset %}
+
+{% set sidebar %}
+  <h2 class="h3">Filter By:</h2>
+  {% include '@uswds/accordion/accordion.twig' with {
+    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
+    'is_multi_selectable': true,
+    'accordion_id': 'facets',
+    'accordion': [
+      {
+        'title': 'Location of Proposed Action',
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Alaska <span class="facet__count">1<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">California <span class="facet__count">2<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Colorado <span class="facet__count">3<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Connecticut <span class="facet__count">1<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">District of Columbia <span class="facet__count">1<span class="u-visually-hidden"> items</span></span></span></a></li></ul><button class="facet-limit"><svg class="icon icon--facet-limit" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#plus-circle"></use></svg>Show more</button>',
+      },
+      {
+        'title': 'Program or Statute',
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Clean Air Act (CAA) <span class="facet__count">4<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Clean Water Act (CWA) <span class="facet__count">26<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">National Pollutant Discharge Elimination System (NPDES) <span class="facet__count">24<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">National Priority List <span class="facet__count">4<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Resource Conservation & Recovery Act (RCRA) <span class="facet__count">4<span class="u-visually-hidden"> items</span></span></span></a></li></ul><button class="facet-limit"><svg class="icon icon--facet-limit" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#plus-circle"></use></svg>Show more</button>',
+      },
+      {
+        'title': 'Proposed Action',
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Enforcement <span class="facet__count">9<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">No Action <span class="facet__count">15<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Permit <span class="facet__count">32<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Public Meetings/Hearings <span class="facet__count">12<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Rule <span class="facet__count">1<span class="u-visually-hidden"> items</span></span></span></a></li></ul>',
+      },
+      {
+        'title': 'Comments Due Date',
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">May 2020 <span class="facet__count">22<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">June 2020 <span class="facet__count">18<span class="u-visually-hidden"> items</span></span></span></a></li></ul>',
+      },
+    ]
+  } %}
+{% endset %}
+
+{% set filters %}
+  <p class="h5 margin-bottom-5">Displaying 1-15 of 64 results</p>
+{% endset %}
+
+{% set body %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Opportunity to Comment on Notice of Discharge Requirements for Jabil, Incorporated',
+    'date': 'May 15, 2020',
+    'location': 'Colorado, Rocky Mountains',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': '(Draft Permit) New Gloucester Fish Hatchery, New Gloucester, ME, ME0001040',
+    'date': 'May 18, 2020',
+    'location': 'Maine',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Notice of Intent to Assess Administrative Penalty and Opportunity for Public Comment: Forrester Construction Co., Rockville, MD 20852',
+    'date': 'May 18, 2020',
+    'location': 'Mid-Atlantic, Maryland, Virginia',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Opportunity to Comment on CWA Section 401 Certification for a Bank Stabilization Project on the Bighorn River within the Crow Reservation',
+    'date': 'May 18, 2020',
+    'location': 'Montana, Rocky Mountains',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Proposed Class II Permit MI-113-2R-0065',
+    'date': 'May 22, 2020',
+    'location': 'Michigan',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Notice of Intent to reissue the NPDES permit for Bardon, Inc. (d/b/a Aggregate Industries, aka Super Concrete), Washington, D.C.',
+    'date': 'May 25, 2020',
+    'location': 'Mid-Atlantic, District of Columbia',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Proposed Settlement with Pacific Seafood - Westport LLC for Clean Water Act Violations',
+    'date': 'May 26, 2020',
+    'location': 'Washington, Pacific Northwest',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Settlement Concerning the Welch Group Environmental Palmetto Superfund Site',
+    'date': 'May 26, 2020',
+    'location': 'North Carolina',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Proposed Permit for the Metlakatla Sewer Treatment Plant',
+    'date': 'May 26, 2020',
+    'location': 'Alaska, Pacific Northwest',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Proposed RCRA Corrective Action - Cleanup Proposal for Chemical Leaman Tank Lines Incorporated in Institute, WV - EPA ID: WVR000001719',
+    'date': 'May 27, 2020',
+    'location': 'Mid-Atlantic, West Virginia',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': '(Draft Permit) Town of Ledyard WPCF, Ledyard, CT, CT0101681',
+    'date': 'May 30, 2020',
+    'location': 'Connecticut',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'Aviso Público: LANL - Aguas Pluviales - Permiso Propuesto No. NM0030759',
+    'date': 'May 31, 2020',
+    'location': 'New Mexico',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'LANL Industrial Wastewater Permit - Draft Permit No. NM0028355',
+    'date': 'May 31, 2020',
+    'location': 'New Mexico',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'NPDES: 2020 Issuance of the Multi-Sector General Permit for Stormwater Discharges Associated with Industrial Activity',
+    'date': 'May 31, 2020',
+    'location': 'Texas',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/teaser/teaser--public-notice/teaser--public-notice.twig' with {
+    'title': 'NPDES: 2020 Issuance of the Multi-Sector General Permit for Stormwater Discharges Associated with Industrial Activity',
+    'date': 'May 31, 2020',
+    'location': 'Louisiana',
+    'summary': '<p>This is the summary, which can contain <abbr title="Hyper Text Markup Language">HTML</abbr> markup. It should be 300 characters or less.</p>',
+  } %}
+  {% include '@components/pager/pager.twig' with {
+    'heading': 'Pagination',
+    'current': '6',
+  } %}
+{% endset %}
+
 {% set page_content %}
   {# include page template #}
   {% include '@templates/listing-pages/listing-page.twig' with {

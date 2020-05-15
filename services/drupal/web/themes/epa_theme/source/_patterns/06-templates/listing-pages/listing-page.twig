@@ -28,7 +28,9 @@
   {{ search }}
 {% endblock %}
 
-{% embed '@layouts/sidebar-first/sidebar-first.twig' %}
+{% embed '@layouts/sidebar-first/sidebar-first.twig' with {
+  'modifier_classes': 'l-sidebar-first--reversed',
+} %}
   {% block main_content %}
     {{ filters }}
     {{ body }}
