@@ -179,15 +179,15 @@ resource "aws_autoscaling_group" "servers" {
       }
 
       override {
-        instance_type     = var.server-instance-types.primary
+        instance_type = var.server-instance-types.primary
       }
 
       override {
-        instance_type     = var.server-instance-types.secondary
+        instance_type = var.server-instance-types.secondary
       }
 
       override {
-        instance_type     = var.server-instance-types.tertiary
+        instance_type = var.server-instance-types.tertiary
       }
     }
   }

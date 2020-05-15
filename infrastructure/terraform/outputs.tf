@@ -24,7 +24,7 @@ output "alb-domain" {
 output "drush-task-config" {
   value = jsonencode({
     awsvpcConfiguration = {
-      subnets = aws_subnet.private.*.id
+      subnets        = aws_subnet.private.*.id
       securityGroups = local.drupal-security-groups
       assignPublicIp = "DISABLED"
     }

@@ -247,9 +247,9 @@ resource "aws_security_group" "drupal_task" {
   egress {
     description = "Allow access SMTP servers for email"
 
-    protocol = "tcp"
-    from_port = 587
-    to_port = 587
+    protocol    = "tcp"
+    from_port   = 587
+    to_port     = 587
     cidr_blocks = ["0.0.0.0/0"]
   }
 
