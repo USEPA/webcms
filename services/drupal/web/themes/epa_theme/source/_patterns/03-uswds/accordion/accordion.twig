@@ -6,11 +6,11 @@
 <div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
   {% for item in accordion %}
     <h2 class="usa-accordion__heading">
-      <button class="usa-accordion__button" aria-expanded="false" aria-controls="{{ accordion_id }}-a{{ loop.index }}">
+      <button class="usa-accordion__button" aria-expanded="{{ item.is_expanded }}" aria-controls="{{ accordion_id }}-{{ loop.index }}">
         {{ item.title }}
       </button>
     </h2>
-    <div id="{{ accordion_id }}-a{{ loop.index }}" class="usa-accordion__content">
+    <div id="{{ accordion_id }}-{{ loop.index }}" class="usa-accordion__content">
       {{ item.content }}
     </div>
   {% endfor %}

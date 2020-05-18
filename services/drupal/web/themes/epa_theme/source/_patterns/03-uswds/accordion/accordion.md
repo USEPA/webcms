@@ -12,4 +12,5 @@ __Variables:__
 * accordion_id: [string] Unique ID for this accordion.
 * accordion: [array] Accordion items.
   * title: [string] Title of the item.
+  * is_expanded: [boolean] Whether this item is expanded at the start.
   * content: [string] Content of the item.
