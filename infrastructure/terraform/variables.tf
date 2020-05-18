@@ -178,6 +178,14 @@ variable "db-max-capacity" {
   type        = number
 }
 
+# S3 variables
+# cf. s3.tf
+
+variable "s3-bucket-name" {
+  description = "Name of the S3 bucket used to store all uploads (public and private)."
+  type        = string
+}
+
 # Search variables
 # cf. search.tf
 

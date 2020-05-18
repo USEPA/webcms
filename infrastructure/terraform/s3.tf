@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "uploads" {
-  bucket = "webcms-uploads"
+  bucket = var.s3-bucket-name
 
   tags = {
     Group = "webcms"
