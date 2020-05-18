@@ -405,7 +405,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   }
 
   // Make the element visible on VBO edits.
-  if ($form['#form_id'] == 'views_form_content_page_1') {
+  if (isset($form['node_bulk_form'])) {
     $form['workflow_508_compliant']['#states'] = [
       'visible' => [
         ':input[name="action"]' => ['value' => 'set_to_published'],
@@ -428,7 +428,7 @@ function _epa_workflow_form_validation_508($element, FormStateInterface $form_st
   }
 
   // VBO form on content dashboard
-  if ($form['#form_id'] == 'views_form_content_page_1') {
+  if (isset($form['node_bulk_form'])) {
     $op = $form_state->getValue('action');
   }
 
