@@ -208,13 +208,8 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     }
   }
 
-  if ($form_id == 'node_page_edit_form' || $form_id = 'content_moderation_entity_moderation_form') {
-
-    // The moderation form prints twice on the dashboard. So, lets do this once.
-    // This check could be more clear.
-    if ($form['#form_id'] != 'views_exposed_form') {
+  if (in_array($form_id,['content_moderation_entity_moderation_form'])) {
       _epa_workflow_add_compliance_checkboxes($form);
-    }
   }
 }
 
@@ -427,10 +422,6 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
  * the checkboxes be ticked when moving content to published.
  */
 function _epa_workflow_form_validation_508($element, FormStateInterface $form_state, $form) {
-
-  // Node edit form
-  $op = $form_state->getValue('op');
-
   // Block form on latest revision
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
     $op = $form_state->getValue('new_state');
