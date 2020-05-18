@@ -1,0 +1,10 @@
+{% set classes = [
+  'is-open',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/facet-limit/facet-limit.twig' with {
+  'modifier_classes': classes,
+  'icon': icon,
+  'text': text,
+} %}

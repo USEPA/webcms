@@ -1,0 +1,18 @@
+{% set page_content %}
+  {# include page template #}
+  {% include '@templates/listing-pages/listing-page.twig' with {
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': page_title,
+    'intro': intro,
+    'search': search,
+    'body': body,
+    'sidebar': sidebar,
+    'footer': footer,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
