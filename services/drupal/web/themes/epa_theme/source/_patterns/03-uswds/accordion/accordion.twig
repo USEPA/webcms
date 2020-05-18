@@ -3,6 +3,8 @@
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
+{% set accordion_id = 'accordion'|unique_id %}
+
 <div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
   {% for item in accordion %}
     <h2 class="usa-accordion__heading">
