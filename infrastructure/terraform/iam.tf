@@ -577,3 +577,29 @@ resource "aws_iam_policy" "user_ssm_policy" {
   description = "Grants Session Manager access for users"
   policy      = data.aws_iam_policy_document.user_ssm_policy.json
 }
+
+resource "aws_iam_group" "webcms_administrators" {
+  name = "WebCMSAdministrators"
+}
+
+resource "aws_iam_user" "webcms_admin" {
+  name = "WebCMSAdmin"
+
+  tags = {
+    Group = "webcms"
+  }
+}
+
+resource "aws_iam_group_membership" "webcms_administrators_admin" {
+  name  = "WebCMSAdminGroupMembership"
+  group = aws_iam_group.webcms_administrators.name
+
+  users = [
+    aws_iam_user.webcms_admin.name
+  ]
+}
+
+resource "aws_iam_group_policy_attachment" "webcms_administrators" {
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.user_ssm_policy.arn
+}
