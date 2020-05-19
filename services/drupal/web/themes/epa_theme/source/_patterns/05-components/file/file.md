@@ -1,7 +1,7 @@
 ---
 el: .file
 title: File
-state: inreview
+state: complete
 ---
 
 __Variables:__

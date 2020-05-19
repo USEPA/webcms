@@ -1,7 +1,7 @@
 ---
 el: .figure
 title: Figure with Audio
-state: inreview
+state: complete
 ---
 
 __Variables:__

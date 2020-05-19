@@ -1,7 +1,7 @@
 ---
 el: .article
 title: Article
-state: inreview
+state: complete
 ---
 
 __Variables:__
