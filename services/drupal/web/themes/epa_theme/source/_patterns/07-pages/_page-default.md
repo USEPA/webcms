@@ -1,4 +1,4 @@
 ---
-title: Page with Admin
+title: Default Page
 state: complete
 ---

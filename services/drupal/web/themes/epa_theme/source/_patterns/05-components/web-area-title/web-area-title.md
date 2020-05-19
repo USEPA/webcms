@@ -1,7 +1,7 @@
 ---
 el: .web-area-title
 title: Web Area Title
-state: inreview
+state: complete
 ---
 
 __Variables:__
