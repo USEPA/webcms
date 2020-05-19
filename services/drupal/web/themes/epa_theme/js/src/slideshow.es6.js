@@ -12,10 +12,11 @@ import { tns } from 'tiny-slider/src/tiny-slider';
       const sliders = context.querySelectorAll('.js-slideshow');
       sliders.forEach(slider =>
         tns({
-          arrowKeys: true,
           container: slider.querySelector('.js-slideshow__container'),
           controlsContainer: slider.querySelector('.js-slideshow__controls'),
+          gutter: 16,
           nav: false,
+          preventScrollOnTouch: 'auto',
         })
       );
     },

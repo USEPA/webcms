@@ -1,0 +1,38 @@
+{% set classes = [
+  'image-gallery',
+  'js-slideshow',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  {% if title %}
+    <div class="image-gallery__title">{{ title }}</div>
+  {% endif %}
+  <div class="image-gallery__controls js-slideshow__controls">
+    <button class="image-gallery__prev" aria-label="{{ 'Previous Image'|t }}">
+      {%- include '@components/icon/icon.twig' with {
+        'modifier_classes': 'icon--image-gallery-control',
+        'is_hidden': true,
+        'icon_name': 'chevron-circle-left',
+      } -%}
+    </button>
+    <button class="image-gallery__next" aria-label="{{ 'Next Image'|t }}">
+      {%- include '@components/icon/icon.twig' with {
+        'modifier_classes': 'icon--image-gallery-control',
+        'is_hidden': true,
+        'icon_name': 'chevron-circle-right',
+      } -%}
+    </button>
+  </div>
+  <ul class="image-gallery__list js-slideshow__container">
+    {% for image in images %}
+      <li class="image-gallery__item">
+        {% include '@components/figure/figure.twig' with {
+          'modifier_classes': 'figure--gallery',
+          'caption': image.caption,
+          'media': image.media,
+        }%}
+      </li>
+    {% endfor %}
+  </ul>
+</div>
