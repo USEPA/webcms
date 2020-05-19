@@ -1,5 +1,5 @@
 import STATE_CLASSES from '../constants/_STATE_CLASSES.es6';
-import { TRANSITIONS } from '../constants/_GESSO.es6';
+import TRANSITIONS from '../constants/_TRANSITIONS.es6';
 import { debounce } from 'throttle-debounce';
 
 class Slider {
