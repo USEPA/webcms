@@ -10,8 +10,10 @@
         {{ content }}
       </div>
       {% if show_close %}
-        <button class="sitewide-alert__close" aria-label="{{ 'Close'|t }}">
+        <button class="sitewide-alert__close">
+          {{ 'Close'|t }}
           {% include '@components/icon/icon.twig' with {
+            'modifier_classes': 'icon--sitewide-alert-close is-spaced-before',
             'is_hidden': true,
             'icon_name': 'close'
           } %}
