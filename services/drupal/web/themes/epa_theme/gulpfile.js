@@ -82,7 +82,11 @@ const compileStyles = () => {
     .pipe(sourcemaps.init())
     .pipe(
       sass({
-        includePaths: ['./node_modules/breakpoint-sass/stylesheets', './node_modules/uswds/src/stylesheets'],
+        includePaths: [
+          './node_modules/breakpoint-sass/stylesheets',
+          './node_modules/tiny-slider/src',
+          './node_modules/uswds/src/stylesheets',
+        ],
         precision: 10,
         importer: sassGlobImporter(),
       })
