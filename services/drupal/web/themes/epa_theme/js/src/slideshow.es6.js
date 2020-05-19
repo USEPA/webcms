@@ -13,7 +13,7 @@ import { tns } from 'tiny-slider/src/tiny-slider';
           container: slider.querySelector('.js-slideshow__container'),
           controlsContainer: slider.querySelector('.js-slideshow__controls'),
           gutter: 16,
-          nav: false,
+          navContainer: slider.querySelector('.js-slideshow__nav'),
           preventScrollOnTouch: 'auto',
         })
       );
