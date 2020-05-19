@@ -1,4 +1,4 @@
 ---
 title: Page with Wide Template
-state: inreview
+state: complete
 ---

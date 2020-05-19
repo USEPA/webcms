@@ -1,4 +1,4 @@
 ---
-title: News Release
+title: Default Page
 state: complete
 ---

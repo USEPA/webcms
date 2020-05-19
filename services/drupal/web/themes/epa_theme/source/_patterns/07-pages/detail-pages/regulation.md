@@ -1,4 +1,4 @@
 ---
 title: Regulation
-state: inreview
+state: complete
 ---
