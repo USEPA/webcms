@@ -241,33 +241,6 @@ function epa_workflow_get_entity_moderation_states(EntityInterface $entity, arra
   return $moderation_manager->filterTransitionOptions($entity, $states);
 }
 
-/**
- * Filters workflow buttons displayed on the page and customizes styling.
- */
-function epa_workflow_process_workflow_buttons($element, FormStateInterface $form_state, array &$form) {
-  $states = $form['moderation_state']['widget'][0]['#options'];
-  $default_states = epa_workflow_get_entity_moderation_states($form_state->getFormObject()->getEntity(), $states);
-  $default_states_keys = array_keys($default_states);
-  array_walk($default_states_keys, function (&$state_name) {
-    $state_name = 'moderation_state_' . $state_name;
-  });
-  $buttons = $form['actions'];
-  foreach ($buttons as $state_machine_name => &$state_array) {
-    if (isset($state_array['#access']) && $state_array['#access'] && strpos($state_machine_name, 'moderation_state') !== FALSE && !in_array($state_machine_name, $default_states_keys)) {
-      $state_array['#access'] = FALSE;
-    }
-    if ($state_machine_name == 'moderation_state_published') {
-      $state_array['#attached'] = [
-        'library' => [
-          'epa_workflow/epa_workflow',
-        ],
-      ];
-    }
-  }
-  $buttons['#attributes']['class'][] = 'actions-wrapper';
-  $form['actions'] = $buttons;
-  $form['actions_top'] = $buttons;
-}
 
 /**
  * Implements hook_entity_view().
@@ -290,8 +263,8 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
       'epa_web_areas.group_content' => 'Content',
     ],
     [
-      'content_moderation.content' => 'Current Revisions',
-      'epa_web_areas.sub_group_content' => 'Current Revisions',
+      'content_moderation.content' => 'Published content',
+      'epa_web_areas.sub_group_content' => 'Published content',
       'content_moderation.moderated_content' => 'Latest Revisions',
       'epa_web_areas.moderated_group_content' => 'Latest Revisions',
     ],

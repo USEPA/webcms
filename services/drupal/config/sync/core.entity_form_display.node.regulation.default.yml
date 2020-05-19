@@ -28,14 +28,15 @@ dependencies:
     - field.field.node.regulation.field_scheduled_transition
     - field.field.node.regulation.field_type
     - node.type.regulation
+    - workflows.workflow.epa_default
   module:
+    - content_moderation
     - datetime
     - datetime_range
     - field_group
     - paragraphs
     - shs
     - text
-    - workflow_buttons
 third_party_settings:
   field_group:
     group_other_metadata:
@@ -322,12 +323,11 @@ content:
     type: options_select
     region: content
   moderation_state:
-    type: workflow_buttons
-    weight: 18
-    settings:
-      show_current_state: '1'
-    region: content
+    weight: 50
+    settings: {  }
     third_party_settings: {  }
+    type: moderation_state_default
+    region: content
   promote:
     type: boolean_checkbox
     settings:
