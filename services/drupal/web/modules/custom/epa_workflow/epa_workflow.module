@@ -222,9 +222,9 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $node->setNewRevision();
   $node->setRevisionCreationTime($request_time);
   $node->setChangedTime($request_time);
-  $node->setRevisionLogMessage(t('@messageThis is a new default revision based on revision @vid.', [
+  $node->setRevisionLogMessage(t('@messageThis is a new revision based on revision %vid.', [
     '@message' => $message,
-    '@vid' => $vid,
+    '%vid' => $vid,
   ]));
   $node->set('revision_translation_affected', 1);
   $node->set('moderation_state', $values['new_state']);
@@ -314,23 +314,25 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
 function epa_workflow_node_presave(NodeInterface $node) {
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $original = $node->original;
-  $default_revision_id = $original->get('vid')->value;
-  $latest_revision_id = $storage->getLatestRevisionId($node->id());
-  $loaded_rev_id = $node->getLoadedRevisionId();
-  $moderation_state = $node->moderation_state->value;
-  $moderation_info = \Drupal::service('content_moderation.moderation_information');
-  $workflow = $moderation_info->getWorkflowForEntity($node);
-  $workflow_states = $workflow->get('type_settings')['states'];
+  if ($original) {
+    $default_revision_id = $original->get('vid')->value;
+    $latest_revision_id = $storage->getLatestRevisionId($node->id());
+    $loaded_rev_id = $node->getLoadedRevisionId();
+    $moderation_state = $node->moderation_state->value;
+    $moderation_info = \Drupal::service('content_moderation.moderation_information');
+    $workflow = $moderation_info->getWorkflowForEntity($node);
+    $workflow_states = $workflow->get('type_settings')['states'];
 
-  // Only leapfrog to reset latest revision if the following is true:
-  // - Revision undergoing transition is the default revision AND
-  // - there's a different latest revision AND
-  // - we are transitioning the current revision to another state that will make
-  // it the "default" revision AND
-  // - this is not a "syncing" save (a save that is meant to happen more-or-less
-  // transparently on a revision just to update field data)
-  if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
-    $node->leapfrog = $latest_revision_id;
+    // Only leapfrog to reset latest revision if the following is true:
+    // - Revision undergoing transition is the default revision AND
+    // - there's a different latest revision AND
+    // - we are transitioning the current revision to another state that will make
+    // it the "default" revision AND
+    // - this is not a "syncing" save (a save that is meant to happen more-or-less
+    // transparently on a revision just to update field data)
+    if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
+      $node->leapfrog = $latest_revision_id;
+    }
   }
 }
 
@@ -348,7 +350,7 @@ function epa_workflow_node_update(NodeInterface $node) {
     $last_revision->isDefaultRevision(FALSE);
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
-    $last_revision->setRevisionLogMessage(t('Restoring the latest revision after a transition occurred to the current revision.'));
+    $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
     $last_revision->save();
   }
 }
