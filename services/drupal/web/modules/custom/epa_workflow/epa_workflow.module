@@ -197,17 +197,12 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   if ($form_id === 'content_moderation_entity_moderation_form') {
     $request = \Drupal::request();
     $route = $request->attributes->get('_route');
-    if ($route == 'entity.node.latest_version') {
-      // Filter the allowed transition states to those that wouldn't result in a
-      // new default revision and show the Publish transition if the user has
-      // permission to use it.
-      $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
-    }
-    elseif ($route == 'entity.node.canonical') {
+    if ($route == 'entity.node.canonical') {
       $form['#submit'] = [
         '_epa_workflow_node_view_moderation_form_submit',
       ];
     }
+    $form['revision_log']['#required'] = TRUE;
   }
 
   if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
@@ -235,16 +230,6 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $node->set('revision_translation_affected', 1);
   $node->set('moderation_state', $values['new_state']);
   $node->save();
-}
-
-/**
- * Given an entity, and its current transition states, filter out those that
- * would result in a default revision (other than "Published"). The $states
- * array should have the machine name of the states as its keys.
- */
-function epa_workflow_get_entity_moderation_states(EntityInterface $entity, array $states) {
-  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
-  return $moderation_manager->filterTransitionOptions($entity, $states);
 }
 
 
@@ -341,7 +326,7 @@ function epa_workflow_node_update(NodeInterface $node) {
  */
 function _epa_workflow_add_compliance_checkboxes(&$form) {
 
-    $link_508 = Link::fromTextAndUrl(
+  $link_508 = Link::fromTextAndUrl(
     t('applicable Section 508 standards'),
     Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
   );
@@ -364,7 +349,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
     '#description' => t('I certify that the content on this page is accessible per all @508. ' .
       'This content will be subject to random external site link reviews by the Office of Web Communications, ' .
       'and that non-compliant pages will be unpublished until remediated.', [
-    '@508' => $link_508,
+      '@508' => $link_508,
     ]),
     '#required' => FALSE,
     '#weight' => -1,
