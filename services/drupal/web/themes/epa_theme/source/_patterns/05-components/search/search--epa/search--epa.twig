@@ -16,6 +16,10 @@
     <input type="hidden" name="areacontacts" value="">
     <input type="hidden" name="areasearchurl" value="">
     <input type="hidden" name="typeofsearch" value="epa">
-    <input type="hidden" name="result_template" value="2col.ftl">
+    <input type="hidden" name="result_template" value="{{ epa_search_result_template }}">
+
+    {% if gsa_epa_search_bias %}
+      <input type="hidden" name="bias" value="{{ gsa_epa_search_bias }} ">
+    {% endif %}
   </div>
 </form>
