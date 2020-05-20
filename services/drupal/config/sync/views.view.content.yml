@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_review_deadline
     - field.storage.node.field_scheduled_transition
+    - workflows.workflow.epa_default
   module:
     - content_moderation
     - datetime
@@ -664,7 +665,11 @@ display:
           group_type: group
           admin_label: ''
           operator: in
-          value: {  }
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
           group: 1
           exposed: true
           expose:
@@ -682,11 +687,11 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
-            reduce: false
+            reduce: true
           is_grouped: false
           group_info:
             label: ''
