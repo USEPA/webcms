@@ -15,6 +15,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -195,17 +197,16 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   if ($form_id === 'content_moderation_entity_moderation_form') {
     $request = \Drupal::request();
     $route = $request->attributes->get('_route');
-    if ($route == 'entity.node.latest_version') {
-      // Filter the allowed transition states to those that wouldn't result in a
-      // new default revision and show the Publish transition if the user has
-      // permission to use it.
-      $form['new_state']['#options'] = epa_workflow_get_entity_moderation_states($form_state->getStorage()['entity'], $form['new_state']['#options']);
-    }
-    elseif ($route == 'entity.node.canonical') {
+    if ($route == 'entity.node.canonical') {
       $form['#submit'] = [
         '_epa_workflow_node_view_moderation_form_submit',
       ];
     }
+    $form['revision_log']['#required'] = TRUE;
+  }
+
+  if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
+      _epa_workflow_add_compliance_checkboxes($form);
   }
 }
 
@@ -229,16 +230,6 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $node->set('revision_translation_affected', 1);
   $node->set('moderation_state', $values['new_state']);
   $node->save();
-}
-
-/**
- * Given an entity, and its current transition states, filter out those that
- * would result in a default revision (other than "Published"). The $states
- * array should have the machine name of the states as its keys.
- */
-function epa_workflow_get_entity_moderation_states(EntityInterface $entity, array $states) {
-  $moderation_manager = \Drupal::service('epa_workflow.moderation_manager');
-  return $moderation_manager->filterTransitionOptions($entity, $states);
 }
 
 
@@ -325,5 +316,85 @@ function epa_workflow_node_update(NodeInterface $node) {
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
     $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
     $last_revision->save();
+  }
+}
+
+
+/**
+ * Helper function to add compliance checkboxes to some forms
+ * @param $form
+ */
+function _epa_workflow_add_compliance_checkboxes(&$form) {
+
+  $link_508 = Link::fromTextAndUrl(
+    t('applicable Section 508 standards'),
+    Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
+  );
+
+  $link_508 = $link_508->toString();
+
+  $link_external = Link::fromTextAndUrl(
+    t("EPA's External Site Links Procedure"),
+    Url::fromUri('https://www.epa.gov/web-policies-and-procedures/procedure-external-site-links')
+  );
+  $link_external = $link_external->toString();
+
+  // Create a checkbox for 508 compliance agreement
+  $form['workflow_508_compliant'] = [
+    '#type' => 'checkbox',
+    '#title' => t('I certify that all links on this page comply with @external.', [
+        '@external' => $link_external,
+      ]
+    ),
+    '#description' => t('I certify that the content on this page is accessible per all @508. ' .
+      'This content will be subject to random external site link reviews by the Office of Web Communications, ' .
+      'and that non-compliant pages will be unpublished until remediated.', [
+      '@508' => $link_508,
+    ]),
+    '#required' => FALSE,
+    '#weight' => -1,
+  ];
+
+  // Make the element visible when publish is selected on the latest revision.
+  if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
+    $form['workflow_508_compliant']['#states'] = [
+      'visible' => [
+        ':input[name="new_state"]' => ['value' => 'published'],
+      ],
+    ];
+  }
+
+  // Make the element visible on VBO edits.
+  if (isset($form['node_bulk_form'])) {
+    $form['workflow_508_compliant']['#states'] = [
+      'visible' => [
+        ':input[name="action"]' => ['value' => 'set_to_published'],
+      ],
+    ];
+  }
+
+  $form['workflow_508_compliant']['widget']['#element_validate'] = ['_epa_workflow_form_validation_508'];
+}
+
+
+/**
+ * Validation for compliance 508 checkbox.  Must require
+ * the checkboxes be ticked when moving content to published.
+ */
+function _epa_workflow_form_validation_508($element, FormStateInterface $form_state, $form) {
+  // Block form on latest revision
+  if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
+    $op = $form_state->getValue('new_state');
+  }
+
+  // VBO form on content dashboard
+  if (isset($form['node_bulk_form'])) {
+    $op = $form_state->getValue('action');
+  }
+
+  if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published')  {
+    if (empty($form_state->getValue('workflow_508_compliant'))) {
+      $form_state->setError($element, t('508 compliance is required to Publish content.'));
+    }
   }
 }
