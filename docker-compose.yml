@@ -8,9 +8,7 @@ services:
     image: nginx:mainline-alpine
     depends_on:
       - drupal
-    ports:
-      - 8080:80
-      - 8443:443
+    network_mode: service:drupal
     volumes:
       - ${F1_TLS_CERT}:/etc/nginx/ssl/local.crt:ro,cached
       - ${F1_TLS_KEY}:/etc/nginx/ssl/local.key:ro,cached
@@ -50,6 +48,9 @@ services:
     environment:
       # This enables connecting back to the user's computer during an XDebug session.
       XDEBUG_CONFIG: remote_host=${F1_XDEBUG_REMOTE:-127.0.0.1}
+    ports:
+      - 8080:80
+      - 8443:443
     volumes:
       - ./services/drupal:/var/www/html:cached
       - type: volume
