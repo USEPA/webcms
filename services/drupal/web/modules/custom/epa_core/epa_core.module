@@ -188,7 +188,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
     switch ($name) {
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
-          $replacements[$original] = _epa_core_get_machine_name_alias($data[$type]);
+          $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
         }
         break;
       case 'default-revision-created':
@@ -226,31 +226,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
 }
 
 /**
- * Helper function to determine node machine name.
- */
-function _epa_core_get_machine_name_alias($entity) {
-  $alias_string = '';
-
-  // Set alias_string to machine name.
-  // If $alias_string is empty fallback to node's title.
-  if (!$entity->get('field_machine_name')->isEmpty()) {
-    $alias_string = $entity->get('field_machine_name')->value;
-  }
-  if (empty($alias_string)) {
-    $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($entity->label());
-  }
-
-  return $alias_string;
-}
-
-/**
  * Helper function to determine the published revision's creation date.
  */
 function _epa_core_get_default_revision_created($node, $type = 'medium', $format = NULL) {
   $node = $node->isDefaultRevision() ? $node : Node::load($node->id());
   return \Drupal::service('date.formatter')->format($node->getRevisionCreationTime(), $type, $format);
 }
-
 
 /**
  * Implements hook_entity_revision_delete().
