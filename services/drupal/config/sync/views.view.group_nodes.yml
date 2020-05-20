@@ -2,6 +2,8 @@ uuid: 4e8b3565-5944-4f41-89e1-4284c5b52667
 langcode: en
 status: true
 dependencies:
+  config:
+    - workflows.workflow.epa_default
   module:
     - content_moderation
     - gnode
@@ -902,7 +904,11 @@ display:
           group_type: group
           admin_label: ''
           operator: in
-          value: {  }
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
           group: 1
           exposed: true
           expose:
@@ -924,7 +930,7 @@ display:
               system_editor: '0'
               system_webmaster: '0'
               administrator: '0'
-            reduce: false
+            reduce: true
           is_grouped: false
           group_info:
             label: ''
