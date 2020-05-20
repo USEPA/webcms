@@ -1,4 +1,4 @@
 ---
 title: Event
-state: inreview
+state: complete
 ---

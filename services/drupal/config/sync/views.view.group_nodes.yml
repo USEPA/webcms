@@ -2,10 +2,14 @@ uuid: 4e8b3565-5944-4f41-89e1-4284c5b52667
 langcode: en
 status: true
 dependencies:
+  config:
+    - workflows.workflow.epa_default
   module:
+    - content_moderation
     - gnode
     - group
     - node
+    - views_autocomplete_filters
 _core:
   default_config_hash: za6rNdVPn3HsOOwx2Yka3EmWEkXSdUIlaUpT8qOAxG0
 id: group_nodes
@@ -753,57 +757,59 @@ display:
           destination: true
           plugin_id: dropbutton
       filters:
-        status:
-          id: status
+        title:
+          id: title
           table: node_field_data
-          field: status
+          field: title
           relationship: none
           group_type: group
           admin_label: ''
-          operator: '='
-          value: '1'
+          operator: contains
+          value: ''
           group: 1
           exposed: true
           expose:
-            operator_id: ''
-            label: 'Published status'
+            operator_id: title_op
+            label: Title
             description: ''
             use_operator: false
-            operator: status_op
-            identifier: status
-            required: true
+            operator: title_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: title
+            required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              system_editor: '0'
+              system_webmaster: '0'
               administrator: '0'
-              group_admin: '0'
-            operator_limit_selection: false
-            operator_list: {  }
-          is_grouped: true
+            placeholder: ''
+            autocomplete_filter: 0
+            autocomplete_min_chars: '0'
+            autocomplete_items: '10'
+            autocomplete_field: title
+            autocomplete_raw_suggestion: 1
+            autocomplete_raw_dropdown: 1
+            autocomplete_dependent: 0
+          is_grouped: false
           group_info:
-            label: 'Published status'
+            label: ''
             description: ''
-            identifier: status
+            identifier: ''
             optional: true
             widget: select
             multiple: false
             remember: false
             default_group: All
             default_group_multiple: {  }
-            group_items:
-              1:
-                title: Published
-                operator: '='
-                value: '1'
-              2:
-                title: Unpublished
-                operator: '='
-                value: '0'
+            group_items: {  }
           entity_type: node
-          entity_field: status
-          plugin_id: boolean
+          entity_field: title
+          plugin_id: views_autocomplete_filters_string
         type:
           id: type
           table: node_field_data
@@ -817,10 +823,12 @@ display:
           exposed: true
           expose:
             operator_id: type_op
-            label: Type
+            label: 'Content Type'
             description: ''
             use_operator: false
             operator: type_op
+            operator_limit_selection: false
+            operator_list: {  }
             identifier: type
             required: false
             remember: false
@@ -828,11 +836,11 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              system_editor: '0'
+              system_webmaster: '0'
               administrator: '0'
-              group_admin: '0'
             reduce: false
-            operator_limit_selection: false
-            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -848,6 +856,95 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
+        status_1:
+          id: status_1
+          table: node_field_data
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+        moderation_state:
+          id: moderation_state
+          table: node_field_data
+          field: moderation_state
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
+          group: 1
+          exposed: true
+          expose:
+            operator_id: moderation_state_op
+            label: 'Moderation state'
+            description: ''
+            use_operator: false
+            operator: moderation_state_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: moderation_state
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: true
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: moderation_state_filter
       sorts: {  }
       header: {  }
       footer: {  }
@@ -915,6 +1012,10 @@ display:
           plugin_id: numeric
       display_extenders: {  }
       title: Content
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
     cache_metadata:
       max-age: -1
       contexts:
@@ -925,7 +1026,8 @@ display:
         - url.query_args
         - user.group_permissions
         - 'user.node_grants:view'
-      tags: {  }
+      tags:
+        - 'config:workflow_list'
   page_1:
     display_plugin: page
     id: page_1
@@ -960,4 +1062,5 @@ display:
         - url.query_args
         - user.group_permissions
         - 'user.node_grants:view'
-      tags: {  }
+      tags:
+        - 'config:workflow_list'

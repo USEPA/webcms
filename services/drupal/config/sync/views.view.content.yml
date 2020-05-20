@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_review_deadline
     - field.storage.node.field_scheduled_transition
+    - workflows.workflow.epa_default
   module:
     - content_moderation
     - datetime
@@ -656,54 +657,6 @@ display:
           plugin_id: bundle
           entity_type: node
           entity_field: type
-        status:
-          id: status
-          table: node_field_data
-          field: status
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: '1'
-          group: 1
-          exposed: true
-          expose:
-            operator_id: ''
-            label: Status
-            description: ''
-            use_operator: false
-            operator: status_op
-            identifier: status
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-            operator_limit_selection: false
-            operator_list: {  }
-          is_grouped: true
-          group_info:
-            label: 'Published status'
-            description: ''
-            identifier: status
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: Published
-                operator: '='
-                value: '1'
-              2:
-                title: Unpublished
-                operator: '='
-                value: '0'
-          plugin_id: boolean
-          entity_type: node
-          entity_field: status
         moderation_state:
           id: moderation_state
           table: node_field_data
@@ -712,7 +665,11 @@ display:
           group_type: group
           admin_label: ''
           operator: in
-          value: {  }
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
           group: 1
           exposed: true
           expose:
@@ -730,11 +687,11 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
-            reduce: false
+            reduce: true
           is_grouped: false
           group_info:
             label: ''
@@ -761,6 +718,46 @@ display:
           expose:
             operator_limit_selection: false
             operator_list: {  }
+        status_1:
+          id: status_1
+          table: node_field_data
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
       sorts: {  }
       title: 'Current Revisions'
       empty:

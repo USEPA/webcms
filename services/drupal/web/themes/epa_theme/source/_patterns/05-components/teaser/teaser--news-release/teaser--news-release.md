@@ -1,7 +1,7 @@
 ---
 el: .teaser--news-release
 title: News Release Teaser
-state: inreview
+state: complete
 ---
 
 __Variables:__
