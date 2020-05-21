@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: aHgPDWpVqJokftwbVdbHrSvMfPiFoEKXQoK0HvP92Xc
+  default_config_hash: RrKho89LtMO3Np9DYWcKoallZPOiBLVJDNYaKqGeyvI
 id: upgrade_d7_node_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -323,8 +323,10 @@ process:
       source: field_searchable_collection
   field_related_documents:
     -
-      plugin: get
+      plugin: single_value
       source: field_related_documents
+    -
+      plugin: epa_documents
   field_hublinks:
     -
       plugin: get
