@@ -125,6 +125,12 @@ variable "server-instance-types" {
   })
 }
 
+variable "server-extra-policies" {
+  description = "Additional IAM policies to apply to the cluster EC2s"
+  type        = list(string)
+  default     = []
+}
+
 # Cluster variables
 # cf. cluster.tf
 

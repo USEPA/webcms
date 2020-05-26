@@ -216,6 +216,13 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm_session" {
   policy_arn = aws_iam_policy.ssm_session_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ec2_extra_policies" {
+  for_each = toset(var.server-extra-policies)
+
+  role       = aws_iam_role.ec2_server_role.name
+  policy_arn = each.value
+}
+
 resource "aws_iam_instance_profile" "ec2_servers" {
   name = "WebCMSAppInstanceProfile"
   role = aws_iam_role.ec2_server_role.name
