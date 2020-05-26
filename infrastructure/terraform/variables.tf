@@ -125,6 +125,12 @@ variable "server-instance-types" {
   })
 }
 
+variable "server-extra-bootstrap" {
+  description = "Additional bootstrap code to run on the cluster EC2s"
+  type        = string
+  default     = ""
+}
+
 variable "server-extra-policies" {
   description = "Additional IAM policies to apply to the cluster EC2s"
   type        = list(string)

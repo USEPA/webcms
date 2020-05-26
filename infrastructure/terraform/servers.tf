@@ -29,6 +29,17 @@ data "template_cloudinit_config" "servers" {
     CONFIG
   }
 
+  # Run any custom bootstrap steps before the server joins the cluster in the next part.
+  part {
+    content_type = "text/x-shellscript"
+    content = <<-USERDATA
+    #!/bin/bash
+    set -euo pipefail
+
+    ${var.server-extra-bootstrap}
+    USERDATA
+  }
+
   part {
     # This script does two things:
     #
