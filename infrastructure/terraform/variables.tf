@@ -131,6 +131,12 @@ variable "server-extra-policies" {
   default     = []
 }
 
+variable "server-security-ingress" {
+  description = "List of security groups to allow access to the cluster EC2s"
+  type        = list(string)
+  default     = []
+}
+
 # Cluster variables
 # cf. cluster.tf
 

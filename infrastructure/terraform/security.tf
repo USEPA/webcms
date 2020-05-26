@@ -101,6 +101,20 @@ resource "aws_security_group" "server" {
   }
 }
 
+resource "aws_security_group_rule" "server_extra_ingress" {
+  for_each = toset(var.server-security-ingress)
+
+  description       = "Allows ingress from security scanners to the ECS instances"
+  security_group_id = aws_security_group.server.id
+
+  type      = "ingress"
+  from_port = 0
+  to_port   = 65535
+  protocol  = "all"
+
+  source_security_group_id = each.value
+}
+
 resource "aws_security_group" "bastion" {
   name        = "webcms-bastion-sg"
   description = "Security group for SSH bastions"
@@ -156,6 +170,20 @@ resource "aws_security_group" "bastion" {
     Group = "webcms"
     Name  = "WebCMS Bastion"
   }
+}
+
+resource "aws_security_group_rule" "bastion_extra_ingress" {
+  for_each = toset(var.server-security-ingress)
+
+  description       = "Allows ingress from security scanners to the utility server"
+  security_group_id = aws_security_group.bastion.id
+
+  type      = "ingress"
+  from_port = 0
+  to_port   = 65535
+  protocol  = "all"
+
+  source_security_group_id = each.value
 }
 
 resource "aws_security_group" "database" {
