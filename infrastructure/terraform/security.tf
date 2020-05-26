@@ -157,15 +157,6 @@ resource "aws_security_group" "bastion" {
     prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
   }
 
-  ingress {
-    description = "SSH"
-
-    protocol    = "tcp"
-    from_port   = 22
-    to_port     = 22
-    cidr_blocks = ["52.72.16.231/32"]
-  }
-
   tags = {
     Group = "webcms"
     Name  = "WebCMS Bastion"
