@@ -1,1 +1,111 @@
-{% include '@pages/detail-pages/00-page.twig' %}
+{% set header_info %}
+  {% include '@components/hublinks/hublinks.twig' with {
+    'links': [
+      {
+        'url': '#',
+        'text': 'Environmental Economics',
+      },
+    ],
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set content %}
+  {% include '@components/field/field.twig' with {
+    'label': 'Date and Time',
+    'label_element': 'h3',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': 'Thursday, April 12, 2018<br>6:00 pm to 7:30 pm EDT',
+        },
+    ],
+  } %}
+  {% include '@components/field/field.twig' with {
+    'label': 'Location',
+    'label_element': 'h3',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': '<address>Room 1416, William Jefferson Clinton West Building<br>1301 Constitution Ave., NW<br>Washington, DC 20001</address>',
+        },
+    ],
+  } %}
+  <div class="dropbutton js-dropbutton has-multiple">
+    <ul class="dropbutton__list js-dropbutton-list">
+      <li class="dropbutton__item is-action">
+        <button class="usa-button dropbutton__button">Add to Calendar</button>
+      </li><li class="dropbutton__toggle"><button class="dropbutton__toggle-button" type="button"><span class="visually-hidden">List additional actions</span></button></li>
+      <li class="dropbutton__toggle is-secondary-action">
+        <button class="dropbutton__toggle-button"><span class="visually-hidden">Choose Calendar</span></button>
+      </li>
+      <li class="dropbutton__item is-secondary-action">
+        <a class="usa-button dropbutton__button" href="#">iCalendar</a>
+      </li>
+      <li class="dropbutton__item is-secondary-action">
+        <a class="usa-button dropbutton__button" href="#">Outlook</a>
+      </li>
+      <li class="dropbutton__item is-secondary-action">
+        <a class="usa-button dropbutton__button" href="#">Google</a>
+      </li>
+      <li class="dropbutton__item is-secondary-action">
+        <a class="usa-button dropbutton__button" href="#">Yahoo</a>
+      </li>
+    </ul>
+  </div>
+  <h2>Details</h2>
+  {% include '@components/field/field.twig' with {
+    'label': 'Contact',
+    'label_display': 'inline',
+    'label_element': 'h3',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': 'Carl Pasurka, 202-566-2275',
+        },
+    ],
+  } %}
+  {% include '@components/field/field.twig' with {
+    'label': 'Presenter',
+    'label_display': 'inline',
+    'label_element': 'h3',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': 'Paramita Sinha (RTI International)',
+        },
+    ],
+  } %}
+  {% include '@components/field/field.twig' with {
+    'label': 'Description',
+    'label_display': 'inline',
+    'label_element': 'h3',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': 'We examine differences between the two principal approaches used to estimate the value of urban amenities: the hedonic model, in which amenities are capitalized into wages and housing prices, and the discrete model of household location choices, which is derived from a random utility framework. Several empirical studies have noted that the discrete choice approach often yields much larger estimates of amenity values than the hedonic approach. We investigate these differences and their possible causes by estimating how U.S. households value milder seasonal temperatures using 2000 PUMS Census data. We estimate both hedonic and discrete choice models allowing for heterogeneity in tastes for mean winter and summer temperature. The results from both approaches are compared systematically. Consistent with the previous literature, we find that discrete choice models consistently yield mean marginal willingness to pay estimates for climate amenities that significantly exceed those implied by hedonic estimates. Additionally, we find that the household sorting patterns implied by the two models are very different. For example, the discrete choice model suggests that households with the greatest preference for warmer winter temperature tend to locate in cities with the mildest winters, while the hedonic model does not. We show that explanations for differences advanced by the previous literature cannot fully explain our findings, and suggest alternative theories that deserve further investigation.',
+        },
+    ],
+  } %}
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'intro': intro,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
