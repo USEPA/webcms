@@ -1,1 +1,121 @@
-{% include '@pages/detail-pages/00-page.twig' %}
+{% set header_info %}
+  {% include '@components/hublinks/hublinks.twig' with {
+    'links': [
+      {
+        'url': '#',
+        'text': 'Stationary Sources of Air Pollution',
+      },
+    ],
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set content %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': 'u-align-right',
+    'title': {
+      'tag': 'div',
+      'text': 'Basic Information',
+    },
+    'content': '<div class="field"><div class="field__label">Code of Federal Regulations Citation</div><div class="field__content"><ul><li><a href="#">40 CFR Part 63 Subpart FFFF</a></li></ul></div></div><div class="field"><div class="field__label">Docket Numbers</div><div class="field__content"><ul><li><a href="#">EPA-HQ-OAR-2003-0121</a></li><li><a href="#">EPA-HQ-OAR-2018-0746</a></li></ul></div></div>',
+  } only %}
+  <p>On this page:</p>
+  <ul>
+    <li><a href="#rule-summary">Rule Summary</a></li>
+    <li><a href="#rule-history">Rule History</a></li>
+    <li><a href="#additional-resources">Additional Resources</a></li>
+    <li><a href="#compliance">Compliance</a></li>
+  </ul>
+  <h2 id="rule-summary">Rule Summary</h2>
+  <p>The national emission standards for hazardous air pollutants (NESHAP) for the miscellaneous organic chemical (MON) manufacturing industry established emission limits and work practice standards for new and existing miscellaneous organic chemical manufacturing process units, wastewater treatment and conveyance systems, transfer operations, and associated ancillary equipment and implemented section 112(d) of the Clean Air Act (CAA) by requiring all major sources to meet hazardous air pollutants (HAP) emission standards to reflect application of the maximum achievable control technology (MACT).</p>
+  <p>The HAP emitted from MON manufacturing facilities include toluene, methanol, xylene, hydrogen chloride, and methylene chloride. Exposure to these substances may cause adverse health effects such as irritation of the lung, eye, and mucous membranes, effects on the central nervous system, and cancer.</p>
+  <p>The final rule will reduce HAP emissions by 16,800 tons per year for existing facilities that manufacture miscellaneous organic chemicals.</p>
+  <p>See the regulations below for more details.</p>
+  <h2 id="rule-history">Rule History</h2>
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': 'u-align-right',
+    'title': {
+      'tag': 'div',
+      'text': 'Comment Period and Public Hearings',
+    },
+    'content': '<p><strong>Update (February 26, 2020)</strong> – EPA is re-opening the public comment period until <strong>March 19, 2020</strong>. You can read the <em>Federal Register</em> notice <a href="#">here.</a> All comments received in both the initial and the re-opened comment periods will be posted and remain in the docket. Commenters who submitted comments in the initial comment period are welcome to submit new comments during the re-opened comment period and are encouraged to include a cover note indicating whether the new comments replace or supplement their initial comments.</p><p><strong>Update (February 19, 2020)</strong> - EPA was granted additional time from the court to finalize the MON rulemaking. The deadline for the final rule has been extended from March 13, 2020, to <strong>May 29, 2020</strong>.</p><p><strong>Public Hearings:</strong><br>EPA held two public hearings for this proposed action in Houston, TX, on January 14, 2020, and in Washington, DC, on January 16, 2020.</p><ul><li><a href="#">Learn more about the hearings</a></li></ul>',
+  } only %}
+  <p>12/17/2019 - <a href="#">Proposed Amendments</a></p>
+  <p>12/17/2019 - <a href="#">Public Hearing and Comment Period Extension</a></p>
+  <p>07/14/2006 - <a href="#">Final Rule</a></p>
+  <p>12/08/2005 - <a href="#">Proposed Rule</a></p>
+  <p>08/30/2005 - <a href="#">Partial Withdrawl of Rule</a></p>
+  <p>07/01/2005 - <a href="#">Direct final rule</a> &amp; <a href="#">Proposed Amendments</a></p>
+  <p>11/10/2003 - <a href="#">Final Rule</a></p>
+  <p>05/01/2002 - <a href="#">Comment Period Extension</a></p>
+  <p>04/04/2002 - <a href="#">Proposed Rule</a></p>
+  <h2 id="additional-resources">Additional Resources</h2>
+  <p><strong>Proposed Amendments:</strong></p>
+  <ul>
+    <li><a href="#">Fact Sheet: Proposed Risk and Technology Review Amendments</a></li>
+    <li><a href="#">Public hearings on the proposed amendments</a></li>
+    <li><a href="#">Comment on the proposed amendments</a></li>
+    <li><a href="#">Webinar slides</a></li>
+  </ul>
+  <p><a href="#">Older Fact sheets</a></p>
+  <p>View the <a href="#">supporting documents in the docket folder</a> to find additional related documents to this rule.</p>
+  <p>To submit comments on the emissions risk modeling file for the proposed Risk and Technology Review Proposed Rulemaking, please use this
+  {% include '@components/file/file.twig' with {
+    file: {
+      icon: 'file',
+      mime: 'application/zip',
+      name: 'MON Public Comment Review Tool',
+    },
+  } %}. (Note: This is not a web-based tool. Save and unzip the files to your computer to execute.)</p>
+  <p>Miscellaneous Organic Chemical Manufacturing RTR HEM input files including source ID crosswalks. Please note the inputs are still undergoing review and are subject to change. (For 508 Compliance questions, please contact lavoie.tegan@epa.gov)</p>
+  <p>
+    {% include '@components/file/file.twig' with {
+      file: {
+        icon: 'file',
+        mime: 'application/zip',
+        name: 'Revised - MON HEM Input Files',
+      },
+    } %}
+  </p>
+  <p>
+    {% include '@components/file/file.twig' with {
+      file: {
+        icon: 'file',
+        mime: 'application/zip',
+        name: 'Revised - MON HEM Source ID Crosswalk',
+      },
+    } %}
+  </p>
+  <h2 id="compliance">Compliance</h2>
+  <p>
+    {% include '@components/file/file.twig' with {
+      file: {
+        icon: 'file',
+        mime: 'text/plain',
+        name: 'Inspection Tool for the Miscellaneous Organic Chemical Manufacturing NESHAP',
+      },
+    } %}
+  </p>
+  <p><a href="#">Miscellaneous Organic Chemical Manufacturing MACT training</a></p>
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'intro': intro,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
