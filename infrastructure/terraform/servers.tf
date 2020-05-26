@@ -25,29 +25,11 @@ data "template_cloudinit_config" "servers" {
     content      = <<-CONFIG
     packages:
       - awscli
-      - jq
     CONFIG
   }
 
-  # Run any custom bootstrap steps before the server joins the cluster in the next part.
   part {
-    content_type = "text/x-shellscript"
-    content = <<-USERDATA
-    #!/bin/bash
-    set -euo pipefail
-
-    ${var.server-extra-bootstrap}
-    USERDATA
-  }
-
-  part {
-    # This script does two things:
-    #
-    # First, it determines if the instance on which it is running is a spot instance. We
-    # make this distinction in order to avoid scheduling drush (see cron.tf) on spot
-    # servers.
-    #
-    # Second, it sets up the configuration to join the ECS cluster:
+    # ECS options configured below:
     # 1. ECS_CLUSTER tells the ECS agent which cluster to join.
     # 2. ECS_AWSVPC_BLOCK_IMDS prevents containers from accessing the EC2 instance
     #    metadata service
@@ -55,44 +37,20 @@ data "template_cloudinit_config" "servers" {
     #    ECS, which prevents the OS from running low on memory due to over-allocation
     # 4. ECS_ENABLE_SPOT_INSTANCE_DRAINING tells the ECS agent to listen for spot instance
     #    termination events and begin draining during the two-minute termination window
-    # 5. ECS_INSTANCE_ATTRIBUTES is set to include our custom attribute type
     content_type = "text/x-shellscript"
     content      = <<-USERDATA
     #!/bin/bash
     set -euo pipefail
 
-    # Obtain identity document from the EC2 metadata service - this document contains
-    # both the instance's ID and the region in which it is launched
-    token="$(curl -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 30" http://169.254.169.254/latest/api/token)"
-    identity="$(curl -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/dynamic/instance-identity/document)"
-
-    # Read out the fields we're interested in - we need the region in order to pass it to
-    # the AWS CLI.
-    instance_id="$(jq -r .instanceId <<<"$identity")"
-    region="$(jq -r .region <<<"$identity")"
-
-    # We can't directly determine if an instance is spot or on-demand through the metadata
-    # service, but we can determine it by seeing if it's associated with a spot instance
-    # request (hence the query for the request ID)
-    spot_request="$(
-      aws --region "$region" ec2 describe-instances \
-        --instance-ids "$instance_id" \
-        --query 'Reservations[0].Instances[0].SpotInstanceRequestId'
-    )"
-
-    # A null request ID implies an on-demand instance
-    if test "$spot_request" == null; then
-      type="on-demand"
-    else
-      type="spot"
-    fi
+    # Run custom bootstrap script (if present)
+    ${var.server-extra-bootstrap}
 
     # Join the cluster (see comments above)
     cat <<EOF >> /etc/ecs/ecs.config
     ECS_CLUSTER=${var.cluster-name}
     ECS_AWSVPC_BLOCK_IMDS=true
     ECS_RESERVED_MEMORY=128
-    ECS_CONTAINER_ATTRIBUTES={"webcms.type":"$type"}
+    ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
     EOF
     USERDATA
   }
