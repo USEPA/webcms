@@ -769,8 +769,7 @@ $databases['default']['default'] = [
   'password' => getenv('WEBCMS_DB_PASS'),
   'driver' => 'mysql',
   'collation' => 'utf8mb4_general_ci',
-  // In ECS, the host 'mysql' resolves to an alias to the Aurora cluster
-  'host' => 'mysql',
+  'host' => getenv('WEBCMS_DB_HOST'),
   'port' => 3306,
 ];
 
@@ -793,9 +792,7 @@ $env_state = getenv('WEBCMS_ENV_STATE');
 if ($env_state === 'run') {
   $settings['redis.connection'] = [
     'interface' => 'Predis',
-    // Like the database above, the hostname 'redis' resolves to the ElastiCache
-    // cluster in production.
-    'host' => 'redis',
+    'host' => getenv('WEBCMS_CACHE_HOST'),
     'port' => 6379,
   ];
 

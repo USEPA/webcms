@@ -2,7 +2,7 @@ resource "aws_security_group" "interface" {
   name        = "webcms-interface-sg"
   description = "Security group for AWS interface endpoints"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   # Permissively allow ingress to VPC interface endpoints.
   # We allow this for a few reasons:
@@ -18,12 +18,12 @@ resource "aws_security_group" "interface" {
     protocol    = "tcp"
     from_port   = 0
     to_port     = 65535
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = [local.vpc-cidr-block]
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Interfaces"
+    Group = "webcms"
+    Name  = "WebCMS Interfaces"
   }
 }
 
@@ -31,7 +31,7 @@ resource "aws_security_group" "load_balancer" {
   name        = "webcms-alb-sg"
   description = "Security group for the WebCMS load balancers"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   # We allow port 80 in order to perform HTTP -> HTTPS redirection here instead of at the
   # app level.
@@ -54,8 +54,8 @@ resource "aws_security_group" "load_balancer" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Load Balancer"
+    Group = "webcms"
+    Name  = "WebCMS Load Balancer"
   }
 }
 
@@ -66,7 +66,7 @@ resource "aws_security_group" "server" {
   name        = "webcms-ec2-sg"
   description = "Security group for the WebCMS EC2 instances"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allow outgoing HTTP traffic"
@@ -96,16 +96,30 @@ resource "aws_security_group" "server" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Cluster Server"
+    Group = "webcms"
+    Name  = "WebCMS Cluster Server"
   }
+}
+
+resource "aws_security_group_rule" "server_extra_ingress" {
+  for_each = toset(var.server-security-ingress)
+
+  description       = "Allows ingress from security scanners to the ECS instances"
+  security_group_id = aws_security_group.server.id
+
+  type      = "ingress"
+  from_port = 0
+  to_port   = 65535
+  protocol  = "all"
+
+  source_security_group_id = each.value
 }
 
 resource "aws_security_group" "bastion" {
   name        = "webcms-bastion-sg"
   description = "Security group for SSH bastions"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allow access to VPC endpoint services"
@@ -143,30 +157,35 @@ resource "aws_security_group" "bastion" {
     prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
   }
 
-  ingress {
-    description = "SSH"
-
-    protocol    = "tcp"
-    from_port   = 22
-    to_port     = 22
-    cidr_blocks = ["52.72.16.231/32"]
-  }
-
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Bastion"
+    Group = "webcms"
+    Name  = "WebCMS Bastion"
   }
+}
+
+resource "aws_security_group_rule" "bastion_extra_ingress" {
+  for_each = toset(var.server-security-ingress)
+
+  description       = "Allows ingress from security scanners to the utility server"
+  security_group_id = aws_security_group.bastion.id
+
+  type      = "ingress"
+  from_port = 0
+  to_port   = 65535
+  protocol  = "all"
+
+  source_security_group_id = each.value
 }
 
 resource "aws_security_group" "database" {
   name        = "webcms-database-sg"
   description = "Security group for the RDS database"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS RDS"
+    Group = "webcms"
+    Name  = "WebCMS RDS"
   }
 }
 
@@ -177,7 +196,7 @@ resource "aws_security_group" "database_access" {
   name        = "webcms-database-access-sg"
   description = "Security group for access to database servers"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allows outgoing connections to MySQL"
@@ -189,8 +208,8 @@ resource "aws_security_group" "database_access" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS DB Access"
+    Group = "webcms"
+    Name  = "WebCMS DB Access"
   }
 }
 
@@ -215,7 +234,7 @@ resource "aws_security_group" "drupal_task" {
   name        = "webcms-drupal-sg"
   description = "Security group for the WebCMS Drupal container tasks"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allow outgoing HTTP traffic"
@@ -247,15 +266,15 @@ resource "aws_security_group" "drupal_task" {
   egress {
     description = "Allow access SMTP servers for email"
 
-    protocol = "tcp"
-    from_port = 587
-    to_port = 587
+    protocol    = "tcp"
+    from_port   = 587
+    to_port     = 587
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Drupal Containers"
+    Group = "webcms"
+    Name  = "WebCMS Drupal Containers"
   }
 }
 
@@ -290,11 +309,11 @@ resource "aws_security_group" "cache" {
   name        = "webcms-cache-sg"
   description = "Security group for ElastiCache servers"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS ElastiCache"
+    Group = "webcms"
+    Name  = "WebCMS ElastiCache"
   }
 }
 
@@ -302,7 +321,7 @@ resource "aws_security_group" "cache_access" {
   name        = "webcms-cache-access-sg"
   description = "Security group for access to ElastiCache"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allow outgoing connections to ElastiCache"
@@ -331,11 +350,11 @@ resource "aws_security_group" "search" {
   name        = "webcms-search-sg"
   description = "Security group for search servers"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch"
   }
 }
 
@@ -343,7 +362,7 @@ resource "aws_security_group" "search_access" {
   name        = "webcms-search-access-sg"
   description = "Security group for access to search servers"
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   egress {
     description = "Allow access to Elasticsearch"
@@ -355,8 +374,8 @@ resource "aws_security_group" "search_access" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch Access"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch Access"
   }
 }
 

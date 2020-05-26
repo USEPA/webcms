@@ -22,7 +22,7 @@ resource "aws_iam_role" "ecs_cluster_role" {
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -124,7 +124,7 @@ resource "aws_iam_role" "ec2_server_role" {
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -167,29 +167,6 @@ resource "aws_iam_role_policy" "ec2_instance_cluster" {
   policy = data.aws_iam_policy_document.ec2_instance_profile.json
 }
 
-# This policy is used by container instances on start-up to assign attributes to
-# themselves based on whether or not they're spot instances so that we can avoid running
-# Drush on the more volatile spot instances.
-data "aws_iam_policy_document" "ec2_attributes" {
-  version = "2012-10-17"
-
-  # EC2 instance metadata doesn't inform us if our instance is spot or on-demand, so we
-  # use the EC2 API to describe instances. Even though we can't limit this in the policy,
-  # the instance bootstrap (see servers.tf) hook will only ever use its own instance ID.
-  statement {
-    sid       = "allowInstanceRead"
-    effect    = "Allow"
-    actions   = ["ec2:DescribeInstances"]
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_role_policy" "ec2_attributes" {
-  name   = "WebCMSInstanceAttributesPolicy"
-  role   = aws_iam_role.ec2_server_role.name
-  policy = data.aws_iam_policy_document.ec2_attributes.json
-}
-
 resource "aws_iam_role_policy_attachment" "ec2_instance_cluster" {
   role       = aws_iam_role.ec2_server_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
@@ -214,6 +191,13 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm_s3" {
 resource "aws_iam_role_policy_attachment" "ec2_ssm_session" {
   role       = aws_iam_role.ec2_server_role.name
   policy_arn = aws_iam_policy.ssm_session_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_extra_policies" {
+  for_each = toset(var.server-extra-policies)
+
+  role       = aws_iam_role.ec2_server_role.name
+  policy_arn = each.value
 }
 
 resource "aws_iam_instance_profile" "ec2_servers" {
@@ -247,7 +231,7 @@ resource "aws_iam_role" "drupal_container_role" {
   assume_role_policy = data.aws_iam_policy_document.drupal_assume_role_policy.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -382,7 +366,7 @@ resource "aws_iam_role" "drupal_execution_role" {
   assume_role_policy = data.aws_iam_policy_document.drupal_execution_assume_role.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -420,7 +404,7 @@ resource "aws_iam_role" "bastion_role" {
   assume_role_policy = data.aws_iam_policy_document.bastion_assume.json
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -576,4 +560,30 @@ resource "aws_iam_policy" "user_ssm_policy" {
   name        = "WebCMSUserAccessPolicyForSSM"
   description = "Grants Session Manager access for users"
   policy      = data.aws_iam_policy_document.user_ssm_policy.json
+}
+
+resource "aws_iam_group" "webcms_administrators" {
+  name = "WebCMSAdministrators"
+}
+
+resource "aws_iam_user" "webcms_admin" {
+  name = "WebCMSAdmin"
+
+  tags = {
+    Group = "webcms"
+  }
+}
+
+resource "aws_iam_group_membership" "webcms_administrators_admin" {
+  name  = "WebCMSAdminGroupMembership"
+  group = aws_iam_group.webcms_administrators.name
+
+  users = [
+    aws_iam_user.webcms_admin.name
+  ]
+}
+
+resource "aws_iam_group_policy_attachment" "webcms_administrators" {
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.user_ssm_policy.arn
 }

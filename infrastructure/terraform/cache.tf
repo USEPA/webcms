@@ -26,4 +26,8 @@ resource "aws_elasticache_replication_group" "cache" {
     num_node_groups         = 1
     replicas_per_node_group = var.cache-replica-count
   }
+
+  tags = {
+    Group = "webcms"
+  }
 }

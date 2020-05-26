@@ -16,14 +16,16 @@ locals {
     # DB values
     { name = "WEBCMS_DB_USER", value = local.database-user },
     { name = "WEBCMS_DB_NAME", value = local.database-name },
+    { name = "WEBCMS_DB_HOST", value = aws_rds_cluster.db.endpoint },
 
     # Mail
     { name = "WEBCMS_MAIL_USER", value = var.email-auth-user },
     { name = "WEBCMS_MAIL_FROM", value = var.email-from },
     { name = "WEBCMS_MAIL_HOST", value = var.email-host },
 
-    # Injected host names
+    # Injected host names - since we might share a VPC, we can no longer rely on
     { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443/" },
+    { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_replication_group.cache.configuration_endpoint_address },
   ]
 
   # Secrets Manager bindings for Drupal containers
