@@ -134,52 +134,30 @@ process:
     -
       plugin: get
       source: field_description
-  _para_field_applicants_or_respondents:
-    -
-      plugin: flatten
-      source: field_applicants_or_respondents
-    -
-      plugin: array_shift
-    -
-      plugin: skip_on_empty_array
-      method: process
-    -
-      plugin: migration_lookup
-      migration: upgrade_d7_paragraph_applicants_or_respondents
   field_applicants_or_respondents:
     -
-      plugin: skip_on_empty_array
-      method: process
-      source:
-        - '@_para_field_applicants_or_respondents'
+      plugin: single_value
+      source: field_applicants_or_respondents
+    -
+      plugin: epa_lookup_paragraphs
+      migration: upgrade_d7_paragraph_applicants_or_respondents
     -
       plugin: sub_process
       process:
-        target_id: '0'
-        target_revision_id: '1'
-  _para_field_docket_numbers:
-    -
-      plugin: flatten
-      source: field_docket_collection
-    -
-      plugin: array_shift
-    -
-      plugin: skip_on_empty_array
-      method: process
-    -
-      plugin: migration_lookup
-      migration: upgrade_d7_paragraph_docket
+        target_id: 'destid1'
+        target_revision_id: 'destid2'
   field_docket_numbers:
     -
-      plugin: skip_on_empty_array
-      method: process
-      source:
-        - '@_para_field_docket_numbers'
+      plugin: single_value
+      source: field_docket_collection
+    -
+      plugin: epa_lookup_paragraphs
+      migration: upgrade_d7_paragraph_docket
     -
       plugin: sub_process
       process:
-        target_id: '0'
-        target_revision_id: '1'
+        target_id: 'destid1'
+        target_revision_id: 'destid2'
   field_env_laws_regs_and_treaties:
     -
       plugin: sub_process
@@ -198,29 +176,18 @@ process:
           source: value
           from_timezone: 'America/New_York'
           to_timezone: 'UTC'
-  _para_field_federal_register_citations:
-    -
-      plugin: flatten
-      source: field_frc_collection
-    -
-      plugin: array_shift
-    -
-      plugin: skip_on_empty_array
-      method: process
-    -
-      plugin: migration_lookup
-      migration: upgrade_d7_paragraph_frc
   field_federal_register_citations:
     -
-      plugin: skip_on_empty_array
-      method: process
-      source:
-        - '@_para_field_federal_register_citations'
+      plugin: single_value
+      source: field_frc_collection
+    -
+      plugin: epa_lookup_paragraphs
+      migration: upgrade_d7_paragraph_frc
     -
       plugin: sub_process
       process:
-        target_id: '0'
-        target_revision_id: '1'
+        target_id: 'destid1'
+        target_revision_id: 'destid2'
   field_geographic_locations:
     -
       plugin: sub_process
@@ -249,18 +216,19 @@ process:
       plugin: array_shift
     -
       plugin: migration_lookup
-      migration: upgrade_d7_paragraph_locations_of_prop_actions
+      migration:
   field_locations_of_prop_actions:
     -
-      plugin: skip_on_empty_array
-      method: process
-      source:
-        - '@_para_field_locations_of_prop_actions'
+      plugin: single_value
+      source: field_location_of_prop_action
+    -
+      plugin: epa_lookup_paragraphs
+      migration: upgrade_d7_paragraph_locations_of_prop_actions
     -
       plugin: sub_process
       process:
-        target_id: '0'
-        target_revision_id: '1'
+        target_id: 'destid1'
+        target_revision_id: 'destid2'
   field_machine_name:
     -
       plugin: get
