@@ -1,7 +1,7 @@
 ---
 el: .teaser--frequent-question
 title: Frequent Question Teaser
-state: inreview
+state: complete
 ---
 
 __Variables:__

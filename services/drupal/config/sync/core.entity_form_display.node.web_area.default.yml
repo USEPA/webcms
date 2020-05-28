@@ -22,11 +22,11 @@ dependencies:
     - node.type.web_area
     - workflows.workflow.epa_default
   module:
+    - content_moderation
     - datetime
     - field_group
     - paragraphs
     - shs
-    - workflow_buttons
 third_party_settings:
   field_group:
     group_metadata:
@@ -214,12 +214,11 @@ content:
     type: options_select
     region: content
   moderation_state:
-    type: workflow_buttons
-    weight: 10
-    settings:
-      show_current_state: '1'
-    region: content
+    weight: 50
+    settings: {  }
     third_party_settings: {  }
+    type: moderation_state_default
+    region: content
   promote:
     type: boolean_checkbox
     settings:

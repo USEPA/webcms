@@ -107,7 +107,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
         foreach ($scheduledFields as $scheduledField) {
           // We need to process both the latest and current revisions since
           // either one could have relevant transitions scheduled.
-          foreach (['latestRevision','currentRevision'] as $revisionLimiter) {
+          foreach (['latestRevision', 'currentRevision'] as $revisionLimiter) {
             $query = $this->entityTypeManager->getStorage($entityType)
               ->getQuery('AND');
             $query->condition($entityType === 'media' ? 'bundle' : 'type', $bundleName);
@@ -206,30 +206,10 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @todo Use a better key.
    */
   private function updateEntity(ContentEntityBase $entity, string $moderationState, string $scheduledPublishField, $scheduledValue): void {
-    $resave = FALSE;
-    $storage = $this->entityTypeManager->getStorage('node');
-    $revision_ids = $storage->revisionIds($entity);
-    $last_revision_id = end($revision_ids);
-    $last_revision = $storage->loadRevision($last_revision_id);
-    if ($entity->getLoadedRevisionId() != $last_revision_id) {
-      $resave = TRUE;
-    }
-
     $entity->set($scheduledPublishField, $scheduledValue);
     $entity->set('moderation_state', $moderationState);
     $entity->set('epa_revision_automated', 1);
-
     $entity->save();
-
-    if ($resave) {
-      // If the current revision is not the latest, we have a forward revision and
-      // we need to leap frog it to the front so the user doesn't get confused.
-      $last_revision->setNewRevision();
-      $last_revision->isDefaultRevision(FALSE);
-      $last_revision->setRevisionCreationTime($this->dateTime->getRequestTime());
-      $last_revision->setChangedTime($this->dateTime->getRequestTime());
-      $last_revision->save();
-    }
   }
 
 }

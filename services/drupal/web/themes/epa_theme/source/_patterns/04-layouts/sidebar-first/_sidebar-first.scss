@@ -1,0 +1,28 @@
+// @file
+// Styles for the Sidebar First Layout.
+
+.l-sidebar-first {
+  @include breakpoint(gesso-breakpoint(sidebar)) {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}
+
+.l-sidebar-first__main {
+  flex-grow: 1;
+
+  @include breakpoint(gesso-breakpoint(sidebar)) {
+    max-width: calc(75% - #{rem(gesso-get-map(gutter-width))});
+  }
+}
+
+.l-sidebar-first__sidebar {
+  flex-shrink: 0;
+  margin-right: 2 * rem(gesso-get-map(gutter-width));
+
+  @include breakpoint(gesso-breakpoint(sidebar)) {
+    margin-left: rem(gesso-get-map(gutter-width));
+    margin-right: 0;
+    width: 25%;
+  }
+}

@@ -4,6 +4,7 @@ namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**

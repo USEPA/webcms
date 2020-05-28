@@ -2,6 +2,25 @@
   'class': ['article']
 } %}
 
+{% set body_content %}
+  {% if sidebar %}
+    {% embed '@layouts/sidebar/sidebar.twig' with {
+      modifier_classes: '',
+      has_sidebar: true,
+    } %}
+      {% block main_content %}
+        {{ body }}
+      {% endblock %}
+
+      {% block sidebar %}
+        {{ sidebar }}
+      {% endblock %}
+    {% endembed %}
+  {% else %}
+    {{ body }}
+  {% endif %}
+{% endset %}
+
 <article {{ add_attributes(additional_attributes) }}>
   {% block title %}
     {% include '@components/page-title/page-title.twig' with {
@@ -35,6 +54,6 @@
   {% endblock %}
 
   {% block content %}
-    {{ body }}
+    {{ body_content }}
   {% endblock %}
 </article>

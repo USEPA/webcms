@@ -32,7 +32,7 @@ resource "aws_elasticsearch_domain" "es" {
     security_group_ids = [aws_security_group.search.id]
 
     # We have to shorten the list of subnets here if we have a single instance
-    subnet_ids         = slice(
+    subnet_ids = slice(
       aws_subnet.private.*.id,
       0,
       min(length(aws_subnet.private), var.search-instance-count)
@@ -45,8 +45,8 @@ resource "aws_elasticsearch_domain" "es" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Elasticsearch"
+    Group = "webcms"
+    Name  = "WebCMS Elasticsearch"
   }
 
   depends_on = [

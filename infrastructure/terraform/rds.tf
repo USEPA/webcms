@@ -4,7 +4,7 @@ resource "aws_db_subnet_group" "default" {
   subnet_ids = aws_subnet.private.*.id
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -36,8 +36,8 @@ resource "aws_rds_cluster" "db" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS DB"
+    Group = "webcms"
+    Name  = "WebCMS DB"
   }
 
   # Ignore changes to the master password since it's stored in the Terraform state.
