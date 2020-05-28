@@ -5,15 +5,17 @@ import Drupal from 'drupal';
 import { tns } from 'tiny-slider/src/tiny-slider';
 
 (function(Drupal) {
-  Drupal.behaviors.gallery = {
+  Drupal.behaviors.imageGallery = {
     attach(context) {
-      const sliders = context.querySelectorAll('.js-slideshow');
+      const sliders = context.querySelectorAll('.js-image-gallery');
       sliders.forEach(slider =>
         tns({
-          container: slider.querySelector('.js-slideshow__container'),
-          controlsContainer: slider.querySelector('.js-slideshow__controls'),
+          container: slider.querySelector('.js-image-gallery__container'),
+          controlsContainer: slider.querySelector(
+            '.js-image-gallery__controls'
+          ),
           gutter: 16,
-          navContainer: slider.querySelector('.js-slideshow__nav'),
+          navContainer: slider.querySelector('.js-image-gallery__nav'),
           preventScrollOnTouch: 'auto',
         })
       );
