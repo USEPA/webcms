@@ -8,8 +8,8 @@ import { tns } from 'tiny-slider/src/tiny-slider';
   Drupal.behaviors.heroSlideshow = {
     attach(context) {
       const sliders = context.querySelectorAll('.js-hero-slideshow');
-      sliders.forEach(slider =>
-        tns({
+      sliders.forEach(slider => {
+        const sliderObject = tns({
           autoplay: true,
           autoplayButtonOutput: false,
           autoplayHoverPause: true,
@@ -20,8 +20,16 @@ import { tns } from 'tiny-slider/src/tiny-slider';
           navContainer: slider.querySelector('.js-hero-slideshow__nav'),
           preventScrollOnTouch: 'auto',
           speed: 500,
-        })
-      );
+        });
+
+        // Stop autoplay after it has looped once through all slides.
+        sliderObject.events.on('transitionEnd', function() {
+          const sliderInfo = sliderObject.getInfo();
+          if (sliderInfo.displayIndex === 1) {
+            sliderObject.pause();
+          }
+        });
+      });
     },
   };
 })(Drupal);
