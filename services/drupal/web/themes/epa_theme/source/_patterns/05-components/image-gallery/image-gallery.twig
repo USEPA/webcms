@@ -1,6 +1,6 @@
 {% set classes = [
   'image-gallery',
-  'js-slideshow',
+  'js-image-gallery',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
@@ -8,7 +8,7 @@
   {% if title %}
     <div class="image-gallery__title">{{ title }}</div>
   {% endif %}
-  <div class="image-gallery__controls js-slideshow__controls">
+  <div class="image-gallery__controls js-image-gallery__controls">
     <button class="image-gallery__prev" aria-label="{{ 'Previous Image'|t }}">
       {%- include '@components/icon/icon.twig' with {
         'modifier_classes': 'icon--image-gallery-control',
@@ -24,12 +24,12 @@
       } -%}
     </button>
   </div>
-  <div class="image-gallery__nav js-slideshow__nav">
+  <div class="image-gallery__nav js-image-gallery__nav">
     {%- for image in images -%}
       <button class="image-gallery__nav-button"></button>
     {%- endfor -%}
   </div>
-  <ul class="image-gallery__list js-slideshow__container">
+  <ul class="image-gallery__list js-image-gallery__container">
     {% for image in images %}
       <li class="image-gallery__item">
         {% include '@components/figure/figure.twig' with {
