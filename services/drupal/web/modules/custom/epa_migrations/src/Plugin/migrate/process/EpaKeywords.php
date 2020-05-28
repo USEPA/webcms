@@ -102,24 +102,24 @@ class EpaKeywords extends ProcessPluginBase implements ContainerFactoryPluginInt
       $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
 
       foreach ($tids as $tid) {
-        // Check if this term has already been migrated.
-        $existing_term = $term_storage->load($tid);
+        // Find the object for this term.
+        $term_data = array_filter($all_term_data, function ($term_object) use ($tid) {
+          return $term_object->tid === $tid;
+        });
 
-        if ($existing_term) {
-          // Add this term id to our return array and we're done.
-          $return_ids[] = $tid;
-        }
-        else {
-          // Find the object for this term.
-          $term_data = array_filter($all_term_data, function ($term_object) use ($tid) {
-            return $term_object->tid === $tid;
-          });
+        $term_data = array_pop($term_data);
 
-          $term_data = array_pop($term_data);
+        // Ensure the this term is a member of the vids to consolidate.
+        if (in_array($term_data->vid, $vids_to_migrate)) {
 
-          // Ensure the this term is a member of the vids to consolidate.
-          if (in_array($term_data->vid, $vids_to_migrate)) {
+          // Check if this term has already been migrated.
+          $existing_term = $term_storage->load($tid);
 
+          if ($existing_term) {
+            // Add this term id to our return array and we're done.
+            $return_ids[] = $tid;
+          }
+          else {
             // Build the hierarchy for this term.
             $ancestors = $this->getTidAncestors($tid);
 
