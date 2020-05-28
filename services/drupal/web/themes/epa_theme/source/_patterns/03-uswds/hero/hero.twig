@@ -6,12 +6,15 @@
 <section class="{{ classes }}" style="background-image:url({{ background_image }})">
   <div class="grid-container">
     <div class="usa-hero__callout">
-      <h1 class="usa-hero__heading">
+      <{{ title_element }} class="usa-hero__heading">
         {% if callout %}
           <span class="usa-hero__heading--alt">{{ callout }}</span>
         {% endif %}
         {{ title }}
-      </h1>
+      </{{ title_element }}>
+      {% if content %}
+        {{ content }}
+      {% endif %}
       {% if paragraph %}
         <p>{{ paragraph }}</p>
       {% endif %}
