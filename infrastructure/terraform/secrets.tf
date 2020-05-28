@@ -20,7 +20,7 @@ resource "aws_secretsmanager_secret" "db_root_password" {
   description = "Password for the WebCMS DB administrator"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_secretsmanager_secret" "db_app_password" {
   description = "Password for the WebCMS DB user"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_secretsmanager_secret" "hash_salt" {
   description = "Drupal hash salt"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -47,6 +47,6 @@ resource "aws_secretsmanager_secret" "mail_pass" {
   description = "Password for SMTP auth"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }

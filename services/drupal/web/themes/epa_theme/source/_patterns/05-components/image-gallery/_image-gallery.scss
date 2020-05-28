@@ -1,0 +1,90 @@
+// @file
+// Styles for an Image Gallery.
+
+@import 'tiny-slider';
+
+$button-size: 44px;
+
+.image-gallery {
+  margin-bottom: rem(units(3));
+  max-width: rem(320px + $button-size * 2);
+  padding: 0 rem($button-size);
+  position: relative;
+}
+
+.image-gallery__title {
+  @extend %h3;
+  position: relative;
+  z-index: 1;
+}
+
+.image-gallery__list {
+  @include list-clean();
+}
+
+.image-gallery__nav {
+  line-height: 0;
+  padding-bottom: rem(gesso-spacing('05'));
+  position: relative;
+  z-index: 1;
+}
+
+.image-gallery__nav-button {
+  background: gesso-brand(blue, light-1);
+  border: 0;
+  border-radius: 50%;
+  height: rem(gesso-spacing(1));
+  margin-right: rem(gesso-spacing(1));
+  padding: 0;
+  width: rem(gesso-spacing(1));
+
+  &.tns-nav-active {
+    background-color: gesso-brand(blue, light);
+  }
+}
+
+.image-gallery__controls {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  &:focus {
+    outline-offset: 2px;
+  }
+
+  &:focus-within {
+    @include focus-outline();
+  }
+}
+
+%image-gallery__button {
+  background: gesso-grayscale(white);
+  border: 0;
+  bottom: 0;
+  box-shadow: 0;
+  color: gesso-brand(blue, base);
+  font-size: rem(gesso-spacing(4));
+  padding: 0;
+  position: absolute;
+  top: 0;
+  width: rem($button-size);
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: gesso-brand(blue, dark);
+    outline: 0 !important;
+  }
+}
+
+.image-gallery__prev {
+  @extend %image-gallery__button;
+  left: 0;
+}
+
+.image-gallery__next {
+  @extend %image-gallery__button;
+  right: 0;
+}

@@ -1,0 +1,48 @@
+{% embed '@layouts/detail-header/detail-header.twig' %}
+  {% block info %}
+    {{ header_info }}
+  {% endblock %}
+
+  {% block contact %}
+    {{ contact_link }}
+  {% endblock %}
+{% endembed %}
+
+{% include '@components/page-title/page-title.twig' with {
+  'page_title': title
+} %}
+
+{% block messages %}
+  {{ messages }}
+{% endblock %}
+
+{% block local_tasks %}
+  {{ tasks }}
+{% endblock %}
+
+{% block intro %}
+  {{ intro }}
+{% endblock %}
+
+{% block search %}
+  {{ search }}
+{% endblock %}
+
+{% embed '@layouts/sidebar-first/sidebar-first.twig' with {
+  'modifier_classes': 'l-sidebar-first--reversed',
+} %}
+  {% block main_content %}
+    {{ filters }}
+    {{ body }}
+  {% endblock %}
+
+  {% block sidebar %}
+    {{ sidebar }}
+  {% endblock %}
+{% endembed %}
+
+{% embed '@layouts/detail-footer/detail-footer.twig' %}
+  {% block content %}
+    {{ footer }}
+  {% endblock %}
+{% endembed %}

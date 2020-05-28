@@ -1,31 +1,38 @@
 data "aws_availability_zones" "available" {}
 
+# Conditionally create a VPC if there isn't an existing one provided
 resource "aws_vpc" "main" {
+  count = var.vpc-existing-vpc == null ? 1 : 0
+
   cidr_block = "10.0.0.0/16"
 
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS VPC"
+    Group = "webcms"
+    Name  = "WebCMS VPC"
   }
 }
 
-# Enable private DNS (see dns.tf)
-resource "aws_vpc_dhcp_options" "main" {
-  domain_name         = "epa.local"
-  domain_name_servers = ["AmazonProvidedDNS"]
+# If there was an existing VPC provided, read out its properties
+data "aws_vpc" "existing" {
+  count = var.vpc-existing-vpc != null ? 1 : 0
 
-  tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS DHCP"
-  }
+  id = var.vpc-existing-vpc
 }
 
-resource "aws_vpc_dhcp_options_association" "main" {
-  vpc_id          = aws_vpc.main.id
-  dhcp_options_id = aws_vpc_dhcp_options.main.id
+locals {
+  # ID of the VPC in use - used to avoid copying/pasting this expression over and over again
+  vpc-id = length(aws_vpc.main) == 1 ? aws_vpc.main[0].id : data.aws_vpc.existing[0].id
+
+  # Save the local VPC's CIDR block (see security.tf for how this is used)
+  vpc-cidr-block = length(aws_vpc.main) == 1 ? aws_vpc.main[0].cidr_block : data.aws_vpc.existing[0].cidr_block
+
+  # This is the CIDR range used for subnetting: if there is an explicit vpc-subnet-block
+  # variable, we use that - but fall back to the VPC's full CIDR block if it's not
+  # present.
+  vpc-subnet-block = var.vpc-subnet-block != null ? var.vpc-subnet-block : local.vpc-cidr-block
 }
 
 # Create one public subnet for each availability zone that this VPC spans. Anything
@@ -34,14 +41,14 @@ resource "aws_vpc_dhcp_options_association" "main" {
 resource "aws_subnet" "public" {
   count = var.vpc-az-count
 
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index)
+  cidr_block              = cidrsubnet(local.vpc-subnet-block, var.vpc-subnet-bits, count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = local.vpc-id
   map_public_ip_on_launch = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Public ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Public ${count.index}"
   }
 }
 
@@ -51,38 +58,46 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   count = var.vpc-az-count
 
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, 8, count.index + 128)
+  cidr_block              = cidrsubnet(local.vpc-subnet-block, var.vpc-subnet-bits, count.index + var.vpc-subnet-offset)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = local.vpc-id
   map_public_ip_on_launch = false
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Private ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Private ${count.index}"
   }
 }
 
+# As with VPCs, we create a new internet gateway if one hasn't been provided.
 resource "aws_internet_gateway" "gateway" {
-  vpc_id = aws_vpc.main.id
+  count = var.vpc-existing-gateway == null ? 1 : 0
+
+  vpc_id = local.vpc-id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Gateway"
+    Group = "webcms"
+    Name  = "WebCMS Gateway"
   }
+}
+
+locals {
+  # As with the vpc-id local, save this here to avoid needless repetition
+  gateway-id = length(aws_internet_gateway.gateway) == 1 ? aws_internet_gateway.gateway[0].id : var.vpc-existing-gateway
 }
 
 # We only need one route table since there is only a single internet gateway
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.gateway.id
+    gateway_id = local.gateway-id
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Public Routes"
+    Group = "webcms"
+    Name  = "WebCMS Public Routes"
   }
 }
 
@@ -99,8 +114,8 @@ resource "aws_eip" "ip" {
   vpc = true
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS EIP ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS EIP ${count.index}"
   }
 }
 
@@ -111,8 +126,8 @@ resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.ip[count.index].id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Nat ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Nat ${count.index}"
   }
 }
 
@@ -121,7 +136,7 @@ resource "aws_nat_gateway" "nat" {
 resource "aws_route_table" "private" {
   count = var.vpc-az-count
 
-  vpc_id = aws_vpc.main.id
+  vpc_id = local.vpc-id
 
   route {
     cidr_block     = "0.0.0.0/0"
@@ -129,8 +144,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Private Routes ${count.index}"
+    Group = "webcms"
+    Name  = "WebCMS Private Routes ${count.index}"
   }
 }
 
@@ -147,7 +162,7 @@ data "aws_vpc_endpoint_service" "s3" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id            = aws_vpc.main.id
+  vpc_id            = local.vpc-id
   service_name      = data.aws_vpc_endpoint_service.s3.service_name
   vpc_endpoint_type = "Gateway"
 
@@ -167,8 +182,8 @@ resource "aws_vpc_endpoint" "s3" {
   })
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS S3 Gateway"
+    Group = "webcms"
+    Name  = "WebCMS S3 Gateway"
   }
 }
 
@@ -186,7 +201,7 @@ data "aws_vpc_endpoint_service" "ssm" {
 resource "aws_vpc_endpoint" "ssm" {
   for_each = toset(local.ssm-endpoints)
 
-  vpc_id              = aws_vpc.main.id
+  vpc_id              = local.vpc-id
   service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
@@ -194,7 +209,7 @@ resource "aws_vpc_endpoint" "ssm" {
   subnet_ids          = aws_subnet.private.*.id
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS SSM Interface: ${each.value}"
+    Group = "webcms"
+    Name  = "WebCMS SSM Interface: ${each.value}"
   }
 }

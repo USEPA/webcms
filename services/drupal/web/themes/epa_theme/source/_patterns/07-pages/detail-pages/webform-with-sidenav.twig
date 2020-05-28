@@ -1,0 +1,119 @@
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Enforcement',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set content %}
+  <p><a href="#">Frequent Questions about Enforcement.</a></p>
+  <h2>Ask a Question or Report a Web Site Problem</h2>
+  <ul>
+    <li>Have a question or a comment?</li>
+    <li>Found a broken link? Unable to access a database? Need other technical assistance on our site?</li>
+    <li>Then <a href="#">Ask a Question or Report a Problem with Our Site</a></li>
+  </ul>
+  <h2>Report Environmental Violations</h2>
+  <ul>
+    <li><a href="#">Report what appears to you as a possible violation of environmental laws and regulations</a>. Information you submit will be forwarded to EPA environmental enforcement personnel or to the appropriate regulatory authority.</li>
+    <li><a href="#">What <strong>NOT</strong> to report to EPA</a> Often, it is most appropriate to contact your local (city or county) or state environmental or health agency rather than EPA.</li>
+  </ul>
+  <h3>Regional (local)<h3>
+  <h4 id="criminal">Criminal Enforcement</h4>
+  <ul>
+    <li><a href="#">Criminal Enforcement Area and Resident Offices</a></li>
+    <li><a href="#">National Enforcement Investigations Center</a></li>
+  </ul>
+  <h4 id="federal">Federal Facilities</h4>
+  <ul>
+    <li><a href="#">Regional Federal Facility Contacts</a></li>
+  </ul>
+  <h3>Headquarters</h3>
+  <h4>Contacts by Topic:</h4>
+  <table summary="Contacts for headquarters offices by topic">
+    <thead>
+      <tr>
+        <th scope="col">Topic</th>
+        <th scope="col">Responsible Office</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Mail Code</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Civil Enforcement<br>(Air, Water, Waste, Chemical)</td>
+        <td><a href="#">Office of Civil Enforcement</a></td>
+        <td>202-564-2220</td>
+        <td>2271A</td>
+      </tr>
+      <tr>
+        <td>Cleanup Enforcement</td>
+        <td><a href="#">Office of Site Remediation and Enforcement</a></td>
+        <td>202-564-5110</td>
+        <td>2248A</td>
+      </tr>
+      <tr>
+        <td>Criminal Enforcement</td>
+        <td><a href="#">Office of Criminal Enforcement, Forensics and Training</a></td>
+        <td>202-564-2480</td>
+        <td>2231A</td>
+      </tr>
+      <tr>
+        <td>Federal Facilities</td>
+        <td><a href="#">Federal Facilities Enforcement Office</a></td>
+        <td>202-564-2510</td>
+        <td>2261A</td>
+      </tr>
+    </tbody>
+  </table>
+  {% include '@components/field/field.twig' with {
+    'label': 'Mailing Address',
+    'label_element': 'div',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': '<address>US EPA<br>Office of Enforcement and Compliance Assurance (OECA)<br>(Office mail code)<br>1200 Pennsylvania Ave<br>Washington, DC. 20460</address>',
+        },
+    ],
+  } %}
+{% endset %}
+
+{% set sidebar %}
+  {% include '@components/box/box--report-violation/box--report-violation.twig' with {
+    'title': {
+      'tag': 'div',
+      'text': 'Report a Violation',
+      'url': '#',
+    },
+    'img': false,
+    'content': '<p>Report possible violations of environmental laws and regulations.</p>',
+  } %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'title': {
+      'tag': 'div',
+      'text': 'Hotlines and Service Lines',
+    },
+    'img': false,
+    'content': '<ul><li><a href="#">Specific Topics</a></li><li><a href="#">Region-specific Customer Service Lines</a></li></ul>',
+  } %}
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'title': page_title,
+    'body': content,
+    'sidebar': sidebar,
+    'has_sidenav': has_sidenav,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}

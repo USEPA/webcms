@@ -1,0 +1,159 @@
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Frequent Questions',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set search %}
+  <form class="margin-y-3">
+    <div class="form-item form-item--textfield is-inline">
+      <label class="form-item__label u-visually-hidden" for="listing-search">
+        Search
+      </label>
+      <input class="form-item__text" id="listing-search" type="text" size="30" maxlength="128">
+    </div>
+    <button class="button">Search</button>
+  </form>
+{% endset %}
+
+{% set sidebar %}
+  <h2 class="h3">Filter By:</h2>
+  {% include '@uswds/accordion/accordion.twig' with {
+    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
+    'is_multi_selectable': true,
+    'accordion_id': 'facets',
+    'accordion': [
+      {
+        'title': 'Topic',
+        'is_expanded': false,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet is-active" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Fuel Program <span class="facet__count">804<span class="u-visually-hidden"> items</span></span></span></a><ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Reformulated Gasoline and Anti-Dumping <span class="facet__count">432<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Diesel Sulfur Program <span class="facet__count">117<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Renewable Fuel Standard (RFS2) <span class="facet__count">111<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Renewable Fuel Standard (RFS1) <span class="facet__count">67<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Reporting <span class="facet__count">22<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Registration and Reporting under 40 CFR 79 <span class="facet__count">19<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Gasoline Sulfur Program <span class="facet__count">17<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Registration <span class="facet__count">9<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Other <span class="facet__count">6<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Fuels and Fuel Additives (FFARs) <span class="facet__count">2<span class="u-visually-hidden"> items</span></span></span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">E15 Comments <span class="facet__count">1<span class="u-visually-hidden"> items</span></span></span></a></li></ul></li></ul>',
+      },
+      {
+        'title': 'Web Area',
+        'is_expanded': false,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use xlink:href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Fuels Registration, Reporting, and Compliance Help<span class="facet__count">804<span class="u-visually-hidden"> items</span></span></span></a></li></ul>',
+      },
+    ]
+  } %}
+{% endset %}
+
+{% set filters %}
+  {% include '@components/filters/filters.twig' with {
+    'show_filters': true,
+    'list': [
+      {
+        'url': '#',
+        'text': 'Fuel Program',
+      },
+    ]
+  } %}
+  <p class="h5 margin-bottom-5">Displaying 76-90 of 804 results</p>
+{% endset %}
+
+{% set body %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If a large refinery spins off a small refinery how long does the small refiner have to apply for the small refiner status?',
+    'date': 'August 21, 2019',
+    'summary': '<p>The dates to apply for small refiner status were specified in both rulemakings, and&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If a pipeline does not have sufficient storage capacity for all grades of ULSD and exempted product, will the pipeline be allowed to blend at the terminal to prevent outages?',
+    'date': 'August 21, 2019',
+    'summary': '<p>Yes, pipelines/terminals may blend different grades of fuel subject to the anti-downgrading limitations on highway ULSD and&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If a pipeline or terminal has test results indicating that motor vehicle diesel fuel sulfur content is 15 ppm and EPA tests show the sulfur content is greater than 18 ppm, would the pipeline’s tests be an acceptable defense, or would the EPA’s test results prevail?',
+    'date': 'August 21, 2019',
+    'summary': '<p>EPA would treat this as a violation.</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If a terminal imports off-spec kerosene (higher than 15 ppm), terminal operators are planning to blend the kerosene with diesel fuel so that the ultimate diesel fuel leaving the terminal gate and entering into commerce meets the 15 ppm standard. Would EPA please confirm that this process is permissible for an importer?',
+    'date': 'August 21, 2019',
+    'summary': '<p>The regulations at § 80.525(d) state that kerosene&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If an entity, for a facility (as those terms are defined in 40 C.F.R. § 80.502), chooses a single registration number for its refinery, pipeline, and terminal (thus creating an ‘aggregated facility’), does this mean that in the event of finding product in violation of the diesel fuel regulations, only the registered entity will be subject to civil penalty, and not all 3 portions of the system separately?',
+    'date': 'August 21, 2019',
+    'summary': '<p>It is dependent on the type of violation&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If tests are done upon receipt from the pipeline, how will PTDs reflect sulfur contamination added by the terminal through common piping, manifolds or at the rack?',
+    'date': 'August 21, 2019',
+    'summary': '<p>These tests would not address contamination by the terminal&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'If XYZ Refining has a branded retailer who independently owns his/her XYZ Gas Station, does XYZ Refining have a duty to test ULSD at XYZ Gas Station?',
+    'date': 'August 21, 2019',
+    'summary': '<p>A branded refiner is not required to test gasoline at its branded retail outlets whether or not&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'In order to be in compliance with the lubricity requirements of the ASTM D 975 diesel fuel specification, refineries will have to use lubricity additives, some of which may contain sulfur. Most, if not all, pipelines will likely prohibit the use of these additives in product that they transport. Therefore, these additives will be added to diesel fuel downstream of the pipelines (either into tanks at the terminal or at the rack). Can volumetric calculations be used to account for the sulfur content of these additives?',
+    'date': 'August 21, 2019',
+    'summary': '<p>Volumetric calculations cannot be used to account for the sulfur content of these additives&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'In the definition of facility, can a common carrier pipeline be aggregated with any other non-common carrier terminals if they are all owned by the same parent company?',
+    'date': 'August 21, 2019',
+    'summary': '<p>The parent company must maintain custody of the fuel at all times in the aggregated facility&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'In the past, EPA has, with the assistance of industry trade associations, produced fuels brochures for use at retail outlets explaining new fuel programs and addressing performance and air quality issues. Is EPA planning a similar effort with respect to the diesel fuel programs?',
+    'date': 'August 21, 2019',
+    'summary': '<p>In November 2005, the Clean Diesel Fuel Alliance was formed. Many public and private organizations are&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'In the preamble, EPA states, “the reporting forms can be standardized and the review process automated in such a fashion as to minimize the Agency resource requirements” (page 39062). What is EPA’s intent with regard to such standardization? According to EPA, commenters stated that the information needed for D & T is already kept as part of normal business practices (pages 39061, 39069). What is EPA’s understanding of “normal business practices” and the way this information is already kept? How does this mesh with EPA’s statement on standardization? What are EPA’s expectations of D & T documentation? How will EPA address the different ways that facilities “already keep” the documentation? What is EPA’s expectation with regard to PTDs? Is EPA looking to create or require a standard PTD? Will EPA request electronic copies of PTDs?',
+    'date': 'August 21, 2019',
+    'summary': '<p>We are proposing a flexible reporting system which historically has been well received by industry because of&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'Is it correct that below the rack, the primary recordkeeping mandate is production and retention of PTDs with no reporting obligations?',
+    'date': 'August 21, 2019',
+    'summary': '<p>Yes, if requisite dye/marker has been added and/or taxes were paid&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'Is sulfur measurement at 15 ppm level practical at the pump? Do any of these methods work for portable/field testing?',
+    'date': 'August 21, 2019',
+    'summary': '<p>Currently only for sampling at the pump and testing in the lab. However&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser.twig' with {
+    'title': 'Is the Agency going to publish a list of sulfur analytical methods that had been deemed equivalent under the rule?',
+    'date': 'August 21, 2019',
+    'summary': '<p>There is no designated method or equivalent methods for sulfur&hellip;</p>',
+  } %}
+  {% include '@components/teaser/teaser--frequent-question/teaser--frequent-question.twig' with {
+    'title': 'Is it possible to receive fuel from/deliver fuel to someone who is not registered? The regulations state that everyone has to register, however what would happen in the case of an importer who has never imported fuel to the U.S., and does not plan to do so, but just so happens to import a small batch of fuel. Such a party will not likely be registered with EPA prior to importing the fuel.',
+    'date': 'August 21, 2019',
+    'summary': '<p>Per the regulations of § 80.597(c), all parties in the diesel fuel production and distribution system&hellip;</p>',
+  } %}
+  {% include '@components/pager/pager.twig' with {
+    'heading': 'Pagination',
+    'current': '6',
+  } %}
+{% endset %}
+
+{% set page_content %}
+  {# include page template #}
+  {% include '@templates/listing-pages/listing-page.twig' with {
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': page_title,
+    'intro': intro,
+    'search': search,
+    'body': body,
+    'sidebar': sidebar,
+    'footer': footer,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}

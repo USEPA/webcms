@@ -2,13 +2,10 @@
 // Styles for form items.
 
 .form-item {
+  margin-bottom: gesso-spacing(3);
+
   // Add top margin when preceded by another element.
   * + & {
-    margin-top: gesso-spacing(3);
-  }
-
-  // Add top margin to item directly after this.
-  + * {
     margin-top: gesso-spacing(3);
   }
 
@@ -33,10 +30,23 @@
       max-width: 100%;
     }
   }
+
+  &.is-inline {
+    display: inline-block;
+    margin-bottom: gesso-spacing(1);
+    margin-right: 0;
+    width: 100%;
+
+    @include breakpoint(gesso-breakpoint(mobile-lg)) {
+      margin-right: gesso-spacing(1);
+      width: auto;
+    }
+  }
 }
 
 .form-item__label {
   @extend .usa-label;
+  margin-bottom: gesso-spacing(1);
   margin-top: 0;
 
   .is-disabled > & {
@@ -75,6 +85,7 @@
 .form-item__url,
 .form-item__week {
   @extend .usa-input;
+  margin-top: 0;
 
   &:disabled {
     background-color: color($theme-color-disabled-light);
@@ -96,6 +107,7 @@
 
 .form-item__textarea {
   @extend .usa-textarea;
+  margin-top: 0;
 
   &:disabled {
     background-color: color($theme-color-disabled-light);

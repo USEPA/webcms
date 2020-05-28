@@ -1,7 +1,7 @@
 ---
 el: .usa-intro
 title: Intro
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -1,7 +1,7 @@
 ---
 el: .l-detail-footer
 title: Detail Footer Layout
-state: inreview
+state: complete
 ---
 
 __Blocks:__

@@ -1,4 +1,4 @@
 ---
 title: News Release
-state: inreview
+state: complete
 ---

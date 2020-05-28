@@ -1,7 +1,7 @@
 ---
 el: .l-detail-header
 title: Detail Header Layout
-state: inreview
+state: complete
 ---
 
 __Blocks:__

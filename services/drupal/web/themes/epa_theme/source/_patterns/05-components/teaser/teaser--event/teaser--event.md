@@ -1,7 +1,7 @@
 ---
 el: .teaser--event
 title: Event Teaser
-state: inreview
+state: complete
 ---
 
 __Variables:__

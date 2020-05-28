@@ -37,7 +37,7 @@ resource "aws_instance" "utility" {
   ]
 
   tags = {
-    Application = "WebCMS"
-    Name        = "WebCMS Bastion"
+    Group = "webcms"
+    Name  = "WebCMS Bastion"
   }
 }

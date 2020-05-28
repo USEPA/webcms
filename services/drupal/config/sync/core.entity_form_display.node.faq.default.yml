@@ -23,12 +23,13 @@ dependencies:
     - field.field.node.faq.field_scheduled_transition
     - field.field.node.faq.field_type
     - node.type.faq
+    - workflows.workflow.epa_default
   module:
+    - content_moderation
     - datetime
     - field_group
     - shs
     - text
-    - workflow_buttons
 third_party_settings:
   field_group:
     group_other_metadata:
@@ -243,12 +244,11 @@ content:
     type: options_select
     region: content
   moderation_state:
-    type: workflow_buttons
-    weight: 12
-    settings:
-      show_current_state: '1'
-    region: content
+    weight: 50
+    settings: {  }
     third_party_settings: {  }
+    type: moderation_state_default
+    region: content
   promote:
     type: boolean_checkbox
     settings:

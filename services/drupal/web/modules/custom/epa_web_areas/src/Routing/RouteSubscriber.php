@@ -4,6 +4,7 @@ namespace Drupal\epa_web_areas\Routing;
 
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
+use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -68,12 +69,28 @@ class RouteSubscriber extends RouteSubscriberBase {
       'view.group_publishers.page_1',
       'view.group_moderated_content.moderated_content',
       'entity.group.menu',
+      'layout_builder.overrides.node.view',
+      'layout_builder.overrides.node.discard_changes',
+      'layout_builder.overrides.node.revert',
+      'layout_builder.overrides.node.disable',
+      'layout_builder.defaults.node.view',
+      'layout_builder.defaults.node.discard_changes',
+      'layout_builder.defaults.node.revert',
+      'layout_builder.defaults.node.disable'
     ];
     foreach ($route_names as $route_name) {
       if ($route = $collection->get($route_name)) {
         $route->addOptions(['_admin_route' => TRUE]);
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getSubscribedEvents() {
+    $events[RoutingEvents::ALTER] = array('onAlterRoutes', -111); // Need this to run after layout builder adds its routes
+    return $events;
   }
 
 }

@@ -1,7 +1,7 @@
 ---
 el: .teaser--public-notice
 title: Public Notice Teaser
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "drupal" {
   name = "webcms-drupal"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -17,7 +17,7 @@ resource "aws_ecr_repository" "nginx" {
   name = "webcms-nginx"
 
   tags = {
-    Application = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -61,8 +61,8 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
   tags = {
     # Give this capacity provider a name that matches the random_pet to aid debugging/triage
-    Name        = "WebCMS ${random_pet.capacity_provider.id}"
-    Application = "WebCMS"
+    Name  = "WebCMS ${random_pet.capacity_provider.id}"
+    Group = "webcms"
   }
 }
 
@@ -78,8 +78,8 @@ resource "aws_ecs_cluster" "cluster" {
   }
 
   tags = {
-    Name        = "WebCMS"
-    Application = "WebCMS"
+    Name  = "WebCMS"
+    Group = "webcms"
   }
 }
 
@@ -191,8 +191,8 @@ resource "aws_ecs_task_definition" "drupal_task" {
   ])
 
   tags = {
-    Name        = "WebCMS Task - Drupal"
-    Application = "WebCMS"
+    Name  = "WebCMS Task - Drupal"
+    Group = "webcms"
   }
 
   # Explicitly depend on IAM permissions: if we don't, the ECS service may not be able
@@ -262,8 +262,8 @@ resource "aws_ecs_service" "drupal" {
 
   # TODO: Once new ARN/ID format applies to this account
   # tags = {
-  #   Name        = "WebCMS Service - Drupal"
-  #   Application = "WebCMS"
+  #   Name  = "WebCMS Service - Drupal"
+  #   Group = "webcms"
   # }
 
   # Ignore changes to the desired_count attribute - we assume that the application

@@ -74,11 +74,11 @@ type_settings:
         - published_expiring
         - published_needs_review
       to: published
-      weight: 0
+      weight: -1
     create_new_draft:
       label: 'Save as Draft'
       to: draft
-      weight: -6
+      weight: -5
       from:
         - draft
         - published
@@ -91,11 +91,11 @@ type_settings:
       from:
         - published_expiring
       to: published_day_til_expire
-      weight: 3
+      weight: 2
     publish:
       label: Publish
       to: published
-      weight: -5
+      weight: 3
       from:
         - draft
         - draft_approved
@@ -108,9 +108,9 @@ type_settings:
         - draft_approved
         - draft_needs_review
       to: draft
-      weight: -1
+      weight: -2
     send_for_review:
-      label: 'Send for review'
+      label: 'Submit draft for approval'
       from:
         - draft
         - draft_needs_review
@@ -121,19 +121,16 @@ type_settings:
       from:
         - published
       to: published_needs_review
-      weight: 1
+      weight: 0
     send_to_editor_s_for_review:
       label: 'Send to editor(s) for review'
       from:
         - published_needs_review
       to: published_expiring
-      weight: 2
+      weight: 1
     unpublish:
       label: Unpublish
       from:
-        - draft
-        - draft_approved
-        - draft_needs_review
         - published
         - published_day_til_expire
         - published_expiring

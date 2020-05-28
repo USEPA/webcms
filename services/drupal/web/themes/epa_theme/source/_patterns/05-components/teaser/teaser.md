@@ -1,7 +1,7 @@
 ---
 el: .teaser
 title: Teaser
-state: inreview
+state: complete
 ---
 
 __Variables:__
