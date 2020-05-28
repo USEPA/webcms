@@ -1,1 +1,85 @@
-{% include '@pages/detail-pages/00-page.twig' %}
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'EPA in New York',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set content %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': 'u-align-right',
+    'title': {
+      'tag': 'div',
+      'text': 'How to Comment',
+    },
+    'content': '<div class="field"><div class="field__label is-inline">Comments accepted through</div><div class="field__content">03/16/2020</div></div><p>You may comment on the proposed action in writing by mail or phone. Submit comments to:</p><address>Karen Maples, Regional Hearing Clerk,<br>U.S. Environmental Protection Agency, Region II<br>290 Broadway, 16th Floor<br>New York, New York 10007-1866<br>212-637-3247</address>',
+  } only %}
+  {% include '@components/field/field.twig' with {
+    'label': 'Publish Date',
+    'label_element': 'h3',
+    'label_display': 'inline',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': '02/14/2020',
+        },
+    ],
+  } %}
+  <h2>Summary</h2>
+  <p>Notice of proceeding to assess a class I civil penalty and opportunity to comment</p>
+  <h2>Applicant or Respondent</h2>
+  <address>
+    Taxi Tours, Inc., d/b/a Big Bus Tours, New York<br>
+    70 Hamilton Avenue<br>
+    Brooklyn, NY 11231
+  </address>
+  <h2>Docket number</h2>
+  <ul>
+    <li>EPA-R02-CWA-2020-3310</li>
+  </ul>
+  {% include '@components/field/field.twig' with {
+    'label': 'Permit #',
+    'label_element': 'h3',
+    'label_display': 'inline',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': 'NYU005849',
+        },
+    ],
+  } %}
+  <hr>
+  <h2>Related Documents</h2>
+  <ul>
+    <li>
+      {% include '@components/file/file.twig' with {
+        file: {
+          icon: 'file',
+          mime: 'application/pdf',
+          name: 'Public Notice: 2020-13 Taxi Tours, Inc., d/b/a Big Bus Tours, New York (pdf)',
+        },
+      } %}
+    </li>
+  </ul>
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'intro': intro,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}

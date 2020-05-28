@@ -1,3 +1,21 @@
+{% set header_info %}
+  {% include '@components/hublinks/hublinks.twig' with {
+    'links': [
+      {
+        'url': '#',
+        'text': 'Air Quality Management Cycle',
+      },
+    ],
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
 {% set page_messages %}
   {% if show_admin_info %}
     {% include '@uswds/alert/alert--success/alert--success.twig' with {
@@ -13,6 +31,24 @@
       'buttons': local_tasks,
     } %}
   {% endif %}
+{% endset %}
+
+{% set content %}
+  <p>Air quality management refers to all the activities a regulatory authority undertakes to help protect human health and the environment from the harmful effects of air pollution. The process of managing air quality can be illustrated as a cycle of inter-related elements. Click on the image below to enlarge it.</p>
+  {% include '@components/figure/figure.twig' with {
+    'modifier_classes': 'figure--medium is-centered',
+    'media': '<img src="https://www.epa.gov/sites/production/files/styles/large/public/2016-04/aqm_draft5.jpg" alt="Graphic showing the air quality management process cycle: 1. establish goals; 2. determine emission reductions; 3. develop control strategies; 4. implement programs; 5. evaluation; back to 1" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/medium/public/2016-04/aqm_draft5.jpg 448w, https://www.epa.gov/sites/production/files/styles/large/public/2016-04/aqm_draft5.jpg 928w, https://www.epa.gov/sites/production/files/2016-04/aqm_draft5.jpg 1638w" width="640" height="400">',
+    'caption': '',
+  } %}
+  <ul>
+    <li>A government institution typically <strong>establishes goals</strong> related to air quality. An example is an acceptable level of a pollutant in the air that will protect public health, including people who are more vulnerable to the effects of air pollution.</li>
+    <li>Air quality managers need to <strong>determine</strong> how much <strong>emissions reductions</strong> are needed to achieve the goal. Air quality managers use emissions inventories, air monitoring, air quality modeling and other assessment tools to understand the air quality problem fully.</li>
+    <li>In <strong>developing control strategies</strong>, air quality managers consider how pollution prevention and emission control techniques can be applied to achieve the reductions needed to achieve the goals.</li>
+    <li>To successfully achieve the air quality goals, air quality managers need to <strong>implement programs </strong>for pollution control strategies. Regulations or incentive programs that lower emissions from sources need to be put in place. Regulated industries need training and assistance in how to comply with rules. And the rules need to be enforced.</li>
+    <li>It is important to <strong>undertake on-going evaluation </strong>to know if your air quality goals are being met.</li>
+  </ul>
+  <p>The cycle is a dynamic process. There is a continuous review and assessment of goals and strategies based on their effectiveness. All parts of this process are informed by<strong> scientific research </strong>that provides air quality managers with essential understanding of how pollutants are emitted, transported and transformed in the air and their effects on human health and the environment.</p>
+  <p>The process involves all levels of government – elected officials, national agencies like EPA, tribal, state and local governments. Regulated industry groups, scientists, environmental groups, and the general public all play important roles too.</p>
 {% endset %}
 
 {% set page_content %}

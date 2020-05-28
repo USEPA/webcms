@@ -1,1 +1,188 @@
-{% include '@pages/detail-pages/00-page.twig' %}
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'New Bedford Harbor',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set page_messages %}
+  {% if show_admin_info %}
+    {% include '@uswds/alert/alert--success/alert--success.twig' with {
+      'title': 'Status message',
+      'content': '<p class="usa-alert__text">Basic page <em class="placeholder"><a href="#" hreflang="en">' ~ page_title ~ '</a></em> has been updated.</p>',
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set page_tasks %}
+  {% if show_admin_info %}
+    {% include '@components/button-group/button-group--base/button-group--base.twig' with {
+      'buttons': local_tasks,
+    } %}
+  {% endif %}
+{% endset %}
+
+
+{% set content %}
+  <p class="disclaimer pdf">You may need a PDF reader to view some of the files on this page. See <a href="/home/pdf-files">EPA’s About PDF page</a> to learn more.</p>
+  <p>Learn about EPA’s past involvement at the Aerovox Mill Site.</p>
+  <div>On this page:</div>
+  <ul>
+    <li><a href="#WhatsHappeningNow">What’s happening now?</a></li>
+    <li>
+      <a href="#AirDataResultsDuringDemolition">Air Data Results During the Demolition</a>
+      <ul>
+        <li><a href="#WhatDataMeant">What the Data Meant</a></li>
+      </ul>
+    </li>
+    <li><a href="#PhasesOfWork">Demolition Phases of Work</a></li>
+  </ul>
+  <div>On other pages:</div>
+  <ul>
+    <li><a href="/new-bedford-harbor/history-epa-involvement-aerovox-mill">HISTORY of EPA Involvement at the Aerovox Mill</a></li>
+  </ul>
+  <hr>
+  <h2 id="WhatsHappeningNow">What’s happening now?</h2>
+  <p class="disclaimer pdf">The demolition of the Aerovox Mill was safely completed. The site is now under further environmental review by the <a href="https://www.mass.gov/orgs/bureau-of-waste-site-cleanup-massdep">Massachusetts Department of Environmental Protection</a>, in coordination with the <a href="https://www.newbedford-ma.gov">City of New Bedford</a>.</p>
+  <p><a href="https://semspub.epa.gov/src/document/01/480701/">Print and share EPA’s latest project update (PDF)</a> (2 pp, 686 K)</span></p>
+  <hr>
+  <h2 id="AirDataResultsDuringDemolition">Air Data Results During the Demolition</h2>
+  <p>Four air monitoring stations were around the Aerovox Demolition project and took daily measurements of particulate matter (dust particles) in the air. <a href="/pm-pollution">Learn more about particulate matter</a>.</p>
+  <p>The results were measured in micrograms of particle per cubic meter and were shown alongside the meteorological (MET) results for the average wind speed and direction.</p>
+  <p>Below is a chart that explains the color coding system for the work day messages that were made available to the surrounding communities.</p>
+  <p><a href="https://semspub.epa.gov/src/document/01/480796/">Lab-Validated Air Sampling Results through November 21, 2011 (PDF)</a> (13 pp, 307 K)</span></p>
+  <p><a href="https://semspub.epa.gov/src/document/01/480788/">Lab-Validated Air Sampling Results through October 7, 2011 (PDF)</a> (11 pp, 292 K)</span></p>
+  <h3 id="WhatDataMeant">Key to Air Monitoring Results - What the Data Meant</h3>
+  <div id="aerovoxTableContainer">
+    <table id="aerovoxTable">
+      <thead>
+        <tr>
+          <th>AQI Values</th>
+          <th>CONTAMINANT RESULT / STATUS</th>
+          <th>CONTAMINANT CONCENTRATION</th>
+          <th>WHAT HAPPENS NEXT</th>
+          <th>WHAT YOU SHOULD DO</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td id="AQIGood">Good</td>
+          <td id="AQIGoodUB1">Particulate Matter are either not detected or below project specific action levels.</td>
+          <td id="AQIGoodUB2">&lt;100 ug/m3</td>
+          <td id="AQIGoodUB3">Work continues as anticipated.</td>
+          <td id="AQIGoodUB4">No additional protective action necessary.</td>
+        </tr>
+        <tr>
+          <td id="AQIModerate">Moderate</td>
+          <td id="AQIModerateUB1">The PM levels were below EPA’s NAAQs* but above more stringent project specific action levels.</td>
+          <td id="AQIModerateUB2">100- 149 ug/m3</td>
+          <td id="AQIModerateUB3">Work crews at the site increased dust suppression and control measures to address site specific dust to ensure that work could continue.</td>
+          <td id="AQIModerateUB4">No additional protective action necessary. Note: project action levels trigger additional dust controls well before air quality conditions become unhealthy to those working and living near the project.</td>
+        </tr>
+        <tr>
+          <td id="AQIUSG">Unhealthy for Sensitive Groups</td>
+          <td id="AQIUSGUB1">The PM levels were above EPA’s NAAQs* for Air Quality</td>
+          <td id="AQIUSGUB2">&gt;150 ug/m3</td>
+          <td id="AQIUSGUB3">Work at the site may have been suspended to identify and control site-specific dust before work continued.</td>
+          <td id="AQIUSGUB4">No additional protective action necessary. Note: elevated concentrations of PM may be the result of sources unrelated to the work at Aerovox. See EPA’s Air Quality Index (AQI) data for area-specific information.</td>
+        </tr>
+        <tr>
+          <td id="AQIUnhealthy">Unhealthy</td>
+            <td id="AQIUnhealthyUB1">Emergency at the site or PM levels above OSHA's permissible exposure limits (PEL)**</td>
+            <td id="AQIUnhealthyUB2">&gt; 500 ug/m3 or Site Emergency</td>
+            <td id="AQIUnhealthyUB3">Work stops. Officials will work with residents/property owner(s) to either evacuate or stay in place until the situation is controlled.</td>
+            <td id="AQIUnhealthyUB4">Stay away from the Aerovox Site. If you live nearby shut your windows and listen to emergency officials for possible evacuation instructions.</td>
+        </tr>
+        <tr>
+          <td colspan="5">
+            <p>*NAAQS <strong>= </strong>National Ambient Air Quality Standards are based on risk to human health. The NAAQ for particulate matter (PM) is 150 ug/m3 which indicates unhealthy air quality. The unit measurements are micrograms per cubic meter ug/m3. Particulate Matter (PM), for this chart, means project-related dust may include site contaminants.</p>
+            <p><strong>What do the contaminant concentrations mean?</strong></p>
+            <p>The project-specific action level for PM is based on a more conservative 10 hr. time weighted average whereas EPA’s NAAQ for particulate matter is based on a 24-hr. time-weighted average.</p>
+            <p>EPA is using extremely low levels to trigger additional action to prevent exposure. The action levels assume that the dust detected from the project is transporting the additional contaminants such as PCBs that cannot be detected as easily and immediately.</p>
+            <p>**In this scenario, the number assumes that PCBs are the only contaminant in the PM and the levels are above the OSHA permissible exposure limit (PEL) for worker safety.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <hr>
+  <h2 id="PhasesOfWork">Demolition Phases of Work</h2>
+  <figure id="PhasesOfWorkGraphic" class="figure figure--medium">
+    <div class="figure__media">
+      <img alt="Phases of Work graphic: Planning Phase, 10 months, June 3, 2010 > Hazardous Material Removal Phase, 5 months, April 2011 > Building Demolition Phase, 12 months, August 2011 - August 2012" src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/aerovox_phasesofwork.jpg" width="640">
+    </div>
+    <figcaption class="figure__caption">*Does not reflect the actual timeline, the demolition was completed ahead of the original, anticipated schedule.</figcaption>
+  </figure>
+  <p>It will be difficult to see the early progress as work takes place inside the building. Work crews must first remove interior material and debris and safely decommission utilities which will take several months to complete. Dismantling of the exterior structure of the building is expected to begin fall of 2011.</p>
+  <ul>
+    <li>Rigorous air and water quality monitoring and stormwater management will take place (from runoff collected from rainfall and dust suppression). EPA oversight of the data collection and validation will ensure that the project is progressing safely.</li>
+    <li>Strict air and water quality standards will be used to compare with the collected data results. Background, or currently existing, air quality measurements will be recorded prior to the start of on-site work to verify that environmental conditions are not been impacted by the demolition.</li>
+    <li>Data results will be made available to the public as soon as they are available. EPA will post summaries of the data here.</li>
+    <li>Real-time air quality monitors will be operating at the site to ensure worker safety and alert work crews to the presence of dust that could carry airborne contaminants. In such an event, work would stop until the source is identified and controlled, if site-related. EPA will report daily on these results here.</li>
+  </ul>
+  <p>All exterior and interior building material and debris will be disposed off-site at appropriately licensed landfills; the building foundation will remain on-site under a protective cap. Once the demolition and capping work is completed, the State Chapter 21-E cleanup program begins.</p>
+{% endset %}
+
+{% set sidebar %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': '',
+    'title': {
+      'tag': 'div',
+      'text': 'Administrative Record Documents',
+    },
+    'content': '<p>Administrative Record Index documents links to additional PDF files</p><ul><li><a href="#">RCRA Administrative Order on Consent, September 22, 1999</a> (Doc ID: 446738)</li><li><a href="#">Supplemental RCRA Administrative Order on Consent, February 9, 2001</a> Doc ID: 461800)</li><li><a href="#">Removal Action, July 1, 2004</a> (Doc ID: 446737)</li><li><a href="#">Supplemental Removal Action, May 1, 2008</a> (Doc ID: 288901)</li><li><a href="#">Non-Time Critical Removal Action (NTCRA), March 1, 2010</a> (Doc ID: 462994)</li><li><a href="#" class="file"><svg class="icon icon--file is-spaced-after" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#file"></use></svg>Administrative Settlement Agreement and Order on Consent (AOC) for Non-Time Critical Removal Action (NTCRA), June 3, 2010 (pdf)</a></li><li><a href="#" class="file"><svg class="icon icon--file is-spaced-after" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#file"></use></svg>Notice of Completion of Work Under Administrative Settlement Agreement and Order on Consent for Non-Time Critical Removal Action (NTCRA), May 16, 2013 (pdf)</a></li></ul>',
+  } only %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': '',
+    'title': {
+      'tag': 'div',
+      'text': 'Cleaning up at Aerovox',
+    },
+    'content': '<p><a href="https://www.flickr.com/photos/24400159@N05/5242413878/"><img alt="Targeted cleanup near Aerovox shoreline" src="https://farm6.staticflickr.com/5127/5242413878_c7eb93c6ab_m.jpg" width="240" height="180"><br>View photos of EPA’s cleanup of the Aerovox Mill and New Bedford Harbor</a></p>',
+  } only %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': '',
+    'title': {
+      'tag': 'div',
+      'text': 'More Information',
+    },
+    'content': '<p><a href="#" class="external-link">Latest News&colon; Celebrating the end of the demolition</a></p><p><a href="#" class="external-link">See past work day updates (Twitter)</a></p><p><a href="#" class="file"><svg class="icon icon--file is-spaced-after" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#file"></use></svg>December 2010 Presentation about the Aerovox Demolition Plan with photos of similar projects (pdf)</a></p>',
+  } only %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': '',
+    'title': {
+      'tag': 'div',
+      'text': 'Next Public Meeting',
+    },
+    'content': '<p>Sign up for e-mail updates or call for the upcoming weekly schedule.</p><form accept-charset="UTF-8" action="https://us.vocuspr.com/WebPublish/controller.aspx?SiteName=EPA&amp;Definition=SearchResults" method="post"><input name="utf8" value="?" type="hidden"><input id="SV_IndividualEditPR_UDF05_Miscellaneous" name="SV_IndividualEditPR_UDF05_Miscellaneous" value="01 New Bedford Harbor" type="hidden"><strong>Get email alerts</strong><br><input id="SearchEmail" name="SearchEmail" placeholder="enter email address" size="15" value="enter email address" type="text">&nbsp;<input id="email-submit" name="commit" value="sign up" type="submit"><br>Finish on the next page.</form>',
+  } only %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': '',
+    'title': {
+      'tag': 'div',
+      'text': 'Your Community Involvement Coordinator',
+    },
+    'content': '<p><a href="mailto:purnell.zanetta@epa.gov">Zanetta Purnell</a> (purnell.zanetta@epa.gov)<br>617-918-1306<br>Toll Free 1-888-372-7341 ext. 8-1306</p>',
+  } only %}
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'intro': intro,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
