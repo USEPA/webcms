@@ -1,4 +1,4 @@
-// Slideshow script
+// Image Gallery script
 // Implements Tiny Slider library
 // https://github.com/ganlanyuan/tiny-slider
 import Drupal from 'drupal';
