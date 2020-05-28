@@ -22,8 +22,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: 'und'
-      replace: 'en'
+      search: und
+      replace: en
   field_link:
     -
       plugin: sub_process
@@ -33,8 +33,8 @@ process:
           plugin: str_replace
           regex: true
           source: url
-          search: '/^www\./'
-          replace: 'https://www.'
+          search: '/^((?!https?:\/\/).+)/'
+          replace: 'https://$1'
   field_frc_citation:
     -
       plugin: sub_process

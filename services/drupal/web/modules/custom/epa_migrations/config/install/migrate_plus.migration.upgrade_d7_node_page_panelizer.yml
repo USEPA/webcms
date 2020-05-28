@@ -33,9 +33,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: 'und'
-      replace: 'en'
-
+      search: und
+      replace: en
   title:
     -
       plugin: get
@@ -117,6 +116,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_geographic_locations:
     -
       plugin: sub_process
@@ -139,7 +140,7 @@ process:
     -
       plugin: get
       source: field_page_head
-  field_searchable_collection:
+  field_is_searchable_collection:
     -
       plugin: get
       source: field_searchable_collection
@@ -163,6 +164,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_review_deadline:
     -
       plugin: sub_process
@@ -173,6 +176,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_metatag:
     -
       plugin: d7_metatag_entities
@@ -185,5 +190,5 @@ destination:
   plugin: 'entity:node'
   default_bundle: page
 migration_dependencies:
-  required: { }
-  optional: { }
+  required: {  }
+  optional: {  }

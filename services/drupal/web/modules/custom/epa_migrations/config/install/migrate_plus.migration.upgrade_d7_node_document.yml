@@ -30,8 +30,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: 'und'
-      replace: 'en'
+      search: und
+      replace: en
   title:
     -
       plugin: get
@@ -90,8 +90,8 @@ process:
     -
       plugin: sub_process
       process:
-        target_id: 'target_id'
-        target_revision_id: 'target_revision_id'
+        target_id: target_id
+        target_revision_id: target_revision_id
   field_paragraphs_1:
     -
       plugin: skip_on_empty
@@ -106,8 +106,8 @@ process:
     -
       plugin: sub_process
       process:
-        target_id: 'target_id'
-        target_revision_id: 'target_revision_id'
+        target_id: target_id
+        target_revision_id: target_revision_id
   field_channel:
     -
       plugin: sub_process
@@ -134,6 +134,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_geographic_locations:
     -
       plugin: sub_process
@@ -156,7 +158,7 @@ process:
     -
       plugin: get
       source: field_resource_directories
-  field_searchable_collection:
+  field_is_searchable_collection:
     -
       plugin: get
       source: field_searchable_collection
@@ -176,6 +178,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_review_deadline:
     -
       plugin: sub_process
@@ -186,6 +190,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_page_head:
     -
       plugin: get

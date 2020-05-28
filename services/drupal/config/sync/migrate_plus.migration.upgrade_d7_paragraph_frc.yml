@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: J2yESYvNGA5VaDd0Th5IyGjDGD8nT4CxljCygXlNJC4
+  default_config_hash: HILnYzmwxeEiSNeHICFy3j66vxNgDE6QMnxn-N7_e3o
 id: upgrade_d7_paragraph_frc
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -35,8 +35,8 @@ process:
           plugin: str_replace
           regex: true
           source: url
-          search: /^www\./
-          replace: 'https://www.'
+          search: '/^((?!https?:\/\/).+)/'
+          replace: 'https://$1'
   field_frc_citation:
     -
       plugin: sub_process

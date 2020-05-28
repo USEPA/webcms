@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: QtfP6lhoLbFPZsMnxmUTTgA0OjP9mPPxiW8BGSG2D2Q
+  default_config_hash: mAOwCSzML_o-IoM-E5U4DEL_Zswi7OVWYzy9aNEFxuY
 id: upgrade_d7_node_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -115,6 +115,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_geographic_locations:
     -
       plugin: sub_process
@@ -149,6 +151,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_review_deadline:
     -
       plugin: sub_process
@@ -159,6 +163,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_metatag:
     -
       plugin: d7_metatag_entities

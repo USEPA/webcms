@@ -30,8 +30,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: 'und'
-      replace: 'en'
+      search: und
+      replace: en
   title:
     -
       plugin: get
@@ -90,8 +90,8 @@ process:
     -
       plugin: sub_process
       process:
-        target_id: 'target_id'
-        target_revision_id: 'target_revision_id'
+        target_id: target_id
+        target_revision_id: target_revision_id
   field_aside_block:
     0:
       plugin: get
@@ -124,6 +124,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_geographic_locations:
     -
       plugin: sub_process
@@ -148,10 +150,6 @@ process:
       source: field_type
       process:
         target_id: tid
-  # field_web_area_slideshow:
-  #   -
-  #     plugin: get
-  #     source: field_web_area_slideshow
   field_publish_date:
     -
       plugin: sub_process
@@ -162,6 +160,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_review_deadline:
     -
       plugin: sub_process
@@ -172,6 +172,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
+          from_timezone: America/New_York
+          to_timezone: UTC
   field_metatag:
     -
       plugin: d7_metatag_entities
