@@ -1,0 +1,60 @@
+// @file
+// Styles for a Hero Slideshow.
+
+@import 'tiny-slider';
+
+$button-size: 44px;
+
+.hero-slideshow {
+  margin-bottom: rem(gesso-spacing(3));
+}
+
+.hero-slideshow__list {
+  @include list-clean();
+}
+
+.hero-slideshow__nav {
+  display: none;
+
+  .js & {
+    display: block;
+  }
+}
+
+.hero-slideshow__slide {
+  position: relative;
+}
+
+.hero-slideshow__slide-image {
+  line-height: 0;
+
+  img {
+    width: 100%;
+  }
+}
+
+.hero-slideshow__canvas {
+  position: absolute;
+}
+
+.hero-slideshow__nav {
+  position: relative;
+  top: rem(gesso-spacing(6)) * -1;
+}
+
+.hero-slideshow__nav-button {
+  @extend .button;
+  background-color: gesso-grayscale('gray-4');
+  margin-right: gesso-spacing(1);
+  width: auto;
+
+  &:hover,
+  &:focus {
+    background-color: gesso-brand(blue, base);
+  }
+
+  &:active,
+  &.tns-nav-active {
+    background-color: gesso-brand(blue, dark);
+  }
+}
