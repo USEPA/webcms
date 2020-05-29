@@ -1,0 +1,26 @@
+{% set classes = [
+  'govdelivery',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set email_id = 'govdelivery-email'|unique_id %}
+
+<form class="{{ classes }}" method="get" action="https://public.govdelivery.com/accounts/{{ govdelivery_id }}/subscribers/qualify">
+  <fieldset class="govdelivery__fieldset">
+    <legend class="govdelivery__legend h3">{{ legend }}</legend>
+    <div class="form-item form-item--email is-inline">
+      <label class="form-item__label u-visually-hidden" for="{{ email_id }}">Email</label>
+      <input class="form-item__email" id="{{ email_id }}" type="email" size="25" maxlength="255" placeholder="Enter email address">
+    </div>
+
+    {% if category_id %}
+      <input name="category_id" type="hidden" value="{{ category_id }}">
+    {% endif %}
+
+    {% if topic_id %}
+      <input name="topic_id" type="hidden" value="{{ topic_id }}">
+    {% endif %}
+
+    <button class="button" type="submit">Sign up</button>
+  </fieldset>
+</form>
