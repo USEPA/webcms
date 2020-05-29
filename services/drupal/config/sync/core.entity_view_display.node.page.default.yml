@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.page.field_is_searchable_collection
     - field.field.node.page.field_keywords
     - field.field.node.page.field_language
+    - field.field.node.page.field_last_published
     - field.field.node.page.field_machine_name
     - field.field.node.page.field_page_head
     - field.field.node.page.field_paragraphs
@@ -389,6 +390,23 @@ third_party_settings:
               context_mapping: {  }
             additional: {  }
             weight: 21
+          d4e776aa-4cff-4271-ba2a-142d28205a9d:
+            uuid: d4e776aa-4cff-4271-ba2a-142d28205a9d
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:page:field_last_published'
+              formatter:
+                label: above
+                settings:
+                  format_type: medium
+                  timezone_override: ''
+                third_party_settings: {  }
+                type: datetime_default
+            additional: {  }
+            weight: 22
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories:
@@ -511,6 +529,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: list_default
+    region: content
+  field_last_published:
+    weight: 138
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
     region: content
   field_links:
     weight: 101
