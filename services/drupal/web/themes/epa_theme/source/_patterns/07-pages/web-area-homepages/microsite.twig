@@ -1,0 +1,193 @@
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set page_messages %}
+  {% if show_admin_info %}
+    {% include '@uswds/alert/alert--success/alert--success.twig' with {
+      'title': 'Status message',
+      'content': '<p class="usa-alert__text">Basic page <em class="placeholder"><a href="#" hreflang="en">' ~ page_title ~ '</a></em> has been updated.</p>',
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set page_tasks %}
+  {% if show_admin_info %}
+    {% include '@components/button-group/button-group--base/button-group--base.twig' with {
+      'buttons': local_tasks,
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set slideshow %}
+  {% include '@components/hero-slideshow/hero-slideshow.twig' with {
+    'slides': [
+      {
+        'image': '../../../source/image/covid--hero.jpg',
+        'title': 'COVID-19 Coronavirus',
+        'content': '<p>There are EPA-Registered Disinfectants for Use Against SARS-CoV-2, the Novel Coronavirus that Causes COVID-19.</p>',
+        'button_url': '#',
+        'button_text': 'View distinfectants',
+      },
+      {
+        'image': 'https://www.epa.gov/sites/production/files/styles/microsite_banner/public/2020-03/epa-banner-images/tree_sky.jpg',
+        'callout': 'Attention:',
+        'title': 'Pesticide Registration Applicants',
+        'content': '<p>In an abundance of caution due to COVID-19, Pesticide Registration Applicants should note that EPA is only accepting electronic submissions rather than hand deliveries until further notice.</p>',
+        'button_url': '#',
+        'button_text': 'Submit application',
+      },
+      {
+        'image': 'https://www.epa.gov/sites/production/files/styles/microsite_banner/public/2020-04/epa-banner-images/3rd-banner2.jpg',
+        'title': 'EPA Docket Center and Reading Room Closed to Public Visitors',
+        'content': '<p>Out of an abundance of caution for members of the public and our staff, the EPA Docket Center and Reading Room is temporarily closed to public visitors to reduce the risk of transmitting COVID-19.</p>',
+        'button_url': '#',
+        'button_text': 'Read more',
+      },
+      {
+        'image': 'https://www.epa.gov/sites/production/files/styles/microsite_banner/public/2016-12/epa-banner-images/pesticide-worker-safety-banner2.jpg',
+        'title': 'Recognition and Management of Pesticide Poisonings',
+        'content': '<p>Healthcare providers can find the best toxicology and treatment information for patients with pesticide exposures.</p>',
+        'button_url': '#',
+        'button_text': 'Read more',
+      },
+    ],
+  } %}
+{% endset %}
+
+{% set content %}
+  {% embed '@layouts/grid/grid.twig' with {
+    'num_of_cols': '2',
+  } %}
+    {% block content %}
+      <div>
+        {% include '@components/box/box--alert/box--alert.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Attention',
+            'icon': 'warning',
+          },
+          'content': '<p><a href="#">In an abundance of caution due to COVID-19, Pesticide Registration Applicants should note that EPA is only accepting electronic submissions rather than hand deliveries until further notice.</a></p>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box--news/box--news.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Recent Highlights and Pesticide News',
+          },
+          'content': '<ul><li><a href="#">EPA Proposes Registration of Animal Repellents Containing New Active Ingredient</a></li><li><a href="#">EPA Proposes Registration of New Biopesticide and Product</a></li><li><a href="#">EPA Proposes Action to Protect Soybeans from Major Agricultural Pest</a></li></ul><div><a href="#">View more pesticide news</a></div><div><a href="#">Comment on open dockets</a></div>',
+        } only %}
+      </div>
+    {% endblock %}
+  {% endembed %}
+  {% embed '@layouts/grid/grid.twig' with {
+    'num_of_cols': '4',
+  } %}
+    {% block content %}
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'About Pesticides',
+          },
+          'content': '<ul><li><a href="#">What are pesticides?</a></li><li><a href="#">How EPA evaluates pesticide risks</a></li><li><a href="#">How EPA regulates pesticides</a></li><li><a href="#">Pesticides and public health</a></li><li><a href="#">Sales and usage report</a></li><li><a href="#">Información relacionada disponible en español</a></li><li><a href="#">Additional OPP Guidance Documents</a></p></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Protecting Health & the Environment',
+          },
+          'content': '<ul><li><a href="#">Pesticide worker safety</a></li><li><a href="#">Endangered species</a></li><li><a href="#">Protecting pollinators</a></li><li><a href="#">Reducing pesticide drift</a></li><li><a href="#">Reporting pesticide incidents</a></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Pest Control',
+          },
+          'content': '<ul><li><a href="#">Bed bugs</a></li><li><a href="#">Pest control and pesticide safety for consumers</a></li><li><a href="#">Managing pests in schools</a></li><li><a href="#">Insect repellents</a></li><li><a href="#">Mosquito control</a></li><li><a href="#">Protecting pets from fleas and ticks</a></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Pesticide Regulation',
+          },
+          'content': '<ul><li><a href="#">Pesticide registration</a></li><li><a href="#">Pesticide establishment registration</a></li><li><a href="#">Pesticide reevaluation</a></li><li><a href="#">PRIA fees</a></li><li><a href="#">Pesticide science and assessing pesticide risk</a></li><li><a href="#">Regulating biotechnology under TSCA and FIFRA</a></li><li><a href="#">Pesticide labels</a></li><li><a href="#">Pesticide tolerances</a></li><li><a href="#">Importing and Exporting Pesticides</a></li></ul>',
+        } only %}
+      </div>
+    {% endblock %}
+  {% endembed %}
+  {% embed '@layouts/grid/grid.twig' with {
+    'num_of_cols': '4',
+  } %}
+    {% block content %}
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Partners',
+          },
+          'content': '<ul><li><a href="#">Advisory committees and regulatory partners</a></li><li><a href="#">Pesticide applicator certification in Indian country</a></li><li><a href="#">International activities</a></li><li><a href="#">Pesticide Environmental Stewardship Program</a></li><li><a href="#">Pesticide Cooperative Agreements</a></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Pesticide Ingredients and Products',
+          },
+          'content': '<ul><li><a href="#">Ingredients used in pesticide products</a></li><li><a href="#">Minimum risk pesticides</a></li><li><a href="#">Soil fumigants</a></li><li><a href="#">Rodenticides</a></li><li><a href="#">Biopesticides</a></li><li><a href="#">Antimicrobials</a></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'For Kids',
+          },
+          'content': '<ul><li><a href="#">Endangered species coloring book</a></li><li><a href="#">Endangered species poster</a></li><li><a href="#">Join our Pest Patrol: A backyard activity book on integrated pest management</a></li><li><a href="#">Help! It’s a Roach!</a></li></ul>',
+        } only %}
+      </div>
+      <div>
+        {% include '@components/box/box.twig' with {
+          'title': {
+            'tag': 'h2',
+            'text': 'Tools',
+          },
+          'content': '<ul><li><a href="#">A-Z index</a></li><li><a href="#">Pesticide chemical search</a></li><li><a href="#">Pesticide Product Label System</a></li><li><a href="#">Analytical methods</a></li><li><a href="#">Pesticide contacts</a></li><li><a href="#">Visit the Office of Pesticide Programs</a></li><li><a href="#">FOIA requests</a></li><li><a href="#">Public involvement opportunities</a></li><li><a href="#">National Pesticide Information Center</a></li></ul>',
+        } only %}
+      </div>
+    {% endblock %}
+  {% endembed %}
+
+  {% include '@components/govdelivery/govdelivery.twig' with {
+    'legend': 'Get pesticide updates by email',
+    'govdelivery_id': 'ABC',
+    'topic_id': '123',
+  } %}
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/web-area-homepages/microsite.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'has_header': has_header,
+    'slideshow': slideshow,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
