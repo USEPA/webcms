@@ -212,6 +212,28 @@ abstract class EPAModeration implements EPAModerationInterface {
   }
 
   /**
+   * Sets field_last_published value to the current date and time
+   *
+   * @param bool $reset
+   *  Pass TRUE to set field_last_published to null
+   */
+  protected function setLastPublishedDate($reset = FALSE) {
+    // Stop if content doesn't have this field
+    if (!$this->contentEntityRevision->hasField('field_last_published')) {
+      return;
+    }
+
+    if ($reset) {
+      $this->contentEntityRevision->set('field_last_published', NULL);
+      return;
+    }
+
+    $date = new DrupalDateTime();
+    $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
+    $this->contentEntityRevision->set('field_last_published', $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT));
+  }
+
+  /**
    * Clear scheduled transitions on content entity revision.
    *
    * @param string $moderation_state

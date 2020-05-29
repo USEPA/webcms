@@ -12,8 +12,10 @@ dependencies:
     - field.storage.node.field_is_searchable_collection
     - field.storage.node.field_keywords
     - field.storage.node.field_language
+    - field.storage.node.field_last_published
     - field.storage.node.field_type
   module:
+    - datetime
     - epa_content_tracker
     - group
     - node
@@ -132,6 +134,12 @@ display:
               raw_output: false
             rendered_entity:
               alias: body
+              raw_output: false
+            created:
+              alias: date_created
+              raw_output: false
+            field_last_published:
+              alias: date_modified
               raw_output: false
       fields:
         qiid:
@@ -1115,7 +1123,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_geographic_locations:
@@ -1178,7 +1186,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_env_laws_regs_and_treaties:
@@ -1241,7 +1249,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_keywords:
@@ -1304,7 +1312,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_language:
@@ -1546,6 +1554,137 @@ display:
           view_mode: full
           entity_type: node
           plugin_id: rendered_entity
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          relationship: related_node
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: timestamp
+          settings:
+            date_format: custom
+            custom_date_format: Y-m-d
+            timezone: ''
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: node
+          entity_field: created
+          plugin_id: field
+        field_last_published:
+          id: field_last_published
+          table: node__field_last_published
+          field: field_last_published
+          relationship: related_node
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: datetime_custom
+          settings:
+            timezone_override: ''
+            date_format: Y-m-d
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
       filters:
         qiid:
           id: qiid
@@ -1726,6 +1865,7 @@ display:
         - 'config:field.storage.node.field_is_searchable_collection'
         - 'config:field.storage.node.field_keywords'
         - 'config:field.storage.node.field_language'
+        - 'config:field.storage.node.field_last_published'
         - 'config:field.storage.node.field_type'
   rest_export_2:
     display_plugin: rest_export
