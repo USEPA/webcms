@@ -18,6 +18,7 @@ dependencies:
     - field.field.node.regulation.field_is_searchable_collection
     - field.field.node.regulation.field_keywords
     - field.field.node.regulation.field_language
+    - field.field.node.regulation.field_last_published
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
     - field.field.node.regulation.field_page_head
@@ -93,7 +94,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 12
+      weight: 11
       format_type: tabs
       format_settings:
         id: ''
@@ -107,7 +108,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 14
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -228,7 +229,7 @@ content:
     type: options_shs
     region: content
   field_hublinks:
-    weight: 11
+    weight: 10
     settings:
       match_operator: CONTAINS
       size: 60
@@ -323,7 +324,7 @@ content:
     type: options_select
     region: content
   moderation_state:
-    weight: 50
+    weight: 17
     settings: {  }
     third_party_settings: {  }
     type: moderation_state_default
@@ -332,21 +333,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 14
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 17
+    weight: 16
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 15
     region: content
     third_party_settings: {  }
   title:
@@ -359,7 +360,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 13
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS
@@ -368,6 +369,7 @@ content:
       match_limit: 10
     third_party_settings: {  }
 hidden:
+  field_last_published: true
   field_review_deadline: true
   field_scheduled_transition: true
   path: true

@@ -139,11 +139,6 @@ function epa_core_token_info() {
     'name' => t('Machine name alias'),
     'description' => t('Machine name field.'),
   ];
-  $default_revision_created_token = [
-    'name' => t('Default revision creation date'),
-    'description' => t('The published revision\'s creation date.'),
-    'type' => 'date'
-  ];
   $contact_us_link = [
     'name' => t('Contact Us Link'),
     'description' => t('The link to a Web Area\'s contact form.'),
@@ -156,7 +151,6 @@ function epa_core_token_info() {
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
-      'default-revision-created' => $default_revision_created_token,
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -179,8 +173,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
-    if (stripos($name, 'default-revision-created') !== FALSE
-      || stripos($name, 'footer-last-updated') !== FALSE ) {
+    if (stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
       $name = $parts[0];
     }
@@ -189,11 +182,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
           $replacements[$original] = _epa_core_get_machine_name_alias($data[$type]);
-        }
-        break;
-      case 'default-revision-created':
-        if ($type == 'node') {
-          $replacements[$original] = _epa_core_get_default_revision_created($data['node'], $parts[1], $parts[2]);
         }
         break;
       case 'contact-us-link':
@@ -213,8 +201,8 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
         $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
-        if (isset($node)) {
-          $replacements[$original] = t('Last updated on @date', ['@date' => _epa_core_get_default_revision_created($node, $parts[1], $parts[2])]);
+        if (isset($node) && !$node->field_last_published->isEmpty()) {
+          $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
         else {
           $replacements[$original] = '';
@@ -242,15 +230,6 @@ function _epa_core_get_machine_name_alias($entity) {
 
   return $alias_string;
 }
-
-/**
- * Helper function to determine the published revision's creation date.
- */
-function _epa_core_get_default_revision_created($node, $type = 'medium', $format = NULL) {
-  $node = $node->isDefaultRevision() ? $node : Node::load($node->id());
-  return \Drupal::service('date.formatter')->format($node->getRevisionCreationTime(), $type, $format);
-}
-
 
 /**
  * Implements hook_entity_revision_delete().

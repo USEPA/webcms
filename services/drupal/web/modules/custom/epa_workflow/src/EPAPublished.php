@@ -27,6 +27,7 @@ class EPAPublished extends EPAModeration {
     $this->scheduleTransition('field_expiration_date', 'unpublished');
 
     $this->setReviewDeadline();
+    $this->setLastPublishedDate();
 
     if ($this->contentHasFieldValue('field_review_deadline')) {
       $transition_date = $this->contentEntityRevision->field_review_deadline->date;
