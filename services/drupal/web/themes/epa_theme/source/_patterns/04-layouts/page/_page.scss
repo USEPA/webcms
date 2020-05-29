@@ -1,0 +1,41 @@
+// @file
+// Styles for the Page Layout.
+
+//.l-page {}
+
+.l-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: rem(gesso-spacing(2));
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    flex-wrap: nowrap;
+  }
+}
+
+.l-page__header-first {
+  margin-bottom: rem(gesso-spacing(2));
+  margin-right: rem(gesso-get-map(gutter-width));
+}
+
+.l-page__header-last {
+  flex-shrink: 0;
+  margin-bottom: rem(gesso-spacing(2));
+}
+
+.l-page__footer {
+  background-color: gesso-grayscale('gray-1');
+  margin-top: rem(gesso-spacing(4));
+  padding-bottom: rem(gesso-site-margins(mobile));
+  padding-top: rem(gesso-site-margins(mobile));
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  @include at-media($theme-site-margins-breakpoint) {
+    padding-bottom: rem(gesso-site-margins(desktop));
+    padding-top: rem(gesso-site-margins(desktop));
+  }
+}
