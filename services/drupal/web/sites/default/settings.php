@@ -820,6 +820,9 @@ $config_directories['sync'] = '../config/sync';
 // garbage collection when their usage drops to zero.
 $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
 
+// Set the root domain for node export operations.
+$settings['epa_node_export.base_url'] = $base_secure_url;
+
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }

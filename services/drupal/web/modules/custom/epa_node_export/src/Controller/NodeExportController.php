@@ -5,7 +5,9 @@ namespace Drupal\epa_node_export\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\epa_core\Utility\EpaCoreHelper;
 use Drupal\node\NodeInterface;
 use GuzzleHttp\Client;
@@ -61,6 +63,13 @@ class NodeExportController extends ControllerBase {
   protected $logger;
 
   /**
+   * The settings service.
+   *
+   * @var \Drupal\Core\Site\Settings
+   */
+  protected $settings;
+
+  /**
    * Constructor for the ArchiveController class.
    *
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
@@ -73,13 +82,16 @@ class NodeExportController extends ControllerBase {
    *   The http client.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger interface.
+   * @param \Drupal\Core\Site\Settings $settings
+   *   The settings service.
    */
-  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger) {
+  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger, Settings $settings) {
     $this->dateFormatter = $date_formatter;
     $this->epaCoreHelper = $epa_core_helper;
     $this->fileSystem = $file_system;
     $this->httpClient = $http_client;
     $this->logger = $logger;
+    $this->settings = $settings;
   }
 
   /**
@@ -91,7 +103,8 @@ class NodeExportController extends ControllerBase {
       $container->get('epa_core.helper'),
       $container->get('file_system'),
       $container->get('http_client'),
-      $container->get('logger.factory')->get('epa_node_export')
+      $container->get('logger.factory')->get('epa_node_export'),
+      $container->get('settings')
     );
   }
 
@@ -119,13 +132,18 @@ class NodeExportController extends ControllerBase {
    */
   public function buildExportAdminPage(NodeInterface $node) {
     return [
-      'title' => [
-        '#type' => 'html_tag',
-        '#tag' => 'h1',
-        '#value' => $node->label(),
+      'export_notice' => [
+        '#type' => 'markup',
+        '#markup' => $this->t('<p>Click the button below to generate a zip file with a standalone copy of this page and any necessary support files.</p>
+        <p><em>Do not navigate away from this page while the zip file is being generated. It will download automatically when the process is complete.</em></p>'),
       ],
-      'body' => [
-        '#markup' => $this->t('Yo'),
+      'export' => [
+        '#type' => 'link',
+        '#url' => Url::fromRoute('epa_node_export.create', ['node' => $node->id()]),
+        '#title' => $this->t('Generate export file'),
+        '#attributes' => [
+          'class' => ['button', 'button--primary'],
+        ],
       ],
       '#cache' => [
         'contexts' => [
@@ -154,7 +172,7 @@ class NodeExportController extends ControllerBase {
 
     $url = $node->toURL('canonical', [
       'absolute' => TRUE,
-      'base_url' => 'http://localhost',
+      'base_url' => $this->settings->get('epa_node_export.base_url', 'https://www.epa.gov'),
     ])->toString();
 
     try {
@@ -165,11 +183,15 @@ class NodeExportController extends ControllerBase {
         $export_uri = $tempnam . '_1';
         $export_dir = $this->fileSystem->realpath($export_uri);
 
-        exec("cd " . dirname($export_dir) . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix=" . basename($export_dir) . " --recursive --level=1 --page-requisites -I /sites,/epafiles,/misc $url", $output, $return);
+        exec("cd " . dirname($export_dir)
+          . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix="
+          . basename($export_dir) . " --content-on-error --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/sites,/system,/themes,/sites $url", $output, $wget_status);
 
         // Bail out if we had an error during the wget call.
-        if ($return != 0) {
-          $this->logger->notice('Error while exporting: @return', ['@return' => $return]);
+        // Note: This seems to trigger in local environments sometimes even when
+        // the exported zip is correctly completed.
+        if ($wget_status != 0) {
+          $this->logger->notice('Error while exporting a node: @wget_status', ['@wget_status' => $wget_status]);
           throw new NotFoundHttpException();
         }
 
