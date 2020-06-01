@@ -36,8 +36,7 @@ resource "aws_instance" "utility" {
     aws_security_group.search_access.id
   ]
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Bastion"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Bastion"
+  })
 }

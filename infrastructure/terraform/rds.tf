@@ -1,15 +1,15 @@
 # Launch DBs in private subnets
 resource "aws_db_subnet_group" "default" {
-  name       = "webcms_default"
+  name       = "webcms_default_${local.env-suffix}"
   subnet_ids = aws_subnet.private.*.id
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DB subnets"
+  })
 }
 
 resource "aws_rds_cluster" "db" {
-  cluster_identifier = "webcms-db"
+  cluster_identifier = "webcms-db-${local.env-suffix}"
 
   # Aurora Serverless doesn't support engine versions (for MySQL, it's fixed at 5.6)
   engine      = "aurora"
@@ -35,10 +35,9 @@ resource "aws_rds_cluster" "db" {
     seconds_until_auto_pause = 21600 # 6 * 3600 = 6 hours
   }
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS DB"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DB"
+  })
 
   # Ignore changes to the master password since it's stored in the Terraform state.
   # Instead, the value in Parameter Store should be treated as the sole source of truth.

@@ -16,14 +16,12 @@ data "aws_iam_policy_document" "ecs_assume_role_policy" {
 }
 
 resource "aws_iam_role" "ecs_cluster_role" {
-  name        = "WebCMSAppClusterRole"
+  name        = "${local.role-prefix}AppClusterRole"
   description = "Role for the WebCMS's cluster"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_assume_role_policy.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 # resource "aws_iam_role_policy_attachment" "ecs_policy" {
@@ -57,7 +55,7 @@ data "aws_iam_policy_document" "ssm_s3_policy" {
 }
 
 resource "aws_iam_policy" "ssm_s3_policy" {
-  name        = "WebCMSAccessPolicyForSSMAndS3"
+  name        = "${local.role-prefix}AccessPolicyForSSMAndS3"
   description = "Policy to grant access to SSM-related S3 buckets"
   policy      = data.aws_iam_policy_document.ssm_s3_policy.json
 }
@@ -94,7 +92,7 @@ data "aws_iam_policy_document" "ssm_session_policy" {
 }
 
 resource "aws_iam_policy" "ssm_session_policy" {
-  name        = "WebCMSSessionPolicyForSSM"
+  name        = "${local.role-prefix}SessionPolicyForSSM"
   description = "Policy to grant servers access to SSM sessions"
   policy      = data.aws_iam_policy_document.ssm_session_policy.json
 }
@@ -118,14 +116,12 @@ data "aws_iam_policy_document" "ec2_assume_role_policy" {
 }
 
 resource "aws_iam_role" "ec2_server_role" {
-  name        = "WebCMSAppInstanceRole"
+  name        = "${local.role-prefix}AppInstanceRole"
   description = "Role for the WebCMS's EC2 instances"
 
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role_policy.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 data "aws_iam_policy_document" "ec2_instance_profile" {
@@ -162,7 +158,7 @@ data "aws_iam_policy_document" "ec2_instance_profile" {
 }
 
 resource "aws_iam_role_policy" "ec2_instance_cluster" {
-  name   = "WebCMSAppAutoscalingPolicy"
+  name   = "${local.role-prefix}AppAutoscalingPolicy"
   role   = aws_iam_role.ec2_server_role.name
   policy = data.aws_iam_policy_document.ec2_instance_profile.json
 }
@@ -201,7 +197,7 @@ resource "aws_iam_role_policy_attachment" "ec2_extra_policies" {
 }
 
 resource "aws_iam_instance_profile" "ec2_servers" {
-  name = "WebCMSAppInstanceProfile"
+  name = "${local.role-prefix}AppInstanceProfile"
   role = aws_iam_role.ec2_server_role.name
 }
 
@@ -225,14 +221,12 @@ data "aws_iam_policy_document" "drupal_assume_role_policy" {
 }
 
 resource "aws_iam_role" "drupal_container_role" {
-  name        = "WebCMSDrupalContainerRole"
+  name        = "${local.role-prefix}DrupalContainerRole"
   description = "Role for the WebCMS's Drupal app containers"
 
   assume_role_policy = data.aws_iam_policy_document.drupal_assume_role_policy.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 data "aws_iam_policy_document" "uploads_access" {
@@ -268,7 +262,7 @@ data "aws_iam_policy_document" "uploads_access" {
 }
 
 resource "aws_iam_policy" "uploads_access" {
-  name        = "WebCMSUploadsAccess"
+  name        = "${local.role-prefix}UploadsAccess"
   description = "Grants read/write access to the WebCMS' uploads bucket"
 
   policy = data.aws_iam_policy_document.uploads_access.json
@@ -303,7 +297,7 @@ data "aws_iam_policy_document" "es_access" {
 }
 
 resource "aws_iam_policy" "es_access" {
-  name        = "WebCMSElasticsearchAccess"
+  name        = "${local.role-prefix}ElasticsearchAccess"
   description = "Grants read/write access to Elasticsearch"
 
   policy = data.aws_iam_policy_document.es_access.json
@@ -335,7 +329,7 @@ data "aws_iam_policy_document" "task_secrets_access" {
 }
 
 resource "aws_iam_policy" "task_secrets_access" {
-  name        = "WebCMSTaskSecretsAccess"
+  name        = "${local.role-prefix}TaskSecretsAccess"
   description = "Grants read access to the WebCMS's secrets"
 
   policy = data.aws_iam_policy_document.task_secrets_access.json
@@ -360,14 +354,12 @@ data "aws_iam_policy_document" "drupal_execution_assume_role" {
 # secrets we've identified in the Drupal task definitions. This is not the same as the
 # task role itself, which is how Drupal itself is identified.
 resource "aws_iam_role" "drupal_execution_role" {
-  name        = "WebCMSDrupalTaskExecutionRole"
+  name        = "${local.role-prefix}DrupalTaskExecutionRole"
   description = "Task execution role for Drupal containers"
 
   assume_role_policy = data.aws_iam_policy_document.drupal_execution_assume_role.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 # Attach the AWS-managed default task execution policy
@@ -398,14 +390,12 @@ data "aws_iam_policy_document" "bastion_assume" {
 }
 
 resource "aws_iam_role" "bastion_role" {
-  name        = "WebCMSBastionRole"
+  name        = "${local.role-prefix}BastionRole"
   description = "IAM role for the utility EC2 instance"
 
   assume_role_policy = data.aws_iam_policy_document.bastion_assume.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 resource "aws_iam_role_policy_attachment" "bastion_ssm" {
@@ -424,7 +414,7 @@ resource "aws_iam_role_policy_attachment" "bastion_ssm_session" {
 }
 
 resource "aws_iam_instance_profile" "bastion_profile" {
-  name = "WebCMSUtilityInstanceProfile"
+  name = "${local.role-prefix}UtilityInstanceProfile"
   role = aws_iam_role.bastion_role.name
 }
 
@@ -475,7 +465,7 @@ data "aws_iam_policy_document" "ssm_policy" {
 }
 
 resource "aws_iam_policy" "ssm_policy" {
-  name        = "WebCMSPolicyForSystemsManager"
+  name        = "${local.role-prefix}PolicyForSystemsManager"
   description = "Grants permission to perform Systems Manager functions"
   policy      = data.aws_iam_policy_document.ssm_policy.json
 }
@@ -557,21 +547,19 @@ data "aws_iam_policy_document" "user_ssm_policy" {
 }
 
 resource "aws_iam_policy" "user_ssm_policy" {
-  name        = "WebCMSUserAccessPolicyForSSM"
+  name        = "${local.role-prefix}UserAccessPolicyForSSM"
   description = "Grants Session Manager access for users"
   policy      = data.aws_iam_policy_document.user_ssm_policy.json
 }
 
 resource "aws_iam_group" "webcms_administrators" {
-  name = "WebCMSAdministrators"
+  name = "${local.role-prefix}Administrators"
 }
 
 resource "aws_iam_user" "webcms_admin" {
-  name = "WebCMSAdmin"
+  name = "${local.role-prefix}Admin"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 resource "aws_iam_group_membership" "webcms_administrators_admin" {

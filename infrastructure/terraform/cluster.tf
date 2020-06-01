@@ -3,22 +3,22 @@
 # First, create a custom Drupal container repository. This will house our built Drupal
 # images.
 resource "aws_ecr_repository" "drupal" {
-  name = "webcms-drupal"
+  name = "webcms-drupal-${local.env-suffix}"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${env.name-prefix} Drupal Repository"
+  })
 }
 
 # Second, we also create an nginx repository. We do this for two reasons:
 # 1. It gives nginx full access to the built Drupal filesystem in order to serve static files
 # 2. It lets us copy custom configuration into the image.
 resource "aws_ecr_repository" "nginx" {
-  name = "webcms-nginx"
+  name = "webcms-nginx-${local.env-suffix}"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${env.name-prefix} Nginx Repository"
+  })
 }
 
 # Generate a random ID for the ECS capacity provider to work around limitations in the AWS
@@ -59,11 +59,10 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
     }
   }
 
-  tags = {
+  tags = merge(local.common-tags, {
     # Give this capacity provider a name that matches the random_pet to aid debugging/triage
-    Name  = "WebCMS ${random_pet.capacity_provider.id}"
-    Group = "webcms"
-  }
+    Name = "WebCMS ${random_pet.capacity_provider.id}"
+  })
 }
 
 # ECS cluster
@@ -77,10 +76,9 @@ resource "aws_ecs_cluster" "cluster" {
     weight            = 100
   }
 
-  tags = {
-    Name  = "WebCMS"
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "WebCMS ${local.env-title}"
+  })
 }
 
 # Resources below this line are conditionally created if the image-tag-nginx and image-tag-drupal
@@ -98,7 +96,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # The 1-or-0 count here is a Terraform idiom for conditionally creating a resource
   count = var.image-tag-nginx != null && var.image-tag-drupal != null ? 1 : 0
 
-  family             = "webcms-drupal"
+  family             = "webcms-drupal-${local.env-suffix}"
   network_mode       = "awsvpc"
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
@@ -190,10 +188,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
     }
   ])
 
-  tags = {
-    Name  = "WebCMS Task - Drupal"
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Task - Drupal"
+  })
 
   # Explicitly depend on IAM permissions: if we don't, the ECS service may not be able
   # to launch tasks
@@ -216,7 +213,7 @@ resource "aws_ecs_service" "drupal" {
   # to the autoscaling rules below.
   count = length(aws_ecs_task_definition.drupal_task)
 
-  name            = "webcms-drupal"
+  name            = "webcms-drupal-${local.env-suffix}"
   cluster         = aws_ecs_cluster.cluster.arn
   desired_count   = 1
   task_definition = aws_ecs_task_definition.drupal_task[count.index].arn
@@ -260,12 +257,6 @@ resource "aws_ecs_service" "drupal" {
     type  = "spread"
   }
 
-  # TODO: Once new ARN/ID format applies to this account
-  # tags = {
-  #   Name  = "WebCMS Service - Drupal"
-  #   Group = "webcms"
-  # }
-
   # Ignore changes to the desired_count attribute - we assume that the application
   # autoscaling rules will take over
   lifecycle {
@@ -296,7 +287,7 @@ resource "aws_appautoscaling_target" "drupal" {
 resource "aws_appautoscaling_policy" "drupal_autoscaling" {
   count = length(aws_appautoscaling_target.drupal)
 
-  name        = "webcms-drupal-scaling"
+  name        = "webcms-drupal-scaling-${local.env-suffix}"
   policy_type = "TargetTrackingScaling"
 
   # These identify what we're scaling (see the autoscaling target above)

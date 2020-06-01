@@ -9,7 +9,7 @@ data "aws_ssm_parameter" "ecs-ami" {
 # designed to minimize possible downtime due to errors in the underlying AWS hardware,
 # since it reduces the number of instances in any given point of failure.
 resource "aws_placement_group" "servers" {
-  name = "WebCMS-Placement"
+  name = "webcms-placement-${local.env-suffix}"
 
   strategy = "spread"
 }
@@ -59,7 +59,7 @@ data "template_cloudinit_config" "servers" {
 # Since we're using a mixed-instances policy, this template doesn't define an instance
 # type. See the autoscaling group below.
 resource "aws_launch_template" "servers" {
-  name = "webcms-launch-template"
+  name = "webcms-launch-template-${local.env-suffix}"
 
   image_id               = data.aws_ssm_parameter.ecs-ami.value
   vpc_security_group_ids = [aws_security_group.server.id]
@@ -97,10 +97,9 @@ resource "aws_launch_template" "servers" {
 
   user_data = data.template_cloudinit_config.servers.rendered
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Launch Template"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Launch Template"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -108,7 +107,7 @@ resource "aws_launch_template" "servers" {
 }
 
 resource "aws_autoscaling_group" "servers" {
-  name = "webcms-autoscaling"
+  name = "webcms-autoscaling-${local.env-suffix}"
 
   # NB. We don't set the desired count because it will be managed by the ECS capacity
   # provider.
@@ -161,15 +160,14 @@ resource "aws_autoscaling_group" "servers" {
     }
   }
 
-  tag {
-    key                 = "Application"
-    value               = "WebCMS"
-    propagate_at_launch = true
-  }
+  # For each tag (common + name), add that tag to both the ASG and the servers it spawns
+  dynamic "tag" {
+    for_each = merge(local.common-tags, { Name = "${local.name-prefix} Cluster" })
 
-  tag {
-    key                 = "Name"
-    value               = "WebCMS Cluster"
-    propagate_at_launch = true
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
 }
