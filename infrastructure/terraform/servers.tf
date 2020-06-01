@@ -72,24 +72,11 @@ resource "aws_launch_template" "servers" {
     name = aws_iam_instance_profile.ec2_servers.name
   }
 
-  # Root volume used for the OS
   block_device_mappings {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size           = 64
-      volume_type           = "gp2"
-      delete_on_termination = true
-    }
-  }
-
-  # Volume used for Docker
-  # cf. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html
-  block_device_mappings {
-    device_name = "/dev/xvdcz"
-
-    ebs {
-      volume_size           = 64
+      volume_size           = 32
       volume_type           = "gp2"
       delete_on_termination = true
     }
