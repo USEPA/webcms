@@ -1,7 +1,7 @@
 ---
 el: .block
 title: Block
-state: inprogress
+state: complete
 ---
 
 __Variables:__
