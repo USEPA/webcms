@@ -1,7 +1,7 @@
 ---
 el: .views-view-unformatted
 title: Unformatted Views View
-state: inprogress
+state: complete
 ---
 
 __Variables:__
