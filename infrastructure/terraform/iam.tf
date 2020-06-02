@@ -437,7 +437,7 @@ data "aws_iam_policy_document" "ssm_assume" {
 }
 
 resource "aws_iam_role" "ssm" {
-  name               = "WebCMSSystemsManagerRole"
+  name               = "${local.role-prefix}SystemsManagerRole"
   description        = "Role for the Systems Manager service"
   assume_role_policy = data.aws_iam_policy_document.ssm_assume.json
 }
@@ -487,11 +487,17 @@ data "aws_iam_policy_document" "user_ssm_policy" {
     actions   = ["ssm:StartSession", "ssm:SendCommand"]
     resources = ["arn:aws:ec2:*:*:instance/*"]
 
-    # Limit this policy only to WebCMS EC2 instances
+    # Limit this policy only to WebCMS EC2 instances on a per-environment basis
     condition {
       test     = "StringLike"
-      variable = "ssm:resourceTag/Application"
-      values   = ["WebCMS"]
+      variable = "ssm:resourceTag/Group"
+      values   = ["webcms"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "ssm:resourceTag/Environment"
+      values   = [local.env-suffix]
     }
   }
 
@@ -563,7 +569,7 @@ resource "aws_iam_user" "webcms_admin" {
 }
 
 resource "aws_iam_group_membership" "webcms_administrators_admin" {
-  name  = "WebCMSAdminGroupMembership"
+  name  = "${local.role-prefix}AdminGroupMembership"
   group = aws_iam_group.webcms_administrators.name
 
   users = [
