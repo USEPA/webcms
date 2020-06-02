@@ -1,7 +1,3 @@
-resource "aws_iam_service_linked_role" "es" {
-  aws_service_name = "es.amazonaws.com"
-}
-
 resource "aws_elasticsearch_domain" "es" {
   domain_name = "webcms-domain-${local.env-suffix}"
 
@@ -47,8 +43,4 @@ resource "aws_elasticsearch_domain" "es" {
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Elasticsearch"
   })
-
-  depends_on = [
-    aws_iam_service_linked_role.es
-  ]
 }
