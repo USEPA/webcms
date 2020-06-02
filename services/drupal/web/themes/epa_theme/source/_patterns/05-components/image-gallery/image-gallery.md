@@ -1,7 +1,7 @@
 ---
 el: .image-gallery
 title: Image Gallery
-state: inreview
+state: complete
 ---
 
 __Variables:__
