@@ -1,0 +1,16 @@
+{% set classes = [
+  'usa-hero--slideshow',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include "@uswds/hero/hero.twig" with {
+  modifier_classes: classes,
+  title_element: title_element,
+  callout: callout,
+  title: title,
+  content: content,
+  paragraph: paragraph,
+  button_url: button_url,
+  button_text: button_text,
+  background_image: background_image,
+}%}

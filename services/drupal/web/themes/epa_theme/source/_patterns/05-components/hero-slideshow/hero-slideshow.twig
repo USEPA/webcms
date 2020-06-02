@@ -1,0 +1,32 @@
+{% set classes = [
+  'hero-slideshow',
+  'js-hero-slideshow',
+  'u-full-width',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  <ul class="hero-slideshow__list js-hero-slideshow__container">
+    {% for slide in slides %}
+      <li class="hero-slideshow__item">
+        {% include '@components/hero/hero--slideshow/hero--slideshow.twig' with {
+          modifier_classes: 'usa-hero--reversed',
+          background_image: slide.image,
+          title_element: 'h2',
+          callout: slide.callout,
+          title: slide.title,
+          content: slide.content,
+          button_url: slide.button_url,
+          button_text: slide.button_text,
+        } %}
+      </li>
+    {% endfor %}
+  </ul>
+  <div class="hero-slideshow__nav">
+    <div class="l-constrain js-hero-slideshow__nav">
+      {%- for slide in slides -%}
+        <button class="hero-slideshow__nav-button">{{ loop.index }}</button>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
