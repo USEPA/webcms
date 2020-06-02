@@ -1,12 +1,3 @@
-# Create a custom Drush container repo
-resource "aws_ecr_repository" "drush" {
-  name = "webcms-drush-${local.env-suffix}"
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Drush Repository"
-  })
-}
-
 data "aws_iam_policy_document" "events_assume_role_policy" {
   version = "2012-10-17"
 
