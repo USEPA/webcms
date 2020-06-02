@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "drupal" {
   name = "webcms-drupal-${local.env-suffix}"
 
   tags = merge(local.common-tags, {
-    Name = "${env.name-prefix} Drupal Repository"
+    Name = "${local.name-prefix} Drupal Repository"
   })
 }
 
@@ -17,7 +17,7 @@ resource "aws_ecr_repository" "nginx" {
   name = "webcms-nginx-${local.env-suffix}"
 
   tags = merge(local.common-tags, {
-    Name = "${env.name-prefix} Nginx Repository"
+    Name = "${local.name-prefix} Nginx Repository"
   })
 }
 
@@ -61,13 +61,13 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
   tags = merge(local.common-tags, {
     # Give this capacity provider a name that matches the random_pet to aid debugging/triage
-    Name = "WebCMS ${random_pet.capacity_provider.id}"
+    Name = "${local.name-prefix} ${random_pet.capacity_provider.id}"
   })
 }
 
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
-  name               = var.cluster-name
+  name               = local.cluster-name
   capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name]
 
   # We assume that all services will use our autoscaling group as its capacity provider

@@ -47,7 +47,7 @@ data "template_cloudinit_config" "servers" {
 
     # Join the cluster (see comments above)
     cat <<EOF >> /etc/ecs/ecs.config
-    ECS_CLUSTER=${var.cluster-name}
+    ECS_CLUSTER=${local.cluster-name}
     ECS_AWSVPC_BLOCK_IMDS=true
     ECS_RESERVED_MEMORY=128
     ECS_ENABLE_SPOT_INSTANCE_DRAINING=true

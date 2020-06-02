@@ -75,3 +75,8 @@ locals {
     Environment = var.site-env-name
   }
 }
+
+# Shared cluster naming values
+locals {
+  cluster-name = "webcms-cluster-${local.env-suffix}"
+}

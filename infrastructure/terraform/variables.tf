@@ -146,12 +146,6 @@ variable "server-security-ingress" {
 # Cluster variables
 # cf. cluster.tf
 
-variable "cluster-name" {
-  description = "Name of the ECS cluster to create"
-  type        = string
-  default     = "webcms-cluster"
-}
-
 variable "cluster-min-capacity" {
   description = "Minimum number of Drupal tasks to run in the cluster"
   type        = number
