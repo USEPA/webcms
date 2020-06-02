@@ -1,7 +1,3 @@
-resource "aws_iam_service_linked_role" "es" {
-  aws_service_name = "es.amazonaws.com"
-}
-
 resource "aws_elasticsearch_domain" "es" {
   domain_name = "webcms-domain"
 
@@ -48,8 +44,4 @@ resource "aws_elasticsearch_domain" "es" {
     Group = "webcms"
     Name  = "WebCMS Elasticsearch"
   }
-
-  depends_on = [
-    aws_iam_service_linked_role.es
-  ]
 }

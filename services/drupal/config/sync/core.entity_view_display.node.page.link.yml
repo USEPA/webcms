@@ -1,9 +1,9 @@
-uuid: 89750f32-f1ee-4b95-a209-3f98dfb4a3bf
+uuid: 7c072584-09ee-459d-9dce-6bd82a08983b
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.link
     - field.field.node.page.field_channel
     - field.field.node.page.field_description
     - field.field.node.page.field_env_laws_regs_and_treaties
@@ -26,22 +26,66 @@ dependencies:
     - field.field.node.page.layout_builder__layout
     - node.type.page
   module:
+    - layout_builder
+    - layout_builder_restrictions
     - user
-id: node.page.teaser
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+  layout_builder_restrictions:
+    allowed_block_categories:
+      - 'Chaos Tools'
+      - 'Content fields'
+      - 'Custom block types'
+      - 'Custom blocks'
+      - 'EPA Alerts'
+      - Forms
+      - Group
+      - 'Group Menu Block'
+      - 'Inline blocks'
+      - 'Lists (Views)'
+      - Menus
+      - System
+      - User
+      - Webform
+      - core
+    entity_view_mode_restriction:
+      whitelisted_blocks:
+        'Chaos Tools': {  }
+        'Content fields':
+          - 'field_block:node:page:field_paragraphs'
+          - 'field_block:node:page:field_paragraphs_1'
+        'Custom block types': {  }
+        'Custom blocks': {  }
+        'EPA Alerts': {  }
+        Forms: {  }
+        Group: {  }
+        'Group Menu Block': {  }
+        'Inline blocks':
+          - 'inline_block:paragraph'
+        'Lists (Views)': {  }
+        Menus: {  }
+        System: {  }
+        User: {  }
+        Webform: {  }
+        core: {  }
+      blacklisted_blocks: {  }
+      allowed_layouts: {  }
+id: node.page.link
 targetEntityType: node
 bundle: page
-mode: teaser
+mode: link
 content:
-  field_description:
-    type: basic_string
-    weight: 0
+  field_links:
+    weight: 101
     region: content
-    label: above
     settings: {  }
     third_party_settings: {  }
 hidden:
   content_moderation_control: true
   field_channel: true
+  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true

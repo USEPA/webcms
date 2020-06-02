@@ -1,4 +1,4 @@
 ---
 title: Public Notices
-state: inreview
+state: complete
 ---
