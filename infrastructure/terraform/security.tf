@@ -112,9 +112,9 @@ resource "aws_security_group_rule" "server_extra_ingress" {
   source_security_group_id = each.value
 }
 
-resource "aws_security_group" "bastion" {
-  name        = "webcms-bastion-sg-${local.env-suffix}"
-  description = "Security group for SSH bastions"
+resource "aws_security_group" "utility" {
+  name        = "webcms-utility-sg-${local.env-suffix}"
+  description = "Security group for utility servers"
 
   vpc_id = local.vpc-id
 
@@ -155,15 +155,15 @@ resource "aws_security_group" "bastion" {
   }
 
   tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Bastion"
+    Name = "${local.name-prefix} Utility"
   })
 }
 
-resource "aws_security_group_rule" "bastion_extra_ingress" {
+resource "aws_security_group_rule" "utility_extra_ingress" {
   for_each = toset(var.server-security-ingress)
 
   description       = "Allows ingress from security scanners to the utility server"
-  security_group_id = aws_security_group.bastion.id
+  security_group_id = aws_security_group.utility.id
 
   type      = "ingress"
   from_port = 0

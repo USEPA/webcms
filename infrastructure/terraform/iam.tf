@@ -374,7 +374,7 @@ resource "aws_iam_role_policy_attachment" "drupal_execution_parameters" {
   policy_arn = aws_iam_policy.task_secrets_access.arn
 }
 
-data "aws_iam_policy_document" "bastion_assume" {
+data "aws_iam_policy_document" "utility_assume" {
   version = "2012-10-17"
 
   statement {
@@ -389,33 +389,33 @@ data "aws_iam_policy_document" "bastion_assume" {
   }
 }
 
-resource "aws_iam_role" "bastion_role" {
-  name        = "${local.role-prefix}BastionRole"
+resource "aws_iam_role" "utility_role" {
+  name        = "${local.role-prefix}UtilityRole"
   description = "IAM role for the utility EC2 instance"
 
-  assume_role_policy = data.aws_iam_policy_document.bastion_assume.json
+  assume_role_policy = data.aws_iam_policy_document.utility_assume.json
 
   tags = local.common-tags
 }
 
-resource "aws_iam_role_policy_attachment" "bastion_ssm" {
-  role       = aws_iam_role.bastion_role.name
+resource "aws_iam_role_policy_attachment" "utility_ssm" {
+  role       = aws_iam_role.utility_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_role_policy_attachment" "bastion_ssm_s3" {
-  role       = aws_iam_role.bastion_role.name
+resource "aws_iam_role_policy_attachment" "utility_ssm_s3" {
+  role       = aws_iam_role.utility_role.name
   policy_arn = aws_iam_policy.ssm_s3_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "bastion_ssm_session" {
-  role       = aws_iam_role.bastion_role.name
+resource "aws_iam_role_policy_attachment" "utility_ssm_session" {
+  role       = aws_iam_role.utility_role.name
   policy_arn = aws_iam_policy.ssm_session_policy.arn
 }
 
-resource "aws_iam_instance_profile" "bastion_profile" {
+resource "aws_iam_instance_profile" "utility_profile" {
   name = "${local.role-prefix}UtilityInstanceProfile"
-  role = aws_iam_role.bastion_role.name
+  role = aws_iam_role.utility_role.name
 }
 
 # SSM role
