@@ -166,7 +166,10 @@ class NodeExportController extends ControllerBase {
 
     // Bail early if the node isn't published.
     if (!$node->isPublished()) {
-      $this->logger->notice('Error while exporting node: @title - @id. The page must be published.', ['@title' => $node->label(), '@id' => $node->id()]);
+      $this->logger->notice('Error while exporting node: @title - @id. The page must be published.', [
+        '@title' => $node->label(),
+        '@id' => $node->id(),
+      ]);
       throw new AccessDeniedHttpException();
     }
 
@@ -185,12 +188,27 @@ class NodeExportController extends ControllerBase {
 
         exec("cd " . dirname($export_dir)
           . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix="
-          . basename($export_dir) . " --content-on-error --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/sites,/system,/themes,/sites $url", $output, $wget_status);
+          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/sites,/system,/themes,/sites "
+          . $url . ' 2>&1 | grep -i "failed\|error"', $output, $wget_status);
 
-        // Bail out if we had an error during the wget call.
-        // Note: This seems to trigger in local environments sometimes even when
-        // the exported zip is correctly completed.
-        if ($wget_status != 0) {
+        // Filter out any 404 errors and any files with download errors that are
+        // actually named "error[...].[extension]".
+        // This will filter out files like:
+        // - error.svg
+        // - error-image.svg
+        // - image-error.svg
+        // ...and many more file type and options. Basically if the file appears
+        // in the output from wget, and has "error" in it, we'll filter it out
+        // in an effort to only halt the generation of the zip export for real
+        // errors.
+        $output = array_filter($output, function ($entry) {
+          return !strpos($entry, '404') && preg_match('/\/([a-zA-Z-]*)error([a-zA-Z-]*).([a-z]*)/', $entry) !== 1;
+        });
+
+        // Bail out if we had an error during the wget call. An attempt has been
+        // made to make this more robust and prevent 404s on files from
+        // disrupting the export process.
+        if (!empty($output)) {
           $this->logger->notice('Error while exporting a node: @wget_status', ['@wget_status' => $wget_status]);
           throw new NotFoundHttpException();
         }
