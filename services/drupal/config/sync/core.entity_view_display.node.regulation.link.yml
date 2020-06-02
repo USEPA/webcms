@@ -1,9 +1,9 @@
-uuid: ca4f5ef2-8fc7-4438-9509-f34812ab8fff
+uuid: 34bab02c-b857-45cf-af00-c89dbc32b737
 langcode: en
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.full
+    - core.entity_view_mode.node.link
     - field.field.node.regulation.field_additional_resources
     - field.field.node.regulation.field_cfr
     - field.field.node.regulation.field_channel
@@ -31,115 +31,47 @@ dependencies:
     - field.field.node.regulation.field_type
     - node.type.regulation
   module:
-    - datetime_range
-    - entity_reference_revisions
     - layout_builder
-    - text
     - user
 third_party_settings:
   layout_builder:
     allow_custom: false
     enabled: false
-id: node.regulation.full
+id: node.regulation.link
 targetEntityType: node
 bundle: regulation
-mode: full
+mode: link
 content:
-  field_additional_resources:
-    weight: 7
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_cfr:
-    type: entity_reference_revisions_entity_view
-    weight: 2
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    region: content
-  field_compliance:
-    weight: 8
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_docket_numbers:
-    weight: 3
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
-    region: content
-  field_effective_dates:
-    weight: 4
-    label: hidden
-    settings:
-      timezone_override: ''
-      format_type: short_no_time
-      separator: ''
-    third_party_settings: {  }
-    type: daterange_default
-    region: content
-  field_federal_register_citations:
-    weight: 1
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
-    region: content
-  field_legal_authorities:
-    type: entity_reference_revisions_entity_view
-    weight: 0
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    region: content
   field_links:
     weight: 100
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_rule_history:
-    weight: 6
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
-  field_rule_summary:
-    weight: 5
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: text_default
-    region: content
 hidden:
   content_moderation_control: true
+  field_additional_resources: true
+  field_cfr: true
   field_channel: true
+  field_compliance: true
   field_description: true
+  field_docket_numbers: true
+  field_effective_dates: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
+  field_federal_register_citations: true
   field_geographic_locations: true
   field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
   field_last_published: true
+  field_legal_authorities: true
   field_machine_name: true
   field_page_head: true
   field_publish_date: true
   field_review_deadline: true
+  field_rule_history: true
+  field_rule_summary: true
   field_scheduled_transition: true
   field_type: true
   links: true
