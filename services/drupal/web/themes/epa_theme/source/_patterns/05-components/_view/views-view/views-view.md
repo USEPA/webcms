@@ -1,7 +1,7 @@
 ---
 el: .views-view
 title: Views View
-state: inprogress
+state: complete
 ---
 
 __Variables:__
