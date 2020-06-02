@@ -11,6 +11,8 @@ set -eu
 cd infrastructure/terraform
 terraform init -input=false -backend-config=backend.config
 
+terraform workspace select "$WEBCMS_WORKSPACE"
+
 # Apply Terraform plan generated in previous step
 terraform apply -input=false out.plan
 
