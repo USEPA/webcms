@@ -1,9 +1,9 @@
-uuid: d05f7e32-a75c-458e-94c5-0d160e8656e7
+uuid: 83651f86-4170-4afe-9b54-379669df1880
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.link
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
     - field.field.node.event.field_deadline
@@ -31,40 +31,23 @@ dependencies:
     - field.field.node.event.field_type
     - node.type.event
   module:
-    - date_range_formatter
+    - layout_builder
     - user
-id: node.event.teaser
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.event.link
 targetEntityType: node
 bundle: event
-mode: teaser
-content:
-  field_date:
-    type: date_range_without_time
-    weight: 0
-    region: content
-    label: above
-    settings:
-      timezone_override: ''
-      single: 'D, m/d/Y - g:i A (T)'
-      single_all_day: 'D, m/d/Y'
-      one_day: 'D, m/d/Y - g:i A (T)'
-      one_month: 'D, m/d/Y - g:i A (T)'
-      several_months: 'D, m/d/Y - g:i A (T)'
-      several_years: 'D, m/d/Y - g:i A (T)'
-      separator: '-'
-      date_format: 'Y-m-d\TH:i:s'
-    third_party_settings: {  }
-  field_description:
-    type: basic_string
-    weight: 0
-    region: content
-    label: above
-    settings: {  }
-    third_party_settings: {  }
+mode: link
+content: {  }
 hidden:
   content_moderation_control: true
   field_channel: true
+  field_date: true
   field_deadline: true
+  field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
   field_event_cancellation: true
