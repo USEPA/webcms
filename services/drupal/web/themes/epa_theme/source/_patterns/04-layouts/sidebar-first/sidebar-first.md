@@ -1,7 +1,7 @@
 ---
 el: .l-sidebar-first
 title: Sidebar First Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__
