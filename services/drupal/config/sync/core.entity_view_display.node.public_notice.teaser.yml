@@ -37,43 +37,48 @@ dependencies:
     - field.field.node.public_notice.field_type_of_proposed_action
     - node.type.public_notice
   module:
-    - text
+    - datetime
     - user
 id: node.public_notice.teaser
 targetEntityType: node
 bundle: public_notice
 mode: teaser
 content:
-  body:
-    label: hidden
-    type: text_summary_or_trimmed
-    weight: 101
+  field_computed_comments_due_date:
+    type: datetime_default
+    weight: 0
+    region: content
+    label: above
     settings:
-      trim_length: 600
+      timezone_override: ''
+      format_type: short_no_time
     third_party_settings: {  }
+  field_description:
+    type: basic_string
+    weight: 2
     region: content
-  content_moderation_control:
-    weight: -20
+    label: above
     settings: {  }
     third_party_settings: {  }
+  field_geographic_locations:
+    type: entity_reference_label
+    weight: 1
     region: content
-  links:
-    weight: 100
-    settings: {  }
+    label: above
+    settings:
+      link: false
     third_party_settings: {  }
-    region: content
 hidden:
+  body: true
+  content_moderation_control: true
   field_applicants_or_respondents: true
   field_channel: true
   field_comments_due_date: true
   field_comments_extension_date: true
-  field_computed_comments_due_date: true
-  field_description: true
   field_docket_numbers: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_federal_register_citations: true
-  field_geographic_locations: true
   field_how_to_comment: true
   field_hublinks: true
   field_is_searchable_collection: true
@@ -93,3 +98,4 @@ hidden:
   field_scheduled_transition: true
   field_type: true
   field_type_of_proposed_action: true
+  links: true

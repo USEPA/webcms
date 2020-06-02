@@ -1,9 +1,9 @@
-uuid: 4aa80e74-a4d9-4a41-9032-76b2f1f8c119
+uuid: ec9dc4b7-73fa-41a3-a56d-073768b7f571
 langcode: en
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.full
+    - core.entity_view_mode.node.link
     - field.field.node.webform.field_description
     - field.field.node.webform.field_geographic_locations
     - field.field.node.webform.field_hublinks
@@ -18,36 +18,17 @@ dependencies:
     - field.field.node.webform.webform
     - node.type.webform
   module:
-    - entity_reference_revisions
     - layout_builder
     - user
-    - webform
 third_party_settings:
   layout_builder:
     allow_custom: false
     enabled: false
-id: node.webform.full
+id: node.webform.link
 targetEntityType: node
 bundle: webform
-mode: full
-content:
-  field_paragraphs:
-    weight: 0
-    label: hidden
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
-    region: content
-  webform:
-    weight: 1
-    label: hidden
-    settings:
-      source_entity: true
-    third_party_settings: {  }
-    type: webform_entity_reference_entity_view
-    region: content
+mode: link
+content: {  }
 hidden:
   content_moderation_control: true
   field_description: true
@@ -58,6 +39,8 @@ hidden:
   field_last_published: true
   field_machine_name: true
   field_page_head: true
+  field_paragraphs: true
   field_review_deadline: true
   field_type: true
   links: true
+  webform: true

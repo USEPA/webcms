@@ -1,8 +1,9 @@
-uuid: 8743e6e3-4ea6-4a69-8147-8787cf1c779d
+uuid: b491b972-550d-4069-ad84-c9807a5e4aac
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.link
     - field.field.node.faq.body
     - field.field.node.faq.field_channel
     - field.field.node.faq.field_description
@@ -25,73 +26,54 @@ dependencies:
     - field.field.node.faq.field_type
     - node.type.faq
   module:
-    - text
+    - layout_builder
+    - linked_field
     - user
-id: node.faq.default
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.faq.link
 targetEntityType: node
 bundle: faq
-mode: default
+mode: link
 content:
-  body:
-    label: hidden
-    type: text_default
-    weight: 3
-    settings: {  }
-    third_party_settings: {  }
-    region: content
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_hublinks:
-    weight: 0
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_links:
     weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_page_head:
-    weight: 5
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_question:
     weight: 2
     label: hidden
     settings: {  }
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: '[node:url]'
+        advanced: {  }
+        token: ''
     type: basic_string
     region: content
-  field_related_questions:
-    weight: 4
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
 hidden:
+  body: true
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_faq_taxonomy_topics: true
   field_geographic_locations: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
   field_last_published: true
   field_machine_name: true
+  field_page_head: true
   field_publish_date: true
+  field_related_questions: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true

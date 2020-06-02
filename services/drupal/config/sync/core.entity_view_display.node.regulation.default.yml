@@ -30,10 +30,8 @@ dependencies:
     - field.field.node.regulation.field_type
     - node.type.regulation
   module:
-    - datetime
     - datetime_range
     - entity_reference_revisions
-    - options
     - text
     - user
 id: node.regulation.default
@@ -42,12 +40,12 @@ bundle: regulation
 mode: default
 content:
   content_moderation_control:
-    weight: -20
+    weight: 1
     region: content
     settings: {  }
     third_party_settings: {  }
   field_additional_resources:
-    weight: 101
+    weight: 9
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -55,37 +53,22 @@ content:
     region: content
   field_cfr:
     type: entity_reference_revisions_entity_view
-    weight: 130
+    weight: 4
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
-  field_channel:
-    weight: 107
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_compliance:
-    weight: 102
+    weight: 10
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  field_description:
-    weight: 128
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_docket_numbers:
-    weight: 131
+    weight: 5
     label: above
     settings:
       view_mode: default
@@ -94,7 +77,7 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   field_effective_dates:
-    weight: 134
+    weight: 6
     label: above
     settings:
       separator: '-'
@@ -103,25 +86,8 @@ content:
     third_party_settings: {  }
     type: daterange_default
     region: content
-  field_env_laws_regs_and_treaties:
-    weight: 112
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_expiration_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 137
-    region: content
   field_federal_register_citations:
-    weight: 132
+    weight: 3
     label: above
     settings:
       view_mode: default
@@ -129,59 +95,17 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_geographic_locations:
-    weight: 115
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_hublinks:
-    weight: 130
+    weight: 0
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
-    region: content
-  field_is_searchable_collection:
-    weight: 131
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_keywords:
-    weight: 118
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_language:
-    weight: 125
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: list_key
-    region: content
-  field_last_published:
-    weight: 138
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
     region: content
   field_legal_authorities:
     type: entity_reference_revisions_entity_view
-    weight: 133
+    weight: 2
     label: above
     settings:
       view_mode: default
@@ -193,58 +117,40 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_machine_name:
-    weight: 127
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
   field_page_head:
-    weight: 129
+    weight: 11
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
-  field_publish_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 135
-    region: content
-  field_review_deadline:
-    weight: 104
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_rule_history:
-    weight: 105
+    weight: 8
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
   field_rule_summary:
-    weight: 106
+    weight: 7
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  links:
-    weight: 100
-    region: content
-    settings: {  }
-    third_party_settings: {  }
 hidden:
+  field_channel: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_publish_date: true
+  field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  links: true

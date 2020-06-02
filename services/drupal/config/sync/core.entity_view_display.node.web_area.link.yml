@@ -1,9 +1,9 @@
-uuid: bdc55372-6d1e-41c4-8887-a29c611da5d8
+uuid: 9dfffaa7-53eb-49b8-a61d-a5a222b4356f
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.link
     - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
@@ -22,24 +22,61 @@ dependencies:
     - field.field.node.web_area.layout_builder__layout
     - node.type.web_area
   module:
+    - layout_builder
+    - layout_builder_restrictions
     - user
-id: node.web_area.teaser
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+  layout_builder_restrictions:
+    allowed_block_categories:
+      - 'Chaos Tools'
+      - 'Content fields'
+      - 'Custom block types'
+      - 'Custom blocks'
+      - 'EPA Alerts'
+      - Forms
+      - Group
+      - 'Group Menu Block'
+      - 'Inline blocks'
+      - 'Lists (Views)'
+      - Menus
+      - System
+      - User
+      - Webform
+      - core
+    entity_view_mode_restriction:
+      whitelisted_blocks:
+        'Chaos Tools': {  }
+        'Content fields':
+          - 'field_block:node:web_area:field_paragraphs'
+        'Custom block types': {  }
+        'Custom blocks': {  }
+        'EPA Alerts': {  }
+        Forms: {  }
+        Group: {  }
+        'Group Menu Block': {  }
+        'Inline blocks':
+          - 'inline_block:paragraph'
+        'Lists (Views)': {  }
+        Menus: {  }
+        System: {  }
+        User: {  }
+        Webform: {  }
+        core: {  }
+      blacklisted_blocks: {  }
+      allowed_layouts: {  }
+id: node.web_area.link
 targetEntityType: node
 bundle: web_area
-mode: teaser
-content:
-  field_description:
-    type: basic_string
-    weight: 0
-    region: content
-    label: above
-    settings: {  }
-    third_party_settings: {  }
+mode: link
+content: {  }
 hidden:
   content_moderation_control: true
   field_banner: true
   field_channel: true
-  field_editor_email_address: true
+  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
@@ -49,7 +86,6 @@ hidden:
   field_page_head: true
   field_paragraphs: true
   field_publish_date: true
-  field_publisher_term: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
