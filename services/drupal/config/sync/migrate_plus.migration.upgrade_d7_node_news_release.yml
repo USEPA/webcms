@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 6fUoJLtX0yWzwwD29J9yhS3Wvvl_jL8u0LkXgGRcmG0
+  default_config_hash: 69ouWUL2COoOrq8iR7nGRMSWODKe0zUzHYd1L7GDgIw
 id: upgrade_d7_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -78,22 +78,18 @@ process:
     -
       plugin: get
       source: comment
+  _html_paragraphs:
+    plugin: migration_lookup
+    migration: upgrade_d7_node_news_release_paragraph_html
+    source: nid
   field_paragraphs:
     -
-      plugin: skip_on_empty
-      method: process
-      source: main_col_panes
-    -
-      plugin: single_value
-    -
-      plugin: epa_panes_to_paragraphs
-    -
-      plugin: multiple_values
-    -
       plugin: sub_process
+      source:
+        - '@_html_paragraphs'
       process:
-        target_id: target_id
-        target_revision_id: target_revision_id
+        target_id: '0'
+        target_revision_id: '1'
   field_channel:
     -
       plugin: sub_process
