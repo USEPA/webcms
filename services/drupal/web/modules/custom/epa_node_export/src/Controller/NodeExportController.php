@@ -2,9 +2,11 @@
 
 namespace Drupal\epa_node_export\Controller;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -16,8 +18,8 @@ use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use ZipArchive;
 
@@ -63,6 +65,13 @@ class NodeExportController extends ControllerBase {
   protected $logger;
 
   /**
+   * The currently active request object.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
+  protected $request;
+
+  /**
    * The settings service.
    *
    * @var \Drupal\Core\Site\Settings
@@ -82,15 +91,18 @@ class NodeExportController extends ControllerBase {
    *   The http client.
    * @param \Psr\Log\LoggerInterface $logger
    *   The logger interface.
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request object.
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings service.
    */
-  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger, Settings $settings) {
+  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger, Request $request, Settings $settings) {
     $this->dateFormatter = $date_formatter;
     $this->epaCoreHelper = $epa_core_helper;
     $this->fileSystem = $file_system;
     $this->httpClient = $http_client;
     $this->logger = $logger;
+    $this->request = $request;
     $this->settings = $settings;
   }
 
@@ -104,6 +116,7 @@ class NodeExportController extends ControllerBase {
       $container->get('file_system'),
       $container->get('http_client'),
       $container->get('logger.factory')->get('epa_node_export'),
+      $container->get('request_stack')->getCurrentRequest(),
       $container->get('settings')
     );
   }
@@ -119,6 +132,27 @@ class NodeExportController extends ControllerBase {
    */
   public function getExportAdminPageTitle(NodeInterface $node) {
     return $this->t('Export "@title"', ['@title' => $node->label()]);
+  }
+
+  /**
+   * Checks access for a specific request.
+   *
+   * @param \Drupal\Core\Session\AccountInterface $account
+   *   Run access checks for this account.
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   *   The access result.
+   */
+  public function access(AccountInterface $account) {
+    // Allow access to authenticated users if this node is published.
+    if ($account->isAuthenticated()) {
+      $node = $this->request->attributes->get('node');
+      if ($node->isPublished()) {
+        return AccessResult::allowed();
+      }
+    }
+    // Default to deny access to the route.
+    return AccessResult::forbidden();
   }
 
   /**
@@ -164,18 +198,9 @@ class NodeExportController extends ControllerBase {
    */
   public function createExportFile(NodeInterface $node) {
 
-    // Bail early if the node isn't published.
-    if (!$node->isPublished()) {
-      $this->logger->notice('Error while exporting node: @title - @id. The page must be published.', [
-        '@title' => $node->label(),
-        '@id' => $node->id(),
-      ]);
-      throw new AccessDeniedHttpException();
-    }
-
     $url = $node->toURL('canonical', [
       'absolute' => TRUE,
-      'base_url' => $this->settings->get('epa_node_export.base_url', 'https://www.epa.gov'),
+      'base_url' => $this->settings->get('epa_node_export.base_url', $base_secure_url),
     ])->toString();
 
     try {
@@ -188,29 +213,23 @@ class NodeExportController extends ControllerBase {
 
         exec("cd " . dirname($export_dir)
           . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix="
-          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/sites,/system,/themes,/sites "
-          . $url . ' 2>&1 | grep -i "failed\|error"', $output, $wget_status);
-
-        // Filter out any 404 errors and any files with download errors that are
-        // actually named "error[...].[extension]".
-        // This will filter out files like:
-        // - error.svg
-        // - error-image.svg
-        // - image-error.svg
-        // ...and many more file type and options. Basically if the file appears
-        // in the output from wget, and has "error" in it, we'll filter it out
-        // in an effort to only halt the generation of the zip export for real
-        // errors.
-        $output = array_filter($output, function ($entry) {
-          return !strpos($entry, '404') && preg_match('/\/([a-zA-Z-]*)error([a-zA-Z-]*).([a-z]*)/', $entry) !== 1;
-        });
+          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/sites,/system,/themes,/sites "
+          . $url . ' 2>&1', $wget_output, $wget_status);
 
         // Bail out if we had an error during the wget call. An attempt has been
         // made to make this more robust and prevent 404s on files from
-        // disrupting the export process.
-        if (!empty($output)) {
-          $this->logger->notice('Error while exporting a node: @wget_status', ['@wget_status' => $wget_status]);
-          throw new NotFoundHttpException();
+        // disrupting the export process. Any status returned from a file that
+        // wget attempts to include that is not 200 or 404 will trigger this
+        // logic.
+        if (!empty($wget_status)) {
+          $log_contents = implode("\n", $wget_output);
+          $this->logger->notice(t('Errors occurred while exporting node %node_title. <br/><strong>System Output:</strong> <br/><pre>@wget_output</pre>', [
+            '%node_title' => $node->label(),
+            '@wget_output' => $log_contents,
+          ]));
+
+          // Export the log to file so it will be included in the zip file.
+          file_put_contents($export_dir . '/export-error-log.txt', $log_contents);
         }
 
         $export_uri_filename = $export_uri . '.zip';

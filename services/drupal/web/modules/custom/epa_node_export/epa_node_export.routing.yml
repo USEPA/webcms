@@ -9,7 +9,7 @@ epa_node_export.admin_page:
       node:
         type: entity:node
   requirements:
-    _role: 'authenticated'
+    _custom_access: '\Drupal\epa_node_export\Controller\NodeExportController:access'
 
 epa_node_export.create:
   path: '/node/{node}/export/download'
@@ -22,4 +22,4 @@ epa_node_export.create:
       node:
         type: entity:node
   requirements:
-    _role: 'authenticated'
+    _custom_access: '\Drupal\epa_node_export\Controller\NodeExportController:access'
