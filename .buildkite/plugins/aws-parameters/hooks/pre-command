@@ -20,7 +20,7 @@ echo "~~~ :aws: Loading parameters..."
 # steps.
 get-parameter() {
   local -r name="/buildkite/terraform/$1"
-  local -r file="infrastructure/terraform/$1"
+  local -r file="infrastructure/terraform/$2"
 
   aws ssm get-parameter --name "$name" |
     jq -r '.Parameter.Value' \
