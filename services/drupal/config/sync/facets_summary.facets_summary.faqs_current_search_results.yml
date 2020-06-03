@@ -1,0 +1,32 @@
+uuid: 196e7454-d64c-4cdd-bc67-319cfb9a93f4
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.frequent_questions
+    - views.view.search_faqs
+  module:
+    - search_api
+id: faqs_current_search_results
+name: 'Current search results'
+facets:
+  faqs_topic:
+    checked: true
+    label: Topic
+    separator: ', '
+    weight: 0
+    show_count: false
+  faqs_webarea:
+    checked: true
+    label: 'Web Area'
+    separator: ', '
+    weight: 0
+    show_count: false
+facet_source_id: 'search_api:views_block__search_faqs__block_1'
+processor_configs:
+  reset_facets:
+    processor_id: reset_facets
+    weights:
+      build: '30'
+    settings:
+      link_text: 'Reset all search options'

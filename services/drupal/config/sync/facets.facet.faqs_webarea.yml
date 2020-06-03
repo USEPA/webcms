@@ -1,0 +1,72 @@
+uuid: 36f47f26-6988-4afd-a383-daf7124ef23f
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.frequent_questions
+    - views.view.search_faqs
+  module:
+    - facets_pretty_paths
+    - search_api
+third_party_settings:
+  facets_pretty_paths:
+    coder: default_coder
+id: faqs_webarea
+name: 'Web Area'
+url_alias: webarea
+weight: 0
+min_count: 1
+show_only_one_result: false
+field_identifier: epa_web_area_group
+facet_source_id: 'search_api:views_block__search_faqs__block_1'
+widget:
+  type: checkbox
+  config:
+    show_numbers: true
+    soft_limit: 20
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
+    show_reset_link: false
+    reset_text: 'Show all'
+    hide_reset_when_no_selection: false
+query_operator: and
+use_hierarchy: false
+expand_hierarchy: false
+enable_parent_when_child_gets_disabled: true
+hard_limit: 50
+exclude: false
+only_visible_when_facet_source_is_visible: false
+processor_configs:
+  active_widget_order:
+    processor_id: active_widget_order
+    weights:
+      sort: 20
+    settings:
+      sort: DESC
+  count_widget_order:
+    processor_id: count_widget_order
+    weights:
+      sort: 30
+    settings:
+      sort: DESC
+  display_value_widget_order:
+    processor_id: display_value_widget_order
+    weights:
+      sort: 40
+    settings:
+      sort: ASC
+  translate_entity:
+    processor_id: translate_entity
+    weights:
+      build: 5
+    settings: {  }
+  url_processor_handler:
+    processor_id: url_processor_handler
+    weights:
+      pre_query: 50
+      build: 15
+    settings: {  }
+empty_behavior:
+  behavior: none
+show_title: false
