@@ -1,7 +1,7 @@
 ---
 el: .filters
 title: Filters
-state: inreview
+state: complete
 ---
 
 __Variables:__

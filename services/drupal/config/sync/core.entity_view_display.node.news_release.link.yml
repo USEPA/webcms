@@ -1,9 +1,9 @@
-uuid: d476302d-c525-45cb-8f60-2cd1a7d8b288
+uuid: 5548d66a-88a1-46d5-97db-0f17b765cff8
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.link
     - field.field.node.news_release.field_channel
     - field.field.node.news_release.field_description
     - field.field.node.news_release.field_env_laws_regs_and_treaties
@@ -27,40 +27,26 @@ dependencies:
     - field.field.node.news_release.field_type
     - node.type.news_release
   module:
-    - datetime
+    - layout_builder
     - user
-id: node.news_release.teaser
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.news_release.link
 targetEntityType: node
 bundle: news_release
-mode: teaser
+mode: link
 content:
-  field_description:
-    type: basic_string
-    weight: 2
-    region: content
-    label: above
+  field_links:
+    weight: 100
     settings: {  }
     third_party_settings: {  }
-  field_release:
-    type: datetime_default
-    weight: 1
     region: content
-    label: inline
-    settings:
-      timezone_override: ''
-      format_type: medium
-    third_party_settings: {  }
-  field_secondary_headline:
-    type: string
-    weight: 0
-    region: content
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
 hidden:
   content_moderation_control: true
   field_channel: true
+  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
@@ -74,8 +60,10 @@ hidden:
   field_press_office: true
   field_press_officers: true
   field_publish_date: true
+  field_release: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_secondary_headline: true
   field_subjects: true
   field_type: true
   links: true

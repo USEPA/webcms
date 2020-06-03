@@ -1,7 +1,7 @@
 ---
 el: .facet-limit
 title: Facet Limit
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -1,7 +1,7 @@
 ---
 el: .facet-limit.is-open
 title: Open Facet Limit
-state: inreview
+state: complete
 ---
 
 __Variables:__
