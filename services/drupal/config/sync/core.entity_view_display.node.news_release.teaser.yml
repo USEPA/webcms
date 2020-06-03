@@ -27,25 +27,40 @@ dependencies:
     - field.field.node.news_release.field_type
     - node.type.news_release
   module:
+    - datetime
     - user
 id: node.news_release.teaser
 targetEntityType: node
 bundle: news_release
 mode: teaser
 content:
-  content_moderation_control:
-    weight: -20
+  field_description:
+    type: basic_string
+    weight: 2
+    region: content
+    label: above
     settings: {  }
     third_party_settings: {  }
+  field_release:
+    type: datetime_default
+    weight: 1
     region: content
-  links:
-    weight: 100
-    settings: {  }
+    label: inline
+    settings:
+      timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
+  field_secondary_headline:
+    type: string
+    weight: 0
     region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
 hidden:
+  content_moderation_control: true
   field_channel: true
-  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
@@ -59,9 +74,8 @@ hidden:
   field_press_office: true
   field_press_officers: true
   field_publish_date: true
-  field_release: true
   field_review_deadline: true
   field_scheduled_transition: true
-  field_secondary_headline: true
   field_subjects: true
   field_type: true
+  links: true

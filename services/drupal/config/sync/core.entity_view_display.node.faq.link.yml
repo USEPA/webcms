@@ -1,0 +1,80 @@
+uuid: b491b972-550d-4069-ad84-c9807a5e4aac
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.link
+    - field.field.node.faq.body
+    - field.field.node.faq.field_channel
+    - field.field.node.faq.field_description
+    - field.field.node.faq.field_env_laws_regs_and_treaties
+    - field.field.node.faq.field_expiration_date
+    - field.field.node.faq.field_faq_taxonomy_topics
+    - field.field.node.faq.field_geographic_locations
+    - field.field.node.faq.field_hublinks
+    - field.field.node.faq.field_is_searchable_collection
+    - field.field.node.faq.field_keywords
+    - field.field.node.faq.field_language
+    - field.field.node.faq.field_last_published
+    - field.field.node.faq.field_machine_name
+    - field.field.node.faq.field_page_head
+    - field.field.node.faq.field_publish_date
+    - field.field.node.faq.field_question
+    - field.field.node.faq.field_related_questions
+    - field.field.node.faq.field_review_deadline
+    - field.field.node.faq.field_scheduled_transition
+    - field.field.node.faq.field_type
+    - node.type.faq
+  module:
+    - layout_builder
+    - linked_field
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.faq.link
+targetEntityType: node
+bundle: faq
+mode: link
+content:
+  field_links:
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_question:
+    weight: 2
+    label: hidden
+    settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: '[node:url]'
+        advanced: {  }
+        token: ''
+    type: basic_string
+    region: content
+hidden:
+  body: true
+  content_moderation_control: true
+  field_channel: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_faq_taxonomy_topics: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_page_head: true
+  field_publish_date: true
+  field_related_questions: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_type: true
+  links: true

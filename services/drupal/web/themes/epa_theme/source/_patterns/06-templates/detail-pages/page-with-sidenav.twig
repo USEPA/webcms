@@ -1,4 +1,36 @@
-{% embed '@layouts/detail-header/detail-header.twig' %}
+{% set content %}
+  {% embed '@layouts/sidebar/sidebar.twig' with {
+    'has_sidebar': has_sidenav,
+    'modifier_classes': 'l-sidebar--reversed',
+  } %}
+    {% block main_content %}
+      {% embed '@components/article/article.twig' with {
+        'title': title,
+        'intro': intro,
+        'content': body,
+        'sidebar': sidebar,
+      } %}
+
+        {% block messages %}
+          {{ messages }}
+        {% endblock %}
+
+        {% block local_tasks %}
+          {{ tasks }}
+        {% endblock %}
+      {% endembed %}
+    {% endblock %}
+
+    {% block sidebar %}
+      {% include '@uswds/sidenav/sidenav.twig' %}
+    {% endblock %}
+  {% endembed %}
+
+{% endset %}
+
+{% embed '@layouts/page/page.twig' with {
+  'has_header': has_header,
+} %}
   {% block info %}
     {{ header_info }}
   {% endblock %}
@@ -6,37 +38,12 @@
   {% block contact %}
     {{ contact_link }}
   {% endblock %}
-{% endembed %}
 
-{% embed '@layouts/sidebar/sidebar.twig' with {
-  'has_sidebar': has_sidenav,
-  'modifier_classes': 'l-sidebar--reversed',
-} %}
-  {% block main_content %}
-    {% embed '@components/article/article.twig' with {
-      'title': title,
-      'intro': intro,
-      'content': body,
-      'sidebar': sidebar,
-    } %}
-
-      {% block messages %}
-        {{ messages }}
-      {% endblock %}
-
-      {% block local_tasks %}
-        {{ tasks }}
-      {% endblock %}
-    {% endembed %}
-  {% endblock %}
-
-  {% block sidebar %}
-    {% include '@uswds/sidenav/sidenav.twig' %}
-  {% endblock %}
-{% endembed %}
-
-{% embed '@layouts/detail-footer/detail-footer.twig' %}
   {% block content %}
+    {{ content }}
+  {% endblock %}
+
+  {% block footer %}
     {{ footer }}
   {% endblock %}
 {% endembed %}

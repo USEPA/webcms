@@ -1,7 +1,7 @@
 ---
 el: .facet.is-active
 title: Active Facet
-state: inreview
+state: complete
 ---
 
 __Variables:__
