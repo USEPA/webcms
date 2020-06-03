@@ -1,5 +1,5 @@
 resource "aws_elasticsearch_domain" "es" {
-  domain_name = "webcms-domain"
+  domain_name = "webcms-domain-${local.env-suffix}"
 
   elasticsearch_version = "7.4"
 
@@ -40,8 +40,7 @@ resource "aws_elasticsearch_domain" "es" {
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Elasticsearch"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Elasticsearch"
+  })
 }

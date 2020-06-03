@@ -1,9 +1,10 @@
-# Shared variables here. We use separate definitions for the web-facing Drupal tasks
-# and scheduled Drush cron scripts for a few reasons (such as avoiding spawning nginx),
-# so we share the values here.
+# This file is for values shared across multiple other *.tf files.
 
 data "aws_caller_identity" "current" {}
 
+# We use separate definitions for the web-facing Drupal tasks and scheduled Drush cron
+# scripts for a few reasons (such as avoiding spawning nginx), so we share the values
+# here.
 locals {
   # Plaintext environment variables for Drupal containers
   drupal-environment = [
@@ -50,4 +51,32 @@ locals {
   # in Terraform! It's the app-level user that only needs permissions to modify
   # the WebCMS's database.
   database-user = "webcms"
+}
+
+# Local values related to environment-specific naming
+locals {
+  # Per-environment suffix (for creating "foo-dev" or "bar-prod")
+  env-suffix = var.site-env-name
+
+  # Title-cased name of the environment
+  env-title = title(var.site-env-name)
+
+  # Prefix of the name tag, to give human-friendly names to generated resources
+  name-prefix = "WebCMS ${local.env-title}"
+
+  # Save the role prefix in order to use it everywhere - we don't use a /foo/ prefix
+  # because there are many places where role<->permission associations only use role
+  # names, so we keep them unique instead of prefixing non-unique names.
+  role-prefix = "WebCMS${local.env-title}"
+
+  # Tags attached to every resource
+  common-tags = {
+    Group       = "webcms"
+    Environment = var.site-env-name
+  }
+}
+
+# Shared cluster naming values
+locals {
+  cluster-name = "webcms-cluster-${local.env-suffix}"
 }

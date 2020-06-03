@@ -9,10 +9,9 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS VPC"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} VPC"
+  })
 }
 
 # If there was an existing VPC provided, read out its properties
@@ -46,10 +45,9 @@ resource "aws_subnet" "public" {
   vpc_id                  = local.vpc-id
   map_public_ip_on_launch = true
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Public ${count.index}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Public ${count.index}"
+  })
 }
 
 # We also create a private subnet for each availability zone spanned by this VPC. These
@@ -63,10 +61,9 @@ resource "aws_subnet" "private" {
   vpc_id                  = local.vpc-id
   map_public_ip_on_launch = false
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Private ${count.index}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Private ${count.index}"
+  })
 }
 
 # As with VPCs, we create a new internet gateway if one hasn't been provided.
@@ -75,10 +72,9 @@ resource "aws_internet_gateway" "gateway" {
 
   vpc_id = local.vpc-id
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Gateway"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Gateway"
+  })
 }
 
 locals {
@@ -95,10 +91,9 @@ resource "aws_route_table" "public" {
     gateway_id = local.gateway-id
   }
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Public Routes"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Public Routes"
+  })
 }
 
 resource "aws_route_table_association" "public_association" {
@@ -113,10 +108,9 @@ resource "aws_eip" "ip" {
 
   vpc = true
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS EIP ${count.index}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} EIP ${count.index}"
+  })
 }
 
 resource "aws_nat_gateway" "nat" {
@@ -125,10 +119,9 @@ resource "aws_nat_gateway" "nat" {
   subnet_id     = aws_subnet.public[count.index].id
   allocation_id = aws_eip.ip[count.index].id
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Nat ${count.index}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Nat ${count.index}"
+  })
 }
 
 # Create one private route table for each NAT gateway - since there is one per subnet, we
@@ -143,10 +136,9 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.nat[count.index].id
   }
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Private Routes ${count.index}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Private Routes ${count.index}"
+  })
 }
 
 resource "aws_route_table_association" "private_association" {
@@ -181,10 +173,9 @@ resource "aws_vpc_endpoint" "s3" {
     ]
   })
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS S3 Gateway"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} S3 Gateway"
+  })
 }
 
 locals {
@@ -208,8 +199,7 @@ resource "aws_vpc_endpoint" "ssm" {
   security_group_ids  = [aws_security_group.interface.id]
   subnet_ids          = aws_subnet.private.*.id
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS SSM Interface: ${each.value}"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} SSM Interface: ${each.value}"
+  })
 }

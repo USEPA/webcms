@@ -24,11 +24,11 @@ resource "aws_instance" "utility" {
   associate_public_ip_address = false
   instance_type               = "t3a.micro"
   subnet_id                   = aws_subnet.private[0].id
-  iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
+  iam_instance_profile        = aws_iam_instance_profile.utility_profile.name
   user_data_base64            = data.template_cloudinit_config.utility.rendered
 
   vpc_security_group_ids = [
-    aws_security_group.bastion.id,
+    aws_security_group.utility.id,
 
     # Grant access from the utility server for administrative tasks
     aws_security_group.database_access.id,
@@ -36,8 +36,7 @@ resource "aws_instance" "utility" {
     aws_security_group.search_access.id
   ]
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Bastion"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Utility"
+  })
 }
