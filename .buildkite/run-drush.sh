@@ -30,8 +30,8 @@ overrides="$(
 
 network_configuration="$(cat drushvpc.json)"
 
-task_definition="webcms-drush"
-cluster="webcms-cluster"
+task_definition="webcms-drush-$WEBCMS_ENVIRONMENT"
+cluster="webcms-cluster-$WEBCMS_ENVIRONMENT"
 
 # The lines using $(jq . | sed) are doing pretty-printing with indentation:
 # - jq . tells jq to just copy the input JSON object to stdout, and it will pretty-print
@@ -54,7 +54,7 @@ Task networking:
 $(jq . <<<"$network_configuration" | sed -e 's/^/  /')
 
 Update script:
-$script
+$(sed -e 's/^/  /' <<<"$script")
 EOF
 
 # Run a Drush task, capturing the task's ARN for later (that's the jq line at the end)
@@ -74,7 +74,7 @@ echo "--- Waiting on task ARN $arn"
 last_status=
 
 while true; do
-  output="$(aws ecs describe-tasks --tasks "$arn" --cluster webcms-cluster)"
+  output="$(aws ecs describe-tasks --tasks "$arn" --cluster "$cluster")"
 
   # If ECS reports any failures, bail early with the pretty-printed results
   if test "$(jq '.failures | length' <<<"$output")" -gt 0; then
