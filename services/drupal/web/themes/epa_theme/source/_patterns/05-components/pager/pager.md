@@ -1,7 +1,7 @@
 ---
 el: .pager
 title: Pager
-state: inreview
+state: complete
 ---
 
 __Variables:__
