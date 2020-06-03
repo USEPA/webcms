@@ -23,6 +23,8 @@ resource "aws_rds_cluster" "db" {
   preferred_backup_window      = "04:00-06:00"
   preferred_maintenance_window = "sun:06:00-sun:08:00"
 
+  skip_final_snapshot = true
+
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]
   # We don't set the availability zones manually here - Aurora auto-assigns 3 AZs which

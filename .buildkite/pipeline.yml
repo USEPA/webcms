@@ -93,8 +93,10 @@ steps:
       - step: build
       - step: plan
 
-    # Only build on commits (not pull requests) to the master branch
-    if: build.branch == "master" && build.pull_request.id == null
+    # Only build on commits (not pull requests) to master/stable
+    if: |
+      (build.branch == "master" || build.branch == "stable") &&
+      build.pull_request.id == null
 
     # See the previous plan step for most of these values
     plugins:
@@ -125,8 +127,10 @@ steps:
   - label: ":ecs: Run Drush updates"
     command: bash .buildkite/run-drush.sh
 
-    # Only build on commits (not pull requests) to the master branch
-    if: build.branch == "master" && build.pull_request.id == null
+    # Only build on commits (not pull requests) to master/stable
+    if: |
+      (build.branch == "master" || build.branch == "stable") &&
+      build.pull_request.id == null
 
     # Run only if the previous deploy step succeeded
     depends_on: apply
@@ -139,6 +143,8 @@ steps:
       # Download the Drush AWSVPC configuration
       - artifacts#v1.3.0:
           download: drushvpc.json
+      # Load configuration variables
+      - ./.buildkite/plugins/config: {}
       # Assume our ECS task management role
       - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
