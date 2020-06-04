@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# Exports in this plugin affect other plugins and command steps. We use this to centralize
+# a few configuration variables that are branch-dependent.
+
+# Exports:
+# WEBCMS_ENVIRONMENT: The name of the environment (used for, e.g., Docker repository
+# names)
+# WEBCMS_WORKSPACE: The Terraform workspace name
+
+if test "$BUILDKITE_BRANCH" == stable; then
+  export WEBCMS_ENVIRONMENT=stage
+  export WEBCMS_WORKSPACE=stage
+else
+  export WEBCMS_ENVIRONMENT=dev
+  export WEBCMS_WORKSPACE=default
+fi

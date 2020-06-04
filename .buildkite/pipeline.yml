@@ -41,6 +41,7 @@ steps:
       - ecr#v1.2.0:
           login: true
           no-include-email: true
+      - ./.buildkite/plugins/config: {}
 
   - label: ":terraform: Plan"
     key: plan
@@ -56,23 +57,23 @@ steps:
           # Use a 30-minute duration for credentials to minimize the time spent in this
           # nearly-administrative role
           duration: 1800
+      # Load configuration values. This is done in a plugin in order to affect other
+      # plugin's environment (namely, the aws-parameters plugin below).
+      - ./.buildkite/plugins/config: {}
       # Load AWS parameters: we do this here because hashicorp/terraform does not include
       # the AWS CLI, so we need to obtain these configuration values before executing
       # Terraform in Docker.
       - ./.buildkite/plugins/aws-parameters:
-          params:
-            - name: /buildkite/terraform/backend-config
-              file: infrastructure/terraform/backend.config
-            - name: /buildkite/terraform/variables
-              file: infrastructure/terraform/terraform.tfvars
+          variables: true
       # Perform a Terraform apply in the provided Docker image
       - docker#v3.5.0:
           image: hashicorp/terraform:0.12.24
           entrypoint: /bin/sh
           command: [.buildkite/terraform-plan.sh]
           environment:
-            # Forward image tag
+            # Forward build variables
             - WEBCMS_IMAGE_TAG
+            - WEBCMS_WORKSPACE
             # Forward STS-assumed credentials
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
@@ -93,25 +94,25 @@ steps:
       - step: build
       - step: plan
 
-    # Only build on commits (not pull requests) to the master branch
-    if: build.branch == "master" && build.pull_request.id == null
+    # Only build on commits (not pull requests) to master/stable
+    if: |
+      (build.branch == "master" || build.branch == "stable") &&
+      build.pull_request.id == null
 
     # See the previous plan step for most of these values
     plugins:
       - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
           duration: 1800
-      - ./.buildkite/plugins/aws-parameters:
-          params:
-            # Since we are using plan data, we don't need to load the Terraform variables
-            - name: /buildkite/terraform/backend-config
-              file: infrastructure/terraform/backend.config
+      - ./.buildkite/plugins/config: {}
+      - ./.buildkite/plugins/aws-parameters: {}
       - docker#v3.5.0:
           image: hashicorp/terraform:0.12.24
           entrypoint: /bin/sh
           command: [.buildkite/terraform-apply.sh]
           environment:
             - WEBCMS_IMAGE_TAG
+            - WEBCMS_WORKSPACE
             - AWS_ACCESS_KEY_ID
             - AWS_SECRET_ACCESS_KEY
             - AWS_SESSION_TOKEN
@@ -127,8 +128,10 @@ steps:
   - label: ":ecs: Run Drush updates"
     command: bash .buildkite/run-drush.sh
 
-    # Only build on commits (not pull requests) to the master branch
-    if: build.branch == "master" && build.pull_request.id == null
+    # Only build on commits (not pull requests) to master/stable
+    if: |
+      (build.branch == "master" || build.branch == "stable") &&
+      build.pull_request.id == null
 
     # Run only if the previous deploy step succeeded
     depends_on: apply
@@ -141,6 +144,8 @@ steps:
       # Download the Drush AWSVPC configuration
       - artifacts#v1.3.0:
           download: drushvpc.json
+      # Load configuration variables
+      - ./.buildkite/plugins/config: {}
       # Assume our ECS task management role
       - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks

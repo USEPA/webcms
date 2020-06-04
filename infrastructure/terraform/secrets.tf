@@ -16,37 +16,37 @@ resource "random_pet" "secret_suffix" {
 }
 
 resource "aws_secretsmanager_secret" "db_root_password" {
-  name        = "/webcms-${random_pet.secret_suffix.id}/db_root/password"
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_root/password"
   description = "Password for the WebCMS DB administrator"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: DB Root Password"
+  })
 }
 
 resource "aws_secretsmanager_secret" "db_app_password" {
-  name        = "/webcms-${random_pet.secret_suffix.id}/db_app/password"
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app/password"
   description = "Password for the WebCMS DB user"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: DB App Password"
+  })
 }
 
 resource "aws_secretsmanager_secret" "hash_salt" {
-  name        = "/webcms-${random_pet.secret_suffix.id}/drupal/hash_salt"
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/drupal/hash_salt"
   description = "Drupal hash salt"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: Hash Salt"
+  })
 }
 
 resource "aws_secretsmanager_secret" "mail_pass" {
-  name        = "/webcms-${random_pet.secret_suffix.id}/mail/password"
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/mail/password"
   description = "Password for SMTP auth"
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: Email Password"
+  })
 }

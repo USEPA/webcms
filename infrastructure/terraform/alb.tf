@@ -1,19 +1,19 @@
 # Create the user-facing load balancer for the ECS cluster
 resource "aws_lb" "frontend" {
-  name               = "webcms-frontend"
+  name               = "webcms-frontend-${local.env-suffix}"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Load Balancer"
+  })
 }
 
 # Target group for Drupal container tasks
 resource "aws_lb_target_group" "drupal_target_group" {
-  name = "webcms-drupal-tg"
+  name = "webcms-drupal-tg-${local.env-suffix}"
 
   port        = 80
   protocol    = "HTTP"
