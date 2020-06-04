@@ -1,0 +1,25 @@
+epa_node_export.admin_page:
+  path: '/node/{node}/export'
+  defaults:
+    _controller: '\Drupal\epa_node_export\Controller\NodeExportController::buildExportAdminPage'
+    _title_callback: '\Drupal\epa_node_export\Controller\NodeExportController::getExportAdminPageTitle'
+  options:
+    _admin_route: TRUE
+    parameters:
+      node:
+        type: entity:node
+  requirements:
+    _custom_access: '\Drupal\epa_node_export\Controller\NodeExportController:access'
+
+epa_node_export.create:
+  path: '/node/{node}/export/download'
+  defaults:
+    _controller: '\Drupal\epa_node_export\Controller\NodeExportController::createExportFile'
+    _title: 'Export Content'
+  options:
+    _admin_route: TRUE
+    parameters:
+      node:
+        type: entity:node
+  requirements:
+    _custom_access: '\Drupal\epa_node_export\Controller\NodeExportController:access'
