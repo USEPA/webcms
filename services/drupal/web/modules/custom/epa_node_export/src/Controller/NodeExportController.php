@@ -197,6 +197,7 @@ class NodeExportController extends ControllerBase {
    *   The zipped file for download.
    */
   public function createExportFile(NodeInterface $node) {
+    global $base_secure_url;
 
     $url = $node->toURL('canonical', [
       'absolute' => TRUE,
@@ -216,11 +217,7 @@ class NodeExportController extends ControllerBase {
           . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/sites,/system,/themes,/sites "
           . $url . ' 2>&1', $wget_output, $wget_status);
 
-        // Bail out if we had an error during the wget call. An attempt has been
-        // made to make this more robust and prevent 404s on files from
-        // disrupting the export process. Any status returned from a file that
-        // wget attempts to include that is not 200 or 404 will trigger this
-        // logic.
+        // Log the output of wget if we hit an error (non-zero status code).
         if (!empty($wget_status)) {
           $log_contents = implode("\n", $wget_output);
           $this->logger->notice(t('Errors occurred while exporting node %node_title. <br/><strong>System Output:</strong> <br/><pre>@wget_output</pre>', [
