@@ -23,7 +23,9 @@
 {% endset %}
 
 {% set main_top %}
-  <p><mark><em><strong>The recommendations on these pages apply to all mercury-containing light bulbs. <a href="#">Read a full list of which bulbs contain mercury.</a></strong></em></mark></p>
+  {% include '@uswds/intro/intro.twig' with {
+    'intro': 'The recommendations on these pages apply to all mercury-containing light bulbs. <a href="#">Read a full list of which bulbs contain mercury.</a>',
+  } %}
   <p>CFLs can help you save money, use less energy, reduce light bulb changes, and lower greenhouse gas emissions.</p>
   <ul>
     <li><a href="#">Learn more about energy-efficient lighting choices at EnergyStar.gov</a></li>
@@ -111,9 +113,7 @@
       'tag': 'div',
       'text': 'LED Recycling and Disposal',
     },
-    'content': '<ul><li><a href="#">Do LEDs Need To Be Recycled Like CFLs Or Other Electronics?</a></li>
-			<li><a href="#">Learn About LED Lighting</a></li>
-		</ul>',
+    'content': '<ul><li><a href="#">Do LEDs Need To Be Recycled Like CFLs Or Other Electronics?</a></li><li><a href="#">Learn About LED Lighting</a></li></ul>',
   } only %}
   {% include '@components/box/box--multipurpose/box--multipurpose.twig' with {
     'title': {
