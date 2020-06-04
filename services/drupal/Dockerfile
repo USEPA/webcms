@@ -1,6 +1,10 @@
 FROM forumone/drupal8:7.3-xdebug AS dev
 
 # Development-only dependencies/config here
+
+# Install gnu copy of wget to override copy provided by BusyBox.
+RUN apk add --no-cache wget
+
 # Note that any configuration applied to the prod image must be mirrored here, due to the
 # difference in base layers.
 RUN set -ex \
@@ -15,6 +19,9 @@ FROM forumone/drupal8:7.3 AS base
 
 # This is the base production layer. We use it here in order to make it easier to ensure
 # that both the dev and base targets are in sync with each other.
+
+# Install gnu copy of wget to override copy provided by BusyBox.
+RUN apk add --no-cache wget
 
 RUN set -ex \
   && { \
