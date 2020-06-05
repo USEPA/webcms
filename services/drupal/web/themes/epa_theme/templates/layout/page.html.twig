@@ -35,16 +35,55 @@
   */
 #}
 
+{% include '@uswds/banner/banner.twig' with {
+  'banner_text': 'An official website of the United States government',
+  'has_expanded': true,
+  'banner_action': 'Here’s how you know',
+  'expanded_blocks': [
+    {
+      'icon': '/themes/epa_theme/images/icon-dot-gov.svg',
+      'icon_alt': 'Dot gov',
+      'heading': 'The .gov means it’s official.',
+      'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.',
+    },
+    {
+      'icon': '/themes/epa_theme/images/icon-https.svg',
+      'icon_alt': 'HTTPS',
+      'heading': 'The site is secure.',
+      'content': 'The <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.',
+    },
+  ],
+} %}
+
 {{ page.header }}
-{{ page.navigation }}
-{{ page.breadcrumb }}
-{{ page.highlighted }}
+
+{% embed '@layouts/header/header.twig' %}
+  {% block logo %}
+    {% include "@components/site-logo/site-logo.twig" with {
+      'url': '/',
+    } %}
+  {% endblock %}
+
+  {% block search %}
+    {% include '@components/search/search--epa/search--epa.twig' %}
+  {% endblock %}
+
+  {% block navigation %}
+    {% embed '@components/nav/nav--epa/nav--epa.twig' with {
+      'label': 'Primary navigation',
+      'extended': true
+    } %}
+      {% block menu %}
+        {{ page.navigation }}
+      {% endblock %}
+    {% endembed %}
+  {% endblock %}
+{% endembed %}
+
 {{ page.help }}
 
 <main id="main" class="main" role="main" tabindex="-1">
-  {{ page.preface }}
   {{ page.content }}
-  {{ page.postscript }}
 </main>
 
 {{ page.footer }}
