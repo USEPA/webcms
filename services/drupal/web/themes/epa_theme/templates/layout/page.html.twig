@@ -86,4 +86,8 @@
   {{ page.content }}
 </main>
 
-{{ page.footer }}
+{% embed '@components/footer/footer.twig' %}
+  {% block content %}
+    {{ page.footer }}
+  {% endblock %}
+{% endembed %}
