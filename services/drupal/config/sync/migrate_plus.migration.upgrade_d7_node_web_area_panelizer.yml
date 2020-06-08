@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: mAOwCSzML_o-IoM-E5U4DEL_Zswi7OVWYzy9aNEFxuY
+  default_config_hash: EF-NSvVBNyWnHJjevbpV2n2mcHT_-lHjDSKPE6OAnbs
 id: upgrade_d7_node_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -169,6 +169,18 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
 destination:
   plugin: 'entity:node'
   default_bundle: web_area

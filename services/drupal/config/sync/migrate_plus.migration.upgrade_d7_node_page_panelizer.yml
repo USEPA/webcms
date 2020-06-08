@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 4DokTAjalJc70MRyDA_BoyhisJ97L_YG0IB2R3BfDos
+  default_config_hash: WTt-yy-Nn1nuYkI5xdOLic_iljEy9bZq43wE5aLfFtw
 id: upgrade_d7_node_page_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -188,6 +188,18 @@ process:
     -
       plugin: get
       source: field_resource_directories
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
 destination:
   plugin: 'entity:node'
   default_bundle: page
