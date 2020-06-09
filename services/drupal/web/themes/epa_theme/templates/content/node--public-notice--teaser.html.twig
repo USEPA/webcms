@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Theme override to display a teaser node.
+ */
+#}
+
+{% set metadata %}
+  {{ content.field_computed_comments_due_date }}
+  {{ content.field_geographic_locations }}
+{% endset %}
+
+{% include '@components/teaser/teaser.twig' with {
+  'url': url,
+  'title': label,
+  'subtitle': content.field_secondary_headline,
+  'metadata': metadata,
+  'summary': content.field_description,
+} %}
