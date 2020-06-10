@@ -60,54 +60,55 @@
   {{ content }}
 </main>
 
-{% embed '@components/footer/footer.twig' with {
-  'last_updated': 'Last updated on February 25, 2020'
-} %}
-  {% block column_one %}
-    <h2>Discover.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Accessibility', 'url': '#' },
-        { 'title': 'EPA Administrator', 'url': '#' },
-        { 'title': 'Budget & Performance', 'url': '#' },
-        { 'title': 'Contracting', 'url': '#' },
-        { 'title': 'Grants', 'url': '#' },
-        { 'title': 'January 19, 2017 Web Snapshot', 'url': '#' },
-        { 'title': 'No FEAR Act Data', 'url': '#' },
-        { 'title': 'Privacy', 'url': '#' },
-        { 'title': 'Privacy and Security Notice', 'url': '#' }
-      ],
-    } %}
-  {% endblock %}
-  {% block column_two %}
-    <h2>Connect.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Data.gov', 'url': '#' },
-        { 'title': 'Inspector General', 'url': '#' },
-        { 'title': 'Jobs', 'url': '#' },
-        { 'title': 'Newsroom', 'url': '#' },
-        { 'title': 'Open Government', 'url': '#' },
-        { 'title': 'Regulations.gov', 'url': '#' },
-        { 'title': 'Subscribe', 'url': '#' },
-        { 'title': 'USA.gov', 'url': '#' },
-        { 'title': 'White House', 'url': '#' }
-      ],
-    } %}
-  {% endblock %}
-  {% block column_three %}
-    <h2>Ask.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Contact EPA', 'url': '#' },
-        { 'title': 'Hotlines', 'url': '#' },
-        { 'title': 'FOIA Requests', 'url': '#' }
-      ],
-    } %}
-    <h2>Follow.</h2>
-    {% include '@components/menu/menu--social/menu--social.twig' %}
+{% embed '@components/footer/footer.twig' %}
+  {% block content %}
+    <div class="footer__column">
+      <h2>Discover.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Accessibility', 'url': '#' },
+          { 'title': 'EPA Administrator', 'url': '#' },
+          { 'title': 'Budget & Performance', 'url': '#' },
+          { 'title': 'Contracting', 'url': '#' },
+          { 'title': 'Grants', 'url': '#' },
+          { 'title': 'January 19, 2017 Web Snapshot', 'url': '#' },
+          { 'title': 'No FEAR Act Data', 'url': '#' },
+          { 'title': 'Privacy', 'url': '#' },
+          { 'title': 'Privacy and Security Notice', 'url': '#' }
+        ],
+      } %}
+    </div>
+    <div class="footer__column">
+      <h2>Connect.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Data.gov', 'url': '#' },
+          { 'title': 'Inspector General', 'url': '#' },
+          { 'title': 'Jobs', 'url': '#' },
+          { 'title': 'Newsroom', 'url': '#' },
+          { 'title': 'Open Government', 'url': '#' },
+          { 'title': 'Regulations.gov', 'url': '#' },
+          { 'title': 'Subscribe', 'url': '#' },
+          { 'title': 'USA.gov', 'url': '#' },
+          { 'title': 'White House', 'url': '#' }
+        ],
+      } %}
+    </div>
+    <div class="footer__column">
+      <h2>Ask.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Contact EPA', 'url': '#' },
+          { 'title': 'Hotlines', 'url': '#' },
+          { 'title': 'FOIA Requests', 'url': '#' }
+        ],
+      } %}
+      <h2>Follow.</h2>
+      {% include '@components/menu/menu--social/menu--social.twig' %}
+      <p class="footer__last-updated">Last updated on February 25, 2020</p>
+    </div>
   {% endblock %}
 {% endembed %}
