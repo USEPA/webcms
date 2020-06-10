@@ -3,23 +3,23 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.node.body
     - field.storage.node.field_comments_due_date
     - field.storage.node.field_computed_comments_due_date
     - field.storage.node.field_description
     - field.storage.node.field_geographic_locations
     - field.storage.node.field_locations_of_prop_actions
     - field.storage.paragraph.field_location_proposed_other
-    - field.storage.paragraph.field_state_or_territory
     - field.storage.node.field_notice_sort_date
     - field.storage.node.field_programs_or_statutes
     - field.storage.node.field_type_of_proposed_action
-    - field.storage.node.body
+    - field.storage.paragraph.field_state_or_territory
     - search_api.server.localhost
   module:
-    - node
+    - epa_web_areas
     - paragraphs
     - taxonomy
-    - epa_web_areas
+    - node
     - search_api
 id: public_notices
 name: 'Public Notices'
@@ -168,7 +168,6 @@ processor_settings:
   add_url: {  }
   aggregated_field: {  }
   entity_status: {  }
-  epa_web_areas_group: {  }
   html_filter:
     all_fields: false
     fields:
@@ -176,12 +175,12 @@ processor_settings:
     title: false
     alt: true
     tags:
-      b: 2
-      em: 1
       h1: 5
       h2: 3
       h3: 2
       strong: 2
+      b: 2
+      em: 1
       u: 1
     weights:
       preprocess_index: -49
