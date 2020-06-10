@@ -1,7 +1,7 @@
 ---
 el: .facet-list
 title: Facet List
-state: inreview
+state: complete
 ---
 
 __Variables:__

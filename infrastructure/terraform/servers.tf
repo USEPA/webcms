@@ -9,7 +9,7 @@ data "aws_ssm_parameter" "ecs-ami" {
 # designed to minimize possible downtime due to errors in the underlying AWS hardware,
 # since it reduces the number of instances in any given point of failure.
 resource "aws_placement_group" "servers" {
-  name = "WebCMS-Placement"
+  name = "webcms-placement-${local.env-suffix}"
 
   strategy = "spread"
 }
@@ -47,7 +47,7 @@ data "template_cloudinit_config" "servers" {
 
     # Join the cluster (see comments above)
     cat <<EOF >> /etc/ecs/ecs.config
-    ECS_CLUSTER=${var.cluster-name}
+    ECS_CLUSTER=${local.cluster-name}
     ECS_AWSVPC_BLOCK_IMDS=true
     ECS_RESERVED_MEMORY=128
     ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
@@ -59,7 +59,7 @@ data "template_cloudinit_config" "servers" {
 # Since we're using a mixed-instances policy, this template doesn't define an instance
 # type. See the autoscaling group below.
 resource "aws_launch_template" "servers" {
-  name = "webcms-launch-template"
+  name = "webcms-launch-template-${local.env-suffix}"
 
   image_id               = data.aws_ssm_parameter.ecs-ami.value
   vpc_security_group_ids = [aws_security_group.server.id]
@@ -72,24 +72,11 @@ resource "aws_launch_template" "servers" {
     name = aws_iam_instance_profile.ec2_servers.name
   }
 
-  # Root volume used for the OS
   block_device_mappings {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size           = 64
-      volume_type           = "gp2"
-      delete_on_termination = true
-    }
-  }
-
-  # Volume used for Docker
-  # cf. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html
-  block_device_mappings {
-    device_name = "/dev/xvdcz"
-
-    ebs {
-      volume_size           = 64
+      volume_size           = 32
       volume_type           = "gp2"
       delete_on_termination = true
     }
@@ -97,10 +84,9 @@ resource "aws_launch_template" "servers" {
 
   user_data = data.template_cloudinit_config.servers.rendered
 
-  tags = {
-    Group = "webcms"
-    Name  = "WebCMS Launch Template"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Launch Template"
+  })
 
   lifecycle {
     create_before_destroy = true
@@ -108,7 +94,7 @@ resource "aws_launch_template" "servers" {
 }
 
 resource "aws_autoscaling_group" "servers" {
-  name = "webcms-autoscaling"
+  name = "webcms-autoscaling-${local.env-suffix}"
 
   # NB. We don't set the desired count because it will be managed by the ECS capacity
   # provider.
@@ -161,15 +147,14 @@ resource "aws_autoscaling_group" "servers" {
     }
   }
 
-  tag {
-    key                 = "Application"
-    value               = "WebCMS"
-    propagate_at_launch = true
-  }
+  # For each tag (common + name), add that tag to both the ASG and the servers it spawns
+  dynamic "tag" {
+    for_each = merge(local.common-tags, { Name = "${local.name-prefix} Cluster" })
 
-  tag {
-    key                 = "Name"
-    value               = "WebCMS Cluster"
-    propagate_at_launch = true
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
 }

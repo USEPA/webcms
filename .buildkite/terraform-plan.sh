@@ -12,6 +12,8 @@ set -eu
 cd infrastructure/terraform
 terraform init -input=false -backend-config=backend.config
 
+terraform workspace select "$WEBCMS_WORKSPACE"
+
 # Perform a plan using a file - this file can be inspected later for changes that may have
 # been applied to the infrastructure.
 terraform plan \

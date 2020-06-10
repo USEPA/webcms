@@ -8,30 +8,30 @@ set -euo pipefail
 
 echo "~~~ :aws: Loading parameters..."
 
-i=0
-while true; do
-  prefix="BUILDKITE_PLUGIN_AWS_PARAMETERS_PARAMS_${i}"
-  name_key="${prefix}_NAME"
+# Usage:
+#   get-parameter NAME FILE
+#
+# NAME: The name of a Parameter Store parameter. The prefix /buildkite/terraform is
+#       automatically applied.
+# FILE: The destination file in the infrastructure/terraform directory.
+#
+# This function copies an AWS Parameter Store parameter into a destination file. This is
+# mostly intended to be used for downloading data to be used during the Terraform-related
+# steps.
+get-parameter() {
+  local -r name="/buildkite/terraform/$1"
+  local -r file="infrastructure/terraform/$2"
 
-  if ! [[ -v "$name_key" ]]; then
-    break
-  fi
+  aws ssm get-parameter --name "$name" |
+    jq -r '.Parameter.Value' \
+      >"$file"
 
-  name="${!name_key}"
+  echo "Loaded parameter $name into $file"
+}
 
-  file_key="${prefix}_FILE"
-  if test -z "${!file_key:-}"; then
-    echo "+++ No 'file' option specified for parameter $name" >&2
-    exit 1
-  fi
+get-parameter backend-config backend.config
 
-  file_name="${!file_key}"
-
-  parameter="$(aws ssm get-parameter --name "$name" | jq -r '.Parameter.Value')"
-
-  echo "$parameter" >"$file_name"
-
-  echo "Loaded parameter $name into $file_name"
-
-  i=$((i + 1))
-done
+# Only download the variables if asked
+if test "${BUILDKITE_PLUGIN_AWS_PARAMETERS_VARIABLES:-}" == true; then
+  get-parameter "variables-$WEBCMS_ENVIRONMENT" terraform.tfvars
+fi
