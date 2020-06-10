@@ -9,14 +9,15 @@ use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\media_library\MediaLibraryState;
-use Drupal\views\Plugin\views\query\Sql;
-use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -267,4 +268,29 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
 
     $entity->field_hublinks->setValue($hublinks);
   }
+}
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function epa_web_areas_entity_base_field_info(EntityTypeInterface $entity_type) {
+  $fields = [];
+  $config_syncing = \Drupal::isConfigSyncing();
+  if ($entity_type->id() == 'node' && !$config_syncing) {
+    $fields['epa_web_area_group'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Group reference'))
+      ->setDescription(t('The group with which this content is associated.'))
+      ->setSetting('target_type', 'group')
+      ->setTargetEntityTypeId('group')
+      ->setTargetBundle('web_area')
+      ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
+      ->setClass('\Drupal\epa_web_areas\ComputedGroupReference')
+      ->setComputed(TRUE)
+      ->setRequired(TRUE)
+      ->setRevisionable(FALSE)
+      ->setTranslatable(FALSE)
+      ->setDisplayConfigurable('view', FALSE)
+      ->setDisplayConfigurable('form', FALSE);
+  }
+  return $fields;
 }

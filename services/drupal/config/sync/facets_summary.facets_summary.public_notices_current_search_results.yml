@@ -1,0 +1,43 @@
+uuid: d9e3feb1-0c58-4afa-942e-41712ca4b512
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.public_notices
+    - views.view.search_public_notices
+  module:
+    - search_api
+id: public_notices_current_search_results
+name: 'Current search results'
+facets:
+  public_notices_comments_due_date:
+    checked: true
+    label: 'Comments Due Date'
+    separator: ', '
+    weight: 0
+    show_count: false
+  public_notices_program_or_statute:
+    checked: true
+    label: 'Program or Statute'
+    separator: ', '
+    weight: 0
+    show_count: false
+  public_notices_proposed_actions:
+    checked: true
+    label: 'Proposed Action'
+    separator: ', '
+    weight: 0
+    show_count: false
+  public_notices_location_of_prop_action:
+    checked: true
+    label: 'Location of Proposed Action'
+    separator: ', '
+    weight: 0
+    show_count: false
+facet_source_id: 'search_api:views_page__search_public_notices__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '45'
+    settings: {  }

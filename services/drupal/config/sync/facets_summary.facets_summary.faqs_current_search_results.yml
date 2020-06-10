@@ -1,0 +1,31 @@
+uuid: e0ab49f5-48d6-43ff-bb8b-a3be2d3fe989
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.frequent_questions
+    - views.view.search_faqs
+  module:
+    - search_api
+id: faqs_current_search_results
+name: 'Current search results'
+facets:
+  faqs_topic:
+    checked: true
+    label: Topic
+    separator: ', '
+    weight: 0
+    show_count: false
+  faqs_webarea:
+    checked: true
+    label: 'Web Area'
+    separator: ', '
+    weight: 0
+    show_count: false
+facet_source_id: 'search_api:views_page__search_faqs__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '45'
+    settings: {  }

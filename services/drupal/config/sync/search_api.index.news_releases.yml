@@ -1,0 +1,174 @@
+uuid: 085c1caa-d460-436d-9953-3c5065f10b4f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_paragraphs
+    - field.storage.paragraph.field_body
+    - field.storage.node.field_description
+    - field.storage.node.field_geographic_locations
+    - field.storage.node.field_press_office
+    - field.storage.node.field_release
+    - field.storage.node.field_secondary_headline
+    - field.storage.node.field_subjects
+    - search_api.server.localhost
+  module:
+    - paragraphs
+    - node
+    - epa_web_areas
+    - search_api
+id: news_releases
+name: 'News Releases'
+description: ''
+read_only: false
+field_settings:
+  epa_web_area_group:
+    label: 'Parent Group'
+    datasource_id: 'entity:node'
+    property_path: epa_web_area_group
+    type: integer
+    dependencies:
+      module:
+        - epa_web_areas
+  field_body:
+    label: 'Body » Paragraph » Body'
+    datasource_id: 'entity:node'
+    property_path: 'field_paragraphs:entity:field_body'
+    type: text
+    dependencies:
+      config:
+        - field.storage.node.field_paragraphs
+        - field.storage.paragraph.field_body
+      module:
+        - paragraphs
+  field_description:
+    label: Description
+    datasource_id: 'entity:node'
+    property_path: field_description
+    type: text
+    boost: 0.2
+    dependencies:
+      config:
+        - field.storage.node.field_description
+  field_geographic_locations:
+    label: 'Geographic Locations'
+    datasource_id: 'entity:node'
+    property_path: field_geographic_locations
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_geographic_locations
+  field_press_office:
+    label: 'Press Office'
+    datasource_id: 'entity:node'
+    property_path: field_press_office
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_press_office
+  field_release:
+    label: 'Release Date'
+    datasource_id: 'entity:node'
+    property_path: field_release
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_release
+  field_secondary_headline:
+    label: 'Secondary Headline'
+    datasource_id: 'entity:node'
+    property_path: field_secondary_headline
+    type: text
+    boost: !!float 3
+    dependencies:
+      config:
+        - field.storage.node.field_secondary_headline
+  field_subjects:
+    label: Subjects
+    datasource_id: 'entity:node'
+    property_path: field_subjects
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_subjects
+  status:
+    label: Published
+    datasource_id: 'entity:node'
+    property_path: status
+    type: integer
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 5
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - news_release
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_status: {  }
+  html_filter:
+    all_fields: false
+    fields:
+      - title
+    title: false
+    alt: true
+    tags:
+      b: 2
+      em: 1
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      u: 1
+    weights:
+      preprocess_index: -49
+      preprocess_query: -47
+  language_with_fallback: {  }
+  rendered_item: {  }
+  tokenizer:
+    all_fields: false
+    fields:
+      - title
+    spaces: '[^[:alnum:]]'
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -47
+      preprocess_query: -44
+  transliteration:
+    all_fields: false
+    fields:
+      - title
+    weights:
+      preprocess_index: -48
+      preprocess_query: -46
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: true
+  cron_limit: 50
+server: localhost
