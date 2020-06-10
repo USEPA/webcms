@@ -19,7 +19,7 @@
 {% set content %}
   {% include '@components/field/field.twig' with {
     'label': 'Date and Time',
-    'label_element': 'h3',
+    'label_element': 'h2',
     'element': 'div',
     'field_items': [
         {
@@ -29,7 +29,7 @@
   } %}
   {% include '@components/field/field.twig' with {
     'label': 'Location',
-    'label_element': 'h3',
+    'label_element': 'h2',
     'element': 'div',
     'field_items': [
         {
@@ -37,32 +37,20 @@
         },
     ],
   } %}
-  <div class="dropbutton js-dropbutton has-multiple">
-    <ul class="dropbutton__list js-dropbutton-list">
-      <li class="dropbutton__item is-action">
-        <button class="usa-button dropbutton__button">Add to Calendar</button>
-      </li><li class="dropbutton__toggle"><button class="dropbutton__toggle-button" type="button"><span class="visually-hidden">List additional actions</span></button></li>
-      <li class="dropbutton__toggle is-secondary-action">
-        <button class="dropbutton__toggle-button"><span class="visually-hidden">Choose Calendar</span></button>
-      </li>
-      <li class="dropbutton__item is-secondary-action">
-        <a class="usa-button dropbutton__button" href="#">iCalendar</a>
-      </li>
-      <li class="dropbutton__item is-secondary-action">
-        <a class="usa-button dropbutton__button" href="#">Outlook</a>
-      </li>
-      <li class="dropbutton__item is-secondary-action">
-        <a class="usa-button dropbutton__button" href="#">Google</a>
-      </li>
-      <li class="dropbutton__item is-secondary-action">
-        <a class="usa-button dropbutton__button" href="#">Yahoo</a>
-      </li>
-    </ul>
-  </div>
+  {% include '@components/field/field.twig' with {
+    'label': 'Add to Calendar',
+    'label_element': 'h2',
+    'element': 'div',
+    'field_items': [
+        {
+          'content': '<ul><li><a href="#">iCalendar</a></li><li><a href="#">Outlook</a></li><li><a href="#">Google</a></li><li><a href="#">Yahoo</a></li></ul>',
+        },
+    ],
+  } %}
+
   <h2>Details</h2>
   {% include '@components/field/field.twig' with {
     'label': 'Contact',
-    'label_display': 'inline',
     'label_element': 'h3',
     'element': 'div',
     'field_items': [
@@ -73,7 +61,6 @@
   } %}
   {% include '@components/field/field.twig' with {
     'label': 'Presenter',
-    'label_display': 'inline',
     'label_element': 'h3',
     'element': 'div',
     'field_items': [
@@ -84,7 +71,6 @@
   } %}
   {% include '@components/field/field.twig' with {
     'label': 'Description',
-    'label_display': 'inline',
     'label_element': 'h3',
     'element': 'div',
     'field_items': [

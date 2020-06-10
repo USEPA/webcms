@@ -4,11 +4,6 @@
   * Theme override for a main block.
   */
 #}
-{% set hide_wrapper = true %}
-
-{% if logged_in %}
-  {% set hide_wrapper = false %}
-{% endif %}
 
 {% set classes = [
   'block',
@@ -19,10 +14,10 @@
 {% set attributes = attributes.addClass(classes) %}
 
 {% embed '@components/block/block.twig' with {
-  'hide_wrapper': hide_wrapper,
+  'hide_wrapper': not logged_in,
   'has_constrain': false,
   'hide_content_wrapper': true,
-  'label': false
+  'label': false,
 } %}
 
   {% block content %}
