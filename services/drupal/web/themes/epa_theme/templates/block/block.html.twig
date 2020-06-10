@@ -21,11 +21,6 @@
   * @see template_preprocess_block()
   */
 #}
-{% set hide_wrapper = true %}
-
-{% if logged_in %}
-  {% set hide_wrapper = false %}
-{% endif %}
 
 {% set classes = [
   'block',
@@ -36,11 +31,11 @@
 {% set attributes = attributes.addClass(classes) %}
 
 {% embed '@components/block/block.twig' with {
-  'hide_wrapper': hide_wrapper,
+  'hide_wrapper': not logged_in,
   'has_constrain': false,
   'title_prefix': title_prefix,
   'title_suffix': title_suffix,
-  'label': label is not empty ? label : false
+  'label': label is not empty ? label : false,
 } %}
 
   {% block content %}
