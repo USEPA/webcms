@@ -6,6 +6,13 @@
  */
 
 /**
+ * Implements hook_preprocess().
+ */
+function epa_theme_preprocess(&$vars) {
+  $vars['epa_theme_image_path'] = '/' . $vars['directory'] . '/images/';
+}
+
+/**
  * Implements hook_preprocess_html().
  */
 function epa_theme_preprocess_html(&$vars, $hook) {
@@ -20,7 +27,6 @@ function epa_theme_preprocess_html(&$vars, $hook) {
     ],
     'x_ua_compatible',
   ];
-  $vars['image_path'] = '/' . $vars['directory'] . '/images';
 
   // Add wide template body class.
   if ($node = \Drupal::request()->attributes->get('node')) {

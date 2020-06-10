@@ -1,3 +1,10 @@
+{#
+ /**
+  * @file
+  * Theme override for a main block.
+  */
+#}
+
 {% set classes = [
   'block',
   'block--provider-' ~ configuration.provider|clean_class,
@@ -7,10 +14,10 @@
 {% set attributes = attributes.addClass(classes) %}
 
 {% embed '@components/block/block.twig' with {
-  'hide_wrapper': true,
+  'hide_wrapper': not logged_in,
   'has_constrain': false,
   'hide_content_wrapper': true,
-  'label': false
+  'label': false,
 } %}
 
   {% block content %}
