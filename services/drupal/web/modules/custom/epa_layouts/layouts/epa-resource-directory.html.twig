@@ -1,46 +1,57 @@
-<div class="row cols-2">
-  <div class="col size-3of4">
-    {{ content.main }}
-
-  {% if content.a1 or content.a2 %}
-    <div class="row cols-2">
-      <div class="col">
-        {{ content.a1 }}
-      </div>
-      <div class="col">
-        {{ content.a2 }}
-      </div>
+{% set row_a %}
+  {% if content.a1|render and content.a2|render %}
+    <div class="l-grid l-grid--2-col">
+      <div>{{ content.a1 }}</div>
+      <div>{{ content.a2 }}</div>
     </div>
+  {% else %}
+    {{ content.a1 }}
+    {{ content.a2 }}
   {% endif %}
+{% endset %}
 
-  {% if content.b1 or content.b2 %}
-    <div class="row cols-2">
-      <div class="col">
-        {{ content.b1 }}
-      </div>
-      <div class="col">
-        {{ content.b2 }}
-      </div>
+{% set row_b %}
+  {% if content.b1|render and content.b2|render %}
+    <div class="l-grid l-grid--2-col">
+      <div>{{ content.b1 }}</div>
+      <div>{{ content.b2 }}</div>
     </div>
+  {% else %}
+    {{ content.b1 }}
+    {{ content.b2 }}
   {% endif %}
-  
-  {% if content.c1 or content.c2 %}
-    <div class="row cols-2">
-      <div class="col">
-        {{ content.c1 }}
-      </div>
-      <div class="col">
-        {{ content.c2 }}
-      </div>
-    </div>
-  {% endif %}
+{% endset %}
 
-    {{ content.bottom }}
+{% set row_c %}
+  {% if content.c1|render and content.a2|render %}
+    <div class="l-grid l-grid--2-col">
+      <div>{{ content.c1 }}</div>
+      <div>{{ content.c2 }}</div>
+    </div>
+  {% else %}
+    {{ content.c1 }}
+    {{ content.c2 }}
+  {% endif %}
+{% endset %}
+
+{% set main_content %}
+  {{ content.main }}
+  {{ row_a }}
+  {{ row_b }}
+  {{ row_c }}
+  {{ content.bottom }}
+{% endset %}
+
+{% if main_content|trim and content.sidebar|render %}
+  <div class="l-sidebar">
+    <div class="l-sidebar__main">
+      {{ main_content }}
+    </div>
+    <div class="l-sidebar__sidebar">
+      {{ content.sidebar }}
+    </div>
   </div>
-
-{% if content.sidebar %}
-  <aside class="col size-1of4">
-    {{ content.sidebar }}
-  </aside>
+{% else %}
+  {{ main_content }}
+  {{ content.sidebar }}
 {% endif %}
-</div>
