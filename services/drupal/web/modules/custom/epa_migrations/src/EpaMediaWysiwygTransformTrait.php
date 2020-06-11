@@ -18,6 +18,9 @@ trait EpaMediaWysiwygTransformTrait {
    *   The content to search and transform embedded media.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entityTypeManager service.
+   *
+   * @return string
+   *   The original wysiwyg_content with embedded media in D8 format.
    */
   public function transformWysiwyg($wysiwyg_content, EntityTypeManager $entityTypeManager) {
     $view_modes = [
@@ -56,7 +59,9 @@ TEMPLATE;
 
       $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
       $media_entity_uuid = $entityTypeManager->getStorage('media')
-        ->load($tag_info['fid'])->uuid();
+        ->load($tag_info['fid']);
+
+      $media_entity_uuid = $media_entity_uuid ? $media_entity_uuid->uuid() : 0;
 
       if ($tag_info['view_mode'] === 'media_link') {
         return sprintf($inline_embed_replacement_template,
@@ -75,6 +80,40 @@ TEMPLATE;
     }, $wysiwyg_content);
 
     return $wysiwyg_content;
+  }
+
+  /**
+   * Extract block_header media from wysiwyg content.
+   *
+   * @param string $wysiwyg_content
+   *   The content to search and extract block_header media.
+   *
+   * @return array
+   *   An array that consists of the extracted block_header and the original
+   *   wysiwyg_content with the block header removed.
+   */
+  public function extractBlockHeader($wysiwyg_content) {
+    $pattern = '/\[\[(?<tag_info>.+?"view_mode":"block_header".+?)\]\]/s';
+    preg_match($pattern, $wysiwyg_content, $matches);
+
+    if ($matches['tag_info']) {
+      $decoder = new JsonDecode(TRUE);
+      $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
+      $block_header = [
+        'target_id' => $tag_info['fid'],
+        'alt' => $tag_info['attributes']['alt'],
+      ];
+
+      return [
+        'block_header' => $block_header,
+        'wysiwyg_content' => preg_replace($pattern, '', $wysiwyg_content),
+      ];
+    }
+
+    return [
+      'block_header' => NULL,
+      'wysiwyg_content' => $wysiwyg_content,
+    ];
   }
 
 }

@@ -54,9 +54,13 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
    */
   public function createParagraph($row, $record, $configuration) {
 
-    // Transform body field content.
     $body_field = $configuration['html_body'];
-    $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager);
+
+    // Extract media that uses the block_header view mode.
+    $split_content = $this->extractBlockHeader($body_field['value']);
+
+    // Convert D7 media to D8 media.
+    $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager);
 
     // Create an html paragraph and wrap it in a box.
     return $this->addBoxWrapper(
@@ -64,7 +68,8 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
         $this->createHtmlParagraph($body_field, $this->entityTypeManager),
       ],
       $configuration['override_title_text'],
-      $configuration['box_style']
+      $configuration['box_style'],
+      $split_content['block_header']
     );
   }
 
