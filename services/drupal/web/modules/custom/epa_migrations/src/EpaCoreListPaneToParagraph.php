@@ -57,9 +57,13 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
    */
   public function createParagraph($row, $record, $configuration) {
 
-    // Transform body field content.
     $body_field = $configuration['node_list_body'] ?? $configuration['link_list_body'];
-    $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager);
+
+    // Extract media that uses the block_header view mode.
+    $split_content = $this->extractBlockHeader($body_field['value']);
+
+    // Convert D7 media to D8 media.
+    $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager);
 
     $link_type = isset($configuration['node_field']) ? 'entity' : 'uri';
     $links = $link_type == 'entity' ? $configuration['node_field'] : $configuration['link_field'];
@@ -71,7 +75,8 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
         $this->createLinkListParagraph($link_type, $links),
       ],
       $configuration['title'] ?? $configuration['override_title_text'] ?? '',
-      $configuration['box_style'] ?? 'none'
+      $configuration['box_style'] ?? 'none',
+      $split_content['block_header']
     );
 
   }

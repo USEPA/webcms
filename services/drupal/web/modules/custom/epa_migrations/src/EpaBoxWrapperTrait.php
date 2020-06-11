@@ -18,11 +18,13 @@ trait EpaBoxWrapperTrait {
    *   The title for the box.
    * @param string $box_style
    *   The box style to use.
+   * @param array $image
+   *   The image file id and alt text.
    *
    * @return paragraph
    *   The saved box paragraph.
    */
-  public function addBoxWrapper(array $children, string $title, string $box_style) {
+  public function addBoxWrapper(array $children, string $title, string $box_style, array $image = NULL) {
     // Create Box paragraph container.
     $box_paragraph = Paragraph::create(['type' => 'box']);
 
@@ -36,6 +38,10 @@ trait EpaBoxWrapperTrait {
 
     if ($children) {
       $box_paragraph->set('field_paragraphs', $children);
+    }
+
+    if ($image) {
+      $box_paragraph->set('field_image', $image);
     }
 
     $box_paragraph->isNew();
