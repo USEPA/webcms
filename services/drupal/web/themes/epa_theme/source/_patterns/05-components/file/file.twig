@@ -1,16 +1,7 @@
-{% set type = '' %}
-{% if file.mime == 'application/msword' or file.mime == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' %}
-  {% set type = ' (doc)' %}
-{% elseif file.mime == 'application/pdf' %}
-  {% set type = ' (pdf)' %}
-{% elseif file.mime == 'application/vnd.ms-powerpoint' or file.mime == 'application/vnd.openxmlformats-officedocument.presentationml.presentation' %}
-  {% set type = ' (ppt)' %}
-{% elseif file.mime == 'application/rtf' %}
-  {% set type = ' (rtf)' %}
-{% elseif file.mime == 'text/plain' %}
-  {% set type = ' (txt)' %}
-{% elseif file.mime == 'application/zip' %}
-  {% set type = ' (zip)' %}
+{% if file.extension %}
+  {% set type %}
+    ({{ file.extension }})
+  {%- endset %}
 {% endif %}
 
 <a href="{{ url }}" class="file">
