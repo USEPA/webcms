@@ -77,7 +77,7 @@ resource "aws_launch_template" "servers" {
 
     ebs {
       encrypted             = true
-      kms_key_id            = var.ebs-encryption-key
+      kms_key_id            = var.encryption-at-rest-key
       volume_size           = 32
       volume_type           = "gp2"
       delete_on_termination = true

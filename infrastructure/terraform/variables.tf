@@ -23,9 +23,9 @@ variable "site-env-name" {
   type        = string
 }
 
-# Cross-cutting variables
-variable "ebs-encryption-key" {
-  description = "Name of the AWS KMS key to use for encrypting EBS volumes."
+# Encryption-related variables
+variable "encryption-at-rest-key" {
+  description = "Name of the AWS KMS key to use for encrypting at-rest data."
   type        = string
   default     = null
 }

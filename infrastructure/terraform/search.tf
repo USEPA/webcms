@@ -26,7 +26,7 @@ resource "aws_elasticsearch_domain" "es" {
 
   encrypt_at_rest {
     enabled    = true
-    kms_key_id = var.ebs-encryption-key
+    kms_key_id = var.encryption-at-rest-key
   }
 
   vpc_options {
