@@ -23,6 +23,13 @@ variable "site-env-name" {
   type        = string
 }
 
+# Cross-cutting variables
+variable "ebs-encryption-key" {
+  description = "Name of the AWS KMS key to use for encrypting EBS volumes."
+  type        = string
+  default     = null
+}
+
 # VPC
 # cf. vpc.tf
 
