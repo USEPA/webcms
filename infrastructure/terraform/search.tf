@@ -24,6 +24,11 @@ resource "aws_elasticsearch_domain" "es" {
     volume_size = var.search-instance-storage
   }
 
+  encrypt_at_rest {
+    enabled    = true
+    kms_key_id = var.encryption-at-rest-key
+  }
+
   vpc_options {
     security_group_ids = [aws_security_group.search.id]
 

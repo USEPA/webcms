@@ -23,6 +23,13 @@ variable "site-env-name" {
   type        = string
 }
 
+# Encryption-related variables
+variable "encryption-at-rest-key" {
+  description = "Name of the AWS KMS key to use for encrypting at-rest data."
+  type        = string
+  default     = null
+}
+
 # VPC
 # cf. vpc.tf
 
