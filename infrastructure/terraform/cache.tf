@@ -19,6 +19,9 @@ resource "aws_elasticache_replication_group" "cache" {
   subnet_group_name  = aws_elasticache_subnet_group.default.name
   security_group_ids = [aws_security_group.cache.id]
 
+  at_rest_encryption_enabled = true
+  kms_key_id                 = var.encryption-at-rest-key
+
   cluster_mode {
     # Since we're using Redis as a cache backend instead of a data store, we don't
     # worry too much about the number of cluster shards and instead use cluster mode
