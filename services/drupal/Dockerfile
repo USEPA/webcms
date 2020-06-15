@@ -37,27 +37,40 @@ WORKDIR /app
 # Create a stub 'web' folder instead of copying to maximize cache usage
 RUN mkdir web
 
+# Copy "base" Composer scripts and patches first - we assume these change less frequently
+# than composer.json and friends
 COPY ./scripts scripts
 COPY ./console console
 COPY ./patches patches
+
+# Copy Composer manifest files
 COPY composer.json composer.lock composer.patches.json ./
 
+# Perform a production-quality Composer build
 RUN composer install \
   --ignore-platform-reqs \
   --no-dev \
   --optimize-autoloader
 
-# Build Gesso
+# Build Gesso, the WebCMS' theme
 FROM forumone/gesso:php7.3-node12 AS gesso
 
 WORKDIR /app
 
+# Install base npm dependencies (npm ci = npm clean-install)
 COPY web/themes/epa_theme/package*.json ./
 RUN npm ci
 
+# Copy theme source files and perform a build
 COPY web/themes/epa_theme ./
-RUN npx gulp build && rm -rf node_modules
+RUN set -ex \
+  # Build theme
+  && npx gulp build \
+  # Remove node_modules - these are only needed for the build, so we save some size in the
+  # images by removing theme here.
+  && rm -rf node_modules
 
+# Create the final Drupal 8 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
 # Copy Composer-installed packages
@@ -68,9 +81,10 @@ COPY --from=deps /app/scripts scripts
 # Copy composer.json files
 COPY --from=deps /app/composer.json /app/composer.lock /app/composer.patches.json ./
 
-# Copy Gesso
+# Copy the built theme
 COPY --from=gesso /app web/themes/epa_theme
 
+# Copy the environment loader
 COPY load.environment.php ./
 
 # Copies performed here won't overwrite the build artifacts from previous
@@ -83,8 +97,10 @@ COPY drush drush
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
 
+# Copy the Drupal filesystem into this image
 COPY --from=drupal /var/www/html /var/www/html
 
+# Copy the nginx configuration and the startup script
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY scripts/ecs/nginx-entrypoint.sh /entrypoint.sh
 
@@ -94,10 +110,12 @@ ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
 # and ssh that are inappropriate for a server container image.
 FROM forumone/drupal8-cli:7.3 AS drush
 
-# Allow unlimited memory usage when running Drush tasks
+# Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
+# instead of PHP)
 RUN set -ex \
   && { \
     echo 'memory_limit=-1'; \
   } | tee /usr/local/etc/php/php-cli.ini
 
+# Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
