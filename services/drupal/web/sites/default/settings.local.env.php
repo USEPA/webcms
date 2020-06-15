@@ -4,6 +4,10 @@
 $config['smtp.settings']['smtp_port'] = 1025;
 $config['smtp.settings']['smtp_protocol'] = 'standard';
 
+// Don't initiate TLS sessions during local development; the MySQL certificate is
+// self-signed, which OpenSSL rejects
+unset($databases['default']['default']['pdo'][PDO::MYSQL_ATTR_SSL_CA]);
+
 // Replace profile credentials with Minio-specific secrets
 unset($config['s3fs.settings']['use_instance_profile']);
 $settings['s3fs.access_key'] = 'minio_access';
