@@ -29,3 +29,8 @@
 8. Import custom block configurations and clear cache: ```f1 drush ib --choice safe; f1 drush cr```
 
 9. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+
+# Other READMEs
+
+- Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
+- Builds: see [.buildkite](.buildkite/README.md).
