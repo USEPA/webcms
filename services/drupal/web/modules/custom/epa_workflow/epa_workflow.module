@@ -5,7 +5,6 @@
  * Contains epa_workflow.module.
  */
 
-use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
@@ -297,6 +296,16 @@ function epa_workflow_node_presave(NodeInterface $node) {
     if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
       $node->leapfrog = $latest_revision_id;
     }
+  }
+
+  // Update the log message for revisions created through bulk operations.
+  $request = \Drupal::request();
+  $parameters = $request->request->all();
+  if (isset($parameters['node_bulk_form'])) {
+    $new_state = $node->moderation_state->value;
+    $node->setRevisionLogMessage(t('Transitioned to %state as part of a bulk operation.', [
+      '%state' => $new_state,
+    ]));
   }
 }
 
