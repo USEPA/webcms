@@ -76,6 +76,8 @@ resource "aws_launch_template" "servers" {
     device_name = "/dev/xvda"
 
     ebs {
+      encrypted             = true
+      kms_key_id            = var.encryption-at-rest-key
       volume_size           = 32
       volume_type           = "gp2"
       delete_on_termination = true
