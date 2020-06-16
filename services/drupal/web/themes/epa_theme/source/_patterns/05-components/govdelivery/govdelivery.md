@@ -1,7 +1,7 @@
 ---
 el: .govdelivery
 title: GovDelivery
-state: inreview
+state: complete
 ---
 
 __Variables:__
