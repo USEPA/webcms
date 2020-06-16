@@ -26,9 +26,19 @@ $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default
 
 $config['system.logging']['error_level'] = 'all';
 
-// Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
-if ($env_state == 'build') {
-  unset($settings['cache']['default']);
+switch ($env_state) {
+  case 'run':
+    // Convert connection details to single-instance, unencrypted
+    $settings['redis.connection'] = [
+      'interface' => 'Predis',
+      'host' => getenv('WEBCMS_CACHE_HOST'),
+      'port' => 6379,
+    ];
+  break;
+
+  // Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
+  case 'build':
+    unset($settings['cache']['default']);
 }
 
 // Set the base url for node export operations. Setting this to "localhost"

@@ -800,9 +800,10 @@ $env_state = getenv('WEBCMS_ENV_STATE');
 // exception.
 if ($env_state === 'run') {
   $settings['redis.connection'] = [
-    'interface' => 'Predis',
-    'host' => getenv('WEBCMS_CACHE_HOST'),
-    'port' => 6379,
+    'interface' => 'PredisCluster',
+    'hosts' => [
+      'rediss://' . getenv('WEBCMS_CACHE_HOST') . ':6379'
+    ],
   ];
 
   $settings['cache']['default'] = 'cache.backend.redis';
