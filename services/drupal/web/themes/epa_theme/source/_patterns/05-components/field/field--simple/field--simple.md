@@ -1,6 +1,6 @@
 ---
-el: .field--tight
-title: Tight Field
+el: .field--simple
+title: Simple Field
 state: inreview
 ---
 

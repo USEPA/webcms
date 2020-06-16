@@ -5,10 +5,11 @@
  */
 #}
 
-<div>
-  <strong>{{ label }}:</strong>
-  {% for item in items -%}
-    {{ item.content }}
-    {{- not loop.last ? ', ' -}}
-  {%- endfor %}
-</div>
+{% include '@components/field/field--simple/field--simple.twig' with {
+  'modifier_classes': 'field--tight',
+  'element': 'div',
+  'label': label,
+  'label_hidden': false,
+  'label_element': 'strong',
+  'field_items': items,
+} %}
