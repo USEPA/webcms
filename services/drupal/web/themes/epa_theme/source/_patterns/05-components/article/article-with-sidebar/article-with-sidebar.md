@@ -1,7 +1,7 @@
 ---
 el: .article
 title: Article with Sidebar
-state: inreview
+state: complete
 ---
 
 __Variables:__

@@ -1,4 +1,4 @@
 ---
 title: Resource Directory
-state: inreview
+state: complete
 ---
