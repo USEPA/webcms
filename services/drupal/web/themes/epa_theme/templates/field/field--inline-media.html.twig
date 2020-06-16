@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% for item in items %}
+  {% include '@components/file/file.twig' with {
+    'url': item.content['#url'].toString,
+    'file': {
+      'extension': item.content['#file_extension'],
+      'icon': 'file',
+      'name': item.content['#name'],
+      'mime': item.content['#file_mime'],
+      'size': item.content['#file_size'],
+    },
+  } %}
+{% endfor %}
