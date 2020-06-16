@@ -1,7 +1,7 @@
 ---
-el: .field
-title: Field
-state: complete
+el: .field--tight
+title: Tight Field
+state: inreview
 ---
 
 __Variables:__
