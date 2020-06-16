@@ -1,7 +1,7 @@
 ---
 el: .figure--gallery
 title: Gallery Figure
-state: inreview
+state: complete
 ---
 
 __Variables:__

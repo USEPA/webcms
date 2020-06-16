@@ -1,7 +1,7 @@
 ---
 el: .l-page
 title: Page Layout
-state: inreview
+state: complete
 ---
 
 __Variables:__
