@@ -1,12 +1,50 @@
 {% set audio_caption %}
   {% if transcript %}
-    <div><strong>Transcript:</strong> {{ transcript }}</div>
+    {% include '@components/field/field--simple/field--simple.twig' with {
+      'is_demo': false,
+      'modifier_classes': 'field--tight',
+      'element': 'div',
+      'label': 'Transcript',
+      'label_hidden': false,
+      'label_element': 'strong',
+      'field_items': [
+        {
+          "content": transcript,
+        }
+      ],
+    } %}
   {% endif %}
+
   {% if running_time %}
-    <div><strong>Running Time:</strong> {{ running_time }}</div>
+    {% include '@components/field/field--simple/field--simple.twig' with {
+      'is_demo': false,
+      'modifier_classes': 'field--tight',
+      'element': 'div',
+      'label': 'Running Time',
+      'label_hidden': false,
+      'label_element': 'strong',
+      'field_items': [
+        {
+          "content": running_time,
+        }
+      ],
+    } %}
   {% endif %}
+
   {% if author %}
-    <div><strong>Author:</strong> {{ author }}</div>
+    {% include '@components/field/field--simple/field--simple.twig' with {
+      'is_demo': false,
+      'modifier_classes': 'field--tight',
+      'element': 'div',
+      'label': 'Author',
+      'label_hidden': false,
+      'label_element': 'strong',
+      'field_items': [
+        {
+          "content": author,
+        }
+      ],
+    } %}
   {% endif %}
 {% endset %}
 
