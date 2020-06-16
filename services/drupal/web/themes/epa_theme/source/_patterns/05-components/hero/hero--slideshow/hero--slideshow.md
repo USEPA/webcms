@@ -1,7 +1,7 @@
 ---
 el: .usa-hero--slideshow
 title: Slideshow Hero
-state: inreview
+state: complete
 ---
 See
 [https://components.designsystem.digital.gov/components/detail/hero.html]().
