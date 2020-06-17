@@ -2,34 +2,39 @@
  * @file
  * Provides the layout styles for epa layouts.
  */
-.layout-builder__section .row {
+
+.l-grid {
   display: flex;
-  flex-wrap: wrap;
 }
 
-.layout-builder__section .row > .col {
-  flex: 0 1 100%;
+.l-grid > * {
+  flex: 0 0 auto;
+  width: 100%;
 }
 
-@media screen and (min-width: 40em) {
-  .layout-builder__section .row.cols-2 > .col {
-    flex: 0 1 50%;
-  }
+.l-grid--2-col > * {
+  width: 50%;
+}
 
-  .layout-builder__section .row.cols-2 > .col.size-3of4 {
-    flex: 0 1 75%;
-  }
+.l-grid--3-col > * {
+  width: 33.3333333333%;
+}
 
-  .layout-builder__section .row.cols-2 > .col.size-1of4,
-  .layout-builder__section .row.cols-4 > .col.size-1of4 {
-    flex: 0 1 25%;
-  }
+.l-grid--4-col > * {
+  width: 25%;
+}
 
-  .layout-builder__section .row.cols-3 > .col.size-1of3 {
-    flex: 0 1 33%;
-  }
+.l-sidebar {
+  display: flex;
+}
 
-  .layout-builder__section .row.cols-3 > .col.size-1of3:nth-child(2) {
-    flex: 0 1 34%;
-  }
+.l-sidebar__main {
+  flex-grow: 1;
+  max-width: calc(75% - 2.5rem);
+}
+
+.l-sidebar__sidebar {
+  flex-shrink: 0;
+  margin-left: 2.5rem;
+  width: 25%;
 }
