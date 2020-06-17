@@ -7,7 +7,10 @@
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_entity_access().
@@ -34,4 +37,30 @@ function epa_media_preprocess_media_embed_error(array &$vars) {
     unset($vars['message']);
     $vars['attributes']['class'] = [];
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterface $form_state) {
+  // Extract the media UUID that is passed through from the WYSIWYG and use it
+  // to load the media entity. Then add a link through to the media edit form
+  // in the embedded media modal.
+  $editor_object = $form_state->getUserInput()['editor_object'];
+  $entity_repository = \Drupal::service('entity.repository');
+  $media = $entity_repository->loadEntityByUuid('media', $editor_object['attributes']['data-entity-uuid']);
+  $edit_url = Url::fromRoute('entity.media.edit_form', ['media' => $media->id()]);
+  $link = Link::fromTextAndUrl('Click to open the media edit window', $edit_url);
+
+  $form['edit_link_wrapper'] = [
+    '#type' => 'details',
+    '#open' => FALSE,
+    '#title' => t('Edit embedded media item'),
+    '#weight' => 200,
+    'edit_link' => $link->toRenderable() + [
+      '#attributes' => [
+        'target' => '_blank',
+      ],
+    ],
+  ];
 }
