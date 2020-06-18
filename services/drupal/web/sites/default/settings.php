@@ -754,6 +754,10 @@ $settings['file_scan_ignore_directories'] = [
  */
 $settings['entity_update_batch_size'] = 50;
 
+if (getenv('WEBCMS_SITE_URL')) {
+  $base_url = getenv('WEBCMS_SITE_URL');
+}
+
 /**
  * Entity update backup.
  *
