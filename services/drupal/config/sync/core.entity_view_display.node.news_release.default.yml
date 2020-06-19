@@ -28,6 +28,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - hierarchical_term_formatter
     - user
 id: node.news_release.default
 targetEntityType: node
@@ -65,9 +66,13 @@ content:
     weight: 3
     label: above
     settings:
-      link: true
+      display: all
+      wrap: span
+      separator: ' > '
+      link: false
+      reverse: false
     third_party_settings: {  }
-    type: entity_reference_label
+    type: hierarchical_term_formatter
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
