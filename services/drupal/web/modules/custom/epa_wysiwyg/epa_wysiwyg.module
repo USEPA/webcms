@@ -12,3 +12,12 @@ function epa_wysiwyg_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-new';
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-add-definitions';
 }
+
+
+function epa_wysiwyg_pathologic_alter(&$url_params, $parts, $settings) {
+  // Do not rewrite links to minio container.  This is necessary because
+  // Pathologic does not respect ports when matching host names.
+  if (isset($parts['port']) && isset($parts['host']) && $parts['port'] === 8888 && $parts['host'] === 'localhost') {
+    $url_params['options']['use_original'] = true;
+  }
+}
