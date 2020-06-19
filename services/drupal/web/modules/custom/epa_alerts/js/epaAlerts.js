@@ -28,6 +28,13 @@
 
             if (!noResults) {
               $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).hide().html(response.data).slideDown();
+
+              // Call Drupal.attachBehaviors() on added content.
+              $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).each(function (index, element) {
+                if (element.nodeType === Node.ELEMENT_NODE) {
+                  Drupal.attachBehaviors(element);
+                }
+              });
             }
           }
         };
@@ -41,4 +48,3 @@
     }
   };
 })(jQuery, Drupal);
-
