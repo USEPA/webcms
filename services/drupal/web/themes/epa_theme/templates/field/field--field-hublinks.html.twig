@@ -1,0 +1,21 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% set links = [] %}
+
+{% for item in items %}
+  {% set links = links|merge([
+    {
+      'text': item.content['#title'],
+      'url': item.content['#url'],
+    }
+  ]) %}
+{% endfor %}
+
+{% include '@components/hublinks/hublinks.twig' with {
+  'links': links,
+} %}
