@@ -19,11 +19,11 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
   protected $staticCache;
 
   /**
-   * The list of epa node migrations to act on.
+   * The regex used to match node migrations.
    *
    * @var array
    */
-  protected $nodeMigrations;
+  protected $pregPatternNodeMigrations;
 
   /**
    * Constructs event subscriber.
@@ -31,19 +31,7 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
   public function __construct() {
     $this->staticCache = &drupal_static('epa_node_migration');
 
-    $this->nodeMigrations = [
-      'upgrade_d7_node_document_panelizer' => TRUE,
-      'upgrade_d7_node_document' => TRUE,
-      'upgrade_d7_node_event' => TRUE,
-      'upgrade_d7_node_faq' => TRUE,
-      'upgrade_d7_node_news_release' => TRUE,
-      'upgrade_d7_node_page_panelizer' => TRUE,
-      'upgrade_d7_node_page' => TRUE,
-      'upgrade_d7_node_public_notice' => TRUE,
-      'upgrade_d7_node_regulation' => TRUE,
-      'upgrade_d7_node_web_area_panelizer' => TRUE,
-      'upgrade_d7_node_web_area' => TRUE,
-    ];
+    $this->pregPatternNodeMigrations = '/upgrade_d7_node_.*|upgrade_d7_group_content_node/';
   }
 
   /**
@@ -54,7 +42,7 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
    */
   public function onMigratePreImport(MigrateImportEvent $event) {
     $current_migration = $event->getMigration()->getBaseId();
-    if (isset($this->nodeMigrations[$current_migration])) {
+    if (preg_match($this->pregPatternNodeMigrations, $current_migration)) {
       $this->staticCache = TRUE;
     }
   }
@@ -67,7 +55,7 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
    */
   public function onMigratePostImport(MigrateImportEvent $event) {
     $current_migration = $event->getMigration()->getBaseId();
-    if (isset($this->nodeMigrations[$current_migration])) {
+    if (preg_match($this->pregPatternNodeMigrations, $current_migration)) {
       $this->staticCache = FALSE;
     }
   }
