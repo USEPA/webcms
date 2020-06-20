@@ -5,6 +5,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\process;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Database\Connection;
+use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -90,7 +91,9 @@ class EpaGenerateRevisionLog extends ProcessPluginBase implements ContainerFacto
       $messages = [];
 
       foreach ($epa_states_history as $history) {
-        $date = date('m/d/Y h:iA', $history->timestamp);
+        $date = DateTimePlus::createFromTimestamp($history->timestamp);
+        $date->setTimezone(new \DateTimeZone('America/New_York'));
+        $date = $date->format('m/d/Y h:i A');
         $user = $this->entityTypeManager->getStorage('user')->load($history->uid);
         $user = $user ? $user->label() : 'unknown user';
         $message = "$date $user => {$history->state}";
