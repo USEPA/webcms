@@ -277,7 +277,7 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
   ];
 
   foreach ($override_link_titles as $level => $link_overrides) {
-  if (isset($data['tabs'][$level])) {
+    if (isset($data['tabs'][$level])) {
       foreach ($link_overrides as $link_name => $link_title) {
         if (isset($data['tabs'][$level][$link_name])) {
           $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
@@ -291,6 +291,10 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
  * Implements hook_entity_presave().
  */
 function epa_workflow_node_presave(NodeInterface $node) {
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $original = $node->original;
   if ($original) {
