@@ -2,17 +2,17 @@
 
 namespace Drupal\epa_migrations\Plugin\migrate\source;
 
-use Drupal\node\Plugin\migrate\source\d7\Node;
+use Drupal\node\Plugin\migrate\source\d7\NodeRevision;
 use Drupal\migrate\Row;
 
 /**
- * Load nodes that will be migrated into fields.
+ * Load node revisions that will be migrated into fields.
  *
  * @MigrateSource(
- *   id = "epa_node",
+ *   id = "epa_node_revision",
  * )
  */
-class EpaNode extends Node {
+class EpaNodeRevision extends NodeRevision {
 
   /**
    * {@inheritdoc}
@@ -36,7 +36,7 @@ class EpaNode extends Node {
 
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state', 'timestamp'])
+      ->fields('nres', ['state', 'timestamp', 'status'])
       ->condition('nres.vid', $row->getSourceProperty('vid'))
       ->execute()
       ->fetchAll();
@@ -55,6 +55,7 @@ class EpaNode extends Node {
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
+      $row->setSourceProperty('nres_revision_status', $state_data['status']);
     }
 
     // To prepare rows for import into fields, we're going to:
@@ -110,6 +111,47 @@ class EpaNode extends Node {
 
       }
     }
+
+    // Get the latest published draft
+    // If there are multiple drafts, determine which is the latest revision.
+    // $eligible_states = ['published', 'draft', 'draft_approved', 'draft_review'];
+    // $competing_revisions = $this->select('node_revision_epa_states', 'nres')
+    //   ->fields('nres', ['vid', 'state', 'timestamp'])
+    //   ->condition('nres.nid', $row->getSourceProperty('nid'))
+    //   ->condition('nres.state', $eligible_states, 'IN')
+    //   ->orderBy('nres.timestamp', 'DESC')
+    //   ->execute()
+    //   ->fetchAll();
+
+    // if ($competing_revisions && count($competing_revisions > 1)) {
+    //   // To start, set the latest revision as the most recently published.
+    //   foreach ($competing_revisions as $revision) {
+    //     if ($revision->state == 'published') {
+
+    //     }
+    //   }
+    //   $latest_revision = $competing_revisions[0];
+
+
+    //   foreach ($competing_revisions as $revision) {
+    //     // If an older revision has a higher state (closer to published) than
+    //     // the revision currently set as latest, replace it.
+    //     if ($revision->state == 'draft_approved' and in_array($latest_revision->state, ['draft', 'draft_review'])) {
+    //       $latest_revision = $revision;
+    //     }
+    //     elseif ($revision->state == 'draft_review' and $latest_revision->state === 'draft') {
+    //       $latest_revision = $revision;
+    //     }
+
+    //   }
+    // }
+
+    // if ($latest_revision->vid === $row->getSourceProperty('vid')) {
+    //   $row->setSourceProperty('latest_revision', TRUE);
+    // }
+    // else {
+    //   $row->setSourceProperty('latest_revision', FALSE);
+    // }
 
     parent::prepareRow($row);
   }
