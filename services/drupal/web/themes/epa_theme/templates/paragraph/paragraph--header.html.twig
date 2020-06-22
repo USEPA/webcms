@@ -1,0 +1,18 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set classes = '' %}
+
+{% if content.field_style_1|field_value %}
+  {% set classes -%}
+    class="{{ content.field_style_1|field_value }}"
+  {%- endset %}
+{% endif %}
+
+<{{ content.field_level|field_value }} {{ classes }}>
+  {{- content.field_title -}}
+</{{ content.field_level|field_value }}>
