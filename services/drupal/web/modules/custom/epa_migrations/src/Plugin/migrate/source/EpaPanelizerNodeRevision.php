@@ -2,17 +2,17 @@
 
 namespace Drupal\epa_migrations\Plugin\migrate\source;
 
-use Drupal\node\Plugin\migrate\source\d7\Node;
+use Drupal\node\Plugin\migrate\source\d7\NodeRevision;
 use Drupal\migrate\Row;
 
 /**
  * Load Nodes that will be migrated into Layout Builder.
  *
  * @MigrateSource(
- *   id = "epa_panelizer_node",
+ *   id = "epa_panelizer_node_revision",
  * )
  */
-class EpaPanelizerNode extends Node {
+class EpaPanelizerNodeRevision extends NodeRevision {
 
   /**
    * {@inheritdoc}
@@ -35,8 +35,8 @@ class EpaPanelizerNode extends Node {
     if ($this->configuration['node_type'] !== 'web_area') {
       $query->condition('pd.layout', 'twocol_page', '<>');
     }
-
-    $query->condition('n.nid', [53047], 'IN');
+    // 53047, 791,
+    $query->condition('n.nid', [109], 'IN');
 
     return $query;
   }
