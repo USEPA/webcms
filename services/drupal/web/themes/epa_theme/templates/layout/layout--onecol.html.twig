@@ -1,0 +1,30 @@
+{#
+/**
+ * @file
+ * Theme override to display a one-column layout.
+ *
+ * Available variables:
+ * - content: The content for this layout.
+ * - attributes: HTML attributes for the layout <div>.
+ */
+#}
+
+{% if content %}
+  {% if attributes %}
+    <div{{ attributes }}>
+  {% endif %}
+
+  {% if region_attributes.content %}
+      <div{{ region_attributes.content }}>
+  {% endif %}
+
+  {{ content.content }}
+
+  {% if attributes %}
+    </div>
+  {% endif %}
+
+  {% if region_attributes.content %}
+    </div>
+  {% endif %}
+{% endif %}

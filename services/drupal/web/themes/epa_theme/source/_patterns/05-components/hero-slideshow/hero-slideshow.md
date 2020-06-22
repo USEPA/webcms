@@ -1,7 +1,7 @@
 ---
 el: .hero-slideshow
 title: Hero Slideshow
-state: inreview
+state: complete
 ---
 
 __Variables:__
