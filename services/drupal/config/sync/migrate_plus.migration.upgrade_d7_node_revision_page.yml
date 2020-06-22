@@ -1,11 +1,13 @@
-uuid: 485f90d8-8474-4160-97d3-3b4801bfafc9
+uuid: 90559c1d-a1b2-48af-9e06-65a5fe556114
 langcode: en
 status: true
 dependencies:
   enforced:
     module:
       - epa_migrations
-id: upgrade_d7_node_page
+_core:
+  default_config_hash: bU7aNUOr3Wz32_JrtoCLMvxmMrXi9xF0Tpmdr3PgSFA
+id: upgrade_d7_node_revision_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -13,15 +15,15 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Nodes (Basic page)'
+label: 'Node Revisions (Basic page)'
 source:
-  plugin: epa_node
+  plugin: epa_node_revision
   node_type: page
 process:
   nid:
     -
       plugin: get
-      source: tnid
+      source: nid
   vid:
     -
       plugin: get
@@ -46,7 +48,7 @@ process:
   status:
     -
       plugin: get
-      source: status
+      source: nres_revision_status
   created:
     -
       plugin: get
@@ -217,14 +219,14 @@ process:
     -
       plugin: sub_process
       process:
-        moderation_state: 'moderation_state'
-        value: 'value'
+        moderation_state: moderation_state
+        value: value
   moderation_state:
     -
       plugin: get
       source: nres_state
 destination:
-  plugin: 'entity:node'
+  plugin: 'entity_revision:node'
   default_bundle: page
 migration_dependencies:
   required: {  }
