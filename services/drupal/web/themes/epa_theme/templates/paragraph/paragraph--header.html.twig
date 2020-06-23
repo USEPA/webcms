@@ -5,14 +5,10 @@
  */
 #}
 
-{% set classes = '' %}
+{% set classes = [
+  content.field_style_1|field_value|render|clean_class,
+]|join(' ')|trim %}
 
-{% if content.field_style_1|field_value %}
-  {% set classes -%}
-    class="{{ content.field_style_1|field_value }}"
-  {%- endset %}
-{% endif %}
-
-<{{ content.field_level|field_value }} {{ classes }}>
-  {{- content.field_title -}}
+<{{ content.field_level|field_value }}{% if classes %} class="{{ classes }}"{% endif %}>
+  {{- content.field_title|field_value -}}
 </{{ content.field_level|field_value }}>
