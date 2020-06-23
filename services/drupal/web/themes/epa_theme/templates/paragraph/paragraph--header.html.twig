@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set classes = [
+  content.field_style_1|field_value|render|clean_class,
+]|join(' ')|trim %}
+
+<{{ content.field_level|field_value }}{% if classes %} class="{{ classes }}"{% endif %}>
+  {{- content.field_title|field_value -}}
+</{{ content.field_level|field_value }}>
