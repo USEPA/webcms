@@ -1,10 +1,10 @@
-uuid: c67068c4-8e5c-4582-ad08-c6920bd202b1
+uuid: 9df8c424-a6bd-4f01-9df5-b4422dbe36c1
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: bzQb1u74_QNVyPP5UgeKFzbFc27S4Gzz05iYSyDjx9M
-id: upgrade_d7_node_web_area_panelizer
+  default_config_hash: gnZloBpZIj25TM778-ryntdWesAxkhCkSWGhLQoX348
+id: upgrade_d7_node_revision_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -12,9 +12,9 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Panelizer Nodes (Web Area)'
+label: 'Panelizer Node Revisions (Web Area)'
 source:
-  plugin: epa_panelizer_node
+  plugin: epa_panelizer_node_revision
   node_type: web_area
 process:
   layout_builder__layout:
@@ -56,7 +56,7 @@ process:
   status:
     -
       plugin: get
-      source: status
+      source: nres_revision_status
   created:
     -
       plugin: get
@@ -79,12 +79,28 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
       source: timestamp
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
   comment_node_web_area/0/status:
     -
       plugin: get
@@ -169,24 +185,8 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
-  field_scheduled_transition:
-    -
-      plugin: epa_scheduled_transition
-      source: vid
-    -
-      plugin: skip_on_empty
-      method: process
-    -
-      plugin: sub_process
-      process:
-        moderation_state: moderation_state
-        value: value
-  moderation_state:
-    -
-      plugin: get
-      source: nres_state
 destination:
-  plugin: 'entity:node'
+  plugin: 'entity_revision:node'
   default_bundle: web_area
 migration_dependencies:
   required:

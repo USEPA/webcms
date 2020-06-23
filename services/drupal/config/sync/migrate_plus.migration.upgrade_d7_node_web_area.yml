@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: ThzNr59wtdHvge1kW8eN0vP70i8xZiVFoMR3f971Dhg
+  default_config_hash: wsYxMQSnnY_3lXa2Z4IpyK6Jc_CLZEyzrxNzg8Ud9Is
 id: upgrade_d7_node_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -192,6 +192,10 @@ process:
       process:
         moderation_state: moderation_state
         value: value
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
 destination:
   plugin: 'entity:node'
   default_bundle: web_area
