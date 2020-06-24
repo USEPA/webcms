@@ -42,22 +42,23 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
-      // UI element for generating default keywords.
+      // Validate if the current subjects and their ancestors match what is
+      // currently in the keywords field.
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = Unicode::strtolower($keyword->entity->label());
+          $keywords[] = $keyword->entity->label();
         }
       }
       sort($keywords);
       $keywords = implode(', ', $keywords);
 
       $default_keywords = [];
+      $default_keyword_ids = [];
       foreach ($node->field_subjects as $subject) {
-        if ($subject->entity) {
-          $default_keywords[] = $subject->entity->label();
-        }
+        $default_keyword_ids[] = ['target_id' => $subject->target_id];
       }
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($default_keyword_ids);
       sort($default_keywords);
       $default_keywords = implode(', ', $default_keywords);
 
@@ -117,23 +118,30 @@ function epa_core_new_release_keywords_validate(array &$element, FormStateInterf
     // Logic to collect subjects from form_hierarchical_select_process().
     $default_keywords = [];
     if (!empty($subjects)) {
-      $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-      foreach ($subjects as $subject) {
-        $term_id = $subject['target_id'];
-        $term = $term_storage->load($term_id);
-        $default_keywords[] = $term->label();
-        $ancestors = $term_storage->loadAllParents($term_id);
-        if (!empty($ancestors)) {
-          foreach ($ancestors as $ancestor) {
-            $default_keywords[] = $ancestor->label();
-          }
-        }
-      }
-      $default_keywords = array_unique($default_keywords);
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($subjects);
     }
     $element['#value'] = implode(', ', $default_keywords);
     $form_state->setValueforElement($element, ['target_id' => $element['#value']]);
   }
+}
+
+/**
+ * Logic to load in terms and their ancestors for keyword generation.
+ */
+function _epa_core_load_taxonomy_hierarchy($terms) {
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($terms as $term) {
+    $term_id = $term['target_id'];
+    $term_object = $term_storage->load($term_id);
+    $default_keywords[] = $term_object->label();
+    $ancestors = $term_storage->loadAllParents($term_id);
+    if (!empty($ancestors)) {
+      foreach ($ancestors as $ancestor) {
+        $default_keywords[] = $ancestor->label();
+      }
+    }
+  }
+  return array_unique($default_keywords);
 }
 
 /**
