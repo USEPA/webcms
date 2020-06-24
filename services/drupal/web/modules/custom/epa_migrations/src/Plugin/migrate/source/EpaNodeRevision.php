@@ -112,47 +112,6 @@ class EpaNodeRevision extends NodeRevision {
       }
     }
 
-    // Get the latest published draft
-    // If there are multiple drafts, determine which is the latest revision.
-    // $eligible_states = ['published', 'draft', 'draft_approved', 'draft_review'];
-    // $competing_revisions = $this->select('node_revision_epa_states', 'nres')
-    //   ->fields('nres', ['vid', 'state', 'timestamp'])
-    //   ->condition('nres.nid', $row->getSourceProperty('nid'))
-    //   ->condition('nres.state', $eligible_states, 'IN')
-    //   ->orderBy('nres.timestamp', 'DESC')
-    //   ->execute()
-    //   ->fetchAll();
-
-    // if ($competing_revisions && count($competing_revisions > 1)) {
-    //   // To start, set the latest revision as the most recently published.
-    //   foreach ($competing_revisions as $revision) {
-    //     if ($revision->state == 'published') {
-
-    //     }
-    //   }
-    //   $latest_revision = $competing_revisions[0];
-
-
-    //   foreach ($competing_revisions as $revision) {
-    //     // If an older revision has a higher state (closer to published) than
-    //     // the revision currently set as latest, replace it.
-    //     if ($revision->state == 'draft_approved' and in_array($latest_revision->state, ['draft', 'draft_review'])) {
-    //       $latest_revision = $revision;
-    //     }
-    //     elseif ($revision->state == 'draft_review' and $latest_revision->state === 'draft') {
-    //       $latest_revision = $revision;
-    //     }
-
-    //   }
-    // }
-
-    // if ($latest_revision->vid === $row->getSourceProperty('vid')) {
-    //   $row->setSourceProperty('latest_revision', TRUE);
-    // }
-    // else {
-    //   $row->setSourceProperty('latest_revision', FALSE);
-    // }
-
     parent::prepareRow($row);
   }
 
