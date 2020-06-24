@@ -17,6 +17,7 @@ __Variables:__
     * alt: [string] Alt text for image.
   * medium: [array] Medium image properties.
     * src: [string] Medium image source.
+* image: [string] Responsive image.
 * content: [object] Content of the box.
 * footer: [array] Footer properties.
   * url: [string] URL for footer link.
