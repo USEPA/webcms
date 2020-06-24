@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set classes = [
+  content.field_style|field_value|render ? 'box--' ~ content.field_style|field_value|render,
+]|join(' ')|trim %}
+
+{% set icon = '' %}
+{% if content.field_style|field_value|render == 'alert' %}
+  {% set icon = 'warning' %}
+{% elseif content.field_style|field_value|render == 'rss' %}
+  {% set icon = 'rss' %}
+{% endif %}
+
+{% include '@components/box/box.twig' with {
+  'modifier_classes': classes,
+  'title': {
+    'tag': 'div',
+    'text': content.field_title|field_value|render,
+    'icon': icon,
+  },
+  'image': content.field_image|field_value|render,
+  'content': content.field_paragraphs|field_value|render,
+  'footer': {
+    'text': content.field_link.0['#title'],
+    'url': content.field_link.0['#url_title'],
+  },
+} %}

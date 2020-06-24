@@ -5,6 +5,12 @@ dependencies:
   config:
     - field.storage.paragraph.field_paragraphs
     - paragraphs.paragraphs_type.box
+    - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.from_library
+    - paragraphs.paragraphs_type.header
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
+    - paragraphs.paragraphs_type.slideshow
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -26,54 +32,61 @@ settings:
   handler: 'default:paragraph'
   handler_settings:
     negate: 0
-    target_bundles: null
+    target_bundles:
+      html: html
+      link_list: link_list
+      box: box
+      header: header
+      dynamic_list: dynamic_list
+      slideshow: slideshow
+      from_library: from_library
     target_bundles_drag_drop:
       applicants_or_respondents:
-        weight: 13
+        weight: -26
         enabled: false
       banner:
-        weight: 18
+        weight: -22
         enabled: false
       banner_slide:
-        weight: 19
+        weight: -21
         enabled: false
       box:
-        weight: 12
-        enabled: false
+        enabled: true
+        weight: -31
       cfr:
-        weight: 14
+        weight: -25
         enabled: false
       docket:
-        weight: 15
+        weight: -24
         enabled: false
       dynamic_list:
-        weight: 23
-        enabled: false
+        enabled: true
+        weight: -29
       frc:
-        weight: 16
+        weight: -23
         enabled: false
       from_library:
-        weight: 17
-        enabled: false
+        enabled: true
+        weight: -27
       header:
-        weight: 26
-        enabled: false
+        enabled: true
+        weight: -30
       html:
-        weight: 18
-        enabled: false
+        enabled: true
+        weight: -33
       legal_authorities:
-        weight: 19
+        weight: -20
         enabled: false
       link_list:
-        weight: 20
-        enabled: false
+        enabled: true
+        weight: -32
       locations_of_prop_actions:
-        weight: 21
+        weight: -19
         enabled: false
       press_officers:
-        weight: 22
+        weight: -18
         enabled: false
       slideshow:
-        weight: 32
-        enabled: false
+        enabled: true
+        weight: -28
 field_type: entity_reference_revisions
