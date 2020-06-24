@@ -16,7 +16,6 @@ use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
-use Drupal\node\Entity\Node;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -43,22 +42,23 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
-      // UI element for generating default keywords.
+      // Validate if the current subjects and their ancestors match what is
+      // currently in the keywords field.
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = Unicode::strtolower($keyword->entity->label());
+          $keywords[] = $keyword->entity->label();
         }
       }
       sort($keywords);
       $keywords = implode(', ', $keywords);
 
       $default_keywords = [];
+      $default_keyword_ids = [];
       foreach ($node->field_subjects as $subject) {
-        if ($subject->entity) {
-          $default_keywords[] = $subject->entity->label();
-        }
+        $default_keyword_ids[] = ['target_id' => $subject->target_id];
       }
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($default_keyword_ids);
       sort($default_keywords);
       $default_keywords = implode(', ', $default_keywords);
 
@@ -77,9 +77,15 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Element validation.
       $form['field_description']['widget'][0]['value']['#required'] = FALSE;
       $form['field_description']['widget']['#element_validate'] = ['epa_core_new_release_description_validate'];
-      //$form['field_description']['widget'][0]['#required'] = FALSE;
 
-      // @todo element validation for keywords.
+      // Add in the default autocomplete validators since they aren't
+      // initially set on the form and setting our custom validation handler
+      // will prevent them from being set at all.
+      $autocomplete_info = \Drupal::service('element_info')->getInfo('entity_autocomplete');
+      $form['field_keywords']['widget']['target_id']['#element_validate'] = $autocomplete_info['#element_validate'];
+
+      // Add a custom validator for automated keyword generation.
+      array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
       break;
   }
@@ -88,7 +94,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 /**
  * Element validation: new release description field.
  */
-function epa_core_new_release_description_validate($element, FormStateInterface &$form_state, $form) {
+function epa_core_new_release_description_validate(array &$element, FormStateInterface $form_state, $form) {
   if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
     $node = $form_state->getFormObject()->getEntity();
     $node_langcode = $node->language()->getId();
@@ -98,16 +104,44 @@ function epa_core_new_release_description_validate($element, FormStateInterface 
     $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
   }
 
-  epa_admin_required_fields_validate($element, $form_state);
-}
-
-/**
- * Element validation: required fields.
- */
-function epa_admin_required_fields_validate($element, FormStateInterface $form_state) {
   if (empty($element[0]['value']['#value']) && $element[0]['value']['#value'] !== 0) {
     $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
+}
+
+/**
+ * Element validation: new release keywords field.
+ */
+function epa_core_new_release_keywords_validate(array &$element, FormStateInterface $form_state, $form) {
+  if (!$form_state->getErrors() && !empty($form_state->getValue('generate_keywords'))) {
+    $subjects = $form_state->getValue('field_subjects');
+    // Logic to collect subjects from form_hierarchical_select_process().
+    $default_keywords = [];
+    if (!empty($subjects)) {
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($subjects);
+    }
+    $element['#value'] = implode(', ', $default_keywords);
+    $form_state->setValueforElement($element, ['target_id' => $element['#value']]);
+  }
+}
+
+/**
+ * Logic to load in terms and their ancestors for keyword generation.
+ */
+function _epa_core_load_taxonomy_hierarchy($terms) {
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($terms as $term) {
+    $term_id = $term['target_id'];
+    $term_object = $term_storage->load($term_id);
+    $default_keywords[] = $term_object->label();
+    $ancestors = $term_storage->loadAllParents($term_id);
+    if (!empty($ancestors)) {
+      foreach ($ancestors as $ancestor) {
+        $default_keywords[] = $ancestor->label();
+      }
+    }
+  }
+  return array_unique($default_keywords);
 }
 
 /**
