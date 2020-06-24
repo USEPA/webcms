@@ -5,6 +5,8 @@
  * Contains epa_alerts.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_theme().
  */
@@ -12,4 +14,23 @@ function epa_alerts_theme($existing, $type, $theme, $path) {
   return [
     'epa_alerts' => ['variables' => ['alertContext' => 'internal'],],
   ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function epa_alerts_form_block_content_form_alter(array &$form, FormStateInterface $form_state) {
+  if ($form['#id'] == 'block-content-alert-form') {
+    $form['actions']['submit']['#submit'][] = '_epa_alerts_block_content_submit';
+  }
+}
+
+/**
+ * Custom submit handler to redirect alert creators to the alert dashboard.
+ */
+function _epa_alerts_block_content_submit(array &$form, FormStateInterface $form_state) {
+  $redirect = $form_state->getRedirect();
+  if ($redirect->getRouteName() == 'block.admin_add') {
+    $form_state->setRedirect('view.alerts.page_1');
+  }
 }

@@ -10,7 +10,7 @@
     * [Cluster Infrastructure](#cluster-infrastructure)
     * [Secrets](#secrets)
         * [MySQL Root User](#mysql-root-user)
-        * [MySQL WebCMS User](#mysql-webcms-user)
+        * [MySQL WebCMS Users](#mysql-webcms-users)
         * [Mail Password](#mail-password)
         * [Hash Salt](#hash-salt)
 * [Initial Image Builds](#initial-image-builds)
@@ -63,9 +63,9 @@ SET PASSWORD = PASSWORD('<new password>');
 
 Log out and run `truncate --size=0 ~/.mysql_history` to remove the password from the history file.
 
-#### MySQL WebCMS User
+#### MySQL WebCMS Users
 
-Create a new secure password using the same method as before. Save it to the `/webcms-<env>-<suffix>/db_app/password` secret.
+First, the Drupal 8 user. Create a new secure password using the same method as before. Save it to the `/webcms-<env>-<suffix>/db_app/password` secret.
 
 Next, run this query against Aurora:
 
@@ -74,7 +74,19 @@ CREATE USER 'webcms'@'%' IDENTIFIED BY '<password>';
 GRANT ALL ON webcms.* TO 'webcms'@'%';
 ```
 
-Log out and run `truncate --size=0 ~/.mysql_history` to remove the password from the history file.
+Now, the Drupal 7 user. This user (and database) is used for the Drupal 7->Drupal 8 migration.
+
+Create a new secure password and save it to the `/webcms-<env>-<suffix>/db_app_d7/password` secret.
+
+Run this query against Aurora:
+
+```sql
+CREATE DATABASE webcms_d7;
+CREATE USER 'webcms_d7'@'%' IDENTIFIED BY '<password>';
+GRANT ALL ON webcms_d7.* TO 'webcms_d7'@'%';
+```
+
+After completing these queries, remember to run `truncate --size=0 ~/.mysql_history` to remove the passwords from the history file.
 
 #### Mail Password
 

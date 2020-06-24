@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Theme override to display all the fields in a row.
+ */
+#}
+
+{% set type = fields.field_type.content|clean_class %}
+{% set classes %}sitewide-alert--{{ type }}{% endset %}
+{% set show_close = false %}
+
+{% if type == 'information' or type == 'warning' %}
+  {% set show_close = true %}
+{% endif %}
+
+{% set hash -%}
+  {{- fields.id.content }}-{{ fields.revision_id.content -}}
+{%- endset %}
+
+{% include '@components/sitewide-alert/sitewide-alert.twig' with {
+  'modifier_classes': classes,
+  'show_close': show_close,
+  'hash': hash,
+  'content': fields.field_formatted_long_text.content,
+} %}
