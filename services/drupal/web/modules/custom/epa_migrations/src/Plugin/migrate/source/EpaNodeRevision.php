@@ -2,17 +2,17 @@
 
 namespace Drupal\epa_migrations\Plugin\migrate\source;
 
-use Drupal\node\Plugin\migrate\source\d7\Node;
+use Drupal\node\Plugin\migrate\source\d7\NodeRevision;
 use Drupal\migrate\Row;
 
 /**
- * Load nodes that will be migrated into fields.
+ * Load node revisions that will be migrated into fields.
  *
  * @MigrateSource(
- *   id = "epa_node",
+ *   id = "epa_node_revision",
  * )
  */
-class EpaNode extends Node {
+class EpaNodeRevision extends NodeRevision {
 
   /**
    * {@inheritdoc}
@@ -36,7 +36,7 @@ class EpaNode extends Node {
 
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state', 'timestamp'])
+      ->fields('nres', ['state', 'timestamp', 'status'])
       ->condition('nres.vid', $row->getSourceProperty('vid'))
       ->execute()
       ->fetchAll();
@@ -55,6 +55,7 @@ class EpaNode extends Node {
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
+      $row->setSourceProperty('nres_revision_status', $state_data['status']);
     }
 
     // To prepare rows for import into fields, we're going to:

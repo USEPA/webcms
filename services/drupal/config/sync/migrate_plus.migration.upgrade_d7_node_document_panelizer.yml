@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 1lEcaPk7qSVqmOJ9we7i65-Cx--PjAKXfhJ1AqSxUsY
+  default_config_hash: 4nD5rnLgSmhq4voBrL6tkgSey1_r1aYh4L94g5ZzzGU
 id: upgrade_d7_node_document_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -181,6 +181,18 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
 destination:
   plugin: 'entity:node'
   default_bundle: page

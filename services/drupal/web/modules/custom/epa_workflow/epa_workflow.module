@@ -38,6 +38,11 @@ function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
   if ($epa_moderation->isModeratedEntity($entity)) {
     $epa_moderation->processModeration($entity);
@@ -52,6 +57,11 @@ function epa_workflow_content_moderation_state_insert(ContentModerationStateInte
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
 function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
   // Group will trigger an update after insert.
   // Check to see if entity is moderated.
@@ -171,6 +181,11 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
  * Implements hook_ENTITY_TYPE_revision_create().
  */
 function epa_workflow_node_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   // Remove any schedule field settings from the previous revision.
   if ($new_revision->hasField('field_scheduled_transition')) {
     $new_revision->set('field_scheduled_transition', NULL);
@@ -262,7 +277,7 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
   ];
 
   foreach ($override_link_titles as $level => $link_overrides) {
-  if (isset($data['tabs'][$level])) {
+    if (isset($data['tabs'][$level])) {
       foreach ($link_overrides as $link_name => $link_title) {
         if (isset($data['tabs'][$level][$link_name])) {
           $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
@@ -276,6 +291,10 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
  * Implements hook_entity_presave().
  */
 function epa_workflow_node_presave(NodeInterface $node) {
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $original = $node->original;
   if ($original) {

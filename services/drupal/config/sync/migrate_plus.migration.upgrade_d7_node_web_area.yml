@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: QaEj-UgdbGX0sJkLkWVAN8jbXtfgUxxlv7ijIhREQ28
+  default_config_hash: wsYxMQSnnY_3lXa2Z4IpyK6Jc_CLZEyzrxNzg8Ud9Is
 id: upgrade_d7_node_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -180,6 +180,22 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
 destination:
   plugin: 'entity:node'
   default_bundle: web_area

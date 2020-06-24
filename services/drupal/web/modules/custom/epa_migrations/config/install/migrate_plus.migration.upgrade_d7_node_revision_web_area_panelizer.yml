@@ -1,8 +1,8 @@
-uuid: 1a0c527d-3f0b-4efa-8600-d10619408e7c
+uuid: 9df8c424-a6bd-4f01-9df5-b4422dbe36c1
 langcode: en
 status: true
 dependencies: {  }
-id: upgrade_d7_node_document_panelizer
+id: upgrade_d7_node_revision_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -10,11 +10,22 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Panelizer Nodes (Document)'
+label: 'Panelizer Node Revisions (Web Area)'
 source:
-  plugin: epa_panelizer_node
-  node_type: document
+  plugin: epa_panelizer_node_revision
+  node_type: web_area
 process:
+  layout_builder__layout:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: panes
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_lb_section
+    -
+      plugin: multiple_values
   nid:
     -
       plugin: get
@@ -43,7 +54,7 @@ process:
   status:
     -
       plugin: get
-      source: status
+      source: nres_revision_status
   created:
     -
       plugin: get
@@ -66,27 +77,32 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
       source: timestamp
-  comment_node_document/0/status:
+  moderation_state:
     -
       plugin: get
-      source: comment
-  layout_builder__layout:
+      source: nres_state
+  field_scheduled_transition:
+    -
+      plugin: epa_scheduled_transition
+      source: vid
     -
       plugin: skip_on_empty
       method: process
-      source: panes
     -
-      plugin: single_value
+      plugin: sub_process
+      process:
+        moderation_state: moderation_state
+        value: value
+  comment_node_web_area/0/status:
     -
-      plugin: epa_panes_to_lb_section
-    -
-      plugin: multiple_values
+      plugin: get
+      source: comment
   field_channel:
     -
       plugin: sub_process
@@ -129,18 +145,10 @@ process:
     -
       plugin: get
       source: field_language
-  field_machine_name:
+  field_page_head:
     -
       plugin: get
-      source: field_machine_name
-  field_hublinks:
-    -
-      plugin: get
-      source: field_resource_directories
-  field_is_searchable_collection:
-    -
-      plugin: get
-      source: field_searchable_collection
+      source: field_page_head
   field_type:
     -
       plugin: sub_process
@@ -171,29 +179,18 @@ process:
           source: value
           from_timezone: America/New_York
           to_timezone: UTC
-  field_page_head:
-    -
-      plugin: get
-      source: field_page_head
   field_metatag:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
-  field_scheduled_transition:
-    -
-      plugin: epa_scheduled_transition
-      source: vid
-    -
-      plugin: skip_on_empty
-      method: process
-    -
-      plugin: sub_process
-      process:
-        moderation_state: 'moderation_state'
-        value: 'value'
 destination:
-  plugin: 'entity:node'
-  default_bundle: page
+  plugin: 'entity_revision:node'
+  default_bundle: web_area
 migration_dependencies:
-  required: {  }
-  optional: {  }
+  required:
+    - upgrade_d7_user
+    - upgrade_d7_node_type
+  optional:
+    - upgrade_d7_field_instance
+    - upgrade_d7_metatag_field
+    - upgrade_d7_metatag_field_instance

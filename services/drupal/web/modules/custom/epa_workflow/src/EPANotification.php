@@ -56,6 +56,13 @@ class EPANotification extends Notification {
     if ($entity instanceof ContentEntityInterface && $entity->isSyncing()) {
       return;
     }
+
+    // Skip processing entity if we're migrating.
+    if (drupal_static('epa_node_migration', FALSE)) {
+      return;
+    }
+
     parent::processEntity($entity);
   }
+
 }

@@ -42,7 +42,7 @@ process:
   uid:
     -
       plugin: get
-      source: uid
+      source: node_uid
   status:
     -
       plugin: get
@@ -69,8 +69,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -207,14 +207,22 @@ process:
     -
       plugin: get
       source: field_resource_directories
-  layout_selection:
+  field_scheduled_transition:
     -
-      plugin: static_map
-      source: layout
-      map:
-        onecol_page: basic_one_column
-        twocol_page: basic_two_column
-        six_pack: basic_two_column
+      plugin: epa_scheduled_transition
+      source: vid
+    -
+      plugin: skip_on_empty
+      method: process
+    -
+      plugin: sub_process
+      process:
+        moderation_state: 'moderation_state'
+        value: 'value'
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
 destination:
   plugin: 'entity:node'
   default_bundle: page
