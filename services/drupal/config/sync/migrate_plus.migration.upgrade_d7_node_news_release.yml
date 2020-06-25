@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: lI6y6oOmphTinrAqB_5msB-3y6fCcV69GUb3pUaoHPE
+  default_config_hash: PGL5-20GYv4pC96XNlFqutCFMfoMnTMf0TGch4HhIVc
 id: upgrade_d7_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -230,6 +230,10 @@ process:
       process:
         moderation_state: moderation_state
         value: value
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
 destination:
   plugin: 'entity:node'
   default_bundle: news_release

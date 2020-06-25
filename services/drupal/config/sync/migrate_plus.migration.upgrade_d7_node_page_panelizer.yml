@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: WTt-yy-Nn1nuYkI5xdOLic_iljEy9bZq43wE5aLfFtw
+  default_config_hash: wYX1atsVffaxmDFTVZ-V6_n21-FXJJN-Pjcs2YF05Gk
 id: upgrade_d7_node_page_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -200,6 +200,10 @@ process:
       process:
         moderation_state: moderation_state
         value: value
+  moderation_state:
+    -
+      plugin: get
+      source: nres_state
 destination:
   plugin: 'entity:node'
   default_bundle: page
