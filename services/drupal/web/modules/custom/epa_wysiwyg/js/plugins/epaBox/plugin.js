@@ -1,6 +1,6 @@
 (function (CKEDITOR) {
   'use strict';
-  
+
   function StringBuffer() {
     this.buffer = [];
   }
@@ -72,13 +72,13 @@
               text = editor.getSelection().getSelectedText();
             }
 
-            box.append('<div class="box multi related-info ' + data.position + '">');
+            box.append('<div class="box box--related-info u-align-' + data.position + '">');
 
             if (data.title !== '') {
-              box.append('<h2 class="pane-title">' + data.title + '</h2>');
+              box.append('<div class="box__title">' + data.title + '</div>');
             }
 
-            box.append('<div class="pane-content">');
+            box.append('<div class="box__content">');
 
             if (e !== null) {
               box.append(e.getHtml());
