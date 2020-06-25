@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "uploads" {
   bucket = var.s3-bucket-name
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Uploads"
+  })
 }
 
 resource "aws_s3_bucket_policy" "uploads_policy" {

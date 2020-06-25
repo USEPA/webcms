@@ -1,0 +1,44 @@
+{% set classes = [
+  'l-page',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  <div class="l-constrain">
+
+    {% if has_header %}
+      <div class="l-page__header">
+        <div class="l-page__header-first">
+          {% block info %}
+            {% include '@layouts/_sample-content/sample-content.twig' with {
+              'content': 'Section Information',
+            } %}
+          {% endblock %}
+        </div>
+        <div class="l-page__header-last">
+          {% block contact %}
+            {% include '@layouts/_sample-content/sample-content.twig' with {
+              'content': 'Contact Link',
+            } %}
+          {% endblock %}
+        </div>
+      </div>
+    {% endif %}
+
+    {% block content %}
+      {% include '@layouts/_sample-content/sample-content.twig' with {
+        'content': 'Page Content',
+      } %}
+    {% endblock %}
+  </div>
+
+  <div class="l-page__footer">
+    <div class="l-constrain">
+      {% block footer %}
+        {% include '@layouts/_sample-content/sample-content.twig' with {
+          'content': 'Page Footer',
+        } %}
+      {% endblock %}
+    </div>
+  </div>
+</div>

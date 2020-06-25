@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Theme override for a main view template.
+ */
+#}
+
+{% set classes = [
+  'view',
+  'view--' ~ id|clean_class,
+  'view--display-' ~ display_id,
+  dom_id ? 'js-view-dom-id-' ~ dom_id,
+] %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% include '@components/_view/views-view/views-view.twig' with {
+  'element': 'div',
+  'header': header,
+  'exposed': exposed,
+  'attachment_before': attachment_before,
+  'rows': rows,
+  'empty': empty,
+  'pager': pager,
+  'attachment_after': attachment_after,
+  'more': more,
+  'footer': footer,
+  'feed_icons': feed_icons
+} %}

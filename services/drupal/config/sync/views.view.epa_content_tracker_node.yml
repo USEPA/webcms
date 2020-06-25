@@ -12,8 +12,10 @@ dependencies:
     - field.storage.node.field_is_searchable_collection
     - field.storage.node.field_keywords
     - field.storage.node.field_language
+    - field.storage.node.field_last_published
     - field.storage.node.field_type
   module:
+    - datetime
     - epa_content_tracker
     - group
     - node
@@ -124,14 +126,20 @@ display:
             field_language:
               alias: DC_language
               raw_output: true
-            field_channel_1:
-              alias: reg
-              raw_output: false
-            field_channel_2:
-              alias: pro
-              raw_output: false
             rendered_entity:
               alias: body
+              raw_output: false
+            created:
+              alias: date_created
+              raw_output: false
+            field_last_published:
+              alias: date_modified
+              raw_output: false
+            nothing:
+              alias: reg
+              raw_output: false
+            nothing_1:
+              alias: pro
               raw_output: false
       fields:
         qiid:
@@ -1115,7 +1123,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_geographic_locations:
@@ -1178,7 +1186,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_env_laws_regs_and_treaties:
@@ -1241,7 +1249,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_keywords:
@@ -1304,7 +1312,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: '||'
           field_api_classes: false
           plugin_id: field
         field_language:
@@ -1369,132 +1377,6 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
-        field_channel_1:
-          id: field_channel_1
-          table: node__field_channel
-          field: field_channel
-          relationship: related_node
-          group_type: group
-          admin_label: reg
-          label: ''
-          exclude: false
-          alter:
-            alter_text: true
-            text: "{% if 'Laws &amp; Regulations' in field_channel_1|render %}\r\nyes{% else %}\r\nno{% endif %}"
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: false
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
-          settings:
-            link: false
-          group_column: target_id
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
-          plugin_id: field
-        field_channel_2:
-          id: field_channel_2
-          table: node__field_channel
-          field: field_channel
-          relationship: related_node
-          group_type: group
-          admin_label: pro
-          label: ''
-          exclude: false
-          alter:
-            alter_text: true
-            text: "{% if ('Laws &amp; Regulations' in field_channel_2|render) or ('About EPA' in field_channel_2|render) or ('Science &amp; Technology' in field_channel_2|render) %}\r\nyes{% else %}\r\nno{% endif %}"
-            make_link: false
-            path: ''
-            absolute: false
-            external: false
-            replace_spaces: false
-            path_case: none
-            trim_whitespace: false
-            alt: ''
-            rel: ''
-            link_class: ''
-            prefix: ''
-            suffix: ''
-            target: ''
-            nl2br: false
-            max_length: 0
-            word_boundary: true
-            ellipsis: true
-            more_link: false
-            more_link_text: ''
-            more_link_path: ''
-            strip_tags: false
-            trim: false
-            preserve_tags: ''
-            html: false
-          element_type: ''
-          element_class: ''
-          element_label_type: ''
-          element_label_class: ''
-          element_label_colon: false
-          element_wrapper_type: ''
-          element_wrapper_class: ''
-          element_default_classes: true
-          empty: ''
-          hide_empty: false
-          empty_zero: false
-          hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
-          settings:
-            link: false
-          group_column: target_id
-          group_columns: {  }
-          group_rows: true
-          delta_limit: 0
-          delta_offset: 0
-          delta_reversed: false
-          delta_first_last: false
-          multi_type: separator
-          separator: ', '
-          field_api_classes: false
-          plugin_id: field
         rendered_entity:
           id: rendered_entity
           table: node
@@ -1546,6 +1428,235 @@ display:
           view_mode: full
           entity_type: node
           plugin_id: rendered_entity
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          relationship: related_node
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: timestamp
+          settings:
+            date_format: custom
+            custom_date_format: Y-m-d
+            timezone: ''
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          entity_type: node
+          entity_field: created
+          plugin_id: field
+        field_last_published:
+          id: field_last_published
+          table: node__field_last_published
+          field: field_last_published
+          relationship: related_node
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: datetime_custom
+          settings:
+            timezone_override: ''
+            date_format: Y-m-d
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
+        nothing:
+          id: nothing
+          table: views
+          field: nothing
+          relationship: none
+          group_type: group
+          admin_label: reg
+          label: ''
+          exclude: false
+          alter:
+            alter_text: true
+            text: "{% if 'Laws &amp; Regulations' in field_channel|render %}\r\nyes{% else %}\r\nno{% endif %}"
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: false
+          plugin_id: custom
+        nothing_1:
+          id: nothing_1
+          table: views
+          field: nothing
+          relationship: none
+          group_type: group
+          admin_label: pro
+          label: ''
+          exclude: false
+          alter:
+            alter_text: true
+            text: "{% if ('Laws &amp; Regulations' in field_channel|render) or ('About EPA' in field_channel|render) or ('Science &amp; Technology' in field_channel|render) %}\r\nyes{% else %}\r\nno{% endif %}"
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: false
+          plugin_id: custom
       filters:
         qiid:
           id: qiid
@@ -1569,7 +1680,7 @@ display:
             operator: qiid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: item_id
+            identifier: qiid
             required: false
             remember: false
             multiple: false
@@ -1694,29 +1805,37 @@ display:
         - user.permissions
       tags:
         - 'config:core.entity_view_display.node.event.default'
+        - 'config:core.entity_view_display.node.event.link'
         - 'config:core.entity_view_display.node.event.teaser'
         - 'config:core.entity_view_display.node.faq.default'
         - 'config:core.entity_view_display.node.faq.full'
+        - 'config:core.entity_view_display.node.faq.link'
         - 'config:core.entity_view_display.node.faq.teaser'
         - 'config:core.entity_view_display.node.faq.token'
         - 'config:core.entity_view_display.node.news_release.default'
         - 'config:core.entity_view_display.node.news_release.full'
+        - 'config:core.entity_view_display.node.news_release.link'
         - 'config:core.entity_view_display.node.news_release.teaser'
         - 'config:core.entity_view_display.node.page.default'
+        - 'config:core.entity_view_display.node.page.link'
         - 'config:core.entity_view_display.node.page.teaser'
         - 'config:core.entity_view_display.node.page.token'
         - 'config:core.entity_view_display.node.public_notice.default'
         - 'config:core.entity_view_display.node.public_notice.full'
+        - 'config:core.entity_view_display.node.public_notice.link'
         - 'config:core.entity_view_display.node.public_notice.teaser'
         - 'config:core.entity_view_display.node.regulation.default'
         - 'config:core.entity_view_display.node.regulation.full'
+        - 'config:core.entity_view_display.node.regulation.link'
         - 'config:core.entity_view_display.node.regulation.teaser'
         - 'config:core.entity_view_display.node.web_area.default'
         - 'config:core.entity_view_display.node.web_area.full'
+        - 'config:core.entity_view_display.node.web_area.link'
         - 'config:core.entity_view_display.node.web_area.teaser'
         - 'config:core.entity_view_display.node.web_area.token'
         - 'config:core.entity_view_display.node.webform.default'
         - 'config:core.entity_view_display.node.webform.full'
+        - 'config:core.entity_view_display.node.webform.link'
         - 'config:core.entity_view_display.node.webform.teaser'
         - 'config:field.storage.group.field_publisher'
         - 'config:field.storage.node.field_channel'
@@ -1726,6 +1845,7 @@ display:
         - 'config:field.storage.node.field_is_searchable_collection'
         - 'config:field.storage.node.field_keywords'
         - 'config:field.storage.node.field_language'
+        - 'config:field.storage.node.field_last_published'
         - 'config:field.storage.node.field_type'
   rest_export_2:
     display_plugin: rest_export
@@ -1761,7 +1881,7 @@ display:
             operator: qiid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: item_id
+            identifier: qiid
             required: false
             remember: false
             multiple: false

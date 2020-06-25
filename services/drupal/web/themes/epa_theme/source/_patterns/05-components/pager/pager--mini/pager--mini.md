@@ -1,7 +1,7 @@
 ---
 el: .pager--mini
 title: Mini Pager
-state: inreview
+state: complete
 ---
 
 __Variables:__

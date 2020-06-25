@@ -27,11 +27,27 @@
 .sitewide-alert__close {
   background: transparent;
   border: 0;
-  color: gesso-grayscale('gray-5');
+  color: gesso-color(text, link);
+  cursor: pointer;
   flex-shrink: 0;
   height: units(4);
   margin: units(-1) 0 units(-1) units(3);
   padding: 0;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus {
+    color: gesso-color(text, link-hover);
+  }
+
+  &:active {
+    color: gesso-color(text, link-active);
+  }
+
+  /* stylelint-disable-next-line selector-no-qualifying-type */
+  html.no-js & {
+    display: none;
+  }
 }
 
 %sitewide-alert--with-icon {

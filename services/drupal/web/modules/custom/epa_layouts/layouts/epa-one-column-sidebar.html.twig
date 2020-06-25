@@ -1,10 +1,13 @@
-<div class="row cols-2">
-  <div class="col size-3of4">
-    {{ content.main }}
+{% if content.main|render and content.sidebar|render %}
+  <div class="l-sidebar">
+    <div class="l-sidebar__main">
+      {{ content.main }}
+    </div>
+    <div class="l-sidebar__sidebar">
+      {{ content.sidebar }}
+    </div>
   </div>
-{% if content.sidebar %}
-  <aside class="col size-1of4">
-    {{ content.sidebar }}
-  </aside>
+{% else %}
+  {{ content.main }}
+  {{ content.sidebar }}
 {% endif %}
-</div>

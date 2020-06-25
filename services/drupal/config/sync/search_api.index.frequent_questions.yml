@@ -1,0 +1,150 @@
+uuid: 672ec77e-ab37-4983-b0f7-cad22ade7e83
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_web_areas
+    - node
+    - search_api
+  config:
+    - field.storage.node.field_description
+    - field.storage.node.field_faq_taxonomy_topics
+    - field.storage.node.field_geographic_locations
+    - field.storage.node.field_question
+    - search_api.server.localhost
+id: frequent_questions
+name: 'Frequent Questions'
+description: ''
+read_only: false
+field_settings:
+  epa_web_area_group:
+    label: 'Parent Group'
+    datasource_id: 'entity:node'
+    property_path: epa_web_area_group
+    type: integer
+    dependencies:
+      module:
+        - epa_web_areas
+  field_description:
+    label: Description
+    datasource_id: 'entity:node'
+    property_path: field_description
+    type: text
+    dependencies:
+      config:
+        - field.storage.node.field_description
+  field_faq_taxonomy_topics:
+    label: 'FAQ Taxonomy Topics'
+    datasource_id: 'entity:node'
+    property_path: field_faq_taxonomy_topics
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_faq_taxonomy_topics
+  field_geographic_locations:
+    label: 'Geographic Locations'
+    datasource_id: 'entity:node'
+    property_path: field_geographic_locations
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_geographic_locations
+  field_question:
+    label: Question
+    datasource_id: 'entity:node'
+    property_path: field_question
+    type: text
+    boost: !!float 5
+    dependencies:
+      config:
+        - field.storage.node.field_question
+  status:
+    label: Published
+    datasource_id: 'entity:node'
+    property_path: status
+    type: integer
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 5
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - faq
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_status: {  }
+  hierarchy:
+    fields:
+      field_faq_taxonomy_topics: taxonomy_term-parent
+    weights:
+      preprocess_index: -50
+  html_filter:
+    all_fields: false
+    fields:
+      - field_description
+      - title
+    title: false
+    alt: true
+    tags:
+      b: 2
+      em: 1
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      u: 1
+    weights:
+      preprocess_index: -49
+      preprocess_query: -47
+  language_with_fallback: {  }
+  rendered_item: {  }
+  tokenizer:
+    all_fields: false
+    fields:
+      - field_description
+      - field_question
+      - title
+    spaces: '[^[:alnum:]]'
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -47
+      preprocess_query: -44
+  transliteration:
+    all_fields: false
+    fields:
+      - field_description
+      - title
+    weights:
+      preprocess_index: -48
+      preprocess_query: -46
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: true
+  cron_limit: 50
+server: localhost

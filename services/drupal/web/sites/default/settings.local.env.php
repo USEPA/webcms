@@ -26,3 +26,10 @@ $config['system.logging']['error_level'] = 'all';
 if ($env_state == 'build') {
   unset($settings['cache']['default']);
 }
+
+// Set the base url for node export operations. Setting this to "localhost"
+// instead of "localhost:8080" since this will be utilized by wget and it will
+// use the internal Docker url which uses port 80.
+$settings['epa_node_export.base_url'] = 'http://localhost';
+
+$settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';

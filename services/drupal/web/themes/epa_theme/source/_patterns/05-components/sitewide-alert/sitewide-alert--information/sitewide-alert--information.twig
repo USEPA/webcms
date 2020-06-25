@@ -1,0 +1,11 @@
+{% set classes = [
+  'sitewide-alert--information',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/sitewide-alert/sitewide-alert.twig' with {
+  'modifier_classes': classes,
+  'show_close': show_close,
+  'hash': hash,
+  'content': content,
+} %}

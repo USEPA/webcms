@@ -15,6 +15,7 @@ dependencies:
     - field.field.node.faq.field_is_searchable_collection
     - field.field.node.faq.field_keywords
     - field.field.node.faq.field_language
+    - field.field.node.faq.field_last_published
     - field.field.node.faq.field_machine_name
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_publish_date
@@ -25,6 +26,8 @@ dependencies:
     - field.field.node.faq.field_type
     - node.type.faq
   module:
+    - datetime
+    - linked_field
     - text
     - user
 id: node.faq.teaser
@@ -37,20 +40,33 @@ content:
     type: text_summary_or_trimmed
     weight: 2
     settings:
-      trim_length: 600
+      trim_length: 300
     third_party_settings: {  }
     region: content
-  content_moderation_control:
-    weight: -20
-    settings: {  }
-    third_party_settings: {  }
+  field_last_published:
+    type: datetime_default
+    weight: 1
     region: content
-  links:
+    label: inline
+    settings:
+      timezone_override: ''
+      format_type: medium_no_time
+    third_party_settings: {  }
+  field_question:
+    type: basic_string
     weight: 0
     region: content
+    label: hidden
     settings: {  }
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: '[node:url]'
+        advanced: {  }
+        token: ''
 hidden:
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
@@ -64,8 +80,9 @@ hidden:
   field_machine_name: true
   field_page_head: true
   field_publish_date: true
-  field_question: true
   field_related_questions: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  links: true
+  search_api_excerpt: true

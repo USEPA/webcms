@@ -5,21 +5,17 @@
  * Contains epa_core.module.
  */
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
 use Drupal\Core\Link;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Drupal\block_content\Entity\BlockContent;
-use Drupal\node\NodeInterface;
+use Drupal\Core\Url;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -46,22 +42,23 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
-      // UI element for generating default keywords.
+      // Validate if the current subjects and their ancestors match what is
+      // currently in the keywords field.
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = Unicode::strtolower($keyword->entity->label());
+          $keywords[] = $keyword->entity->label();
         }
       }
       sort($keywords);
       $keywords = implode(', ', $keywords);
 
       $default_keywords = [];
+      $default_keyword_ids = [];
       foreach ($node->field_subjects as $subject) {
-        if ($subject->entity) {
-          $default_keywords[] = $subject->entity->label();
-        }
+        $default_keyword_ids[] = ['target_id' => $subject->target_id];
       }
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($default_keyword_ids);
       sort($default_keywords);
       $default_keywords = implode(', ', $default_keywords);
 
@@ -80,9 +77,15 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Element validation.
       $form['field_description']['widget'][0]['value']['#required'] = FALSE;
       $form['field_description']['widget']['#element_validate'] = ['epa_core_new_release_description_validate'];
-      //$form['field_description']['widget'][0]['#required'] = FALSE;
 
-      // @todo element validation for keywords.
+      // Add in the default autocomplete validators since they aren't
+      // initially set on the form and setting our custom validation handler
+      // will prevent them from being set at all.
+      $autocomplete_info = \Drupal::service('element_info')->getInfo('entity_autocomplete');
+      $form['field_keywords']['widget']['target_id']['#element_validate'] = $autocomplete_info['#element_validate'];
+
+      // Add a custom validator for automated keyword generation.
+      array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
       break;
   }
@@ -91,7 +94,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 /**
  * Element validation: new release description field.
  */
-function epa_core_new_release_description_validate($element, FormStateInterface &$form_state, $form) {
+function epa_core_new_release_description_validate(array &$element, FormStateInterface $form_state, $form) {
   if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
     $node = $form_state->getFormObject()->getEntity();
     $node_langcode = $node->language()->getId();
@@ -101,16 +104,44 @@ function epa_core_new_release_description_validate($element, FormStateInterface 
     $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
   }
 
-  epa_admin_required_fields_validate($element, $form_state);
-}
-
-/**
- * Element validation: required fields.
- */
-function epa_admin_required_fields_validate($element, FormStateInterface $form_state) {
   if (empty($element[0]['value']['#value']) && $element[0]['value']['#value'] !== 0) {
     $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
+}
+
+/**
+ * Element validation: new release keywords field.
+ */
+function epa_core_new_release_keywords_validate(array &$element, FormStateInterface $form_state, $form) {
+  if (!$form_state->getErrors() && !empty($form_state->getValue('generate_keywords'))) {
+    $subjects = $form_state->getValue('field_subjects');
+    // Logic to collect subjects from form_hierarchical_select_process().
+    $default_keywords = [];
+    if (!empty($subjects)) {
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($subjects);
+    }
+    $element['#value'] = implode(', ', $default_keywords);
+    $form_state->setValueforElement($element, ['target_id' => $element['#value']]);
+  }
+}
+
+/**
+ * Logic to load in terms and their ancestors for keyword generation.
+ */
+function _epa_core_load_taxonomy_hierarchy($terms) {
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($terms as $term) {
+    $term_id = $term['target_id'];
+    $term_object = $term_storage->load($term_id);
+    $default_keywords[] = $term_object->label();
+    $ancestors = $term_storage->loadAllParents($term_id);
+    if (!empty($ancestors)) {
+      foreach ($ancestors as $ancestor) {
+        $default_keywords[] = $ancestor->label();
+      }
+    }
+  }
+  return array_unique($default_keywords);
 }
 
 /**
@@ -139,11 +170,6 @@ function epa_core_token_info() {
     'name' => t('Machine name alias'),
     'description' => t('Machine name field.'),
   ];
-  $default_revision_created_token = [
-    'name' => t('Default revision creation date'),
-    'description' => t('The published revision\'s creation date.'),
-    'type' => 'date'
-  ];
   $contact_us_link = [
     'name' => t('Contact Us Link'),
     'description' => t('The link to a Web Area\'s contact form.'),
@@ -156,7 +182,6 @@ function epa_core_token_info() {
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
-      'default-revision-created' => $default_revision_created_token,
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -179,8 +204,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
-    if (stripos($name, 'default-revision-created') !== FALSE
-      || stripos($name, 'footer-last-updated') !== FALSE ) {
+    if (stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
       $name = $parts[0];
     }
@@ -188,12 +212,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
     switch ($name) {
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
-          $replacements[$original] = _epa_core_get_machine_name_alias($data[$type]);
-        }
-        break;
-      case 'default-revision-created':
-        if ($type == 'node') {
-          $replacements[$original] = _epa_core_get_default_revision_created($data['node'], $parts[1], $parts[2]);
+          $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
         }
         break;
       case 'contact-us-link':
@@ -213,8 +232,8 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
         $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
-        if (isset($node)) {
-          $replacements[$original] = t('Last updated on @date', ['@date' => _epa_core_get_default_revision_created($node, $parts[1], $parts[2])]);
+        if (isset($node) && !$node->field_last_published->isEmpty()) {
+          $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
         else {
           $replacements[$original] = '';
@@ -224,33 +243,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   }
   return $replacements;
 }
-
-/**
- * Helper function to determine node machine name.
- */
-function _epa_core_get_machine_name_alias($entity) {
-  $alias_string = '';
-
-  // Set alias_string to machine name.
-  // If $alias_string is empty fallback to node's title.
-  if (!$entity->get('field_machine_name')->isEmpty()) {
-    $alias_string = $entity->get('field_machine_name')->value;
-  }
-  if (empty($alias_string)) {
-    $alias_string = \Drupal::service('pathauto.alias_cleaner')->cleanString($entity->label());
-  }
-
-  return $alias_string;
-}
-
-/**
- * Helper function to determine the published revision's creation date.
- */
-function _epa_core_get_default_revision_created($node, $type = 'medium', $format = NULL) {
-  $node = $node->isDefaultRevision() ? $node : Node::load($node->id());
-  return \Drupal::service('date.formatter')->format($node->getRevisionCreationTime(), $type, $format);
-}
-
 
 /**
  * Implements hook_entity_revision_delete().

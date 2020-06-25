@@ -1,7 +1,145 @@
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set page_messages %}
+  {% if show_admin_info %}
+    {% include '@uswds/alert/alert--success/alert--success.twig' with {
+      'title': 'Status message',
+      'content': '<p class="usa-alert__text">Basic page <em class="placeholder"><a href="#" hreflang="en">' ~ page_title ~ '</a></em> has been updated.</p>',
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set page_tasks %}
+  {% if show_admin_info %}
+    {% include '@components/button-group/button-group--base/button-group--base.twig' with {
+      'buttons': local_tasks,
+    } %}
+  {% endif %}
+{% endset %}
+
+{% set main_top %}
+  {% include '@uswds/intro/intro.twig' with {
+    'intro': 'The recommendations on these pages apply to all mercury-containing light bulbs. <a href="#">Read a full list of which bulbs contain mercury.</a>',
+  } %}
+  <p>CFLs can help you save money, use less energy, reduce light bulb changes, and lower greenhouse gas emissions.</p>
+  <ul>
+    <li><a href="#">Learn more about energy-efficient lighting choices at EnergyStar.gov</a></li>
+    <li><a href="#">Read Energy Star questions and answers about CFLs</a></li>
+    <li>Report defective CFLs to cfl@energystar.gov. <a href="#">Learn what to report</a></li>
+  </ul>
+  <hr>
+{% endset %}
+
+{% set a1 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'Cleaning up a Broken CFL',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://epa.gov/sites/production/files/styles/large/public/2013-06/broken_cfl_green.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://epa.gov/sites/production/files/styles/large/public/2013-06/broken_cfl_green.jpg 320w, https://epa.gov/sites/production/files/styles/large/public/2013-06/broken_cfl_green.jpg 640w" width="640"></div></figure></a><ul><li><a href="#">Steps to take when a CFL breaks</a></li><li><a href="#">What to do if a CFL produces smoke</a></li><li><a href="#">If a CFL smokes and/or releases a bad odor, is mercury released?</a></li></ul>',
+  } only %}
+{% endset %}
+
+{% set a2 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'CFL Recycling and Disposal',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/recycling_3.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/recycling_3.jpg 320w, https://www.epa.gov/sites/production/files/styles/large/public/2013-06/recycling_3.jpg 640w" width="640"></div></figure></a><ul><li><a href="#">Where to recycle/dispose of CFLs after they burn out</a></li><li><a href="#">Why recycling CFLs is important</a></li><li><a href="#">Proper maintenance, removal, and disposal of PCB-containing fluorescent light ballasts (FLBs) in schools</a></li><li><a href="#">Disposal requirements for PCB-containing FLBs</a></li></ul>',
+  } only %}
+{% endset %}
+
+{% set b1 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'Phase-Out of Most Inefficient Bulbs',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/grunge_bulb.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/grunge_bulb.jpg 320w, https://www.epa.gov/sites/production/files/styles/large/public/2013-06/grunge_bulb.jpg 640w" width="640"></div></figure></a><ul><li><a href="#">Phase-Out of Most Inefficient Bulbs</a></li></ul>',
+  } only %}
+{% endset %}
+
+{% set b2 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'CFLs and Mercury',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/mercury-cfl.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/mercury-cfl.jpg 320w, https://www.epa.gov/sites/production/files/styles/large/public/2013-06/mercury-cfl.jpg 640w" width="640"></div></figure></a><ul><li><a href="#">Learn about the connections between CFLs and mercury</a></li></ul>',
+  } only %}
+{% endset %}
+
+{% set c1 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'Shopping for Light Bulbs',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl_label_on_blue.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl_label_on_blue.jpg 320w, https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl_label_on_blue.jpg 640w" width="640"></div></figure></a><ul><li><a href="#">What you need to know when choosing light bulbs (FTC.gov)</a></li><li>Lighting Facts labels that help you compare different bulbs: <ul><li><a href="#">Light bulb label</a></li><li><a href="#">Label for bulbs containing mercury</a></li></ul></li></ul>',
+  } only %}
+{% endset %}
+
+{% set c2 %}
+  {% include '@components/box/box.twig' with {
+    'title': {
+      'tag': 'h2',
+      'text': 'CFLs and UV Radiation',
+    },
+    'content': '<a href="#"><figure class="figure figure--medium"><div class="figure__media"><img src="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl-uv.jpg" alt="Broken CFL" sizes="(max-width: 640px) calc(100vw - 4rem), 640px" srcset="https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl-uv.jpg 320w, https://www.epa.gov/sites/production/files/styles/large/public/2013-06/cfl-uv.jpg 640w" width="640"></div></figure></a><div>Information from:</div><ul><li><a href="#">EnergyStar.gov</a></li><li><a href="#">Food and Drug Administration</a></li><li><a class="file" href="#"><svg class="icon icon--file is-spaced-after" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#file"></use></svg>Health Canada (pdf)</a></li><li><a class="file" href="#"><svg class="icon icon--file is-spaced-after" aria-hidden="true"><use xlink:href="../../../images/sprite.artifact.svg#file"></use></svg>European Commission Scientific Committees (pdf)</a></li></ul>',
+  } only %}
+{% endset %}
+
+{% set main_bottom %}
+  <hr>
+  <p>Couldn’t locate something you expected to find on this page? <a href="#">Contact the webmaster</a>, providing the page URL (epa.gov/cfl) and the content you thought would be here.</p>
+{% endset %}
+
+{% set sidebar %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'title': {
+      'tag': 'div',
+      'text': 'Requirements for Businesses',
+    },
+    'content': '<p>Businesses considered universal waste handlers under RCRA must meet certain storage, transportation and disposal requirements for CFLs and other bulbs that contain mercury. <a href="#">Learn more on the EPA universal wastes website</a>.</p>',
+  } only %}
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'title': {
+      'tag': 'div',
+      'text': 'LED Recycling and Disposal',
+    },
+    'content': '<ul><li><a href="#">Do LEDs Need To Be Recycled Like CFLs Or Other Electronics?</a></li><li><a href="#">Learn About LED Lighting</a></li></ul>',
+  } only %}
+  {% include '@components/box/box--multipurpose/box--multipurpose.twig' with {
+    'title': {
+      'tag': 'div',
+      'text': '',
+    },
+    'img': {
+      'small': {
+         'src': 'https://www.epa.gov/sites/production/files/styles/block_header/public/2013-06/how_bright_are_you_220.jpg',
+         'alt': 'How bright are you?',
+         'width': '320',
+      },
+     'medium': {
+         'src': 'https://www.epa.gov/sites/production/files/styles/block_header/public/2013-06/how_bright_are_you_220.jpg',
+      },
+   },
+    'content': '<p>When a CFL breaks in your home, one of the most important things you can do is&hellip;</p>',
+  } only %}
+{% endset %}
+
 {% set page_content %}
-  {# include page template #}
   {% include '@templates/web-area-homepages/resource-directory.twig' with {
     'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'has_header': has_header,
     'has_sidebar': has_sidebar,
     'main_top': main_top,
     'num_of_cols_a': num_of_cols_a,

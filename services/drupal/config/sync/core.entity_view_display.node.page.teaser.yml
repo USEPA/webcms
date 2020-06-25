@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.page.field_is_searchable_collection
     - field.field.node.page.field_keywords
     - field.field.node.page.field_language
+    - field.field.node.page.field_last_published
     - field.field.node.page.field_machine_name
     - field.field.node.page.field_page_head
     - field.field.node.page.field_paragraphs
@@ -31,17 +32,16 @@ targetEntityType: node
 bundle: page
 mode: teaser
 content:
-  content_moderation_control:
-    weight: -20
+  field_description:
+    type: basic_string
+    weight: 0
+    region: content
+    label: above
     settings: {  }
     third_party_settings: {  }
-    region: content
-  links:
-    weight: 101
-    region: content
 hidden:
+  content_moderation_control: true
   field_channel: true
-  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
@@ -49,6 +49,7 @@ hidden:
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
+  field_last_published: true
   field_machine_name: true
   field_page_head: true
   field_paragraphs: true
@@ -59,3 +60,5 @@ hidden:
   field_type: true
   field_wide_template: true
   layout_builder__layout: true
+  links: true
+  search_api_excerpt: true

@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.news_release.field_is_searchable_collection
     - field.field.node.news_release.field_keywords
     - field.field.node.news_release.field_language
+    - field.field.node.news_release.field_last_published
     - field.field.node.news_release.field_machine_name
     - field.field.node.news_release.field_paragraphs
     - field.field.node.news_release.field_press_office
@@ -27,8 +28,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - options
-    - scheduled_publish
+    - hierarchical_term_formatter
     - user
 id: node.news_release.default
 targetEntityType: node
@@ -36,98 +36,25 @@ bundle: news_release
 mode: default
 content:
   content_moderation_control:
-    weight: 0
+    weight: 1
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_channel:
-    weight: 7
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_description:
-    weight: 25
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
-  field_env_laws_regs_and_treaties:
-    weight: 12
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_expiration_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 103
-    region: content
-  field_geographic_locations:
-    weight: 15
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_hublinks:
-    weight: 28
+    weight: 0
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
-    region: content
-  field_is_searchable_collection:
-    weight: 30
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_keywords:
-    weight: 18
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_language:
-    weight: 23
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: list_key
     region: content
   field_links:
     weight: 100
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_machine_name:
-    weight: 24
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
   field_paragraphs:
-    weight: 2
+    weight: 5
     label: hidden
     settings:
       view_mode: default
@@ -136,85 +63,58 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   field_press_office:
-    weight: 26
+    weight: 3
     label: above
     settings:
-      link: true
+      display: all
+      wrap: span
+      separator: ' > '
+      link: false
+      reverse: false
     third_party_settings: {  }
-    type: entity_reference_label
+    type: hierarchical_term_formatter
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
-    weight: 29
+    weight: 4
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     region: content
-  field_publish_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 101
-    region: content
   field_release:
-    weight: 4
+    weight: 6
     label: above
     settings:
       format_type: medium
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
-    region: content
-  field_review_deadline:
-    weight: 5
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_scheduled_transition:
-    label: above
-    type: scheduled_publish_generic_formatter
-    settings:
-      date_format: html_datetime
-      text_pattern: '%moderation_state% - %date%'
-    third_party_settings: {  }
-    weight: 102
     region: content
   field_secondary_headline:
-    weight: 3
+    weight: 2
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
-  field_subjects:
-    weight: 27
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_type:
-    weight: 6
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  links:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_channel: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_subjects: true
+  field_type: true
+  links: true
+  search_api_excerpt: true

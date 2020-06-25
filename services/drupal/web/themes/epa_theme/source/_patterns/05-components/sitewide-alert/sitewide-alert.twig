@@ -1,16 +1,17 @@
 {% set classes = [
   'sitewide-alert',
   modifier_classes ? modifier_classes,
+  show_close ? 'js-sitewide-alert',
 ]|join(' ')|trim %}
 
-<div class="{{ classes }}">
+<div class="{{ classes }}"{% if hash %} data-alert="{{ hash }}"{% endif %}>
   <div class="l-constrain">
     <div class="sitewide-alert__body">
       <div class="sitewide-alert__content">
         {{ content }}
       </div>
       {% if show_close %}
-        <button class="sitewide-alert__close">
+        <button class="sitewide-alert__close js-sitewide-alert__close">
           {{ 'Close'|t }}
           {% include '@components/icon/icon.twig' with {
             'modifier_classes': 'icon--sitewide-alert-close is-spaced-before',

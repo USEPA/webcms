@@ -19,6 +19,7 @@ dependencies:
     - field.field.node.regulation.field_is_searchable_collection
     - field.field.node.regulation.field_keywords
     - field.field.node.regulation.field_language
+    - field.field.node.regulation.field_last_published
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
     - field.field.node.regulation.field_page_head
@@ -36,22 +37,19 @@ targetEntityType: node
 bundle: regulation
 mode: teaser
 content:
-  content_moderation_control:
-    weight: -20
+  field_description:
+    type: basic_string
+    weight: 0
+    region: content
+    label: hidden
     settings: {  }
     third_party_settings: {  }
-    region: content
-  links:
-    weight: 100
-    settings: {  }
-    third_party_settings: {  }
-    region: content
 hidden:
+  content_moderation_control: true
   field_additional_resources: true
   field_cfr: true
   field_channel: true
   field_compliance: true
-  field_description: true
   field_docket_numbers: true
   field_effective_dates: true
   field_env_laws_regs_and_treaties: true
@@ -62,6 +60,7 @@ hidden:
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
+  field_last_published: true
   field_legal_authorities: true
   field_machine_name: true
   field_page_head: true
@@ -71,3 +70,5 @@ hidden:
   field_rule_summary: true
   field_scheduled_transition: true
   field_type: true
+  links: true
+  search_api_excerpt: true

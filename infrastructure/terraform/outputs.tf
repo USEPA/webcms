@@ -6,6 +6,10 @@ output "ecr-nginx" {
   value = aws_ecr_repository.nginx.repository_url
 }
 
+output "ecr-drush" {
+  value = aws_ecr_repository.drush.repository_url
+}
+
 output "s3-bucket" {
   value = aws_s3_bucket.uploads.bucket_regional_domain_name
 }

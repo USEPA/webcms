@@ -1,12 +1,3 @@
-# Create a custom Drush container repo
-resource "aws_ecr_repository" "drush" {
-  name = "webcms-drush"
-
-  tags = {
-    Group = "webcms"
-  }
-}
-
 data "aws_iam_policy_document" "events_assume_role_policy" {
   version = "2012-10-17"
 
@@ -23,14 +14,12 @@ data "aws_iam_policy_document" "events_assume_role_policy" {
 }
 
 resource "aws_iam_role" "events" {
-  name        = "WebCMSCronRole"
+  name        = "${local.role-prefix}CronRole"
   description = "IAM role for the CloudWatch cron schedule"
 
   assume_role_policy = data.aws_iam_policy_document.events_assume_role_policy.json
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = local.common-tags
 }
 
 # This task definition depends on a built and published Drush image, so we have to
@@ -38,7 +27,7 @@ resource "aws_iam_role" "events" {
 resource "aws_ecs_task_definition" "drush_task" {
   count = var.image-tag-drush != null ? 1 : 0
 
-  family             = "webcms-drush"
+  family             = "webcms-drush-${local.env-suffix}"
   network_mode       = "awsvpc"
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
@@ -78,10 +67,9 @@ resource "aws_ecs_task_definition" "drush_task" {
     }
   ])
 
-  tags = {
-    Name  = "WebCMS Task - Drush"
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Task - Drush"
+  })
 
   # Like the Drupal task, we ensure that ECS will be able to launch this task when it
   # assumes the execution role.
@@ -127,7 +115,7 @@ data "aws_iam_policy_document" "drush_policy" {
 resource "aws_iam_policy" "drush_policy" {
   count = length(aws_ecs_task_definition.drush_task)
 
-  name        = "WebCMSRunDrushPolicy"
+  name        = "${local.role-prefix}RunDrushPolicy"
   description = "Policy to allow running Drush tasks in the WebCMS cluster"
 
   policy = data.aws_iam_policy_document.drush_policy[count.index].json
@@ -141,7 +129,7 @@ resource "aws_iam_role_policy_attachment" "drush_policy" {
 }
 
 resource "aws_cloudwatch_event_rule" "cron" {
-  name        = "WebCMSCronSchedule"
+  name        = "${local.role-prefix}CronSchedule"
   description = "Invokes Drush cron"
 
   # Run cron every 15 minutes
@@ -151,7 +139,7 @@ resource "aws_cloudwatch_event_rule" "cron" {
 resource "aws_cloudwatch_event_target" "cron" {
   count = length(aws_ecs_task_definition.drush_task)
 
-  target_id = "WebCMSCronTask"
+  target_id = "WebCMS${local.env-title}CronTask"
   arn       = aws_ecs_cluster.cluster.arn
   rule      = aws_cloudwatch_event_rule.cron.name
   role_arn  = aws_iam_role.events.arn

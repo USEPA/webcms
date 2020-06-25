@@ -19,6 +19,7 @@ dependencies:
     - field.field.node.event.field_is_searchable_collection
     - field.field.node.event.field_keywords
     - field.field.node.event.field_language
+    - field.field.node.event.field_last_published
     - field.field.node.event.field_links
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
@@ -30,32 +31,40 @@ dependencies:
     - field.field.node.event.field_type
     - node.type.event
   module:
+    - date_range_formatter
     - user
 id: node.event.teaser
 targetEntityType: node
 bundle: event
 mode: teaser
 content:
-  content_moderation_control:
-    weight: -20
+  field_date:
+    type: date_range_without_time
+    weight: 0
+    region: content
+    label: inline
+    settings:
+      timezone_override: ''
+      single: 'F j, Y g:i a T'
+      single_all_day: 'F j, Y '
+      one_day: 'F j, Y g:i a - {g}:{i} {a} T'
+      one_month: 'F j, Y g:i a - {F} {j}, {Y} {g}:{i} {a} T'
+      several_months: 'F j, Y g:i a - {F} {j}, {Y} {g}:{i} {a} T'
+      several_years: 'F j, Y g:i a - {F} {j}, {Y} {g}:{i} {a} T'
+      separator: '-'
+      date_format: 'Y-m-d\TH:i:s'
+    third_party_settings: {  }
+  field_description:
+    type: basic_string
+    weight: 0
+    region: content
+    label: hidden
     settings: {  }
     third_party_settings: {  }
-    region: content
-  field_links:
-    weight: 100
-    settings: {  }
-    third_party_settings: {  }
-    region: content
-  links:
-    weight: 100
-    settings: {  }
-    third_party_settings: {  }
-    region: content
 hidden:
+  content_moderation_control: true
   field_channel: true
-  field_date: true
   field_deadline: true
-  field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
   field_event_cancellation: true
@@ -67,6 +76,8 @@ hidden:
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
+  field_last_published: true
+  field_links: true
   field_location: true
   field_machine_name: true
   field_page_head: true
@@ -75,3 +86,5 @@ hidden:
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  links: true
+  search_api_excerpt: true

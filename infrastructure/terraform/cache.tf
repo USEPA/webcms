@@ -1,10 +1,10 @@
 resource "aws_elasticache_subnet_group" "default" {
-  name       = "webcms-default"
+  name       = "webcms-default-${local.env-suffix}"
   subnet_ids = aws_subnet.private.*.id
 }
 
 resource "aws_elasticache_replication_group" "cache" {
-  replication_group_id          = "webcms-redis"
+  replication_group_id          = "webcms-redis-${local.env-suffix}"
   replication_group_description = "Replication group for the WebCMS cache"
   automatic_failover_enabled    = true
 
@@ -27,7 +27,7 @@ resource "aws_elasticache_replication_group" "cache" {
     replicas_per_node_group = var.cache-replica-count
   }
 
-  tags = {
-    Group = "webcms"
-  }
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Cache"
+  })
 }

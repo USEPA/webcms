@@ -4,12 +4,17 @@
 ul {
   @extend %usa-list;
   list-style-type: disc;
+  margin-top: 0;
 
   @if $support-for-rtl {
     [dir='rtl'] & {
       padding-left: 0;
       padding-right: 3ch;
     }
+  }
+
+  &:last-child {
+    margin-bottom: revert;
   }
 
   ol,

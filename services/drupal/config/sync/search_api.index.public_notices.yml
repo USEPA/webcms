@@ -1,0 +1,214 @@
+uuid: 3f4de5ee-6a1d-4083-aa2e-59801ba622b6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - field.storage.node.field_comments_due_date
+    - field.storage.node.field_computed_comments_due_date
+    - field.storage.node.field_description
+    - field.storage.node.field_geographic_locations
+    - field.storage.node.field_locations_of_prop_actions
+    - field.storage.paragraph.field_location_proposed_other
+    - field.storage.node.field_notice_sort_date
+    - field.storage.node.field_programs_or_statutes
+    - field.storage.node.field_type_of_proposed_action
+    - field.storage.paragraph.field_state_or_territory
+    - search_api.server.localhost
+  module:
+    - epa_web_areas
+    - paragraphs
+    - taxonomy
+    - node
+    - search_api
+id: public_notices
+name: 'Public Notices'
+description: ''
+read_only: false
+field_settings:
+  aggregated_field:
+    label: 'Aggregated field'
+    property_path: aggregated_field
+    type: string
+    configuration:
+      type: union
+      fields:
+        - 'entity:node/field_locations_of_prop_actions:entity:field_location_proposed_other:value'
+        - 'entity:node/field_locations_of_prop_actions:entity:field_state_or_territory:entity:name'
+  body:
+    label: 'Summary of Proposed Action'
+    datasource_id: 'entity:node'
+    property_path: body
+    type: text
+    dependencies:
+      config:
+        - field.storage.node.body
+  epa_web_area_group:
+    label: 'Parent Group'
+    datasource_id: 'entity:node'
+    property_path: epa_web_area_group
+    type: integer
+    dependencies:
+      module:
+        - epa_web_areas
+  field_comments_due_date:
+    label: 'Comments Due Date'
+    datasource_id: 'entity:node'
+    property_path: field_comments_due_date
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_comments_due_date
+  field_computed_comments_due_date:
+    label: 'Computed Comments Due Date'
+    datasource_id: 'entity:node'
+    property_path: field_computed_comments_due_date
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_computed_comments_due_date
+  field_description:
+    label: Description
+    datasource_id: 'entity:node'
+    property_path: field_description
+    type: text
+    dependencies:
+      config:
+        - field.storage.node.field_description
+  field_geographic_locations:
+    label: 'Geographic Locations'
+    datasource_id: 'entity:node'
+    property_path: field_geographic_locations
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_geographic_locations
+  field_location_proposed_other:
+    label: 'Locations of Proposed Actions » Paragraph » Other'
+    datasource_id: 'entity:node'
+    property_path: 'field_locations_of_prop_actions:entity:field_location_proposed_other'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_locations_of_prop_actions
+        - field.storage.paragraph.field_location_proposed_other
+      module:
+        - paragraphs
+  field_notice_sort_date:
+    label: 'Notice Sort Date'
+    datasource_id: 'entity:node'
+    property_path: field_notice_sort_date
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_notice_sort_date
+  field_programs_or_statutes:
+    label: 'Programs or Statutes'
+    datasource_id: 'entity:node'
+    property_path: field_programs_or_statutes
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_programs_or_statutes
+  field_type_of_proposed_action:
+    label: 'Proposed Actions'
+    datasource_id: 'entity:node'
+    property_path: field_type_of_proposed_action
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_type_of_proposed_action
+  name:
+    label: 'Locations of Proposed Actions » Paragraph » State or Territory » Taxonomy term » Name'
+    datasource_id: 'entity:node'
+    property_path: 'field_locations_of_prop_actions:entity:field_state_or_territory:entity:name'
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_locations_of_prop_actions
+        - field.storage.paragraph.field_state_or_territory
+      module:
+        - paragraphs
+        - taxonomy
+  status:
+    label: Published
+    datasource_id: 'entity:node'
+    property_path: status
+    type: integer
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 5
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - public_notice
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_status: {  }
+  html_filter:
+    all_fields: false
+    fields:
+      - title
+    title: false
+    alt: true
+    tags:
+      b: 2
+      em: 1
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      u: 1
+    weights:
+      preprocess_index: -49
+      preprocess_query: -47
+  language_with_fallback: {  }
+  rendered_item: {  }
+  tokenizer:
+    all_fields: false
+    fields:
+      - body
+      - title
+    spaces: '[^[:alnum:]]'
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -47
+      preprocess_query: -44
+  transliteration:
+    all_fields: false
+    fields:
+      - title
+    weights:
+      preprocess_index: -48
+      preprocess_query: -46
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: true
+  cron_limit: 50
+server: localhost

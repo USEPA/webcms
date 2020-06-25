@@ -1,0 +1,43 @@
+uuid: db99987e-2a2b-44f6-888b-18800afe5487
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.news_releases
+    - views.view.search_news_releases
+  module:
+    - search_api
+id: news_releases_current_search_results
+name: 'Current search results'
+facets:
+  news_releases_geographic_locations:
+    checked: true
+    label: State/Territory
+    separator: ', '
+    weight: 0
+    show_count: false
+  news_releases_press_office:
+    checked: true
+    label: 'Press Office'
+    separator: ', '
+    weight: 0
+    show_count: false
+  news_releases_subjects:
+    checked: true
+    label: Subject
+    separator: ', '
+    weight: 0
+    show_count: false
+  news_releases_year:
+    checked: true
+    label: 'Release Year'
+    separator: ', '
+    weight: 0
+    show_count: false
+facet_source_id: 'search_api:views_page__search_news_releases__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '-6'
+    settings: {  }

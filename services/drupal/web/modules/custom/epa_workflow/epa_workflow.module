@@ -5,7 +5,6 @@
  * Contains epa_workflow.module.
  */
 
-use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
@@ -221,7 +220,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   }
 
   if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
-      _epa_workflow_add_compliance_checkboxes($form);
+    _epa_workflow_add_compliance_checkboxes($form);
   }
 }
 
@@ -317,6 +316,16 @@ function epa_workflow_node_presave(NodeInterface $node) {
       $node->leapfrog = $latest_revision_id;
     }
   }
+
+  // Update the log message for revisions created through bulk operations.
+  $request = \Drupal::request();
+  $parameters = $request->request->all();
+  if (isset($parameters['node_bulk_form'])) {
+    $new_state = $node->moderation_state->value;
+    $node->setRevisionLogMessage(t('Transitioned to %state as part of a bulk operation.', [
+      '%state' => $new_state,
+    ]));
+  }
 }
 
 /**
@@ -359,7 +368,8 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   $link_external = $link_external->toString();
 
   // Create a checkbox for 508 compliance agreement
-  $form['workflow_508_compliant'] = [
+  // $form['workflow_508_compliant'] = [
+  $compliance_checkbox = [
     '#type' => 'checkbox',
     '#title' => t('I certify that all links on this page comply with @external.', [
         '@external' => $link_external,
@@ -374,10 +384,22 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
     '#weight' => -1,
   ];
 
+  // Add validation handler for the checkbox.
+  $compliance_checkbox['widget']['#element_validate'] = ['_epa_workflow_form_validation_508'];
+
+  // Ensure a revision comment is not required by default.
+  $form['revision_log']['#required'] = FALSE;
+
   // Make the element visible when publish is selected on the latest revision.
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
-    $form['workflow_508_compliant']['#states'] = [
+    $compliance_checkbox['#states'] = [
       'visible' => [
+        ':input[name="new_state"]' => ['value' => 'published'],
+      ],
+    ];
+    $form['workflow_508_compliant'] = $compliance_checkbox;
+    $form['revision_log']['#states'] = [
+      'required' => [
         ':input[name="new_state"]' => ['value' => 'published'],
       ],
     ];
@@ -385,14 +407,25 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
 
   // Make the element visible on VBO edits.
   if (isset($form['node_bulk_form'])) {
-    $form['workflow_508_compliant']['#states'] = [
+    $compliance_checkbox['#states'] = [
       'visible' => [
         ':input[name="action"]' => ['value' => 'set_to_published'],
       ],
     ];
+    $form['header']['node_bulk_form']['workflow_508_compliant'] = $compliance_checkbox;
+    $form['revision_log']['#states'] = [
+      'required' => [
+        ':input[name="action"]' => ['value' => 'set_to_published'],
+      ],
+    ];
+
+    // Update field weights on the bulk update form so the submit button is
+    // always at the bottom.
+    $form['header']['node_bulk_form']['action']['#weight'] = 0;
+    $form['header']['node_bulk_form']['workflow_508_compliant']['#weight'] = 1;
+    $form['header']['node_bulk_form']['actions']['#weight'] = 1000;
   }
 
-  $form['workflow_508_compliant']['widget']['#element_validate'] = ['_epa_workflow_form_validation_508'];
 }
 
 

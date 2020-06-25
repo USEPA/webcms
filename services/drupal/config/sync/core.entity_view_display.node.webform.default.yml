@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.webform.field_hublinks
     - field.field.node.webform.field_is_searchable_collection
     - field.field.node.webform.field_language
+    - field.field.node.webform.field_last_published
     - field.field.node.webform.field_machine_name
     - field.field.node.webform.field_page_head
     - field.field.node.webform.field_paragraphs
@@ -16,9 +17,7 @@ dependencies:
     - field.field.node.webform.webform
     - node.type.webform
   module:
-    - datetime
     - entity_reference_revisions
-    - options
     - user
     - webform
 id: node.webform.default
@@ -27,60 +26,20 @@ bundle: webform
 mode: default
 content:
   content_moderation_control:
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_hublinks:
+    type: entity_reference_label
     weight: 0
     region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_description:
-    weight: 9
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
-  field_geographic_locations:
-    weight: 6
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_hublinks:
-    weight: 11
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_is_searchable_collection:
-    weight: 12
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_language:
-    weight: 7
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: list_key
-    region: content
-  field_machine_name:
-    weight: 8
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
   field_page_head:
-    weight: 10
+    weight: 4
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -95,28 +54,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_review_deadline:
-    weight: 4
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_type:
-    weight: 5
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  links:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   webform:
     weight: 3
     label: hidden
@@ -125,4 +62,14 @@ content:
     third_party_settings: {  }
     type: webform_entity_reference_entity_view
     region: content
-hidden: {  }
+hidden:
+  field_description: true
+  field_geographic_locations: true
+  field_is_searchable_collection: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_review_deadline: true
+  field_type: true
+  links: true
+  search_api_excerpt: true

@@ -7,16 +7,16 @@
       'icon': '../../../images/icon-dot-gov.svg',
       'icon_alt': 'Dot gov',
       'heading': 'The .gov means it’s official.',
-      'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.'
+      'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.',
     },
     {
       'icon': '../../../images/icon-https.svg',
       'icon_alt': 'HTTPS',
       'heading': 'The site is secure.',
-      'content': 'The <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.'
-    }
-  ]
-}%}
+      'content': 'The <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.',
+    },
+  ],
+} %}
 
 {% if show_sitewide_alerts %}
   {% include '@components/sitewide-alert/sitewide-alert--emergency/sitewide-alert--emergency.twig' with {
@@ -25,11 +25,13 @@
   } %}
   {% include '@components/sitewide-alert/sitewide-alert--warning/sitewide-alert--warning.twig' with {
     'show_close': true,
+    'hash': 'sample-alert-1',
     'content': '<p>This is a <strong>warning</strong> alert.</p>',
   } %}
-  {% include '@components/sitewide-alert/sitewide-alert--info/sitewide-alert--info.twig' with {
+  {% include '@components/sitewide-alert/sitewide-alert--information/sitewide-alert--information.twig' with {
     'show_close': true,
-    'content': '<p>We’ve made some changes to <a href="/">EPA.gov</a>. If the information you are looking for is not here, you may be able to find it on the <a href="https://archive.epa.gov/">EPA Web Archive</a> or the <a href="https://19january2017snapshot.epa.gov/">January 19, 2017 Web Snapshot</a>.</p>',
+    'hash': 'sample-alert-2',
+    'content': '<p>We’ve made some changes to <a href="#">EPA.gov</a>. If the information you are looking for is not here, you may be able to find it on the <a href="https://archive.epa.gov/">EPA Web Archive</a> or the <a href="https://19january2017snapshot.epa.gov/">January 19, 2017 Web Snapshot</a>.</p>',
   } %}
 {% endif %}
 
@@ -54,98 +56,59 @@
   {% endblock %}
 {% endembed %}
 
-{% embed '@layouts/region/region.twig' with {
-  'region_name': 'highlighted',
-  'has_constrain': true
-} %}
-  {% block content %}
-
-  {% endblock %}
-{% endembed %}
-
-{% embed '@layouts/region/region.twig' with {
-  'region_name': 'help',
-  'has_constrain': true
-} %}
-  {% block content %}
-
-  {% endblock %}
-{% endembed %}
-
 <main id="main" class="main" role="main" tabindex="-1">
-  {% embed '@layouts/region/region.twig' with {
-    'region_name': 'preface',
-    'has_constrain': true
-  } %}
-    {% block content %}
-
-    {% endblock %}
-  {% endembed %}
-
-  {% embed '@layouts/constrain/constrain.twig' %}
-    {% block content %}
-      {{ content }}
-    {% endblock %}
-  {% endembed %}
-
-  {% embed '@layouts/region/region.twig' with {
-    'region_name': 'postscript',
-    'has_constrain': true
-  } %}
-    {% block content %}
-
-    {% endblock %}
-  {% endembed %}
+  {{ content }}
 </main>
 
-{% embed '@components/footer/footer.twig' with {
-  'last_updated': 'Last updated on February 25, 2020'
-} %}
-  {% block column_one %}
-    <h2>Discover.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Accessibility', 'url': '#' },
-        { 'title': 'EPA Administrator', 'url': '#' },
-        { 'title': 'Budget & Performance', 'url': '#' },
-        { 'title': 'Contracting', 'url': '#' },
-        { 'title': 'Grants', 'url': '#' },
-        { 'title': 'January 19, 2017 Web Snapshot', 'url': '#' },
-        { 'title': 'No FEAR Act Data', 'url': '#' },
-        { 'title': 'Privacy', 'url': '#' },
-        { 'title': 'Privacy and Security Notice', 'url': '#' }
-      ],
-    } %}
-  {% endblock %}
-  {% block column_two %}
-    <h2>Connect.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Data.gov', 'url': '#' },
-        { 'title': 'Inspector General', 'url': '#' },
-        { 'title': 'Jobs', 'url': '#' },
-        { 'title': 'Newsroom', 'url': '#' },
-        { 'title': 'Open Government', 'url': '#' },
-        { 'title': 'Regulations.gov', 'url': '#' },
-        { 'title': 'Subscribe', 'url': '#' },
-        { 'title': 'USA.gov', 'url': '#' },
-        { 'title': 'White House', 'url': '#' }
-      ],
-    } %}
-  {% endblock %}
-  {% block column_three %}
-    <h2>Ask.</h2>
-    {% include '@components/menu/menu--footer/menu--footer.twig' with {
-      'menu_name': 'footer',
-      'items': [
-        { 'title': 'Contact EPA', 'url': '#' },
-        { 'title': 'Hotlines', 'url': '#' },
-        { 'title': 'FOIA Requests', 'url': '#' }
-      ],
-    } %}
-    <h2>Follow.</h2>
-    {% include '@components/menu/menu--social/menu--social.twig' %}
+{% embed '@components/footer/footer.twig' %}
+  {% block content %}
+    <div class="footer__column">
+      <h2>Discover.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Accessibility', 'url': '#' },
+          { 'title': 'EPA Administrator', 'url': '#' },
+          { 'title': 'Budget & Performance', 'url': '#' },
+          { 'title': 'Contracting', 'url': '#' },
+          { 'title': 'Grants', 'url': '#' },
+          { 'title': 'January 19, 2017 Web Snapshot', 'url': '#' },
+          { 'title': 'No FEAR Act Data', 'url': '#' },
+          { 'title': 'Privacy', 'url': '#' },
+          { 'title': 'Privacy and Security Notice', 'url': '#' }
+        ],
+      } %}
+    </div>
+    <div class="footer__column">
+      <h2>Connect.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Data.gov', 'url': '#' },
+          { 'title': 'Inspector General', 'url': '#' },
+          { 'title': 'Jobs', 'url': '#' },
+          { 'title': 'Newsroom', 'url': '#' },
+          { 'title': 'Open Government', 'url': '#' },
+          { 'title': 'Regulations.gov', 'url': '#' },
+          { 'title': 'Subscribe', 'url': '#' },
+          { 'title': 'USA.gov', 'url': '#' },
+          { 'title': 'White House', 'url': '#' }
+        ],
+      } %}
+    </div>
+    <div class="footer__column">
+      <h2>Ask.</h2>
+      {% include '@components/menu/menu--footer/menu--footer.twig' with {
+        'menu_name': 'footer',
+        'items': [
+          { 'title': 'Contact EPA', 'url': '#' },
+          { 'title': 'Hotlines', 'url': '#' },
+          { 'title': 'FOIA Requests', 'url': '#' }
+        ],
+      } %}
+      <h2>Follow.</h2>
+      {% include '@components/menu/menu--social/menu--social.twig' %}
+      <p class="footer__last-updated">Last updated on February 25, 2020</p>
+    </div>
   {% endblock %}
 {% endembed %}
