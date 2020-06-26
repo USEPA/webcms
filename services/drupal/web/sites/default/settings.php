@@ -785,6 +785,18 @@ $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
 $env_name = getenv('WEBCMS_ENV_NAME');
 $env_state = getenv('WEBCMS_ENV_STATE');
+$env_lang = getenv('WEBCMS_ENV_LANG');
+
+if (empty($env_lang)) {
+  $env_lang = 'en';
+}
+
+switch ($env_lang) {
+  case 'es':
+    $config['system.site']['slogan'] = 'Agencia de Protección Ambiental de Estados Unidos';
+    $config['pathologic.settings']['local_paths'] = 'http://es-dev.epa.byf1.io\r\nhttps://es-dev.epa.byf1.io\r\nhttp://es-stage.epa.byf1.io\r\nhttps://es-stage.epa.byf1.io\r\nhttp://es-prod.epa.byf1.io\r\nhttps://es-prod.epa.byf1.io\r\nhttp://es-drupal1.epa.gov\r\nhttps://es-drupal1.epa.gov\r\nhttp://es-drupal2.epa.gov  \r\nhttps://es-drupal2.epa.gov\r\nhttp://es-wcms.epa.gov\r\nhttps://es-wcms.epa.gov\r\nhttp://espanol.epa.gov\r\nhttps://espanol.epa.gov\r\nhttp://es-drupal1-test.epa.gov\r\nhttps://es-drupal1-test.epa.gov\r\nhttp://es-drupal2-test.epa.gov\r\nhttps://es-drupal2-test.epa.gov';
+    break;
+}
 
 // Only activate Redis if we're in the 'run' ENV_STATE. We need to do this because
 // setting the cache backend before the Redis module is installed, Drupal will throw an
