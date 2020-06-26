@@ -6,12 +6,9 @@
 #}
 
 {% set classes = [
-  'node',
-  'node--type-' ~ node.bundle|clean_class,
-  node.isPromoted() ? 'node--promoted',
-  node.isSticky() ? 'node--sticky',
-  not node.isPublished() ? 'node--unpublished',
-  view_mode ? 'node--display-mode-' ~ view_mode|clean_class,
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
 ] %}
 
 {% set header_info %}
@@ -36,6 +33,10 @@
 {% endset %}
 
 {% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+{% endif %}
 
 {% include '@templates/detail-pages/page.twig' with {
   'header_info': header_info,
