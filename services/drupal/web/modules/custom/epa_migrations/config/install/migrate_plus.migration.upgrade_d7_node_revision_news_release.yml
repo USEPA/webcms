@@ -1,10 +1,8 @@
-uuid: e219afa4-523a-4925-a757-09812ffdb4f8
+uuid: 0448a68f-1958-4e1e-8e9a-9f926cebac12
 langcode: en
 status: true
 dependencies: {  }
-_core:
-  default_config_hash: IvLx34dxeL5F3x0JGeytRJoZGeFWtcHnMfT67G8rqEE
-id: upgrade_d7_node_document
+id: upgrade_d7_node_revision_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -12,10 +10,10 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Nodes (Document)'
+label: 'Node Revisions (News Release)'
 source:
-  plugin: epa_node
-  node_type: document
+  plugin: epa_node_revision
+  node_type: news_release
 process:
   nid:
     -
@@ -32,8 +30,8 @@ process:
       default_value: en
     -
       plugin: str_replace
-      search: und
-      replace: en
+      search: 'und'
+      replace: 'en'
   title:
     -
       plugin: get
@@ -68,48 +66,28 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
       source: timestamp
-  comment_node_document/0/status:
+  comment_node_news_release/0/status:
     -
       plugin: get
       source: comment
+  _html_paragraphs:
+    plugin: migration_lookup
+    migration: upgrade_d7_node_news_release_paragraph_html
+    source: nid
   field_paragraphs:
     -
-      plugin: skip_on_empty
-      method: process
-      source: main_col_panes
-    -
-      plugin: single_value
-    -
-      plugin: epa_panes_to_paragraphs
-    -
-      plugin: multiple_values
-    -
       plugin: sub_process
+      source:
+        - '@_html_paragraphs'
       process:
-        target_id: target_id
-        target_revision_id: target_revision_id
-  field_paragraphs_1:
-    -
-      plugin: skip_on_empty
-      method: process
-      source: sidebar_panes
-    -
-      plugin: single_value
-    -
-      plugin: epa_panes_to_paragraphs
-    -
-      plugin: multiple_values
-    -
-      plugin: sub_process
-      process:
-        target_id: target_id
-        target_revision_id: target_revision_id
+        target_id: '0'
+        target_revision_id: '1'
   field_channel:
     -
       plugin: sub_process
@@ -136,8 +114,8 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: Y-m-d
           source: value
-          from_timezone: America/New_York
-          to_timezone: UTC
+          from_timezone: 'America/New_York'
+          to_timezone: 'UTC'
   field_geographic_locations:
     -
       plugin: sub_process
@@ -156,20 +134,24 @@ process:
     -
       plugin: get
       source: field_machine_name
-  field_hublinks:
-    -
-      plugin: get
-      source: field_resource_directories
-  field_is_searchable_collection:
-    -
-      plugin: get
-      source: field_searchable_collection
-  field_type:
+  field_press_office:
     -
       plugin: sub_process
-      source: field_type
+      source: field_press_office
       process:
         target_id: tid
+  field_press_officers:
+    -
+      plugin: single_value
+      source: field_press_officers
+    -
+      plugin: epa_lookup_paragraphs
+      migration: upgrade_d7_paragraph_press_officers
+    -
+      plugin: sub_process
+      process:
+        target_id: 'destid1'
+        target_revision_id: 'destid2'
   field_publish_date:
     -
       plugin: sub_process
@@ -180,8 +162,24 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
-          from_timezone: America/New_York
-          to_timezone: UTC
+          from_timezone: 'America/New_York'
+          to_timezone: 'UTC'
+  field_release:
+    -
+      plugin: sub_process
+      source: field_release_date
+      process:
+        value:
+          plugin: format_date
+          from_format: 'Y-m-d H:i:s'
+          to_format: Y-m-d
+          source: value
+          from_timezone: 'America/New_York'
+          to_timezone: 'UTC'
+  field_hublinks:
+    -
+      plugin: get
+      source: field_resource_directories
   field_review_deadline:
     -
       plugin: sub_process
@@ -192,12 +190,28 @@ process:
           from_format: 'Y-m-d H:i:s'
           to_format: 'Y-m-d\TH:i:s'
           source: value
-          from_timezone: America/New_York
-          to_timezone: UTC
-  field_page_head:
+          from_timezone: 'America/New_York'
+          to_timezone: 'UTC'
+  field_is_searchable_collection:
     -
       plugin: get
-      source: field_page_head
+      source: field_searchable_collection
+  field_secondary_headline:
+    -
+      plugin: get
+      source: field_secondary_headline
+  field_subjects:
+    -
+      plugin: sub_process
+      source: field_subjects
+      process:
+        target_id: tid
+  field_type:
+    -
+      plugin: sub_process
+      source: field_type
+      process:
+        target_id: tid
   field_metatag:
     -
       plugin: d7_metatag_entities
@@ -212,15 +226,15 @@ process:
     -
       plugin: sub_process
       process:
-        moderation_state: moderation_state
-        value: value
+        moderation_state: 'moderation_state'
+        value: 'value'
   moderation_state:
     -
       plugin: get
       source: nres_state
 destination:
-  plugin: 'entity:node'
-  default_bundle: page
+  plugin: 'entity_revision:node'
+  default_bundle: news_release
 migration_dependencies:
   required: {  }
   optional: {  }

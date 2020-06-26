@@ -36,8 +36,6 @@ class EpaPanelizerNode extends Node {
       $query->condition('pd.layout', 'twocol_page', '<>');
     }
 
-    $query->condition('n.nid', [53047], 'IN');
-
     return $query;
   }
 
@@ -53,7 +51,7 @@ class EpaPanelizerNode extends Node {
 
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state', 'timestamp', 'status'])
+      ->fields('nres', ['state'])
       ->condition('nres.vid', $row->getSourceProperty('vid'))
       ->execute()
       ->fetchAll();
@@ -72,7 +70,6 @@ class EpaPanelizerNode extends Node {
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
-      $row->setSourceProperty('nres_revision_status', $state_data['status']);
     }
 
     // To prepare rows for import into fields, we're going to:

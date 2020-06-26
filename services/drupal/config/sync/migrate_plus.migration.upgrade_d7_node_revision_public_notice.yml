@@ -1,10 +1,10 @@
-uuid: a1aa3d4c-f2b9-424d-a60d-657fa23e581f
+uuid: 47293b02-5a54-478a-a4cb-9d3a5d84fd61
 langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: YxLGcgEMHVvTaDaB-Sj-jb1KIo4pTc07b5TWSX1c9Hc
-id: upgrade_d7_node_public_notice
+  default_config_hash: sZTABKg8dPuTENVA73R6y0ZYeW0tE2zCg4JYD5Adjfk
+id: upgrade_d7_node_revision_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -12,9 +12,9 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Nodes (Public Notice)'
+label: 'Node Revisions (Public Notice)'
 source:
-  plugin: epa_node
+  plugin: epa_node_revision
   node_type: public_notice
 process:
   nid:
@@ -68,8 +68,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -348,7 +348,7 @@ process:
       plugin: get
       source: nres_state
 destination:
-  plugin: 'entity:node'
+  plugin: 'entity_revision:node'
   default_bundle: public_notice
 migration_dependencies:
   required: {  }

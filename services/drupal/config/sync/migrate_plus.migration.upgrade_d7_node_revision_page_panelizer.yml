@@ -1,10 +1,13 @@
-uuid: e219afa4-523a-4925-a757-09812ffdb4f8
+uuid: d73a2e1a-88ec-4679-af82-22fd154d4229
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  enforced:
+    module:
+      - epa_migrations
 _core:
-  default_config_hash: IvLx34dxeL5F3x0JGeytRJoZGeFWtcHnMfT67G8rqEE
-id: upgrade_d7_node_document
+  default_config_hash: rj4TRDB8GgWh3oB0db61YsIiLP6Yg6CBQL7cQik1SiA
+id: upgrade_d7_node_revision_page_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -12,10 +15,10 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Nodes (Document)'
+label: 'Panelizer Node Revisions (Basic page)'
 source:
-  plugin: epa_node
-  node_type: document
+  plugin: epa_panelizer_node_revision
+  node_type: page
 process:
   nid:
     -
@@ -41,7 +44,7 @@ process:
   uid:
     -
       plugin: get
-      source: node_uid
+      source: uid
   status:
     -
       plugin: get
@@ -68,48 +71,27 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
       source: timestamp
-  comment_node_document/0/status:
+  comment_node_page/0/status:
     -
       plugin: get
       source: comment
-  field_paragraphs:
+  layout_builder__layout:
     -
       plugin: skip_on_empty
       method: process
-      source: main_col_panes
+      source: panes
     -
       plugin: single_value
     -
-      plugin: epa_panes_to_paragraphs
+      plugin: epa_panes_to_lb_section
     -
       plugin: multiple_values
-    -
-      plugin: sub_process
-      process:
-        target_id: target_id
-        target_revision_id: target_revision_id
-  field_paragraphs_1:
-    -
-      plugin: skip_on_empty
-      method: process
-      source: sidebar_panes
-    -
-      plugin: single_value
-    -
-      plugin: epa_panes_to_paragraphs
-    -
-      plugin: multiple_values
-    -
-      plugin: sub_process
-      process:
-        target_id: target_id
-        target_revision_id: target_revision_id
   field_channel:
     -
       plugin: sub_process
@@ -156,10 +138,10 @@ process:
     -
       plugin: get
       source: field_machine_name
-  field_hublinks:
+  field_page_head:
     -
       plugin: get
-      source: field_resource_directories
+      source: field_page_head
   field_is_searchable_collection:
     -
       plugin: get
@@ -170,6 +152,10 @@ process:
       source: field_type
       process:
         target_id: tid
+  field_wide_template:
+    -
+      plugin: get
+      source: field_wide_template
   field_publish_date:
     -
       plugin: sub_process
@@ -194,14 +180,14 @@ process:
           source: value
           from_timezone: America/New_York
           to_timezone: UTC
-  field_page_head:
-    -
-      plugin: get
-      source: field_page_head
   field_metatag:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  field_hublinks:
+    -
+      plugin: get
+      source: field_resource_directories
   field_scheduled_transition:
     -
       plugin: epa_scheduled_transition
@@ -219,7 +205,7 @@ process:
       plugin: get
       source: nres_state
 destination:
-  plugin: 'entity:node'
+  plugin: 'entity_revision:node'
   default_bundle: page
 migration_dependencies:
   required: {  }
