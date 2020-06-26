@@ -36,7 +36,7 @@ class EpaNodeRevision extends NodeRevision {
 
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state', 'timestamp', 'status'])
+      ->fields('nres', ['state'])
       ->condition('nres.vid', $row->getSourceProperty('vid'))
       ->execute()
       ->fetchAll();
@@ -55,7 +55,6 @@ class EpaNodeRevision extends NodeRevision {
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
-      $row->setSourceProperty('nres_revision_status', $state_data['status']);
     }
 
     // To prepare rows for import into fields, we're going to:
