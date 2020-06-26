@@ -1,0 +1,36 @@
+uuid: 0093862f-bd3d-498f-a936-edecd881ade7
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - epa_migrations
+_core:
+  default_config_hash: 1xqOspnRshQ_hqnIv6MtJ4fuL8SyjSVMJhAST5F5e4k
+id: upgrade_d7_file_entity_video
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'File Entity migration (video)'
+source:
+  plugin: epa_d7_file_entity_item
+  type: video
+  constants:
+    empty: ''
+process:
+  mid:
+    -
+      plugin: skip_on_empty
+      source: constants/empty
+      message: 'Local video files are not supported in Drupal 8.'
+      method: row
+destination:
+  plugin: 'entity:media'
+  bundle: remote_video
+migration_dependencies:
+  optional: {  }
+  required: {  }
