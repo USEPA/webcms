@@ -35,8 +35,6 @@ class EpaPanelizerNodeRevision extends NodeRevision {
     if ($this->configuration['node_type'] !== 'web_area') {
       $query->condition('pd.layout', 'twocol_page', '<>');
     }
-    // 53047, 791,
-    $query->condition('n.nid', [109], 'IN');
 
     return $query;
   }

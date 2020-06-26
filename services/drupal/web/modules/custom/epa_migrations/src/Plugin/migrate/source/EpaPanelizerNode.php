@@ -36,8 +36,6 @@ class EpaPanelizerNode extends Node {
       $query->condition('pd.layout', 'twocol_page', '<>');
     }
 
-    $query->condition('n.nid', [53047], 'IN');
-
     return $query;
   }
 
