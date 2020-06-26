@@ -773,6 +773,12 @@ $databases['default']['default'] = [
   'port' => 3306,
 ];
 
+// Override migration group settings for database connection.
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['database'] = getenv('WEBCMS_DB_NAME_D7');
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['username'] = getenv('WEBCMS_DB_USER_D7');
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['password'] = getenv('WEBCMS_DB_PASS_D7');
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['host'] = getenv('WEBCMS_DB_HOST');
+
 // Use instance credentials since we're in an AWS environment
 $config['s3fs.settings']['use_instance_profile'] = TRUE;
 $config['s3fs.settings']['bucket'] = getenv('WEBCMS_S3_BUCKET');
