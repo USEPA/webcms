@@ -4,6 +4,7 @@ namespace Drupal\epa_media\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -33,6 +34,17 @@ class EPAMediaExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
     ];
     if ($attributes->get('scheme') == 'private' && in_array($attributes->get('_route'), $restricted_routes)) {
       $event->setException(new NotFoundHttpException());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function onException(GetResponseForExceptionEvent $event) {
+    // Only handle 403 exceptions.
+    $exception = $event->getException();
+    if ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() === 403) {
+      parent::onException($event);
     }
   }
 
