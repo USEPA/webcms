@@ -4,6 +4,8 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_keywords
+    - field.field.media.image.field_legacy_caption
+    - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_media_image
     - image.style.media_library
@@ -11,6 +13,8 @@ dependencies:
   module:
     - image
     - media_inline_embed
+    - options
+    - text
 third_party_settings:
   media_inline_embed:
     embed_inline: false
@@ -19,6 +23,20 @@ targetEntityType: media
 bundle: image
 mode: default
 content:
+  field_legacy_caption:
+    weight: 3
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_legacy_image_alignment:
+    weight: 2
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: list_default
+    region: content
   field_media_image:
     weight: 1
     label: hidden
