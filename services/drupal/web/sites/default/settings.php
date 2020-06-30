@@ -795,6 +795,7 @@ switch ($env_lang) {
   case 'es':
     $config['system.site']['slogan'] = 'Agencia de Protección Ambiental de Estados Unidos';
     $config['pathologic.settings']['local_paths'] = 'http://es-dev.epa.byf1.io\r\nhttps://es-dev.epa.byf1.io\r\nhttp://es-stage.epa.byf1.io\r\nhttps://es-stage.epa.byf1.io\r\nhttp://es-prod.epa.byf1.io\r\nhttps://es-prod.epa.byf1.io\r\nhttp://es-drupal1.epa.gov\r\nhttps://es-drupal1.epa.gov\r\nhttp://es-drupal2.epa.gov  \r\nhttps://es-drupal2.epa.gov\r\nhttp://es-wcms.epa.gov\r\nhttps://es-wcms.epa.gov\r\nhttp://espanol.epa.gov\r\nhttps://espanol.epa.gov\r\nhttp://es-drupal1-test.epa.gov\r\nhttps://es-drupal1-test.epa.gov\r\nhttp://es-drupal2-test.epa.gov\r\nhttps://es-drupal2-test.epa.gov';
+    $config['language.negotiation']['selected_langcode'] = 'es';
     break;
 }
 
