@@ -791,6 +791,17 @@ $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
 $env_name = getenv('WEBCMS_ENV_NAME');
 $env_state = getenv('WEBCMS_ENV_STATE');
+$env_lang = getenv('WEBCMS_ENV_LANG');
+
+if (empty($env_lang)) {
+  $env_lang = 'en';
+}
+
+switch ($env_lang) {
+  case 'es':
+    $config['config_split.config_split.spanish']['status'] = TRUE;
+    break;
+}
 
 // Only activate Redis if we're in the 'run' ENV_STATE. We need to do this because
 // setting the cache backend before the Redis module is installed, Drupal will throw an
