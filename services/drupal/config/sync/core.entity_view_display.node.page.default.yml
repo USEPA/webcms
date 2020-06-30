@@ -247,16 +247,31 @@ third_party_settings:
             uuid: c5f4de94-3519-4c25-a94b-f2eec33a8f50
             region: content
             configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
               id: 'field_block:node:page:field_hublinks'
+              label: Hublinks
+              provider: layout_builder
+              label_display: '0'
               formatter:
                 label: above
-                settings:
-                  link: true
-                third_party_settings: {  }
-                type: entity_reference_label
+                type: web_areas_homepage_link_formatter
+                settings: {  }
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
             additional: {  }
             weight: 14
           8d2e8d19-b79e-4257-a1a4-dfc041365068:
