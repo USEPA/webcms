@@ -1,0 +1,46 @@
+uuid: 6730106c-0530-4366-bc10-19c167bd6fa3
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: F24IA7YB49-736CkWO1YFDhGt1Jnb8Y1olco2pqnv48
+id: upgrade_d7_paragraph_press_officers
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Paragraphs (Press Officers)'
+source:
+  plugin: d7_field_collection_item
+  field_name: field_press_officers
+process:
+  langcode:
+    -
+      plugin: default_value
+      source: language
+      default_value: en
+    -
+      plugin: str_replace
+      search: und
+      replace: en
+  field_person_name:
+    -
+      plugin: get
+      source: field_person_name
+  field_email:
+    -
+      plugin: get
+      source: field_email
+  field_phone_numbers:
+    -
+      plugin: get
+      source: field_phone_numbers
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: press_officers
+migration_dependencies:
+  required: {  }
+  optional: {  }
