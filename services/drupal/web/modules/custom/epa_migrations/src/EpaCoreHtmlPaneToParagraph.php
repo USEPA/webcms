@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
   use EpaMediaWysiwygTransformTrait;
+  use EpaWysiwygTextProcessingTrait;
 
   /**
    * The drupal_7 database connection.
@@ -61,6 +62,9 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
 
     // Convert D7 media to D8 media.
     $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager);
+
+    // Perform text processing to update/remove inline code.
+    $body_field['value'] = $this->processText($body_field['value']);
 
     // Create an html paragraph and wrap it in a box.
     return $this->addBoxWrapper(
