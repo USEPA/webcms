@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set images = [] %}
+{% for key, item in content.field_slide|field_value %}
+  {% set images = images|merge([
+    {
+      'caption': item['#media'].name.value,
+      'media': item|render,
+    }
+  ]) %}
+{% endfor %}
+
+{% include '@components/image-gallery/image-gallery.twig' with {
+  'modifier_classes': classes,
+  'title': content.field_title|field_value|render,
+  'images': images,
+} %}
