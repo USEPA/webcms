@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
   use EpaMediaWysiwygTransformTrait;
+  use EpaWysiwygTextProcessingTrait;
 
   /**
    * The drupal_7 database connection.
@@ -64,6 +65,9 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
 
     // Convert D7 media to D8 media.
     $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager);
+
+    // Perform text processing to update/remove inline code.
+    $body_field['value'] = $this->processText($body_field['value']);
 
     $link_type = isset($configuration['node_field']) ? 'entity' : 'uri';
     $links = $link_type == 'entity' ? $configuration['node_field'] : $configuration['link_field'];
