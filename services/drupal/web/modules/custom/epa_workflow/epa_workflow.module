@@ -11,6 +11,7 @@ use Drupal\content_moderation_notifications\ContentModerationNotificationInterfa
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
@@ -229,21 +230,31 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
  * view pages.
  */
 function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateInterface $form_state) {
-  $node = $form_state->getStorage()['entity'];
-  $vid = $node->get('vid')->value;
-  $values = $form_state->getValues();
-  $request_time = \Drupal::time()->getRequestTime();
-  $message = !empty($values['revision_log']) ? $values['revision_log'] . ' ' : '';
-  $node->setNewRevision();
-  $node->setRevisionCreationTime($request_time);
-  $node->setChangedTime($request_time);
-  $node->setRevisionLogMessage(t('@messageThis is a new revision based on revision %vid.', [
-    '@message' => $message,
-    '%vid' => $vid,
-  ]));
-  $node->set('revision_translation_affected', 1);
-  $node->set('moderation_state', $values['new_state']);
-  $node->save();
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  $entity = $form_state->get('entity');
+  /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+  $last_revision = $entity;
+  $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
+
+  // This is needed to fool the content_moderation_notifications module because
+  // it always assumes the latest revision is the one being acted on.
+  $entity->last_revision = $last_revision;
+
+  $new_state = $form_state->getValue('new_state');
+
+  $entity->set('moderation_state', $new_state);
+
+  if ($entity instanceof RevisionLogInterface) {
+    $entity->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+    $entity->setRevisionLogMessage($form_state->getValue('revision_log'));
+    $entity->setRevisionUserId(\Drupal::currentUser()->id());
+  }
+  $entity->save();
+
+  \Drupal::messenger()->addStatus(t('The moderation state has been updated.'));
+
+  $form_state->setRedirectUrl($entity->toUrl('canonical'));
 }
 
 
@@ -343,6 +354,7 @@ function epa_workflow_node_update(NodeInterface $node) {
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
     $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
+    $last_revision->setSyncing(TRUE);
     $last_revision->save();
   }
 }

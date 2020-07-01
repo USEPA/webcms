@@ -10,4 +10,3 @@ __Variables:__
 * media: [string] Media content, usually an image, audio, or video.
 * transcript: [string] Transcript link for the audio.
 * running_time: [string] Running time of the audio.
-* author: [string] Author of the audio.

@@ -1,0 +1,31 @@
+// @file
+// Styles for New content.
+
+$languages: (
+  'es': 'Nuevo',
+  'ar': 'جديد',
+  'zh_CN': '新',
+  'zh_TW': '新',
+  'fr': 'Nouveau',
+  'ht': 'Nouvo',
+  'it': ' Nuovo',
+  'ko': '신규',
+  'pt': 'Novo',
+  'ru': 'Новый',
+  'tl': 'Bago',
+  'vi': 'Mới',
+);
+
+.new::before {
+  @extend .usa-tag;
+  @extend .usa-tag--accent;
+  content: 'New';
+  display: inline-block;
+  margin-right: rem(units('05')) !important;
+
+  @each $code, $text in $languages {
+    article[lang='#{$code}'] & {
+      content: $text;
+    }
+  }
+}
