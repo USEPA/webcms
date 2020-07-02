@@ -35,11 +35,9 @@ trait EpaWysiwygTextProcessingTrait {
       $doc->loadHtml($wysiwyg_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT);
       libxml_clear_errors();
 
-      // Create a DOM XPath object for searching the document.
-      $xpath = new \DOMXPath($doc);
-
       // Run the document through the transformation methods.
-      $doc = $this->transformRelatedInfoBox($doc, $xpath);
+      $doc = $this->transformRelatedInfoBox($doc);
+      $doc = $this->stripPageTopLink($doc);
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -60,13 +58,14 @@ trait EpaWysiwygTextProcessingTrait {
    *
    * @param \DOMDocument $doc
    *   The document to search and replace.
-   * @param \DOMXPath $xpath
-   *   An xpath representation of the document.
    *
    * @return \DOMDocument
    *   The document with transformed info boxes.
    */
-  private function transformRelatedInfoBox(DOMDocument $doc, DOMXPath $xpath) {
+  private function transformRelatedInfoBox(DOMDocument $doc) {
+
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
 
     $related_info_boxes = $xpath->query('//div[contains(@class, "box multi related-info")]');
 
@@ -114,6 +113,30 @@ trait EpaWysiwygTextProcessingTrait {
 
     return $doc;
 
+  }
+
+  /**
+   * Strip Top of Page links.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed info boxes.
+   */
+  private function stripPageTopLink(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    $page_top_links = $xpath->query('//p[contains(concat(" ", @class, " "), " pagetop ")]');
+
+    if ($page_top_links) {
+      foreach ($page_top_links as $link) {
+        $link->parentNode->removeChild($link);
+      }
+    }
+
+    return $doc;
   }
 
 }
