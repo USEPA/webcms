@@ -3,7 +3,6 @@
 namespace Drupal\epa_migrations;
 
 use DOMDocument;
-use DOMXPath;
 
 /**
  * Helpers to reformat/strip inline HTML.
@@ -21,7 +20,7 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info/s';
+    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa/s';
 
     $num_matches = preg_match($pattern, $wysiwyg_content);
 
@@ -37,7 +36,8 @@ trait EpaWysiwygTextProcessingTrait {
 
       // Run the document through the transformation methods.
       $doc = $this->transformRelatedInfoBox($doc);
-      $doc = $this->stripPageTopLink($doc);
+      $doc = $this->stripPageTopLinks($doc);
+      $doc = $this->stripExitEpaLinks($doc);
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -122,16 +122,41 @@ trait EpaWysiwygTextProcessingTrait {
    *   The document to search and replace.
    *
    * @return \DOMDocument
-   *   The document with transformed info boxes.
+   *   The document with stripped links.
    */
-  private function stripPageTopLink(DOMDocument $doc) {
+  private function stripPageTopLinks(DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
-    $page_top_links = $xpath->query('//p[contains(concat(" ", @class, " "), " pagetop ")]');
+    $page_top_links = $xpath->query('//*[contains(concat(" ", @class, " "), " pagetop ")]');
 
     if ($page_top_links) {
       foreach ($page_top_links as $link) {
+        $link->parentNode->removeChild($link);
+      }
+    }
+
+    return $doc;
+  }
+
+  /**
+   * Strip Exit EPA link disclaimers.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped links.
+   */
+  private function stripExitEpaLinks(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Links that use the exit-disclaimer class.
+    $exit_epa_links = $xpath->query('//*[contains(concat(" ", @class, " "), " exit-disclaimer ") or contains(@href, "exit-epa") or contains(@href, "exitepa")]');
+
+    if ($exit_epa_links) {
+      foreach ($exit_epa_links as $link) {
         $link->parentNode->removeChild($link);
       }
     }
