@@ -20,7 +20,7 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa/s';
+    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view/s';
 
     $num_matches = preg_match($pattern, $wysiwyg_content);
 
@@ -38,6 +38,7 @@ trait EpaWysiwygTextProcessingTrait {
       $doc = $this->transformRelatedInfoBox($doc);
       $doc = $this->stripPageTopLinks($doc);
       $doc = $this->stripExitEpaLinks($doc);
+      $doc = $this->stripPdfDisclaimers($doc);
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -158,6 +159,31 @@ trait EpaWysiwygTextProcessingTrait {
     if ($exit_epa_links) {
       foreach ($exit_epa_links as $link) {
         $link->parentNode->removeChild($link);
+      }
+    }
+
+    return $doc;
+  }
+
+  /**
+   * Strip PDF disclaimers.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped disclaimers.
+   */
+  private function stripPdfDisclaimers(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Elements that include the PDF disclaimer.
+    $pdf_disclaimer_elements = $xpath->query('//*[contains(text(), "need Adobe Reader to view") or contains(text(), "need a PDF reader to view")]');
+
+    if ($pdf_disclaimer_elements) {
+      foreach ($pdf_disclaimer_elements as $element) {
+        $element->parentNode->removeChild($element);
       }
     }
 
