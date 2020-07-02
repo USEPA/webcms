@@ -31,7 +31,9 @@ trait EpaWysiwygTextProcessingTrait {
 
       // Load the content as a DOMDocument for more powerful transformation.
       $doc = new \DomDocument();
+      libxml_use_internal_errors(TRUE);
       $doc->loadHtml($wysiwyg_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT);
+      libxml_clear_errors();
 
       // Create a DOM XPath object for searching the document.
       $xpath = new \DOMXPath($doc);
