@@ -261,7 +261,10 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
 
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
-      if (FALSE === array_search($group_hublink, $hublinks)) {
+      $the_group = array_filter($hublinks, function($item) use ($group_hublink) {
+        return !empty($item['target_id']) && $item['target_id'] == $group_hublink['target_id'];
+      });
+      if (empty($the_group)) {
         array_unshift($hublinks, $group_hublink);
       }
     }
