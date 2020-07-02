@@ -15,6 +15,11 @@ use Drupal\webform\Entity\Webform;
  * Implements hook_ENTITY_TYPE_insert().
  */
 function epa_forms_node_insert(EntityInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   if ($entity->bundle() == 'webform' && $entity->get('webform')->isEmpty()) {
     $title = $entity->label();
     $machine_name = $entity->get('field_machine_name')->getValue();

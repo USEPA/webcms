@@ -196,6 +196,7 @@ abstract class EPAModeration implements EPAModerationInterface {
     }
 
     if (!$this->contentEntityRevision->get('field_type')->isEmpty()
+        && $this->contentEntityRevision->get('field_type')->entity
         && !$this->contentEntityRevision->get('field_type')->entity->get('field_term_days_til_review')->isEmpty()
     ) {
       // Create datetime with appropriate offset.

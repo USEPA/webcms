@@ -1,0 +1,31 @@
+uuid: f90164fd-6a6d-48c7-b72e-3c36b4ddfbf1
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: _GqovzJg4sbXAxa0dwVQqtBuLf5jRPFuPRfLm1l42Jw
+id: upgrade_d7_node_revision_webform_paragraph_html
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Paragraphs (Webform Revisions, HTML)'
+source:
+  plugin: epa_node_revision
+  node_type: webform
+process:
+  field_body:
+    0:
+      plugin: get
+      source: body
+    media_wysiwyg:
+      plugin: epa_media_wysiwyg_filter
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: html
+migration_dependencies:
+  required: {  }
+  optional: {  }
