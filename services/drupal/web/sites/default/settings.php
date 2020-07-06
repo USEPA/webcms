@@ -822,7 +822,7 @@ if ($env_state === 'run') {
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
 // is made.
 $config['elasticsearch_connector.cluster.elasticsearch']['url'] = getenv('WEBCMS_SEARCH_HOST');
-$config['elasticsearch_connector.cluster.elasticsearch']['use_authentication'] = FALSE;
+$config['elasticsearch_connector.cluster.elasticsearch']['options']['use_authentication'] = FALSE;
 
 $config['smtp.settings']['smtp_username'] = getenv('WEBCMS_MAIL_USER');
 $config['smtp.settings']['smtp_password'] = getenv('WEBCMS_MAIL_PASS');
