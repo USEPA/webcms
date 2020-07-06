@@ -38,6 +38,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - entitygroupfield
     - epa_web_areas
     - text
     - user
@@ -60,7 +61,7 @@ content:
     third_party_settings: {  }
   field_applicants_or_respondents:
     type: entity_reference_revisions_entity_view
-    weight: 11
+    weight: 12
     label: above
     settings:
       view_mode: default
@@ -87,7 +88,7 @@ content:
     region: content
   field_docket_numbers:
     type: entity_reference_revisions_entity_view
-    weight: 12
+    weight: 13
     label: above
     settings:
       view_mode: default
@@ -96,7 +97,7 @@ content:
     region: content
   field_federal_register_citations:
     type: entity_reference_revisions_entity_view
-    weight: 13
+    weight: 14
     label: above
     settings:
       view_mode: default
@@ -124,7 +125,7 @@ content:
     region: content
   field_locations_of_prop_actions:
     type: entity_reference_revisions_entity_view
-    weight: 14
+    weight: 15
     label: above
     settings:
       view_mode: default
@@ -132,7 +133,7 @@ content:
     third_party_settings: {  }
     region: content
   field_page_head:
-    weight: 8
+    weight: 9
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -147,7 +148,7 @@ content:
     type: string
     region: content
   field_programs_or_statutes:
-    weight: 9
+    weight: 10
     label: above
     settings:
       link: true
@@ -165,7 +166,7 @@ content:
     region: content
   field_related_documents:
     type: entity_reference_entity_view
-    weight: 15
+    weight: 16
     label: above
     settings:
       view_mode: default
@@ -173,13 +174,21 @@ content:
     third_party_settings: {  }
     region: content
   field_type_of_proposed_action:
-    weight: 10
+    weight: 11
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 8
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
 hidden:
   field_channel: true
   field_computed_comments_due_date: true
