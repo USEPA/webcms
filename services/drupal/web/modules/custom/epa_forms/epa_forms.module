@@ -50,6 +50,11 @@ function epa_forms_node_insert(EntityInterface $entity) {
  * Implements hook_ENTITY_TYPE_delete().
  */
 function epa_forms_node_delete(EntityInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   if ($entity->bundle() == 'webform' && !$entity->get('webform')->isEmpty()) {
     $webform = $entity->get('webform')->entity;
     $webform->delete();
