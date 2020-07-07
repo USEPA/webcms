@@ -42,7 +42,7 @@ resource "aws_rds_cluster" "db" {
 
   skip_final_snapshot = true
 
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_gropup.params.id
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.params.id
 
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]
