@@ -8,7 +8,7 @@ resource "aws_db_subnet_group" "default" {
   })
 }
 
-resource "aws_rds_cluster_parameter_gropup" "params" {
+resource "aws_rds_cluster_parameter_group" "params" {
   name   = "webcms-params-${local.env-suffix}"
   family = "aurora5.6"
 
