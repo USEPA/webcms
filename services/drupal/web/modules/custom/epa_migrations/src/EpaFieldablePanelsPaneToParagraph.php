@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
   use EpaMediaWysiwygTransformTrait;
+  use EpaWysiwygTextProcessingTrait;
 
   /**
    * The drupal_7 database connection.
@@ -107,6 +108,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field = $body_field_query->execute()->fetchAssoc();
           $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
 
+          // Perform text processing to update/remove inline code.
+          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
+
           $paragraph = $this->addBoxWrapper(
             [
               $this->createHtmlParagraph($body_field),
@@ -125,6 +129,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
           $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
+
+          // Perform text processing to update/remove inline code.
+          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
 
           $links_query = $this->d7Connection->select('field_data_field_epa_link_list_links', 'fpp_links')
             ->condition("fpp_links.{$id_type}", $id, '=');
@@ -152,6 +159,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
           $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
+
+          // Perform text processing to update/remove inline code.
+          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
 
           $links_query = $this->d7Connection->select('field_data_field_epa_node_list_ref', 'fpp_links')
             ->condition("fpp_links.{$id_type}", $id, '=');

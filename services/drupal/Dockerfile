@@ -11,6 +11,7 @@ RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
   && { \
+    echo 'memory_limit=256M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini
@@ -25,6 +26,7 @@ RUN apk add --no-cache wget
 
 RUN set -ex \
   && { \
+    echo 'memory_limit=256M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini

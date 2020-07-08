@@ -1,8 +1,9 @@
-uuid: 981ab390-247b-44d5-98fe-85f4a615aeb1
+uuid: 2f2006f7-b439-428d-8279-c1f445b016cf
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.token
     - field.field.node.news_release.field_channel
     - field.field.node.news_release.field_description
     - field.field.node.news_release.field_env_laws_regs_and_treaties
@@ -31,11 +32,16 @@ dependencies:
     - entitygroupfield
     - epa_web_areas
     - hierarchical_term_formatter
+    - layout_builder
     - user
-id: node.news_release.default
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.news_release.token
 targetEntityType: node
 bundle: news_release
-mode: default
+mode: token
 content:
   content_moderation_control:
     weight: 1

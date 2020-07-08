@@ -771,6 +771,15 @@ $databases['default']['default'] = [
   'collation' => 'utf8mb4_general_ci',
   'host' => getenv('WEBCMS_DB_HOST'),
   'port' => 3306,
+
+  'pdo' => [
+    // Request peer verification of encrypted connections
+    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+
+    // Use the Alpine root CA bundle for peer verification (without this option, the PDO
+    // driver won't actually initiate a TLS session).
+    PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
+  ],
 ];
 
 // Override migration group settings for database connection.
@@ -808,9 +817,10 @@ switch ($env_lang) {
 // exception.
 if ($env_state === 'run') {
   $settings['redis.connection'] = [
-    'interface' => 'Predis',
-    'host' => getenv('WEBCMS_CACHE_HOST'),
-    'port' => 6379,
+    'interface' => 'PredisCluster',
+    'hosts' => [
+      'rediss://' . getenv('WEBCMS_CACHE_HOST') . ':6379'
+    ],
   ];
 
   $settings['cache']['default'] = 'cache.backend.redis';

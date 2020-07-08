@@ -12,6 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EpaNodeContentPaneToParagraph extends EpaPaneToParagraph {
   use EpaMediaWysiwygTransformTrait;
   use EpaAppendFilesTrait;
+  use EpaWysiwygTextProcessingTrait;
 
   /**
    * The drupal_7 database connection.
@@ -57,6 +58,7 @@ class EpaNodeContentPaneToParagraph extends EpaPaneToParagraph {
     // Transform body field content.
     $body_field = $row->get('body');
     $body_field[0]['value'] = $this->transformWysiwyg($body_field[0]['value'], $this->entityTypeManager);
+    $body_field[0]['value'] = $this->processText($body_field[0]['value']);
 
     // Append files to the body field for document node types.
     if ($row->getSourceProperty('type') === 'document') {

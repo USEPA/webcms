@@ -24,6 +24,11 @@ resource "aws_elasticsearch_domain" "es" {
     volume_size = var.search-instance-storage
   }
 
+  encrypt_at_rest {
+    enabled    = true
+    kms_key_id = var.encryption-at-rest-key
+  }
+
   vpc_options {
     security_group_ids = [aws_security_group.search.id]
 
@@ -36,7 +41,7 @@ resource "aws_elasticsearch_domain" "es" {
   }
 
   domain_endpoint_options {
-    enforce_https       = false
+    enforce_https       = true
     tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
   }
 
