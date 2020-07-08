@@ -265,7 +265,14 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
   // Add the moderation form to the view mode of a node for authenticated
   // users.
   if ($entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
-    $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+    if (isset($entity->in_preview) && $entity->in_preview) {
+      return;
+    }
+    // Only display the interface on the latest and default revisions.
+    if (!$entity->isLatestRevision() && !$entity->isDefaultRevision()) {
+      return;
+    }
+    $build['epa_content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
   }
 }
 

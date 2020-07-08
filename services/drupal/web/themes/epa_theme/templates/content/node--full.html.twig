@@ -32,7 +32,7 @@
 {% set local_tasks %}
   {{ drupal_block('local_tasks_block', wrapper=false) }}
   {{ drupal_block('local_actions_block', wrapper=false) }}
-  <!-- Content Moderation Control goes here -->
+  {{ content.epa_content_moderation_control }}
 {% endset %}
 
 {% set footer %}
@@ -54,7 +54,7 @@
     'title': label,
     'messages': messages,
     'tasks': local_tasks,
-    'body': content,
+    'body': content|without('epa_content_moderation_control'),
     'sidenav': sidenav,
     'footer': footer,
   } %}
@@ -66,7 +66,7 @@
     'title': label,
     'messages': messages,
     'tasks': local_tasks,
-    'body': content,
+    'body': content|without('epa_content_moderation_control'),
     'footer': footer,
   } %}
 {% endif %}
