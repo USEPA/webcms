@@ -15,9 +15,13 @@ resource "aws_elasticache_replication_group" "cache" {
   engine_version             = "5.0.6"
   auto_minor_version_upgrade = true
   parameter_group_name       = "default.redis5.0.cluster.on"
+  transit_encryption_enabled = true
 
   subnet_group_name  = aws_elasticache_subnet_group.default.name
   security_group_ids = [aws_security_group.cache.id]
+
+  at_rest_encryption_enabled = true
+  kms_key_id                 = var.encryption-at-rest-key
 
   cluster_mode {
     # Since we're using Redis as a cache backend instead of a data store, we don't

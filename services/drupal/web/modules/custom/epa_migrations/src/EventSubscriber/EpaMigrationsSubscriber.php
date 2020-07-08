@@ -3,6 +3,7 @@
 namespace Drupal\epa_migrations\EventSubscriber;
 
 use Drupal\migrate\Event\MigrateImportEvent;
+use Drupal\migrate\Event\MigrateRollbackEvent;
 use Drupal\migrate\Event\MigrateEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -61,12 +62,40 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Migrate pre rollback event handler.
+   *
+   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   *   Migrate import event.
+   */
+  public function onMigratePreRollback(MigrateRollbackEvent $event) {
+    $current_migration = $event->getMigration()->getBaseId();
+    if (preg_match($this->pregPatternNodeMigrations, $current_migration)) {
+      $this->staticCache = TRUE;
+    }
+  }
+
+  /**
+   * Migrate post rollback event handler.
+   *
+   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   *   Migrate import event.
+   */
+  public function onMigratePostRollback(MigrateRollbackEvent $event) {
+    $current_migration = $event->getMigration()->getBaseId();
+    if (preg_match($this->pregPatternNodeMigrations, $current_migration)) {
+      $this->staticCache = FALSE;
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     return [
       MigrateEvents::PRE_IMPORT => 'onMigratePreImport',
       MigrateEvents::POST_IMPORT => 'onMigratePostImport',
+      MigrateEvents::PRE_ROLLBACK => 'onMigratePreRollback',
+      MigrateEvents::POST_ROLLBACK => 'onMigratePostRollback',
     ];
   }
 
