@@ -20,6 +20,13 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 1
   }
 
+  # Set the InnoDB file format to Barracuda: the Antelope format doesn't respect the
+  # innodb_large_prefix option.
+  parameter {
+    name  = "innodb_file_format"
+    value = "Barracuda"
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DB parameters"
   })
