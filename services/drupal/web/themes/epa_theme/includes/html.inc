@@ -9,7 +9,9 @@
  * Implements hook_preprocess().
  */
 function epa_theme_preprocess(&$vars) {
-  $vars['epa_theme_image_path'] = '/' . $vars['directory'] . '/images/';
+  if (!empty($vars['directory'])) {
+    $vars['epa_theme_image_path'] = '/' . $vars['directory'] . '/images/';
+  }
 }
 
 /**
@@ -47,10 +49,4 @@ function epa_theme_preprocess_maintenance_page(&$vars, $hook) {
   // on the maintenance page, it has to be called here.
   epa_theme_preprocess_html($vars, $hook);
   epa_theme_preprocess_page($vars, $hook);
-}
-
-/**
- * Implements hook_preprocess_page().
- */
-function epa_theme_preprocess_page(&$vars, $hook) {
 }
