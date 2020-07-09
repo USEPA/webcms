@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: GY5JfcrFwpgKb9_QMbBzeoRz4mPpzzLVsPNRnPI6t9Q
+  default_config_hash: UnYVjpjClP2m2eEu6dlzFWgZc49R3PEsr9-X4RCWlx4
 id: upgrade_d7_node_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -225,6 +225,10 @@ process:
     -
       plugin: get
       source: nres_state
+  field_last_published:
+    -
+      plugin: get
+      source: last_published
 destination:
   plugin: 'entity:node'
   default_bundle: page

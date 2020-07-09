@@ -72,6 +72,19 @@ class EpaPanelizerNode extends Node {
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
     }
 
+    // Get the timestamp for the latest published revision.
+    $last_published = $this->select('node_revision_epa_states_history', 'nresh')
+      ->fields('nresh', ['timestamp'])
+      ->condition('nresh.nid', $row->getSourceProperty('nid'))
+      ->condition('nresh.state', 'published')
+      ->orderBy('nresh.timestamp', 'DESC')
+      ->execute()
+      ->fetchField();
+
+    if ($last_published) {
+      $row->setSourceProperty('last_published', gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $last_published));
+    }
+
     // To prepare rows for import into fields, we're going to:
     // - Add a 'layout' source property for use during processing.
     // - Add a 'panes' source property containing query results for all panes.
