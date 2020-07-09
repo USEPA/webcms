@@ -95,17 +95,21 @@ trait EpaWysiwygTextProcessingTrait {
 
         // Change child H2 to div and replace classes.
         $h2 = $xpath->query('//h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
-        $box_title = $doc->createElement('div', $h2->nodeValue);
-        $box_title_classes = $h2->attributes->getNamedItem('class')->value;
-        $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
-        $box_title->setAttribute('class', $box_title_classes);
-        $rib_wrapper->replaceChild($box_title, $h2);
+        if ($h2) {
+          $box_title = $doc->createElement('div', $h2->nodeValue);
+          $box_title_classes = $h2->attributes->getNamedItem('class')->value;
+          $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
+          $box_title->setAttribute('class', $box_title_classes);
+          $h2->parentNode->replaceChild($box_title, $h2);
+        }
 
         // Replace div class on pane content.
         $box_content = $xpath->query('//div[contains(@class, "pane-content")]', $rib_wrapper)[0];
-        $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
-        $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
-        $box_content->setAttribute('class', $box_content_classes);
+        if ($box_content) {
+          $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
+          $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
+          $box_content->setAttribute('class', $box_content_classes);
+        }
 
         // Replace the original element with the modified element in the doc.
         $rib_wrapper->parentNode->replaceChild($rib_wrapper, $related_info_boxes[$key]);
