@@ -269,6 +269,15 @@ variable "email-host" {
   type        = string
 }
 
+# Users
+# cf. iam.tf
+
+variable "users-extra-admin" {
+  description = "Names of additional IAM users to make administrators"
+  type        = list(string)
+  default     = []
+}
+
 # Image tag variables
 # cf. cluster.tf
 
