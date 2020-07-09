@@ -596,7 +596,7 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
       # 5. AWS account ID
       # 6. ECS task family ("webcms-drush-${local.env-suffix}", but we read it from the task definition directly)
       # 7. The task revision number - we use "*" due to the reasons stated above.
-      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[1].family}:*"
+      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[0].family}:*"
     ]
 
     # Limit RunTask to the WebCMS's cluster.
@@ -622,7 +622,7 @@ resource "aws_iam_policy" "user_run_tasks_policy" {
 
   name        = "${local.role-prefix}UserRunTasksPolicy"
   description = "Grants permission to run Drush tasks against the cluster"
-  policy      = data.aws_iam_policy_document.user_run_tasks_policy[1].json
+  policy      = data.aws_iam_policy_document.user_run_tasks_policy[0].json
 }
 
 resource "aws_iam_group" "webcms_administrators" {
@@ -651,5 +651,5 @@ resource "aws_iam_group_policy_attachment" "webcm_administrators_run_tasks" {
   count = length(data.aws_iam_policy_document.user_run_tasks_policy)
 
   group      = aws_iam_group.webcms_administrators.name
-  policy_arn = aws_iam_policy.user_run_tasks_policy[1].arn
+  policy_arn = aws_iam_policy.user_run_tasks_policy[0].arn
 }
