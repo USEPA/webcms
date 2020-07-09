@@ -34,7 +34,7 @@ resource "aws_secretsmanager_secret" "db_app_password" {
 }
 
 resource "aws_secretsmanager_secret" "db_app_d7_password" {
-  name = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app_d7/password"
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app_d7/password"
   description = "Password for the WebCMS' Drupal 7 database user"
 
   tags = merge(local.common-tags, {
