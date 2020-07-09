@@ -5,7 +5,6 @@
  * Contains epa_core.module.
  */
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
@@ -16,6 +15,34 @@ use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
+ */
+function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  if ($route_name === 'entity.node.revision') {
+    // Show the same local tasks on node revision pages as the ones displayed
+    // on node canonical pages.
+    $node_canonical_local_tasks = \Drupal::service('plugin.manager.menu.local_task')
+      ->getLocalTasks('entity.node.canonical');
+    $local_tasks['tabs'][0] = $node_canonical_local_tasks['tabs'];
+
+    // Mark the version history local task as active when viewing a node
+    // revision.
+    foreach ($local_tasks['tabs'][0] as $route_name => &$tab) {
+      $tab['#active'] = $route_name === 'entity.node.version_history';
+
+    }
+
+    $cacheability = CacheableMetadata::createFromObject($cacheability)
+      ->merge($node_canonical_local_tasks['cacheability']);
+  }
+}
+
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
