@@ -1,7 +1,7 @@
 ---
-el: .menu--subnav
-title: Subnav Menu
-state: inprogress
+el: .menu--sidenav
+title: Sidenav Menu
+state: in-review
 ---
 
 __Variables:__
