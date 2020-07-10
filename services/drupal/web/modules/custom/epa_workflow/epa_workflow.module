@@ -279,10 +279,8 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
       'epa_web_areas.group_content' => 'Content',
     ],
     [
-      'content_moderation.content' => 'Published Content',
-      'epa_web_areas.sub_group_content' => 'Published Content',
-      'content_moderation.moderated_content' => 'Latest Revisions',
-      'epa_web_areas.moderated_group_content' => 'Latest Revisions',
+      'content_moderation.content' => 'Latest Revisions',
+      'content_moderation.moderated_content' => FALSE, // Hides the task provided by the content moderation module.
     ],
   ];
 
@@ -290,7 +288,12 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
     if (isset($data['tabs'][$level])) {
       foreach ($link_overrides as $link_name => $link_title) {
         if (isset($data['tabs'][$level][$link_name])) {
-          $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          if ($link_title === FALSE) {
+            unset($data['tabs'][$level][$link_name]);
+          }
+          else {
+            $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          }
         }
       }
     }
