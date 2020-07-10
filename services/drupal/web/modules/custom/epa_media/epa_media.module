@@ -76,6 +76,10 @@ function epa_media_media_delete(MediaInterface $media) {
   if (isset($file_fields[$media_bundle])) {
     $fid = $media->{$file_fields[$media_bundle]}->target_id;
     $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
-    $file->delete();
+    // Make sure that the file was marked as "Temporary" to prevent accidentally
+    // removing files that are, somehow, used in multiple places.
+    if ($file->isTemporary()) {
+      $file->delete();
+    }
   }
 }
