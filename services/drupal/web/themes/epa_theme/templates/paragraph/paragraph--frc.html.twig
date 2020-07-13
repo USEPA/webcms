@@ -1,0 +1,10 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% if content.field_link|field_value[0]['#url'] and content.field_frc_citation|field_value|render -%}
+  <a href="{{ content.field_link|field_value[0]['#url'] }}">{{ content.field_frc_citation|field_value|render }}</a>
+{%- endif %}
