@@ -598,6 +598,7 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
       # 6. ECS task family ("webcms-drush-${local.env-suffix}", but we read it from the task definition directly)
       # 7. The task revision number - we use "*" due to the reasons stated above.
       # "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[0].family}:*"
+      "*"
     ]
 
     # Limit RunTask to the WebCMS's cluster.
