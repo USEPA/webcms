@@ -572,11 +572,12 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
     sid = "listEcsTasks"
 
     effect    = "Allow"
-    actions   = ["ecs:ListTasks", "ecs:DescribeTasks", "ecs:ListTaskDefinitions", "ecs:DescribeTaskDefinitions"]
+    actions   = ["ecs:ListTasks", "ecs:DescribeTasks", "ecs:ListTaskDefinitions", "ecs:DescribeTaskDefinition"]
     resources = ["*"]
   }
 
   # Allow access to the RunTask ECS API, but only for Drush.
+  # TODO: Resolve why the conditional permissions aren't allowing RunTask API calls
   statement {
     sid = "runTask"
 
@@ -596,15 +597,15 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
       # 5. AWS account ID
       # 6. ECS task family ("webcms-drush-${local.env-suffix}", but we read it from the task definition directly)
       # 7. The task revision number - we use "*" due to the reasons stated above.
-      "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[0].family}:*"
+      # "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[0].family}:*"
     ]
 
     # Limit RunTask to the WebCMS's cluster.
-    condition {
-      test     = "StringEquals"
-      variable = "ecs:cluster"
-      values   = [aws_ecs_cluster.cluster.arn]
-    }
+    # condition {
+    #   test     = "StringEquals"
+    #   variable = "ecs:cluster"
+    #   values   = [aws_ecs_cluster.cluster.arn]
+    # }
   }
 
   # Allow users to pass this deployment's Drush role to the RunTask API.
