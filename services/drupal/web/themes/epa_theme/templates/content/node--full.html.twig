@@ -11,8 +11,14 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
+{% set sidenav = drupal_region('sidebar') %}
+
 {% set header_info %}
-  <h4>Header Info</h4>
+  {% if sidenav %}
+    {{ node.group_content|view({type: 'parent_group_label_formatter', settings: {link: false}}) }}
+  {% else %}
+    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+  {% endif %}
 {% endset %}
 
 {% set contact_link %}
@@ -26,6 +32,7 @@
 {% set local_tasks %}
   {{ drupal_block('local_tasks_block', wrapper=false) }}
   {{ drupal_block('local_actions_block', wrapper=false) }}
+  {{ content.epa_content_moderation_control }}
 {% endset %}
 
 {% set footer %}
@@ -38,12 +45,28 @@
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
 {% endif %}
 
-{% include '@templates/detail-pages/page.twig' with {
-  'header_info': header_info,
-  'contact_link': contact_link,
-  'title': label,
-  'messages': messages,
-  'tasks': local_tasks,
-  'body': content,
-  'footer': footer,
-} %}
+{% if sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': content|without('epa_content_moderation_control'),
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': content|without('epa_content_moderation_control'),
+    'footer': footer,
+  } %}
+{% endif %}

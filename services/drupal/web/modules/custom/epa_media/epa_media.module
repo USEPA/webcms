@@ -11,6 +11,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
+use Drupal\media\MediaInterface;
 
 /**
  * Implements hook_entity_access().
@@ -57,4 +59,21 @@ function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterfa
       'target' => '_blank',
     ],
   ];
+}
+
+/**
+ * Implements hook_media_delete().
+ */
+function epa_media_media_delete(MediaInterface $media) {
+  $source_field_name = $media->getSource()->getConfiguration()['source_field'];
+  // Delete the digital file from the system instead just marking it for
+  // deletion and waiting for the cron garbage collection task to run.
+  if ($media->{$source_field_name}->entity instanceof FileInterface) {
+    $file = $media->{$source_field_name}->entity;
+    // Make sure that the file was marked as "Temporary" to prevent accidentally
+    // removing files that are, somehow, used in multiple places.
+    if ($file->isTemporary()) {
+      $file->delete();
+    }
+  }
 }
