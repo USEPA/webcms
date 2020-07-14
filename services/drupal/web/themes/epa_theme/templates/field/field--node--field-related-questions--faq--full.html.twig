@@ -1,0 +1,15 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% if items.0.content|render|striptags|trim %}
+  <h2>{{ label }}</h2>
+  <ul>
+    {% for item in items -%}
+      <li>{{ item.content }}</li>
+    {%- endfor %}
+  </ul>
+{% endif %}
