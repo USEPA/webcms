@@ -1,0 +1,118 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set header_info %}
+  {% if sidenav %}
+    {{ node.group_content|view({type: 'parent_group_label_formatter', settings: {link: false}}) }}
+  {% else %}
+    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+  {% endif %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
+{% set local_tasks %}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+  {{ content.epa_content_moderation_control }}
+{% endset %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+{% endif %}
+
+{% set table_of_contents %}
+  {% if
+    content.field_rule_history|render or
+    content.field_additional_resources|render or
+    content.field_compliance|render
+  %}
+    <p>On this page:</p>
+    <ul>
+      {% if content.field_rule_summary|render %}
+        <li><a href="#rule-summary">{{ content.field_rule_summary|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_rule_history|render %}
+        <li><a href="#rule-history">{{ content.field_rule_history|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_additional_resources|render %}
+        <li><a href="#additional-resources">{{ content.field_additional_resources|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_compliance|render %}
+        <li><a href="#compliance">{{ content.field_compliance|field_label }}</a></li>
+      {% endif %}
+    </ul>
+  {% endif %}
+{% endset %}
+
+{% set box_content %}
+  {{ content.field_computed_comments_due_date }}
+  {{ content.field_how_to_comment }}
+{% endset %}
+
+{% set body %}
+  {% if box_content|trim %}
+    {% include '@components/box/box.twig' with {
+      'modifier_classes': 'box--related-info u-align-right',
+      'title': {
+        'tag': 'div',
+        'text': 'Basic Information'|t,
+      },
+      'content': box_content,
+    } %}
+  {% endif %}
+  {{ table_of_contents }}
+  {{ content|without(
+    'epa_content_moderation_control'
+  ) }}
+{% endset %}
+
+{% if sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'footer': footer,
+  } %}
+{% endif %}
