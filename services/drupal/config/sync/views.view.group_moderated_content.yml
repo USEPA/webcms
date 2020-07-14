@@ -28,9 +28,9 @@ display:
     position: 0
     display_options:
       access:
-        type: perm
+        type: group_permission
         options:
-          perm: 'view any unpublished content'
+          group_permission: 'access group_node overview'
       cache:
         type: tag
         options: {  }
@@ -928,10 +928,11 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - route
+        - route.group
         - url
         - url.query_args
+        - user.group_permissions
         - 'user.node_grants:view'
-        - user.permissions
       tags:
         - 'config:field.storage.node.field_scheduled_transition'
         - 'config:workflow_list'
@@ -944,7 +945,7 @@ display:
       display_extenders:
         views_ajax_get:
           ajax_get: false
-      path: group/%group/nodes/moderated
+      path: group/%group/nodes
       display_description: ''
       menu:
         type: none
@@ -961,10 +962,11 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - route
+        - route.group
         - url
         - url.query_args
+        - user.group_permissions
         - 'user.node_grants:view'
-        - user.permissions
       tags:
         - 'config:field.storage.node.field_scheduled_transition'
         - 'config:workflow_list'

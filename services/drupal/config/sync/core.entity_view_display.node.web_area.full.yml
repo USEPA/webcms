@@ -4,6 +4,7 @@ status: false
 dependencies:
   config:
     - core.entity_view_mode.node.full
+    - field.field.node.web_area.field_aside_block
     - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
@@ -89,11 +90,6 @@ targetEntityType: node
 bundle: web_area
 mode: full
 content:
-  content_moderation_control:
-    weight: -20
-    settings: {  }
-    third_party_settings: {  }
-    region: content
   field_channel:
     weight: 107
     label: above
@@ -206,7 +202,11 @@ content:
     third_party_settings: {  }
     region: content
 hidden:
+  content_moderation_control: true
+  field_aside_block: true
   field_banner: true
   field_last_published: true
+  group_content: true
+  langcode: true
   layout_builder__layout: true
   search_api_excerpt: true

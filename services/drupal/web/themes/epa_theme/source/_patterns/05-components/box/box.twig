@@ -2,6 +2,7 @@
   'box',
   modifier_classes ? modifier_classes,
   img.small.src ? 'has-image-header',
+  image ? 'has-image-header',
 ]|join(' ')|trim %}
 
 {% set title_icon %}
@@ -40,6 +41,8 @@
     {% include '@base/responsive-images/01-small.twig' with {
       'modifier_classes': 'box__image',
     } %}
+  {% elseif image %}
+    {{ image }}
   {% endif %}
   <div class="box__content">{{ content }}</div>
   {% if footer.text %}

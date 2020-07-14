@@ -4,12 +4,15 @@ status: true
 dependencies:
   config:
     - field.field.media.image.field_keywords
+    - field.field.media.image.field_legacy_caption
+    - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
     - field.field.media.image.field_media_image
     - image.style.thumbnail
     - media.type.image
   module:
     - focal_point
+    - text
 id: media.image.default
 targetEntityType: media
 bundle: image
@@ -24,6 +27,20 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete_tags
+    region: content
+  field_legacy_caption:
+    weight: 27
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_legacy_image_alignment:
+    weight: 26
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
     region: content
   field_limit_file_accessibility:
     weight: 5
@@ -41,6 +58,13 @@ content:
     third_party_settings: {  }
     type: image_focal_point
     region: content
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   name:
     type: string_textfield
     weight: 0

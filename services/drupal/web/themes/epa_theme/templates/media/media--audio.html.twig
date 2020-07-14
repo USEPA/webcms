@@ -2,16 +2,9 @@
 /**
  * @file
  * Theme override to display a media item.
- *
- * Available variables:
- * - name: Name of the media.
- * - content: Media content.
- *
- * @see template_preprocess_media()
- *
- * @ingroup themeable
  */
 #}
+
 {% set classes = [
   'figure--medium',
   attributes.hasClass('align-center') ? 'is-centered',
@@ -24,7 +17,6 @@
 {% set media_caption %}
   {{ content.field_transcript }}
   {{ content.field_running_time }}
-  {{ content.field_author }}
 {% endset %}
 
 {% include '@components/figure/figure.twig' with {

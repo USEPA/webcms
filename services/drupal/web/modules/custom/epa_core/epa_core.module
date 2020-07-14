@@ -5,7 +5,6 @@
  * Contains epa_core.module.
  */
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
@@ -16,7 +15,34 @@ use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
-use Drupal\node\Entity\Node;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
+ */
+function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  if ($route_name === 'entity.node.revision') {
+    // Show the same local tasks on node revision pages as the ones displayed
+    // on node canonical pages.
+    $node_canonical_local_tasks = \Drupal::service('plugin.manager.menu.local_task')
+      ->getLocalTasks('entity.node.canonical');
+    $local_tasks['tabs'][0] = $node_canonical_local_tasks['tabs'];
+
+    // Mark the version history local task as active when viewing a node
+    // revision.
+    foreach ($local_tasks['tabs'][0] as $route_name => &$tab) {
+      $tab['#active'] = $route_name === 'entity.node.version_history';
+
+    }
+
+    $cacheability = CacheableMetadata::createFromObject($cacheability)
+      ->merge($node_canonical_local_tasks['cacheability']);
+  }
+}
+
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
@@ -43,22 +69,23 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
-      // UI element for generating default keywords.
+      // Validate if the current subjects and their ancestors match what is
+      // currently in the keywords field.
       $keywords = [];
       foreach ($node->field_keywords as $keyword) {
         if ($keyword->entity) {
-          $keywords[] = Unicode::strtolower($keyword->entity->label());
+          $keywords[] = $keyword->entity->label();
         }
       }
       sort($keywords);
       $keywords = implode(', ', $keywords);
 
       $default_keywords = [];
+      $default_keyword_ids = [];
       foreach ($node->field_subjects as $subject) {
-        if ($subject->entity) {
-          $default_keywords[] = $subject->entity->label();
-        }
+        $default_keyword_ids[] = ['target_id' => $subject->target_id];
       }
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($default_keyword_ids);
       sort($default_keywords);
       $default_keywords = implode(', ', $default_keywords);
 
@@ -77,9 +104,15 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Element validation.
       $form['field_description']['widget'][0]['value']['#required'] = FALSE;
       $form['field_description']['widget']['#element_validate'] = ['epa_core_new_release_description_validate'];
-      //$form['field_description']['widget'][0]['#required'] = FALSE;
 
-      // @todo element validation for keywords.
+      // Add in the default autocomplete validators since they aren't
+      // initially set on the form and setting our custom validation handler
+      // will prevent them from being set at all.
+      $autocomplete_info = \Drupal::service('element_info')->getInfo('entity_autocomplete');
+      $form['field_keywords']['widget']['target_id']['#element_validate'] = $autocomplete_info['#element_validate'];
+
+      // Add a custom validator for automated keyword generation.
+      array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
       break;
   }
@@ -88,7 +121,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 /**
  * Element validation: new release description field.
  */
-function epa_core_new_release_description_validate($element, FormStateInterface &$form_state, $form) {
+function epa_core_new_release_description_validate(array &$element, FormStateInterface $form_state, $form) {
   if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
     $node = $form_state->getFormObject()->getEntity();
     $node_langcode = $node->language()->getId();
@@ -98,16 +131,44 @@ function epa_core_new_release_description_validate($element, FormStateInterface 
     $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
   }
 
-  epa_admin_required_fields_validate($element, $form_state);
-}
-
-/**
- * Element validation: required fields.
- */
-function epa_admin_required_fields_validate($element, FormStateInterface $form_state) {
   if (empty($element[0]['value']['#value']) && $element[0]['value']['#value'] !== 0) {
     $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
+}
+
+/**
+ * Element validation: new release keywords field.
+ */
+function epa_core_new_release_keywords_validate(array &$element, FormStateInterface $form_state, $form) {
+  if (!$form_state->getErrors() && !empty($form_state->getValue('generate_keywords'))) {
+    $subjects = $form_state->getValue('field_subjects');
+    // Logic to collect subjects from form_hierarchical_select_process().
+    $default_keywords = [];
+    if (!empty($subjects)) {
+      $default_keywords = _epa_core_load_taxonomy_hierarchy($subjects);
+    }
+    $element['#value'] = implode(', ', $default_keywords);
+    $form_state->setValueforElement($element, ['target_id' => $element['#value']]);
+  }
+}
+
+/**
+ * Logic to load in terms and their ancestors for keyword generation.
+ */
+function _epa_core_load_taxonomy_hierarchy($terms) {
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  foreach ($terms as $term) {
+    $term_id = $term['target_id'];
+    $term_object = $term_storage->load($term_id);
+    $default_keywords[] = $term_object->label();
+    $ancestors = $term_storage->loadAllParents($term_id);
+    if (!empty($ancestors)) {
+      foreach ($ancestors as $ancestor) {
+        $default_keywords[] = $ancestor->label();
+      }
+    }
+  }
+  return array_unique($default_keywords);
 }
 
 /**
@@ -353,5 +414,16 @@ function _epa_core_augment_datetime_description(&$field_description) {
   }
   else {
     $field_description = $timezone_description;
+  }
+}
+
+
+/**
+ * Implements hook_entity_bundle_field_info_alter().
+ */
+function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+  $env_lang = getenv('WEBCMS_ENV_LANG');
+  if (isset($env_lang) && $env_lang === 'es' && $entity_type->id() == 'node' && !empty($fields['field_language'])) {
+    $fields['field_language']->setDefaultValue('es');
   }
 }

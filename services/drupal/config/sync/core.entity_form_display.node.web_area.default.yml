@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.web_area.field_aside_block
     - field.field.node.web_area.field_banner
     - field.field.node.web_area.field_channel
     - field.field.node.web_area.field_description
@@ -99,6 +100,14 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_aside_block:
+    weight: 3
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
   field_banner:
     type: entity_reference_paragraphs
     weight: 1
@@ -205,6 +214,13 @@ content:
     third_party_settings: {  }
     type: options_select
     region: content
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
   moderation_state:
     weight: 9
     settings: {  }

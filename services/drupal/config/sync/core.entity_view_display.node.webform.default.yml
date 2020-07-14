@@ -18,6 +18,8 @@ dependencies:
     - node.type.webform
   module:
     - entity_reference_revisions
+    - entitygroupfield
+    - epa_web_areas
     - user
     - webform
 id: node.webform.default
@@ -25,18 +27,12 @@ targetEntityType: node
 bundle: webform
 mode: default
 content:
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_hublinks:
-    type: entity_reference_label
+    type: web_areas_homepage_link_formatter
     weight: 0
     region: content
     label: above
-    settings:
-      link: true
+    settings: {  }
     third_party_settings: {  }
   field_page_head:
     weight: 4
@@ -54,6 +50,14 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 5
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
   webform:
     weight: 3
     label: hidden
@@ -63,6 +67,7 @@ content:
     type: webform_entity_reference_entity_view
     region: content
 hidden:
+  content_moderation_control: true
   field_description: true
   field_geographic_locations: true
   field_is_searchable_collection: true
@@ -71,5 +76,6 @@ hidden:
   field_machine_name: true
   field_review_deadline: true
   field_type: true
+  langcode: true
   links: true
   search_api_excerpt: true

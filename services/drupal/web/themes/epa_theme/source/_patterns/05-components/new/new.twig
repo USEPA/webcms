@@ -1,0 +1,67 @@
+{% if is_demo %}<article class="article" lang="en"><p>{% endif %}
+  <ins class="new" data-date="{{ date }}">
+    {{- content -}}
+  </ins>
+{% if is_demo %}</p></article>{% endif %}
+
+{% if is_demo %}
+  {% set languages = [
+    {
+      'code': 'es',
+      'name': 'Spanish',
+    },
+    {
+      'code': 'ar',
+      'name': 'Arabic',
+    },
+    {
+      'code': 'zh_CN',
+      'name': 'Chinese Simplified',
+    },
+    {
+      'code': 'zh_TW',
+      'name': 'Chinese Traditional',
+    },
+    {
+      'code': 'fr',
+      'name': 'French',
+    },
+    {
+      'code': 'ht',
+      'name': 'Haitian Creole',
+    },
+    {
+      'code': 'it',
+      'name': 'Italian',
+    },
+    {
+      'code': 'ko',
+      'name': 'Korean',
+    },
+    {
+      'code': 'pt',
+      'name': 'Portugese',
+    },
+    {
+      'code': 'ru',
+      'name': 'Russian',
+    },
+    {
+      'code': 'tl',
+      'name': 'Tagalog',
+    },
+    {
+      'code': 'vi',
+      'name': 'Vietnamese',
+    },
+  ] %}
+  {% for lang in languages %}
+    <article class="article" lang="{{ lang.code }}">
+      <p>
+        <ins class="new" data-date="{{ date }}">
+          <strong>{{ lang.name }}: </strong>{{- content -}}
+        </ins>
+      </p>
+    </article>
+  {% endfor %}
+{% endif %}

@@ -9,6 +9,7 @@ dependencies:
     - field.field.group.web_area.field_homepage_pub_date
     - field.field.group.web_area.field_long_name
     - field.field.group.web_area.field_machine_name
+    - field.field.group.web_area.field_migration_review_complete
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
     - field.field.group.web_area.field_web_area_comments
@@ -65,6 +66,13 @@ content:
     third_party_settings: {  }
     type: string_textfield
     region: content
+  field_migration_review_complete:
+    weight: 10
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
+    region: content
   field_navigation_style:
     weight: 5
     settings: {  }
@@ -106,6 +114,13 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
     third_party_settings: {  }
 hidden:
   field_homepage_pub_date: true

@@ -261,7 +261,10 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
 
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
-      if (FALSE === array_search($group_hublink, $hublinks)) {
+      $the_group = array_filter($hublinks, function($item) use ($group_hublink) {
+        return !empty($item['target_id']) && $item['target_id'] == $group_hublink['target_id'];
+      });
+      if (empty($the_group)) {
         array_unshift($hublinks, $group_hublink);
       }
     }
@@ -293,4 +296,20 @@ function epa_web_areas_entity_base_field_info(EntityTypeInterface $entity_type) 
       ->setDisplayConfigurable('form', FALSE);
   }
   return $fields;
+}
+
+/**
+ * Alter local actions plugins.
+ *
+ * @param array $local_actions
+ *   The array of local action plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\Core\Menu\LocalActionInterface
+ * @see \Drupal\Core\Menu\LocalActionManager
+ *
+ * @ingroup menu
+ */
+function epa_web_areas_menu_local_actions_alter(&$local_actions) {
+  $local_actions['group_content.group_node_add_page']['appears_on'] = ['view.group_moderated_content.moderated_content'];
+  $local_actions['group_content.group_node_relate_page']['appears_on'] = ['view.group_moderated_content.moderated_content'];
 }

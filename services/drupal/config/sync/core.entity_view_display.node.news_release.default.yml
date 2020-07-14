@@ -28,6 +28,8 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - entitygroupfield
+    - epa_web_areas
     - hierarchical_term_formatter
     - user
 id: node.news_release.default
@@ -35,18 +37,12 @@ targetEntityType: node
 bundle: news_release
 mode: default
 content:
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_hublinks:
     weight: 0
     label: above
-    settings:
-      link: true
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_label
+    type: web_areas_homepage_link_formatter
     region: content
   field_links:
     weight: 100
@@ -100,7 +96,16 @@ content:
     third_party_settings: {  }
     type: string
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 7
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
 hidden:
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
@@ -116,5 +121,6 @@ hidden:
   field_scheduled_transition: true
   field_subjects: true
   field_type: true
+  langcode: true
   links: true
   search_api_excerpt: true

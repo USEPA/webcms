@@ -11,6 +11,7 @@ use Drupal\content_moderation_notifications\ContentModerationNotificationInterfa
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
@@ -37,6 +38,11 @@ function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function epa_workflow_content_moderation_state_insert(ContentModerationStateInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
   if ($epa_moderation->isModeratedEntity($entity)) {
     $epa_moderation->processModeration($entity);
@@ -51,6 +57,11 @@ function epa_workflow_content_moderation_state_insert(ContentModerationStateInte
  * @see https://www.drupal.org/project/drupal/issues/2803717
  */
 function epa_workflow_content_moderation_state_update(ContentModerationStateInterface $entity) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $epa_moderation = \Drupal::service('epa_workflow.moderation_manager');
   // Group will trigger an update after insert.
   // Check to see if entity is moderated.
@@ -170,6 +181,11 @@ function epa_workflow_field_formatter_info_alter(array &$info) {
  * Implements hook_ENTITY_TYPE_revision_create().
  */
 function epa_workflow_node_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields) {
+  // Disable hook during migration.
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   // Remove any schedule field settings from the previous revision.
   if ($new_revision->hasField('field_scheduled_transition')) {
     $new_revision->set('field_scheduled_transition', NULL);
@@ -214,21 +230,31 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
  * view pages.
  */
 function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateInterface $form_state) {
-  $node = $form_state->getStorage()['entity'];
-  $vid = $node->get('vid')->value;
-  $values = $form_state->getValues();
-  $request_time = \Drupal::time()->getRequestTime();
-  $message = !empty($values['revision_log']) ? $values['revision_log'] . ' ' : '';
-  $node->setNewRevision();
-  $node->setRevisionCreationTime($request_time);
-  $node->setChangedTime($request_time);
-  $node->setRevisionLogMessage(t('@messageThis is a new revision based on revision %vid.', [
-    '@message' => $message,
-    '%vid' => $vid,
-  ]));
-  $node->set('revision_translation_affected', 1);
-  $node->set('moderation_state', $values['new_state']);
-  $node->save();
+  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  $entity = $form_state->get('entity');
+  /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
+  $last_revision = $entity;
+  $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
+
+  // This is needed to fool the content_moderation_notifications module because
+  // it always assumes the latest revision is the one being acted on.
+  $entity->last_revision = $last_revision;
+
+  $new_state = $form_state->getValue('new_state');
+
+  $entity->set('moderation_state', $new_state);
+
+  if ($entity instanceof RevisionLogInterface) {
+    $entity->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+    $entity->setRevisionLogMessage($form_state->getValue('revision_log'));
+    $entity->setRevisionUserId(\Drupal::currentUser()->id());
+  }
+  $entity->save();
+
+  \Drupal::messenger()->addStatus(t('The moderation state has been updated.'));
+
+  $form_state->setRedirectUrl($entity->toUrl('canonical'));
 }
 
 
@@ -236,10 +262,17 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
  * Implements hook_entity_view().
  */
 function epa_workflow_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  // Add the moderation form to the view mode of a node for authenticated
+  // Add the moderation form to the full view mode of a node for authenticated
   // users.
-  if ($entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
-    $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+  if ($view_mode === 'full' && $entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
+    if (isset($entity->in_preview) && $entity->in_preview) {
+      return;
+    }
+    // Only display the interface on the latest and default revisions.
+    if (!$entity->isLatestRevision() && !$entity->isDefaultRevision()) {
+      return;
+    }
+    $build['epa_content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
   }
 }
 
@@ -253,18 +286,21 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
       'epa_web_areas.group_content' => 'Content',
     ],
     [
-      'content_moderation.content' => 'Published Content',
-      'epa_web_areas.sub_group_content' => 'Published Content',
-      'content_moderation.moderated_content' => 'Latest Revisions',
-      'epa_web_areas.moderated_group_content' => 'Latest Revisions',
+      'content_moderation.content' => 'Latest Revisions',
+      'content_moderation.moderated_content' => FALSE, // Hides the task provided by the content moderation module.
     ],
   ];
 
   foreach ($override_link_titles as $level => $link_overrides) {
-  if (isset($data['tabs'][$level])) {
+    if (isset($data['tabs'][$level])) {
       foreach ($link_overrides as $link_name => $link_title) {
         if (isset($data['tabs'][$level][$link_name])) {
-          $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          if ($link_title === FALSE) {
+            unset($data['tabs'][$level][$link_name]);
+          }
+          else {
+            $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          }
         }
       }
     }
@@ -275,6 +311,10 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
  * Implements hook_entity_presave().
  */
 function epa_workflow_node_presave(NodeInterface $node) {
+  if (drupal_static('epa_node_migration', FALSE)) {
+    return;
+  }
+
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $original = $node->original;
   if ($original) {
@@ -324,6 +364,7 @@ function epa_workflow_node_update(NodeInterface $node) {
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
     $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
+    $last_revision->setSyncing(TRUE);
     $last_revision->save();
   }
 }

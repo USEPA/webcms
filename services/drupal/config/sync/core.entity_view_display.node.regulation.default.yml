@@ -32,6 +32,8 @@ dependencies:
   module:
     - datetime_range
     - entity_reference_revisions
+    - entitygroupfield
+    - epa_web_areas
     - text
     - user
 id: node.regulation.default
@@ -39,11 +41,6 @@ targetEntityType: node
 bundle: regulation
 mode: default
 content:
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_additional_resources:
     weight: 9
     label: above
@@ -98,10 +95,9 @@ content:
   field_hublinks:
     weight: 0
     label: above
-    settings:
-      link: true
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_label
+    type: web_areas_homepage_link_formatter
     region: content
   field_legal_authorities:
     type: entity_reference_revisions_entity_view
@@ -138,7 +134,16 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 12
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
 hidden:
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
@@ -153,5 +158,6 @@ hidden:
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  langcode: true
   links: true
   search_api_excerpt: true

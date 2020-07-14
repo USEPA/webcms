@@ -28,6 +28,8 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - entitygroupfield
+    - epa_web_areas
     - layout_builder
     - options
     - scheduled_publish
@@ -41,11 +43,6 @@ targetEntityType: node
 bundle: page
 mode: token
 content:
-  content_moderation_control:
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_channel:
     weight: 5
     label: above
@@ -89,10 +86,9 @@ content:
   field_hublinks:
     weight: 13
     label: above
-    settings:
-      link: true
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_label
+    type: web_areas_homepage_link_formatter
     region: content
   field_is_searchable_collection:
     weight: 14
@@ -211,11 +207,21 @@ content:
     third_party_settings: {  }
     type: boolean
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 21
+    region: content
+    label: above
+    settings:
+      link: 0
+    third_party_settings: {  }
   links:
     weight: 1
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  content_moderation_control: true
+  langcode: true
   layout_builder__layout: true
   search_api_excerpt: true

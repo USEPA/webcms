@@ -8,6 +8,30 @@ resource "aws_db_subnet_group" "default" {
   })
 }
 
+resource "aws_rds_cluster_parameter_group" "params" {
+  name   = "webcms-params-${local.env-suffix}"
+  family = "aurora5.6"
+
+  # The innodb_large_prefix parameter expands the key size from 767 bytes to ~3000 bytes,
+  # enabling the use of indexes on VARCHAR(255) columns when that column uses the utf8m4
+  # encoding.
+  parameter {
+    name  = "innodb_large_prefix"
+    value = 1
+  }
+
+  # Set the InnoDB file format to Barracuda: the Antelope format doesn't respect the
+  # innodb_large_prefix option.
+  parameter {
+    name  = "innodb_file_format"
+    value = "Barracuda"
+  }
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DB parameters"
+  })
+}
+
 resource "aws_rds_cluster" "db" {
   cluster_identifier = "webcms-db-${local.env-suffix}"
 
@@ -24,6 +48,8 @@ resource "aws_rds_cluster" "db" {
   preferred_maintenance_window = "sun:06:00-sun:08:00"
 
   skip_final_snapshot = true
+
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.params.id
 
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]

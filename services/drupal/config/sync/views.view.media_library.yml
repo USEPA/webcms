@@ -585,6 +585,45 @@ display:
           plugin_id: media_status
           id: status_extra
           group_type: group
+        uid_current_1:
+          id: uid_current_1
+          table: users
+          field: uid_current
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 2
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          plugin_id: user_current
         uid_current:
           id: uid_current
           table: users
@@ -594,7 +633,7 @@ display:
           admin_label: ''
           operator: '='
           value: ''
-          group: 1
+          group: 2
           exposed: true
           expose:
             operator_id: ''
@@ -768,6 +807,7 @@ display:
         operator: AND
         groups:
           1: AND
+          2: OR
       group_by: true
     cache_metadata:
       max-age: 0
@@ -782,28 +822,30 @@ display:
       tags:
         - 'config:core.entity_view_display.media.audio.default'
         - 'config:core.entity_view_display.media.audio.link'
+        - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
+        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
-        - 'config:core.entity_view_display.media.image.full_width'
-        - 'config:core.entity_view_display.media.image.half_width'
+        - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
         - 'config:core.entity_view_display.media.image.link'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
+        - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
         - 'config:core.entity_view_display.media.other.link'
+        - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
-        - 'config:core.entity_view_display.media.remote_video.full_width'
-        - 'config:core.entity_view_display.media.remote_video.half_width'
         - 'config:core.entity_view_display.media.remote_video.large'
         - 'config:core.entity_view_display.media.remote_video.media_library'
         - 'config:core.entity_view_display.media.remote_video.medium'
+        - 'config:core.entity_view_display.media.remote_video.small'
         - 'config:core.entity_view_display.media.remote_video.thumbnail'
   page:
     display_plugin: page
@@ -1104,28 +1146,30 @@ display:
       tags:
         - 'config:core.entity_view_display.media.audio.default'
         - 'config:core.entity_view_display.media.audio.link'
+        - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
+        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
-        - 'config:core.entity_view_display.media.image.full_width'
-        - 'config:core.entity_view_display.media.image.half_width'
+        - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
         - 'config:core.entity_view_display.media.image.link'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
+        - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
         - 'config:core.entity_view_display.media.other.link'
+        - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
-        - 'config:core.entity_view_display.media.remote_video.full_width'
-        - 'config:core.entity_view_display.media.remote_video.half_width'
         - 'config:core.entity_view_display.media.remote_video.large'
         - 'config:core.entity_view_display.media.remote_video.media_library'
         - 'config:core.entity_view_display.media.remote_video.medium'
+        - 'config:core.entity_view_display.media.remote_video.small'
         - 'config:core.entity_view_display.media.remote_video.thumbnail'
   widget:
     display_plugin: page
@@ -1545,6 +1589,45 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
+        uid_current_1:
+          id: uid_current_1
+          table: users
+          field: uid_current
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 2
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          plugin_id: user_current
         uid_current:
           id: uid_current
           table: users
@@ -1554,7 +1637,7 @@ display:
           admin_label: ''
           operator: '='
           value: ''
-          group: 1
+          group: 2
           exposed: true
           expose:
             operator_id: ''
@@ -1592,6 +1675,7 @@ display:
         operator: AND
         groups:
           1: AND
+          2: OR
       arguments:
         bundle:
           id: bundle
@@ -1665,28 +1749,30 @@ display:
       tags:
         - 'config:core.entity_view_display.media.audio.default'
         - 'config:core.entity_view_display.media.audio.link'
+        - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
+        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
-        - 'config:core.entity_view_display.media.image.full_width'
-        - 'config:core.entity_view_display.media.image.half_width'
+        - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
         - 'config:core.entity_view_display.media.image.link'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
+        - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
         - 'config:core.entity_view_display.media.other.link'
+        - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
-        - 'config:core.entity_view_display.media.remote_video.full_width'
-        - 'config:core.entity_view_display.media.remote_video.half_width'
         - 'config:core.entity_view_display.media.remote_video.large'
         - 'config:core.entity_view_display.media.remote_video.media_library'
         - 'config:core.entity_view_display.media.remote_video.medium'
+        - 'config:core.entity_view_display.media.remote_video.small'
         - 'config:core.entity_view_display.media.remote_video.thumbnail'
   widget_table:
     display_plugin: page
@@ -2173,6 +2259,45 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
+        uid_current_1:
+          id: uid_current_1
+          table: users
+          field: uid_current
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 2
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          plugin_id: user_current
         uid_current:
           id: uid_current
           table: users
@@ -2182,7 +2307,7 @@ display:
           admin_label: ''
           operator: '='
           value: ''
-          group: 1
+          group: 2
           exposed: true
           expose:
             operator_id: ''
@@ -2220,6 +2345,7 @@ display:
         operator: AND
         groups:
           1: AND
+          2: OR
       arguments:
         bundle:
           id: bundle
