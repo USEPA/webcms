@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% if
+  content.field_person_name|field_value|render|striptags|trim or
+  content.field_email|field_value|render|striptags|trim or
+  content.field_phone_numbers|field_value|render|striptags|trim
+%}
+  <div class="margin-bottom-1">
+    {{ content.field_person_name|field_value }}
+    {% if content.field_email|field_value %}
+      (<a href="mailto:{{ content.field_email|field_value }}">{{ content.field_email|field_value }}</a>)
+    {% endif %}
+    {% if content.field_phone_numbers|field_value %}
+      {{ content.field_phone_numbers }}
+    {% endif %}
+  </div>
+{% endif %}
