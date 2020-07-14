@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\file\FileInterface;
 use Drupal\media\MediaInterface;
 
 /**
@@ -61,21 +62,14 @@ function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterfa
 }
 
 /**
- * Implements hook_file_delete().
+ * Implements hook_media_delete().
  */
 function epa_media_media_delete(MediaInterface $media) {
-  $media_bundle = $media->bundle();
-  $file_fields = [
-    'audio' => 'field_media_audio_file',
-    'document' => 'field_media_file',
-    'image' => 'field_media_image',
-    'other' => 'field_media_file_1',
-  ];
+  $source_field_name = $media->getSource()->getConfiguration()['source_field'];
   // Delete the digital file from the system instead just marking it for
   // deletion and waiting for the cron garbage collection task to run.
-  if (isset($file_fields[$media_bundle])) {
-    $fid = $media->{$file_fields[$media_bundle]}->target_id;
-    $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+  if ($media->{$source_field_name}->entity instanceof FileInterface) {
+    $file = $media->{$source_field_name}->entity;
     // Make sure that the file was marked as "Temporary" to prevent accidentally
     // removing files that are, somehow, used in multiple places.
     if ($file->isTemporary()) {
