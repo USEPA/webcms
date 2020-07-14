@@ -262,10 +262,17 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
  * Implements hook_entity_view().
  */
 function epa_workflow_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  // Add the moderation form to the view mode of a node for authenticated
+  // Add the moderation form to the full view mode of a node for authenticated
   // users.
-  if ($entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
-    $build['content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+  if ($view_mode === 'full' && $entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
+    if (isset($entity->in_preview) && $entity->in_preview) {
+      return;
+    }
+    // Only display the interface on the latest and default revisions.
+    if (!$entity->isLatestRevision() && !$entity->isDefaultRevision()) {
+      return;
+    }
+    $build['epa_content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
   }
 }
 
@@ -279,10 +286,8 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
       'epa_web_areas.group_content' => 'Content',
     ],
     [
-      'content_moderation.content' => 'Published Content',
-      'epa_web_areas.sub_group_content' => 'Published Content',
-      'content_moderation.moderated_content' => 'Latest Revisions',
-      'epa_web_areas.moderated_group_content' => 'Latest Revisions',
+      'content_moderation.content' => 'Latest Revisions',
+      'content_moderation.moderated_content' => FALSE, // Hides the task provided by the content moderation module.
     ],
   ];
 
@@ -290,7 +295,12 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
     if (isset($data['tabs'][$level])) {
       foreach ($link_overrides as $link_name => $link_title) {
         if (isset($data['tabs'][$level][$link_name])) {
-          $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          if ($link_title === FALSE) {
+            unset($data['tabs'][$level][$link_name]);
+          }
+          else {
+            $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+          }
         }
       }
     }

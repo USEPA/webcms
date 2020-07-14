@@ -1,10 +1,10 @@
 {% import _self as menus %}
 
-{{ menus.menu_links(items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class) }}
+{{ menus.menu_links(main_items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class) }}
 
-{% macro menu_links(items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class) %}
+{% macro menu_links(main_items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class) %}
   {% import _self as menus %}
-  {% if items %}
+  {% if main_items %}
     {% if menu_level == 0 %}
       {# double quotes around class using menu_name needed for interpolation #}
       {% set additional_classes = [
@@ -21,7 +21,7 @@
     {% else %}
       <ul class="menu menu__subnav">
     {% endif %}
-    {% for item in items %}
+    {% for item in main_items %}
 
       {% set item_classes = ['menu__item'] %}
       {% if menu_level == 0 and menu_class_prefix %}
