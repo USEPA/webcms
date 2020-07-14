@@ -609,6 +609,17 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
     # }
   }
 
+  # Allow users to stop tasks - useful to abort long-running Drush scripts or force a
+  # restart of service tasks.
+  # TODO: Limit this only to the WebCMS' specific cluster
+  statement {
+    sid = "stopTask"
+
+    effect = "Allow"
+    actions = ["ecs:StopTask"]
+    resources = ["*"]
+  }
+
   # Allow users to pass this deployment's Drush role to the RunTask API.
   statement {
     sid = "passDrupalRole"
@@ -647,6 +658,13 @@ resource "aws_iam_group_membership" "webcms_administrators_admin" {
 resource "aws_iam_group_policy_attachment" "webcms_administrators" {
   group      = aws_iam_group.webcms_administrators.name
   policy_arn = aws_iam_policy.user_ssm_policy.arn
+}
+
+# Grant admin users read-only access to the app's secrets so they can make connections to,
+# e.g., the Aurora cluster.
+resource "aws_iam_group_policy_attachment" "webcms_administrators_secrets_access" {
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.task_secrets_access.arn
 }
 
 resource "aws_iam_group_policy_attachment" "webcm_administrators_run_tasks" {
