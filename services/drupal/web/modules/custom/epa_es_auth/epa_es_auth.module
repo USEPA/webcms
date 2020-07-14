@@ -1,38 +1,37 @@
 <?php
 
 use Aws\Credentials\CredentialProvider;
+// cf. https://github.com/jeskew/amazon-es-php
 use Aws\ElasticsearchService\ElasticsearchPhpHandler;
 use Drupal\elasticsearch_connector\Entity\Cluster;
 
-/**
- * This implementation is a stripped-down version of the code that can be found
- * here:
- *
- * https://git.drupalcode.org/project/elasticsearch_aws_connector/-/blob/8.x-5.x/elasticsearch_aws_connector.module
- *
- * There are three differences:
- *   1. We're using our ECS role's credentials instead of fixed IAM keys, and
- *   2. We assume one of two things:
- *    a) every cluster we're connecting to is an AWS Elasticsearch cluster
- *    b) none of them are
- *   3. By not using an external module, we aren't tied to its composer.json,
- *      which points to an older elasticsearch_connector than we can use, since
- *      the cluster is 7.x-based.
- *
- * AWS libraries are provided as part of the Elasticsearch Connector module.
- */
+// This implementation is a stripped-down version of the code that can be found here:
+// https://git.drupalcode.org/project/elasticsearch_aws_connector/-/blob/8.x-5.x/elasticsearch_aws_connector.module
+// There are three differences:
+// 1. We're using our ECS role's credentials instead of fixed IAM keys, and
+// 2. We assume one of two things:
+//    a) every cluster we're connecting to is an AWS Elasticsearch cluster
+//    b) none of them are
+// 3. By not using an external module, we aren't tied to its composer.json, which points
+//    to an older elasticsearch_connector than we can use, since the cluster is 7.x-based.
 
 /**
  * Implements hook_elasticsearch_connector_load_library_options_alter().
  */
 function epa_es_auth_elasticsearch_connector_load_library_options_alter(array &$options, Cluster $cluster) {
-  // Only sign requests if we're not in a local environment: this functionality
-  // is only present in the AWS implementation of Elasticsearch.
+  // Only sign requests if we're not in a local environment: this functionality is only present
+  // in the AWS implementation of Elasticsearch.
   if (getenv('WEBCMS_ENV_NAME') === 'local') {
     return;
   }
 
+  fwrite(
+    fopen('php://stderr', 'w'),
+    "epa_es_auth_elasticsearch_connector_load_library_options_alter() fired"
+  );
+
   $provider = CredentialProvider::defaultProvider();
   $aws_region = getenv('WEBCMS_S3_REGION');
+
   $options['handler'] = new ElasticsearchPhpHandler($aws_region, $provider);
 }
