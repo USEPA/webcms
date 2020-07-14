@@ -847,6 +847,9 @@ $config_directories['sync'] = '../config/sync';
 // garbage collection when their usage drops to zero.
 $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
 
+// Ensure we force the site to use the "include" method of shielding pages
+$config['shield.settings']['method'] = 1;
+
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
