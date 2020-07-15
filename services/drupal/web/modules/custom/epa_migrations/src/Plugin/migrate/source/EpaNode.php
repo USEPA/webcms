@@ -4,6 +4,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\source;
 
 use Drupal\node\Plugin\migrate\source\d7\Node;
 use Drupal\migrate\Row;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Load nodes that will be migrated into fields.
