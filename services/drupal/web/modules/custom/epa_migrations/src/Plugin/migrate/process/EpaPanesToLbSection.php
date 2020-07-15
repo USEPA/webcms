@@ -146,28 +146,24 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
     $layout = $row->getSourceProperty('layout');
     if ($layout === 'flexgrid') {
       // If the D7 layout is 'flexible_grid', inspect pane panels so we can
-      // determine how many columns there are and which layout builder layout to
-      // use. The possible panels for this layout are labeled a1..d4.
-      $panel_names = array_column($value, 'panel');
+      // determine how many rows there are and how many columns are in each row.
+      // The possible panels for this layout are labeled a1..d4.
+      // First, let's organize the panes into an structured array.
+      $layout_rows = [];
+      foreach ($value as $pane) {
+        $row_name = substr($pane['panel'], 0, 1);
+        $col_name = substr($pane['panel'], 1, 1);
 
-      // Extract the number from the panel name.
-      $panel_names = array_map(function ($value) {
-        return substr($value, 1, 1);
-      },
-      $panel_names);
+        $layout_rows[$row_name][$col_name] ? array_push($layout_rows[$row_name][$col_name], $pane) : $layout_rows[$row_name][$col_name] = [$pane];
+      }
 
-      // The highest number determines the number of columns.
-      asort($panel_names);
-      $num_columns = end($panel_names);
-
+      // Set translation arrays.
       $layouts_by_num_columns = [
         1 => 'epa_one_column',
         2 => 'epa_two_column',
         3 => 'epa_three_column',
         4 => 'epa_four_column',
       ];
-
-      $layout = $layouts_by_num_columns[$num_columns];
 
       $regions_by_column_number = [
         1 => 'first',
@@ -176,38 +172,53 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
         4 => 'fourth',
       ];
 
-      // Create paragraph inline content blocks from each pane and wrap them in
-      // SectionComponents to be assigned to the overall Section.
-      $section = new Section($layout);
+      // Initialize our return array.
+      $sections = [];
 
-      foreach ($value as $pane) {
-        $shown = $pane['shown'];
+      foreach ($layout_rows as $layout_row) {
+        // The number of children determines the number of columns.
+        $num_columns = count($layout_row);
+        $layout = $layouts_by_num_columns[$num_columns];
 
-        if ($shown) {
-          if ($num_columns == 1) {
-            $region = 'main';
+        $section = new Section($layout);
+
+        // Instead of using the column number keys from the $layout_rows array,
+        // we should count the number of columns ourselves. This will ensure we
+        // don't create empty columns that might have existed in the flexgrid.
+        $col_number = 1;
+
+        foreach ($layout_row as $panes) {
+
+          foreach ($panes as $pane) {
+            if ($pane['shown']) {
+              if ($num_columns == 1) {
+                $region = 'main';
+              }
+              else {
+                $region = $regions_by_column_number[$col_number];
+              }
+
+              $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
+
+              if ($paragraphs) {
+                $component = $this->buildSectionComponent($paragraphs, $region);
+                $section->appendComponent($component);
+              }
+            }
           }
-          else {
-            $column_number = substr($pane['panel'], 1, 1);
-            $region = $regions_by_column_number[$column_number];
-          }
 
-          $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
-
-          if ($paragraphs) {
-            $component = $this->buildSectionComponent($paragraphs, $region);
-            $section->appendComponent($component);
-          }
+          $col_number++;
         }
+
+        // Add the built section (layout row) to our return array.
+        $sections[] = $section;
       }
 
-      return $section;
+      return $sections;
     }
     elseif ($layout === 'rd_homepage') {
       // If the D7 layout is 'rd_homepage', we have only one destination layout.
       // The panel names from D7 will map 1:1 to a region in Layout Builder.
-      $panel_names = array_column($value, 'panel');
-
       $regions_by_panel_name = [
         'main_col' => 'main',
         'rda1' => 'a1',
@@ -248,8 +259,6 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
       // For most node types this layout is migrated into fields. For web_areas
       // it is migrated into Layout Builder.
       // The panel names from D7 will map 1:1 to a region in Layout Builder.
-      $panel_names = array_column($value, 'panel');
-
       $regions_by_panel_name = [
         'main_col' => 'main',
         'sidebar' => 'sidebar',
