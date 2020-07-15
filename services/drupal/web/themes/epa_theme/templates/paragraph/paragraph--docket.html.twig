@@ -5,6 +5,10 @@
  */
 #}
 
-{% if content.field_link|field_value[0]['#url'] and content.field_number|field_value|render -%}
-  <a href="{{ content.field_link|field_value[0]['#url'] }}">{{ content.field_number|field_value|render }}</a>
+{% if content.field_number|field_value|render -%}
+  {%- if content.field_link|field_value[0]['#url'] -%}
+    <a href="{{ content.field_link|field_value[0]['#url'] }}">{{ content.field_number|field_value|render }}</a>
+  {%- else -%}
+    {{ content.field_number|field_value|render }}
+  {%- endif %}
 {%- endif %}

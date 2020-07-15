@@ -70,12 +70,14 @@
 {% endset %}
 
 {% set box_content %}
-  {{ content.field_computed_comments_due_date }}
-  {{ content.field_how_to_comment }}
+  {{ content.field_legal_authorities }}
+  {{ content.field_federal_register_citations }}
+  {{ content.field_cfr }}
+  {{ content.field_docket_numbers }}
 {% endset %}
 
 {% set body %}
-  {% if box_content|trim %}
+  {% if box_content|striptags|trim %}
     {% include '@components/box/box.twig' with {
       'modifier_classes': 'box--related-info u-align-right',
       'title': {
@@ -87,7 +89,11 @@
   {% endif %}
   {{ table_of_contents }}
   {{ content|without(
-    'epa_content_moderation_control'
+    'epa_content_moderation_control',
+    'field_legal_authorities',
+    'field_federal_register_citations',
+    'field_cfr',
+    'field_docket_numbers'
   ) }}
 {% endset %}
 
