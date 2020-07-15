@@ -33,6 +33,19 @@ trait EpaBoxWrapperTrait {
     }
 
     if ($box_style) {
+      $box_style_map = [
+        'related' => 'related-info',
+        'highlight' => 'highlight',
+        'news' => 'news',
+        'alert' => 'alert',
+        'multi' => 'multipurpose',
+        'simple' => 'multipurpose',
+        'special' => 'special',
+        'rss' => 'rss',
+        'blog' => 'blog',
+      ];
+
+      $box_style = $box_style_map[$box_style] ?? '';
       $box_paragraph->set('field_style', $box_style);
     }
 
