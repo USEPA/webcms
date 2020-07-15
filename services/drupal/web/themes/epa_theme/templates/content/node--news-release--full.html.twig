@@ -54,7 +54,7 @@
   ) }}
 {% endset %}
 
-{% if sidenav %}
+{% if sidenav|render|striptags|trim %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_sidenav': true,
