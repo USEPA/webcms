@@ -30,7 +30,11 @@ dependencies:
     - field.field.node.regulation.field_type
     - node.type.regulation
   module:
+    - datetime
+    - datetime_range
     - entity_reference_revisions
+    - entitygroupfield
+    - options
     - text
     - user
 id: node.regulation.default
@@ -54,6 +58,14 @@ content:
       link: ''
     third_party_settings: {  }
     region: content
+  field_channel:
+    type: entity_reference_label
+    weight: 25
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
   field_compliance:
     weight: 3
     label: above
@@ -61,6 +73,13 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+  field_description:
+    type: basic_string
+    weight: 24
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
   field_docket_numbers:
     weight: 7
     label: above
@@ -70,6 +89,33 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
+  field_effective_dates:
+    type: daterange_default
+    weight: 23
+    region: content
+    label: above
+    settings:
+      separator: '-'
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_env_laws_regs_and_treaties:
+    type: entity_reference_label
+    weight: 22
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_expiration_date:
+    type: datetime_default
+    weight: 21
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_federal_register_citations:
     weight: 5
     label: above
@@ -79,6 +125,56 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
+  field_geographic_locations:
+    type: entity_reference_label
+    weight: 20
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_hublinks:
+    type: entity_reference_label
+    weight: 19
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_is_searchable_collection:
+    type: boolean
+    weight: 18
+    region: content
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_keywords:
+    type: entity_reference_label
+    weight: 16
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_language:
+    type: list_default
+    weight: 15
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_last_published:
+    type: datetime_default
+    weight: 9
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_legal_authorities:
     type: entity_reference_revisions_entity_view
     weight: 4
@@ -93,6 +189,39 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
+  field_machine_name:
+    type: string
+    weight: 14
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_page_head:
+    type: basic_string
+    weight: 13
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_publish_date:
+    type: datetime_default
+    weight: 12
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_review_deadline:
+    type: datetime_default
+    weight: 11
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_rule_history:
     weight: 1
     label: above
@@ -107,26 +236,34 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+  field_type:
+    type: entity_reference_label
+    weight: 10
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  group_content:
+    type: parent_group_entity_formatter
+    weight: 17
+    region: content
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+  langcode:
+    type: language
+    weight: 8
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+      native_language: false
+    third_party_settings: {  }
 hidden:
   content_moderation_control: true
-  field_channel: true
-  field_description: true
-  field_effective_dates: true
-  field_env_laws_regs_and_treaties: true
-  field_expiration_date: true
-  field_geographic_locations: true
-  field_hublinks: true
-  field_is_searchable_collection: true
-  field_keywords: true
-  field_language: true
-  field_last_published: true
-  field_machine_name: true
-  field_page_head: true
-  field_publish_date: true
-  field_review_deadline: true
   field_scheduled_transition: true
-  field_type: true
-  group_content: true
-  langcode: true
   links: true
   search_api_excerpt: true
