@@ -30,10 +30,7 @@ dependencies:
     - field.field.node.regulation.field_type
     - node.type.regulation
   module:
-    - datetime_range
     - entity_reference_revisions
-    - entitygroupfield
-    - epa_web_areas
     - text
     - user
 id: node.regulation.default
@@ -42,7 +39,7 @@ bundle: regulation
 mode: default
 content:
   field_additional_resources:
-    weight: 9
+    weight: 2
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -50,7 +47,7 @@ content:
     region: content
   field_cfr:
     type: entity_reference_revisions_entity_view
-    weight: 4
+    weight: 6
     label: above
     settings:
       view_mode: default
@@ -58,13 +55,22 @@ content:
     third_party_settings: {  }
     region: content
   field_compliance:
-    weight: 10
+    weight: 3
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
   field_docket_numbers:
+    weight: 7
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+  field_federal_register_citations:
     weight: 5
     label: above
     settings:
@@ -73,35 +79,9 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_effective_dates:
-    weight: 6
-    label: above
-    settings:
-      separator: '-'
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: daterange_default
-    region: content
-  field_federal_register_citations:
-    weight: 3
-    label: above
-    settings:
-      view_mode: default
-      link: ''
-    third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
-    region: content
-  field_hublinks:
-    weight: 0
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: web_areas_homepage_link_formatter
-    region: content
   field_legal_authorities:
     type: entity_reference_revisions_entity_view
-    weight: 2
+    weight: 4
     label: above
     settings:
       view_mode: default
@@ -113,51 +93,40 @@ content:
     settings: {  }
     third_party_settings: {  }
     region: content
-  field_page_head:
-    weight: 11
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_rule_history:
-    weight: 8
+    weight: 1
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
   field_rule_summary:
-    weight: 7
+    weight: 0
     label: above
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  group_content:
-    type: parent_group_label_formatter
-    weight: 12
-    region: content
-    label: hidden
-    settings:
-      link: false
-    third_party_settings: {  }
 hidden:
   content_moderation_control: true
   field_channel: true
   field_description: true
+  field_effective_dates: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
   field_last_published: true
   field_machine_name: true
+  field_page_head: true
   field_publish_date: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  group_content: true
   langcode: true
   links: true
   search_api_excerpt: true

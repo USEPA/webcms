@@ -45,24 +45,55 @@
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
 {% endif %}
 
+{% set table_of_contents %}
+  {% if
+    content.field_rule_history|render or
+    content.field_additional_resources|render or
+    content.field_compliance|render
+  %}
+    <p>On this page:</p>
+    <ul>
+      {% if content.field_rule_summary|render %}
+        <li><a href="#rule-summary">{{ content.field_rule_summary|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_rule_history|render %}
+        <li><a href="#rule-history">{{ content.field_rule_history|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_additional_resources|render %}
+        <li><a href="#additional-resources">{{ content.field_additional_resources|field_label }}</a></li>
+      {% endif %}
+      {% if content.field_compliance|render %}
+        <li><a href="#compliance">{{ content.field_compliance|field_label }}</a></li>
+      {% endif %}
+    </ul>
+  {% endif %}
+{% endset %}
+
 {% set box_content %}
-  {{ content.field_computed_comments_due_date }}
-  {{ content.field_how_to_comment }}
+  {{ content.field_legal_authorities }}
+  {{ content.field_federal_register_citations }}
+  {{ content.field_cfr }}
+  {{ content.field_docket_numbers }}
 {% endset %}
 
 {% set body %}
-  {% include '@components/box/box.twig' with {
-    'modifier_classes': 'box--related-info u-align-right',
-    'title': {
-      'tag': 'div',
-      'text': content.field_how_to_comment|field_label,
-    },
-    'content': box_content,
-  } %}
+  {% if box_content|striptags|trim %}
+    {% include '@components/box/box.twig' with {
+      'modifier_classes': 'box--related-info u-align-right',
+      'title': {
+        'tag': 'div',
+        'text': 'Basic Information'|t,
+      },
+      'content': box_content,
+    } %}
+  {% endif %}
+  {{ table_of_contents }}
   {{ content|without(
     'epa_content_moderation_control',
-    'field_computed_comments_due_date',
-    'field_how_to_comment'
+    'field_legal_authorities',
+    'field_federal_register_citations',
+    'field_cfr',
+    'field_docket_numbers'
   ) }}
 {% endset %}
 

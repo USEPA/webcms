@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% if items.0.content|render|striptags|trim %}
+  <h2 id="compliance">{{ label }}</h2>
+
+  {% for item in items -%}
+    {{ item.content }}
+  {%- endfor %}
+{% endif %}
