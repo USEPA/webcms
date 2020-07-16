@@ -10,6 +10,7 @@ dependencies:
     - 'taxonomy_term:type:aed8671c-aba2-49a1-81b9-b32a0c60004b'
   module:
     - custom_add_another
+    - epa_core
 third_party_settings:
   custom_add_another:
     custom_add_another: ''
@@ -22,10 +23,8 @@ label: Type
 description: 'Use <a href="https://www.epa.gov/webguide/metadata-basic-pages#type" class="external" target="_blank">this guide</a> for choosing the right type.'
 required: true
 translatable: false
-default_value:
-  -
-    target_uuid: aed8671c-aba2-49a1-81b9-b32a0c60004b
-default_value_callback: ''
+default_value: {  }
+default_value_callback: 'epa_core_default_value_field_type'
 settings:
   handler: 'default:taxonomy_term'
   handler_settings:

@@ -5,6 +5,8 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
@@ -425,5 +427,26 @@ function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\E
   $env_lang = getenv('WEBCMS_ENV_LANG');
   if (isset($env_lang) && $env_lang === 'es' && $entity_type->id() == 'node' && !empty($fields['field_language'])) {
     $fields['field_language']->setDefaultValue('es');
+  }
+}
+
+/**
+ * Provides default values for our type fields across a couple content types.
+ */
+function epa_core_default_value_field_type(ContentEntityInterface $entity, FieldDefinitionInterface $definition) {
+  if ($entity->getEntityTypeId() === node) {
+    switch ($entity->bundle()) {
+      case 'public_notice':
+        $term_name = "announcements and schedules";
+        break;
+      case 'news_release':
+        $term_name = "news release";
+        break;
+    }
+    if (!empty($term_name)) {
+      $term = taxonomy_term_load_multiple_by_name($term_name, 'type');
+      $term = reset($term);
+      return $term->id();
+    }
   }
 }
