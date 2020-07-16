@@ -1,6 +1,6 @@
 uuid: 39ee83a3-861c-467d-a418-d86135ebb6d4
 langcode: en
-status: false
+status: true
 dependencies:
   config:
     - core.entity_view_mode.node.token
@@ -27,6 +27,7 @@ dependencies:
     - node.type.faq
   module:
     - datetime
+    - entitygroupfield
     - options
     - text
     - user
@@ -38,12 +39,12 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 2
+    weight: 0
     settings: {  }
     third_party_settings: {  }
     region: content
   field_channel:
-    weight: 6
+    weight: 4
     label: above
     settings:
       link: true
@@ -51,13 +52,30 @@ content:
     type: entity_reference_label
     region: content
   field_description:
-    weight: 24
+    weight: 9
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
   field_env_laws_regs_and_treaties:
+    weight: 5
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_expiration_date:
+    type: datetime_default
+    weight: 15
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_faq_taxonomy_topics:
     weight: 11
     label: above
     settings:
@@ -65,36 +83,63 @@ content:
     third_party_settings: {  }
     type: entity_reference_label
     region: content
-  field_faq_taxonomy_topics:
-    weight: 26
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_geographic_locations:
-    weight: 14
+    weight: 6
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  field_hublinks:
+    type: entity_reference_label
+    weight: 16
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_is_searchable_collection:
+    type: boolean
+    weight: 17
+    region: content
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_keywords:
+    type: entity_reference_label
+    weight: 18
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
   field_language:
-    weight: 22
+    weight: 7
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
+  field_last_published:
+    type: datetime_default
+    weight: 19
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_links:
     weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
   field_machine_name:
-    weight: 23
+    weight: 8
     label: above
     settings:
       link_to_entity: false
@@ -102,14 +147,30 @@ content:
     type: string
     region: content
   field_page_head:
-    weight: 25
+    weight: 10
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
+  field_publish_date:
+    type: datetime_default
+    weight: 20
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_question:
+    type: basic_string
+    weight: 21
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
   field_related_questions:
-    weight: 3
+    weight: 1
     label: above
     settings:
       link: true
@@ -117,7 +178,7 @@ content:
     type: entity_reference_label
     region: content
   field_review_deadline:
-    weight: 4
+    weight: 2
     label: above
     settings:
       format_type: medium
@@ -126,28 +187,36 @@ content:
     type: datetime_default
     region: content
   field_type:
-    weight: 5
+    weight: 3
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  group_content:
+    type: parent_group_label_formatter
+    weight: 14
+    region: content
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
+  langcode:
+    type: language
+    weight: 13
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+      native_language: false
+    third_party_settings: {  }
   links:
-    weight: 100
+    weight: 12
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden:
   content_moderation_control: true
-  field_expiration_date: true
-  field_hublinks: true
-  field_is_searchable_collection: true
-  field_keywords: true
-  field_last_published: true
-  field_publish_date: true
-  field_question: true
   field_scheduled_transition: true
-  group_content: true
-  langcode: true
   search_api_excerpt: true
