@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Default twig file for Hierarchical Term Formatter.
+ *
+ * Available variables:
+ * - terms: The processed taxonomy terms to display.
+ * - wrapper: The HTML tag that should wrap each of the terms.
+ * - separator: The text used to separate each of the terms.
+ *
+ * @see template_preprocess_hierarchical_term_formatter()
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% for term in terms -%}
+  {{ term['#value'] }}{% if loop.last == false %} > {% endif %}
+{%- endfor %}

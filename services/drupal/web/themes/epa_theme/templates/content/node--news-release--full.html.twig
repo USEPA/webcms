@@ -1,0 +1,81 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'News Releases from ' ~ content.field_press_office|field_value|render|striptags,
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
+{% set local_tasks %}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+  {{ content.epa_content_moderation_control }}
+{% endset %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+{% endif %}
+
+{% set body %}
+  {% include '@uswds/intro/intro.twig' with {
+    'intro': content.field_secondary_headline,
+  } %}
+  {{ content|without(
+    'epa_content_moderation_control',
+    'field_press_office',
+    'field_secondary_headline'
+  ) }}
+{% endset %}
+
+{% if sidenav|render|striptags|trim %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'footer': footer,
+  } %}
+{% endif %}
