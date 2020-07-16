@@ -26,7 +26,7 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($num_matches > 0) {
       // Add a temp wrapper around the wysiwyg content.
-      $wysiwyg_content = '<?xml encoding="UTF-8"><tempWrapper>' . $wysiwyg_content . '</tempWrapper>';
+      $wysiwyg_content = '<?xml encoding="UTF-8"><tempwrapper>' . $wysiwyg_content . '</tempwrapper>';
 
       // Load the content as a DOMDocument for more powerful transformation.
       $doc = new \DomDocument();
@@ -46,8 +46,8 @@ trait EpaWysiwygTextProcessingTrait {
       // Remove the temp wrapper and encoding from the output.
       return str_replace([
         '<?xml encoding="UTF-8">',
-        '<tempWrapper>',
-        '</tempWrapper>',
+        '<tempwrapper>',
+        '</tempwrapper>',
       ], '', $wysiwyg_content);
     }
 
