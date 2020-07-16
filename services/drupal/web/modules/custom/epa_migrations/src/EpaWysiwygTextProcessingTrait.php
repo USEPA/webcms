@@ -137,7 +137,9 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($page_top_links) {
       foreach ($page_top_links as $link) {
-        $link->parentNode->removeChild($link);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($link);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
@@ -162,7 +164,9 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($exit_epa_links) {
       foreach ($exit_epa_links as $link) {
-        $link->parentNode->removeChild($link);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($link);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
@@ -187,11 +191,83 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($pdf_disclaimer_elements) {
       foreach ($pdf_disclaimer_elements as $element) {
-        $element->parentNode->removeChild($element);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($element);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
     return $doc;
+
+  }
+
+  /**
+   * Remove an element's white-space only child nodes.
+   *
+   * @param \DOMElement $element
+   *   The element to have its child elements cleaned.
+   *
+   * @return \DOMElement
+   *   The element with cleaned children.
+   */
+  private function removeEmptyTextNodes(\DOMElement $element) {
+    $num_children = count($element->childNodes);
+    if ($num_children > 1) {
+      $empty_text_nodes = [];
+      foreach ($element->childNodes as $node) {
+        if ($node->nodeType == 3 && trim($node->nodeValue) == '') {
+          $empty_text_nodes[] = $node;
+        }
+      }
+
+      if ($empty_text_nodes) {
+        foreach ($empty_text_nodes as $node) {
+          $node->parentNode->removeChild($node);
+        }
+      }
+    }
+    return $element;
+  }
+
+  /**
+   * Traverse ancestor tree of an element to determine if it is an only child.
+   *
+   * @param \DOMElement $element
+   *   The element to have its ancestors checked.
+   *
+   * @return \DOMElement
+   *   The top-most ancestor that has no children other than the element.
+   */
+  private function determineElementToRemove(\DOMElement $element) {
+
+    // Initially the element to remove is the original one.
+    $element_to_remove = $element;
+
+    // Find any ancestor elements that only contain this element.
+    // Start by seeing if the immediate parent has any other children.
+    $cleaned_parent = $this->removeEmptyTextNodes($element->parentNode);
+    if (count($cleaned_parent->childNodes) == 1 && $cleaned_parent->childNodes[0]->isSameNode($element)) {
+      $only_child = TRUE;
+      $element_to_remove = $cleaned_parent;
+    }
+    else {
+      $only_child = FALSE;
+    }
+
+    // If the original element is an only child, traverse the ancestors.
+    while ($only_child && $element->name !== 'tempwrapper') {
+      $cleaned_parent = $this->removeEmptyTextNodes($element_to_remove->parentNode);
+
+      if (count($cleaned_parent->childNodes) == 1 && $cleaned_parent->childNodes[0]->isSameNode($element_to_remove)) {
+        $only_child = TRUE;
+        $element_to_remove = $element_to_remove->parentNode;
+      }
+      else {
+        $only_child = FALSE;
+      }
+    }
+
+    return $element_to_remove;
   }
 
 }
