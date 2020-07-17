@@ -615,8 +615,8 @@ data "aws_iam_policy_document" "user_run_tasks_policy" {
   statement {
     sid = "stopTask"
 
-    effect = "Allow"
-    actions = ["ecs:StopTask"]
+    effect    = "Allow"
+    actions   = ["ecs:StopTask"]
     resources = ["*"]
   }
 
