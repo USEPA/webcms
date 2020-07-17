@@ -247,7 +247,7 @@ variable "cache-instance-type" {
 }
 
 variable "cache-replica-count" {
-  description = "Number of ElastiCache read replicas in this cluster"
+  description = "Number of ElastiCache nodes in this cluster"
   type        = number
 }
 
