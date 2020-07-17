@@ -28,15 +28,10 @@ $config['system.logging']['error_level'] = 'all';
 
 switch ($env_state) {
   case 'run':
-    // Convert connection details to single-instance, unencrypted
-    $settings['redis.connection'] = [
-      'interface' => 'Predis',
-      'host' => getenv('WEBCMS_CACHE_HOST'),
-      'port' => 6379,
-    ];
+    $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
   break;
 
-  // Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
+  // Avoid having a memcached cache backend causing errors before we've had a chance to enable the module.
   case 'build':
     unset($settings['cache']['default']);
 }
