@@ -815,8 +815,11 @@ switch ($env_lang) {
 // Only activate Memcache if we're in the 'run' ENV_STATE. We need to do this because
 // setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
-if ($env_state === 'run') {
-  $settings['cache']['default'] = 'cache.backend.memcache';
+switch ($env_state) {
+  case 'run':
+    $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
+    $settings['cache']['default'] = 'cache.backend.memcache';
+    break;
 }
 
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
