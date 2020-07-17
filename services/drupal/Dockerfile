@@ -5,6 +5,9 @@ FROM forumone/drupal8:7.3-xdebug AS dev
 # Install gnu copy of wget to override copy provided by BusyBox.
 RUN apk add --no-cache wget
 
+# Install memcached.
+RUN f1-ext-install pecl:memcached
+
 # Note that any configuration applied to the prod image must be mirrored here, due to the
 # difference in base layers.
 RUN set -ex \
@@ -23,6 +26,9 @@ FROM forumone/drupal8:7.3 AS base
 
 # Install gnu copy of wget to override copy provided by BusyBox.
 RUN apk add --no-cache wget
+
+# Install memcached.
+RUN f1-ext-install pecl:memcached
 
 RUN set -ex \
   && { \
