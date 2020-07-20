@@ -118,6 +118,8 @@ ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
 # and ssh that are inappropriate for a server container image.
 FROM forumone/drupal8-cli:7.3 AS drush
 
+RUN f1-ext-install pecl:memcached
+
 # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
 # instead of PHP)
 RUN set -ex \
