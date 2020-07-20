@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: tNhTxtJHfgWITVmMT9mHOBuyF3aNeo7D39IuGE1DvTk
+  default_config_hash: nNT0QC7QfodGZr7w8itpyYPUHds_edkB8xhMgFjP9-0
 id: upgrade_d7_node_revision_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -213,7 +213,10 @@ process:
       plugin: sub_process
       source: field_type
       process:
-        target_id: tid
+        target_id:
+          -
+            plugin: default_value
+            default_value: 317872
   field_metatag:
     -
       plugin: d7_metatag_entities
