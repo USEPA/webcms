@@ -41,11 +41,13 @@ class EpaNode extends Node {
     $import_date = strtotime('today');
     $end_import_date = strtotime('+30 days', $import_date);
     $review_deadline = \DateTime::createFromFormat('Y-m-d H:i:s', $review_deadline, new \DateTimeZone('America/New_York'));
-    if ($review_deadline->getTimestamp() >= $import_date && $review_deadline->getTimestamp() <= $end_import_date) {
-      $review_deadline->setTimestamp(strtotime('+30 days', $review_deadline->getTimestamp()));
-    }
+    if ($review_deadline) {
+      if ($review_deadline->getTimestamp() >= $import_date && $review_deadline->getTimestamp() <= $end_import_date) {
+        $review_deadline->setTimestamp(strtotime('+30 days', $review_deadline->getTimestamp()));
+      }
 
-    $row->setSourceProperty('field_modified_review_deadline', [0 => ['value' => $review_deadline->format('Y-m-d H:i:s')]]);
+      $row->setSourceProperty('field_modified_review_deadline', [0 => ['value' => $review_deadline->format('Y-m-d H:i:s')]]);
+    }
 
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
