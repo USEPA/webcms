@@ -1,7 +1,7 @@
 <?php
 
 $config = [
-  'baseurlpath' => 'http://localhost:5080/simplesaml/',
+  'baseurlpath' => 'http://localhost:5000/simplesaml/',
 
   // Send mail to MailHog (localhost:8025 to see UI)
   'mail.transport.method' => 'smtp',
@@ -38,9 +38,9 @@ $config = [
   // Enable SAML 2.0 IdP functionality
   'enable.saml20-idp' => true,
 
-  // Enable OAuth2/OpenID module
+  // Enable exampleAuth module - this gives us username/password authentication
   'module.enable' => [
-    'authoauth2'
+    'exampleauth' => true,
   ],
 
   'tempdir' => '/tmp',

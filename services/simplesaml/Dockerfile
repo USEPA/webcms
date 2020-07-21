@@ -1,11 +1,5 @@
 FROM php:7.4-apache
 
-# Copy the mkcert-generated CA into /etc/ssl/certs - this is needed in order to trust the
-# OIDC nginx proxy.
-
-COPY mkcert.pem /etc/ssl/certs
-RUN update-ca-certificates --fresh
-
 # Install dependencies - we need these for Composer to work
 
 RUN set -ex \
@@ -37,15 +31,6 @@ RUN set -ex \
   && tar xf ${SIMPLESAML_ARCHIVE} --strip-components=1 -C /var/simplesamlphp \
   && rm simplesamlphp-${SIMPLESAML_VERSION}.tar.gz
 
-# Install the OIDC plugin
-
-ENV OPENID_MODULE cirrusidentity/simplesamlphp-module-authoauth2
-ENV OPENID_VERSION 3.1
-
-RUN set -ex \
-  && cd /var/simplesamlphp \
-  && composer require ${OPENID_MODULE}:${OPENID_VERSION}
-
 # Copy the SimpleSAMLphp Apache configuration and enable the vhost
 
 COPY simplesaml.conf /etc/apache2/sites-available/simplesaml.conf
@@ -53,15 +38,8 @@ RUN set -ex \
   && a2dissite 000-default \
   && a2ensite simplesaml
 
-# Copy the SimpleSAMLphp configuration files
+# Copy the SimpleSAMLphp files
 
 COPY config.php authsources.php /var/simplesamlphp/config/
-
-# RUN set -ex \
-#   && pecl install xdebug \
-#   && docker-php-ext-enable xdebug
-
-# RUN { \
-#     echo 'xdebug.remote_enable=1'; \
-#     echo 'xdebug.remote_connect_back=1'; \
-#   } > /usr/local/etc/php/conf.d/xdebug.ini
+COPY saml-private.pem saml-public.crt /var/simplesamlphp/cert/
+COPY metadata.php /var/simplesamlphp/metadata/saml20-idp-hosted.php
