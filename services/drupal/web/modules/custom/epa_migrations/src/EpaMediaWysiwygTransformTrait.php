@@ -57,25 +57,31 @@ TEMPLATE;
     $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes) {
       $decoder = new JsonDecode(TRUE);
 
-      $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
-      $media_entity_uuid = $entityTypeManager->getStorage('media')
-        ->load($tag_info['fid']);
+      try {
+        $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
 
-      $media_entity_uuid = $media_entity_uuid ? $media_entity_uuid->uuid() : 0;
+        $media_entity_uuid = $entityTypeManager->getStorage('media')
+          ->load($tag_info['fid']);
 
-      if ($tag_info['view_mode'] === 'media_link') {
-        return sprintf($inline_embed_replacement_template,
-          $media_entity_uuid
-        );
+        $media_entity_uuid = $media_entity_uuid ? $media_entity_uuid->uuid() : 0;
+
+        if ($tag_info['view_mode'] === 'media_link') {
+          return sprintf($inline_embed_replacement_template,
+            $media_entity_uuid
+          );
+        }
+        else {
+          return sprintf($media_embed_replacement_template,
+            $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
+            $tag_info['fields']['field_image_alignment[und]'] ?? 'center',
+            html_entity_decode($tag_info['fields']['field_caption[und][0][value]']) ?? '',
+            $media_entity_uuid,
+            $view_modes[$tag_info['view_mode']]
+          );
+        }
       }
-      else {
-        return sprintf($media_embed_replacement_template,
-          $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
-          $tag_info['fields']['field_image_alignment[und]'] ?? 'center',
-          html_entity_decode($tag_info['fields']['field_caption[und][0][value]']) ?? '',
-          $media_entity_uuid,
-          $view_modes[$tag_info['view_mode']]
-        );
+      catch (\Exception $e) {
+        \Drupal::logger('epa_migrations')->notice('Caught exception: ' . $e->getMessage() . ' while trying to process this json: ' . $matches['tag_info']);
       }
     }, $wysiwyg_content);
 
@@ -93,21 +99,29 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
-    $pattern = '/\[\[(?<tag_info>.+?"view_mode":"block_header".+?)\]\]/s';
+    $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
     preg_match($pattern, $wysiwyg_content, $matches);
 
     if ($matches['tag_info']) {
-      $decoder = new JsonDecode(TRUE);
-      $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
-      $block_header = [
-        'target_id' => $tag_info['fid'],
-        'alt' => $tag_info['attributes']['alt'],
-      ];
+      try {
+        $decoder = new JsonDecode(TRUE);
+        $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
+        if ($tag_info['view_mode'] == 'block_header') {
+          $block_header = [
+            'target_id' => $tag_info['fid'],
+            'alt' => $tag_info['attributes']['alt'],
+          ];
 
-      return [
-        'block_header' => $block_header,
-        'wysiwyg_content' => preg_replace($pattern, '', $wysiwyg_content),
-      ];
+          return [
+            'block_header' => $block_header,
+            'wysiwyg_content' => str_replace('[[' . $matches['tag_info'] . ']]', '', $wysiwyg_content),
+          ];
+        }
+
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('epa_migrations')->notice('Caught exception: ' . $e->getMessage() . ' while trying to process this json: ' . $matches['tag_info']);
+      }
     }
 
     return [
