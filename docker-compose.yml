@@ -117,17 +117,9 @@ services:
         source: minio-data
         target: /data
 
-  # Redis with persistence enabled
-  redis:
-    image: redis:5.0-alpine
-    entrypoint:
-      - redis-server
-      - --appendonly
-      - "yes"
-    volumes:
-      - type: volume
-        source: redis-data
-        target: /data
+  # Memcached
+  memcached:
+    image: memcached:alpine
 
   # Elasticsearch 7.4
   elasticsearch:
