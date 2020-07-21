@@ -820,8 +820,12 @@ switch ($env_state) {
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
       Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
-      Memcached::OPT_CLIENT_MODE  => Memcached::DYNAMIC_CLIENT_MODE,
     ];
+
+    if (defined('Memcached::OPT_CLIENT_MODE')) {
+      $settings['memcache']['options'][Memcached::OPT_CLIENT_MODE] = Memcached::DYNAMIC_CLIENT_MODE;
+    }
+
     $settings['cache']['default'] = 'cache.backend.memcache';
     break;
 }
