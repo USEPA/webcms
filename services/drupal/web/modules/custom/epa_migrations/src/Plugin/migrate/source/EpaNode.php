@@ -35,14 +35,13 @@ class EpaNode extends Node {
       return FALSE;
     }
 
-    // If the review deadline is within 30 days of the migration, push out the
-    // review deadline by 30 days.
+    // If the review deadline is on the day of or after the migration, push out
+    // the review deadline by 30 days.
     $review_deadline = $row->getSourceProperty('field_review_deadline')[0]['value'];
-    $import_date = strtotime('today');
-    $end_import_date = strtotime('+30 days', $import_date);
+    $import_date = strtotime('now');
     $review_deadline = \DateTime::createFromFormat('Y-m-d H:i:s', $review_deadline, new \DateTimeZone('America/New_York'));
     if ($review_deadline) {
-      if ($review_deadline->getTimestamp() >= $import_date && $review_deadline->getTimestamp() <= $end_import_date) {
+      if ($review_deadline->getTimestamp() >= $import_date) {
         $review_deadline->setTimestamp(strtotime('+30 days', $review_deadline->getTimestamp()));
       }
 
