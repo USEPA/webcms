@@ -100,8 +100,6 @@ TEMPLATE;
    */
   public function extractBlockHeader($wysiwyg_content) {
     $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
-
-    //$pattern = '/\[\[(?<tag_info>.+?"view_mode":"block_header".+?)\]\]/s';
     preg_match($pattern, $wysiwyg_content, $matches);
 
     if ($matches['tag_info']) {
