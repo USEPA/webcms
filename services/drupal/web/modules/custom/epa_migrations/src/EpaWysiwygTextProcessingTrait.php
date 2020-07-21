@@ -204,13 +204,13 @@ trait EpaWysiwygTextProcessingTrait {
   /**
    * Remove an element's white-space only child nodes.
    *
-   * @param \DOMElement $element
+   * @param \DOMElement|\DOMDocument $element
    *   The element to have its child elements cleaned.
    *
    * @return \DOMElement
    *   The element with cleaned children.
    */
-  private function removeEmptyTextNodes(\DOMElement $element) {
+  private function removeEmptyTextNodes($element) {
     $num_children = count($element->childNodes);
     if ($num_children > 1) {
       $empty_text_nodes = [];
@@ -232,13 +232,13 @@ trait EpaWysiwygTextProcessingTrait {
   /**
    * Traverse ancestor tree of an element to determine if it is an only child.
    *
-   * @param \DOMElement $element
+   * @param \DOMElement|\DOMDocument $element
    *   The element to have its ancestors checked.
    *
    * @return \DOMElement
    *   The top-most ancestor that has no children other than the element.
    */
-  private function determineElementToRemove(\DOMElement $element) {
+  private function determineElementToRemove($element) {
 
     // Initially the element to remove is the original one.
     $element_to_remove = $element;
