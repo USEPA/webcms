@@ -818,6 +818,10 @@ switch ($env_lang) {
 switch ($env_state) {
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
+    $setting['memcache']['options'] = [
+      Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
+      Memcached::OPT_CLIENT_MODE  => Memcached::DYNAMIC_CLIENT_MODE,
+    ];
     $settings['cache']['default'] = 'cache.backend.memcache';
     break;
 }
