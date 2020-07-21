@@ -812,21 +812,18 @@ switch ($env_lang) {
     break;
 }
 
-// Only activate Redis if we're in the 'run' ENV_STATE. We need to do this because
-// setting the cache backend before the Redis module is installed, Drupal will throw an
+// Only activate Memcache if we're in the 'run' ENV_STATE. We need to do this because
+// setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
-if ($env_state === 'run') {
-  $settings['redis.connection'] = [
-    'interface' => 'PredisCluster',
-    'hosts' => [
-      'rediss://' . getenv('WEBCMS_CACHE_HOST') . ':6379'
-    ],
-  ];
-
-  $settings['cache']['default'] = 'cache.backend.redis';
-  $settings['cache']['bins']['form'] = 'cache.backend.database';
-
-  $settings['container_yamls'][] = 'modules/redis/example.services.yml';
+switch ($env_state) {
+  case 'run':
+    $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
+    $setting['memcache']['options'] = [
+      Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
+      Memcached::OPT_CLIENT_MODE  => Memcached::DYNAMIC_CLIENT_MODE,
+    ];
+    $settings['cache']['default'] = 'cache.backend.memcache';
+    break;
 }
 
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request

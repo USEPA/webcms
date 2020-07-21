@@ -1,9 +1,67 @@
+FROM forumone/drupal8:7.3 AS memcached-ext
+
+# This build stage builds and installs the AWS Elasticache client for Memcached. It's a
+# manual clone & build process for two reasons:
+# 1. The client cannot be found on PECL, and
+# 2. We cannot use precompiled artifacts due to differences in libc implementations (glibc vs. musl).
+
+# cf. https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached
+# cf. https://github.com/awslabs/aws-elasticache-cluster-client-memcached-for-php/tree/php7
+
+# Change the working directory to / from /var/www/html
+WORKDIR /
+
+# First, install the tools we need to build and link the two libraries.
+RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++
+
+# Second, clone and build AWS' libmemcached fork. Aside from the `sed' invocation (see
+# comment below), this hews to that repo's instructions.
+RUN set -ex \
+  && git clone --depth 1 https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
+  && cd aws-elasticache-cluster-client-libmemcached \
+  # Patch cmdline.cc per https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached/pull/4
+  # The '65' here refers to the line where the declaration 'static char **environ' can be
+  # found - we need to remove the 'static' declaration in order to match libmusl's
+  # declaration.
+  && sed -ie '65s/static //' libtest/cmdline.cc \
+  && touch configure.ac aclocal.m4 configure Makefile.am Makefile.in \
+  && mkdir BUILD \
+  && cd BUILD \
+  && ../configure --prefix=/usr/local/libmemcached --with-pic --disable-sasl \
+  && make -j$(nproc) \
+  && make install
+
+# Next, clone and build the cluster client.
+RUN set -ex \
+  && git clone --branch php7 --depth 1 https://github.com/awslabs/aws-elasticache-cluster-client-memcached-for-php.git \
+  && cd aws-elasticache-cluster-client-memcached-for-php \
+  && phpize \
+  && ./configure --with-libmemcached-dir=/usr/local/libmemcached --disable-memcached-sasl \
+  # Replace link to libmemcached with static library; lets us fully remove the AWS libmemcached fork (see README)
+  && sed -i "s#-lmemcached#/usr/local/libmemcached/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++#" Makefile \
+  && make -j$(nproc) \
+  && make install
+
+# At this point, we now have a fully-realized "memcached.so"
+# available in the PHP extensions directory. It will be copied into the dev, base, and
+# drush build stages.
+
 FROM forumone/drupal8:7.3-xdebug AS dev
 
 # Development-only dependencies/config here
 
-# Install gnu copy of wget to override copy provided by BusyBox.
-RUN apk add --no-cache wget
+# Copy and enable the AWS Elasticache memcached extension
+COPY --from=memcached-ext \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+RUN docker-php-ext-enable memcached
+
+# APK packages needed by this image
+RUN apk add --no-cache \
+  # Needed by the Elasticache memcached client
+  libstdc++ \
+  # GNU wget to override BusyBox
+  wget
 
 # Note that any configuration applied to the prod image must be mirrored here, due to the
 # difference in base layers.
@@ -21,8 +79,18 @@ FROM forumone/drupal8:7.3 AS base
 # This is the base production layer. We use it here in order to make it easier to ensure
 # that both the dev and base targets are in sync with each other.
 
-# Install gnu copy of wget to override copy provided by BusyBox.
-RUN apk add --no-cache wget
+# Copy and enable the AWS Elasticache memcached extension
+COPY --from=memcached-ext \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+RUN docker-php-ext-enable memcached
+
+# APK packages needed by this image
+RUN apk add --no-cache \
+  # Needed by the Elasticache memcached client
+  libstdc++ \
+  # GNU wget to override BusyBox
+  wget
 
 RUN set -ex \
   && { \
@@ -111,6 +179,17 @@ ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
 FROM forumone/drupal8-cli:7.3 AS drush
+
+# Copy and enable the AWS Elasticache memcached extension
+COPY --from=memcached-ext \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+RUN docker-php-ext-enable memcached
+
+# APK packages needed by this image
+RUN apk add --no-cache \
+  # Needed by the Elasticache memcached client
+  libstdc++
 
 # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
 # instead of PHP)
