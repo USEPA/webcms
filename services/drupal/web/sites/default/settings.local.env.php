@@ -31,4 +31,9 @@ $config['system.logging']['error_level'] = 'all';
 // use the internal Docker url which uses port 80.
 $settings['epa_node_export.base_url'] = 'http://localhost';
 
+// Local environments can't use AWS elasticache auto discovery
+if (defined('Memcached::OPT_CLIENT_MODE')) {
+  unset($settings['memcache']['options'][Memcached::OPT_CLIENT_MODE]);
+}
+
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
