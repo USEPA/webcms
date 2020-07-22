@@ -1,5 +1,4 @@
 <?php
-use Drupal\Core\Url;
 
 /**
  * @file
@@ -7,15 +6,24 @@ use Drupal\Core\Url;
  */
 
 /**
- * Implements template_preprocess_facets_summary_item_list().
+ * Implements facets_preprocess_facets_item_list().
+ */
+function epa_theme_preprocess_facets_item_list(&$vars) {
+  // Add class to facet links.
+  foreach ($vars['items'] as &$item) {
+    $item['value']['#url']->setOption('attributes', array(
+      'class' => array('facet'),
+      'rel' => 'no-follow',
+    ));
+  }
+}
+
+/**
+ * Implements facets_preprocess_facets_summary_item_list().
  */
 function epa_theme_preprocess_facets_summary_item_list(&$vars) {
   // Set reset link url.
   if (isset($vars['items'][0]['value']['#title']['#facet'])) {
-    // if ($vars['items'][0]['value']['#title']['#facet']->id() == 'faqs_webarea' || $vars['items'][0]['value']['#title']['#facet']->id() == 'faqs_topic') {
-    //   $vars['reset_url'] = '/faqs/search';
-    // }
-
     switch ($vars['items'][0]['value']['#title']['#facet']->id()) {
       case 'faqs_topic':
       case 'faqs_webarea':

@@ -1,0 +1,39 @@
+{#
+/**
+ * @file
+ * Default theme implementation of a facet result item.
+ *
+ * Available variables:
+ * - value: The item value.
+ * - raw_value: The raw item value.
+ * - show_count: If this facet provides count.
+ * - count: The amount of results.
+ * - is_active: The item is active.
+ * - facet: The facet for this result item.
+ *   - id: the machine name for the facet.
+ *   - label: The facet label.
+ *
+ * @ingroup themeable
+ */
+#}
+
+{%- include '@components/icon/icon.twig' with {
+  'modifier_classes': 'facet__icon facet__icon--empty',
+  'is_hidden': true,
+  'icon_name': 'square',
+} -%}
+{%- include '@components/icon/icon.twig' with {
+  'modifier_classes': 'facet__icon facet__icon--selected',
+  'is_hidden': false,
+  'label': 'Selected:'|t,
+  'icon_name': 'check-square',
+} -%}
+<span class="facet__content">
+  {{- value -}}
+  {%- if show_count %}
+    <span class="facet__count">
+      {{- count -}}
+      <span class="u-visually-hidden"> items</span>
+    </span>
+  {%- endif -%}
+</span>
