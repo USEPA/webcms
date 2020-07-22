@@ -97,7 +97,13 @@ class EpaScheduledTransition extends ProcessPluginBase implements ContainerFacto
       ];
 
       $d8_moderation_state = $moderation_state_map[$epa_workflow_schedule->event];
-      $formatted_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $epa_workflow_schedule->date);
+
+      $import_date = strtotime('now');
+      $workflow_date = $epa_workflow_schedule->date;
+      if ($workflow_date >= $import_date) {
+        $workflow_date = strtotime('+30 days', $workflow_date);
+      }
+      $formatted_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $workflow_date);
 
       return [
         [
