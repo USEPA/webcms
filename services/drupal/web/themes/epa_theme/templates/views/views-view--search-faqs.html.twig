@@ -36,8 +36,24 @@
 {% endset %}
 
 {% set sidebar %}
-  {{ drupal_entity('block', 'faqs_facets_topic', check_access=false) }}
-  {{ drupal_entity('block', 'faqs_facets_webarea', check_access=false) }}
+  <h2 class="h3">{{ 'Filter By:'|t }}</h2>
+  {% include '@uswds/accordion/accordion.twig' with {
+    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
+    'is_multi_selectable': true,
+    'accordion_id': 'facets',
+    'accordion': [
+      {
+        'title': 'Topic'|t,
+        'is_expanded': faqs_facets_topic_is_expanded,
+        'content': drupal_entity('block', 'faqs_facets_topic', check_access=false),
+      },
+      {
+        'title': 'Web Area'|t,
+        'is_expanded': faqs_facets_webarea_is_expanded,
+        'content': drupal_entity('block', 'faqs_facets_webarea', check_access=false),
+      },
+    ]
+  } %}
 {% endset %}
 
 {% set filters %}
