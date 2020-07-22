@@ -10,18 +10,25 @@
     <ul class="filters__list">
       {% for item in list %}
         <li class="filters__item">
-          <a class="filters__link" href="{{ item.url }}" rel="nofollow">
-            {%- include '@components/icon/icon.twig' with {
-              'modifier_classes': 'icon--filter is-spaced-after',
-              'is_hidden': false,
-              'label': 'Remove'|t,
-              'icon_name': 'times-circle',
-            } %}
-            {{ item.text -}}</a>
+          {% if pattern_lab %}
+            <a class="filters__link" href="{{ item.url }}" rel="nofollow">
+              {%- include '@components/icon/icon.twig' with {
+                'modifier_classes': 'icon--filter is-spaced-after',
+                'is_hidden': false,
+                'label': 'Remove'|t,
+                'icon_name': 'times-circle',
+              } %}
+              {{ item.text -}}
+            </a>
+          {% else %}
+            {{ item.value }}
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
-    <a class="filters__remove" href="{{ url }}" rel="nofollow">{{ 'Remove all filters'|t }}</a>
+    {% if reset_url %}
+      <a class="filters__remove" href="{{ reset_url }}" rel="nofollow">{{ 'Remove all filters'|t }}</a>
+    {% endif %}
   </div>
   {% endspaceless %}
 {% endif %}

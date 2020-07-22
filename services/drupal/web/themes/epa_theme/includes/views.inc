@@ -33,6 +33,10 @@ function views_theme_suggestions_views_view_unformatted(array $variables) {
  */
 function epa_theme_preprocess_views_view(&$variables) {
   $variables['path'] = $variables['view']->getRequest()->getPathInfo();
+
+  // TODO: Set the following to true if something within that facet has been selected.
+  $variables['faqs_facets_topic_is_expanded'] = false;
+  $variables['faqs_facets_webarea_is_expanded'] = false;
 }
 
 /**
