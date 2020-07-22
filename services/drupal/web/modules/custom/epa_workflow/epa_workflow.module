@@ -234,12 +234,9 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $entity = $form_state->get('entity');
   /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
   $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
-  $last_revision = $entity;
-  $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
 
-  // This is needed to fool the content_moderation_notifications module because
-  // it always assumes the latest revision is the one being acted on.
-  $entity->last_revision = $last_revision;
+  $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
+  
 
   $new_state = $form_state->getValue('new_state');
 
@@ -335,6 +332,15 @@ function epa_workflow_node_presave(NodeInterface $node) {
     // transparently on a revision just to update field data)
     if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
       $node->leapfrog = $latest_revision_id;
+    }
+
+    // Set the "last_revision" property to fool the content_moderation_notifications
+    // module into properly detecting which transition we are firing since it
+    // does not expect us to be transitioning a non-latest revision.
+    // So if we're doing a save on the default revision and there's a different
+    // latest revision, we need to set the "last_revision" as the current revision.
+    if (!$node->isSyncing() && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
+      $node->last_revision = $original;
     }
   }
 
