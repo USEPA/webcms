@@ -6,21 +6,17 @@
 {% set accordion_id = 'accordion'|unique_id %}
 
 <div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
-  {% for item in accordion %}
-    {% set expanded -%}
-      {%- if item.is_expanded -%}
-        aria-expanded="true"
-      {%- else -%}
-        aria-expanded="false"
-      {%- endif -%}
-    {%- endset %}
-    <h2 class="usa-accordion__heading">
-      <button class="usa-accordion__button" {{ expanded }} aria-controls="{{ accordion_id }}-{{ loop.index }}">
-        {{ item.title }}
-      </button>
-    </h2>
-    <div id="{{ accordion_id }}-{{ loop.index }}" class="usa-accordion__content">
-      {{ item.content }}
-    </div>
-  {% endfor %}
+  {% if pattern_lab %}
+    {% for item in accordion %}
+      {% include '@uswds/accordion/_accordion-content.twig' with {
+        'accordion_id': accordion_id,
+        'content_id': loop.index,
+        'title': item.title,
+        'is_expanded': item.is_expanded,
+        'content': item.content,
+      } %}
+    {% endfor %}
+  {% else %}
+    {{ accordion_content }}
+  {% endif %}
 </div>
