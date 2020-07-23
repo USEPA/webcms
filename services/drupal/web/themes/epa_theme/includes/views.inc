@@ -33,10 +33,6 @@ function views_theme_suggestions_views_view_unformatted(array $variables) {
  */
 function epa_theme_preprocess_views_view(&$variables) {
   $variables['path'] = $variables['view']->getRequest()->getPathInfo();
-
-  // TODO: Set the following to true if something within that facet has been selected.
-  $variables['faqs_facets_topic_is_expanded'] = false;
-  $variables['faqs_facets_webarea_is_expanded'] = false;
 }
 
 /**
@@ -46,7 +42,7 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
   // A list of view names in which to exclude the container markup.
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.
   $exclude_views = [
-    // 'example_view_machine_name',
+    'search_faqs',
   ];
   if (isset($variables['element']['#name'])) {
     if (in_array($variables['element']['#name'], $exclude_views)) {
