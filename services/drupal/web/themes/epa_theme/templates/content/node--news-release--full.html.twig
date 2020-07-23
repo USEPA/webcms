@@ -13,9 +13,14 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
+{%  set press_offices = [] %}
+{% for item in content.field_press_office|field_value %}
+  {% set press_offices = press_offices|merge([item|render]) %}
+{% endfor %}
+
 {% set header_info %}
   {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'News Releases from ' ~ content.field_press_office|field_value|render|striptags,
+    'text': 'News Releases from ' ~ press_offices|join(', ')|striptags,
   } %}
 {% endset %}
 
