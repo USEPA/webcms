@@ -27,6 +27,12 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = "Barracuda"
   }
 
+  # Bump the max allowed packet to 64MB (default is 1-4MB, depending on server version).
+  parameter {
+    name = "max_allowed_packet"
+    value = 64 * (1024 * 1024)
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DB parameters"
   })
