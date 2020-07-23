@@ -28,6 +28,7 @@ dependencies:
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - cshs
     - datetime
     - field_group
     - paragraphs
@@ -196,12 +197,11 @@ content:
   field_press_office:
     weight: 6
     settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
+      parent: '0'
+      level_labels: ''
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
+    type: cshs
     region: content
   field_press_officers:
     type: paragraphs
@@ -311,9 +311,9 @@ content:
     third_party_settings: {  }
   url_redirects:
     weight: 50
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden:
   field_last_published: true
   field_review_deadline: true
