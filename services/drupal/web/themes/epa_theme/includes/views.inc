@@ -43,6 +43,7 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.
   $exclude_views = [
     'search_faqs',
+    'search_news_releases',
   ];
   if (isset($variables['element']['#name'])) {
     if (in_array($variables['element']['#name'], $exclude_views)) {
