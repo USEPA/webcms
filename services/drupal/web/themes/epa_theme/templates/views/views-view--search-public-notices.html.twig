@@ -1,0 +1,84 @@
+{#
+/**
+ * @file
+ * Theme override for a main view template.
+ */
+#}
+
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Public Notices'|t,
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
+{% set local_tasks %}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+{% endset %}
+
+{% set area_footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set intro %}
+  {{ drupal_entity('block', 'public_notices_intro_text', check_access=false) }}
+{% endset %}
+
+{% set search %}
+  {{ drupal_entity('block', 'exposedformsearch_public_noticespage_1', check_access=false) }}
+{% endset %}
+
+{% set sidebar %}
+  {%- set accordion_content -%}
+    {{ drupal_entity('block', 'public_notices_location_of_prop_action', check_access=false) }}
+    {{ drupal_entity('block', 'public_notices_program_or_statute', check_access=false) }}
+    {{ drupal_entity('block', 'public_notices_proposed_actions', check_access=false) }}
+    {{ drupal_entity('block', 'public_notices_comments_due_date', check_access=false) }}
+  {%- endset -%}
+
+  <h2 class="h3">{{ 'Filter By:'|t }}</h2>
+  {% include '@uswds/accordion/accordion.twig' with {
+    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
+    'is_multi_selectable': true,
+    'accordion_id': 'facets',
+    'accordion_content': accordion_content,
+  } %}
+{% endset %}
+
+{% set filters %}
+  {{ drupal_entity('block', 'public_notices_current_search_results', check_access=false) }}
+  <p class="h5 margin-bottom-5">{{ header }}</p>
+{% endset %}
+
+{% set body %}
+  {{ exposed }}
+  {{ rows }}
+  {{ empty }}
+  {{ pager }}
+  {{ footer }}
+{% endset %}
+
+{% include '@templates/listing-pages/listing-page.twig' with {
+  'has_header': true,
+  'has_sidenav': true,
+  'header_info': header_info,
+  'contact_link': contact_link,
+  'title': view.title,
+  'contextual_links': title_suffix.contextual_links,
+  'messages': messages,
+  'tasks': local_tasks,
+  'intro': intro,
+  'search': search,
+  'filters': filters,
+  'body': body,
+  'sidebar': sidebar,
+  'footer': area_footer,
+} %}
