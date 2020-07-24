@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: TzVNHejIWoB3aG-TJ_lF48ylL9QF6HAgNSH_IUWgGWc
+  default_config_hash: S0coGDuTgQBTuPDmDe-DMAOomqYbiJagh3uKR6_OE0o
 id: upgrade_d7_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -213,7 +213,14 @@ process:
       plugin: sub_process
       source: field_type
       process:
-        target_id: tid
+        target_id:
+          -
+            plugin: default_value
+            default_value: 'News Release'
+          -
+            plugin: entity_lookup
+            entity_type: taxonomy_term
+            value_key: name
   field_metatag:
     -
       plugin: d7_metatag_entities

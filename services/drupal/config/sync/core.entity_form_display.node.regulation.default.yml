@@ -56,6 +56,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Other Metadata'
+      region: content
     group_metadata:
       children:
         - field_description
@@ -75,6 +76,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Primary Metadata'
+      region: content
     group_javascript:
       children:
         - field_page_head
@@ -88,6 +90,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Page Javascript'
+      region: content
     group_additional_fields:
       children:
         - group_metadata
@@ -101,6 +104,7 @@ third_party_settings:
         classes: ''
         direction: vertical
       label: 'Additional Fields'
+      region: content
 id: node.regulation.default
 targetEntityType: node
 bundle: regulation
@@ -375,8 +379,14 @@ content:
       placeholder: ''
       match_limit: 10
     third_party_settings: {  }
+  url_redirects:
+    weight: 50
+    settings: {  }
+    third_party_settings: {  }
+    region: content
 hidden:
   field_last_published: true
   field_review_deadline: true
   field_scheduled_transition: true
+  group_content: true
   path: true

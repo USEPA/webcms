@@ -106,18 +106,21 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
 
           // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc();
-          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
 
-          // Perform text processing to update/remove inline code.
-          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
+          if (isset($body_field['value'])) {
+            $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager);
 
-          $paragraph = $this->addBoxWrapper(
-            [
-              $this->createHtmlParagraph($body_field),
-            ],
-            $title,
-            $box_style
-          );
+            // Perform text processing to update/remove inline code.
+            $body_field['value'] = $this->processText($body_field['value']);
+
+            $paragraph = $this->addBoxWrapper(
+              [
+                $this->createHtmlParagraph($body_field),
+              ],
+              $title,
+              $box_style
+            );
+          }
           break;
 
         case 'link_list':

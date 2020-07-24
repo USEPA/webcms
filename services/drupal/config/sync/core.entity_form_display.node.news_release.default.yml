@@ -28,6 +28,7 @@ dependencies:
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - cshs
     - datetime
     - field_group
     - paragraphs
@@ -50,6 +51,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Other Metadata'
+      region: content
     group_metadata:
       children:
         - field_description
@@ -68,6 +70,7 @@ third_party_settings:
         description: ''
         required_fields: true
       label: 'Primary Metadata'
+      region: content
     group_additional_fields:
       children:
         - group_metadata
@@ -80,6 +83,7 @@ third_party_settings:
         classes: ''
         direction: vertical
       label: 'Additional Fields'
+      region: content
 id: node.news_release.default
 targetEntityType: node
 bundle: news_release
@@ -193,12 +197,11 @@ content:
   field_press_office:
     weight: 6
     settings:
-      display_node_count: false
-      create_new_items: false
-      create_new_levels: false
+      parent: '0'
+      level_labels: ''
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
+    type: cshs
     region: content
   field_press_officers:
     type: paragraphs
@@ -306,8 +309,14 @@ content:
       placeholder: ''
       match_limit: 10
     third_party_settings: {  }
+  url_redirects:
+    weight: 50
+    region: content
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   field_last_published: true
   field_review_deadline: true
   field_scheduled_transition: true
+  group_content: true
   path: true

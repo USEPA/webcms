@@ -26,24 +26,14 @@ $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default
 
 $config['system.logging']['error_level'] = 'all';
 
-switch ($env_state) {
-  case 'run':
-    // Convert connection details to single-instance, unencrypted
-    $settings['redis.connection'] = [
-      'interface' => 'Predis',
-      'host' => getenv('WEBCMS_CACHE_HOST'),
-      'port' => 6379,
-    ];
-  break;
-
-  // Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
-  case 'build':
-    unset($settings['cache']['default']);
-}
-
 // Set the base url for node export operations. Setting this to "localhost"
 // instead of "localhost:8080" since this will be utilized by wget and it will
 // use the internal Docker url which uses port 80.
 $settings['epa_node_export.base_url'] = 'http://localhost';
+
+// Local environments can't use AWS elasticache auto discovery
+if (defined('Memcached::OPT_CLIENT_MODE')) {
+  unset($settings['memcache']['options'][Memcached::OPT_CLIENT_MODE]);
+}
 
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
