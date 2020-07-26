@@ -21,11 +21,7 @@ dependencies:
     - field.field.node.web_area.field_type
     - field.field.node.web_area.layout_builder__layout
     - node.type.web_area
-  content:
-    - 'block_content:custom_html:46bbc4b7-ffa1-4db8-8209-64c37fa0fcd7'
-    - 'block_content:custom_html:f76834c2-f52a-4081-bac9-3a97a3ac68e6'
   module:
-    - block_content
     - datetime
     - entity_reference_revisions
     - epa_layouts
@@ -45,8 +41,8 @@ third_party_settings:
         layout_settings:
           label: ''
         components:
-          1ca61118-09e7-45bf-a926-f8508a52426f:
-            uuid: 1ca61118-09e7-45bf-a926-f8508a52426f
+          b061c31c-b949-4052-b571-2e6e33fa075e:
+            uuid: b061c31c-b949-4052-b571-2e6e33fa075e
             region: main
             configuration:
               id: 'field_block:node:web_area:field_paragraphs'
@@ -58,126 +54,25 @@ third_party_settings:
                 type: entity_reference_revisions_entity_view
                 settings:
                   view_mode: default
-                third_party_settings: {  }
-              context_mapping:
-                entity: layout_builder.entity
-            additional: {  }
-            weight: 1
-          a5c494f5-1955-45cd-96c5-d6c07a76a691:
-            uuid: a5c494f5-1955-45cd-96c5-d6c07a76a691
-            region: main
-            configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              id: 'field_block:node:web_area:field_publish_date'
-              formatter:
-                label: above
-                type: datetime_default
-                settings:
-                  format_type: medium
-                  timezone_override: ''
-                third_party_settings: {  }
-            additional: {  }
-            weight: 2
-          5b5029c0-1781-45aa-9d1e-64ce4ba877d2:
-            uuid: 5b5029c0-1781-45aa-9d1e-64ce4ba877d2
-            region: main
-            configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              id: 'field_block:node:web_area:field_scheduled_transition'
-              formatter:
-                label: above
-                type: scheduled_publish_generic_formatter
-                settings:
-                  date_format: html_datetime
-                  text_pattern: '%moderation_state% - %date%'
-                third_party_settings: {  }
-            additional: {  }
-            weight: 3
-          e0621589-6cdf-403e-9d71-0d2da649c331:
-            uuid: e0621589-6cdf-403e-9d71-0d2da649c331
-            region: main
-            configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              id: 'field_block:node:web_area:field_expiration_date'
-              formatter:
-                label: above
-                type: datetime_default
-                settings:
-                  format_type: medium
-                  timezone_override: ''
-                third_party_settings: {  }
-            additional: {  }
-            weight: 4
-          c2fd0159-8889-4e6e-8571-726d01547305:
-            uuid: c2fd0159-8889-4e6e-8571-726d01547305
-            region: main
-            configuration:
-              id: 'block_content:f76834c2-f52a-4081-bac9-3a97a3ac68e6'
-              label: 'Web Area Header'
-              provider: block_content
-              label_display: '0'
-              status: true
-              info: ''
-              view_mode: full
-              context_mapping: {  }
-            additional: {  }
-            weight: 5
-          dc39033e-3355-48ca-b0f8-ff293829d836:
-            uuid: dc39033e-3355-48ca-b0f8-ff293829d836
-            region: main
-            configuration:
-              id: 'block_content:46bbc4b7-ffa1-4db8-8209-64c37fa0fcd7'
-              label: 'Web Area Footer'
-              provider: block_content
-              label_display: '0'
-              status: true
-              info: ''
-              view_mode: full
-              context_mapping: {  }
-            additional: {  }
-            weight: 6
-          c4773fed-913e-40df-bef9-ce01bdca1295:
-            uuid: c4773fed-913e-40df-bef9-ce01bdca1295
-            region: main
-            configuration:
-              id: 'field_block:node:web_area:field_banner'
-              label: Banner
-              provider: layout_builder
-              label_display: '0'
-              formatter:
-                label: above
-                type: entity_reference_revisions_entity_view
-                settings:
-                  view_mode: default
-                third_party_settings: {  }
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
               context_mapping:
                 entity: layout_builder.entity
                 view_mode: view_mode
             additional: {  }
-            weight: 7
-          ccd436ae-3d09-4bc4-8666-8612d0102ddc:
-            uuid: ccd436ae-3d09-4bc4-8666-8612d0102ddc
-            region: main
-            configuration:
-              label_display: '0'
-              context_mapping:
-                entity: layout_builder.entity
-              id: 'field_block:node:web_area:field_last_published'
-              formatter:
-                label: above
-                settings:
-                  format_type: medium
-                  timezone_override: ''
-                third_party_settings: {  }
-                type: datetime_default
-            additional: {  }
-            weight: 8
+            weight: 0
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories:
