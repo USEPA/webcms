@@ -46,7 +46,7 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     }
 
     // Add group label to form.
-    if ($group) {
+    if (!empty($group)) {
       $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
     }
   }
