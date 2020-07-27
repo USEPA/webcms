@@ -97,14 +97,58 @@ class EpaScheduledTransition extends ProcessPluginBase implements ContainerFacto
       ];
 
       $d8_moderation_state = $moderation_state_map[$epa_workflow_schedule->event];
-      $formatted_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $epa_workflow_schedule->date);
 
-      return [
-        [
-          'moderation_state' => $d8_moderation_state,
-          'value' => $formatted_date,
-        ]
-      ];
+      $import_date = strtotime('now');
+
+      // Set the workflow date and formatted workflow date.
+      $workflow_date = $epa_workflow_schedule->date;
+      $formatted_workflow_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $workflow_date);
+
+      // Postpone all future scheduled transitions, except for scheduled_publish
+      // events and unpublish events that are the result of an expiration date.
+      if ($workflow_date >= $import_date) {
+
+        if ($epa_workflow_schedule->event == 'unpublish') {
+          $expiration_date = $this->d7Connection->select('field_data_field_expiration_date', 'fdfed')
+            ->fields('fdfed', ['field_expiration_date_value'])
+            ->condition('fdfed.revision_id', $value)
+            ->execute()
+            ->fetchField();
+
+          $expiration_date = \DateTime::createFromFormat('Y-m-d H:i:s', $expiration_date, new \DateTimeZone('America/New_York'));
+
+          if ($expiration_date && $expiration_date->getTimestamp() == $epa_workflow_schedule->date) {
+            // Don't change the unpublish date.
+            return [
+              [
+                'moderation_state' => $d8_moderation_state,
+                'value' => $formatted_workflow_date,
+              ],
+            ];
+          }
+        }
+
+        if ($epa_workflow_schedule->event == 'scheduled_publish') {
+          // Don't change the scheduled publish date.
+          return [
+            [
+              'moderation_state' => $d8_moderation_state,
+              'value' => $formatted_workflow_date,
+            ],
+          ];
+        }
+        else {
+          // Postpone the scheduled transition date.
+          $postponed_workflow_date = strtotime('+30 days', $workflow_date);
+          $formatted_postponed_workflow_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $postponed_workflow_date);
+          return [
+            [
+              'moderation_state' => $d8_moderation_state,
+              'value' => $formatted_postponed_workflow_date,
+            ],
+          ];
+        }
+      }
     }
     else {
       return [];
