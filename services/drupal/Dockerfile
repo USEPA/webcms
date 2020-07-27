@@ -69,10 +69,47 @@ RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
   && { \
-    echo 'memory_limit=256M'; \
+    echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini
+
+# Set the php-fpm log format. This was largely reverse-engineered from fpm_log.c in the
+# PHP sources. Notes on the available log options:
+# * %C - CPU percentage
+#   * %{user}C - user CPU percentage
+#   * %{system}C - system CPU percentage (i.e., time spent in system calls)
+#   * %{total}C - total CPU (same as %C by itself)
+# * %d - request duration (in seconds)
+#   * %{<format>}d - duration in <format> (seconds, miliseconds [sic], microseconds)
+# * %{VAR}e - read $VAR from environment
+# * %f - script filename
+# * %m - HTTP method
+# * %M - request memory (in bytes)
+#   * %{<format>}M - memory in <format> (bytes, kilobytes, megabytes)
+# * %q - request query string
+# * %Q - '?' or '', depending on whether or not query string is present
+# * %r - request URI (FastCGI's SCRIPT_NAME/DOCUMENT_NAME)
+# * %R - remote IP
+# * %t %T - timestamp
+# * %u - user (HTTP basic auth user)
+#
+# cf. https://github.com/php/php-src/blob/php-7.3.20/sapi/fpm/fpm/fpm_log.c
+RUN set -ex \
+  && { \
+    # Breakdown of this log format:
+    # (1)                          (2)        (3) (4)        (5)                                (6)                  (7)         (8)
+    # [27/Jul/2020:16:58:08 +0000] 172.18.0.7 GET /index.php /admin/dashboard?foo=hello%20world mem(bytes): 31457280 cpu%: 72.78 dur(secs): 0.137
+    # 1. Request timestamp
+    # 2. Remote IP
+    # 3. HTTP method
+    # 4. FastCGI script
+    # 5. "actual" FastCGI request
+    # 6. Memory used (in bytes)
+    # 7. CPU percentage
+    # 8. Request duration
+    echo 'access.format="[%T] %R %m %r %{REQUEST_URI}e mem(bytes): %M cpu%%: %{total}C dur(secs): %d"'; \
+  } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 FROM forumone/drupal8:7.3 AS base
 
@@ -94,10 +131,16 @@ RUN apk add --no-cache \
 
 RUN set -ex \
   && { \
-    echo 'memory_limit=256M'; \
+    echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini
+
+# See notes above
+RUN set -ex \
+  && { \
+    echo 'access.format="[%T] %R %m %r %{REQUEST_URI}e mem(bytes): %M cpu%%: %{total}C dur(secs): %d"'; \
+  } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
 FROM forumone/composer:1.8 AS deps

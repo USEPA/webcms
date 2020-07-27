@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% include '@components/hero/hero--slideshow/hero--slideshow.twig' with {
+  modifier_classes: 'usa-hero--reversed',
+  background_image: content.field_image|field_value|render,
+  title_element: 'h2',
+  title: content.field_title|field_value|render,
+  content: content.field_text|field_value|render,
+} only %}

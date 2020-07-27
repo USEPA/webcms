@@ -585,42 +585,36 @@ display:
           plugin_id: media_status
           id: status_extra
           group_type: group
-        uid_raw:
-          id: uid_raw
-          table: users_field_data
-          field: uid_raw
+        uid_current:
+          id: uid_current
+          table: users
+          field: uid_current
           relationship: gc__user
           group_type: group
           admin_label: ''
           operator: '='
-          value:
-            min: ''
-            max: ''
-            value: '[current-user:uid]'
+          value: ''
           group: 1
           exposed: true
           expose:
-            operator_id: uid_raw_op
-            label: 'The user ID'
+            operator_id: ''
+            label: 'Is the logged in user'
             description: null
             use_operator: false
-            operator: uid_raw_op
+            operator: uid_current_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_raw
-            required: false
+            identifier: uid_current
+            required: true
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: null
-            min_placeholder: null
-            max_placeholder: null
           is_grouped: true
           group_info:
             label: Groups
             description: ''
-            identifier: uid_raw
+            identifier: uid_current
             optional: true
             widget: select
             multiple: false
@@ -631,13 +625,9 @@ display:
               1:
                 title: 'My Groups'
                 operator: '='
-                value:
-                  value: '[current-user:uid]'
-                  min: ''
-                  max: ''
-          use_tokens: 1
+                value: '1'
           entity_type: user
-          plugin_id: numeric
+          plugin_id: user_current
       sorts:
         created:
           id: created
@@ -704,7 +694,7 @@ display:
           field: uid
           relationship: none
           group_type: group
-          admin_label: 'Author of the media'
+          admin_label: User
           required: false
           entity_type: media
           entity_field: uid
@@ -715,13 +705,11 @@ display:
           field: group_content
           relationship: none
           group_type: group
-          admin_label: 'Group content entities media is in'
+          admin_label: 'Media group content'
           required: false
           group_content_plugins:
-            'group_media:audio': '0'
             'group_media:document': '0'
             'group_media:image': '0'
-            'group_media:other': '0'
             'group_media:remote_video': '0'
           entity_type: media
           plugin_id: group_content_to_entity_reverse
@@ -731,7 +719,7 @@ display:
           field: gid
           relationship: group_content
           group_type: group
-          admin_label: 'Groups media is in'
+          admin_label: Group
           required: false
           entity_type: group_content
           entity_field: gid
@@ -742,14 +730,12 @@ display:
           field: group_content_id
           relationship: gid
           group_type: group
-          admin_label: 'Group content entities relating users to the groups media is in'
+          admin_label: 'Group content'
           required: false
           group_content_plugins:
             group_membership: group_membership
-            'group_media:audio': '0'
             'group_media:document': '0'
             'group_media:image': '0'
-            'group_media:other': '0'
             'group_media:remote_video': '0'
             'group_node:event': '0'
             'group_node:faq': '0'
@@ -768,7 +754,7 @@ display:
           field: gc__user
           relationship: group_content_id
           group_type: group
-          admin_label: 'Users in the groups media is in'
+          admin_label: 'Group content User'
           required: false
           group_content_plugins:
             group_membership: '0'
@@ -1563,103 +1549,53 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
-        uid_raw:
-          id: uid_raw
-          table: users_field_data
-          field: uid_raw
+        uid_current:
+          id: uid_current
+          table: users
+          field: uid_current
           relationship: gc__user
           group_type: group
           admin_label: ''
           operator: '='
-          value:
-            min: ''
-            max: ''
-            value: '[current-user:uid]'
-          group: 2
+          value: ''
+          group: 1
           exposed: true
           expose:
-            operator_id: uid_raw_op
-            label: 'The user ID'
+            operator_id: ''
+            label: 'Is the logged in user'
             description: null
             use_operator: false
-            operator: uid_raw_op
+            operator: uid_current_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_raw
-            required: false
+            identifier: uid_current
+            required: true
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: null
-            min_placeholder: null
-            max_placeholder: null
           is_grouped: true
           group_info:
             label: Groups
             description: ''
-            identifier: uid_raw
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: '1'
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value:
-                  value: '[current-user:uid]'
-                  min: ''
-                  max: ''
-          use_tokens: 1
-          entity_type: user
-          plugin_id: numeric
-        uid_current_1:
-          id: uid_current_1
-          table: users
-          field: uid_current
-          relationship: uid
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: '1'
-          group: 2
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
+            identifier: uid_current
             optional: true
             widget: select
             multiple: false
             remember: false
             default_group: All
             default_group_multiple: {  }
-            group_items: {  }
+            group_items:
+              1:
+                title: 'My Groups'
+                operator: '='
+                value: '1'
           entity_type: user
           plugin_id: user_current
       filter_groups:
         operator: AND
         groups:
           1: AND
-          2: OR
       arguments:
         bundle:
           id: bundle
@@ -2243,103 +2179,53 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
-        uid_raw:
-          id: uid_raw
-          table: users_field_data
-          field: uid_raw
+        uid_current:
+          id: uid_current
+          table: users
+          field: uid_current
           relationship: gc__user
           group_type: group
           admin_label: ''
           operator: '='
-          value:
-            min: ''
-            max: ''
-            value: '[current-user:uid]'
-          group: 2
+          value: ''
+          group: 1
           exposed: true
           expose:
-            operator_id: uid_raw_op
-            label: 'The user ID'
+            operator_id: ''
+            label: 'Is the logged in user'
             description: null
             use_operator: false
-            operator: uid_raw_op
+            operator: uid_current_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_raw
-            required: false
+            identifier: uid_current
+            required: true
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: null
-            min_placeholder: null
-            max_placeholder: null
           is_grouped: true
           group_info:
             label: Groups
             description: ''
-            identifier: uid_raw
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: '1'
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value:
-                  value: '[current-user:uid]'
-                  min: ''
-                  max: ''
-          use_tokens: 1
-          entity_type: user
-          plugin_id: numeric
-        uid_current_1:
-          id: uid_current_1
-          table: users
-          field: uid_current
-          relationship: uid
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: '1'
-          group: 2
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
+            identifier: uid_current
             optional: true
             widget: select
             multiple: false
             remember: false
             default_group: All
             default_group_multiple: {  }
-            group_items: {  }
+            group_items:
+              1:
+                title: 'My Groups'
+                operator: '='
+                value: '1'
           entity_type: user
           plugin_id: user_current
       filter_groups:
         operator: AND
         groups:
           1: AND
-          2: OR
       arguments:
         bundle:
           id: bundle

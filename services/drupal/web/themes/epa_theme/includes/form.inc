@@ -22,6 +22,23 @@ function epa_theme_preprocess_fieldset(&$vars) {
 }
 
 /**
+ * Implements template_preprocess_form().
+ */
+function epa_theme_preprocess_form(&$vars) {
+  if ($vars['element']['#form_id'] == 'views_exposed_form') {
+    $vars['attributes']['class'][] = 'margin-y-3';
+  }
+}
+
+/**
+ * Implements HOOK_form_FORM_ID_alter().
+ */
+function epa_theme_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+  // Switch template used for actions wrapper.
+  $form['actions']['#theme_wrappers'] = array('container__no_wrapper');
+}
+
+/**
  * Implements hook_theme_suggestions_HOOK_alter().
  */
 function epa_theme_theme_suggestions_form_alter(array &$suggestions, array $variables) {
