@@ -45,6 +45,13 @@ function epa_theme_preprocess_facets_summary_item_list(&$vars) {
       case 'news_releases_year':
         $vars['reset_url'] = '/newsreleases/search';
         break;
+
+      case 'public_notices_comments_due_date':
+      case 'public_notices_location_of_prop_action':
+      case 'public_notices_program_or_statute':
+      case 'public_notices_proposed_actions':
+        $vars['reset_url'] = '/publicnotices/notices-search';
+        break;
     }
   }
 
