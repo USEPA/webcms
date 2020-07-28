@@ -57,6 +57,15 @@ resource "aws_rds_cluster" "db" {
 
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.params.id
 
+  # Export most of the DB logs - the only thing we're not exporting is audit logs, which
+  # we assume are less of an issue given that the cluster is accessible only from within
+  # the VPC.
+  enabled_cloudwatch_logs_exports = [
+    "error",
+    "general",
+    "slowquery"
+  ]
+
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]
   # We don't set the availability zones manually here - Aurora auto-assigns 3 AZs which
