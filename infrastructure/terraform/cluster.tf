@@ -295,7 +295,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling" {
     # Which metrics are we monitoring
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label = "${data.aws_arn.alb.resource}/${data.aws_arn.target_group.resource}"
+      resource_label = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
     }
   }
 }
