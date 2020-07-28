@@ -34,6 +34,8 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
       status          = "ENABLED"
       target_capacity = 100
     }
+
+    managed_termination_protection = "ENABLED"
   }
 
   tags = merge(local.common-tags, {
