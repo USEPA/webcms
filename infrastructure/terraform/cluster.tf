@@ -42,10 +42,6 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
     # Give this capacity provider a name that matches the random_pet to aid debugging/triage
     Name = "${local.name-prefix} ${random_pet.capacity_provider.id}"
   })
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 # ECS cluster
