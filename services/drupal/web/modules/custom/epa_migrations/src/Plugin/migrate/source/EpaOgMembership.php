@@ -4,7 +4,6 @@ namespace Drupal\epa_migrations\Plugin\migrate\source;
 
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
-use Drupal\migrate\MigrateSkipRowException;
 
 /**
  * Load entities and get their group membership data.
@@ -72,7 +71,7 @@ class EpaOgMembership extends DrupalSqlBase {
       return parent::prepareRow($row);
     }
     else {
-      throw new MigrateSkipRowException();
+      return FALSE;
     }
   }
 
