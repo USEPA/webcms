@@ -114,6 +114,8 @@ resource "aws_autoscaling_group" "servers" {
   # through the ALB.
   vpc_zone_identifier = aws_subnet.private.*.id
 
+  # protect_from_scale_in = true
+
   # Collect ASG metrics
   metrics_granularity = "1Minute"
   enabled_metrics = [
