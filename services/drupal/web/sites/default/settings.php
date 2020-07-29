@@ -771,6 +771,15 @@ $databases['default']['default'] = [
   'collation' => 'utf8mb4_general_ci',
   'host' => getenv('WEBCMS_DB_HOST'),
   'port' => 3306,
+
+  'pdo' => [
+    // Request peer verification of encrypted connections
+    PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true,
+
+    // Use the Alpine root CA bundle for peer verification (without this option, the PDO
+    // driver won't actually initiate a TLS session).
+    PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
+  ],
 ];
 
 // Override migration group settings for database connection.
@@ -803,20 +812,22 @@ switch ($env_lang) {
     break;
 }
 
-// Only activate Redis if we're in the 'run' ENV_STATE. We need to do this because
-// setting the cache backend before the Redis module is installed, Drupal will throw an
+// Only activate Memcache if we're in the 'run' ENV_STATE. We need to do this because
+// setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
-if ($env_state === 'run') {
-  $settings['redis.connection'] = [
-    'interface' => 'Predis',
-    'host' => getenv('WEBCMS_CACHE_HOST'),
-    'port' => 6379,
-  ];
+switch ($env_state) {
+  case 'run':
+    $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
+    $settings['memcache']['options'] = [
+      Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
+    ];
 
-  $settings['cache']['default'] = 'cache.backend.redis';
-  $settings['cache']['bins']['form'] = 'cache.backend.database';
+    if (defined('Memcached::OPT_CLIENT_MODE')) {
+      $settings['memcache']['options'][Memcached::OPT_CLIENT_MODE] = Memcached::DYNAMIC_CLIENT_MODE;
+    }
 
-  $settings['container_yamls'][] = 'modules/redis/example.services.yml';
+    $settings['cache']['default'] = 'cache.backend.memcache';
+    break;
 }
 
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
@@ -836,6 +847,9 @@ $config_directories['sync'] = '../config/sync';
 // Set all managed files to be marked as "temporary" and therefore subject to
 // garbage collection when their usage drops to zero.
 $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
+
+// Ensure we force the site to use the "include" method of shielding pages
+$config['shield.settings']['method'] = 1;
 
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';

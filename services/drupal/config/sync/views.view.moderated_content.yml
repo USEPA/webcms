@@ -52,17 +52,15 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: full
+        type: mini
         options:
-          items_per_page: 50
+          items_per_page: 20
           offset: 0
           id: 0
-          total_pages: null
+          total_pages: 7
           tags:
             previous: '‹ Previous'
             next: 'Next ›'
-            first: '« First'
-            last: 'Last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -71,7 +69,6 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          quantity: 9
       style:
         type: table
         options:
@@ -648,7 +645,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          destination: true
+          destination: false
           entity_type: node
           plugin_id: entity_operations
       filters:
@@ -887,8 +884,22 @@ display:
       display_extenders:
         views_ajax_get:
           ajax_get: false
-      path: admin/content/moderated
+      path: admin/content/node
       display_description: ''
+      menu:
+        type: 'default tab'
+        title: Content
+        description: ''
+        expanded: false
+        parent: ''
+        weight: -10
+        context: '0'
+        menu_name: main
+      tab_options:
+        type: normal
+        title: Content
+        description: 'Find and manage content'
+        weight: 0
     cache_metadata:
       max-age: 0
       contexts:

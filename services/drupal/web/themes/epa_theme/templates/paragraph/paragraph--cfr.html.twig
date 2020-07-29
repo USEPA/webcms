@@ -1,0 +1,14 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% if content.field_code_federal_regulations|field_value|render -%}
+  {%- if content.field_link|field_value[0]['#url'] -%}
+    <a href="{{ content.field_link|field_value[0]['#url'] }}">{{ content.field_code_federal_regulations|field_value|render }}</a>
+  {%- else -%}
+    {{ content.field_code_federal_regulations|field_value|render }}
+  {%- endif %}
+{%- endif %}

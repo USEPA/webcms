@@ -132,8 +132,8 @@ resource "aws_cloudwatch_event_rule" "cron" {
   name        = "${local.role-prefix}CronSchedule"
   description = "Invokes Drush cron"
 
-  # Run cron every 15 minutes
-  schedule_expression = "rate(15 minutes)"
+  # Run cron every 5 minutes
+  schedule_expression = "rate(5 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "cron" {

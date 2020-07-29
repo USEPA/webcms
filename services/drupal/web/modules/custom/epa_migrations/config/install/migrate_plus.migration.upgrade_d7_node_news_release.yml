@@ -183,7 +183,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date
@@ -211,7 +211,14 @@ process:
       plugin: sub_process
       source: field_type
       process:
-        target_id: tid
+        target_id:
+          -
+            plugin: default_value
+            default_value: 'News Release'
+          -
+            plugin: entity_lookup
+            entity_type: taxonomy_term
+            value_key: name
   field_metatag:
     -
       plugin: d7_metatag_entities
@@ -232,6 +239,10 @@ process:
     -
       plugin: get
       source: nres_state
+  field_last_published:
+    -
+      plugin: get
+      source: last_published
 destination:
   plugin: 'entity:node'
   default_bundle: news_release

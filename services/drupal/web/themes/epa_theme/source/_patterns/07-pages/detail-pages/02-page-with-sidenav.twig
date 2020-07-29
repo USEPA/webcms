@@ -104,10 +104,17 @@
   </ul>
 {% endset %}
 
+{% set sidenav %}
+  {% include '@components/menu/menu--sidenav/menu--sidenav.twig' with {
+    'menu_name': 'sidenav',
+  } %}
+{% endset %}
+
 {% set page_content %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'title': page_title,
     'body': content,
+    'sidenav': sidenav,
     'has_sidenav': has_sidenav,
   } %}
 {% endset %}

@@ -5,7 +5,8 @@
  * Contains epa_core.module.
  */
 
-use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
@@ -16,12 +17,41 @@ use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
+ */
+function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
+  if ($route_name === 'entity.node.revision') {
+    // Show the same local tasks on node revision pages as the ones displayed
+    // on node canonical pages.
+    $node_canonical_local_tasks = \Drupal::service('plugin.manager.menu.local_task')
+      ->getLocalTasks('entity.node.canonical');
+    $local_tasks['tabs'][0] = $node_canonical_local_tasks['tabs'];
+
+    // Mark the version history local task as active when viewing a node
+    // revision.
+    foreach ($local_tasks['tabs'][0] as $route_name => &$tab) {
+      $tab['#active'] = $route_name === 'entity.node.version_history';
+
+    }
+
+    $cacheability = CacheableMetadata::createFromObject($cacheability)
+      ->merge($node_canonical_local_tasks['cacheability']);
+  }
+}
+
 
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  *
- * - Used to hide auto generate descriptions and keywords for news releases.
+ * - Used to auto generate descriptions and keywords for news releases.
  * - Hide path field.
+ * - Hide type field on news releasees
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   switch ($form_id) {
@@ -84,6 +114,8 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       $autocomplete_info = \Drupal::service('element_info')->getInfo('entity_autocomplete');
       $form['field_keywords']['widget']['target_id']['#element_validate'] = $autocomplete_info['#element_validate'];
 
+      $form['field_type']['#access'] = FALSE;
+
       // Add a custom validator for automated keyword generation.
       array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
@@ -130,6 +162,7 @@ function epa_core_new_release_keywords_validate(array &$element, FormStateInterf
  */
 function _epa_core_load_taxonomy_hierarchy($terms) {
   $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $default_keywords = [];
   foreach ($terms as $term) {
     $term_id = $term['target_id'];
     $term_object = $term_storage->load($term_id);
@@ -344,6 +377,13 @@ function epa_core_node_presave(NodeInterface $node) {
       $node->set('field_notice_sort_date', $date->format('Y-m-d'));
     }
   }
+  if ($node->bundle() == 'news_release') {
+    $term = taxonomy_term_load_multiple_by_name('news release', 'type');
+    if (!empty($term)) {
+      $term = reset($term);
+      $node->field_type = $term->id();
+    }
+  }
 }
 
 /**
@@ -398,5 +438,28 @@ function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\E
   $env_lang = getenv('WEBCMS_ENV_LANG');
   if (isset($env_lang) && $env_lang === 'es' && $entity_type->id() == 'node' && !empty($fields['field_language'])) {
     $fields['field_language']->setDefaultValue('es');
+  }
+}
+
+/**
+ * Provides default values for our type fields across a couple content types.
+ */
+function epa_core_default_value_field_type(ContentEntityInterface $entity, FieldDefinitionInterface $definition) {
+  if ($entity->getEntityTypeId() === 'node') {
+    switch ($entity->bundle()) {
+      case 'public_notice':
+        $term_name = "announcements and schedules";
+        break;
+      case 'news_release':
+        $term_name = "news release";
+        break;
+    }
+    if (!empty($term_name)) {
+      $term = taxonomy_term_load_multiple_by_name($term_name, 'type');
+      if (!empty($term)) {
+        $term = reset($term);
+        return $term->id();
+      }
+    }
   }
 }

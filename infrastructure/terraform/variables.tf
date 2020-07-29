@@ -23,6 +23,13 @@ variable "site-env-name" {
   type        = string
 }
 
+# Encryption-related variables
+variable "encryption-at-rest-key" {
+  description = "Name of the AWS KMS key to use for encrypting at-rest data."
+  type        = string
+  default     = null
+}
+
 # VPC
 # cf. vpc.tf
 
@@ -240,7 +247,7 @@ variable "cache-instance-type" {
 }
 
 variable "cache-replica-count" {
-  description = "Number of ElastiCache read replicas in this cluster"
+  description = "Number of ElastiCache nodes in this cluster"
   type        = number
 }
 
@@ -260,6 +267,15 @@ variable "email-from" {
 variable "email-host" {
   description = "SMTP hostname to connect to"
   type        = string
+}
+
+# Users
+# cf. iam.tf
+
+variable "users-extra-admin" {
+  description = "Names of additional IAM users to make administrators"
+  type        = list(string)
+  default     = []
 }
 
 # Image tag variables

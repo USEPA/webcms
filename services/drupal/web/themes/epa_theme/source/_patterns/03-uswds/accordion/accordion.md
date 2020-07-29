@@ -13,3 +13,4 @@ __Variables:__
   * title: [string] Title of the item.
   * is_expanded: [boolean] Whether this item is expanded at the start.
   * content: [string] Content of the item.
+* accordion_content: [string] Accordion content from Drupal.

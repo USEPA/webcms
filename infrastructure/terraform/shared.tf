@@ -1,6 +1,7 @@
 # This file is for values shared across multiple other *.tf files.
 
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 # We use separate definitions for the web-facing Drupal tasks and scheduled Drush cron
 # scripts for a few reasons (such as avoiding spawning nginx), so we share the values
@@ -31,8 +32,8 @@ locals {
     { name = "WEBCMS_MAIL_HOST", value = var.email-host },
 
     # Injected host names
-    { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443/" },
-    { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_replication_group.cache.configuration_endpoint_address },
+    { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443" },
+    { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_cluster.cache.configuration_endpoint },
   ]
 
   # Secrets Manager bindings for Drupal containers

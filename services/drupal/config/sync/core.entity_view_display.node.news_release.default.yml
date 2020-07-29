@@ -28,7 +28,6 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - epa_web_areas
     - hierarchical_term_formatter
     - user
 id: node.news_release.default
@@ -36,25 +35,13 @@ targetEntityType: node
 bundle: news_release
 mode: default
 content:
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_hublinks:
-    weight: 0
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: web_areas_homepage_link_formatter
-    region: content
   field_links:
     weight: 100
     settings: {  }
     third_party_settings: {  }
     region: content
   field_paragraphs:
-    weight: 5
+    weight: 3
     label: hidden
     settings:
       view_mode: default
@@ -63,8 +50,8 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   field_press_office:
-    weight: 3
-    label: above
+    weight: 4
+    label: inline
     settings:
       display: all
       wrap: span
@@ -76,7 +63,7 @@ content:
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
-    weight: 4
+    weight: 2
     label: above
     settings:
       view_mode: default
@@ -84,28 +71,30 @@ content:
     third_party_settings: {  }
     region: content
   field_release:
-    weight: 6
-    label: above
+    weight: 1
+    label: hidden
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium_no_time
     third_party_settings: {  }
     type: datetime_default
     region: content
   field_secondary_headline:
-    weight: 2
-    label: above
+    weight: 0
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
 hidden:
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
@@ -116,6 +105,7 @@ hidden:
   field_scheduled_transition: true
   field_subjects: true
   field_type: true
+  group_content: true
   langcode: true
   links: true
   search_api_excerpt: true

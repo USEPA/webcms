@@ -4,6 +4,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\source;
 
 use Drupal\node\Plugin\migrate\source\d7\Node;
 use Drupal\migrate\Row;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Load nodes that will be migrated into fields.
@@ -34,6 +35,19 @@ class EpaNode extends Node {
       return FALSE;
     }
 
+    // If the review deadline is on the day of or after the migration, push out
+    // the review deadline by 30 days.
+    $review_deadline = $row->getSourceProperty('field_review_deadline')[0]['value'];
+    $import_date = strtotime('now');
+    $review_deadline = \DateTime::createFromFormat('Y-m-d H:i:s', $review_deadline, new \DateTimeZone('America/New_York'));
+    if ($review_deadline) {
+      if ($review_deadline->getTimestamp() >= $import_date) {
+        $review_deadline->setTimestamp(strtotime('+30 days', $review_deadline->getTimestamp()));
+      }
+
+      $row->setSourceProperty('field_modified_review_deadline', [0 => ['value' => $review_deadline->format('Y-m-d H:i:s')]]);
+    }
+
     // Get the revision moderation state and timestamp.
     $state_data = $this->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['state', 'timestamp'])
@@ -55,6 +69,19 @@ class EpaNode extends Node {
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
+    }
+
+    // Get the timestamp for the latest published revision.
+    $last_published = $this->select('node_revision_epa_states_history', 'nresh')
+      ->fields('nresh', ['timestamp'])
+      ->condition('nresh.nid', $row->getSourceProperty('nid'))
+      ->condition('nresh.state', 'published')
+      ->orderBy('nresh.timestamp', 'DESC')
+      ->execute()
+      ->fetchField();
+
+    if ($last_published) {
+      $row->setSourceProperty('last_published', gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $last_published));
     }
 
     // To prepare rows for import into fields, we're going to:

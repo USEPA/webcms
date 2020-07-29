@@ -18,7 +18,6 @@ dependencies:
     - node.type.webform
   module:
     - entity_reference_revisions
-    - epa_web_areas
     - user
     - webform
 id: node.webform.default
@@ -26,27 +25,8 @@ targetEntityType: node
 bundle: webform
 mode: default
 content:
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_hublinks:
-    type: web_areas_homepage_link_formatter
-    weight: 0
-    region: content
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-  field_page_head:
-    weight: 4
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_paragraphs:
-    weight: 2
+    weight: 0
     label: hidden
     settings:
       view_mode: default
@@ -55,7 +35,7 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   webform:
-    weight: 3
+    weight: 1
     label: hidden
     settings:
       source_entity: true
@@ -63,14 +43,18 @@ content:
     type: webform_entity_reference_entity_view
     region: content
 hidden:
+  content_moderation_control: true
   field_description: true
   field_geographic_locations: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_language: true
   field_last_published: true
   field_machine_name: true
+  field_page_head: true
   field_review_deadline: true
   field_type: true
+  group_content: true
   langcode: true
   links: true
   search_api_excerpt: true

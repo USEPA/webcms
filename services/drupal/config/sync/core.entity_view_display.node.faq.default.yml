@@ -25,7 +25,6 @@ dependencies:
     - field.field.node.faq.field_type
     - node.type.faq
   module:
-    - epa_web_areas
     - text
     - user
 id: node.faq.default
@@ -36,43 +35,17 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 3
-    settings: {  }
-    third_party_settings: {  }
-    region: content
-  content_moderation_control:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_hublinks:
     weight: 0
-    label: above
     settings: {  }
     third_party_settings: {  }
-    type: web_areas_homepage_link_formatter
     region: content
   field_links:
     weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_page_head:
-    weight: 5
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
-  field_question:
-    weight: 2
-    label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_related_questions:
-    weight: 4
+    weight: 1
     label: above
     settings:
       link: true
@@ -80,21 +53,26 @@ content:
     type: entity_reference_label
     region: content
 hidden:
+  content_moderation_control: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_faq_taxonomy_topics: true
   field_geographic_locations: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
   field_language: true
   field_last_published: true
   field_machine_name: true
+  field_page_head: true
   field_publish_date: true
+  field_question: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_type: true
+  group_content: true
   langcode: true
   links: true
   search_api_excerpt: true

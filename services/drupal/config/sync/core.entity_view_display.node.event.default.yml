@@ -31,44 +31,34 @@ dependencies:
     - node.type.event
   module:
     - address
+    - date_range_formatter
     - datetime
-    - datetime_range
     - entity_reference_revisions
-    - epa_web_areas
     - link
-    - options
-    - scheduled_publish
     - user
 id: node.event.default
 targetEntityType: node
 bundle: event
 mode: default
 content:
-  content_moderation_control:
-    weight: 0
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_channel:
-    weight: 9
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_date:
-    weight: 3
+    weight: 0
     label: above
     settings:
-      separator: '-'
-      format_type: medium
       timezone_override: ''
+      single: 'l, F j, Y \<\b\r\> g:i a T'
+      single_all_day: 'l, F j, Y '
+      one_day: 'l, F j, Y \<\b\r\> g:i a - {g}:{i} {a} T'
+      one_month: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
+      several_months: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
+      several_years: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
+      separator: '-'
+      date_format: 'Y-m-d\TH:i:s'
     third_party_settings: {  }
-    type: daterange_default
+    type: date_range_without_time
     region: content
   field_deadline:
-    weight: 5
+    weight: 4
     label: above
     settings:
       format_type: medium
@@ -76,117 +66,16 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
-  field_description:
-    weight: 29
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
-  field_display_arcgis_map:
-    weight: 6
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_env_laws_regs_and_treaties:
-    weight: 16
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_event_cancellation:
-    weight: 4
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
   field_event_host:
-    weight: 8
+    weight: 2
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
-  field_event_type:
-    weight: 32
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_expiration_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 37
-    region: content
-  field_geographic_locations:
-    weight: 19
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_hublinks:
-    weight: 31
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: web_areas_homepage_link_formatter
-    region: content
-  field_is_searchable_collection:
-    weight: 33
-    label: above
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    type: boolean
-    region: content
-  field_keywords:
-    weight: 22
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  field_language:
-    weight: 27
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: list_key
-    region: content
-  field_last_published:
-    weight: 38
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_links:
-    weight: 11
+    weight: 5
     label: above
     settings:
       trim_length: 80
@@ -198,76 +87,43 @@ content:
     type: link
     region: content
   field_location:
-    weight: 34
+    weight: 1
     label: above
     settings: {  }
     third_party_settings: {  }
     type: address_default
     region: content
-  field_machine_name:
-    weight: 28
-    label: above
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
-    type: string
-    region: content
-  field_page_head:
-    weight: 30
-    label: above
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
-    region: content
   field_paragraphs:
-    weight: 2
-    label: hidden
+    weight: 3
+    label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_publish_date:
-    label: above
-    type: datetime_default
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    weight: 35
-    region: content
-  field_review_deadline:
-    weight: 10
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: datetime_default
-    region: content
-  field_scheduled_transition:
-    label: above
-    type: scheduled_publish_generic_formatter
-    settings:
-      date_format: html_datetime
-      text_pattern: '%moderation_state% - %date%'
-    third_party_settings: {  }
-    weight: 36
-    region: content
-  field_type:
-    weight: 7
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
-  links:
-    weight: 1
-    region: content
-    settings: {  }
-    third_party_settings: {  }
 hidden:
+  content_moderation_control: true
+  field_channel: true
+  field_description: true
+  field_display_arcgis_map: true
+  field_env_laws_regs_and_treaties: true
+  field_event_cancellation: true
+  field_event_type: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_page_head: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_type: true
+  group_content: true
   langcode: true
+  links: true
   search_api_excerpt: true

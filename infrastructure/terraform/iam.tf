@@ -559,6 +559,85 @@ resource "aws_iam_policy" "user_ssm_policy" {
   policy      = data.aws_iam_policy_document.user_ssm_policy.json
 }
 
+# User-level policy for running Drush tasks
+
+data "aws_iam_policy_document" "user_run_tasks_policy" {
+  # Only create this policy if Drush is being deployed
+  count = var.image-tag-drush != null ? 1 : 0
+
+  version = "2012-10-17"
+
+  # Allow minimal read access for ECS tasks
+  statement {
+    sid = "listEcsTasks"
+
+    effect    = "Allow"
+    actions   = ["ecs:ListTasks", "ecs:DescribeTasks", "ecs:ListTaskDefinitions", "ecs:DescribeTaskDefinition"]
+    resources = ["*"]
+  }
+
+  # Allow access to the RunTask ECS API, but only for Drush.
+  # TODO: Resolve why the conditional permissions aren't allowing RunTask API calls
+  statement {
+    sid = "runTask"
+
+    effect  = "Allow"
+    actions = ["ecs:RunTask"]
+
+    # Manually construct the ARN of the Drush task: we want to allow abitrary versions due
+    # to the fact that deployments may introduce some churn in the IAM permissions, and
+    # eventual consistency may inadvertently block access to any newly-created Drush tasks
+    # due to the revision number not yet being fully "settled" in IAM.
+    resources = [
+      # AWS ARN syntax for ECS tasks: each of the pieces is separated by a colon
+      # 1. The string "arn"
+      # 2. The string "aws"
+      # 3. The AWS service (here, ECS)
+      # 4. AWS region
+      # 5. AWS account ID
+      # 6. ECS task family ("webcms-drush-${local.env-suffix}", but we read it from the task definition directly)
+      # 7. The task revision number - we use "*" due to the reasons stated above.
+      # "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_ecs_task_definition.drush_task[0].family}:*"
+      "*"
+    ]
+
+    # Limit RunTask to the WebCMS's cluster.
+    # condition {
+    #   test     = "StringEquals"
+    #   variable = "ecs:cluster"
+    #   values   = [aws_ecs_cluster.cluster.arn]
+    # }
+  }
+
+  # Allow users to stop tasks - useful to abort long-running Drush scripts or force a
+  # restart of service tasks.
+  # TODO: Limit this only to the WebCMS' specific cluster
+  statement {
+    sid = "stopTask"
+
+    effect    = "Allow"
+    actions   = ["ecs:StopTask"]
+    resources = ["*"]
+  }
+
+  # Allow users to pass this deployment's Drush role to the RunTask API.
+  statement {
+    sid = "passDrupalRole"
+
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = [aws_iam_role.drupal_execution_role.arn]
+  }
+}
+
+resource "aws_iam_policy" "user_run_tasks_policy" {
+  count = length(data.aws_iam_policy_document.user_run_tasks_policy)
+
+  name        = "${local.role-prefix}UserRunTasksPolicy"
+  description = "Grants permission to run Drush tasks against the cluster"
+  policy      = data.aws_iam_policy_document.user_run_tasks_policy[0].json
+}
+
 resource "aws_iam_group" "webcms_administrators" {
   name = "${local.role-prefix}Administrators"
 }
@@ -573,12 +652,24 @@ resource "aws_iam_group_membership" "webcms_administrators_admin" {
   name  = "${local.role-prefix}AdminGroupMembership"
   group = aws_iam_group.webcms_administrators.name
 
-  users = [
-    aws_iam_user.webcms_admin.name
-  ]
+  users = concat([aws_iam_user.webcms_admin.name], var.users-extra-admin)
 }
 
 resource "aws_iam_group_policy_attachment" "webcms_administrators" {
   group      = aws_iam_group.webcms_administrators.name
   policy_arn = aws_iam_policy.user_ssm_policy.arn
+}
+
+# Grant admin users read-only access to the app's secrets so they can make connections to,
+# e.g., the Aurora cluster.
+resource "aws_iam_group_policy_attachment" "webcms_administrators_secrets_access" {
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.task_secrets_access.arn
+}
+
+resource "aws_iam_group_policy_attachment" "webcm_administrators_run_tasks" {
+  count = length(data.aws_iam_policy_document.user_run_tasks_policy)
+
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.user_run_tasks_policy[0].arn
 }

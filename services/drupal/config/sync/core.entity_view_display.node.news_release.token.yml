@@ -1,0 +1,243 @@
+uuid: 2f2006f7-b439-428d-8279-c1f445b016cf
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.token
+    - field.field.node.news_release.field_channel
+    - field.field.node.news_release.field_description
+    - field.field.node.news_release.field_env_laws_regs_and_treaties
+    - field.field.node.news_release.field_expiration_date
+    - field.field.node.news_release.field_geographic_locations
+    - field.field.node.news_release.field_hublinks
+    - field.field.node.news_release.field_is_searchable_collection
+    - field.field.node.news_release.field_keywords
+    - field.field.node.news_release.field_language
+    - field.field.node.news_release.field_last_published
+    - field.field.node.news_release.field_machine_name
+    - field.field.node.news_release.field_paragraphs
+    - field.field.node.news_release.field_press_office
+    - field.field.node.news_release.field_press_officers
+    - field.field.node.news_release.field_publish_date
+    - field.field.node.news_release.field_release
+    - field.field.node.news_release.field_review_deadline
+    - field.field.node.news_release.field_scheduled_transition
+    - field.field.node.news_release.field_secondary_headline
+    - field.field.node.news_release.field_subjects
+    - field.field.node.news_release.field_type
+    - node.type.news_release
+  module:
+    - datetime
+    - entity_reference_revisions
+    - entitygroupfield
+    - epa_web_areas
+    - hierarchical_term_formatter
+    - layout_builder
+    - options
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.news_release.token
+targetEntityType: node
+bundle: news_release
+mode: token
+content:
+  field_channel:
+    type: entity_reference_label
+    weight: 14
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_description:
+    type: basic_string
+    weight: 20
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_env_laws_regs_and_treaties:
+    type: entity_reference_label
+    weight: 19
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_expiration_date:
+    type: datetime_default
+    weight: 18
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_geographic_locations:
+    type: entity_reference_label
+    weight: 17
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_hublinks:
+    weight: 0
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: web_areas_homepage_link_formatter
+    region: content
+  field_is_searchable_collection:
+    type: boolean
+    weight: 21
+    region: content
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+  field_keywords:
+    type: entity_reference_label
+    weight: 16
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_language:
+    type: list_default
+    weight: 15
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  field_last_published:
+    type: datetime_default
+    weight: 10
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_machine_name:
+    type: string
+    weight: 12
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  field_paragraphs:
+    weight: 4
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+  field_press_office:
+    weight: 2
+    label: above
+    settings:
+      display: all
+      wrap: span
+      separator: ' > '
+      link: false
+      reverse: false
+    third_party_settings: {  }
+    type: hierarchical_term_formatter
+    region: content
+  field_press_officers:
+    type: entity_reference_revisions_entity_view
+    weight: 3
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_publish_date:
+    type: datetime_default
+    weight: 9
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_release:
+    weight: 5
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_review_deadline:
+    type: datetime_default
+    weight: 8
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+  field_secondary_headline:
+    weight: 1
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    weight: 13
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_type:
+    type: entity_reference_label
+    weight: 7
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  group_content:
+    type: parent_group_label_formatter
+    weight: 6
+    region: content
+    label: hidden
+    settings:
+      link: false
+    third_party_settings: {  }
+  langcode:
+    type: language
+    weight: 11
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+      native_language: false
+    third_party_settings: {  }
+hidden:
+  content_moderation_control: true
+  field_scheduled_transition: true
+  links: true
+  search_api_excerpt: true

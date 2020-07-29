@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: MtRahTc0GO_9CuiCx3e60MPJ62CjARBlbUhtC2pSUeg
+  default_config_hash: FjA54KwyLeNld418IpIdsrF6-b9qYXcQiNIdR5hnXk0
 id: upgrade_d7_node_regulation
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -194,7 +194,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date
@@ -273,6 +273,10 @@ process:
     -
       plugin: get
       source: nres_state
+  field_last_published:
+    -
+      plugin: get
+      source: last_published
 destination:
   plugin: 'entity:node'
   default_bundle: regulation

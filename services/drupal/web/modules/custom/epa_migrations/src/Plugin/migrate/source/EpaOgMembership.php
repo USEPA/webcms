@@ -61,13 +61,18 @@ class EpaOgMembership extends DrupalSqlBase {
     // Load the D8 entity.
     $entity = $this->entityTypeManager->getStorage($type)->load($etid);
 
-    // Make the label for this entity available as a source property.
-    $row->setSourceProperty('label', $entity->label());
+    if ($entity) {
+      // Make the label for this entity available as a source property.
+      $row->setSourceProperty('label', $entity->label());
 
-    // Make the bundle for this entity available as a source property.
-    $row->setSourceProperty('bundle', $entity->bundle());
+      // Make the bundle for this entity available as a source property.
+      $row->setSourceProperty('bundle', $entity->bundle());
 
-    return parent::prepareRow($row);
+      return parent::prepareRow($row);
+    }
+    else {
+      return FALSE;
+    }
   }
 
 }

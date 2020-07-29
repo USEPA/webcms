@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% if content.field_applicant_name|field_value|render or content.field_address|field_value|render %}
+  <address>
+    {{ content.field_applicant_name|field_value|render }}
+    {{ content.field_address|field_value|render }}
+  </address>
+{% endif %}

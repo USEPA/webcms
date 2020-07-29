@@ -28,9 +28,9 @@ display:
     position: 0
     display_options:
       access:
-        type: perm
+        type: group_permission
         options:
-          perm: 'view any unpublished content'
+          group_permission: 'access group_node overview'
       cache:
         type: tag
         options: {  }
@@ -53,17 +53,15 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       pager:
-        type: full
+        type: mini
         options:
-          items_per_page: 50
+          items_per_page: 20
           offset: 0
           id: 0
-          total_pages: null
+          total_pages: 7
           tags:
             previous: '‹ Previous'
             next: 'Next ›'
-            first: '« First'
-            last: 'Last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -72,7 +70,6 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          quantity: 9
       style:
         type: table
         options:
@@ -649,7 +646,7 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          destination: true
+          destination: false
           entity_type: node
           plugin_id: entity_operations
       filters:
@@ -928,10 +925,11 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - route
+        - route.group
         - url
         - url.query_args
+        - user.group_permissions
         - 'user.node_grants:view'
-        - user.permissions
       tags:
         - 'config:field.storage.node.field_scheduled_transition'
         - 'config:workflow_list'
@@ -944,7 +942,7 @@ display:
       display_extenders:
         views_ajax_get:
           ajax_get: false
-      path: group/%group/nodes/moderated
+      path: group/%group/nodes
       display_description: ''
       menu:
         type: none
@@ -961,10 +959,11 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - route
+        - route.group
         - url
         - url.query_args
+        - user.group_permissions
         - 'user.node_grants:view'
-        - user.permissions
       tags:
         - 'config:field.storage.node.field_scheduled_transition'
         - 'config:workflow_list'

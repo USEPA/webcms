@@ -46,7 +46,7 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     }
 
     // Add group label to form.
-    if ($group) {
+    if (!empty($group)) {
       $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
     }
   }
@@ -289,11 +289,26 @@ function epa_web_areas_entity_base_field_info(EntityTypeInterface $entity_type) 
       ->setCardinality(FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED)
       ->setClass('\Drupal\epa_web_areas\ComputedGroupReference')
       ->setComputed(TRUE)
-      ->setRequired(TRUE)
       ->setRevisionable(FALSE)
       ->setTranslatable(FALSE)
       ->setDisplayConfigurable('view', FALSE)
       ->setDisplayConfigurable('form', FALSE);
   }
   return $fields;
+}
+
+/**
+ * Alter local actions plugins.
+ *
+ * @param array $local_actions
+ *   The array of local action plugin definitions, keyed by plugin ID.
+ *
+ * @see \Drupal\Core\Menu\LocalActionInterface
+ * @see \Drupal\Core\Menu\LocalActionManager
+ *
+ * @ingroup menu
+ */
+function epa_web_areas_menu_local_actions_alter(&$local_actions) {
+  $local_actions['group_content.group_node_add_page']['appears_on'] = ['view.group_moderated_content.moderated_content'];
+  $local_actions['group_content.group_node_relate_page']['appears_on'] = ['view.group_moderated_content.moderated_content'];
 }

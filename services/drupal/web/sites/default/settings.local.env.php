@@ -4,6 +4,10 @@
 $config['smtp.settings']['smtp_port'] = 1025;
 $config['smtp.settings']['smtp_protocol'] = 'standard';
 
+// Don't initiate TLS sessions during local development; the MySQL certificate is
+// self-signed, which OpenSSL rejects
+unset($databases['default']['default']['pdo'][PDO::MYSQL_ATTR_SSL_CA]);
+
 // Replace profile credentials with Minio-specific secrets
 unset($config['s3fs.settings']['use_instance_profile']);
 $settings['s3fs.access_key'] = 'minio_access';
@@ -22,14 +26,14 @@ $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default
 
 $config['system.logging']['error_level'] = 'all';
 
-// Avoid having a redis cache backend causing errors before we've had a chance to enable the module.
-if ($env_state == 'build') {
-  unset($settings['cache']['default']);
-}
-
 // Set the base url for node export operations. Setting this to "localhost"
 // instead of "localhost:8080" since this will be utilized by wget and it will
 // use the internal Docker url which uses port 80.
 $settings['epa_node_export.base_url'] = 'http://localhost';
+
+// Local environments can't use AWS elasticache auto discovery
+if (defined('Memcached::OPT_CLIENT_MODE')) {
+  unset($settings['memcache']['options'][Memcached::OPT_CLIENT_MODE]);
+}
 
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';

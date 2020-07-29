@@ -1,5 +1,16 @@
 <?php
 
+ /**
+ * Implements theme_preprocess_menu()
+ *
+ * @param $vars
+ */
+function epa_theme_preprocess_menu(&$vars) {
+  if (preg_match('/^group-[0-9]+-menu$/', $vars['menu_name'])) {
+    $vars['attributes']['class'][] = 'menu--sidenav';
+  }
+}
+
 /**
  * Implements theme_preprocess_menu_local_tasks()
  *
