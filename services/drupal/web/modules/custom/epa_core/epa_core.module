@@ -463,3 +463,15 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
     }
   }
 }
+
+/**
+ * Implements hook_entity_operation_alter().
+ */
+function epa_core_entity_operation_alter(array &$operations, EntityInterface $entity) {
+  // Do not redirect node edit operations to the list page.
+  // This code is needed because the Views setting for this is ignored.
+  // https://www.drupal.org/project/node/issues/2689297
+  if ($entity->getEntityTypeId() == 'node') {
+    $operations['edit']['url'] = Url::fromRoute('entity.node.edit_form', ['node' => $entity->id()]);
+  }
+}
