@@ -216,7 +216,7 @@ trait EpaWysiwygTextProcessingTrait {
     $xpath = new \DOMXPath($doc);
 
     // Tab elements.
-    $tabs_parent_element = $xpath->query('//div[contains(concat(" ", @id, " "), " tabs ")]');
+    $tabs_parent_element = $xpath->query('//div[@id="tabs"]');
     if (count($tabs_parent_element) == 0) {
       $tabs_parent_element = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ")]');
     }
@@ -224,19 +224,19 @@ trait EpaWysiwygTextProcessingTrait {
     if (count($tabs_parent_element) > 0) {
       foreach ($tabs_parent_element as $parent_element) {
         if ($parent_element->tagName == 'div') {
-          $parent_element->setAttribute('id', str_replace('tabs', '', $parent_element->attributes->getNamedItem('id')->value));
-          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or contains(concat(" ", @id, " "), " tabsnav ")]', $parent_element);
+          $parent_element->removeAttribute('id');
+          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
           foreach ($uls as $ul) {
             $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
-            if ($ul->attributes->getNamedItem('id')) {
-              $ul->setAttribute('id', str_replace('tabsnav', '', $ul->attributes->getNamedItem('id')->value));
+            if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
+              $ul->removeAttribute('id');
             }
           }
         }
         else {
           $parent_element->setAttribute('class', str_replace('tabs', '', $parent_element->attributes->getNamedItem('class')->value));
-          if ($parent_element->attributes->getNamedItem('id')) {
-            $parent_element->setAttribute('id', str_replace('tabsnav', '', $parent_element->attributes->getNamedItem('id')->value));
+          if ($parent_element->attributes->getNamedItem('id')->value == 'tabsnav') {
+            $parent_element->removeAttribute('id');
           }
         }
 
