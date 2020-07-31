@@ -84,27 +84,108 @@ while true; do
 
   # Check the last reported status from ECS
   status="$(jq -r '.tasks[0].lastStatus' <<<"$output")"
-  case "$status" in
-  STOPPING | STOPPED)
-    echo "Task exited. Check logs in CloudWatch for more details."
 
-    # If we we able to detect an error, flag the build as failing
-    exit_code="$(jq '.tasks[0].containers[0].exitCode' <<<"$output")"
-    if test "$exit_code" -ne 0; then
-      echo "Drush exited with non-zero exit code $exit_code" >&2
-      exit 1
-    fi
-    break
-    ;;
+  # To avoid spamming the console, we only output the status when we detect a change
+  if test "$last_status" != "$status"; then
+    echo "--- Drush status: $status"
+    last_status="$status"
+  fi
 
-  *)
-    # To avoid spamming the console, we only output the status when we detect a change
-    if test "$last_status" != "$status"; then
-      echo "--- Drush status: $status"
-      last_status="$status"
-    fi
-
+  # If the container is still running, sleep 5 seconds and re-run the loop
+  if test "$status" != STOPPED; then
     sleep 5
-    ;;
-  esac
+    continue
+  fi
+
+  # Now that we know the task has stopped, it's time to report task stop information. The
+  # most normal case for this is the stop reason "Essential container in task exited",
+  # which just means that Drush exited.
+  #
+  # NB. The "| values" in the JQ filters just means "don't report null". This lets us use
+  # test -n and test -z for null output, which is the usual shell convention.
+  task="$(jq .tasks[0] <<<"$output")"
+  stop_code="$(jq -r ".stopCode | values" <<<"$task")"
+  stop_reason="$(jq -r ".stoppedReason | values" <<<"$task")"
+
+  # Formats of this block:
+  #   Stop information: <code> (<reason>)
+  #   Stop information: <reason>
+  #   Stop information: Unavailable
+  echo -n "Stop information: "
+  if test -n "$stop_code"; then
+    if test -n "$stop_reason"; then
+      echo "$stop_code ($stop_reason)"
+    else
+      echo "$stop_code"
+    fi
+  elif test -n "$stop_reason"; then
+    echo "$stop_reason"
+  else
+    echo "Unavailable"
+  fi
+  echo
+
+  # Determine the container exit information, if any is available
+  container="$(jq ".containers[0]" <<<"$task")"
+  exit_code="$(jq -r ".exitCode | values" <<<"$container")"
+  exit_reason="$(jq -r ".reason | values" <<<"$container")"
+  id="$(jq ".runtimeId | values" <<<"$container")"
+
+  # Tracks if we need to exit with 1 or 0
+  failure=
+
+  # Formats of this block:
+  #   Drush exit: <code> (<reason>)
+  #   Drush exit: <code>
+  #   Drush exit: <reason>
+  #   Drush exit: Unavailable
+  echo -n "Drush exit: "
+  if test -n "$exit_code"; then
+    if test -n "$exit_reason"; then
+      echo "$exit_code ($exit_reason)"
+    else
+      echo "$exit_code"
+    fi
+
+    # Mark non-zero exits as a failure
+    if test "$exit_code" -ne 0; then
+      failure=1
+    fi
+  elif test -n "$exit_reason"; then
+    # If a container exited without a code, it could mean that the container failed to
+    # start. Mark this as a failure.
+    echo "$exit_reason"
+    failure=1
+  else
+    # If the API gave us nothing, mark that as a failure too.
+    echo "Unavailable"
+    failure=1
+  fi
+  echo
+
+  # Formats of this block:
+  #   Logs URL: <link>
+  #   Logs URL: Unavailable
+  echo -n "Logs: "
+  if test -n "$id"; then
+    # Construct a direct link to the CloudWatch logs.
+    url="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/\$252Fwebcms-$WEBCMS_ENVIRONMENT\$252Fapp-drush/log-events/$id"
+
+    # Generate a nicely-formatted URL for the Buildkite logs
+    # cf. https://buildkite.com/docs/pipelines/links-and-images-in-log-output#links
+    printf '\033]1339;%s\a\n' "url='$url';content='$id'"
+  else
+    echo "Unavailable"
+    failure=1
+  fi
+  echo
+
+  # Now that we've output all the information we know about, we can exit
+  if test -n "$failure"; then
+    # If we saw any failures, open the log output by default
+    echo "^^^ +++"
+    exit 1
+  else
+    exit 0
+  fi
 done
