@@ -57,7 +57,8 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN apk add --no-cache \
+RUN f1-ext-install pecl:apcu \
+  && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
   # GNU wget to override BusyBox
@@ -123,7 +124,8 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN apk add --no-cache \
+RUN f1-ext-install pecl:apcu \
+  && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
   # GNU wget to override BusyBox
@@ -230,7 +232,8 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN apk add --no-cache \
+RUN f1-ext-install pecl:apcu \
+  && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++
 
