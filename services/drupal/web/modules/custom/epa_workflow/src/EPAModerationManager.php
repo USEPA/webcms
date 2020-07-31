@@ -49,20 +49,22 @@ class EPAModerationManager {
    */
   public function processModeration(ContentModerationStateInterface $moderation_entity) {
     $state = $moderation_entity->moderation_state->value;
-    foreach ($this->moderations as $moderation) {
-      if ($state == $moderation->getModerationName()) {
-        $moderation->process($moderation_entity);
-        $moderation->save();
-        $moderation->logTransition();
-      }
+    if (!empty($this->moderations[$state])) {
+      $moderation = $this->moderations[$state];
     }
+    else {
+      $moderation = $this->moderations['base'];
+    }
+    $moderation->process($moderation_entity);
+    $moderation->save();
+    $moderation->logTransition();
   }
 
   /**
    * Adds a moderation.
    */
   public function addModeration(EPAModerationInterface $moderation) {
-    $this->moderations[] = $moderation;
+    $this->moderations[$moderation->getModerationName()] = $moderation;
   }
 
   /**
