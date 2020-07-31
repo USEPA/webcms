@@ -27,14 +27,14 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
+        type: search_api_tag
         options: {  }
       query:
         type: views_query
         options:
-          bypass_access: false
-          skip_access: false
-          preserve_facet_query_args: false
+          skip_access: 0
+          bypass_access: 0
+          preserve_facet_query_args: 1
       exposed_form:
         type: basic
         options:
@@ -255,7 +255,7 @@ display:
           empty: true
           tokenize: false
           content:
-            value: '<p>There are no results for your current search.</p>'
+            value: "<p>There are no results for your current search.</p>\r\n<p><a href=\"[view:url]\">Reset All Search Options</a></p>"
             format: filtered_html
           plugin_id: text
       relationships: {  }
