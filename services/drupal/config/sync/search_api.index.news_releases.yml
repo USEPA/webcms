@@ -7,6 +7,7 @@ dependencies:
     - field.storage.paragraph.field_body
     - field.storage.node.field_description
     - field.storage.node.field_geographic_locations
+    - field.storage.node.field_hublinks
     - field.storage.node.field_press_office
     - field.storage.node.field_release
     - field.storage.node.field_secondary_headline
@@ -15,21 +16,12 @@ dependencies:
   module:
     - paragraphs
     - node
-    - epa_web_areas
     - search_api
 id: news_releases
 name: 'News Releases'
 description: ''
 read_only: false
 field_settings:
-  epa_web_area_group:
-    label: 'Parent Group'
-    datasource_id: 'entity:node'
-    property_path: epa_web_area_group
-    type: integer
-    dependencies:
-      module:
-        - epa_web_areas
   field_body:
     label: 'Body » Paragraph » Body'
     datasource_id: 'entity:node'
@@ -58,6 +50,14 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_geographic_locations
+  field_hublinks:
+    label: 'Parent Group'
+    datasource_id: 'entity:node'
+    property_path: field_hublinks
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_hublinks
   field_press_office:
     label: 'Press Office'
     datasource_id: 'entity:node'

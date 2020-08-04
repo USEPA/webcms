@@ -3,23 +3,23 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.body
     - field.storage.node.field_comments_due_date
     - field.storage.node.field_computed_comments_due_date
     - field.storage.node.field_description
     - field.storage.node.field_geographic_locations
+    - field.storage.node.field_hublinks
     - field.storage.node.field_locations_of_prop_actions
     - field.storage.paragraph.field_location_proposed_other
+    - field.storage.paragraph.field_state_or_territory
     - field.storage.node.field_notice_sort_date
     - field.storage.node.field_programs_or_statutes
     - field.storage.node.field_type_of_proposed_action
-    - field.storage.paragraph.field_state_or_territory
+    - field.storage.node.body
     - search_api.server.localhost
   module:
-    - epa_web_areas
+    - node
     - paragraphs
     - taxonomy
-    - node
     - search_api
 id: public_notices
 name: 'Public Notices'
@@ -43,14 +43,6 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.body
-  epa_web_area_group:
-    label: 'Parent Group'
-    datasource_id: 'entity:node'
-    property_path: epa_web_area_group
-    type: integer
-    dependencies:
-      module:
-        - epa_web_areas
   field_comments_due_date:
     label: 'Comments Due Date'
     datasource_id: 'entity:node'
@@ -83,6 +75,14 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_geographic_locations
+  field_hublinks:
+    label: 'Parent Group'
+    datasource_id: 'entity:node'
+    property_path: field_hublinks
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_hublinks
   field_location_proposed_other:
     label: 'Locations of Proposed Actions » Paragraph » Other'
     datasource_id: 'entity:node'
