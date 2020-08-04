@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: QC20WcNriGbdK5QmDEDG8Hux0kOwWmVSUA4_4mpHKOo
+  default_config_hash: 3qcWMaIgGYvOU1mv7DkIcWERwcixIq7-2SimpYMiYfY
 id: upgrade_d7_node_revision_page
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -19,6 +19,9 @@ label: 'Node Revisions (Basic page)'
 source:
   plugin: epa_node_revision
   node_type: page
+  high_water_property:
+    name: vid
+    alias: nr
 process:
   nid:
     -

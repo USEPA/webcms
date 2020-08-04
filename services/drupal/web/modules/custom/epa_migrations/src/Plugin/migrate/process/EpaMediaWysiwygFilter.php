@@ -97,10 +97,15 @@ class EpaMediaWysiwygFilter extends ProcessPluginBase implements ContainerFactor
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
-    // Extract content in case this is an array with value and format keys.
-    $value['value'] ? $content = $value['value'] : $content = $value;
+    if (isset($value['value'])) {
+      $value['value'] = $this->transformWysiwyg($value['value'], $this->entityTypeManager);
+    }
+    else {
+      $value = $this->transformWysiwyg($value, $this->entityTypeManager);
+    }
 
-    return $this->transformWysiwyg($content, $this->entityTypeManager);
+    return $value;
+
   }
 
 }

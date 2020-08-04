@@ -29,7 +29,9 @@ trait EpaBoxWrapperTrait {
     $box_paragraph = Paragraph::create(['type' => 'box']);
 
     if ($title) {
-      $box_paragraph->set('field_title', $title);
+      // Add a space before any '<' character, then strip tags. This ensures
+      // titles that were split by <br /> don't run together.
+      $box_paragraph->set('field_title', strip_tags(str_replace('<', ' <', $title)));
     }
 
     if ($box_style) {

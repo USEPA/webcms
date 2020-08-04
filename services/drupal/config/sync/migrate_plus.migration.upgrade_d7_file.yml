@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: _81FmUk6aFx-pZFE49wDlYWxrbLZ_CeGVZTC0pKvcFY
+  default_config_hash: eH9ujHMrP74Es_ejwzPkT8ZRHhFUI2iV-iDTH3G76AI
 id: upgrade_d7_file
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -19,6 +19,8 @@ label: 'Public files'
 source:
   plugin: epa_d7_file
   scheme: public
+  high_water_property:
+    name: fid
   constants:
     source_base_path: 'https://www.epa.gov'
 process:

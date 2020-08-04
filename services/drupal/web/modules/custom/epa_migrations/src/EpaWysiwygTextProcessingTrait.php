@@ -20,7 +20,7 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view/s';
+    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view|"(.*?tabs.*?)"/s';
 
     $num_matches = preg_match($pattern, $wysiwyg_content);
 
@@ -39,6 +39,7 @@ trait EpaWysiwygTextProcessingTrait {
       $doc = $this->stripPageTopLinks($doc);
       $doc = $this->stripExitEpaLinks($doc);
       $doc = $this->stripPdfDisclaimers($doc);
+      $doc = $this->stripTabClasses($doc);
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -194,6 +195,61 @@ trait EpaWysiwygTextProcessingTrait {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($element);
         $element_to_remove->parentNode->removeChild($element_to_remove);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Strip Tab classes.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped tab classes.
+   */
+  private function stripTabClasses(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Tab elements.
+    $tabs_parent_element = $xpath->query('//div[@id="tabs"]');
+    if (count($tabs_parent_element) == 0) {
+      $tabs_parent_element = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ")]');
+    }
+
+    if (count($tabs_parent_element) > 0) {
+      foreach ($tabs_parent_element as $parent_element) {
+        if ($parent_element->tagName == 'div') {
+          $parent_element->removeAttribute('id');
+          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
+          foreach ($uls as $ul) {
+            $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
+            if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
+              $ul->removeAttribute('id');
+            }
+          }
+        }
+        else {
+          $parent_element->setAttribute('class', str_replace('tabs', '', $parent_element->attributes->getNamedItem('class')->value));
+          if ($parent_element->attributes->getNamedItem('id')->value == 'tabsnav') {
+            $parent_element->removeAttribute('id');
+          }
+        }
+
+        $lis = $xpath->query('//li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
+        foreach ($lis as $li) {
+          $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
+        }
+
+        $links = $xpath->query('//a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
+        foreach ($links as $link) {
+          $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
+        }
+
       }
     }
 

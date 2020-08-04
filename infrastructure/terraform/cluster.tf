@@ -34,6 +34,8 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
       status          = "ENABLED"
       target_capacity = 100
     }
+
+    # managed_termination_protection = "ENABLED"
   }
 
   tags = merge(local.common-tags, {
@@ -256,14 +258,19 @@ resource "aws_appautoscaling_target" "drupal" {
   service_namespace  = "ecs"
 }
 
-# This creates the autoscaling rules around the Drupal service in ECS. Note that this does
-# not use metrics from the underlying EC2s; instead, it uses the actual utilization of the
-# containers in the Drupal service.
-# The target_value here is CPU utilization: if all of the Drupal containers average above
-# 40% utilization, ECS will increase the replica count of the Drupal service. If there
-# are not enough EC2 servers to meet the demand, only then will additional EC2 servers be
-# added to the cluster - this is where our ECS services and EC2 autoscaling groups
-# interact.
+# Read out the ARNs for the load balancer and Drupal target group (used below)
+data "aws_arn" "alb" {
+  arn = aws_lb.frontend.arn
+}
+
+data "aws_arn" "target_group" {
+  arn = aws_lb_target_group.drupal_target_group.arn
+}
+
+# Define an autoscaling rule. We scale when the load balancer reports an average of more
+# than 50 requests/target, indicating a high volume of traffic spread across too few
+# containers. If the metric goes above this threshold, ECS will add replicas of the
+# Drupal task.
 resource "aws_appautoscaling_policy" "drupal_autoscaling" {
   count = length(aws_appautoscaling_target.drupal)
 
@@ -279,15 +286,16 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling" {
 
   # Autoscaling rules: What is the condition that triggers scaling of the above target?
   target_tracking_scaling_policy_configuration {
-    target_value = 40
+    target_value = 50
 
-    # Wait 1 minute between scaling events
-    scale_in_cooldown  = 60
+    # Wait 5 minutes before scaling in, but only 1 for scaling out.
+    scale_in_cooldown  = 5 * 60
     scale_out_cooldown = 60
 
     # Which metrics are we monitoring
     predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+      predefined_metric_type = "ALBRequestCountPerTarget"
+      resource_label         = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
     }
   }
 }

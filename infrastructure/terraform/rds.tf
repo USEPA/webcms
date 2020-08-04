@@ -29,7 +29,7 @@ resource "aws_rds_cluster_parameter_group" "params" {
 
   # Bump the max allowed packet to 64MB (default is 1-4MB, depending on server version).
   parameter {
-    name = "max_allowed_packet"
+    name  = "max_allowed_packet"
     value = 64 * (1024 * 1024)
   }
 
@@ -56,6 +56,15 @@ resource "aws_rds_cluster" "db" {
   skip_final_snapshot = true
 
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.params.id
+
+  # Export most of the DB logs - the only thing we're not exporting is audit logs, which
+  # we assume are less of an issue given that the cluster is accessible only from within
+  # the VPC.
+  enabled_cloudwatch_logs_exports = [
+    "error",
+    "general",
+    "slowquery"
+  ]
 
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]

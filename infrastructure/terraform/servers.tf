@@ -42,9 +42,6 @@ data "template_cloudinit_config" "servers" {
     #!/bin/bash
     set -euo pipefail
 
-    # Run custom bootstrap script (if present)
-    ${var.server-extra-bootstrap}
-
     # Join the cluster (see comments above)
     cat <<EOF >> /etc/ecs/ecs.config
     ECS_CLUSTER=${local.cluster-name}
@@ -52,6 +49,10 @@ data "template_cloudinit_config" "servers" {
     ECS_RESERVED_MEMORY=128
     ECS_ENABLE_SPOT_INSTANCE_DRAINING=true
     EOF
+
+    # Run custom bootstrap script (if present)
+    ${var.server-extra-bootstrap}
+
     USERDATA
   }
 }
@@ -113,6 +114,8 @@ resource "aws_autoscaling_group" "servers" {
   # Only launch into the private VPC subnet - this will require that all traffic goes
   # through the ALB.
   vpc_zone_identifier = aws_subnet.private.*.id
+
+  # protect_from_scale_in = true
 
   # Collect ASG metrics
   metrics_granularity = "1Minute"

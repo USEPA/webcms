@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "drush_task" {
       image = "${aws_ecr_repository.drush.repository_url}:${var.image-tag-drush}"
 
       cpu    = 1024
-      memory = 1024
+      memory = 2048
 
       # By explicitly emptying these values, we allow task overrides to effectively
       # take precedence over what is specified in the container. This enables us
