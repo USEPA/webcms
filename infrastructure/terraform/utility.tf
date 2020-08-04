@@ -8,6 +8,18 @@ data "template_cloudinit_config" "utility" {
   gzip          = true
 
   part {
+    content_type = "text/x-shellscript"
+    content      = <<-USERDATA
+    #!/bin/bash
+    set -euo pipefail
+
+    # Run custom bootstrap script (if present)
+    ${var.server-extra-bootstrap}
+
+    USERDATA
+  }
+
+  part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
     content      = <<-EOF
