@@ -13,12 +13,14 @@ import Drupal from 'drupal';
         const alertHash = alert.dataset.alert;
         const closeButton = alert.querySelector('.js-sitewide-alert__close');
 
-        // Hide previously closed alerts if not too old.
+        // Show all but recently closed alerts.
         if (
-          closedHashes[alertHash] !== null &&
-          now - cacheLimitDays * 1000 * 60 * 60 * 24 < closedHashes[alertHash]
+          !(
+            closedHashes[alertHash] !== null &&
+            now - cacheLimitDays * 1000 * 60 * 60 * 24 < closedHashes[alertHash]
+          )
         ) {
-          alert.classList.add('u-hidden');
+          alert.classList.remove('u-hidden');
         }
 
         closeButton.addEventListener('click', event => {
