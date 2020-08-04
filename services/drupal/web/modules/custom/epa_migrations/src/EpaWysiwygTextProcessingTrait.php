@@ -20,13 +20,13 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view/s';
+    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view|"(.*?tabs.*?)"/s';
 
     $num_matches = preg_match($pattern, $wysiwyg_content);
 
     if ($num_matches > 0) {
       // Add a temp wrapper around the wysiwyg content.
-      $wysiwyg_content = '<?xml encoding="UTF-8"><tempWrapper>' . $wysiwyg_content . '</tempWrapper>';
+      $wysiwyg_content = '<?xml encoding="UTF-8"><tempwrapper>' . $wysiwyg_content . '</tempwrapper>';
 
       // Load the content as a DOMDocument for more powerful transformation.
       $doc = new \DomDocument();
@@ -39,6 +39,7 @@ trait EpaWysiwygTextProcessingTrait {
       $doc = $this->stripPageTopLinks($doc);
       $doc = $this->stripExitEpaLinks($doc);
       $doc = $this->stripPdfDisclaimers($doc);
+      $doc = $this->stripTabClasses($doc);
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -46,8 +47,8 @@ trait EpaWysiwygTextProcessingTrait {
       // Remove the temp wrapper and encoding from the output.
       return str_replace([
         '<?xml encoding="UTF-8">',
-        '<tempWrapper>',
-        '</tempWrapper>',
+        '<tempwrapper>',
+        '</tempwrapper>',
       ], '', $wysiwyg_content);
     }
 
@@ -137,7 +138,9 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($page_top_links) {
       foreach ($page_top_links as $link) {
-        $link->parentNode->removeChild($link);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($link);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
@@ -162,7 +165,9 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($exit_epa_links) {
       foreach ($exit_epa_links as $link) {
-        $link->parentNode->removeChild($link);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($link);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
@@ -187,11 +192,138 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($pdf_disclaimer_elements) {
       foreach ($pdf_disclaimer_elements as $element) {
-        $element->parentNode->removeChild($element);
+        // Delete the element and any parent elements that are now empty.
+        $element_to_remove = $this->determineElementToRemove($element);
+        $element_to_remove->parentNode->removeChild($element_to_remove);
       }
     }
 
     return $doc;
+
+  }
+
+  /**
+   * Strip Tab classes.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped tab classes.
+   */
+  private function stripTabClasses(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Tab elements.
+    $tabs_parent_element = $xpath->query('//div[@id="tabs"]');
+    if (count($tabs_parent_element) == 0) {
+      $tabs_parent_element = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ")]');
+    }
+
+    if (count($tabs_parent_element) > 0) {
+      foreach ($tabs_parent_element as $parent_element) {
+        if ($parent_element->tagName == 'div') {
+          $parent_element->removeAttribute('id');
+          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
+          foreach ($uls as $ul) {
+            $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
+            if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
+              $ul->removeAttribute('id');
+            }
+          }
+        }
+        else {
+          $parent_element->setAttribute('class', str_replace('tabs', '', $parent_element->attributes->getNamedItem('class')->value));
+          if ($parent_element->attributes->getNamedItem('id')->value == 'tabsnav') {
+            $parent_element->removeAttribute('id');
+          }
+        }
+
+        $lis = $xpath->query('//li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
+        foreach ($lis as $li) {
+          $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
+        }
+
+        $links = $xpath->query('//a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
+        foreach ($links as $link) {
+          $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
+        }
+
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Remove an element's white-space only child nodes.
+   *
+   * @param \DOMElement|\DOMDocument $element
+   *   The element to have its child elements cleaned.
+   *
+   * @return \DOMElement
+   *   The element with cleaned children.
+   */
+  private function removeEmptyTextNodes($element) {
+    $num_children = count($element->childNodes);
+    if ($num_children > 1) {
+      $empty_text_nodes = [];
+      foreach ($element->childNodes as $node) {
+        if ($node->nodeType == 3 && trim($node->nodeValue) == '') {
+          $empty_text_nodes[] = $node;
+        }
+      }
+
+      if ($empty_text_nodes) {
+        foreach ($empty_text_nodes as $node) {
+          $node->parentNode->removeChild($node);
+        }
+      }
+    }
+    return $element;
+  }
+
+  /**
+   * Traverse ancestor tree of an element to determine if it is an only child.
+   *
+   * @param \DOMElement|\DOMDocument $element
+   *   The element to have its ancestors checked.
+   *
+   * @return \DOMElement
+   *   The top-most ancestor that has no children other than the element.
+   */
+  private function determineElementToRemove($element) {
+
+    // Initially the element to remove is the original one.
+    $element_to_remove = $element;
+
+    // Find any ancestor elements that only contain this element.
+    // Start by seeing if the immediate parent has any other children.
+    $cleaned_parent = $this->removeEmptyTextNodes($element->parentNode);
+    if (count($cleaned_parent->childNodes) == 1 && $cleaned_parent->childNodes[0]->isSameNode($element)) {
+      $only_child = TRUE;
+      $element_to_remove = $cleaned_parent;
+    }
+    else {
+      $only_child = FALSE;
+    }
+
+    // If the original element is an only child, traverse the ancestors.
+    while ($only_child && $element->name !== 'tempwrapper') {
+      $cleaned_parent = $this->removeEmptyTextNodes($element_to_remove->parentNode);
+
+      if (count($cleaned_parent->childNodes) == 1 && $cleaned_parent->childNodes[0]->isSameNode($element_to_remove)) {
+        $only_child = TRUE;
+        $element_to_remove = $element_to_remove->parentNode;
+      }
+      else {
+        $only_child = FALSE;
+      }
+    }
+
+    return $element_to_remove;
   }
 
 }

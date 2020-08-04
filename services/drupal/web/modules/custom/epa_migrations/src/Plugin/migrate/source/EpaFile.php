@@ -15,21 +15,6 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
 class EpaFile extends File {
 
   /**
-   * {@inheritDoc}
-   */
-  public function query() {
-    // Get the parent query.
-    $query = parent::query();
-
-    $query->condition('f.type', 'video', '!=');
-
-    $query->innerJoin('file_usage', 'fu', 'f.fid = fu.fid');
-    $query->distinct();
-
-    return $query;
-  }
-
-  /**
    * {@inheritdoc}
    */
   protected function initializeIterator() {

@@ -1,0 +1,16 @@
+{% set expanded -%}
+  {%- if is_expanded -%}
+    aria-expanded="true"
+  {%- else -%}
+    aria-expanded="false"
+  {%- endif -%}
+{%- endset %}
+
+<h2 class="usa-accordion__heading">
+  <button class="usa-accordion__button" {{ expanded }} aria-controls="{{ accordion_id }}-{{ content_id }}">
+    {{ title }}
+  </button>
+</h2>
+<div id="{{ accordion_id }}-{{ content_id }}" class="usa-accordion__content">
+  {{ content }}
+</div>

@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: tNhTxtJHfgWITVmMT9mHOBuyF3aNeo7D39IuGE1DvTk
+  default_config_hash: 98xV8qTWamEG2lme885YqKQPp6Nph2p1XHpk3t4Cmx8
 id: upgrade_d7_node_revision_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -16,6 +16,8 @@ label: 'Node Revisions (News Release)'
 source:
   plugin: epa_node_revision
   node_type: news_release
+  high_water_property:
+    name: vid
 process:
   nid:
     -
@@ -213,7 +215,14 @@ process:
       plugin: sub_process
       source: field_type
       process:
-        target_id: tid
+        target_id:
+          -
+            plugin: default_value
+            default_value: 'News Release'
+          -
+            plugin: entity_lookup
+            entity_type: taxonomy_term
+            value_key: name
   field_metatag:
     -
       plugin: d7_metatag_entities

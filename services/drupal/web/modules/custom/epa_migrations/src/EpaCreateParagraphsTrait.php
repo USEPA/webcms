@@ -58,8 +58,18 @@ trait EpaCreateParagraphsTrait {
       case "uri":
         foreach ($links as $item) {
           is_array($item) ?: $item = (array) $item;
+
+          if (strpos($item['link'], 'http') !== 0 && strpos($item['link'], '/') !== 0) {
+            // Assume this is an internal relative link without a scheme.
+            $item['link'] = 'internal:/' . $item['link'];
+          }
+          elseif (strpos($item['link'], '/') == 0) {
+            // Assume this is an internal relative link without a scheme.
+            $item['link'] = 'internal:' . $item['link'];
+          }
+
           $list_links[] = [
-            'uri' => preg_replace('@^/?node/(.*)@', 'entity:node/$1', $item['link']),
+            'uri' => $item['link'],
             'title' => $item['title'],
             'options' => [],
           ];

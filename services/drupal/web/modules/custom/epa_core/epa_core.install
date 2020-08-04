@@ -1,0 +1,28 @@
+<?php
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_install.
+ */
+function epa_core_install() {
+  _epa_core_create_news_release_type_term();
+}
+
+/**
+ * Create News Release type term.
+ */
+function epa_core_update_8001() {
+  _epa_core_create_news_release_type_term();
+}
+
+/**
+ * Create the new News Release term with 730 day review cycle.
+ */
+function _epa_core_create_news_release_type_term() {
+  $term = Term::create([
+    'name' => 'News Release',
+    'vid' => 'type',
+  ]);
+  $term->field_term_days_til_review = 730;
+  $term->save();
+}

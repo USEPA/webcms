@@ -42,7 +42,9 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
   // A list of view names in which to exclude the container markup.
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.
   $exclude_views = [
-    // 'example_view_machine_name',
+    'search_faqs',
+    'search_news_releases',
+    'search_public_notices',
   ];
   if (isset($variables['element']['#name'])) {
     if (in_array($variables['element']['#name'], $exclude_views)) {

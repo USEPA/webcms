@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: t_zXM1Vnj0sgFuEOaR5zZ84so0jlayw-buiBxPgFKxw
+  default_config_hash: pTUYTWvQv8Y6mbEf2IazU0iPe-4woITrV25cFk-IL7M
 id: upgrade_d7_node_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -16,6 +16,8 @@ label: 'Nodes (Public Notice)'
 source:
   plugin: epa_node
   node_type: public_notice
+  high_water_property:
+    name: tnid
 process:
   nid:
     -
@@ -302,7 +304,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date

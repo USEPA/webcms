@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 98GcWosoJAxGHDaKmoIxqG9lEZLMH_xEYvm31DeVhoc
+  default_config_hash: 3XF5IIpueemRPsUTCKvQc3mpkQLJcAmap98HOEFS6nw
 id: upgrade_d7_user
 class: Drupal\user\Plugin\migrate\User
 field_plugin_method: null
@@ -18,6 +18,8 @@ migration_group: migrate_drupal_7
 label: 'User accounts'
 source:
   plugin: epa_user
+  high_water_property:
+    name: uid
 process:
   uid:
     -
@@ -74,6 +76,18 @@ process:
     -
       plugin: get
       source: init
+  roles:
+    -
+      plugin: static_map
+      source: roles
+      map:
+        5: administrator
+        1: anonymous
+        2: authenticated
+        9: system_webmaster
+        13: system_editor
+        11: system_webmaster
+      default_value: authenticated
 destination:
   plugin: epa_user_group_membership
 migration_dependencies:

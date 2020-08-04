@@ -114,6 +114,28 @@ resource "aws_autoscaling_group" "servers" {
   # through the ALB.
   vpc_zone_identifier = aws_subnet.private.*.id
 
+  # protect_from_scale_in = true
+
+  # Collect ASG metrics
+  metrics_granularity = "1Minute"
+  enabled_metrics = [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+
+    # Don't collect these metrics: we're not using instance weighting, so the capacity
+    # unit metric has no relevance.
+    # GroupInServiceCapacity
+    # GroupPendingCapacity
+    # GroupTotalInstances
+    # GroupStandbyCapacity
+    # GroupTotalCapacity
+    # GroupTerminatingCapacity
+  ]
+
   mixed_instances_policy {
     instances_distribution {
       # We require at least one on-demand server at all times and request that 10% of the

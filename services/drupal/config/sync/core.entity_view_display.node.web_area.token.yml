@@ -25,9 +25,11 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - entitygroupfield
     - layout_builder
     - options
     - scheduled_publish
+    - text
     - user
 third_party_settings:
   layout_builder:
@@ -38,9 +40,16 @@ targetEntityType: node
 bundle: web_area
 mode: token
 content:
+  field_aside_block:
+    type: text_default
+    weight: 17
+    region: content
+    label: above
+    settings: {  }
+    third_party_settings: {  }
   field_banner:
     type: entity_reference_revisions_entity_view
-    weight: 12
+    weight: 11
     region: content
     label: above
     settings:
@@ -48,7 +57,7 @@ content:
       link: ''
     third_party_settings: {  }
   field_channel:
-    weight: 4
+    weight: 3
     label: above
     settings:
       link: true
@@ -56,14 +65,14 @@ content:
     type: entity_reference_label
     region: content
   field_description:
-    weight: 9
+    weight: 8
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 5
+    weight: 4
     label: above
     settings:
       link: true
@@ -72,7 +81,7 @@ content:
     region: content
   field_expiration_date:
     type: datetime_default
-    weight: 15
+    weight: 14
     region: content
     label: above
     settings:
@@ -80,7 +89,7 @@ content:
       timezone_override: ''
     third_party_settings: {  }
   field_geographic_locations:
-    weight: 6
+    weight: 5
     label: above
     settings:
       link: true
@@ -88,7 +97,7 @@ content:
     type: entity_reference_label
     region: content
   field_keywords:
-    weight: 7
+    weight: 6
     label: above
     settings:
       link: true
@@ -96,7 +105,7 @@ content:
     type: entity_reference_label
     region: content
   field_language:
-    weight: 8
+    weight: 7
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -104,7 +113,7 @@ content:
     region: content
   field_last_published:
     type: datetime_default
-    weight: 16
+    weight: 15
     region: content
     label: above
     settings:
@@ -112,7 +121,7 @@ content:
       format_type: medium
     third_party_settings: {  }
   field_page_head:
-    weight: 10
+    weight: 9
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -120,7 +129,7 @@ content:
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 11
+    weight: 10
     label: above
     settings:
       view_mode: default
@@ -129,7 +138,7 @@ content:
     region: content
   field_publish_date:
     type: datetime_default
-    weight: 13
+    weight: 12
     region: content
     label: above
     settings:
@@ -137,7 +146,7 @@ content:
       timezone_override: ''
     third_party_settings: {  }
   field_review_deadline:
-    weight: 2
+    weight: 1
     label: above
     settings:
       format_type: medium
@@ -147,7 +156,7 @@ content:
     region: content
   field_scheduled_transition:
     type: scheduled_publish_generic_formatter
-    weight: 14
+    weight: 13
     region: content
     label: above
     settings:
@@ -155,22 +164,37 @@ content:
       text_pattern: '%moderation_state% - %date%'
     third_party_settings: {  }
   field_type:
-    weight: 3
+    weight: 2
     label: above
     settings:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
     region: content
+  group_content:
+    type: parent_group_entity_formatter
+    weight: 18
+    region: content
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+  langcode:
+    type: language
+    weight: 16
+    region: content
+    label: above
+    settings:
+      link_to_entity: false
+      native_language: false
+    third_party_settings: {  }
   links:
-    weight: 1
+    weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   content_moderation_control: true
-  field_aside_block: true
-  group_content: true
-  langcode: true
   layout_builder__layout: true
   search_api_excerpt: true

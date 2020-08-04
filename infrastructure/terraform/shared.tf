@@ -32,8 +32,8 @@ locals {
     { name = "WEBCMS_MAIL_HOST", value = var.email-host },
 
     # Injected host names
-    { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443/" },
-    { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_replication_group.cache.configuration_endpoint_address },
+    { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443" },
+    { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_cluster.cache.configuration_endpoint },
   ]
 
   # Secrets Manager bindings for Drupal containers

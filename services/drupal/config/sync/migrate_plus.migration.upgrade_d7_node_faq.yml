@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: JSHsSX-AAcll6h11oA3NFbis0MAbNzbX-zWVDrCaEl0
+  default_config_hash: heUNKZffZ3rPNTpT_r4uObJyRqI6Yq_nNutOnj0eZVM
 id: upgrade_d7_node_faq
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -16,6 +16,8 @@ label: 'Nodes (Frequent Question)'
 source:
   plugin: epa_node
   node_type: faq
+  high_water_property:
+    name: tnid
 process:
   nid:
     -
@@ -167,7 +169,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date

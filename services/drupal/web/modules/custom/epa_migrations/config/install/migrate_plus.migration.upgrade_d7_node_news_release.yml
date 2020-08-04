@@ -14,6 +14,8 @@ label: 'Nodes (News Release)'
 source:
   plugin: epa_node
   node_type: news_release
+  high_water_property:
+    name: tnid
 process:
   nid:
     -
@@ -183,7 +185,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date
@@ -211,7 +213,14 @@ process:
       plugin: sub_process
       source: field_type
       process:
-        target_id: tid
+        target_id:
+          -
+            plugin: default_value
+            default_value: 'News Release'
+          -
+            plugin: entity_lookup
+            entity_type: taxonomy_term
+            value_key: name
   field_metatag:
     -
       plugin: d7_metatag_entities

@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 12i6tINjCFzCfJt9cQM54B2csJp5rJhm6bJ_pZA9BG8
+  default_config_hash: EzIbic4XhZ9BrOLXLxQvgQ557mEiLbqejp_5UhV9zq4
 id: upgrade_d7_node_page_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -19,6 +19,8 @@ label: 'Panelizer Nodes (Basic page)'
 source:
   plugin: epa_panelizer_node
   node_type: page
+  high_water_property:
+    name: tnid
 process:
   nid:
     -
@@ -171,7 +173,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date

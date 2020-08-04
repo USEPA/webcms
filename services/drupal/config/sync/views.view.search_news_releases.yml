@@ -38,7 +38,7 @@ display:
       exposed_form:
         type: basic
         options:
-          submit_button: Apply
+          submit_button: Search
           reset_button: false
           reset_button_label: Reset
           exposed_sorts_label: 'Sort by'
@@ -68,12 +68,16 @@ display:
           quantity: 9
       style:
         type: default
+        options:
+          row_class: ''
+          default_row_class: false
+          uses_fields: false
       row:
         type: search_api
         options:
           view_modes:
             'entity:node':
-              faq: teaser
+              news_release: teaser
       fields: {  }
       filters:
         type:
@@ -249,7 +253,7 @@ display:
           group_type: group
           admin_label: ''
           empty: false
-          content: '<p>Displaying @start - @end of @total</p>'
+          content: 'Displaying @start - @end of @total results'
           plugin_id: result
       footer: {  }
       empty:
@@ -293,7 +297,8 @@ display:
       path: newsreleases/search
       exposed_block: true
       cache:
-        type: none
+        type: search_api_tag
+        options: {  }
       defaults:
         cache: false
     cache_metadata:

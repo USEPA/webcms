@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: IvLx34dxeL5F3x0JGeytRJoZGeFWtcHnMfT67G8rqEE
+  default_config_hash: hvZz2j_KtnkTk9ervrHGn1tA9JSDeuJPB2wWwRPFFEM
 id: upgrade_d7_node_document
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -16,6 +16,8 @@ label: 'Nodes (Document)'
 source:
   plugin: epa_node
   node_type: document
+  high_water_property:
+    name: tnid
 process:
   nid:
     -
@@ -185,7 +187,7 @@ process:
   field_review_deadline:
     -
       plugin: sub_process
-      source: field_review_deadline
+      source: field_modified_review_deadline
       process:
         value:
           plugin: format_date
