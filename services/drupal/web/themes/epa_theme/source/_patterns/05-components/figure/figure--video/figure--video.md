@@ -1,6 +1,6 @@
 ---
-el: .figure
-title: Figure with Video
+el: .figure--video
+title: Video Figure
 state: complete
 ---
 
