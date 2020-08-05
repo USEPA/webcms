@@ -43,3 +43,4 @@ RUN set -ex \
 COPY config.php authsources.php /var/simplesamlphp/config/
 COPY saml-private.pem saml-public.crt /var/simplesamlphp/cert/
 COPY metadata.php /var/simplesamlphp/metadata/saml20-idp-hosted.php
+COPY saml20-sp-remote.php /var/simplesamlphp/metadata/saml20-sp-remote.php

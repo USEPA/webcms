@@ -51,6 +51,7 @@ services:
     ports:
       - 8080:80
       - 8443:443
+      - 5000:5000
     volumes:
       - ./services/drupal:/var/www/html:cached
       - type: volume
@@ -123,14 +124,10 @@ services:
     image: memcached:alpine
 
   simplesaml:
+    depends_on:
+      - drupal
+    network_mode: service:drupal
     build: ./services/simplesaml
-    environment:
-      CONFIG_BASEURLPATH: http://localhost:4040/simplesaml/
-      CONFIG_ENABLESAML20IDP: 'true'
-      MTA_NULLCLIENT: 'true'
-      DOCKER_REDIRECTLOGS: 'true'
-    ports:
-      - 5000:80
     tty: true
 
   # Elasticsearch 7.4
