@@ -90,9 +90,9 @@ class EpaScheduledTransition extends ProcessPluginBase implements ContainerFacto
 
       $moderation_state_map = [
         'alert_stakeholders' => 'published_expiring',
-        'scheduled_publish' => 'scheduled_publish_cron',
+        'scheduled_publish' => 'published',
         'scheduled_queue_for_review' => 'published_needs_review',
-        'scheduled_unpublish' => 'published_day_til_expire',
+        'scheduled_unpublish' => 'unpublished',
         'unpublish' => 'unpublished',
       ];
 
