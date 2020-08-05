@@ -3,4 +3,11 @@
 
 .figure--medium {
   max-width: rem(640px);
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    &.u-align-left,
+    &.u-align-right {
+      max-width: calc(60% - #{rem(gesso-get-map(gutter-width))});
+    }
+  }
 }
