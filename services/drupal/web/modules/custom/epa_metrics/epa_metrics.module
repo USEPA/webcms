@@ -1,0 +1,58 @@
+<?php
+
+use Drupal\epa_metrics\ViewTimer;
+use Drupal\views\Plugin\views\cache\CachePluginBase;
+use Drupal\views\ViewExecutable;
+
+/**
+ * Implements hook_views_pre_view().
+ */
+function epa_metrics_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
+  ViewTimer::start($view);
+}
+
+/**
+ * Implements hook_views_pre_build().
+ */
+function epa_metrics_views_pre_build(ViewExecutable $view) {
+  ViewTimer::startBuild($view);
+}
+
+/**
+ * Implements hook_views_post_build().
+ */
+function epa_metrics_views_post_build(ViewExecutable $view) {
+  ViewTimer::stopBuild($view);
+}
+
+/**
+ * Implements hook_views_pre_execute().
+ */
+function epa_metrics_views_pre_execute(ViewExecutable $view) {
+  ViewTimer::startExecute($view);
+}
+
+/**
+ * Implements hook_views_post_execute().
+ */
+function epa_metrics_views_post_execute(ViewExecutable $view) {
+  ViewTimer::stopExecute($view);
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function epa_metrics_views_pre_render(ViewExecutable $view) {
+  ViewTimer::startRender($view);
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function epa_metrics_views_post_render(ViewExecutable $view, &$output, CachePluginBase $cache) {
+  ViewTimer::stopRender($view);
+
+  // There isn't really a counterpart to hook_views_pre_view() for the end of a view,
+  // so we use hook_views_post_render as a good enough estimate.
+  ViewTimer::stop($view);
+}
