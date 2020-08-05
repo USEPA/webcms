@@ -34,6 +34,13 @@ locals {
     # Injected host names
     { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443" },
     { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_cluster.cache.configuration_endpoint },
+
+    # SAML
+    { name = "WEBCMS_SAML_SP_CERT", value = var.saml-sp-cert },
+    { name = "WEBCMS_SAML_IDP_ID", value = var.saml-idp-id },
+    { name = "WEBCMS_SAML_IDP_SSO_URL", value = var.saml-idp-sso-url },
+    { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml-idp-slo-url },
+    { name = "WEBCMS_SAML_IDP_CERT", value = var.saml-idp-cert },
   ]
 
   # Secrets Manager bindings for Drupal containers
@@ -42,6 +49,7 @@ locals {
     { name = "WEBCMS_DB_PASS_D7", valueFrom = aws_secretsmanager_secret.db_app_d7_password.arn },
     { name = "WEBCMS_HASH_SALT", valueFrom = aws_secretsmanager_secret.hash_salt.arn },
     { name = "WEBCMS_MAIL_PASS", valueFrom = aws_secretsmanager_secret.mail_pass.arn },
+    { name = "WEBCMS_SAML_SP_KEY", valueFrom = aws_secretsmanager_secret.saml_sp_key.arn },
   ]
 
   # Security groups used by Drupal containers
