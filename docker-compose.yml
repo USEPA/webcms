@@ -70,6 +70,7 @@ services:
   # tool like Sequel Pro or MySQL Workbench.
   mysql:
     image: mysql:5.7
+    command: --max_allowed_packet=64M
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
     ports:

@@ -414,6 +414,13 @@ resource "aws_iam_role_policy_attachment" "utility_ssm_session" {
   policy_arn = aws_iam_policy.ssm_session_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "utility_extra_polices" {
+  for_each = toset(var.server-extra-policies)
+
+  role       = aws_iam_role.utility_role.name
+  policy_arn = each.value
+}
+
 resource "aws_iam_instance_profile" "utility_profile" {
   name = "${local.role-prefix}UtilityInstanceProfile"
   role = aws_iam_role.utility_role.name
