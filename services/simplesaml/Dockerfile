@@ -36,7 +36,8 @@ RUN set -ex \
 COPY simplesaml.conf /etc/apache2/sites-available/simplesaml.conf
 RUN set -ex \
   && a2dissite 000-default \
-  && a2ensite simplesaml
+  && a2ensite simplesaml \
+  && sed -ie 's/Listen 80/Listen 5000/' /etc/apache2/ports.conf
 
 # Copy the SimpleSAMLphp files
 
