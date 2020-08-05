@@ -273,6 +273,29 @@ resource "aws_iam_role_policy_attachment" "drupal_uploads_access" {
   policy_arn = aws_iam_policy.uploads_access.arn
 }
 
+data "aws_iam_policy_document" "put_metrics" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "allowPublishingMetrics"
+    effect    = "Allow"
+    actions   = ["cloudwatch:PutMetricData"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "put_metrics" {
+  name        = "${local.role-prefix}MetricsPublish"
+  description = "Permits publishing CloudWatch metrics"
+
+  policy = data.aws_iam_policy_document.put_metrics.json
+}
+
+resource "aws_iam_role_policy_attachment" "drupal_put_metrics" {
+  role       = aws_iam_role.drupal_container_role.name
+  policy_arn = aws_iam_policy.put_metrics.arn
+}
+
 # This is a policy for read/write access to the cluster's data, but not for
 # cluster management.
 data "aws_iam_policy_document" "es_access" {
