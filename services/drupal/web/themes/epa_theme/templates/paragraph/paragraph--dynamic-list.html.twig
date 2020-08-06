@@ -1,0 +1,32 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{# Display as a list unless any non-link view modes are output. #}
+{% set use_list = true %}
+{% for key, item in content.field_dynamic_list %}
+  {% if item['#view_mode'] and item['#view_mode'] != 'link' %}
+    {% set use_list = false %}
+  {% endif %}
+{% endfor %}
+
+{% if use_list %}
+  <ul>
+    {% for key, item in content.field_dynamic_list %}
+      {% if item['#view_mode'] %}
+        <li>{{ item|render }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% else %}
+  {% for key, item in content.field_dynamic_list %}
+    {% if item['#view_mode'] == 'link' %}
+      <p>{{ item|render }}</p>
+    {% elseif item['#view_mode'] == 'teaser' %}
+      {{ item|render }}
+    {% endif %}
+  {% endfor %}
+{% endif %}
