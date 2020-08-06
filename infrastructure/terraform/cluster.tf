@@ -191,6 +191,15 @@ resource "aws_ecs_task_definition" "drupal_task" {
           }),
         },
       ],
+
+      logConfiguration = {
+        logDriver = "awslogs",
+
+        options = {
+          awslogs-group = aws_cloudwatch_log_group.agent.name,
+          awslogs-region = var.aws-region,
+        },
+      },
     }
   ])
 

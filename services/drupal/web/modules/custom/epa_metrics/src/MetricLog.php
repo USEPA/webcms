@@ -43,7 +43,7 @@ class MetricLog {
 
     $this->packet = [
       '_aws' => [
-        'LogGroupName' => '/app/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
+        'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
         'Timestamp' => $timestamp ?? time(),
         'CloudWatchMetrics' => [],
       ],

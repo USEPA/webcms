@@ -288,7 +288,7 @@ data "aws_iam_policy_document" "metrics_logs" {
     sid       = "logPublishing"
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["${aws_cloudwatch_log_group.metrics.arn}:log-group:*"]
+    resources = ["${aws_cloudwatch_log_group.metrics.arn}:log-stream:*"]
   }
 }
 
