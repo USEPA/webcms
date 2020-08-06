@@ -31,6 +31,16 @@ class KernelEventSubscriber implements EventSubscriberInterface {
     $memory = memory_get_peak_usage();
     $this->service->gauge('Drupal.PeakMemory', $memory);
 
+    // Record some GC statistics: these can be used to determine if we're potentially
+    // seeing memory pressure.
+    $stats = gc_status();
+
+    // Number of times the garbage collector ran
+    $this->service->gauge('Drupal.GCRuns', $stats['runs']);
+
+    // Amount of memory (in bytes) reclaimed by the GC
+    $this->service->gauge('Drupal.GCCollected', $stats['collected']);
+
     $this->service->flush();
   }
 
