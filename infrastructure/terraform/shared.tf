@@ -36,6 +36,7 @@ locals {
     { name = "WEBCMS_CACHE_HOST", value = aws_elasticache_cluster.cache.configuration_endpoint },
 
     # SAML
+    { name = "WEBCMS_SAML_SP_ENTITY_ID", value = var.saml-sp-entity-id },
     { name = "WEBCMS_SAML_SP_CERT", value = var.saml-sp-cert },
     { name = "WEBCMS_SAML_IDP_ID", value = var.saml-idp-id },
     { name = "WEBCMS_SAML_IDP_SSO_URL", value = var.saml-idp-sso-url },
