@@ -59,3 +59,12 @@ resource "aws_secretsmanager_secret" "mail_pass" {
     Name = "${local.name-prefix} Secret: Email Password"
   })
 }
+
+resource "aws_secretsmanager_secret" "saml_sp_key" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/drupal/saml_sp_key"
+  description = "Private key for Drupal's SAML SP."
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: SAML SP private key"
+  })
+}

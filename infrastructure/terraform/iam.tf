@@ -325,6 +325,7 @@ data "aws_iam_policy_document" "task_secrets_access" {
       aws_secretsmanager_secret.db_app_d7_password.arn,
       aws_secretsmanager_secret.hash_salt.arn,
       aws_secretsmanager_secret.mail_pass.arn,
+      aws_secretsmanager_secret.saml_sp_key.arn,
     ]
   }
 }
