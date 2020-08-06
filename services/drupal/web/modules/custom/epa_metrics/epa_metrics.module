@@ -56,3 +56,33 @@ function epa_metrics_views_post_render(ViewExecutable $view, &$output, CachePlug
   // so we use hook_views_post_render as a good enough estimate.
   ViewTimer::stop($view);
 }
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_metrics_module_implements_alter(&$implementations, $hook) {
+  switch ($hook) {
+    case 'views_pre_view':
+    case 'views_pre_build':
+    case 'views_pre_execute':
+    case 'views_pre_render':
+      // In the case of views_pre_FOO hooks, we want to be the *first* implementation in
+      // order to get accurate timing information.
+      // Calling array_merge like this will enforce that the epa_metrics hook is in front
+      // of the other implementations.
+      $self = $implementations['epa_metrics'];
+      $implementations = array_merge(['epa_metrics' => $self], $implementations);
+
+      break;
+
+    case 'views_post_build':
+    case 'views_post_execute':
+    case 'views_post_render':
+      // For views_post_FOO hooks we want to be last.
+      $self = $implementations['epa_metrics'];
+      unset($implementations['epa_metrics']);
+      $implementations['epa_metrics'] = $self;
+
+      break;
+  }
+}
