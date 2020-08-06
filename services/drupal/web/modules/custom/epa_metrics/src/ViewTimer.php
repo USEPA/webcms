@@ -3,9 +3,6 @@
 namespace Drupal\epa_metrics;
 
 use Drupal\views\ViewExecutable;
-use Liuggio\StatsdClient\Sender\SocketSender;
-use Liuggio\StatsdClient\Service\StatsdService;
-use Liuggio\StatsdClient\StatsdClient;
 
 /**
  * Helper utility class to time the execution of views.
@@ -69,17 +66,18 @@ class ViewTimer {
     self::stopPhase($view, 'view');
     $stats = self::$timers[$id];
 
-    $sender = new SocketSender('127.0.0.1', 8125, 'udp');
-    $client = new StatsdClient($sender);
-    $service = new StatsdService($client);
+    $log = new MetricLog(time(), 'WebCMS/Drupal', [
+      'Environment' => getenv('WEBCMS_ENV_NAME'),
+      'View' => $view->id(),
+    ]);
 
-    // The statsd protocol uses milliseconds, so we have to convert from the seconds that
-    // microtime(TRUE) returns.
-    $service->timing('Drupal.Views.' . $id, $stats['view'] * 1000);
-    $service->timing('Drupal.ViewsBuild.' . $id, $stats['build'] * 1000);
-    $service->timing('Drupal.ViewsExecute.' . $id, $stats['execute'] * 1000);
-    $service->timing('Drupal.ViewsRender.' . $id, $stats['render'] * 1000);
-    $service->flush();
+    foreach ($stats as $stat => $value) {
+      $name = $stat === 'view' ? 'Overall' : ucfirst($stat);
+
+      $log->putMetric($name, $value, 'Seconds');
+    }
+
+    $log->send();
 
     unset(self::$timers[$id]);
   }
