@@ -25,7 +25,7 @@
   {% for key, item in content.field_dynamic_list %}
     {% if item['#view_mode'] == 'link' %}
       <p>{{ item|render }}</p>
-    {% elseif item['#view_mode'] == 'teaser' %}
+    {% elseif item['#view_mode'] %}
       {{ item|render }}
     {% endif %}
   {% endfor %}
