@@ -304,6 +304,11 @@ variable "image-tag-drush" {
 }
 
 # SAML variables
+variable "saml-sp-entity-id" {
+  description = "Value this site will use as its SAML service provider (SP) entity ID"
+  type        = string
+}
+
 variable "saml-sp-cert" {
   description = "Public certificate of the Drupal SAML service provider (SP)"
   type        = string
