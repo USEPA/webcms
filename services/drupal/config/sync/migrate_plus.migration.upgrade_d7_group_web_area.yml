@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: VqnunrAb47tYbbSPXzqGLmiSzdDyUAg4Kj7F_Fpqp6U
+  default_config_hash: B-yk0L994SQoEbLfVxCkorU9tqFhKZiy-jcR7M_hwNs
 id: upgrade_d7_group_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -86,6 +86,13 @@ process:
       source: field_publisher_term
       process:
         target_id: tid
+  field_navigation_style:
+    -
+      plugin: static_map
+      source: field_web_area_type
+      map:
+        Microsite: sidebar_navigation
+      default_value: hublinks
 destination:
   plugin: 'entity:group'
   default_bundle: web_area
