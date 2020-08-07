@@ -9,13 +9,15 @@
  * Implements facets_preprocess_facets_item_list().
  */
 function epa_theme_preprocess_facets_item_list(&$vars) {
-  $vars['facet_id'] = $vars['facet']->id();
-  $vars['facet_name'] = $vars['facet']->getName();
-  $vars['facet_is_expanded'] = false;
+  if(isset($vars['facet'])) {
+    $vars['facet_id'] = $vars['facet']->id();
+    $vars['facet_name'] = $vars['facet']->getName();
+    $vars['facet_is_expanded'] = FALSE;
 
-  // Expand if facet has any active items.
-  if (!empty($vars['facet']->getActiveItems())) {
-    $vars['facet_is_expanded'] = true;
+    // Expand if facet has any active items.
+    if (!empty($vars['facet']->getActiveItems())) {
+      $vars['facet_is_expanded'] = TRUE;
+    }
   }
 
   // Add class to facet links.
