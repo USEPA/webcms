@@ -24,7 +24,7 @@ class EpaMultivalueField extends DrupalSqlBase {
    */
   public function query() {
     if (isset($this->configuration['field'])) {
-      $field_table = 'field_data_' . $this->configuration['field'];
+      $field_table = 'field_revision_' . $this->configuration['field'];
 
       $query = $this->select($field_table, 'fd')
         ->fields('fd');
@@ -56,8 +56,8 @@ class EpaMultivalueField extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    $ids['entity_id']['type'] = 'integer';
-    $ids['entity_id']['alias'] = 'fd';
+    $ids['revision_id']['type'] = 'integer';
+    $ids['revision_id']['alias'] = 'fd';
     $ids['delta']['type'] = 'integer';
     $ids['delta']['alias'] = 'fd';
     return $ids;

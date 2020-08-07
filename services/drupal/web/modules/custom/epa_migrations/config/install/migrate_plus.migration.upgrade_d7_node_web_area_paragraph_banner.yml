@@ -1,4 +1,4 @@
-#uuid: e5182b25-e9b4-44ba-baf0-b13339b6f421
+uuid: 40d22577-78ba-44c4-b9ab-00b748b8b292
 langcode: en
 status: true
 dependencies: {  }
@@ -12,16 +12,16 @@ migration_tags:
 migration_group: migrate_drupal_7
 label: 'Paragraphs (Web Area, Banner)'
 source:
-  plugin: d7_node
+  plugin: d7_node_revision
   node_type: web_area
   skip_custom_logic: true
   high_water_property:
-    name: tnid
+    name: vid
 process:
   _banner_slide_paragraphs:
     plugin: epa_lookup_multivalue_paragraphs
     migration: upgrade_d7_node_web_area_paragraph_banner_slide
-    source: nid
+    source: vid
   field_banner_slides:
     -
       plugin: sub_process

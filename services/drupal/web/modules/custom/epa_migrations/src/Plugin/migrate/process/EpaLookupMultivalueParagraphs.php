@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * process:
  *   bar:
  *     plugin: epa_lookup_multivalue_paragraphs
- *     source: nid
+ *     source: vid
  *     migration: upgrade_d7_paragraph_legal_authorities
  * @endcode
  *
