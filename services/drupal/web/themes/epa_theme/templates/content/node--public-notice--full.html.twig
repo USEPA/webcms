@@ -66,13 +66,17 @@
   ) }}
 {% endset %}
 
+{% set title %}
+  {{ 'Public Notice'|t }}: {{ label }}
+{% endset %}
+
 {% if sidenav|render|striptags|trim %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_sidenav': true,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,
@@ -84,7 +88,7 @@
     'has_header': true,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,
