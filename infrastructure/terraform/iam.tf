@@ -281,14 +281,14 @@ data "aws_iam_policy_document" "metrics_logs" {
     sid       = "logStreamActions"
     effect    = "Allow"
     actions   = ["logs:CreateLogStream", "logs:DescribeLogStreams"]
-    resources = [aws_cloudwatch_log_group.metrics.arn]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.metrics.name}"]
   }
 
   statement {
     sid       = "logPublishing"
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["${aws_cloudwatch_log_group.metrics.arn}:log-stream:*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:${aws_cloudwatch_log_group.metrics.name}:*"]
   }
 }
 
