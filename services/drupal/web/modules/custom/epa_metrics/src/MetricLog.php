@@ -18,14 +18,32 @@ class MetricLog {
   private $packet;
 
   /**
-   * The namespace in which metrics are stored.
+   * The metric data we will be sending.
+   *
+   * @var array
+   */
+  private $metrics;
+
+  /**
+   * The time of this log entry
+   *
+   * @var float
+   */
+  private $timestamp;
+
+  /**
+   * The namespace in which to add metrics.
    *
    * @var string|null
    */
   private $namespace;
 
   /**
-   * An array of dimensions to associate with each metric in this log entry.
+   * The dimensions associated with this metric.
+   *
+   * Dimensions in the embedded metric format are structured as a list of arrays. Each
+   * array contains one or more strings representing properties attached to the metric
+   * log.
    *
    * @var array
    */
@@ -34,38 +52,24 @@ class MetricLog {
   /**
    * Constructs a new log entry.
    *
-   * @param number $timestamp The timestamp of this log entry. Defaults to the current time.
+   * @param float $timestamp The timestamp of this log entry. Defaults to the current
+   * time.
    * @param string $namespace The namespace of metrics in this entry.
    * @param array $dimensions Any dimensions to associate with this entry's metrics.
+   * Remember to call `putProperty` on any dimension names here.
    */
   public function __construct($timestamp = null, $namespace = null, array $dimensions = []) {
+    $this->timestamp = $timestamp ?? time();
     $this->namespace = $namespace;
+    $this->dimensions = $dimensions;
 
-    $this->packet = [
-      '_aws' => [
-        'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
-        'Timestamp' => $timestamp ?? time(),
-        'CloudWatchMetrics' => [],
-      ],
-    ];
-
-    $this->dimensions = [];
-
-    // Dimensions are top-level properties in the log entry.
-    foreach ($dimensions as $name => $value) {
-      $this->packet[$name] = $value;
-
-      // Metric dimensions are a list of arrays like ["<name>"], which refers to to the
-      // top-level "<name>" property in the JSON.
-      // Since we don't support nested dimensions, we simply compute the list of dimension
-      // names here.
-      $this->dimensions[] = [$name];
-    }
+    $this->packet = [];
+    $this->metrics = [];
   }
 
   /**
-   * Attaches metadata to this log entry. This metadata is not used in reporting, but can
-   * be searched for or ingested with other CloudWatch tools.
+   * Attaches data to this log entry. If not referenced in a dimension or metric, the data
+   * is not used by CloudWatch directly but can still be searched.
    *
    * @param string $name The name of the property
    * @param mixed $value The value of the property
@@ -85,25 +89,29 @@ class MetricLog {
     // Like dimensions and properties, metrics are top-level JSON elements.
     $this->packet[$name] = $value;
 
-    $metric = [
+    $this->metrics[] = [
       'Name' => $name,
       'Unit' => $unit,
     ];
-
-    if (isset($this->namespace)) {
-      $metric['Namespace'] = $this->namespace;
-    }
-
-    // Save a few bytes in JSON output: if the array of dimensions is empty, don't include
-    // the key in the object at all.
-    if (!empty($this->dimensions)) {
-      $metric['Dimensions'] = $this->dimensions;
-    }
-
-    $this->packet['_aws']['CloudWatchMetrics'][] = $metric;
   }
 
   public function send() {
+    $this->packet['_aws'] = [
+      'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
+      'Timestamp' => $this->timestamp,
+      'CloudWatchMetrics' => [
+        'Metrics' => $this->metrics,
+      ],
+    ];
+
+    if (!empty($this->namespace)) {
+      $this->packet['_aws']['CloudWatchMetrics']['Namespace'] = $this->namespace;
+    }
+
+    if (!empty($this->dimensions)) {
+      $this->packet['_aws']['CloudWatchMetrics']['Dimensions'] = $this->dimensions;
+    }
+
     $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
     if ($socket !== FALSE) {
       $data = json_encode($this->packet);
