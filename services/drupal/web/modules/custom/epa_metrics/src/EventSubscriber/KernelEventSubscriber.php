@@ -11,12 +11,13 @@ use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 class KernelEventSubscriber implements EventSubscriberInterface {
   public function onKernelTerminate(PostResponseEvent $event) {
     $request = $event->getRequest();
+    $response = $event->getResponse();
 
-    $log = new MetricLog(time(), 'WebCMS/Drupal', [
-      'Environment' => getenv('WEBCMS_ENV_NAME'),
-    ]);
+    $log = new MetricLog(time(), 'WebCMS/Drupal', [['Environment']]);
+    $log->putProperty('Environment', getenv('WEBCMS_ENV_NAME'));
 
     $log->putProperty('request', $request->getPathInfo());
+    $log->putProperty('status', $response->getStatusCode());
 
     $log->putMetric('RequestTime', microtime(TRUE) - $_SERVER['REQUEST_TIME_FLOAT'], 'Seconds');
     $log->putMetric('PeakMemory', memory_get_peak_usage(), 'Bytes');

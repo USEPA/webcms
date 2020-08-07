@@ -66,10 +66,9 @@ class ViewTimer {
     self::stopPhase($view, 'view');
     $stats = self::$timers[$id];
 
-    $log = new MetricLog(time(), 'WebCMS/Drupal', [
-      'Environment' => getenv('WEBCMS_ENV_NAME'),
-      'View' => $view->id(),
-    ]);
+    $log = new MetricLog(time(), 'WebCMS/Drupal', [['Environment', 'View']]);
+    $log->putProperty('Environment', getenv('WEBCMS_ENV_NAME'));
+    $log->putProperty('View', $view->id());
 
     foreach ($stats as $stat => $value) {
       $name = $stat === 'view' ? 'Overall' : ucfirst($stat);
