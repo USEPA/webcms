@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: B-yk0L994SQoEbLfVxCkorU9tqFhKZiy-jcR7M_hwNs
+  default_config_hash: '-W5r5WrJ9R6OMI0KsjxmEIibdumqdPt58NAWrnqmVjc'
 id: upgrade_d7_group_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -18,6 +18,7 @@ source:
   node_type: web_area
   high_water_property:
     name: nid
+    alias: 'n'
 process:
   id:
     -
@@ -36,6 +37,10 @@ process:
     -
       plugin: get
       source: title
+  uid:
+    -
+      plugin: get
+      source: node_uid
   created:
     -
       plugin: get
