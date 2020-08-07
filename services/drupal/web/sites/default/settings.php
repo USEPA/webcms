@@ -840,6 +840,15 @@ $config['smtp.settings']['smtp_password'] = getenv('WEBCMS_MAIL_PASS');
 $config['smtp.settings']['smtp_from'] = getenv('WEBCMS_MAIL_FROM');
 $config['smtp.settings']['smtp_host'] = getenv('WEBCMS_MAIL_HOST');
 
+$config['samlauth.authentication']['sp_entity_id'] = getenv('WEBCMS_SAML_SP_ENTITY_ID');
+$config['samlauth.authentication']['sp_x509_certificate'] = getenv('WEBCMS_SAML_SP_CERT');
+$config['samlauth.authentication']['sp_private_key'] = getenv('WEBCMS_SAML_SP_KEY');
+$config['samlauth.authentication']['idp_entity_id'] = getenv('WEBCMS_SAML_IDP_ID');
+$config['samlauth.authentication']['idp_single_sign_on_service'] = getenv('WEBCMS_SAML_IDP_SSO_URL');
+$config['samlauth.authentication']['idp_single_log_out_service'] = getenv('WEBCMS_SAML_IDP_SLO_URL');
+$config['samlauth.authentication']['idp_x509_certificate'] = getenv('WEBCMS_SAML_IDP_CERT');
+
+
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
 $config_directories['sync'] = '../config/sync';

@@ -51,6 +51,7 @@ services:
     ports:
       - 8080:80
       - 8443:443
+      - 5000:5000
     volumes:
       - ./services/drupal:/var/www/html:cached
       - type: volume
@@ -121,6 +122,13 @@ services:
   # Memcached
   memcached:
     image: memcached:alpine
+
+  simplesaml:
+    depends_on:
+      - drupal
+    network_mode: service:drupal
+    build: ./services/simplesaml
+    tty: true
 
   # Elasticsearch 7.4
   elasticsearch:
