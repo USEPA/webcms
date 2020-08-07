@@ -68,7 +68,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#type' => 'checkbox',
         '#title' => t('Generate automatic description'),
         '#default_value' => !$node->label() || $description == $default_description ? TRUE : FALSE,
-        '#description' => t('Uncheck this to create a custom description below.'),
+        '#description' => t('Uncheck this to create a custom description above.'),
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
@@ -96,7 +96,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#type' => 'checkbox',
         '#title' => t('Generate automatic keywords'),
         '#default_value' => $keywords == $default_keywords,
-        '#description' => t('Uncheck this to add custom keywords below.'),
+        '#description' => t('Uncheck this to add custom keywords above.'),
         '#weight' => isset($form['field_keywords']['#weight']) ? (int) $form['field_keywords']['#weight'] - 0.5 : 8.5,
       ];
 
