@@ -1,0 +1,39 @@
+uuid: 40d22577-78ba-44c4-b9ab-00b748b8b292
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: '-HW5VBkuIUli1M6RkTyxGW1fktTJn7ViEaXu86XW9ms'
+id: upgrade_d7_node_web_area_paragraph_banner
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Paragraphs (Web Area, Banner)'
+source:
+  plugin: d7_node_revision
+  node_type: web_area
+  skip_custom_logic: true
+  high_water_property:
+    name: vid
+process:
+  _banner_slide_paragraphs:
+    plugin: epa_lookup_multivalue_paragraphs
+    migration: upgrade_d7_node_web_area_paragraph_banner_slide
+    source: vid
+  field_banner_slides:
+    -
+      plugin: sub_process
+      source: '@_banner_slide_paragraphs'
+      process:
+        target_id: destid1
+        target_revision_id: destid2
+destination:
+  plugin: 'entity_reference_revisions:paragraph'
+  default_bundle: banner
+migration_dependencies:
+  required: {  }
+  optional: {  }
