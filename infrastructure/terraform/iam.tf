@@ -274,6 +274,9 @@ resource "aws_iam_role_policy_attachment" "drupal_uploads_access" {
 }
 
 # Policy to allow publishing CloudWatch logs using the Embedded Metric Format
+#
+# This policy should be limited to the CloudWatch metrics log group, but for some reason
+# the IAM resource syntax keeps failing to grant the necessary permissions.
 data "aws_iam_policy_document" "metrics_logs" {
   version = "2012-10-17"
 
@@ -281,14 +284,14 @@ data "aws_iam_policy_document" "metrics_logs" {
     sid       = "logStreamActions"
     effect    = "Allow"
     actions   = ["logs:CreateLogStream", "logs:DescribeLogStreams"]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.metrics.name}"]
+    resources = ["*"]
   }
 
   statement {
     sid       = "logPublishing"
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.metrics.name}:log-stream:*"]
+    resources = ["*"]
   }
 }
 
