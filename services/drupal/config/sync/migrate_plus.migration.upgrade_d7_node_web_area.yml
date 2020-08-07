@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 1XfoFH-Hu_zYYCLPHSkVEMHO3tbNxPkZd31y5DYAjqg
+  default_config_hash: sty-UExlYMGXuVJbJSpcR-f8pi9Z9Ka6Ry-MFWFuw6Q
 id: upgrade_d7_node_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -202,6 +202,18 @@ process:
     -
       plugin: get
       source: last_published
+  _banner_paragraphs:
+    plugin: migration_lookup
+    migration: upgrade_d7_node_web_area_paragraph_banner
+    source: nid
+  field_banner:
+    -
+      plugin: sub_process
+      source:
+        - '@_banner_paragraphs'
+      process:
+        target_id: '0'
+        target_revision_id: '1'
 destination:
   plugin: 'entity:node'
   default_bundle: web_area
