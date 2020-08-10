@@ -20,8 +20,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'access toolbar'
       cache:
         type: tag
         options: {  }
@@ -170,8 +171,8 @@ display:
           empty: true
           tokenize: false
           content:
-            value: 'You are not a member of any Web Areas.'
-            format: filtered_html
+            value: '<p style="color:black; margin-left:1em;">You are not a member of any Web Areas.</p>'
+            format: full_html
           plugin_id: text
       relationships:
         group_content_id:
@@ -257,6 +258,7 @@ display:
         - url
         - url.query_args
         - user
+        - user.permissions
       tags: {  }
   block_1:
     display_plugin: block
@@ -264,7 +266,9 @@ display:
     display_title: Block
     position: 1
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:
@@ -273,4 +277,5 @@ display:
         - url
         - url.query_args
         - user
+        - user.permissions
       tags: {  }
