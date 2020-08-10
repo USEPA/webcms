@@ -25,7 +25,6 @@ dependencies:
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_type
     - node.type.news_release
-    - workflows.workflow.epa_default
   module:
     - content_moderation
     - cshs
@@ -106,7 +105,12 @@ content:
     settings:
       rows: 5
       placeholder: ''
-    third_party_settings: {  }
+    third_party_settings:
+      maxlength:
+        maxlength_js: 256
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+        maxlength_js_enforce: true
+        maxlength_js_truncate_html: false
     type: string_textarea
     region: content
   field_env_laws_regs_and_treaties:

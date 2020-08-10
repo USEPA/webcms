@@ -302,3 +302,34 @@ variable "image-tag-drush" {
   type        = string
   default     = null
 }
+
+# SAML variables
+variable "saml-sp-entity-id" {
+  description = "Value this site will use as its SAML service provider (SP) entity ID"
+  type        = string
+}
+
+variable "saml-sp-cert" {
+  description = "Public certificate of the Drupal SAML service provider (SP)"
+  type        = string
+}
+
+variable "saml-idp-id" {
+  description = "Entity ID of the SAML IdP"
+  type        = string
+}
+
+variable "saml-idp-sso-url" {
+  description = "Single sign on service URL where the SP will direct authentication requests."
+  type        = string
+}
+
+variable "saml-idp-slo-url" {
+  description = "Single logout service URL where the SP will direct logout requests."
+  type        = string
+}
+
+variable "saml-idp-cert" {
+  description = "Public x509 certificate of the IdP."
+  type        = string
+}

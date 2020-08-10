@@ -8,6 +8,7 @@
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -62,13 +63,13 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 
       // UI element for generating default description.
       $description = $node->field_description->value;
-      $default_description = t('EPA News Release: @title', ['@title' => $node->label()], ['langcode' => $node_langcode]);
+      $default_description = t('EPA News Release: @title', ['@title' => Markup::create($node->label())], ['langcode' => $node_langcode]);
 
       $form['generate_description'] = [
         '#type' => 'checkbox',
         '#title' => t('Generate automatic description'),
         '#default_value' => !$node->label() || $description == $default_description ? TRUE : FALSE,
-        '#description' => t('Uncheck this to create a custom description below.'),
+        '#description' => t('Uncheck this to create a custom description above.'),
         '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
       ];
 
@@ -96,7 +97,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
         '#type' => 'checkbox',
         '#title' => t('Generate automatic keywords'),
         '#default_value' => $keywords == $default_keywords,
-        '#description' => t('Uncheck this to add custom keywords below.'),
+        '#description' => t('Uncheck this to add custom keywords above.'),
         '#weight' => isset($form['field_keywords']['#weight']) ? (int) $form['field_keywords']['#weight'] - 0.5 : 8.5,
       ];
 
@@ -131,7 +132,7 @@ function epa_core_new_release_description_validate(array &$element, FormStateInt
     $node = $form_state->getFormObject()->getEntity();
     $node_langcode = $node->language()->getId();
     $title = $form_state->getValue('title');
-    $description = t('EPA News Release: @title', ['@title' => $title[0]['value']], ['langcode' => $node_langcode]);
+    $description = t('EPA News Release: @title', ['@title' => Markup::create($title[0]['value'])], ['langcode' => $node_langcode]);
     $element[0]['value']['#value'] = $description->render();
     $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
   }

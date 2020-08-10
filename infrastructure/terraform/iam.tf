@@ -348,6 +348,7 @@ data "aws_iam_policy_document" "task_secrets_access" {
       aws_secretsmanager_secret.db_app_d7_password.arn,
       aws_secretsmanager_secret.hash_salt.arn,
       aws_secretsmanager_secret.mail_pass.arn,
+      aws_secretsmanager_secret.saml_sp_key.arn,
     ]
   }
 }
@@ -435,6 +436,13 @@ resource "aws_iam_role_policy_attachment" "utility_ssm_s3" {
 resource "aws_iam_role_policy_attachment" "utility_ssm_session" {
   role       = aws_iam_role.utility_role.name
   policy_arn = aws_iam_policy.ssm_session_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "utility_extra_polices" {
+  for_each = toset(var.server-extra-policies)
+
+  role       = aws_iam_role.utility_role.name
+  policy_arn = each.value
 }
 
 resource "aws_iam_instance_profile" "utility_profile" {
