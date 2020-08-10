@@ -109,7 +109,7 @@ class MetricLog {
     $this->packet['_aws'] = [
       'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
       'Timestamp' => $this->timestamp,
-      'CloudWatchMetrics'] => [$metrics],
+      'CloudWatchMetrics' => [$metrics],
     ];
 
     $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
