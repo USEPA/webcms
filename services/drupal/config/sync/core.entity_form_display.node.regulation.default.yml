@@ -29,7 +29,6 @@ dependencies:
     - field.field.node.regulation.field_scheduled_transition
     - field.field.node.regulation.field_type
     - node.type.regulation
-    - workflows.workflow.epa_default
   module:
     - content_moderation
     - datetime
@@ -161,7 +160,12 @@ content:
     settings:
       rows: 5
       placeholder: ''
-    third_party_settings: {  }
+    third_party_settings:
+      maxlength:
+        maxlength_js: 256
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+        maxlength_js_enforce: true
+        maxlength_js_truncate_html: false
     type: string_textarea
     region: content
   field_docket_numbers:
@@ -381,9 +385,9 @@ content:
     third_party_settings: {  }
   url_redirects:
     weight: 50
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden:
   field_last_published: true
   field_review_deadline: true
