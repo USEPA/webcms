@@ -52,14 +52,14 @@ class MetricLog {
   /**
    * Constructs a new log entry.
    *
-   * @param float $timestamp The timestamp of this log entry. Defaults to the current
-   * time.
+   * @param float $timestamp The timestamp of this log entry, in milliseconds. Defaults to
+   * the current time.
    * @param string $namespace The namespace of metrics in this entry.
    * @param array $dimensions Any dimensions to associate with this entry's metrics.
    * Remember to call `putProperty` on any dimension names here.
    */
   public function __construct($timestamp = null, $namespace = null, array $dimensions = []) {
-    $this->timestamp = $timestamp ?? time();
+    $this->timestamp = $timestamp ?? floor(microtime(TRUE));
     $this->namespace = $namespace;
     $this->dimensions = $dimensions;
 
