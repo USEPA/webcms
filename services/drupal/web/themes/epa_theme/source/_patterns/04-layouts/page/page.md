@@ -7,6 +7,7 @@ state: complete
 __Variables:__
 * modifier_classes: [string] Classes to modify the default layout styling.
 * has_header: [boolean] Whether the page has header content.
+* has_footer: [boolean] Whether the page has footer content.
 
 __Blocks:__
 * info: Twig block for web area or hublinks.
