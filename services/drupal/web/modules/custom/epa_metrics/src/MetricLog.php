@@ -96,21 +96,21 @@ class MetricLog {
   }
 
   public function send() {
-    $this->packet['_aws'] = [
-      'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
-      'Timestamp' => $this->timestamp,
-      'CloudWatchMetrics' => [
-        'Metrics' => $this->metrics,
-      ],
-    ];
+    $metrics = ['Metrics' => $this->metrics];
 
     if (!empty($this->namespace)) {
-      $this->packet['_aws']['CloudWatchMetrics']['Namespace'] = $this->namespace;
+      $metrics['Namespace'] = $this->namespace;
     }
 
     if (!empty($this->dimensions)) {
-      $this->packet['_aws']['CloudWatchMetrics']['Dimensions'] = $this->dimensions;
+      $metrics['Dimensions'] = $this->dimensions;
     }
+
+    $this->packet['_aws'] = [
+      'LogGroupName' => '/webcms-' . getenv('WEBCMS_ENV_NAME') . '/cloudwatch-metrics',
+      'Timestamp' => $this->timestamp,
+      'CloudWatchMetrics'] => [$metrics],
+    ];
 
     $socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
     if ($socket !== FALSE) {
