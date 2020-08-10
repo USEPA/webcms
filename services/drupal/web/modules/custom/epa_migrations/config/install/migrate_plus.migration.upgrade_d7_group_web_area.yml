@@ -16,6 +16,7 @@ source:
   node_type: web_area
   high_water_property:
     name: nid
+    alias: n
 process:
   id:
     -
@@ -34,6 +35,10 @@ process:
     -
       plugin: get
       source: title
+  uid:
+    -
+      plugin: get
+      source: node_uid
   created:
     -
       plugin: get
@@ -84,6 +89,13 @@ process:
       source: field_publisher_term
       process:
         target_id: tid
+  field_navigation_style:
+    -
+      plugin: static_map
+      source: field_web_area_type
+      map:
+        Microsite: sidebar_navigation
+      default_value: hublinks
 destination:
   plugin: 'entity:group'
   default_bundle: web_area
