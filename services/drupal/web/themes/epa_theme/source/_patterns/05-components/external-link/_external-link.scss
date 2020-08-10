@@ -21,6 +21,11 @@
   }
 }
 
-a:not(.menu__link, [href*='.gov'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com']) {
+a:not(.menu__link, [href=''], [href*='.gov'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com']) {
   @extend .external-link;
+}
+
+// Hide external link icon for anchors without an href attribute.
+a:not([href])::after {
+  display: none !important;
 }
