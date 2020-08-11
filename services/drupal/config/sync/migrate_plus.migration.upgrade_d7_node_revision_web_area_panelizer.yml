@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: Nsm3aEHMwKhLC09l8oT8OCAkoAmnKkNOgFgx1BrQ_ZQ
+  default_config_hash: KApzFbPH5XM4Vi9GBIBj7z8O8tlctk1ifBvNQaa-kCM
 id: upgrade_d7_node_revision_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -183,6 +183,12 @@ process:
           source: value
           from_timezone: America/New_York
           to_timezone: UTC
+  field_aside_block:
+    0:
+      plugin: get
+      source: field_aside_block
+    media_wysiwyg:
+      plugin: epa_media_wysiwyg_filter
   field_metatag:
     -
       plugin: d7_metatag_entities
