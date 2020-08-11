@@ -6,8 +6,8 @@ resource "aws_vpc" "main" {
 
   cidr_block = "10.0.0.0/16"
 
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  enable_dns_hostnames = false
+  enable_dns_support   = false
 
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} VPC"
