@@ -14,6 +14,22 @@ resource "aws_vpc" "main" {
   })
 }
 
+# If we're creating a VPC, create a DHCP options set. This is needed for Fargate tasks.
+resource "aws_vpc_dhcp_options" "options" {
+  count = length(aws_vpc.main)
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DHCP"
+  })
+}
+
+resource "aws_vpc_dhcp_options_association" "options" {
+  count = length(aws_vpc.main)
+
+  vpc_id          = aws_vpc.main[0].id
+  dhcp_options_id = aws_vpc_dhcp_options.options[0].id
+}
+
 # If there was an existing VPC provided, read out its properties
 data "aws_vpc" "existing" {
   count = var.vpc-existing-vpc != null ? 1 : 0
