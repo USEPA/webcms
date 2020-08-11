@@ -1,0 +1,60 @@
+// @file
+// Styles for a Definition.
+
+.definition {
+  cursor: help;
+
+  &:hover {
+    .definition__tooltip {
+      display: block;
+    }
+  }
+}
+
+.definition__trigger {
+  @extend .usa-button--unstyled;
+  border-bottom: 1px dotted;
+  position: relative;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+
+    + .definition__tooltip {
+      display: block;
+    }
+  }
+}
+
+.definition__tooltip {
+  background: gesso-brand(blue, dark-1);
+  color: gesso-grayscale(white);
+  display: none;
+  font-size: font-size(body, xs);
+  margin-top: rem(-3px);
+  padding: gesso-spacing(2);
+  position: absolute;
+
+  a {
+    &:link,
+    &:visited {
+      color: gesso-brand(aqua, light);
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: gesso-brand(aqua, base);
+    }
+  }
+}
+
+.definition__term {
+  color: gesso-brand(aqua, base);
+  display: block;
+  font-family: font-family(heading);
+  font-size: font-size(heading, md);
+  font-weight: gesso-bold(bold);
+  margin-bottom: gesso-spacing(1);
+}

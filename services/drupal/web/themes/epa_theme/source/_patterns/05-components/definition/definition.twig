@@ -1,0 +1,11 @@
+{% set definition_id = 'definition'|unique_id %}
+
+<span class="definition">
+  <button class="definition__trigger" aria-described-by="{{ definition_id }}">
+    {{ term }}
+  </button>
+  <span class="definition__tooltip" role="tooltip" id="{{ definition_id }}">
+    <dfn class="definition__term">{{ term }}</dfn>
+    {{ definition }}
+  </span>
+</span>
