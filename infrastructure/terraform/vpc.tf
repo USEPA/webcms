@@ -18,6 +18,9 @@ resource "aws_vpc" "main" {
 resource "aws_vpc_dhcp_options" "options" {
   count = length(aws_vpc.main)
 
+  # This is the default for VPCs
+  domain_name = "ec2.internal"
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DHCP"
   })
