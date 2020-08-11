@@ -36,6 +36,10 @@ function epa_theme_preprocess_html(&$vars, $hook) {
     if ($node->hasField('field_wide_template') && $node->field_wide_template->value) {
       $vars['attributes']['class'][] = 'has-wide-template';
     }
+
+    if ($node->hasField('field_page_head') && $node->field_page_head->value) {
+      $vars['page_js'] = $node->field_page_head->value;
+    }
   }
 }
 
