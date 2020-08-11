@@ -1,0 +1,17 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% if items.0.content|render|striptags|trim %}
+  {% include '@components/field/field--list/field--list.twig' with {
+    'element': 'div',
+    'label_display': label_display,
+    'label_hidden': label_hidden,
+    'label_element': 'div',
+    'label': 'Effective Date'|t,
+    'field_items': items,
+  } %}
+{% endif %}

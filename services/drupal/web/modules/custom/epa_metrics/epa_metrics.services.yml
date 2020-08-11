@@ -1,0 +1,6 @@
+services:
+  epa_metrics.event_subscriber:
+    class: Drupal\epa_metrics\EventSubscriber\KernelEventSubscriber
+    arguments: ['@messenger']
+    tags:
+      - name: event_subscriber

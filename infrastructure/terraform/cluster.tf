@@ -134,7 +134,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # Resource limits. We assume that nginx is able to use fewer resources since it is
       # mostly going to execute routing decisions and proxy requests.
-      cpu    = 256, # = 0.25 vCPU
+      cpu    = 192,
       memory = 256,
 
       environment = [
@@ -167,6 +167,33 @@ resource "aws_ecs_task_definition" "drupal_task" {
           awslogs-region = var.aws-region,
         }
       }
+    },
+    # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
+    # the epa_metrics module for what we export to the agent.
+    {
+      name  = "cloudwatch",
+      image = "amazon/cloudwatch-agent:latest",
+
+      cpu    = 64,
+      memory = 256,
+
+      # The agent reads its JSON-formatted configuration from the environment in containers
+      environment = [
+        {
+          name = "CW_CONFIG_CONTENT",
+          # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
+          value = jsonencode({
+            metrics = {
+              namespace = "WebCMS",
+              metrics_collected = {
+                statsd = {
+                  service_address = ":8125",
+                },
+              },
+            },
+          }),
+        },
+      ],
     }
   ])
 
