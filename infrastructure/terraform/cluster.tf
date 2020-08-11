@@ -47,7 +47,11 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
   name               = local.cluster-name
-  capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name]
+
+  # FARGATE adds the ability to launch tasks in Fargate; we primarily use this for Drush
+  # in order to protect it from the vagaries of autoscaling group resizes prematurely
+  # terminating it.
+  capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name, "FARGATE"]
 
   # We assume that all services will use our autoscaling group as its capacity provider
   default_capacity_provider_strategy {
