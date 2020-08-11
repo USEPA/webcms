@@ -57,7 +57,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
@@ -124,7 +124,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
@@ -232,7 +232,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++
