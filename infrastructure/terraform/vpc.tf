@@ -6,12 +6,32 @@ resource "aws_vpc" "main" {
 
   cidr_block = "10.0.0.0/16"
 
-  enable_dns_hostnames = true
+  enable_dns_hostnames = false
   enable_dns_support   = true
 
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} VPC"
   })
+}
+
+# If we're creating a VPC, create a DHCP options set. This is needed for Fargate tasks.
+resource "aws_vpc_dhcp_options" "options" {
+  count = length(aws_vpc.main)
+
+  # This is the default for VPCs
+  domain_name = "ec2.internal"
+  domain_name_servers = ["AmazonProvidedDNS"]
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DHCP"
+  })
+}
+
+resource "aws_vpc_dhcp_options_association" "options" {
+  count = length(aws_vpc.main)
+
+  vpc_id          = aws_vpc.main[0].id
+  dhcp_options_id = aws_vpc_dhcp_options.options[0].id
 }
 
 # If there was an existing VPC provided, read out its properties
