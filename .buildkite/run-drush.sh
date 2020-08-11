@@ -64,6 +64,7 @@ arn="$(
     --cluster "$cluster" \
     --overrides "$overrides" \
     --network-configuration "$network_configuration" \
+    --capacity-provider capacityProvider=FARGATE,weight=1,base=1 \
     --started-by "$started_by" |
     jq -r '.tasks[0].taskArn'
 )"
