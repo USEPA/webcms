@@ -263,6 +263,23 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           }
         }
         break;
+      case 'contact-us-header-link':
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if (isset($node)) {
+          // load the group's contact form information
+          $groups = \Drupal::service('epa_web_areas.web_areas_helper')
+            ->getNodeReferencingGroups($node);
+          foreach ($groups as $group) {
+            $contact_form = $group->field_contact_us_form->target_id;
+            $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
+            if ($url) {
+              $link = Link::fromTextAndUrl(t('Contact Us'), $url)->toRenderable();
+              $link['#attributes'] = ['class' => array('header-link')];
+            }
+            $replacements[$original] = $url ? render($link) : $original;
+          }
+        }
+        break;
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
         $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
