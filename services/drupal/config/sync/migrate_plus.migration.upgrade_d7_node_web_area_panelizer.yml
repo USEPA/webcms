@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: DOTycdud8ZKXjJrojnq_OXpzhRbwcobpkTYWEf4eiFs
+  default_config_hash: HL1WE6wy0miNglhFFYHY8pgjGbIb0NeKGXzUS-9ziDQ
 id: upgrade_d7_node_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -203,6 +203,12 @@ process:
       process:
         target_id: '0'
         target_revision_id: '1'
+  field_aside_block:
+    0:
+      plugin: get
+      source: field_aside_block
+    media_wysiwyg:
+      plugin: epa_media_wysiwyg_filter
 destination:
   plugin: 'entity:node'
   default_bundle: web_area
