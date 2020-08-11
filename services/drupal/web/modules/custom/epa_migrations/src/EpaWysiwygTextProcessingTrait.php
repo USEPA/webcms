@@ -20,11 +20,18 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view|"(.*?tabs.*?)"/s';
+    $pattern = '/';
+    $pattern .= 'class=".*?(box multi related-info).*?"|';
+    $pattern .= 'class=".*?(pagetop).*?"|';
+    $pattern .= 'class=".*?(exit-disclaimer).*?"|';
+    $pattern .= 'class=".*?(tabs).*?"|';
+    $pattern .= 'href=".*?(exitepa).*?"|';
+    $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
+    $pattern .= '/';
 
-    $num_matches = preg_match($pattern, $wysiwyg_content);
+    $matches = [];
 
-    if ($num_matches > 0) {
+    if (preg_match_all($pattern, $wysiwyg_content, $matches) > 0) {
       // Add a temp wrapper around the wysiwyg content.
       $wysiwyg_content = '<?xml encoding="UTF-8"><tempwrapper>' . $wysiwyg_content . '</tempwrapper>';
 
@@ -34,12 +41,47 @@ trait EpaWysiwygTextProcessingTrait {
       $doc->loadHtml($wysiwyg_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT);
       libxml_clear_errors();
 
-      // Run the document through the transformation methods.
-      $doc = $this->transformRelatedInfoBox($doc);
-      $doc = $this->stripPageTopLinks($doc);
-      $doc = $this->stripExitEpaLinks($doc);
-      $doc = $this->stripPdfDisclaimers($doc);
-      $doc = $this->stripTabClasses($doc);
+      // Run the document through the transformation methods depending on the
+      // matches identified.
+      foreach ($matches as $key => $match_strings) {
+
+        // Skip the first value, which contains the full pattern matches.
+        if ($key > 0) {
+          // Get unique values with array_unique, then remove any empty strings
+          // with array_filter, and finally get the remaining match text.
+          $match = array_pop(array_filter(array_unique($match_strings)));
+
+          switch ($match) {
+            case 'box multi related-info':
+              $doc = $this->transformRelatedInfoBox($doc);
+              break;
+
+            case 'pagetop':
+              $doc = $this->stripPageTopLinks($doc);
+              break;
+
+            case 'exit-disclaimer':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'exitepa':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'tabs':
+              $doc = $this->stripTabClasses($doc);
+              break;
+
+            case 'need Adobe Reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+
+            case 'need a PDF reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+          }
+        }
+      }
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
