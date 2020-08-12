@@ -32,14 +32,16 @@ resource "aws_ecs_task_definition" "drush_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
+  requires_compatibilities = [ "EC2", "FARGATE" ]
+
+  cpu    = 1024
+  memory = 2048
+
   # See cluster.tf for more information on these parameters
   container_definitions = jsonencode([
     {
       name  = "drush"
       image = "${aws_ecr_repository.drush.repository_url}:${var.image-tag-drush}"
-
-      cpu    = 1024
-      memory = 2048
 
       # By explicitly emptying these values, we allow task overrides to effectively
       # take precedence over what is specified in the container. This enables us
@@ -60,8 +62,9 @@ resource "aws_ecs_task_definition" "drush_task" {
         logDriver = "awslogs"
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.drush.name
-          awslogs-region = var.aws-region
+          awslogs-group         = aws_cloudwatch_log_group.drush.name
+          awslogs-region        = var.aws-region
+          awslogs-stream-prefix = "drush"
         }
       }
     }
