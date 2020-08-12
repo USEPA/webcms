@@ -110,14 +110,14 @@ data "template_cloudinit_config" "utility" {
   }
 }
 
-# Create a utility server if requested
-resource "aws_instance" "utility" {
-  ami                         = data.aws_ssm_parameter.utility-ami.value
-  associate_public_ip_address = false
-  instance_type               = "t3a.micro"
-  subnet_id                   = aws_subnet.private[0].id
-  iam_instance_profile        = aws_iam_instance_profile.utility_profile.name
-  user_data_base64            = data.template_cloudinit_config.utility.rendered
+resource "aws_launch_template" "utility" {
+  name = "webcms-launch-template-${local.env-suffix}-utility"
+
+  image_id      = data.aws_ssm_parameter.utility-ami.value
+  user_data     = data.template_cloudinit_config.utility.rendered
+  instance_type = "t3a.micro"
+
+  max_instance_lifetime = 7 * 24 * 3600
 
   vpc_security_group_ids = [
     aws_security_group.utility.id,
@@ -128,7 +128,39 @@ resource "aws_instance" "utility" {
     aws_security_group.search_access.id
   ]
 
+  monitoring {
+    enabled = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.utility_profile.name
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Utility"
   })
+}
+
+resource "aws_autoscaling_group" "utility" {
+  name = "webcms-autoscaling-${local.env-suffix}-utility"
+
+  max_size = 1
+  min_size = 0
+
+  vpc_zone_identifier = aws_subnet.private.*.id
+
+  launch_template {
+    id      = aws_launch_template.utility.id
+    version = "$Latest"
+  }
+
+  dynamic "tag" {
+    for_each = merge(local.common-tags, { Name = "${local.name-prefix} Utility" })
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 }
