@@ -40,7 +40,7 @@ class EPANotificationInformation extends NotificationInformation {
   public function getNotifications(EntityInterface $entity) {
     $notifications = [];
 
-    $exclude_process = !empty($entity->epa_revision_automated) && $entity->epa_revision_automated->value ? 'manual' : 'automatic';
+    $exclude_process = !empty($entity->epa_revision_automated) && !empty($entity->epa_revision_automated->value) && $entity->epa_revision_automated->value ? 'manual' : 'automatic';
 
     if ($this->isModeratedEntity($entity)) {
       $workflow = $this->getWorkflow($entity);
