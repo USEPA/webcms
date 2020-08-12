@@ -28,6 +28,12 @@ class EpaOgMembership extends DrupalSqlBase {
       ->condition('eoom.entity_type', $this->configuration['d7_entity_type'])
       ->fields('eoom', ['etid', 'gid']);
 
+    if (isset($this->configuration['node_bundle'])) {
+      $query->innerJoin('node', 'n', 'eoom.etid = n.nid');
+      $query->condition('n.type', $this->configuration['node_bundle']);
+      $query->condition('eoom.entity_type', 'node');
+    }
+
     return $query;
   }
 
