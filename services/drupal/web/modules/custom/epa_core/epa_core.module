@@ -20,6 +20,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
  * Implements hook_menu_local_tasks_alter().
@@ -400,6 +401,26 @@ function epa_core_node_presave(NodeInterface $node) {
     if (!empty($term)) {
       $term = reset($term);
       $node->field_type = $term->id();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ */
+function epa_core_node_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // If there is no comment due date, then notify the public with a message
+  // that comments aren't being accepted.
+  if ($entity->bundle() == 'public_notice' && $build['#view_mode'] == 'full') {
+    if ($entity->field_comments_due_date->isEmpty()) {
+      $build['no_comments_notice']['#markup'] = '<p class="no-comments">' . t('EPA is neither requesting nor accepting comments on this public notice. It is for informational purposes only.') . '</p>';
+    }
+    // Setup the name of the right column from the field label of the "How to
+    // Comment" field so it's dynamic. If it's not set here, then if the "How
+    // to Comment" field is empty, there is no header on the comment box since
+    // the field is not rendered.
+    if ($entity->hasField('field_how_to_comment')) {
+      $build['how_to_comment_header']['#markup'] = $entity->field_how_to_comment->getFieldDefinition()->getLabel();
     }
   }
 }
