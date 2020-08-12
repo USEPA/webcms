@@ -117,8 +117,6 @@ resource "aws_launch_template" "utility" {
   user_data     = data.template_cloudinit_config.utility.rendered
   instance_type = "t3a.micro"
 
-  max_instance_lifetime = 7 * 24 * 3600
-
   vpc_security_group_ids = [
     aws_security_group.utility.id,
 
@@ -146,6 +144,8 @@ resource "aws_autoscaling_group" "utility" {
 
   max_size = 1
   min_size = 0
+
+  max_instance_lifetime = 7 * 24 * 3600
 
   vpc_zone_identifier = aws_subnet.private.*.id
 
