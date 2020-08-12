@@ -1,7 +1,7 @@
 ---
 el: .new
 title: New
-state: inreview
+state: complete
 ---
 The New! tag will be updated according to the language attribute set on the page content.
 

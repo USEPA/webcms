@@ -1,7 +1,7 @@
 ---
 el: .field--list
 title: List Field
-state: inreview
+state: complete
 ---
 
 __Variables:__
