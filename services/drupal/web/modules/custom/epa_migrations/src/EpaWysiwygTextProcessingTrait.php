@@ -25,6 +25,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(pagetop).*?"|';
     $pattern .= 'class=".*?(exit-disclaimer).*?"|';
     $pattern .= 'class=".*?(tabs).*?"|';
+    $pattern .= 'class=".*?(accordion).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -70,6 +71,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'tabs':
               $doc = $this->stripTabClasses($doc);
+              break;
+
+            case 'accordion':
+              $doc = $this->transformAccordion($doc);
               break;
 
             case 'need Adobe Reader to view':
@@ -292,6 +297,50 @@ trait EpaWysiwygTextProcessingTrait {
           $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
         }
 
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform accordions to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped accordion classes.
+   */
+  private function transformAccordion(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Accordion elements.
+    $accordion_elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " accordion ")]');
+
+    if ($accordion_elements) {
+      foreach ($accordion_elements as $ul) {
+        $ul->setAttribute('class', str_replace('accordion', '', $ul->attributes->getNamedItem('class')->value));
+        $lis = $xpath->query('li', $ul);
+
+        foreach ($lis as $li) {
+          $as = $xpath->query('a[contains(concat(" ", @class, " "), " accordion-title ")]', $li);
+          foreach ($as as $a) {
+            // Change a to strong.
+            $strong = $doc->createElement('strong', $a->nodeValue);
+            $a->parentNode->replaceChild($strong, $a);
+          }
+
+          $divs = $xpath->query('div[contains(concat(" ", @class, " "), " accordion-pane ")]', $li);
+          foreach ($divs as $div) {
+            // Remove old classes, id, and any 'display: none' styles.
+            $div->setAttribute('class', str_replace(['accordion-pane', 'is-closed'], '', $div->attributes->getNamedItem('class')->value));
+            $div->removeAttribute('id');
+            $div->setAttribute('style', str_replace('style="display: none;"', '', $div->attributes->getNamedItem('style')->array_count_values));
+          }
+        }
       }
     }
 
