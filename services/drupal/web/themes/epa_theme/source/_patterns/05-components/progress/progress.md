@@ -1,7 +1,7 @@
 ---
 el: .progress
 title: Progress Bar
-state: inprogress
+state: complete
 ---
 
 __Variables:__
