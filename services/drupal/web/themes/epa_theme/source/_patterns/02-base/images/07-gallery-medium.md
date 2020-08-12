@@ -1,6 +1,6 @@
 ---
 title: Medium Gallery
-state: inreview
+state: complete
 ---
 
 __Variables:__

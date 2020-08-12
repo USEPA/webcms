@@ -1,4 +1,4 @@
 ---
 title: Short Datetime
-state: inreview
+state: complete
 ---

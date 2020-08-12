@@ -1,6 +1,6 @@
 ---
 title: Small Gallery
-state: Inreview
+state: complete
 ---
 
 __Variables:__
