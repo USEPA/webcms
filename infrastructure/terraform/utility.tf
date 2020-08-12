@@ -123,7 +123,10 @@ resource "aws_launch_template" "utility" {
     # Grant access from the utility server for administrative tasks
     aws_security_group.database_access.id,
     aws_security_group.cache_access.id,
-    aws_security_group.search_access.id
+    aws_security_group.search_access.id,
+
+    # Grant access to the AWS VPC endpoints
+    aws_security_group.interface_access.id,
   ]
 
   monitoring {
