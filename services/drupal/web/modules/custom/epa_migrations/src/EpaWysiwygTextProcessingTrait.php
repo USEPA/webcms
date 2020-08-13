@@ -142,7 +142,7 @@ trait EpaWysiwygTextProcessingTrait {
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
-        $h2 = $xpath->query('//h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
+        $h2 = $xpath->query('h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
         if ($h2) {
           $box_title = $doc->createElement('div', $h2->nodeValue);
           $box_title_classes = $h2->attributes->getNamedItem('class')->value;
@@ -152,7 +152,7 @@ trait EpaWysiwygTextProcessingTrait {
         }
 
         // Replace div class on pane content.
-        $box_content = $xpath->query('//div[contains(@class, "pane-content")]', $rib_wrapper)[0];
+        $box_content = $xpath->query('div[contains(@class, "pane-content")]', $rib_wrapper)[0];
         if ($box_content) {
           $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
           $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
@@ -272,7 +272,7 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($tabs_parent_element as $parent_element) {
         if ($parent_element->tagName == 'div') {
           $parent_element->removeAttribute('id');
-          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
+          $uls = $xpath->query('ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
           foreach ($uls as $ul) {
             $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
             if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
@@ -287,12 +287,12 @@ trait EpaWysiwygTextProcessingTrait {
           }
         }
 
-        $lis = $xpath->query('//li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
+        $lis = $xpath->query('li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
         foreach ($lis as $li) {
           $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
         }
 
-        $links = $xpath->query('//a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
+        $links = $xpath->query('a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
         foreach ($links as $link) {
           $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
         }
