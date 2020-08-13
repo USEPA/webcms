@@ -28,8 +28,8 @@ data "template_cloudinit_config" "utility" {
       - mariadb
     write_files:
       - path: /usr/local/bin/webcms-env-info
-        mode: 0755
-        contents: |
+        permissions: 0755
+        content: |
           #!/bin/bash
 
           cat <<INFO
@@ -50,8 +50,8 @@ data "template_cloudinit_config" "utility" {
           S3: s3://${aws_s3_bucket.uploads.bucket}
           INFO
       - path: /usr/local/bin/webcms-sql-dump
-        mode: 0755
-        contents: |
+        permissions: 0755
+        content: |
           #!/bin/bash
 
           set -euo pipefail

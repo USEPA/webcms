@@ -1,7 +1,7 @@
 ---
 el: .field
 title: Field without item separator
-state: inreview
+state: complete
 ---
 
 __Variables:__
