@@ -137,8 +137,13 @@ class EpaNode extends Node {
 
       }
     }
+    else {
+      // Return the body content as 'main_col_panes' so it can be converted to
+      // a paragraph.
+      $row->setSourceProperty('main_col_panes', $row->getSourceProperty('body'));
+    }
 
-    parent::prepareRow($row);
+    return parent::prepareRow($row);
   }
 
   /**
