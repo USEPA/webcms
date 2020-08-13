@@ -85,9 +85,7 @@ class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssI
    * {@inheritdoc}
    */
   public function getLibraries(Editor $editor) {
-    return [
-      'epa_wysiwyg/epa-add-definitions',
-    ];
+    return [];
   }
 
   /**
@@ -109,9 +107,7 @@ class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssI
    */
   public function getCssFiles(Editor $editor) {
     return [
-      drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.css',
       drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.admin.css',
     ];
   }
-
 }
