@@ -111,7 +111,7 @@ class EpaNodeRevision extends NodeRevision {
       }
     }
 
-    parent::prepareRow($row);
+    return parent::prepareRow($row);
   }
 
   /**
