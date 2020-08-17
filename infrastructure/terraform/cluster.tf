@@ -46,7 +46,7 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
-  name               = local.cluster-name
+  name = local.cluster-name
 
   # FARGATE adds the ability to launch tasks in Fargate; we primarily use this for Drush
   # in order to protect it from the vagaries of autoscaling group resizes prematurely
@@ -84,6 +84,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
+  # Setting reservations at the task level lets Docker be more flexible in how the
+  # resources are used (mainly, it allows Drupal to soak up as much CPU capacity as it
+  # needs)
+  cpu    = 1024
+  memory = 2048
+
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
     # container, which means that by itself it cannot receive HTTP requests. Instead, the
@@ -97,10 +103,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # Service updates are triggered when either of these two references changes.
       image = "${aws_ecr_repository.drupal.repository_url}:${var.image-tag-drupal}",
-
-      # Resource limits
-      cpu    = 768, # = 0.75 vCPU
-      memory = 1024,
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true,
@@ -135,11 +137,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # As with the Drupal definition, service updates are triggered when these change.
       image = "${aws_ecr_repository.nginx.repository_url}:${var.image-tag-nginx}",
-
-      # Resource limits. We assume that nginx is able to use fewer resources since it is
-      # mostly going to execute routing decisions and proxy requests.
-      cpu    = 192,
-      memory = 256,
 
       environment = [
         # See nginx.conf in services/drupal for why this is needed.
@@ -177,9 +174,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
     {
       name  = "cloudwatch",
       image = "amazon/cloudwatch-agent:latest",
-
-      cpu    = 64,
-      memory = 256,
 
       # The agent reads its JSON-formatted configuration from the environment in containers
       environment = [

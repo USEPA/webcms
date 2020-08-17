@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "drush_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
-  requires_compatibilities = [ "EC2", "FARGATE" ]
+  requires_compatibilities = ["EC2", "FARGATE"]
 
   cpu    = 1024
   memory = 2048

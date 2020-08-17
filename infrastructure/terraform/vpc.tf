@@ -19,7 +19,7 @@ resource "aws_vpc_dhcp_options" "options" {
   count = length(aws_vpc.main)
 
   # This is the default for VPCs
-  domain_name = "ec2.internal"
+  domain_name         = "ec2.internal"
   domain_name_servers = ["AmazonProvidedDNS"]
 
   tags = merge(local.common-tags, {
