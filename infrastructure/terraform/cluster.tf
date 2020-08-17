@@ -46,7 +46,7 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
-  name               = local.cluster-name
+  name = local.cluster-name
 
   # FARGATE adds the ability to launch tasks in Fargate; we primarily use this for Drush
   # in order to protect it from the vagaries of autoscaling group resizes prematurely
@@ -87,7 +87,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # Setting reservations at the task level lets Docker be more flexible in how the
   # resources are used (mainly, it allows Drupal to soak up as much CPU capacity as it
   # needs)
-  cpu = 1024
+  cpu    = 1024
   memory = 2048
 
   container_definitions = jsonencode([
