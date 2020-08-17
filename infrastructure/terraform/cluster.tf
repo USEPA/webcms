@@ -194,10 +194,10 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group = aws_cloudwatch_log_group.agent.name,
+          awslogs-group  = aws_cloudwatch_log_group.agent.name,
           awslogs-region = var.aws-region,
-        },
-      },
+        }
+      }
     },
 
     # This is a small Alpine container used to report metrics from FPM to CloudWatch
@@ -341,6 +341,15 @@ resource "aws_ecs_task_definition" "drupal_task" {
         done
         COMMAND
       ]
+
+      logConfiguration = {
+        logDriver = "awslogs",
+
+        options = {
+          awslogs-group  = aws_cloudwatch_log_group.fpm_metrics.name,
+          awslogs-region = var.aws-region,
+        }
+      }
     }
   ])
 
