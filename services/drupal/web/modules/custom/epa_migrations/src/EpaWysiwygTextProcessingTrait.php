@@ -20,11 +20,19 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view|"(.*?tabs.*?)"/s';
+    $pattern = '/';
+    $pattern .= 'class=".*?(box multi related-info).*?"|';
+    $pattern .= 'class=".*?(pagetop).*?"|';
+    $pattern .= 'class=".*?(exit-disclaimer).*?"|';
+    $pattern .= 'class=".*?(tabs).*?"|';
+    $pattern .= 'class=".*?(accordion).*?"|';
+    $pattern .= 'href=".*?(exitepa).*?"|';
+    $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
+    $pattern .= '/';
 
-    $num_matches = preg_match($pattern, $wysiwyg_content);
+    $matches = [];
 
-    if ($num_matches > 0) {
+    if (preg_match_all($pattern, $wysiwyg_content, $matches) > 0) {
       // Add a temp wrapper around the wysiwyg content.
       $wysiwyg_content = '<?xml encoding="UTF-8"><tempwrapper>' . $wysiwyg_content . '</tempwrapper>';
 
@@ -34,12 +42,51 @@ trait EpaWysiwygTextProcessingTrait {
       $doc->loadHtml($wysiwyg_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT);
       libxml_clear_errors();
 
-      // Run the document through the transformation methods.
-      $doc = $this->transformRelatedInfoBox($doc);
-      $doc = $this->stripPageTopLinks($doc);
-      $doc = $this->stripExitEpaLinks($doc);
-      $doc = $this->stripPdfDisclaimers($doc);
-      $doc = $this->stripTabClasses($doc);
+      // Run the document through the transformation methods depending on the
+      // matches identified.
+      foreach ($matches as $key => $match_strings) {
+
+        // Skip the first value, which contains the full pattern matches.
+        if ($key > 0) {
+          // Get unique values with array_unique, then remove any empty strings
+          // with array_filter, and finally get the remaining match text.
+          $match = array_pop(array_filter(array_unique($match_strings)));
+
+          switch ($match) {
+            case 'box multi related-info':
+              $doc = $this->transformRelatedInfoBox($doc);
+              break;
+
+            case 'pagetop':
+              $doc = $this->stripPageTopLinks($doc);
+              break;
+
+            case 'exit-disclaimer':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'exitepa':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'tabs':
+              $doc = $this->stripTabClasses($doc);
+              break;
+
+            case 'accordion':
+              $doc = $this->transformAccordion($doc);
+              break;
+
+            case 'need Adobe Reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+
+            case 'need a PDF reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+          }
+        }
+      }
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -95,7 +142,7 @@ trait EpaWysiwygTextProcessingTrait {
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
-        $h2 = $xpath->query('//h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
+        $h2 = $xpath->query('h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
         if ($h2) {
           $box_title = $doc->createElement('div', $h2->nodeValue);
           $box_title_classes = $h2->attributes->getNamedItem('class')->value;
@@ -105,7 +152,7 @@ trait EpaWysiwygTextProcessingTrait {
         }
 
         // Replace div class on pane content.
-        $box_content = $xpath->query('//div[contains(@class, "pane-content")]', $rib_wrapper)[0];
+        $box_content = $xpath->query('div[contains(@class, "pane-content")]', $rib_wrapper)[0];
         if ($box_content) {
           $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
           $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
@@ -225,7 +272,7 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($tabs_parent_element as $parent_element) {
         if ($parent_element->tagName == 'div') {
           $parent_element->removeAttribute('id');
-          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
+          $uls = $xpath->query('ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
           foreach ($uls as $ul) {
             $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
             if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
@@ -240,16 +287,60 @@ trait EpaWysiwygTextProcessingTrait {
           }
         }
 
-        $lis = $xpath->query('//li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
+        $lis = $xpath->query('li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
         foreach ($lis as $li) {
           $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
         }
 
-        $links = $xpath->query('//a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
+        $links = $xpath->query('a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
         foreach ($links as $link) {
           $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
         }
 
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform accordions to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped accordion classes.
+   */
+  private function transformAccordion(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Accordion elements.
+    $accordion_elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " accordion ")]');
+
+    if ($accordion_elements) {
+      foreach ($accordion_elements as $ul) {
+        $ul->setAttribute('class', str_replace('accordion', '', $ul->attributes->getNamedItem('class')->value));
+        $lis = $xpath->query('li', $ul);
+
+        foreach ($lis as $li) {
+          $as = $xpath->query('a[contains(concat(" ", @class, " "), " accordion-title ")]', $li);
+          foreach ($as as $a) {
+            // Change a to strong.
+            $strong = $doc->createElement('strong', $a->nodeValue);
+            $a->parentNode->replaceChild($strong, $a);
+          }
+
+          $divs = $xpath->query('div[contains(concat(" ", @class, " "), " accordion-pane ")]', $li);
+          foreach ($divs as $div) {
+            // Remove old classes, id, and any 'display: none' styles.
+            $div->setAttribute('class', str_replace(['accordion-pane', 'is-closed'], '', $div->attributes->getNamedItem('class')->value));
+            $div->removeAttribute('id');
+            $div->setAttribute('style', str_replace('style="display: none;"', '', $div->attributes->getNamedItem('style')->array_count_values));
+          }
+        }
       }
     }
 
