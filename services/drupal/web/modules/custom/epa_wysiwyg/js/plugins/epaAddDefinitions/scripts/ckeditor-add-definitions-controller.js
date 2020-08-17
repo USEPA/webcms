@@ -539,8 +539,14 @@ var CKEditorAddDefinitions = (function(my, $, undefined) {
     my.applyTermReplace(my.rawContentParent, entry.term, indexNum+1, replaceMaskNode, my.rawReplacementsNodes, my.rawReplacements);
     my.applyTermReplace(my.displayContent, entry.term, indexNum+1, replaceMaskNode, [], [], true);
 
-    my.termOrder[step][2] = ('<a class="termlookup-tooltip" href="#self"><span class="termlookup-custom"><img width="48" height="48" alt="Help" src="'
-    + my.dictionaryModulePath + 'images/add_definitions_icon_popup_help.png"><em> ' + entry.term + '</em> ' + entry.definition + '</span></a>'
+    my.termOrder[step][2] = (
+      '<span class="definition js-definition"><button class="definition__trigger js-definition__trigger">' +
+      entry.term +
+      '</button><span class="definition__tooltip js-definition__tooltip" role="tooltip"><dfn class="definition__term">' +
+      entry.term +
+      '</dfn>' +
+      entry.definition +
+      '</span></span>'
     ).length;
   }
 
@@ -651,33 +657,28 @@ var CKEditorAddDefinitions = (function(my, $, undefined) {
 
   // Create and return a new DOM element which contains all markup for a term and associated definition.
   function createTermNode(occurrenceNum, entryDefinition) {
+    var entryTerm = '%TERM%';
+    var definition = document.createElement('span');
+    definition.setAttribute('class', 'definition js-definition');
 
-    var anchor = document.createElement('a');
-    anchor.setAttribute('class', 'termlookup-tooltip');
-    anchor.setAttribute('occurrence', occurrenceNum);
-    anchor.setAttribute('href', '#self');
+    var button = document.createElement('button');
+    button.setAttribute('class', 'definition__trigger js-definition__trigger');
+    button.appendChild(document.createTextNode(entryTerm));
 
-    var span = document.createElement('span');
-    span.setAttribute('class', 'termlookup-custom');
+    var tooltip = document.createElement('span');
+    tooltip.setAttribute('class', 'definition__tooltip js-definition__tooltip');
+    tooltip.setAttribute('role', 'tooltip');
 
-    var img = document.createElement('img');
-    img.setAttribute('width', '48');
-    img.setAttribute('height', '48');
-    img.setAttribute('alt', 'Help');
-    img.setAttribute('src', my.dictionaryModulePath + 'images/add_definitions_icon_popup_help.png');
+    var term = document.createElement('dfn');
+    term.setAttribute('class', 'definition__term');
+    term.appendChild(document.createTextNode(entryTerm));
 
-    var em = document.createElement('em');
+    tooltip.appendChild(term);
+    tooltip.appendChild(document.createTextNode(entryDefinition));
+    definition.appendChild(button);
+    definition.appendChild(tooltip);
 
-    var definitionText = document.createTextNode(entryDefinition);
-
-    anchor.appendChild(document.createTextNode('%TERM%'));
-    anchor.appendChild(span);
-    span.appendChild(img);
-    span.appendChild(em);
-    em.appendChild(document.createTextNode('%TERM%'));
-    span.appendChild(definitionText);
-
-    return anchor;
+    return definition;
   }
 
   function computeDisplayOffset(step) {

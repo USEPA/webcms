@@ -357,6 +357,30 @@ resource "aws_security_group_rule" "drupal_lb_ingress" {
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
+resource "aws_security_group_rule" "lb_drupal_ping_egress" {
+  description = "Allow outgoing connections from ALBs to the PHP-FPM /ping endpoint"
+
+  security_group_id = aws_security_group.load_balancer.id
+
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 8080
+  to_port                  = 8080
+  source_security_group_id = aws_security_group.drupal_task.id
+}
+
+resource "aws_security_group_rule" "drupal_lb_ping_ingress" {
+  description = "Allow incoming connections from ALBs to the PHP-FPM /ping endpoint"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 8080
+  to_port                  = 8080
+  source_security_group_id = aws_security_group.load_balancer.id
+}
+
 resource "aws_security_group" "cache" {
   name        = "webcms-cache-sg-${local.env-suffix}"
   description = "Security group for ElastiCache servers"
