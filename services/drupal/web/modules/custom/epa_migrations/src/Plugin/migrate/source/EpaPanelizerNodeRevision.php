@@ -109,7 +109,7 @@ class EpaPanelizerNodeRevision extends NodeRevision {
       $row->setSourceProperty('panes', $panes);
     }
 
-    parent::prepareRow($row);
+    return parent::prepareRow($row);
   }
 
 }
