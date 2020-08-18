@@ -17,3 +17,8 @@ resource "aws_cloudwatch_log_group" "drush" {
 resource "aws_cloudwatch_log_group" "agent" {
   name = "/webcms-${local.env-suffix}/cloudwatch-agent"
 }
+
+# Log group for the FPM metrics helper
+resource "aws_cloudwatch_log_group" "fpm_metrics" {
+  name = "/webcms-${local.env-suffix}/fpm-metrics"
+}
