@@ -211,7 +211,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
       environment = [
         # Configure the region for aws-cli
         {
-          name  = "AWS_REGION"
+          name  = "AWS_DEFAULT_REGION"
           value = var.aws-region
         },
 
