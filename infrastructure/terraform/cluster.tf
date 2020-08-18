@@ -209,6 +209,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
       image = "alpine:latest"
 
       environment = [
+        # Configure the region for aws-cli
+        {
+          name  = "AWS_REGION"
+          value = var.aws-region
+        },
+
         {
           name  = "WEBCMS_ENV_NAME"
           value = var.site-env-name
@@ -337,7 +343,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
           input="$(curl -s http://localhost:8080/status?json)"
           echo "PHP-FPM metrics: $input"
 
-          metrics="$(echo "$input" | jq "$WEBCMS_METRICS_SCRIPT" --argjson metrics "$WEBCMS_METRICS_MAP")"
+          metrics="$(echo "$input" | jq -c "$WEBCMS_METRICS_SCRIPT" --argjson metrics "$WEBCMS_METRICS_MAP")"
           echo "CloudWatch metrics: $metrics"
 
           aws cloudwatch put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
