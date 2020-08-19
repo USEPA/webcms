@@ -6,12 +6,23 @@
  */
 
 /**
+ * Implements hook_library_info_alter().
+ */
+function epa_wysiwyg_library_info_alter(&$libraries, $extension) {
+  // Add CKEditor overrides JS file to CKEditor library.
+  if ($extension == 'ckeditor' && isset($libraries['drupal.ckeditor'])) {
+    $module_path = drupal_get_path('module', 'epa_wysiwyg');
+    $js_path = "/$module_path/js/ckeditor-overrides.js";
+    $libraries['drupal.ckeditor']['js'][$js_path] = [];
+  }
+}
+
+/**
  * Implements hook_page_attachments().
  */
 function epa_wysiwyg_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-new';
 }
-
 
 function epa_wysiwyg_pathologic_alter(&$url_params, $parts, $settings) {
   // Do not rewrite links to minio container.  This is necessary because
