@@ -315,7 +315,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
               Value: $input[.key],
               Timestamp: now | floor,
               Dimensions: [
-                { Name: "Environment", value: "\($ENV.WEBCMS_ENV_NAME)" }
+                { Name: "Environment", Value: "\($ENV.WEBCMS_ENV_NAME)" }
               ]
             })
           SCRIPT
