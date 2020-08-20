@@ -26,6 +26,11 @@ services:
     arguments: ['@logger.factory', '@entity_type.manager', '@content_moderation_notifications.notification', '@content_moderation_notifications.notification_information']
     public: false
     abstract: true
+  epa_workflow.base_moderation:
+    class: Drupal\epa_workflow\EPABaseModeration
+    parent: epa_workflow.default_moderation
+    tags:
+      - { name: epa_workflow_moderation_manager }
   epa_workflow.draft_approved_moderation:
     class: Drupal\epa_workflow\EPADraftApproved
     parent: epa_workflow.default_moderation
