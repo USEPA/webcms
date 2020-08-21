@@ -209,12 +209,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
       image = "alpine:latest"
 
       environment = [
-        # Configure the region for aws-cli
-        {
-          name  = "AWS_DEFAULT_REGION"
-          value = var.aws-region
-        },
-
         {
           name  = "WEBCMS_ENV_NAME"
           value = var.site-env-name
@@ -321,7 +315,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
               Value: $input[.key],
               Timestamp: now | floor,
               Dimensions: [
-                { Name: "Environment", value: "\($ENV.WEBCMS_ENV_NAME)" }
+                { Name: "Environment", Value: "\($ENV.WEBCMS_ENV_NAME)" }
               ]
             })
           SCRIPT
@@ -346,7 +340,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
           metrics="$(echo "$input" | jq -c "$WEBCMS_METRICS_SCRIPT" --argjson metrics "$WEBCMS_METRICS_MAP")"
           echo "CloudWatch metrics: $metrics"
 
-          aws cloudwatch put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
+          aws cloudwatch --region=${var.aws-region} put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
         done
         COMMAND
       ]

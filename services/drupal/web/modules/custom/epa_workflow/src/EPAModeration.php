@@ -112,6 +112,10 @@ abstract class EPAModeration implements EPAModerationInterface {
       $this->isAutomated = TRUE;
       $this->contentEntityRevision->set('epa_revision_automated', NULL);
     }
+
+    if ($this->contentEntityRevision->isPublished()) {
+      $this->scheduleTransition('field_expiration_date', 'unpublished');
+    }
   }
 
   /**
