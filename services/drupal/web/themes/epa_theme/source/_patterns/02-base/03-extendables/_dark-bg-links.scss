@@ -1,0 +1,25 @@
+// @file
+// Dark Background Links
+//
+
+// Dark gray background with white links.
+%dark-bg-link {
+  &:link,
+  &:visited {
+    color: gesso-grayscale(gray-2);
+
+    &::after {
+      @include svg-background-important(external-link--gray-2);
+    }
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    color: gesso-grayscale(white);
+
+    &::after {
+      @include svg-background-important(external-link--white);
+    }
+  }
+}
