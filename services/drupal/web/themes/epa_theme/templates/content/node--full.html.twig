@@ -45,7 +45,17 @@
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
 {% endif %}
 
+{% set display_sidenav = false %}
+
 {% if sidenav|render|striptags|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
+{% if node.field_wide_template.value %}
+  {% set display_sidenav = false %}
+{% endif %}
+
+{% if display_sidenav %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_footer': true,
