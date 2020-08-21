@@ -130,7 +130,6 @@ while true; do
   container="$(jq ".containers[0]" <<<"$task")"
   exit_code="$(jq -r ".exitCode | values" <<<"$container")"
   exit_reason="$(jq -r ".reason | values" <<<"$container")"
-  id="$(jq ".runtimeId | values" <<<"$container")"
 
   # Tracks if we need to exit with 1 or 0
   failure=
@@ -166,19 +165,17 @@ while true; do
 
   # Formats of this block:
   #   Logs URL: <link>
-  #   Logs URL: Unavailable
   echo -n "Logs: "
-  if test -n "$id"; then
-    # Construct a direct link to the CloudWatch logs.
-    url="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/\$252Fwebcms-$WEBCMS_ENVIRONMENT\$252Fapp-drush/log-events/$id"
 
-    # Generate a nicely-formatted URL for the Buildkite logs
-    # cf. https://buildkite.com/docs/pipelines/links-and-images-in-log-output#links
-    printf '\033]1339;%s\a\n' "url='$url';content='$id'"
-  else
-    echo "Unavailable"
-    failure=1
-  fi
+  # Construct a direct link to the CloudWatch logs.
+  IFS=/ read -ra parts <<<"$arn"
+  log_group="/webcms-$WEBCMS_ENVIRONMENT/app-drush"
+  log_stream="drush/drush/${parts[1]}"
+  url="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/${log_group//\//\$252F}/log-events/${log_stream//\//\$252F}"
+
+  # Generate a nicely-formatted URL for the Buildkite logs
+  # cf. https://buildkite.com/docs/pipelines/links-and-images-in-log-output#links
+  printf '\033]1339;%s\a\n' "url='$url';content='Task ${parts[1]}'"
   echo
 
   # Now that we've output all the information we know about, we can exit
