@@ -16,9 +16,9 @@
 {% set header_info %}
   {% if sidenav %}
     {% if node.field_wide_template.value %}
-      {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+      {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: true}}) }}
     {% else %}
-      {{ node.group_content|view({type: 'parent_group_label_formatter', settings: {link: false}}) }}
+      {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: false}}) }}
     {% endif %}
   {% else %}
     {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
