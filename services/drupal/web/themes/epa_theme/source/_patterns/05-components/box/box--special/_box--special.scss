@@ -4,6 +4,10 @@
 .box--special {
   background: gesso-grayscale(gray-1);
 
+  &.has-image-header {
+    max-width: rem($image-header-width) + rem(units(4));
+  }
+
   > .box__title,
   > .box__content,
   > .box__footer {
@@ -15,6 +19,11 @@
     @extend %h3;
   }
 
+  > .box__image {
+    margin: rem(units(2));
+  }
+
+  > * + .box__image,
   > * + .box__content,
   > * + .box__footer {
     margin-top: rem(units('05')) * -1;
