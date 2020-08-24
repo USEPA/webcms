@@ -34,6 +34,12 @@
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
+{% set has_footer = false %}
+
+{% if footer|render|striptags|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
 {% set attributes = attributes.addClass(classes) %}
 
 {% if node.field_language.value %}
@@ -53,7 +59,7 @@
 
 {% include '@templates/web-area-homepages/microsite.twig' with {
   'has_header': true,
-  'has_footer': true,
+  'has_footer': has_footer,
   'header_info': header_info,
   'contact_link': contact_link,
   'title': label,
