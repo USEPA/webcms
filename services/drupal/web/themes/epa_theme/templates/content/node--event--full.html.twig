@@ -52,8 +52,17 @@
   {{ content|without(
     'epa_content_moderation_control',
     'field_date',
-    'field_location'
+    'field_location',
+    'field_event_cancellation'
   ) }}
+{% endset %}
+
+{% set title %}
+  {%- if node.field_event_cancellation.value == 1 -%}
+    {{ 'Canceled'|t }}: {{ label }}
+  {%- else -%}
+    {{ label }}
+  {%- endif -%}
 {% endset %}
 
 {% if sidenav|render|striptags|trim %}
@@ -63,7 +72,7 @@
     'has_sidenav': true,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,
@@ -75,7 +84,7 @@
     'has_header': true,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,
