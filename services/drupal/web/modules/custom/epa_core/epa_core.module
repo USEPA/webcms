@@ -338,6 +338,10 @@ function epa_core_entity_delete(EntityInterface $entity) {
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Disable HTML5 validation on all forms.
+  $form['#attributes']['novalidate'] = 'novalidate';
+
+  // Adds some extra descriptive text to media upload.
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
