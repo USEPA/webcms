@@ -5,8 +5,21 @@
  */
 #}
 
+
+
 {% extends "page.html.twig" %}
 
 {% block main_content %}
-  {{ page.content }}
+  {% if node %}
+    {{ page.content }}
+  {% else %}
+    {# Use generic wrapper if no node object (e.g., 404 error) #}
+    <div class="l-page">
+      <div class="l-constrain">
+        <h1 class="page-title">{{ page['#title'] }}</h1>
+        {{ page.content }}
+      </div>
+    </div>
+  {% endif %}
+
 {% endblock %}
