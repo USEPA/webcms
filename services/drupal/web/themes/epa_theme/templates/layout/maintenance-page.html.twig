@@ -1,0 +1,77 @@
+{#
+/**
+ * @file
+ * Default theme implementation to display a single Drupal page while offline.
+ *
+ * All available variables are mirrored in page.html.twig.
+ * Some may be blank but they are provided for consistency.
+ *
+ * @see template_preprocess_maintenance_page()
+ *
+ * @ingroup themeable
+ */
+#}
+
+{% include '@uswds/banner/banner.twig' with {
+  'banner_text': 'An official website of the United States government'|t,
+  'has_expanded': true,
+  'banner_action': 'Here’s how you know'|t,
+  'expanded_blocks': [
+    {
+      'icon': '/themes/epa_theme/images/icon-dot-gov.svg',
+      'icon_alt': 'Dot gov'|t,
+      'heading': 'The .gov means it’s official.'|t,
+      'content': 'Federal government websites often end in .gov or .mil. Before sharing sensitive information, make sure you’re on a federal government site.'|t,
+    },
+    {
+      'icon': '/themes/epa_theme/images/icon-https.svg',
+      'icon_alt': 'HTTPS',
+      'heading': 'The site is secure.'|t,
+      'content': 'When combined with .gov, the <strong>https://</strong> ensures that you are connecting to the official website and that any information you provide is encrypted and transmitted securely.'|t,
+    },
+  ],
+} %}
+
+{{ page.header }}
+
+{% embed '@layouts/header/header.twig' %}
+  {% block logo %}
+    {% include "@components/site-logo/site-logo.twig" with {
+      'url': '/',
+    } %}
+  {% endblock %}
+
+  {% block search %}
+    {% include '@components/search/search--epa/search--epa.twig' %}
+  {% endblock %}
+
+  {% block navigation %}
+    {% embed '@components/nav/nav--epa/nav--epa.twig' with {
+      'label': 'Primary navigation'|t,
+      'extended': true,
+    } %}
+      {% block menu %}
+        {{ page.navigation }}
+      {% endblock %}
+    {% endembed %}
+  {% endblock %}
+{% endembed %}
+
+{{ page.help }}
+
+<main id="main" class="main" role="main" tabindex="-1">
+  {% block main_content %}
+    <div class="l-page">
+      <div class="l-constrain">
+        <h1 class="page-title">{{ page['#title'] }}</h1>
+        {{ page.content }}
+      </div>
+    </div>
+  {% endblock %}
+</main>
+
+{% embed '@components/footer/footer.twig' %}
+  {% block content %}
+    {{ page.footer }}
+  {% endblock %}
+{% endembed %}
