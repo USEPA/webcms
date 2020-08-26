@@ -251,6 +251,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'contact-us-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
           // load the group's contact form information
@@ -265,6 +266,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'contact-us-header-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
           // load the group's contact form information
@@ -283,7 +285,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         break;
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
-        $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
+        $bubbleable_metadata->addCacheContexts(['url']);
         if (isset($node) && !$node->field_last_published->isEmpty()) {
           $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
