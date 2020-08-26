@@ -289,45 +289,57 @@ resource "aws_security_group" "drupal_task" {
 
   vpc_id = local.vpc-id
 
-  egress {
-    description = "Allow outgoing HTTP traffic"
-
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow outgoing HTTPS traffic"
-
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow access to VPC endpoint services"
-
-    protocol        = "tcp"
-    from_port       = 0
-    to_port         = 0
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  egress {
-    description = "Allow access SMTP servers for email"
-
-    protocol    = "tcp"
-    from_port   = 587
-    to_port     = 587
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Drupal Containers"
   })
+}
+
+resource "aws_security_group_rule" "drupal_http_egress" {
+  description = "Allow outgoing HTTP traffic"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 80
+  to_port     = 80
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "drupal_https_egress" {
+  description = "Allow outgoing HTTPS traffic"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 443
+  to_port     = 443
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "drupal_interface_egress" {
+  description = "Allow access to VPC endpoint services"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 0
+  to_port                  = 0
+  source_security_group_id = aws_security_group.interface.id
+}
+
+resource "aws_security_group_rule" "drupal_smtp_egress" {
+  description = "Allow access to SMTP servers for email"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 587
+  to_port     = 587
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 # Rule: egress from load balancers to Drupal
