@@ -2,20 +2,23 @@
 
 ## Table of Contents
 
-* [Prerequisites](#prerequisites)
-* [Special Variables](#special-variables)
-    * [`site-env-name`](#site-env-name)
-    * [`site-env-state`](#site-env-state)
-* [First-Time Setup](#first-time-setup)
-    * [Cluster Infrastructure](#cluster-infrastructure)
-    * [Secrets](#secrets)
-        * [MySQL Root User](#mysql-root-user)
-        * [MySQL WebCMS Users](#mysql-webcms-users)
-        * [Mail Password](#mail-password)
-        * [Hash Salt](#hash-salt)
-* [Initial Image Builds](#initial-image-builds)
-* [Drupal Installation](#drupal-installation)
-* [Changing the Environment State](#changing-the-environment-state)
+- [Table of Contents](#table-of-contents)
+- [Prerequisites](#prerequisites)
+- [Special Variables](#special-variables)
+  - [`site-env-name`](#site-env-name)
+  - [`site-env-state`](#site-env-state)
+- [First-Time Setup](#first-time-setup)
+  - [Cluster Infrastructure](#cluster-infrastructure)
+  - [Secrets](#secrets)
+    - [MySQL Root User](#mysql-root-user)
+    - [MySQL WebCMS Users](#mysql-webcms-users)
+    - [Mail Password](#mail-password)
+    - [Hash Salt](#hash-salt)
+- [Initial Image Builds](#initial-image-builds)
+- [Drupal Installation](#drupal-installation)
+- [Changing the Environment State](#changing-the-environment-state)
+- [Terraform Overrides](#terraform-overrides)
+  - [Drupal Egress Rules](#drupal-egress-rules)
 
 ## Prerequisites
 
@@ -185,4 +188,23 @@ The task created by this script is run asynchronously. You can follow progress a
 
 ## Changing the Environment State
 
-Now that Drupal has been installed, it is safe to change the `site-env-state` variable to `"run"`. This will activate the Redis cache backend.
+Now that Drupal has been installed, it is safe to change the `site-env-state` variable to `"run"`. This will activate the Memcached cache backend.
+
+## Terraform Overrides
+
+Most of the Terraform resources are easy to override (see [Override Files](https://www.terraform.io/docs/configuration/override.html) in the documentation). Some notes are included below.
+
+### Drupal Egress Rules
+
+The Drupal task's VPC security egress rules have been separated into individual rules. As a result, each rule can be overridden individually.
+
+Here is an example, overriding the SMTP egress rule to point to a prefix list instead of the default CIDR range of `0.0.0.0/0`:
+
+```terraform
+# In security_override.tf
+
+resource "aws_security_group_rule" "drupal_smtp_egress" {
+  cidr_blocks     = null
+  prefix_list_ids = ["pfx-12345-678"]
+}
+```
