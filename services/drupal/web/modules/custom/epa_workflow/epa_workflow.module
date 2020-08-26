@@ -382,7 +382,7 @@ function epa_workflow_node_update(NodeInterface $node) {
 function _epa_workflow_add_compliance_checkboxes(&$form) {
 
   $link_508 = Link::fromTextAndUrl(
-    t('applicable Section 508 standards'),
+    t('applicable Section 508 requirements'),
     Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
   );
 
@@ -398,14 +398,12 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   // $form['workflow_508_compliant'] = [
   $compliance_checkbox = [
     '#type' => 'checkbox',
-    '#title' => t('I certify that all links on this page comply with @external.', [
-        '@external' => $link_external,
-      ]
-    ),
-    '#description' => t('I certify that the content on this page is accessible per all @508. ' .
-      'This content will be subject to random external site link reviews by the Office of Web Communications, ' .
-      'and that non-compliant pages will be unpublished until remediated.', [
+    '#title' => t('I certify that this page complies with:'),
+    '#description' => t('all @508 and @external.' .
+      'This page will be subject to random external site link reviews and Section508 compliance reviews. ' .
+      'Non-compliant pages will be unpublished until remediated.', [
       '@508' => $link_508,
+      '@external' => $link_external,
     ]),
     '#required' => FALSE,
     '#weight' => -1,
