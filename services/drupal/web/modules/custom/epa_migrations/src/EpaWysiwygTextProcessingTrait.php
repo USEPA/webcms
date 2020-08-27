@@ -30,6 +30,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(row).*?"|';
     $pattern .= 'class=".*?(menu pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
+    $pattern .= 'class=".*?(nostyle).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -103,6 +104,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'pullquote':
               $doc = $this->transformPullquote($doc);
+              break;
+
+            case 'nostyle':
+              $doc = $this->singleClassReplacement($doc);
               break;
           }
         }
@@ -411,6 +416,32 @@ trait EpaWysiwygTextProcessingTrait {
         $new_element->appendChild($span_element);
 
         $element->parentNode->replaceChild($new_element, $element);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Update a single class on an element.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with updated classes.
+   */
+  private function singleClassReplacement(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Tables with nostyle classes.
+    $table_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " nostyle ")]');
+
+    if ($table_elements) {
+      foreach ($table_elements as $table_element) {
+        $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
       }
     }
 
