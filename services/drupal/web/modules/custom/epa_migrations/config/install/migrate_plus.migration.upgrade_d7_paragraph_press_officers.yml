@@ -30,10 +30,13 @@ process:
     -
       plugin: get
       source: field_person_name
-  field_email:
+  field_email/value:
     -
-      plugin: get
+      plugin: extract
       source: field_email
+      index:
+        - 0
+        - email
   field_phone_numbers:
     -
       plugin: get

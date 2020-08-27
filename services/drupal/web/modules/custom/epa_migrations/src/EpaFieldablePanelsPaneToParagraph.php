@@ -97,8 +97,9 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
         ->fetchObject();
       // Determine if this is a reusable pane and whether it already exists.
       if ($pane->reusable) {
+        $label = $fpid . ': ';
         // Set a default label of fpid if there is no admin_title or title.
-        $label = $pane->admin_title ?: $pane_revision->title ?: $fpid;
+        $label .= $pane->admin_title ?: $pane_revision->title;
 
         $library_item = $this->getParagraphLibraryItem($label, $this->entityTypeManager);
 
