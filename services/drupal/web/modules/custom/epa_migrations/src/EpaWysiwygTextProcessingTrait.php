@@ -31,6 +31,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(menu pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
+    $pattern .= 'class=".*?(highlighted).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -107,6 +108,10 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
+              $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'highlighted':
               $doc = $this->singleClassReplacement($doc);
               break;
           }
@@ -442,6 +447,14 @@ trait EpaWysiwygTextProcessingTrait {
     if ($table_elements) {
       foreach ($table_elements as $table_element) {
         $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
+      }
+    }
+
+    // Headings with highlighted class.
+    $highlighted_headings = $xpath->query('//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]');
+    if ($highlighted_headings) {
+      foreach ($highlighted_headings as $heading) {
+        $heading->setAttribute('class', str_replace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
       }
     }
 
