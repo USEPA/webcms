@@ -28,6 +28,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(accordion).*?"|';
     $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
     $pattern .= 'class=".*?(row).*?"|';
+    $pattern .= 'class=".*?(menu pipeline).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -93,6 +94,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'row':
               $doc = $this->transformColumns($doc);
+              break;
+
+            case 'menu pipeline':
+              $doc = $this->transformPipelineUls($doc);
               break;
           }
         }
@@ -441,6 +446,40 @@ trait EpaWysiwygTextProcessingTrait {
           }
         }
 
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform pipeline uls to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed pipeline uls.
+   */
+  private function transformPipelineUls(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Row elements.
+    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " menu pipeline ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+
+        // Replace class.
+        $element->setAttribute('class', str_replace($element->attributes->getNamedItem('class')->value, 'menu pipeline', 'list list--pipeline'));
+
+        // Remove menu-item class from children.
+        $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);
+        foreach ($children as $child) {
+          $child->setAttribute('class', str_replace('menu-item', '', $child->attributes->getNamedItem('class')->value));
+        }
       }
     }
 
