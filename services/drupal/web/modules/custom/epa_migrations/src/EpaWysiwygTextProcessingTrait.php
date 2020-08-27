@@ -594,34 +594,6 @@ trait EpaWysiwygTextProcessingTrait {
   }
 
   /**
-   * Remove an element's white-space only child nodes.
-   *
-   * @param \DOMElement|\DOMDocument $element
-   *   The element to have its child elements cleaned.
-   *
-   * @return \DOMElement
-   *   The element with cleaned children.
-   */
-  private function removeEmptyTextNodes($element) {
-    $num_children = count($element->childNodes);
-    if ($num_children > 1) {
-      $empty_text_nodes = [];
-      foreach ($element->childNodes as $node) {
-        if ($node->nodeType == 3 && trim($node->nodeValue) == '') {
-          $empty_text_nodes[] = $node;
-        }
-      }
-
-      if ($empty_text_nodes) {
-        foreach ($empty_text_nodes as $node) {
-          $node->parentNode->removeChild($node);
-        }
-      }
-    }
-    return $element;
-  }
-
-  /**
    * Transform pullquote to D8 markup.
    *
    * @param \DOMDocument $doc
@@ -668,6 +640,34 @@ trait EpaWysiwygTextProcessingTrait {
 
     return $doc;
 
+  }
+
+  /**
+   * Remove an element's white-space only child nodes.
+   *
+   * @param \DOMElement|\DOMDocument $element
+   *   The element to have its child elements cleaned.
+   *
+   * @return \DOMElement
+   *   The element with cleaned children.
+   */
+  private function removeEmptyTextNodes($element) {
+    $num_children = count($element->childNodes);
+    if ($num_children > 1) {
+      $empty_text_nodes = [];
+      foreach ($element->childNodes as $node) {
+        if ($node->nodeType == 3 && trim($node->nodeValue) == '') {
+          $empty_text_nodes[] = $node;
+        }
+      }
+
+      if ($empty_text_nodes) {
+        foreach ($empty_text_nodes as $node) {
+          $node->parentNode->removeChild($node);
+        }
+      }
+    }
+    return $element;
   }
 
   /**
