@@ -26,6 +26,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(exit-disclaimer).*?"|';
     $pattern .= 'class=".*?(tabs).*?"|';
     $pattern .= 'class=".*?(accordion).*?"|';
+    $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -83,6 +84,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'need a PDF reader to view':
               $doc = $this->stripPdfDisclaimers($doc);
+              break;
+
+            case 'termlookup-tooltip':
+              $doc = $this->transformDefinition($doc);
               break;
           }
         }
@@ -341,6 +346,56 @@ trait EpaWysiwygTextProcessingTrait {
             $div->setAttribute('style', str_replace('style="display: none;"', '', $div->attributes->getNamedItem('style')->array_count_values));
           }
         }
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform definitions to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed definitions.
+   */
+  private function transformDefinition(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Definition elements.
+    $elements = $xpath->query('//a[contains(concat(" ", @class, " "), " termlookup-tooltip ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract term and definition.
+        $term = $element->firstChild->nodeValue;
+        $definition = $element->lastChild->lastChild->nodeValue;
+
+        // Build the new element.
+        $button_element = $doc->createElement('button', $term);
+        $button_element->setAttribute('class', 'definition__trigger js-definition__trigger');
+
+        $dfn_element = $doc->createElement('dfn', $term);
+        $dfn_element->setAttribute('class', 'definition__term');
+
+        $span_element = $doc->createElement('span');
+        $span_element->setAttribute('class', 'definition__tooltip js-definition__tooltip');
+        $span_element->setAttribute('role', 'tooltip');
+        $span_element->appendChild($dfn_element);
+
+        $definition_text_node = $doc->createTextNode($definition);
+        $span_element->appendChild($definition_text_node);
+
+        $new_element = $doc->createElement('span');
+        $new_element->setAttribute('class', 'definition js-definition');
+        $new_element->appendChild($button_element);
+        $new_element->appendChild($span_element);
+
+        $element->parentNode->replaceChild($new_element, $element);
       }
     }
 
