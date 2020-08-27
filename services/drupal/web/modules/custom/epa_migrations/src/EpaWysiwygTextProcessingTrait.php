@@ -32,6 +32,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
     $pattern .= 'class=".*?(highlighted).*?"|';
+    $pattern .= 'class=".*?(govdelivery-form).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -113,6 +114,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'highlighted':
               $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'govdelivery-form':
+              $doc = $this->transformGovDeliveryForm($doc);
               break;
           }
         }
@@ -529,6 +534,58 @@ trait EpaWysiwygTextProcessingTrait {
         foreach ($children as $child) {
           $child->setAttribute('class', str_replace('menu-item', '', $child->attributes->getNamedItem('class')->value));
         }
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform govdelivery forms to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed govdelivery forms.
+   */
+  private function transformGovDeliveryForm(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Govdelivery form elements.
+    $elements = $xpath->query('//form[contains(concat(" ", @class, " "), " govdelivery-form ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Replace the class on the form element.
+        $element->setAttribute('class', str_replace('govdelivery-form', 'govdelivery', $element->attributes->getNamedItem('class')->value));
+
+        // Replace classes.
+        $fieldset = $xpath->query('fieldset', $element)[0];
+        $fieldset->setAttribute('class', str_replace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
+
+        $legend = $xpath->query('legend', $fieldset)[0];
+        $legend->setAttribute('class', str_replace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
+
+        $label = $xpath->query('label', $fieldset)[0];
+        $label->setAttribute('class', str_replace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
+
+        $input = $xpath->query('input', $fieldset)[0];
+        $input->setAttribute('class', str_replace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
+
+        $button = $xpath->query('button', $fieldset)[0];
+        $button->setAttribute('class', str_replace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
+
+        // Wrap label and input in a new div.
+        $div = $doc->createElement('div');
+        $div->setAttribute('class', 'form-item form-item--email is-inline');
+        $div->appendChild($label);
+        $div->appendChild($input);
+
+        // Insert the div into the fieldset.
+        $fieldset->insertBefore($div, $button);
       }
     }
 
