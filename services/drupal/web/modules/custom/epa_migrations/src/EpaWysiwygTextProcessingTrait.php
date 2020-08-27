@@ -29,6 +29,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
     $pattern .= 'class=".*?(row).*?"|';
     $pattern .= 'class=".*?(menu pipeline).*?"|';
+    $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -98,6 +99,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'menu pipeline':
               $doc = $this->transformPipelineUls($doc);
+              break;
+
+            case 'pullquote':
+              $doc = $this->transformPullquote($doc);
               break;
           }
         }
@@ -513,6 +518,55 @@ trait EpaWysiwygTextProcessingTrait {
       }
     }
     return $element;
+  }
+
+  /**
+   * Transform pullquote to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed pullqoute.
+   */
+  private function transformPullquote(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Pullquote elements.
+    $elements = $xpath->query('//p[contains(concat(" ", @class, " "), " pullquote ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract quote.
+        $quote = $element->firstChild->nodeValue;
+
+        // Extract the citation.
+        $citation_element = $xpath->query('span[contains(concat(" ", @class, " " ), " author ")]');
+        $citation = str_replace('—', '', $citation_element->firstChild->nodeValue);
+
+        // Build the new element.
+        if ($citation) {
+          $cite_element = $doc->createElement('cite', $citation);
+          $cite_element->setAttribute('class', 'pull-quote__cite');
+        }
+
+        $p_element = $doc->createElement('p', $quote);
+
+        $new_element = $doc->createElement('blockquote');
+        $new_element->setAttribute('class', 'pull-quote');
+        $new_element->appendChild($p_element);
+
+        if ($citation) {
+          $new_element->appendChild($cite_element);
+        }
+
+        $element->parentNode->replaceChild($new_element, $element);
+      }
+    }
+
+    return $doc;
+
   }
 
   /**
