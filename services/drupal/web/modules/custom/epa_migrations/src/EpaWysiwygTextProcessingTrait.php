@@ -27,6 +27,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(tabs).*?"|';
     $pattern .= 'class=".*?(accordion).*?"|';
     $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
+    $pattern .= 'class=".*?(row).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -88,6 +89,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'termlookup-tooltip':
               $doc = $this->transformDefinition($doc);
+              break;
+
+            case 'row':
+              $doc = $this->transformColumns($doc);
               break;
           }
         }
@@ -396,6 +401,46 @@ trait EpaWysiwygTextProcessingTrait {
         $new_element->appendChild($span_element);
 
         $element->parentNode->replaceChild($new_element, $element);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform columns to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed columns.
+   */
+  private function transformColumns(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Row elements.
+    $elements = $xpath->query('//div[contains(concat(" ", @class, " "), " row ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract number of cols from the class name.
+        $classes = $element->attributes->getNamedItem('class')->value;
+        $num_cols = substr($classes, strpos($classes, 'cols-') + 5, 1);
+
+        if ($num_cols) {
+          // Update class.
+          $element->setAttribute('class', "l-grid l-grid--{$num_cols}-col");
+
+          // Remove col class from children.
+          $children = $xpath->query('div[contains(concat(" ", @class, " "), " col ")]', $element);
+          foreach ($children as $child) {
+            $child->setAttribute('class', str_replace('col', '', $child->attributes->getNamedItem('class')->value));
+          }
+        }
+
       }
     }
 
