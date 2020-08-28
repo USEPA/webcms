@@ -21,7 +21,7 @@ trait EpaWysiwygTextProcessingTrait {
   public function processText($wysiwyg_content) {
 
     $pattern = '/';
-    $pattern .= 'class=".*?(box multi related-info).*?"|';
+    $pattern .= 'class=".*?(box).*?"|';
     $pattern .= 'class=".*?(pagetop).*?"|';
     $pattern .= 'class=".*?(exit-disclaimer).*?"|';
     $pattern .= 'class=".*?(tabs).*?"|';
@@ -60,7 +60,7 @@ trait EpaWysiwygTextProcessingTrait {
           $match = array_pop(array_filter(array_unique($match_strings)));
 
           switch ($match) {
-            case 'box multi related-info':
+            case 'box':
               $doc = $this->transformRelatedInfoBox($doc);
               break;
 
@@ -151,13 +151,21 @@ trait EpaWysiwygTextProcessingTrait {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
-    $related_info_boxes = $xpath->query('//div[contains(@class, "box multi related-info")]');
+    $related_info_boxes = $xpath->query('//div[contains(@class, "box")]');
 
     if ($related_info_boxes) {
       foreach ($related_info_boxes as $key => $rib_wrapper) {
         // Replace div classes on box wrapper.
         $box_classes = [
           'box multi related-info',
+          'box multi highlight',
+          'box multi news',
+          'box multi alert',
+          'box simple',
+          'box special',
+          'box multi rss',
+          'box multi blog',
+          'box multi',
           'right',
           'left',
           'clear-right',
@@ -166,6 +174,14 @@ trait EpaWysiwygTextProcessingTrait {
 
         $box_replacement_classes = [
           'box box--related-info',
+          'box box--highlight',
+          'box box--news',
+          'box box--alert',
+          'box box--multipurpose',
+          'box box--special',
+          'box box--rss',
+          'box box--blog',
+          'box box--multipurpose',
           'u-align-right',
           'u-align-left',
           'u-clear-right',
