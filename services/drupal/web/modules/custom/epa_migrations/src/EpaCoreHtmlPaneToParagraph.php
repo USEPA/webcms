@@ -66,13 +66,18 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
     // Perform text processing to update/remove inline code.
     $body_field['value'] = $this->processText($body_field['value']);
 
+    // Get box style from the settings array if it's there. Otherwise, use the
+    // value in configuration.
+    $style = unserialize($record['style']);
+    $box_style = $style['settings']['epa_box_style'] ?? $configuration['box_style'] ?? 'none';
+
     // Create an html paragraph and wrap it in a box.
     return $this->addBoxWrapper(
       [
         $this->createHtmlParagraph($body_field, $this->entityTypeManager),
       ],
       $configuration['override_title_text'],
-      $configuration['box_style'],
+      $box_style,
       $split_content['block_header']
     );
   }
