@@ -10,7 +10,7 @@ use DOMDocument;
 trait EpaWysiwygTextProcessingTrait {
 
   /**
-   * Transform 'related info box' in wysiwyg content.
+   * Transform inline html in wysiwyg content.
    *
    * @param string $wysiwyg_content
    *   The content to search and transform inline html.
@@ -21,7 +21,7 @@ trait EpaWysiwygTextProcessingTrait {
   public function processText($wysiwyg_content) {
 
     $pattern = '/';
-    $pattern .= 'class=".*?(box multi related-info).*?"|';
+    $pattern .= 'class=".*?(box).*?"|';
     $pattern .= 'class=".*?(pagetop).*?"|';
     $pattern .= 'class=".*?(exit-disclaimer).*?"|';
     $pattern .= 'class=".*?(tabs).*?"|';
@@ -60,7 +60,7 @@ trait EpaWysiwygTextProcessingTrait {
           $match = array_pop(array_filter(array_unique($match_strings)));
 
           switch ($match) {
-            case 'box multi related-info':
+            case 'box':
               $doc = $this->transformRelatedInfoBox($doc);
               break;
 
@@ -151,13 +151,21 @@ trait EpaWysiwygTextProcessingTrait {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
-    $related_info_boxes = $xpath->query('//div[contains(@class, "box multi related-info")]');
+    $related_info_boxes = $xpath->query('//div[contains(@class, "box")]');
 
     if ($related_info_boxes) {
       foreach ($related_info_boxes as $key => $rib_wrapper) {
         // Replace div classes on box wrapper.
         $box_classes = [
           'box multi related-info',
+          'box multi highlight',
+          'box multi news',
+          'box multi alert',
+          'box simple',
+          'box special',
+          'box multi rss',
+          'box multi blog',
+          'box multi',
           'right',
           'left',
           'clear-right',
@@ -166,6 +174,14 @@ trait EpaWysiwygTextProcessingTrait {
 
         $box_replacement_classes = [
           'box box--related-info',
+          'box box--highlight',
+          'box box--news',
+          'box box--alert',
+          'box box--multipurpose',
+          'box box--special',
+          'box box--rss',
+          'box box--blog',
+          'box box--multipurpose',
           'u-align-right',
           'u-align-left',
           'u-clear-right',
@@ -177,13 +193,13 @@ trait EpaWysiwygTextProcessingTrait {
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
-        $h2 = $xpath->query('h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
-        if ($h2) {
-          $box_title = $doc->createElement('div', $h2->nodeValue);
-          $box_title_classes = $h2->attributes->getNamedItem('class')->value;
+        $heading = $xpath->query('*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(@class, "pane-title")]', $rib_wrapper)[0];
+        if ($heading) {
+          $box_title = $doc->createElement('div', $heading->nodeValue);
+          $box_title_classes = $heading->attributes->getNamedItem('class')->value;
           $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
           $box_title->setAttribute('class', $box_title_classes);
-          $h2->parentNode->replaceChild($box_title, $h2);
+          $heading->parentNode->replaceChild($box_title, $heading);
         }
 
         // Replace div class on pane content.
