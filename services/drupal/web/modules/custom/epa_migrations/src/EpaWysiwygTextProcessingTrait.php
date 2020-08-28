@@ -10,7 +10,7 @@ use DOMDocument;
 trait EpaWysiwygTextProcessingTrait {
 
   /**
-   * Transform 'related info box' in wysiwyg content.
+   * Transform inline html in wysiwyg content.
    *
    * @param string $wysiwyg_content
    *   The content to search and transform inline html.
@@ -177,13 +177,13 @@ trait EpaWysiwygTextProcessingTrait {
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
-        $h2 = $xpath->query('h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
-        if ($h2) {
-          $box_title = $doc->createElement('div', $h2->nodeValue);
-          $box_title_classes = $h2->attributes->getNamedItem('class')->value;
+        $heading = $xpath->query('*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(@class, "pane-title")]', $rib_wrapper)[0];
+        if ($heading) {
+          $box_title = $doc->createElement('div', $heading->nodeValue);
+          $box_title_classes = $heading->attributes->getNamedItem('class')->value;
           $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
           $box_title->setAttribute('class', $box_title_classes);
-          $h2->parentNode->replaceChild($box_title, $h2);
+          $heading->parentNode->replaceChild($box_title, $heading);
         }
 
         // Replace div class on pane content.
