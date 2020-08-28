@@ -112,7 +112,11 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
       // Either this pane is not reusable or no library item paragraph exists
       // for this item, yet.
       // Extract values that apply to all panes.
-      $box_style = $configuration['settings']['epa_box_style'] ?? 'none';
+      // Get box style from the settings array if it's there. Otherwise, use the
+      // value in configuration.
+      $style = unserialize($record['style']);
+      $box_style = $style['settings']['epa_box_style'] ?? $configuration['box_style'] ?? 'none';
+
       $title = $pane_revision->title;
 
       $paragraph = NULL;
