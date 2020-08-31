@@ -12,4 +12,19 @@
  * - string classes: The classes of the captioned HTML tag.
  */
 #}
-{{ node }}
+
+{% set classes = [
+  view_mode != 'default' ? ('figure--' ~ view_mode)|clean_class,
+  align == 'center' ? 'is-centered',
+  align == 'left' ? 'u-align-left',
+  align == 'right' ? 'u-align-right',
+]|join(' ')|trim %}
+
+{{ title_suffix.contextual_links }}
+
+{% include '@components/figure/figure.twig' with {
+  'is_demo': false,
+  'modifier_classes': classes,
+  'media': node,
+  'caption': caption,
+} %}

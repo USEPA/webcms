@@ -17,7 +17,7 @@
               {
                 element : 'ins',
                 attributes : {
-                  'class' : 'epa-new',
+                  'class' : 'new',
                   'data-date' : date
                 }
               }
