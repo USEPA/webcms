@@ -1,6 +1,6 @@
 (function (CKEDITOR, $) {
   'use strict';
-  
+
   CKEDITOR.plugins.add('epaNew', {
     requires: ['button'],
 
@@ -17,7 +17,7 @@
               {
                 element : 'ins',
                 attributes : {
-                  'class' : 'new',
+                  'class' : 'epa-new',
                   'data-date' : date
                 }
               }
@@ -30,33 +30,6 @@
         label: 'New! Icon',
         command: 'epaNewCommand',
         icon: this.path + 'images/epaNew.gif'
-      });
-
-      editor.on('setData', function( event ) {
-        var data = $('<div>' + event.data.dataValue + '</div>'),
-          now = new Date();
-        now = now.getTime();
-
-        data.find('ins[data-date]').each(function () {
-          var date = $(this).data(),
-            offset = 30 * 24 * 60 * 60 * 1000,
-            expired = Date.parse(date.date) + offset;
-
-          if (now < expired) {
-            $(this).addClass('new');
-          }
-        });
-
-        // JQuery doesn't have a toString, so this extracts the full html.
-        event.data.dataValue = data.html();
-      });
-
-      editor.on('getData', function( event ) {
-        var data = $('<div>' + event.data.dataValue + '</div>');
-        data.find('ins.new').removeClass('new');
-
-        // JQuery doesn't have a toString, so this extracts the full html.
-        event.data.dataValue = data.html();
       });
     }
   });
