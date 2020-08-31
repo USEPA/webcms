@@ -13,11 +13,14 @@ use Drupal\filter\Render\FilteredMarkup;
  */
 function epa_theme_preprocess_filter_caption(&$vars) {
   $dom = Html::load($vars['node']);
-  // Make captions available in media templates
+  // Make media attributes available in caption template
   foreach ($dom->getElementsByTagName('drupal-media') as $node) {
     $new_node = $node->cloneNode(TRUE);
     $new_node->setAttribute('data-caption', $vars['caption']);
     $node->parentNode->replaceChild($new_node,$node);
+    foreach (['data-view-mode' => 'view_mode','data-align' => 'align'] as $attribute => $var) {
+      $vars[$var] = $node->getAttribute($attribute);
+    }
   }
   $vars['node'] = FilteredMarkup::create(Html::serialize($dom));
 }
@@ -26,9 +29,7 @@ function epa_theme_preprocess_filter_caption(&$vars) {
  * Implements hook_preprocess_media().
  */
 function epa_theme_preprocess_media(&$vars) {
-  if (isset($vars['attributes']['data-caption'])) {
-    $vars['caption'] = $vars['attributes']['data-caption'];
-  }
+  $vars['has_caption'] = isset($vars['attributes']['data-caption']);
 }
 
 /**
