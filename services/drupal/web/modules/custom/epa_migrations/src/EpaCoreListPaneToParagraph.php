@@ -72,6 +72,11 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
     $link_type = isset($configuration['node_field']) ? 'entity' : 'uri';
     $links = $link_type == 'entity' ? $configuration['node_field'] : $configuration['link_field'];
 
+    // Get box style from the settings array if it's there. Otherwise, use the
+    // value in configuration.
+    $style = unserialize($record['style']);
+    $box_style = $style['settings']['epa_box_style'] ?? $configuration['box_style'] ?? 'none';
+
     // Wrap the html and link_list paragraphs in a box.
     return $this->addBoxWrapper(
       [
@@ -79,7 +84,7 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
         $this->createLinkListParagraph($link_type, $links),
       ],
       $configuration['title'] ?? $configuration['override_title_text'] ?? '',
-      $configuration['box_style'] ?? 'none',
+      $box_style,
       $split_content['block_header']
     );
 

@@ -251,6 +251,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'contact-us-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
           // load the group's contact form information
@@ -265,6 +266,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'contact-us-header-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
           // load the group's contact form information
@@ -283,7 +285,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         break;
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
-        $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
+        $bubbleable_metadata->addCacheContexts(['url']);
         if (isset($node) && !$node->field_last_published->isEmpty()) {
           $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
@@ -338,6 +340,10 @@ function epa_core_entity_delete(EntityInterface $entity) {
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Disable HTML5 validation on all forms.
+  $form['#attributes']['novalidate'] = 'novalidate';
+
+  // Adds some extra descriptive text to media upload.
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
