@@ -1,4 +1,4 @@
-uuid: 9e69cf29-2be2-4c2d-b296-e58fb125e77a
+uuid: a23f74ea-ed02-4ca6-b583-d36e8a2bc19f
 langcode: en
 status: true
 dependencies:
@@ -6,8 +6,8 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: SVX3XTziMEF3SWeG4OczMCACBU5CY4BvQMKHAjXJmI4
-id: upgrade_d7_group_content_node
+  default_config_hash: QR5ig0QnnkwM47oYyqjDf2fw3IFuIHaEBnAC_vgcb5M
+id: upgrade_d7_group_content_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -15,13 +15,14 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Group content (Node)'
+label: 'Group content (News Release Nodes)'
 source:
   plugin: epa_og_membership
   high_water_property:
     name: etid
   d7_entity_type: node
   d8_entity_type: node
+  node_bundle: news_release
   constants:
     formatted_group_prefix: web_area-group_
     formatted_d8_entity_type: node-

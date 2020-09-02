@@ -58,7 +58,7 @@ content:
     type: date_range_without_time
     region: content
   field_deadline:
-    weight: 4
+    weight: 5
     label: above
     settings:
       format_type: medium
@@ -66,6 +66,16 @@ content:
     third_party_settings: {  }
     type: datetime_default
     region: content
+  field_event_cancellation:
+    type: boolean
+    weight: 7
+    region: content
+    label: hidden
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
   field_event_host:
     weight: 2
     label: above
@@ -74,8 +84,16 @@ content:
     third_party_settings: {  }
     type: string
     region: content
+  field_event_type:
+    type: entity_reference_label
+    weight: 3
+    region: content
+    label: above
+    settings:
+      link: false
+    third_party_settings: {  }
   field_links:
-    weight: 5
+    weight: 6
     label: above
     settings:
       trim_length: 80
@@ -94,7 +112,7 @@ content:
     type: address_default
     region: content
   field_paragraphs:
-    weight: 3
+    weight: 4
     label: above
     settings:
       view_mode: default
@@ -108,8 +126,6 @@ hidden:
   field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
-  field_event_cancellation: true
-  field_event_type: true
   field_expiration_date: true
   field_geographic_locations: true
   field_hublinks: true

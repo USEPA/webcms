@@ -1,4 +1,4 @@
 ---
 title: Short Date
-state: inreview
+state: complete
 ---

@@ -20,6 +20,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
  * Implements hook_menu_local_tasks_alter().
@@ -250,6 +251,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'contact-us-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
           // load the group's contact form information
@@ -263,9 +265,27 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           }
         }
         break;
+      case 'contact-us-header-link':
+        $bubbleable_metadata->addCacheContexts(['url']);
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if (isset($node)) {
+          // load the group's contact form information
+          $groups = \Drupal::service('epa_web_areas.web_areas_helper')
+            ->getNodeReferencingGroups($node);
+          foreach ($groups as $group) {
+            $contact_form = $group->field_contact_us_form->target_id;
+            $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
+            if ($url) {
+              $link = Link::fromTextAndUrl(t('Contact Us'), $url)->toRenderable();
+              $link['#attributes'] = ['class' => array('header-link')];
+            }
+            $replacements[$original] = $url ? render($link) : $original;
+          }
+        }
+        break;
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
-        $bubbleable_metadata->addCacheableDependency(\Drupal::service('path.current')->getPath());
+        $bubbleable_metadata->addCacheContexts(['url']);
         if (isset($node) && !$node->field_last_published->isEmpty()) {
           $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
@@ -320,6 +340,10 @@ function epa_core_entity_delete(EntityInterface $entity) {
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Disable HTML5 validation on all forms.
+  $form['#attributes']['novalidate'] = 'novalidate';
+
+  // Adds some extra descriptive text to media upload.
   if ($form_id === 'media_library_add_form_upload' && isset($form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"])) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
@@ -383,6 +407,26 @@ function epa_core_node_presave(NodeInterface $node) {
     if (!empty($term)) {
       $term = reset($term);
       $node->field_type = $term->id();
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ */
+function epa_core_node_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // If there is no comment due date, then notify the public with a message
+  // that comments aren't being accepted.
+  if ($entity->bundle() == 'public_notice' && $build['#view_mode'] == 'full') {
+    if ($entity->field_comments_due_date->isEmpty()) {
+      $build['no_comments_notice']['#markup'] = '<p class="no-comments">' . t('EPA is neither requesting nor accepting comments on this public notice. It is for informational purposes only.') . '</p>';
+    }
+    // Setup the name of the right column from the field label of the "How to
+    // Comment" field so it's dynamic. If it's not set here, then if the "How
+    // to Comment" field is empty, there is no header on the comment box since
+    // the field is not rendered.
+    if ($entity->hasField('field_how_to_comment')) {
+      $build['how_to_comment_header']['#markup'] = $entity->field_how_to_comment->getFieldDefinition()->getLabel();
     }
   }
 }

@@ -15,7 +15,8 @@ source:
   plugin: epa_panelizer_node
   node_type: web_area
   high_water_property:
-    name: tnid
+    name: nid
+    alias: n
 process:
   layout_builder__layout:
     -
@@ -48,7 +49,7 @@ process:
   title:
     -
       plugin: get
-      source: title
+      source: field_long_name
   uid:
     -
       plugin: get
@@ -211,10 +212,5 @@ destination:
   plugin: 'entity:node'
   default_bundle: web_area
 migration_dependencies:
-  required:
-    - upgrade_d7_user
-    - upgrade_d7_node_type
-  optional:
-    - upgrade_d7_field_instance
-    - upgrade_d7_metatag_field
-    - upgrade_d7_metatag_field_instance
+  required: { }
+  optional: { }

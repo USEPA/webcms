@@ -42,6 +42,12 @@
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
+{% set has_footer = false %}
+
+{% if footer|render|striptags|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
 {% set attributes = attributes.addClass(classes) %}
 
 {% if node.field_language.value %}
@@ -62,6 +68,7 @@
 {% if sidenav|render|striptags|trim %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
+    'has_footer': has_footer,
     'has_sidenav': true,
     'header_info': header_info,
     'contact_link': contact_link,
@@ -75,6 +82,7 @@
 {% else %}
   {% include '@templates/detail-pages/page.twig' with {
     'has_header': true,
+    'has_footer': has_footer,
     'header_info': header_info,
     'contact_link': contact_link,
     'title': label,

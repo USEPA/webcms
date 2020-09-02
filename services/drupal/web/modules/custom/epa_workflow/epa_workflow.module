@@ -217,7 +217,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         '_epa_workflow_node_view_moderation_form_submit',
       ];
     }
-    $form['revision_log']['#required'] = TRUE;
   }
 
   if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
@@ -234,12 +233,9 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $entity = $form_state->get('entity');
   /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
   $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
-  $last_revision = $entity;
+
   $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
 
-  // This is needed to fool the content_moderation_notifications module because
-  // it always assumes the latest revision is the one being acted on.
-  $entity->last_revision = $last_revision;
 
   $new_state = $form_state->getValue('new_state');
 
@@ -336,6 +332,15 @@ function epa_workflow_node_presave(NodeInterface $node) {
     if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
       $node->leapfrog = $latest_revision_id;
     }
+
+    // Set the "last_revision" property to fool the content_moderation_notifications
+    // module into properly detecting which transition we are firing since it
+    // does not expect us to be transitioning a non-latest revision.
+    // So if we're doing a save on the default revision and there's a different
+    // latest revision, we need to set the "last_revision" as the current revision.
+    if (!$node->isSyncing() && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
+      $node->last_revision = $original;
+    }
   }
 
   // Update the log message for revisions created through bulk operations.
@@ -377,7 +382,7 @@ function epa_workflow_node_update(NodeInterface $node) {
 function _epa_workflow_add_compliance_checkboxes(&$form) {
 
   $link_508 = Link::fromTextAndUrl(
-    t('applicable Section 508 standards'),
+    t('applicable Section 508 requirements'),
     Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
   );
 
@@ -393,14 +398,12 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   // $form['workflow_508_compliant'] = [
   $compliance_checkbox = [
     '#type' => 'checkbox',
-    '#title' => t('I certify that all links on this page comply with @external.', [
-        '@external' => $link_external,
-      ]
-    ),
-    '#description' => t('I certify that the content on this page is accessible per all @508. ' .
-      'This content will be subject to random external site link reviews by the Office of Web Communications, ' .
-      'and that non-compliant pages will be unpublished until remediated.', [
+    '#title' => t('I certify that this page complies with:'),
+    '#description' => t('all @508 and @external.' .
+      'This page will be subject to random external site link reviews and Section508 compliance reviews. ' .
+      'Non-compliant pages will be unpublished until remediated.', [
       '@508' => $link_508,
+      '@external' => $link_external,
     ]),
     '#required' => FALSE,
     '#weight' => -1,
@@ -411,6 +414,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
 
   // Ensure a revision comment is not required by default.
   $form['revision_log']['#required'] = FALSE;
+  $form['revision_log']['#element_validate'] = ['_epa_workflow_form_validation_revision_log'];
 
   // Make the element visible when publish is selected on the latest revision.
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
@@ -469,6 +473,23 @@ function _epa_workflow_form_validation_508($element, FormStateInterface $form_st
   if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published')  {
     if (empty($form_state->getValue('workflow_508_compliant'))) {
       $form_state->setError($element, t('508 compliance is required to Publish content.'));
+    }
+  }
+}
+
+/**
+ * Validation for revision log.  Must require
+ * a revision log when moving content to published.
+ */
+function _epa_workflow_form_validation_revision_log($element, FormStateInterface $form_state, $form) {
+  // Block form on latest revision
+  if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
+    $op = $form_state->getValue('new_state');
+  }
+
+  if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published')  {
+    if (empty($form_state->getValue('revision_log'))) {
+      $form_state->setError($element, t('Revision log required when publishing content.'));
     }
   }
 }

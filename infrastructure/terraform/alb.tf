@@ -19,6 +19,19 @@ resource "aws_lb_target_group" "drupal_target_group" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = local.vpc-id
+
+  # Have the load balancer target the PHP-FPM status port (:8080) instead of the Drupal
+  # application. In an ideal world, we could hit / to determine if Drupal is still
+  # healthy, but this causes so much load on the PHP-FPM pool that it can cause the
+  # container to fail to respond in time, resulting in an unhealthy task - which in turn
+  # puts more load on the other containers, which can cause them to become unhealthy.
+  health_check {
+    enabled  = true
+    interval = 10
+    path     = "/ping"
+    port     = 8080
+    protocol = "HTTP"
+  }
 }
 
 # Listener for HTTP requests. We unconditionally upgrade all HTTP requests to HTTPS because

@@ -14,6 +14,26 @@ resource "aws_vpc" "main" {
   })
 }
 
+# If we're creating a VPC, create a DHCP options set. This is needed for Fargate tasks.
+resource "aws_vpc_dhcp_options" "options" {
+  count = length(aws_vpc.main)
+
+  # This is the default for VPCs
+  domain_name         = "ec2.internal"
+  domain_name_servers = ["AmazonProvidedDNS"]
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DHCP"
+  })
+}
+
+resource "aws_vpc_dhcp_options_association" "options" {
+  count = length(aws_vpc.main)
+
+  vpc_id          = aws_vpc.main[0].id
+  dhcp_options_id = aws_vpc_dhcp_options.options[0].id
+}
+
 # If there was an existing VPC provided, read out its properties
 data "aws_vpc" "existing" {
   count = var.vpc-existing-vpc != null ? 1 : 0
@@ -131,14 +151,18 @@ resource "aws_route_table" "private" {
 
   vpc_id = local.vpc-id
 
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.nat[count.index].id
-  }
-
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Private Routes ${count.index}"
   })
+}
+
+resource "aws_route" "private_gateway" {
+  count = length(aws_route_table.private)
+
+  route_table_id = aws_route_table.private[count.index].id
+
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id = aws_nat_gateway.nat[count.index].id
 }
 
 resource "aws_route_table_association" "private_association" {

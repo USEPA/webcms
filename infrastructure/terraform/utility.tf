@@ -28,8 +28,8 @@ data "template_cloudinit_config" "utility" {
       - mariadb
     write_files:
       - path: /usr/local/bin/webcms-env-info
-        mode: 0755
-        contents: |
+        permissions: 0755
+        content: |
           #!/bin/bash
 
           cat <<INFO
@@ -50,8 +50,8 @@ data "template_cloudinit_config" "utility" {
           S3: s3://${aws_s3_bucket.uploads.bucket}
           INFO
       - path: /usr/local/bin/webcms-sql-dump
-        mode: 0755
-        contents: |
+        permissions: 0755
+        content: |
           #!/bin/bash
 
           set -euo pipefail
@@ -110,14 +110,12 @@ data "template_cloudinit_config" "utility" {
   }
 }
 
-# Create a utility server if requested
-resource "aws_instance" "utility" {
-  ami                         = data.aws_ssm_parameter.utility-ami.value
-  associate_public_ip_address = false
-  instance_type               = "t3a.micro"
-  subnet_id                   = aws_subnet.private[0].id
-  iam_instance_profile        = aws_iam_instance_profile.utility_profile.name
-  user_data_base64            = data.template_cloudinit_config.utility.rendered
+resource "aws_launch_template" "utility" {
+  name = "webcms-launch-template-${local.env-suffix}-utility"
+
+  image_id      = data.aws_ssm_parameter.utility-ami.value
+  user_data     = data.template_cloudinit_config.utility.rendered
+  instance_type = "t3a.micro"
 
   vpc_security_group_ids = [
     aws_security_group.utility.id,
@@ -125,10 +123,47 @@ resource "aws_instance" "utility" {
     # Grant access from the utility server for administrative tasks
     aws_security_group.database_access.id,
     aws_security_group.cache_access.id,
-    aws_security_group.search_access.id
+    aws_security_group.search_access.id,
+
+    # Grant access to the AWS VPC endpoints
+    aws_security_group.interface_access.id,
   ]
+
+  monitoring {
+    enabled = true
+  }
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.utility_profile.name
+  }
 
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Utility"
   })
+}
+
+resource "aws_autoscaling_group" "utility" {
+  name = "webcms-autoscaling-${local.env-suffix}-utility"
+
+  max_size = 1
+  min_size = 0
+
+  max_instance_lifetime = 7 * 24 * 3600
+
+  vpc_zone_identifier = aws_subnet.private.*.id
+
+  launch_template {
+    id      = aws_launch_template.utility.id
+    version = "$Latest"
+  }
+
+  dynamic "tag" {
+    for_each = merge(local.common-tags, { Name = "${local.name-prefix} Utility" })
+
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
 }

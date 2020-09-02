@@ -12,3 +12,13 @@ resource "aws_cloudwatch_log_group" "drupal" {
 resource "aws_cloudwatch_log_group" "drush" {
   name = "/webcms-${local.env-suffix}/app-drush"
 }
+
+# Log group for the CloudWatch agent
+resource "aws_cloudwatch_log_group" "agent" {
+  name = "/webcms-${local.env-suffix}/cloudwatch-agent"
+}
+
+# Log group for the FPM metrics helper
+resource "aws_cloudwatch_log_group" "fpm_metrics" {
+  name = "/webcms-${local.env-suffix}/fpm-metrics"
+}

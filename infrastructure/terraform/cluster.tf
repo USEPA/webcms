@@ -46,8 +46,12 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
-  name               = local.cluster-name
-  capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name]
+  name = local.cluster-name
+
+  # FARGATE adds the ability to launch tasks in Fargate; we primarily use this for Drush
+  # in order to protect it from the vagaries of autoscaling group resizes prematurely
+  # terminating it.
+  capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name, "FARGATE"]
 
   # We assume that all services will use our autoscaling group as its capacity provider
   default_capacity_provider_strategy {
@@ -80,6 +84,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
+  # Setting reservations at the task level lets Docker be more flexible in how the
+  # resources are used (mainly, it allows Drupal to soak up as much CPU capacity as it
+  # needs)
+  cpu    = 1024
+  memory = 2048
+
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
     # container, which means that by itself it cannot receive HTTP requests. Instead, the
@@ -93,10 +103,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       # Service updates are triggered when either of these two references changes.
       image = "${aws_ecr_repository.drupal.repository_url}:${var.image-tag-drupal}",
-
-      # Resource limits
-      cpu    = 768, # = 0.75 vCPU
-      memory = 1024,
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true,
@@ -132,11 +138,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # As with the Drupal definition, service updates are triggered when these change.
       image = "${aws_ecr_repository.nginx.repository_url}:${var.image-tag-nginx}",
 
-      # Resource limits. We assume that nginx is able to use fewer resources since it is
-      # mostly going to execute routing decisions and proxy requests.
-      cpu    = 256, # = 0.25 vCPU
-      memory = 256,
-
       environment = [
         # See nginx.conf in services/drupal for why this is needed.
         { name = "WEBCMS_DOMAIN", value = var.site-hostname },
@@ -164,6 +165,191 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
         options = {
           awslogs-group  = aws_cloudwatch_log_group.nginx.name,
+          awslogs-region = var.aws-region,
+        }
+      }
+    },
+    # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
+    # the epa_metrics module for what we export to the agent.
+    {
+      name  = "cloudwatch",
+      image = "amazon/cloudwatch-agent:latest",
+
+      # The agent reads its JSON-formatted configuration from the environment in containers
+      environment = [
+        {
+          name = "CW_CONFIG_CONTENT",
+          # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
+          value = jsonencode({
+            metrics = {
+              namespace = "WebCMS",
+              metrics_collected = {
+                statsd = {
+                  service_address = ":8125",
+                },
+              },
+            },
+          }),
+        },
+      ],
+
+      logConfiguration = {
+        logDriver = "awslogs",
+
+        options = {
+          awslogs-group  = aws_cloudwatch_log_group.agent.name,
+          awslogs-region = var.aws-region,
+        }
+      }
+    },
+
+    # This is a small Alpine container used to report metrics from FPM to CloudWatch
+    {
+      name  = "metrics"
+      image = "alpine:latest"
+
+      environment = [
+        {
+          name  = "WEBCMS_ENV_NAME"
+          value = var.site-env-name
+        },
+
+        # This is the map needed for mapping PHP-FPM metrics to CloudWatch. The keys are
+        # the metric names output by PHP-FPM, and the values have two expected fields:
+        # - name: the CloudWatch metric name (usually in PascalCase)
+        # - unit: the CloudWatch unit (typically Count or Seconds)
+        #
+        # The keys of the FPM status JSON are listed here:
+        # - "pool": the FPM pool name
+        # - "process manager": the kind of FPM process manager (one of "static",
+        #   "dynamic", or "ondemand")
+        # - "start time": the UNIX timestamp when PHP-FPM started
+        # - "start since": the number of seconds since the start time
+        # - "accepted conn": number of requests accepted by the pool
+        # - "listen queue": the size of PHP-FPM's socket backlog
+        # - "max listen queue": the maximum number of requests in the pending queue seen
+        #   since FPM started
+        # - "listen queue len": the number of pending connections
+        # - "idle processes": number of inactive PHP-FPM workers
+        # - "active processes": number of active workers
+        # - "total workers": number of workers, both idle and active
+        # - "max active processes": highest number of active processes since PHP-FPM
+        #   started
+        # - "max children reached": the number of times PHP-FPM has reached the maximum
+        #   worker size (only applicable for dynamic/ondemand process managers)
+        #
+        # We don't track every metric since some of them are redundant in the face of
+        # CloudWatch metric math, but we report a significant subset. The metrics we track
+        # are listed in the object below.
+        {
+          name = "WEBCMS_METRICS_MAP"
+          value = jsonencode({
+            # Track the age of the FPM process in order to allow us to convert counts to
+            # counts per second
+            "start since" = {
+              name = "Age"
+              unit = "Seconds"
+            }
+            "accepted conn" = {
+              name = "RequestsAccepted"
+              unit = "Count"
+            }
+            "listen queue" = {
+              name = "RequestsPending"
+              unit = "Count"
+            }
+            # By reporting the listen queue length, we can track the size of the listen
+            # queue as a percentage (using RequestsPending/ListenQueueLength), which gives
+            # us a good estimate of backlog pressure at the FPM socket level.
+            "listen queue len" = {
+              name = "ListenQueueLength"
+              unit = "Count"
+            }
+            "idle processes" = {
+              name = "ProcessesIdle"
+              unit = "Count"
+            }
+            "active processes" = {
+              name = "ProcessesActive"
+              unit = "Count"
+            }
+            # We report this value in order to compute MaxChildrenReached/Age. This value
+            # is the rate at which PHP-FPM hits its maximum workers. The closer it gets to
+            # 1, the harder it means PHP-FPM is working.
+            "max children reached" = {
+              name = "MaxChildrenReached"
+              unit = "Count"
+            }
+          })
+        },
+
+        {
+          name = "WEBCMS_METRICS_SCRIPT"
+
+          # This is a jq script (https://stedolan.github.io/jq) that processes the metrics
+          # map against the output of PHP-FPM's status page.
+          #
+          # It is a simple array loop that expands { key, value } pairs from the
+          # $WEBCMS_METRICS_MAP, looks up the key in the PHP-FPM output, and then formats
+          # the result as a set of CloudWatch metrics.
+          #
+          # The beginning of the script is a variable assignment, ". as $input", which
+          # saves the input stream (the JSON output from curl) as a variable, and switches
+          # over to looping over the entries of the $metrics variable (the parsed JSON
+          # of $WEBCMS_METRICS_MAP).
+          #
+          # The to_entries function converts an object into an array of { key, value }
+          # objects, where key is the JSON key (e.g., "idle processes") and value is the
+          # object value - in this case, it will be the { name, unit } pair.
+          #
+          # After that, the map() function constructs a CloudWatch-formatted value
+          # suitable for passing to `aws cloudwatch put-metric-data`, which handles the
+          # heavy lifting of publishing the PHP-FPM metrics.
+          value = <<-SCRIPT
+            . as $input
+            | $metrics
+            | to_entries
+            | map({
+              MetricName: .value.name,
+              Unit: .value.unit,
+              Value: $input[.key],
+              Timestamp: now | floor,
+              Dimensions: [
+                { Name: "Environment", Value: "\($ENV.WEBCMS_ENV_NAME)" }
+              ]
+            })
+          SCRIPT
+        },
+      ]
+
+      # The inline shell script here scrapes PHP-FPM's metrics every 60 seconds and
+      # reports them back to CloudWatch. It uses the inline jq script and metrics
+      # configuration (see above) to transform the FPM output to what the
+      # `put-metric-data` command expects.
+      entrypoint = ["/bin/sh", "-c"]
+      command = [
+        <<-COMMAND
+        apk add --no-cache aws-cli curl jq
+
+        while true; do
+          sleep 60
+
+          input="$(curl -s http://localhost:8080/status?json)"
+          echo "PHP-FPM metrics: $input"
+
+          metrics="$(echo "$input" | jq -c "$WEBCMS_METRICS_SCRIPT" --argjson metrics "$WEBCMS_METRICS_MAP")"
+          echo "CloudWatch metrics: $metrics"
+
+          aws cloudwatch --region=${var.aws-region} put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
+        done
+        COMMAND
+      ]
+
+      logConfiguration = {
+        logDriver = "awslogs",
+
+        options = {
+          awslogs-group  = aws_cloudwatch_log_group.fpm_metrics.name,
           awslogs-region = var.aws-region,
         }
       }

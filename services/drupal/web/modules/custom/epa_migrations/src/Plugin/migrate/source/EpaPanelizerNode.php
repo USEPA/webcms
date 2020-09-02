@@ -136,7 +136,7 @@ class EpaPanelizerNode extends Node {
       $row->setSourceProperty('panes', $panes);
     }
 
-    parent::prepareRow($row);
+    return parent::prepareRow($row);
   }
 
 }

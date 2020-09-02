@@ -4,26 +4,85 @@ resource "aws_security_group" "interface" {
 
   vpc_id = local.vpc-id
 
-  # Permissively allow ingress to VPC interface endpoints.
-  # We allow this for a few reasons:
-  # 1. Interface endpoints resolve to AWS services, which we consider trustworthy
-  # 2. The service on the other end has its own permissions system (IAM) to prevent
-  #    unauthorized access.
-  # 3. Security group rules here will not actually prevent access to the AWS services
-  #    in question; anyone can resolve the service endpoint using public DNS and make
-  #    API requests.
-  ingress {
-    description = "Allow incoming connections"
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Interface"
+  })
+}
 
-    protocol    = "tcp"
-    from_port   = 0
-    to_port     = 65535
-    cidr_blocks = [local.vpc-cidr-block]
+# In some cases, the interface egress rule isn't enough to allow access. This security
+# group has explicit permission to access the VPC endpoint interfaces, albeit in a somewhat
+# more narrow range.
+resource "aws_security_group" "interface_access" {
+  name        = "webcms-interface-access-sg-${local.env-suffix}"
+  description = "Security group for access to VPC endpoints"
+
+  vpc_id = local.vpc-id
+
+  egress {
+    description = "Allow outgoing HTTP connections"
+
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+    security_groups = [aws_security_group.interface.id]
+  }
+
+  egress {
+    description = "Allow outgoing HTTPS connections"
+
+    protocol        = "tcp"
+    from_port       = 443
+    to_port         = 443
+    security_groups = [aws_security_group.interface.id]
   }
 
   tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Interfaces"
+    Name = "${local.name-prefix} Interface Access"
   })
+}
+
+# Allow permissive access to the VPC endpoints. Since the interface security group is only
+# ever applied to AWS VPC endpoints, this is safe since the AWS APIs themselves are
+# protected by IAM rules.
+resource "aws_security_group_rule" "interface_vpc_ingress" {
+  description = "Allows permissive access to all endpoints"
+
+  security_group_id = aws_security_group.interface.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 0
+  to_port   = 65535
+
+  cidr_blocks = [local.vpc-cidr-block]
+}
+
+# In other cases, the rules below allow HTTP and HTTPS access in case an explicit security
+# group is needed.
+resource "aws_security_group_rule" "interface_access_http_ingress" {
+  description = "Allows HTTP ingress from the interface access group"
+
+  security_group_id = aws_security_group.interface.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 80
+  to_port   = 80
+
+  source_security_group_id = aws_security_group.interface_access.id
+}
+
+resource "aws_security_group_rule" "interface_access_https_ingress" {
+  description = "Allow HTTPS ingress from the interface access group"
+
+  security_group_id = aws_security_group.interface.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.interface_access.id
 }
 
 resource "aws_security_group" "load_balancer" {
@@ -137,7 +196,7 @@ resource "aws_security_group" "utility" {
   # Until we can find an alternate means of installing the package, we're stuck with
   # allowing unencrypted access to S3 from this host.
   egress {
-    description = "Allow access to the S3 gateway"
+    description = "Allow HTTP access to the S3 gateway"
 
     protocol        = "tcp"
     from_port       = 80
@@ -146,7 +205,7 @@ resource "aws_security_group" "utility" {
   }
 
   egress {
-    description = "Allow access to the S3 gateway"
+    description = "Allow HTTPS access to the S3 gateway"
 
     protocol        = "tcp"
     from_port       = 443
@@ -230,45 +289,57 @@ resource "aws_security_group" "drupal_task" {
 
   vpc_id = local.vpc-id
 
-  egress {
-    description = "Allow outgoing HTTP traffic"
-
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow outgoing HTTPS traffic"
-
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow access to VPC endpoint services"
-
-    protocol        = "tcp"
-    from_port       = 0
-    to_port         = 0
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  egress {
-    description = "Allow access SMTP servers for email"
-
-    protocol    = "tcp"
-    from_port   = 587
-    to_port     = 587
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Drupal Containers"
   })
+}
+
+resource "aws_security_group_rule" "drupal_http_egress" {
+  description = "Allow outgoing HTTP traffic"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 80
+  to_port     = 80
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "drupal_https_egress" {
+  description = "Allow outgoing HTTPS traffic"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 443
+  to_port     = 443
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "drupal_interface_egress" {
+  description = "Allow access to VPC endpoint services"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 0
+  to_port                  = 0
+  source_security_group_id = aws_security_group.interface.id
+}
+
+resource "aws_security_group_rule" "drupal_smtp_egress" {
+  description = "Allow access to SMTP servers for email"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type        = "egress"
+  protocol    = "tcp"
+  from_port   = 587
+  to_port     = 587
+  cidr_blocks = ["0.0.0.0/0"]
 }
 
 # Rule: egress from load balancers to Drupal
@@ -295,6 +366,30 @@ resource "aws_security_group_rule" "drupal_lb_ingress" {
   protocol                 = "tcp"
   from_port                = 80
   to_port                  = 80
+  source_security_group_id = aws_security_group.load_balancer.id
+}
+
+resource "aws_security_group_rule" "lb_drupal_ping_egress" {
+  description = "Allow outgoing connections from ALBs to the PHP-FPM /ping endpoint"
+
+  security_group_id = aws_security_group.load_balancer.id
+
+  type                     = "egress"
+  protocol                 = "tcp"
+  from_port                = 8080
+  to_port                  = 8080
+  source_security_group_id = aws_security_group.drupal_task.id
+}
+
+resource "aws_security_group_rule" "drupal_lb_ping_ingress" {
+  description = "Allow incoming connections from ALBs to the PHP-FPM /ping endpoint"
+
+  security_group_id = aws_security_group.drupal_task.id
+
+  type                     = "ingress"
+  protocol                 = "tcp"
+  from_port                = 8080
+  to_port                  = 8080
   source_security_group_id = aws_security_group.load_balancer.id
 }
 
@@ -370,7 +465,7 @@ resource "aws_security_group" "search_access" {
 }
 
 resource "aws_security_group_rule" "search_access_ingress" {
-  description = "Allows ingress from the search acess group"
+  description = "Allows ingress from the search access group"
 
   security_group_id = aws_security_group.search.id
 

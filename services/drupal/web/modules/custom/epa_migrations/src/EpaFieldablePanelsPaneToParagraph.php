@@ -58,24 +58,48 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
     list($id_type, $id) = explode(':', $record['subtype'], 2);
 
     if (isset($id_type) && isset($id)) {
+      switch ($id_type) {
+        case 'fpid':
+          // If we are working with a 'fpid' then the pane is reusable. Let's
+          // get the vid for this fpid from the current revision table to ensure
+          // we're getting data for the current version of the reusable pane.
+          $fpid = $id;
+          $vid = array_pop($this->d7Connection->select('fieldable_panels_panes', 'fpp')
+            ->fields('fpp', ['vid'])
+            ->condition('fpp.fpid', $id)
+            ->execute()
+            ->fetchCol());
+          break;
+
+        case 'vid':
+          // If we are working with a 'vid' then the pane is not reusable. Let's
+          // get the fpid for this vid from the revision table.
+          $fpid = array_pop($this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
+            ->fields('fppr', ['fpid'])
+            ->condition('fppr.vid', $id)
+            ->execute()
+            ->fetchCol());
+          $vid = $id;
+          break;
+      }
+
       // Get the pane.
       $pane = $this->d7Connection->select('fieldable_panels_panes', 'fpp')
         ->fields('fpp')
-        ->condition("fpp.{$id_type}", $id, '=')
+        ->condition('fpp.fpid', $fpid, '=')
         ->execute()
         ->fetchObject();
 
+      $pane_revision = $this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
+        ->fields('fppr')
+        ->condition('fppr.vid', $vid, '=')
+        ->execute()
+        ->fetchObject();
       // Determine if this is a reusable pane and whether it already exists.
       if ($pane->reusable) {
-        // Set a default label if there is no title or admin_title.
-        $label = $pane->fpid;
-
-        if ($pane->title) {
-          $label = $pane->title;
-        }
-        elseif ($pane->admin_title) {
-          $label = $pane->admin_title;
-        }
+        $label = $fpid . ': ';
+        // Set a default label of fpid if there is no admin_title or title.
+        $label .= $pane->admin_title ?: $pane_revision->title;
 
         $library_item = $this->getParagraphLibraryItem($label, $this->entityTypeManager);
 
@@ -88,19 +112,22 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
       // Either this pane is not reusable or no library item paragraph exists
       // for this item, yet.
       // Extract values that apply to all panes.
-      $box_style = $configuration['settings']['epa_box_style'] ?? 'none';
-      $title = $pane->title;
+      // Get box style from the settings array if it's there. Otherwise, use the
+      // value in configuration.
+      $style = unserialize($record['style']);
+      $box_style = $style['settings']['epa_box_style'] ?? $configuration['box_style'] ?? 'none';
 
-      // Convert id_type so we can extract data from pane field tables.
-      $id_type = $id_type == 'fpid' ? 'entity_id' : 'revision_id';
+      $title = $pane_revision->title;
 
       $paragraph = NULL;
 
       // Process each pane type.
+      // Since we ensured we have the correct vid for this pane, we can use the
+      // revision data tables to get field data.
       switch ($pane->bundle) {
         case 'fieldable_panels_pane':
-          $body_field_query = $this->d7Connection->select('field_data_field_epa_fpp_body', 'fpp_body')
-            ->condition("fpp_body.{$id_type}", $id, '=');
+          $body_field_query = $this->d7Connection->select('field_revision_field_epa_fpp_body', 'fpp_body')
+            ->condition('fpp_body.revision_id', $vid, '=');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
@@ -124,8 +151,8 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           break;
 
         case 'link_list':
-          $body_field_query = $this->d7Connection->select('field_data_field_epa_fpp_body', 'fpp_body')
-            ->condition("fpp_body.{$id_type}", $id, '=');
+          $body_field_query = $this->d7Connection->select('field_revision_field_epa_fpp_body', 'fpp_body')
+            ->condition('fpp_body.revision_id', $vid, '=');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 
@@ -136,8 +163,8 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // Perform text processing to update/remove inline code.
           $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
 
-          $links_query = $this->d7Connection->select('field_data_field_epa_link_list_links', 'fpp_links')
-            ->condition("fpp_links.{$id_type}", $id, '=');
+          $links_query = $this->d7Connection->select('field_revision_field_epa_link_list_links', 'fpp_links')
+            ->condition('fpp_links.revision_id', $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_url', 'link');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_title', 'title');
 
@@ -154,8 +181,8 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           break;
 
         case 'node_list':
-          $body_field_query = $this->d7Connection->select('field_data_field_epa_fpp_body', 'fpp_body')
-            ->condition("fpp_body.{$id_type}", $id, '=');
+          $body_field_query = $this->d7Connection->select('field_revision_field_epa_fpp_body', 'fpp_body')
+            ->condition('fpp_body.revision_id', $vid, '=');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_value', 'value');
           $body_field_query->addField('fpp_body', 'field_epa_fpp_body_format', 'format');
 

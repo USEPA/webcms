@@ -2,21 +2,31 @@ uuid: 672ec77e-ab37-4983-b0f7-cad22ade7e83
 langcode: en
 status: true
 dependencies:
-  module:
-    - node
-    - search_api
   config:
+    - field.storage.node.body
     - field.storage.node.field_description
     - field.storage.node.field_faq_taxonomy_topics
     - field.storage.node.field_geographic_locations
     - field.storage.node.field_hublinks
     - field.storage.node.field_question
     - search_api.server.localhost
+  module:
+    - node
+    - search_api
 id: frequent_questions
 name: 'Frequent Questions'
 description: ''
 read_only: false
 field_settings:
+  body:
+    label: Answer
+    datasource_id: 'entity:node'
+    property_path: body
+    type: text
+    boost: !!float 2
+    dependencies:
+      config:
+        - field.storage.node.body
   field_description:
     label: Description
     datasource_id: 'entity:node'
@@ -66,15 +76,6 @@ field_settings:
     dependencies:
       module:
         - node
-  title:
-    label: Title
-    datasource_id: 'entity:node'
-    property_path: title
-    type: text
-    boost: !!float 5
-    dependencies:
-      module:
-        - node
   type:
     label: 'Content type'
     datasource_id: 'entity:node'
@@ -105,7 +106,6 @@ processor_settings:
     all_fields: false
     fields:
       - field_description
-      - title
     title: false
     alt: true
     tags:
@@ -126,7 +126,6 @@ processor_settings:
     fields:
       - field_description
       - field_question
-      - title
     spaces: '[^[:alnum:]]'
     overlap_cjk: 1
     minimum_word_size: '3'
@@ -137,7 +136,6 @@ processor_settings:
     all_fields: false
     fields:
       - field_description
-      - title
     weights:
       preprocess_index: -48
       preprocess_query: -46

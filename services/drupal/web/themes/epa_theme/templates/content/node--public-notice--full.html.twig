@@ -39,6 +39,12 @@
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
+{% set has_footer = false %}
+
+{% if footer|render|striptags|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
 {% set attributes = attributes.addClass(classes) %}
 
 {% if node.field_language.value %}
@@ -46,8 +52,12 @@
 {% endif %}
 
 {% set box_content %}
-  {{ content.field_computed_comments_due_date }}
-  {{ content.field_how_to_comment }}
+  {% if content.no_comments_notice|render is empty %}
+    {{ content.field_computed_comments_due_date }}
+    {{ content.field_how_to_comment }}
+  {% else %}
+    {{ content.no_comments_notice }}
+  {% endif %}
 {% endset %}
 
 {% set body %}
@@ -55,24 +65,31 @@
     'modifier_classes': 'box--related-info u-align-right',
     'title': {
       'tag': 'div',
-      'text': content.field_how_to_comment|field_label,
+      'text': content.how_to_comment_header,
     },
     'content': box_content,
   } %}
   {{ content|without(
     'epa_content_moderation_control',
+    'how_to_comment_header',
     'field_computed_comments_due_date',
-    'field_how_to_comment'
+    'field_how_to_comment',
+    'no_comments_notice'
   ) }}
+{% endset %}
+
+{% set title %}
+  {{ 'Public Notice'|t }}: {{ label }}
 {% endset %}
 
 {% if sidenav|render|striptags|trim %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
+    'has_footer': has_footer,
     'has_sidenav': true,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,
@@ -82,9 +99,10 @@
 {% else %}
   {% include '@templates/detail-pages/page.twig' with {
     'has_header': true,
+    'has_footer': has_footer,
     'header_info': header_info,
     'contact_link': contact_link,
-    'title': label,
+    'title': title,
     'messages': messages,
     'tasks': local_tasks,
     'body': body,

@@ -5,6 +5,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\process;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\epa_migrations\EpaMediaWysiwygTransformTrait;
+use Drupal\epa_migrations\EpaWysiwygTextProcessingTrait;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -56,6 +57,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EpaMediaWysiwygFilter extends ProcessPluginBase implements ContainerFactoryPluginInterface {
 
   use EpaMediaWysiwygTransformTrait;
+  use EpaWysiwygTextProcessingTrait;
 
   /**
    * The entity type manager service.
@@ -99,9 +101,11 @@ class EpaMediaWysiwygFilter extends ProcessPluginBase implements ContainerFactor
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     if (isset($value['value'])) {
       $value['value'] = $this->transformWysiwyg($value['value'], $this->entityTypeManager);
+      $value['value'] = $this->processText($value['value']);
     }
     else {
       $value = $this->transformWysiwyg($value, $this->entityTypeManager);
+      $value = $this->processText($value);
     }
 
     return $value;

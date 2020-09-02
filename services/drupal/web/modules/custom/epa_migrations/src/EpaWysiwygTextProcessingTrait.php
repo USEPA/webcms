@@ -10,7 +10,7 @@ use DOMDocument;
 trait EpaWysiwygTextProcessingTrait {
 
   /**
-   * Transform 'related info box' in wysiwyg content.
+   * Transform inline html in wysiwyg content.
    *
    * @param string $wysiwyg_content
    *   The content to search and transform inline html.
@@ -20,11 +20,26 @@ trait EpaWysiwygTextProcessingTrait {
    */
   public function processText($wysiwyg_content) {
 
-    $pattern = '/box multi related-info|pagetop|exit-disclaimer|exit-?epa|need Adobe Reader to view|need a PDF reader to view|"(.*?tabs.*?)"/s';
+    $pattern = '/';
+    $pattern .= 'class=".*?(box).*?"|';
+    $pattern .= 'class=".*?(pagetop).*?"|';
+    $pattern .= 'class=".*?(exit-disclaimer).*?"|';
+    $pattern .= 'class=".*?(tabs).*?"|';
+    $pattern .= 'class=".*?(accordion).*?"|';
+    $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
+    $pattern .= 'class=".*?(row).*?"|';
+    $pattern .= 'class=".*?(menu pipeline).*?"|';
+    $pattern .= 'class=".*?(pullquote).*?"|';
+    $pattern .= 'class=".*?(nostyle).*?"|';
+    $pattern .= 'class=".*?(highlighted).*?"|';
+    $pattern .= 'class=".*?(govdelivery-form).*?"|';
+    $pattern .= 'href=".*?(exitepa).*?"|';
+    $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
+    $pattern .= '/';
 
-    $num_matches = preg_match($pattern, $wysiwyg_content);
+    $matches = [];
 
-    if ($num_matches > 0) {
+    if (preg_match_all($pattern, $wysiwyg_content, $matches) > 0) {
       // Add a temp wrapper around the wysiwyg content.
       $wysiwyg_content = '<?xml encoding="UTF-8"><tempwrapper>' . $wysiwyg_content . '</tempwrapper>';
 
@@ -34,12 +49,79 @@ trait EpaWysiwygTextProcessingTrait {
       $doc->loadHtml($wysiwyg_content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT);
       libxml_clear_errors();
 
-      // Run the document through the transformation methods.
-      $doc = $this->transformRelatedInfoBox($doc);
-      $doc = $this->stripPageTopLinks($doc);
-      $doc = $this->stripExitEpaLinks($doc);
-      $doc = $this->stripPdfDisclaimers($doc);
-      $doc = $this->stripTabClasses($doc);
+      // Run the document through the transformation methods depending on the
+      // matches identified.
+      foreach ($matches as $key => $match_strings) {
+
+        // Skip the first value, which contains the full pattern matches.
+        if ($key > 0) {
+          // Get unique values with array_unique, then remove any empty strings
+          // with array_filter, and finally get the remaining match text.
+          $match = array_pop(array_filter(array_unique($match_strings)));
+
+          switch ($match) {
+            case 'box':
+              $doc = $this->transformRelatedInfoBox($doc);
+              break;
+
+            case 'pagetop':
+              $doc = $this->stripPageTopLinks($doc);
+              break;
+
+            case 'exit-disclaimer':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'exitepa':
+              $doc = $this->stripExitEpaLinks($doc);
+              break;
+
+            case 'tabs':
+              $doc = $this->stripTabClasses($doc);
+              break;
+
+            case 'accordion':
+              $doc = $this->transformAccordion($doc);
+              break;
+
+            case 'need Adobe Reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+
+            case 'need a PDF reader to view':
+              $doc = $this->stripPdfDisclaimers($doc);
+              break;
+
+            case 'termlookup-tooltip':
+              $doc = $this->transformDefinition($doc);
+              break;
+
+            case 'row':
+              $doc = $this->transformColumns($doc);
+              break;
+
+            case 'menu pipeline':
+              $doc = $this->transformPipelineUls($doc);
+              break;
+
+            case 'pullquote':
+              $doc = $this->transformPullquote($doc);
+              break;
+
+            case 'nostyle':
+              $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'highlighted':
+              $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'govdelivery-form':
+              $doc = $this->transformGovDeliveryForm($doc);
+              break;
+          }
+        }
+      }
 
       // Transform the document back to HTML.
       $wysiwyg_content = $doc->saveHtml();
@@ -69,13 +151,21 @@ trait EpaWysiwygTextProcessingTrait {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
-    $related_info_boxes = $xpath->query('//div[contains(@class, "box multi related-info")]');
+    $related_info_boxes = $xpath->query('//div[contains(@class, "box")]');
 
     if ($related_info_boxes) {
       foreach ($related_info_boxes as $key => $rib_wrapper) {
         // Replace div classes on box wrapper.
         $box_classes = [
           'box multi related-info',
+          'box multi highlight',
+          'box multi news',
+          'box multi alert',
+          'box simple',
+          'box special',
+          'box multi rss',
+          'box multi blog',
+          'box multi',
           'right',
           'left',
           'clear-right',
@@ -84,6 +174,14 @@ trait EpaWysiwygTextProcessingTrait {
 
         $box_replacement_classes = [
           'box box--related-info',
+          'box box--highlight',
+          'box box--news',
+          'box box--alert',
+          'box box--multipurpose',
+          'box box--special',
+          'box box--rss',
+          'box box--blog',
+          'box box--multipurpose',
           'u-align-right',
           'u-align-left',
           'u-clear-right',
@@ -95,17 +193,17 @@ trait EpaWysiwygTextProcessingTrait {
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
-        $h2 = $xpath->query('//h2[contains(@class, "pane-title")]', $rib_wrapper)[0];
-        if ($h2) {
-          $box_title = $doc->createElement('div', $h2->nodeValue);
-          $box_title_classes = $h2->attributes->getNamedItem('class')->value;
+        $heading = $xpath->query('*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(@class, "pane-title")]', $rib_wrapper)[0];
+        if ($heading) {
+          $box_title = $doc->createElement('div', $heading->nodeValue);
+          $box_title_classes = $heading->attributes->getNamedItem('class')->value;
           $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
           $box_title->setAttribute('class', $box_title_classes);
-          $h2->parentNode->replaceChild($box_title, $h2);
+          $heading->parentNode->replaceChild($box_title, $heading);
         }
 
         // Replace div class on pane content.
-        $box_content = $xpath->query('//div[contains(@class, "pane-content")]', $rib_wrapper)[0];
+        $box_content = $xpath->query('div[contains(@class, "pane-content")]', $rib_wrapper)[0];
         if ($box_content) {
           $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
           $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
@@ -225,7 +323,7 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($tabs_parent_element as $parent_element) {
         if ($parent_element->tagName == 'div') {
           $parent_element->removeAttribute('id');
-          $uls = $xpath->query('//ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
+          $uls = $xpath->query('ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
           foreach ($uls as $ul) {
             $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
             if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
@@ -240,16 +338,319 @@ trait EpaWysiwygTextProcessingTrait {
           }
         }
 
-        $lis = $xpath->query('//li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
+        $lis = $xpath->query('li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
         foreach ($lis as $li) {
           $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
         }
 
-        $links = $xpath->query('//a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
+        $links = $xpath->query('a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
         foreach ($links as $link) {
           $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
         }
 
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform accordions to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with stripped accordion classes.
+   */
+  private function transformAccordion(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Accordion elements.
+    $accordion_elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " accordion ")]');
+
+    if ($accordion_elements) {
+      foreach ($accordion_elements as $ul) {
+        $ul->setAttribute('class', str_replace('accordion', '', $ul->attributes->getNamedItem('class')->value));
+        $lis = $xpath->query('li', $ul);
+
+        foreach ($lis as $li) {
+          $as = $xpath->query('a[contains(concat(" ", @class, " "), " accordion-title ")]', $li);
+          foreach ($as as $a) {
+            // Change a to strong.
+            $strong = $doc->createElement('strong', $a->nodeValue);
+            $a->parentNode->replaceChild($strong, $a);
+          }
+
+          $divs = $xpath->query('div[contains(concat(" ", @class, " "), " accordion-pane ")]', $li);
+          foreach ($divs as $div) {
+            // Remove old classes, id, and any 'display: none' styles.
+            $div->setAttribute('class', str_replace(['accordion-pane', 'is-closed'], '', $div->attributes->getNamedItem('class')->value));
+            $div->removeAttribute('id');
+            $div->setAttribute('style', str_replace('style="display: none;"', '', $div->attributes->getNamedItem('style')->array_count_values));
+          }
+        }
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform definitions to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed definitions.
+   */
+  private function transformDefinition(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Definition elements.
+    $elements = $xpath->query('//a[contains(concat(" ", @class, " "), " termlookup-tooltip ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract term and definition.
+        $term = $element->firstChild->nodeValue;
+        $definition = $element->lastChild->lastChild->nodeValue;
+
+        // Build the new element.
+        $button_element = $doc->createElement('button', $term);
+        $button_element->setAttribute('class', 'definition__trigger js-definition__trigger');
+
+        $dfn_element = $doc->createElement('dfn', $term);
+        $dfn_element->setAttribute('class', 'definition__term');
+
+        $span_element = $doc->createElement('span');
+        $span_element->setAttribute('class', 'definition__tooltip js-definition__tooltip');
+        $span_element->setAttribute('role', 'tooltip');
+        $span_element->appendChild($dfn_element);
+
+        $definition_text_node = $doc->createTextNode($definition);
+        $span_element->appendChild($definition_text_node);
+
+        $new_element = $doc->createElement('span');
+        $new_element->setAttribute('class', 'definition js-definition');
+        $new_element->appendChild($button_element);
+        $new_element->appendChild($span_element);
+
+        $element->parentNode->replaceChild($new_element, $element);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Update a single class on an element.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with updated classes.
+   */
+  private function singleClassReplacement(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Tables with nostyle classes.
+    $table_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " nostyle ")]');
+
+    if ($table_elements) {
+      foreach ($table_elements as $table_element) {
+        $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
+      }
+    }
+
+    // Headings with highlighted class.
+    $highlighted_headings = $xpath->query('//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]');
+    if ($highlighted_headings) {
+      foreach ($highlighted_headings as $heading) {
+        $heading->setAttribute('class', str_replace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform columns to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed columns.
+   */
+  private function transformColumns(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Row elements.
+    $elements = $xpath->query('//div[contains(concat(" ", @class, " "), " row ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract number of cols from the class name.
+        $classes = $element->attributes->getNamedItem('class')->value;
+        $num_cols = substr($classes, strpos($classes, 'cols-') + 5, 1);
+
+        if ($num_cols) {
+          // Update class.
+          $element->setAttribute('class', "l-grid l-grid--{$num_cols}-col");
+
+          // Remove col class from children.
+          $children = $xpath->query('div[contains(concat(" ", @class, " "), " col ")]', $element);
+          foreach ($children as $child) {
+            $child->setAttribute('class', str_replace('col', '', $child->attributes->getNamedItem('class')->value));
+          }
+        }
+
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform pipeline uls to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed pipeline uls.
+   */
+  private function transformPipelineUls(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Row elements.
+    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " menu pipeline ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+
+        // Replace class.
+        $element->setAttribute('class', str_replace($element->attributes->getNamedItem('class')->value, 'menu pipeline', 'list list--pipeline'));
+
+        // Remove menu-item class from children.
+        $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);
+        foreach ($children as $child) {
+          $child->setAttribute('class', str_replace('menu-item', '', $child->attributes->getNamedItem('class')->value));
+        }
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform govdelivery forms to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed govdelivery forms.
+   */
+  private function transformGovDeliveryForm(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Govdelivery form elements.
+    $elements = $xpath->query('//form[contains(concat(" ", @class, " "), " govdelivery-form ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Replace the class on the form element.
+        $element->setAttribute('class', str_replace('govdelivery-form', 'govdelivery', $element->attributes->getNamedItem('class')->value));
+
+        // Replace classes.
+        $fieldset = $xpath->query('fieldset', $element)[0];
+        $fieldset->setAttribute('class', str_replace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
+
+        $legend = $xpath->query('legend', $fieldset)[0];
+        $legend->setAttribute('class', str_replace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
+
+        $label = $xpath->query('label', $fieldset)[0];
+        $label->setAttribute('class', str_replace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
+
+        $input = $xpath->query('input', $fieldset)[0];
+        $input->setAttribute('class', str_replace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
+
+        $button = $xpath->query('button', $fieldset)[0];
+        $button->setAttribute('class', str_replace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
+
+        // Wrap label and input in a new div.
+        $div = $doc->createElement('div');
+        $div->setAttribute('class', 'form-item form-item--email is-inline');
+        $div->appendChild($label);
+        $div->appendChild($input);
+
+        // Insert the div into the fieldset.
+        $fieldset->insertBefore($div, $button);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform pullquote to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed pullqoute.
+   */
+  private function transformPullquote(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Pullquote elements.
+    $elements = $xpath->query('//p[contains(concat(" ", @class, " "), " pullquote ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract quote.
+        $quote = $element->firstChild->nodeValue;
+
+        // Extract the citation.
+        $citation_element = $xpath->query('span[contains(concat(" ", @class, " " ), " author ")]');
+        $citation = str_replace('—', '', $citation_element->firstChild->nodeValue);
+
+        // Build the new element.
+        if ($citation) {
+          $cite_element = $doc->createElement('cite', $citation);
+          $cite_element->setAttribute('class', 'pull-quote__cite');
+        }
+
+        $p_element = $doc->createElement('p', $quote);
+
+        $new_element = $doc->createElement('blockquote');
+        $new_element->setAttribute('class', 'pull-quote');
+        $new_element->appendChild($p_element);
+
+        if ($citation) {
+          $new_element->appendChild($cite_element);
+        }
+
+        $element->parentNode->replaceChild($new_element, $element);
       }
     }
 

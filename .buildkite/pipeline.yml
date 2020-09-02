@@ -47,7 +47,7 @@ steps:
     key: plan
 
     # Only allow one plan at a time
-    concurrency_group: epa-webcms-d8/plan
+    concurrency_group: epa-webcms-d8/terraform
     concurrency: 1
 
     plugins:
@@ -86,7 +86,7 @@ steps:
     key: apply
 
     # Only allow one apply at a time, regardless of branch
-    concurrency_group: epa-webcms-d8/apply
+    concurrency_group: epa-webcms-d8/terraform
     concurrency: 1
 
     # Only deploy after the first two steps have completed
@@ -136,8 +136,8 @@ steps:
     # Run only if the previous deploy step succeeded
     depends_on: apply
 
-    # Only allow one Drush update at a time, regardless of branch
-    concurrency_group: epa-webcms-d8/update
+    # Only allow one Drush update at a time per branch
+    concurrency_group: epa-webcms-d8/update-$BUILDKITE_BRANCH
     concurrency: 1
 
     plugins:

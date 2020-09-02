@@ -1,0 +1,55 @@
+uuid: 4aafaf9c-327b-42f8-aae0-aa348b8b0171
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - epa_migrations
+_core:
+  default_config_hash: nLmnZrAOZ87N8idNC3ASDtMwz8cNpDgs98Rc-JwV6N4
+id: upgrade_d7_group_content_node_public_notice
+class: Drupal\migrate\Plugin\Migration
+field_plugin_method: null
+cck_plugin_method: null
+migration_tags:
+  - 'Drupal 7'
+  - Content
+migration_group: migrate_drupal_7
+label: 'Group content (Public Notice Nodes)'
+source:
+  plugin: epa_og_membership
+  high_water_property:
+    name: etid
+  d7_entity_type: node
+  d8_entity_type: node
+  node_bundle: public_notice
+  constants:
+    formatted_group_prefix: web_area-group_
+    formatted_d8_entity_type: node-
+process:
+  type:
+    -
+      plugin: concat
+      source:
+        - constants/formatted_group_prefix
+        - constants/formatted_d8_entity_type
+        - bundle
+    -
+      plugin: default_value
+  gid:
+    -
+      plugin: get
+      source: gid
+  entity_id:
+    -
+      plugin: get
+      source: etid
+  label:
+    -
+      plugin: get
+      source: label
+destination:
+  plugin: 'entity:group_content'
+migration_dependencies:
+  required: {  }
+  optional: {  }

@@ -57,7 +57,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
@@ -73,7 +73,14 @@ RUN set -ex \
     echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
-  } | tee /usr/local/etc/php/php-fpm-fcgi.ini
+  } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
+  # Enable special PHP-FPM status pages:
+  && sed -i \
+    # 1. The 'ping' endpoint responds with 'pong' (useful for health checks)
+    -e 's/^;\(ping\.path =\)/\1/' \
+    # 2. The 'status' endpoint response with metrics related to this FPM worker pool
+    -e 's/^;\(pm\.status_path =\)/\1/' \
+    /usr/local/etc/php-fpm.d/www.conf
 
 # Set the php-fpm log format. This was largely reverse-engineered from fpm_log.c in the
 # PHP sources. Notes on the available log options:
@@ -124,7 +131,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++ \
@@ -136,7 +143,11 @@ RUN set -ex \
     echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
-  } | tee /usr/local/etc/php/php-fpm-fcgi.ini
+  } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
+  && sed -i \
+    -e 's/^;\(ping\.path =\)/\1/' \
+    -e 's/^;\(pm\.status_path =\)/\1/' \
+    /usr/local/etc/php-fpm.d/www.conf
 
 # See notes above
 RUN set -ex \
@@ -216,7 +227,7 @@ FROM nginx:mainline-alpine AS nginx
 COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the nginx configuration and the startup script
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY default.conf status.conf /etc/nginx/conf.d/
 COPY scripts/ecs/nginx-entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
@@ -232,7 +243,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu \
+RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
   libstdc++

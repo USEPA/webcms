@@ -1,0 +1,84 @@
+uuid: 32358ec2-d4ff-409b-ad87-76cb407805d3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_slides
+    - paragraphs.paragraphs_type.slide
+    - paragraphs.paragraphs_type.slideshow
+  module:
+    - custom_add_another
+    - entity_reference_revisions
+third_party_settings:
+  custom_add_another:
+    custom_add_another: 'Add slide'
+    custom_remove: 'Remove slide'
+id: paragraph.slideshow.field_slides
+field_name: field_slides
+entity_type: paragraph
+bundle: slideshow
+label: Slides
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    negate: 0
+    target_bundles:
+      slide: slide
+    target_bundles_drag_drop:
+      applicants_or_respondents:
+        weight: 18
+        enabled: false
+      banner:
+        weight: 19
+        enabled: false
+      banner_slide:
+        weight: 20
+        enabled: false
+      box:
+        weight: 21
+        enabled: false
+      cfr:
+        weight: 22
+        enabled: false
+      docket:
+        weight: 23
+        enabled: false
+      dynamic_list:
+        weight: 24
+        enabled: false
+      frc:
+        weight: 25
+        enabled: false
+      from_library:
+        weight: 26
+        enabled: false
+      header:
+        weight: 27
+        enabled: false
+      html:
+        weight: 28
+        enabled: false
+      legal_authorities:
+        weight: 29
+        enabled: false
+      link_list:
+        weight: 30
+        enabled: false
+      locations_of_prop_actions:
+        weight: 31
+        enabled: false
+      press_officers:
+        weight: 32
+        enabled: false
+      slide:
+        enabled: true
+        weight: 33
+      slideshow:
+        weight: 34
+        enabled: false
+field_type: entity_reference_revisions
