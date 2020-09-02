@@ -33,6 +33,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(nostyle).*?"|';
     $pattern .= 'class=".*?(highlighted).*?"|';
     $pattern .= 'class=".*?(govdelivery-form).*?"|';
+    $pattern .= 'class=".*?(epa-archive-link).*?"|';
     $pattern .= 'href=".*?(exitepa).*?"|';
     $pattern .= '(need Adobe Reader to view)|(need a PDF reader to view)';
     $pattern .= '/';
@@ -118,6 +119,10 @@ trait EpaWysiwygTextProcessingTrait {
 
             case 'govdelivery-form':
               $doc = $this->transformGovDeliveryForm($doc);
+              break;
+
+            case 'epa-archive-link':
+              $doc = $this->transformArchiveLink($doc);
               break;
           }
         }
@@ -651,6 +656,43 @@ trait EpaWysiwygTextProcessingTrait {
         }
 
         $element->parentNode->replaceChild($new_element, $element);
+      }
+    }
+
+    return $doc;
+
+  }
+
+  /**
+   * Transform archive links to D8 markup.
+   *
+   * @param \DOMDocument $doc
+   *   The document to search and replace.
+   *
+   * @return \DOMDocument
+   *   The document with transformed archive links.
+   */
+  private function transformArchiveLink(DOMDocument $doc) {
+    // Create a DOM XPath object for searching the document.
+    $xpath = new \DOMXPath($doc);
+
+    // Archive link elements.
+    $elements = $xpath->query('//a[contains(concat(" ", @class, " "), " epa-archive-link ")]');
+
+    if ($elements) {
+      foreach ($elements as $element) {
+        // Extract text.
+        $text = $element->firstChild->nodeValue;
+
+        // Build the span element.
+        $span_element = $doc->createElement('span', $text);
+        $span_element->setAttribute('class', 'usa-tag');
+
+        // Update the a class and remove title attribute.
+        $element->setAttribute('class', str_replace('epa-archive-link', 'tag-link', $element->attributes->getNamedItem('class')->value));
+        $element->removeAttribute('title');
+
+        $element->replaceChild($span_element, $element->firstChild);
       }
     }
 
