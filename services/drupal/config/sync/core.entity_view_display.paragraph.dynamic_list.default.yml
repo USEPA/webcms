@@ -3,25 +3,23 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.dynamic_list.field_dynamic_list
+    - field.field.paragraph.dynamic_list.field_views_reference
     - paragraphs.paragraphs_type.dynamic_list
   module:
-    - blizz_dynamic_entitylist
+    - viewsreference
 id: paragraph.dynamic_list.default
 targetEntityType: paragraph
 bundle: dynamic_list
 mode: default
 content:
-  field_dynamic_list:
+  field_views_reference:
     weight: 0
-    label: above
+    label: hidden
     settings:
-      preview_on_admin_routes: '1'
-      register_result_entity_ids: '1'
-      wrapper: none
-      css_classes: ''
+      plugin_types:
+        - block
     third_party_settings: {  }
-    type: blizz_dynamic_entitylist_formatter
+    type: viewsreference_formatter
     region: content
 hidden:
   search_api_excerpt: true
