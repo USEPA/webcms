@@ -6,11 +6,12 @@
 #}
 
 {% set images = [] %}
-{% for key, item in content.field_slide|field_value %}
+
+{% for slide in slides %}
   {% set images = images|merge([
     {
-      'caption': item['#media'].name.value,
-      'media': item|render,
+      'caption': slide.caption|view({label: 'hidden', settings: {}}),
+      'media': slide.media|view({type: 'entity_reference_entity_view', label: 'hidden', settings: {view_mode: 'gallery'}}),
     }
   ]) %}
 {% endfor %}

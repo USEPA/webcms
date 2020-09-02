@@ -3,23 +3,34 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.slideshow.field_slide
+    - field.field.paragraph.slideshow.field_slides
     - field.field.paragraph.slideshow.field_title
     - paragraphs.paragraphs_type.slideshow
+  module:
+    - paragraphs
 id: paragraph.slideshow.default
 targetEntityType: paragraph
 bundle: slideshow
 mode: default
 content:
-  field_slide:
+  field_slides:
+    type: paragraphs
     weight: 1
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-      match_limit: 10
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: slide
+      features:
+        add_above: '0'
+        collapse_edit_all: collapse_edit_all
+        duplicate: '0'
     third_party_settings: {  }
-    type: entity_reference_autocomplete
     region: content
   field_title:
     weight: 0
