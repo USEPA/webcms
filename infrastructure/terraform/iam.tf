@@ -273,38 +273,27 @@ resource "aws_iam_role_policy_attachment" "drupal_uploads_access" {
   policy_arn = aws_iam_policy.uploads_access.arn
 }
 
-# Policy to allow publishing CloudWatch logs using the Embedded Metric Format
-#
-# This policy should be limited to the CloudWatch metrics log group, but for some reason
-# the IAM resource syntax keeps failing to grant the necessary permissions.
-data "aws_iam_policy_document" "metrics_logs" {
+data "aws_iam_policy_document" "put_metrics" {
   version = "2012-10-17"
 
   statement {
-    sid       = "logStreamActions"
+    sid       = "allowPublishingMetrics"
     effect    = "Allow"
-    actions   = ["logs:CreateLogStream", "logs:DescribeLogStreams"]
-    resources = ["*"]
-  }
-
-  statement {
-    sid       = "logPublishing"
-    effect    = "Allow"
-    actions   = ["logs:PutLogEvents"]
+    actions   = ["cloudwatch:PutMetricData"]
     resources = ["*"]
   }
 }
 
-resource "aws_iam_policy" "metrics_logs" {
-  name        = "${local.role-prefix}PublishMetrics"
-  description = "Permits publishing metrics via CloudWatch logs"
+resource "aws_iam_policy" "put_metrics" {
+  name        = "${local.role-prefix}MetricsPublish"
+  description = "Permits publishing CloudWatch metrics"
 
-  policy = data.aws_iam_policy_document.metrics_logs.json
+  policy = data.aws_iam_policy_document.put_metrics.json
 }
 
-resource "aws_iam_role_policy_attachment" "drupal_metrics_logs" {
+resource "aws_iam_role_policy_attachment" "drupal_put_metrics" {
   role       = aws_iam_role.drupal_container_role.name
-  policy_arn = aws_iam_policy.metrics_logs.arn
+  policy_arn = aws_iam_policy.put_metrics.arn
 }
 
 # This is a policy for read/write access to the cluster's data, but not for

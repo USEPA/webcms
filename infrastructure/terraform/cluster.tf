@@ -181,9 +181,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
           name = "CW_CONFIG_CONTENT",
           # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
           value = jsonencode({
-            logs = {
+            metrics = {
+              namespace = "WebCMS",
               metrics_collected = {
-                emf = {},
+                statsd = {
+                  service_address = ":8125",
+                },
               },
             },
           }),
