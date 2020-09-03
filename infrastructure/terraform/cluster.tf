@@ -59,6 +59,11 @@ resource "aws_ecs_cluster" "cluster" {
     weight            = 100
   }
 
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
   tags = merge(local.common-tags, {
     Name = "WebCMS ${local.env-title}"
   })
