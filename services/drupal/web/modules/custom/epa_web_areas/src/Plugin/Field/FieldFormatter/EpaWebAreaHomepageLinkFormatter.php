@@ -9,7 +9,8 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceFormatterBase;
 
 /**
- * Provides a link to the homepage node for a Web Area group.
+ * Provides a link to the homepage node for a Web Area group when referenced via
+ * normal entity reference field.
  *
  * @FieldFormatter(
  *   id = "web_areas_homepage_link_formatter",
