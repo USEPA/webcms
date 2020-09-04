@@ -90,7 +90,9 @@ class LinkWithEntityTitleOrLinkTextFormatter extends FormatterBase implements Co
         $url_params = $url->getRouteParameters();
         $entity_type = key($url_params);
         $entity = $this->entityTypeManager->getStorage($entity_type)->load($url_params[$entity_type]);
-        $link_title = $entity->label();
+        if ($entity && $entity->label()) {
+          $link_title = $entity->label();
+        }
       }
 
       // If the link text field value is available, use it for the text.
