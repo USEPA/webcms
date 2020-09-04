@@ -96,30 +96,8 @@ class LinkWithEntityTitleOrLinkTextFormatter extends LinkFormatter {
       $url = $this->buildUrl($item);
       $link_title = $url->toString();
 
-      // If the title field value is available, use it for the link text.
-      if (empty($settings['url_only']) && !empty($item->title)) {
-        // Unsanitized token replacement here because the entire link title
-        // gets auto-escaped during link generation in
-        // \Drupal\Core\Utility\LinkGenerator::generate().
-        $link_title = \Drupal::token()->replace($item->title, [$entity->getEntityTypeId() => $entity], ['clear' => TRUE]);
-      }
-
-      $element[$delta] = [
-        '#type' => 'link',
-        '#title' => $link_title,
-        '#options' => $url->getOptions(),
-      ];
-      $element[$delta]['#url'] = $url;
-
-    }
-
-    foreach ($items as $delta => $item) {
-      // By default use the full URL as the link text.
-      $url = $this->buildUrl($item);
-      $link_title = $url->toString();
-
       // If the url is internal, try to get the linked entity's title.
-      if ($url->isRouted()) {
+      if (empty($settings['url_only']) && $url->isRouted()) {
         $url_params = $url->getRouteParameters();
         $entity_type = key($url_params);
         $entity = $this->entityTypeManager->getStorage($entity_type)->load($url_params[$entity_type]);
