@@ -194,7 +194,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
 
           $links_query = $this->d7Connection->select('field_data_field_epa_node_list_ref', 'fpp_links')
-            ->condition("fpp_links.{$id_type}", $id, '=');
+            ->condition("fpp_links.revision_id", $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_node_list_ref_target_id', 'entity');
 
           $links = $links_query->execute()->fetchAll();
