@@ -8,6 +8,7 @@ dependencies:
     - node
     - user
     - views_autocomplete_filters
+    - views_bulk_operations
 _core:
   default_config_hash: epCHwxXumnS0FQR7duKz2_r2nkW5CJxTracGsaPMuzE
 id: group_moderated_content
@@ -52,7 +53,7 @@ display:
       pager:
         type: full
         options:
-          items_per_page: 20
+          items_per_page: 10
           offset: 0
           id: 0
           total_pages: null
@@ -82,16 +83,15 @@ display:
           summary: ''
           description: ''
           columns:
-            node_bulk_form: node_bulk_form
+            views_bulk_operations_bulk_form: views_bulk_operations_bulk_form
             title: title
             type: type
             name: name
             moderation_state: moderation_state
-            moderation_state_1: moderation_state_1
             changed: changed
             operations: operations
           info:
-            node_bulk_form:
+            views_bulk_operations_bulk_form:
               align: ''
               separator: ''
               empty_column: false
@@ -124,13 +124,6 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            moderation_state_1:
-              sortable: true
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
             changed:
               sortable: true
               default_sort_order: desc
@@ -148,14 +141,14 @@ display:
       row:
         type: fields
       fields:
-        node_bulk_form:
-          id: node_bulk_form
-          table: node
-          field: node_bulk_form
-          relationship: nid
+        views_bulk_operations_bulk_form:
+          id: views_bulk_operations_bulk_form
+          table: views
+          field: views_bulk_operations_bulk_form
+          relationship: none
           group_type: group
           admin_label: ''
-          label: ''
+          label: Select
           exclude: false
           alter:
             alter_text: false
@@ -196,19 +189,22 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
+          batch: true
+          batch_size: 30
+          form_step: true
+          buttons: false
+          clear_on_exposed: true
           action_title: Action
-          include_exclude: include
           selected_actions:
-            - create_new_draft
-            - create_new_draft_approved
-            - create_new_draft_needs_review
-            - node_delete_action
-            - set_to_published
-            - set_to_published_needs_review
-            - set_to_published_scheduled_for_expiration
-            - set_to_unpublished
-          entity_type: node
-          plugin_id: node_bulk_form
+            0:
+              action_id: 'moderation_state_change:node'
+              preconfiguration:
+                label_override: 'Transition to a new state'
+            10:
+              action_id: views_bulk_operations_delete_entity
+              preconfiguration:
+                label_override: Delete
+          plugin_id: views_bulk_operations_bulk_form
         title:
           id: title
           table: node_field_revision
