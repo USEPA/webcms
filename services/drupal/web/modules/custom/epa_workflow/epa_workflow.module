@@ -487,7 +487,7 @@ function _epa_workflow_form_validation_revision_log($element, FormStateInterface
     $op = $form_state->getValue('new_state');
   }
 
-  if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published')  {
+  if (isset($op) && in_array($op, ['Publish','published','set_to_published']))  {
     if (empty($form_state->getValue('revision_log'))) {
       $form_state->setError($element, t('Revision log required when publishing content.'));
     }
