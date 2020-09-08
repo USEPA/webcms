@@ -32,7 +32,13 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 
     managed_scaling {
       status          = "ENABLED"
-      target_capacity = 100
+
+      # Aim for 75% utilization of the autoscaling group
+      target_capacity = 75
+
+      # Scale by 2 EC2s or 10% of the group's max capacity, whichever is greater
+      minimum_scaling_step_size = max(2, ceil(0.10 * var.server-max-capacity))
+      maximum_scaling_step_size = var.server-max-capacity
     }
 
     # managed_termination_protection = "ENABLED"
@@ -42,6 +48,10 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
     # Give this capacity provider a name that matches the random_pet to aid debugging/triage
     Name = "${local.name-prefix} ${random_pet.capacity_provider.id}"
   })
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # ECS cluster

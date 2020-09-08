@@ -584,29 +584,43 @@ trait EpaWysiwygTextProcessingTrait {
         $element->setAttribute('class', str_replace('govdelivery-form', 'govdelivery', $element->attributes->getNamedItem('class')->value));
 
         // Replace classes.
-        $fieldset = $xpath->query('fieldset', $element)[0];
-        $fieldset->setAttribute('class', str_replace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
+        $fieldset = $xpath->query('fieldset[contains(concat(" ", @class, " "), " govdelivery-fieldset ")]', $element)[0];
+        if ($fieldset) {
+          $fieldset->setAttribute('class', str_replace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
+        }
 
-        $legend = $xpath->query('legend', $fieldset)[0];
-        $legend->setAttribute('class', str_replace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
+        $legend = $xpath->query('legend[contains(concat(" ", @class, " "), " govdelivery-legend ")]', $element)[0];
+        if ($legend) {
+          $legend->setAttribute('class', str_replace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
+        }
 
-        $label = $xpath->query('label', $fieldset)[0];
-        $label->setAttribute('class', str_replace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
+        $label = $xpath->query('label[contains(concat(" ", @class, " "), " element-invisible ")]', $element)[0];
+        if ($label) {
+          $label->setAttribute('class', str_replace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
+        }
 
-        $input = $xpath->query('input', $fieldset)[0];
-        $input->setAttribute('class', str_replace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
+        $input = $xpath->query('input[contains(concat(" ", @class, " "), " govdelivery-text ")]', $element)[0];
+        if ($input) {
+          $input->setAttribute('class', str_replace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
+        }
 
-        $button = $xpath->query('button', $fieldset)[0];
-        $button->setAttribute('class', str_replace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
+        $button = $xpath->query('button[contains(concat(" ", @class, " "), " govdelivery-submit ")]', $element)[0];
+        if ($button) {
+          $button->setAttribute('class', str_replace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
+        }
 
         // Wrap label and input in a new div.
-        $div = $doc->createElement('div');
-        $div->setAttribute('class', 'form-item form-item--email is-inline');
-        $div->appendChild($label);
-        $div->appendChild($input);
+        if ($label && $input) {
+          $div = $doc->createElement('div');
+          $div->setAttribute('class', 'form-item form-item--email is-inline');
+          $div->appendChild($label);
+          $div->appendChild($input);
+        }
 
         // Insert the div into the fieldset.
-        $fieldset->insertBefore($div, $button);
+        if ($fieldset && $div && $button) {
+          $fieldset->insertBefore($div, $button);
+        }
       }
     }
 
