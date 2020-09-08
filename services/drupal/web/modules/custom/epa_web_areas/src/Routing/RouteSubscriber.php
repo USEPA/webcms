@@ -33,8 +33,8 @@ class RouteSubscriber extends RouteSubscriberBase {
    * {@inheritdoc}
    */
   protected function alterRoutes(RouteCollection $collection) {
-    // Always deny access to node/add to force group relationship.
-    $route_names = ['node.add', 'node.add_page'];
+    // Always deny access to node/add and media/add to force group relationship.
+    $route_names = ['node.add', 'node.add_page', 'entity.media.add_page', 'entity.media.add_form'];
     foreach ($route_names as $route_name) {
       if ($route = $collection->get($route_name)) {
         $route->setRequirement('_access', 'FALSE');
