@@ -316,7 +316,7 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
     $component = new SectionComponent($this->uuid->generate(), $region, [
       'id' => 'inline_block:paragraph',
       'label' => 'Paragraph Block',
-      'label_display' => 0,
+      'label_display' => FALSE,
       'block_serialized' => serialize($block),
       'context_mapping' => [],
     ]);
