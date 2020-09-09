@@ -143,6 +143,15 @@ class EpaNode extends Node {
       $row->setSourceProperty('main_col_panes', $row->getSourceProperty('body'));
     }
 
+    // Add node alias.
+    $query = $this->select('url_alias', 'ua')
+      ->fields('ua', ['alias']);
+    $query->condition('ua.source', 'node/' . $row->getSourceProperty('nid'));
+    $alias = $query->execute()->fetchField();
+    if (!empty($alias)) {
+      $row->setSourceProperty('alias', '/' . $alias);
+    }
+
     return parent::prepareRow($row);
   }
 
