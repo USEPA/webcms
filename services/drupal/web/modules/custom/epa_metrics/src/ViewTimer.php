@@ -75,10 +75,15 @@ class ViewTimer {
 
     // The statsd protocol uses milliseconds, so we have to convert from the seconds that
     // microtime(TRUE) returns.
-    $service->timing('Drupal.Views.' . $id, $stats['view'] * 1000);
-    $service->timing('Drupal.ViewsBuild.' . $id, $stats['build'] * 1000);
-    $service->timing('Drupal.ViewsExecute.' . $id, $stats['execute'] * 1000);
-    $service->timing('Drupal.ViewsRender.' . $id, $stats['render'] * 1000);
+    foreach ([
+               'view' => 'Drupal.Views.' . $id,
+               'build' => 'Drupal.ViewsBuild.' . $id,
+               'execute' => 'Drupal.ViewsExecute.' . $id,
+               'render' => 'Drupal.ViewsRender.' . $id] as $stage => $timingkey) {
+      if (isset($stats[$stage])) {
+        $service->timing($timingkey, $stats[$stage] * 1000);
+      }
+    }
     $service->flush();
 
     unset(self::$timers[$id]);
