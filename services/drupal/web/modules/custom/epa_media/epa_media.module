@@ -9,6 +9,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\file\Entity\File;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
@@ -53,6 +54,13 @@ function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterfa
   $media = $entity_repository->loadEntityByUuid('media', $editor_object['attributes']['data-entity-uuid']);
   $edit_url = Url::fromRoute('entity.media.edit_form', ['media' => $media->id()]);
   $link = Link::fromTextAndUrl('Edit this media item', $edit_url);
+
+  if ($fid = $media->getSource()->getSourceFieldValue($media)){
+    $file_url = File::load($fid)->createFileUrl();
+    $form['file_url'] = [
+      '#markup' => t('<p><strong>File URL:</strong> %file_url</p>', ['%file_url' => $file_url])
+    ];
+  }
 
   $form['edit_link'] = $link->toRenderable() + [
     '#attributes' => [
