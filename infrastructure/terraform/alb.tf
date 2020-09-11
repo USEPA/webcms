@@ -20,6 +20,8 @@ resource "aws_lb_target_group" "drupal_target_group" {
   target_type = "ip"
   vpc_id      = local.vpc-id
 
+  load_balancing_algorithm_type = "least_outstanding_requests"
+
   # Have the load balancer target the PHP-FPM status port (:8080) instead of the Drupal
   # application. In an ideal world, we could hit / to determine if Drupal is still
   # healthy, but this causes so much load on the PHP-FPM pool that it can cause the
