@@ -10,7 +10,6 @@ script='drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-fo
 drush --uri="$WEBCMS_SITE_URL" updb -y
 drush --uri="$WEBCMS_SITE_URL" cr
 drush --uri="$WEBCMS_SITE_URL" cim -y
-drush --uri="$WEBCMS_SITE_URL" ib --choice safe
 drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
 drush --uri="$WEBCMS_SITE_URL" cr'
 
