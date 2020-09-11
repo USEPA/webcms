@@ -145,81 +145,26 @@ display:
             operator_limit_selection: false
             operator_list: {  }
           group: 1
-        field_channel_target_id:
-          id: field_channel_target_id
-          table: node__field_channel
-          field: field_channel_target_id
+        type:
+          id: type
+          table: node_field_data
+          field: type
           relationship: none
           group_type: group
           admin_label: ''
-          operator: or
+          operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: field_channel_target_id_op
-            label: Channel
+            operator_id: type_op
+            label: 'Content type'
             description: ''
             use_operator: false
-            operator: field_channel_target_id_op
-            operator_limit_selection: false
-            operator_list:
-              or: or
-              and: and
-              not: not
-            identifier: field_channel_target_id
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: false
-          type: select
-          limit: true
-          vid: channels
-          hierarchy: false
-          error_message: true
-          plugin_id: taxonomy_index_tid
-        field_type_target_id:
-          id: field_type_target_id
-          table: node__field_type
-          field: field_type_target_id
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_type_target_id_op
-            label: Type
-            description: ''
-            use_operator: false
-            operator: field_type_target_id_op
+            operator: type_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_type_target_id
+            identifier: type
             required: false
             remember: false
             multiple: false
@@ -245,13 +190,9 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          reduce_duplicates: false
-          type: select
-          limit: true
-          vid: type
-          hierarchy: false
-          error_message: true
-          plugin_id: taxonomy_index_tid
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
         label:
           id: label
           table: groups_field_data
@@ -366,6 +307,113 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: views_autocomplete_filters_string
+        field_channel_target_id:
+          id: field_channel_target_id
+          table: node__field_channel
+          field: field_channel_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_channel_target_id_op
+            label: Channel
+            description: ''
+            use_operator: false
+            operator: field_channel_target_id_op
+            operator_limit_selection: false
+            operator_list:
+              or: or
+              and: and
+              not: not
+            identifier: field_channel_target_id
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          type: select
+          limit: true
+          vid: channels
+          hierarchy: false
+          error_message: true
+          plugin_id: taxonomy_index_tid
+        field_type_target_id:
+          id: field_type_target_id
+          table: node__field_type
+          field: field_type_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_type_target_id_op
+            label: Type
+            description: ''
+            use_operator: false
+            operator: field_type_target_id_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_type_target_id
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          type: select
+          limit: true
+          vid: type
+          hierarchy: false
+          error_message: true
+          plugin_id: taxonomy_index_tid
         field_description_value:
           id: field_description_value
           table: node__field_description
@@ -631,54 +679,6 @@ display:
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
-        type:
-          id: type
-          table: node_field_data
-          field: type
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: type_op
-            label: 'Content type'
-            description: ''
-            use_operator: false
-            operator: type_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: type
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: node
-          entity_field: type
-          plugin_id: bundle
       sorts:
         field_last_published_value:
           id: field_last_published_value
