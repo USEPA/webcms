@@ -344,8 +344,8 @@ data "aws_iam_policy_document" "task_secrets_access" {
     # This policy does not - and should not - grant access to the root DB password.
     # Drupal doesn't need it.
     resources = [
-      aws_secretsmanager_secret.db_app_password.arn,
-      aws_secretsmanager_secret.db_app_d7_password.arn,
+      aws_secretsmanager_secret.db_app_credentials.arn,
+      aws_secretsmanager_secret.db_app_d7_credentials.arn,
       aws_secretsmanager_secret.hash_salt.arn,
       aws_secretsmanager_secret.mail_pass.arn,
       aws_secretsmanager_secret.saml_sp_key.arn,
