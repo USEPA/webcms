@@ -29,7 +29,8 @@ resource "aws_lb_target_group" "drupal_target_group" {
   # puts more load on the other containers, which can cause them to become unhealthy.
   health_check {
     enabled  = true
-    interval = 10
+    interval = 300
+    timeout  = 60
     path     = "/ping"
     port     = 8080
     protocol = "HTTP"
