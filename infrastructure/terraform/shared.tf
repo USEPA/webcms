@@ -16,7 +16,7 @@ locals {
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
 
     # DB hostname
-    { name = "WEBCMS_DB_HOST", value = aws_rds_cluster.db.endpoint },
+    { name = "WEBCMS_DB_HOST", value = aws_db_proxy.proxy.endpoint },
 
     # Databse names - the D7 database is used as a migration source
     { name = "WEBCMS_DB_NAME", value = local.database-name },
