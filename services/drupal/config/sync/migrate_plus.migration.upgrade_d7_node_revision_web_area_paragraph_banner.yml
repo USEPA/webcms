@@ -1,8 +1,10 @@
-uuid: 95fa1f37-b0a4-4aaf-a456-e738c541ae34
+uuid: 40d22577-78ba-44c4-b9ab-00b748b8b292
 langcode: en
 status: true
 dependencies: {  }
-id: upgrade_d7_node_web_area_paragraph_banner
+_core:
+  default_config_hash: tSBunrb-fDsaF_ksrLAwJhgPk2haLDtBncOp57EFpgc
+id: upgrade_d7_node_revision_web_area_paragraph_banner
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
 cck_plugin_method: null
@@ -10,12 +12,12 @@ migration_tags:
   - 'Drupal 7'
   - Content
 migration_group: migrate_drupal_7
-label: 'Paragraphs (Web Area, Banner)'
+label: 'Paragraphs (Web Area Revisions, Banner)'
 source:
-  plugin: d7_node
+  plugin: d7_node_revision
   node_type: web_area
   high_water_property:
-    name: nid
+    name: vid
     alias: nr
 process:
   _banner_slide_paragraphs:
@@ -27,8 +29,8 @@ process:
       plugin: sub_process
       source: '@_banner_slide_paragraphs'
       process:
-        target_id: 'destid1'
-        target_revision_id: 'destid2'
+        target_id: destid1
+        target_revision_id: destid2
 destination:
   plugin: 'entity_reference_revisions:paragraph'
   default_bundle: banner

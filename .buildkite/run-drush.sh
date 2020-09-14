@@ -10,7 +10,6 @@ script='drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-fo
 drush --uri="$WEBCMS_SITE_URL" updb -y
 drush --uri="$WEBCMS_SITE_URL" cr
 drush --uri="$WEBCMS_SITE_URL" cim -y
-drush --uri="$WEBCMS_SITE_URL" ib --choice safe
 drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
 drush --uri="$WEBCMS_SITE_URL" cr'
 
@@ -147,6 +146,21 @@ while true; do
       echo "$exit_code ($exit_reason)"
     else
       echo "$exit_code"
+    fi
+
+    # Did Drush exit due to a signal?
+    if test "$exit_code" -gt 128; then
+      # Find the signal number and try to match up a name if we can
+      signal=$((exit_code - 128))
+
+      echo -n "  WARNING: Drush exited with signal $signal"
+
+      # If the signal corresponded to a known signal name, print that out too
+      if signal_name="$(kill -l "$signal" 2>/dev/null)"; then
+        echo " ($signal_name)"
+      else
+        echo
+      fi
     fi
 
     # Mark non-zero exits as a failure
