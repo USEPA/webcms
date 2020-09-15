@@ -110,62 +110,163 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       ->execute()
       ->fetchObject();
 
-    // Get all draft revisions modified since the current revision.
-    $draft_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
+    // Get all revisions modified since the current revision.
+    $forward_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['vid', 'timestamp', 'state'])
       ->condition('nres.nid', $nid)
-      ->condition('nres.state', ['draft_approved', 'draft_review', 'draft'], 'IN')
       ->condition('nres.timestamp', $current_revision->timestamp, '>')
       ->orderBy('nres.vid', 'DESC')
       ->execute()
       ->fetchAll();
 
-    if (count($draft_revisions) > 0) {
-      // Ensure the heaviest, newest (by timestamp) revision is the latest
-      // revision (by vid).
-      $state_weights = [
-        'draft_approved' => 300,
-        'draft_review' => 200,
-        'draft' => 100,
-      ];
+    if (count($forward_revisions) > 0) {
+      $forward_revision_states = [];
 
-      $state_map = [
-        'draft_approved' => 'draft_approved',
-        'draft_review' => 'draft_needs_review',
-        'draft' => 'draft',
-      ];
-
-      // Initialize heaviest revision data with most recent draft revision.
-      $heaviest_revision = $draft_revisions[0];
-      $heaviest_revision_weight = $state_weights[$heaviest_revision->state];
-      $heaviest_revision_state = $state_map[$heaviest_revision->state];
-
-      foreach ($draft_revisions as $dr) {
-        if ($state_weights[$dr->state] > $heaviest_revision_weight && $dr->timestamp > $heaviest_revision->timestamp) {
-          $heaviest_revision = $dr;
-          $heaviest_revision_weight = $state_weights[$dr->state];
-          $heaviest_revision_state = $state_map[$dr->state];
-        }
+      foreach ($forward_revisions as $fr) {
+        $forward_revision_states[] = $fr->state;
       }
 
-      if ($heaviest_revision->vid !== $latest_revision->vid) {
-        $heaviest_revision = $this->entityTypeManager
-          ->getStorage('node')
-          ->loadRevision($heaviest_revision->vid);
+      $forward_revision_states = array_unique($forward_revision_states);
 
-        $heaviest_revision->createDuplicate();
-        $heaviest_revision->set('moderation_state', $heaviest_revision_state);
-        $heaviest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision because it was edited after this node was last published.&emsp;|&emsp;') . $heaviest_revision->getRevisionLogMessage());
-        $heaviest_revision->save();
+      switch ($current_revision->state) {
+
+        case 'published':
+          // If there's an unpublished forward revision, create a new draft
+          // based on the current revision if the unpublished forward revision
+          // vid is higher than the current revision vid.
+          if (in_array('unpublished', $forward_revision_states)) {
+            $newer_unpublished_revision = $this->getNewestRevisionByState($forward_revisions, 'unpublished');
+            if ($newer_unpublished_revision->vid > $current_revision->vid) {
+              $new_latest_revision = $current_revision;
+            }
+            else {
+              $new_latest_revision = FALSE;
+            }
+
+          }
+
+          // If there's a draft forward revision, create a new draft based on
+          // the draft forward revision if the draft forward revision has a
+          // lower vid than the current revision.
+          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {
+            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
+            if ($newer_draft_revision->vid < $current_revision->vid) {
+              $new_latest_revision = $newer_draft_revision;
+            }
+          }
+          break;
+
+        case 'unpublished':
+          // If there's an unpublished forward revision, create a new draft
+          // based on the current revision if the unpublished forward revision
+          // vid is lower than the current revision vid.
+          if (in_array('unpublished', $forward_revision_states)) {
+            $new_unpublished_revision = $this->getNewestRevisionByState($forward_revisions, 'unpublished');
+            if ($new_unpublished_revision->vid < $current_revision->vid) {
+              $new_latest_revision = $current_revision;
+            }
+            else {
+              $new_latest_revision = FALSE;
+            }
+          }
+
+          // If there's a draft forward revision, create a new draft based on
+          // the draft forward revision if the draft forward revision has a
+          // lower vid than the current revision.
+          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
+            if ($newer_draft_revision->vid < $current_revision->vid) {
+              $new_latest_revision = $newer_draft_revision;
+            }
+          }
+          break;
+
+        case 'draft':
+        case 'draft_review':
+        case 'draft_approved':
+          // If there's a draft forward revision, create a new draft based on
+          // the draft forward revision if the draft forward revision has a
+          // lower vid than the current revision.
+          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
+            if ($newer_draft_revision->vid < $current_revision->vid) {
+              $new_latest_revision = $newer_draft_revision;
+            }
+          }
+          break;
+
+      }
+
+      if (isset($new_latest_revision) && $new_latest_revision->vid !== $latest_revision->vid) {
+        $state_map = [
+          'draft_review' => 'draft_needs_review',
+        ];
+
+        $new_latest_revision_state = $state_map[$new_latest_revision->state] ?? $new_latest_revision->state;
+
+        $new_latest_revision = $this->entityTypeManager
+          ->getStorage('node')
+          ->loadRevision($new_latest_revision->vid);
+
+        $new_latest_revision->createDuplicate();
+        $new_latest_revision->set('moderation_state', $new_latest_revision_state);
+        $new_latest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision.&emsp;|&emsp;') . $new_latest_revision->getRevisionLogMessage());
+        $new_latest_revision->save();
 
         $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $current_vid]);
 
         return TRUE;
       }
-
     }
 
     return FALSE;
+  }
+
+  /**
+   * Helper method to get the newest, heaviest draft revision.
+   *
+   * @param array $forward_revisions
+   *   The revisions to iterate through.
+   *
+   * @return object
+   *   The heaviest draft revision.
+   */
+  private function getHeaviestDraftRevision(array $forward_revisions) {
+    $state_weights = [
+      'draft_approved' => 300,
+      'draft_review' => 200,
+      'draft' => 100,
+    ];
+
+    // Initialize heaviest revision data with most recent forward revision.
+    $heaviest_revision = $forward_revisions[0];
+    $heaviest_revision_weight = $state_weights[$heaviest_revision->state];
+
+    foreach ($forward_revisions as $fr) {
+      if ($state_weights[$fr->state] > $heaviest_revision_weight && $fr->timestamp > $heaviest_revision->timestamp) {
+        $heaviest_revision = $fr;
+        $heaviest_revision_weight = $state_weights[$fr->state];
+      }
+    }
+
+    return $heaviest_revision;
+  }
+
+  /**
+   * Get the latest revision of a specified state.
+   *
+   * @param array $forward_revisions
+   *   The revisions to iterate through.
+   * @param string $state
+   *   The state to look for.
+   *
+   * @return object
+   *   The latest revision in the specified state.
+   */
+  private function getNewestRevisionByState(array $forward_revisions, string $state) {
+    foreach ($forward_revisions as $fr) {
+      if ($fr->state == $state) {
+        return $fr;
+      }
+    }
   }
 
 }
