@@ -102,10 +102,13 @@ data "template_cloudinit_config" "utility" {
           echo "Dumping content of other tables"
           mysqldump -u webcms -p -h ${aws_rds_cluster.db.endpoint} webcms "$${structure_tables[@]}" >> "$filename"
 
-          echo "Complete. Dump saved to to $filename"
+          echo "Compressing dump"
+          gzip "$filename"
+
+          echo "Complete. Dump saved as $filename.gz"
           echo ""
           echo "To upload to S3, run this command:"
-          echo aws s3 cp "$filename" "s3://${aws_s3_bucket.uploads.bucket}/$filename"
+          echo aws s3 cp "$filename.gz" "s3://${aws_s3_bucket.uploads.bucket}/$filename.gz"
     EOF
   }
 }
