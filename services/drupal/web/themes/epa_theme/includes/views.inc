@@ -29,10 +29,20 @@ function views_theme_suggestions_views_view_unformatted(array $variables) {
 }
 
 /**
- * Implements preprocess_views_view().
+ * Implements template_preprocess_views_view().
  */
 function epa_theme_preprocess_views_view(&$variables) {
   $variables['path'] = $variables['view']->getRequest()->getPathInfo();
+}
+
+/**
+ * Implements template_preprocess_views_view_unformatted().
+ */
+function epa_theme_preprocess_views_view_unformatted(&$variables) {
+  $row_plugin = $variables['view']->display_handler->getPlugin('row');
+  if (isset($row_plugin->options['view_mode'])) {
+    $variables['view_mode'] = $row_plugin->options['view_mode'];
+  }
 }
 
 /**
@@ -42,6 +52,11 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
   // A list of view names in which to exclude the container markup.
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.
   $exclude_views = [
+    'dynamic_content_list',
+    'dynamic_event_list',
+    'dynamic_faq_list',
+    'dynamic_news_release_list',
+    'dynamic_public_notice_list',
     'search_faqs',
     'search_news_releases',
     'search_public_notices',

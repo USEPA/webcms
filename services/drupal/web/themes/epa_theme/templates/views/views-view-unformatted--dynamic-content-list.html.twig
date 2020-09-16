@@ -1,0 +1,18 @@
+{#
+/**
+ * @file
+ * Theme override to display a view of unformatted rows.
+ */
+#}
+
+{% if view_mode == 'link' %}
+  <ul>
+    {% for row in rows %}
+      <li>{{ row.content }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  {% for row in rows %}
+    {{ row.content }}
+  {% endfor %}
+{% endif %}
