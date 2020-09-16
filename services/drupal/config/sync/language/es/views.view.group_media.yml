@@ -1,7 +1,34 @@
 display:
   default:
-    display_title: Máster
     display_options:
+      fields:
+        status:
+          settings:
+            format_custom_true: Publicado
+            format_custom_false: 'Sin publicar'
+          label: Estado
+          separator: ', '
+        changed:
+          label: Actualizado
+          separator: ', '
+        name:
+          label: 'Nombre del elemento multimedia'
+          separator: ', '
+        bundle:
+          label: Paquete
+          separator: ', '
+        delete_group_content:
+          text: 'Eliminar relación'
+        edit_media:
+          label: 'Editar contenido multimedia'
+          text: Editar
+        delete_media:
+          text: Eliminar
+        dropbutton:
+          label: Desplegable
+      empty:
+        area_text_custom:
+          content: 'No hay contenido disponible.'
       exposed_form:
         options:
           submit_button: Aplicar
@@ -18,36 +45,12 @@ display:
           tags:
             previous: ‹‹
             next: ››
-      fields:
-        name:
-          label: Nombre
-          separator: ', '
-        bundle:
-          label: 'Tipos multimedia'
-          separator: ', '
-        status:
-          label: Estado
-          settings:
-            format_custom_true: Publicado
-            format_custom_false: 'Sin publicar'
-          separator: ', '
-        changed:
-          label: Actualizado
-          separator: ', '
-        delete_group_content:
-          text: 'Eliminar relación'
-        edit_media:
-          text: 'Editar contenido multimedia'
-        delete_media:
-          text: 'Eliminar nodo'
-        dropbutton:
-          label: Operaciones
       filters:
         status:
           expose:
-            label: Publicado
+            label: Estado
           group_info:
-            label: 'Estado de publicación'
+            label: Estado
             group_items:
               1:
                 title: Publicado
@@ -55,14 +58,12 @@ display:
                 title: 'Sin publicar'
         bundle:
           expose:
-            label: Tipo
-      empty:
-        area_text_custom:
-          content: 'No hay contenido disponible.'
+            label: 'Tipos multimedia'
       arguments:
         gid:
           exception:
             title: Todo(s)
+    display_title: Máster
   page_1:
     display_title: Página
     display_options:
