@@ -9,6 +9,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
+use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -93,125 +94,77 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $nid = $value[0];
-    $current_vid = $value[1];
+    $d7_vid = $value[1];
 
+    $node = $this->entityTypeManager->getStorage('node')->load($nid);
+    if (!$node) {
+      // If the node doesn't exist in D8, we can't do anything here.
+      return FALSE;
+    }
     // Get timestamp and state for the current revision.
-    $current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
+    $d7_current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['timestamp', 'state'])
-      ->condition('nres.vid', $current_vid)
-      ->execute()
-      ->fetchObject();
-
-    // Get the timestamp and state for the latest revision.
-    $latest_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['vid', 'timestamp', 'state'])
-      ->condition('nres.nid', $nid)
-      ->orderBy('nres.vid', 'DESC')
+      ->condition('nres.vid', $d7_vid)
       ->execute()
       ->fetchObject();
 
     // Get all revisions modified since the current revision.
-    $forward_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
+    $d7_forward_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['vid', 'timestamp', 'state'])
       ->condition('nres.nid', $nid)
-      ->condition('nres.timestamp', $current_revision->timestamp, '>')
+      ->condition('nres.timestamp', $d7_current_revision->timestamp, '>')
       ->orderBy('nres.vid', 'DESC')
       ->execute()
       ->fetchAll();
 
-    if (count($forward_revisions) > 0) {
-      $forward_revision_states = [];
+    // Initialize state mapping for state names that differ from d7 to d8.
+    $state_map = [
+      'draft_review' => 'draft_needs_review',
+    ];
 
-      foreach ($forward_revisions as $fr) {
-        $forward_revision_states[] = $fr->state;
-      }
+    // Load current revision in both D7 and D8 for a given node, compare vids.
+    //
+    // If they do not match, in D8 re-save the vid that we want to make the
+    // current revision (as obtained from D7), retaining its same state.
+    //
+    // If they do match, skip this step and goto forward revision logic.
+    if ($node->vid !== $d7_vid) {
+      // There's a vid mismatch, re-save d7_current_revision in D8 with the
+      // correct state.
+      $new_current_revision_state = $state_map[$d7_current_revision->state] ?? $d7_current_revision->state;
 
-      $forward_revision_states = array_unique($forward_revision_states);
+      $new_current_revision = $this->entityTypeManager
+        ->getStorage('node')
+        ->loadRevision($d7_vid);
 
-      switch ($current_revision->state) {
+      $new_current_revision->createDuplicate();
+      $new_current_revision->set('moderation_state', $new_current_revision_state);
+      $new_current_revision->setRevisionLogMessage(t('During D7 migration, this revision was re-set as the current revision.&emsp;|&emsp;') . $new_current_revision->getRevisionLogMessage());
+      $new_current_revision->save();
 
-        case 'published':
-          // If there's an unpublished forward revision, create a new draft
-          // based on the current revision if the unpublished forward revision
-          // vid is higher than the current revision vid.
-          if (in_array('unpublished', $forward_revision_states)) {
-            $newer_unpublished_revision = $this->getNewestRevisionByState($forward_revisions, 'unpublished');
-            if ($newer_unpublished_revision->vid > $current_revision->vid) {
-              $new_latest_revision = $current_revision;
-            }
-            else {
-              $new_latest_revision = FALSE;
-            }
+      $this->logger->notice('Updated current revision for Node ID: %nid,  D7 Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
+    }
 
-          }
+    // Now that we've handled any potential vid mismatches, process forward
+    // revisions to set the correct draft.
+    if (count($d7_forward_revisions) > 0) {
 
-          // If there's a draft forward revision, create a new draft based on
-          // the draft forward revision if the draft forward revision has a
-          // lower vid than the current revision.
-          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {
-            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
-            if ($newer_draft_revision->vid < $current_revision->vid) {
-              $new_latest_revision = $newer_draft_revision;
-            }
-          }
-          break;
+      $newer_draft_revision = $this->getHeaviestDraftRevision($d7_forward_revisions);
 
-        case 'unpublished':
-          // If there's an unpublished forward revision, create a new draft
-          // based on the current revision if the unpublished forward revision
-          // vid is lower than the current revision vid.
-          if (in_array('unpublished', $forward_revision_states)) {
-            $new_unpublished_revision = $this->getNewestRevisionByState($forward_revisions, 'unpublished');
-            if ($new_unpublished_revision->vid < $current_revision->vid) {
-              $new_latest_revision = $current_revision;
-            }
-            else {
-              $new_latest_revision = FALSE;
-            }
-          }
+      if ($newer_draft_revision->vid < $d7_vid) {
 
-          // If there's a draft forward revision, create a new draft based on
-          // the draft forward revision if the draft forward revision has a
-          // lower vid than the current revision.
-          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
-            if ($newer_draft_revision->vid < $current_revision->vid) {
-              $new_latest_revision = $newer_draft_revision;
-            }
-          }
-          break;
-
-        case 'draft':
-        case 'draft_review':
-        case 'draft_approved':
-          // If there's a draft forward revision, create a new draft based on
-          // the draft forward revision if the draft forward revision has a
-          // lower vid than the current revision.
-          if (in_array('draft', $forward_revision_states) || in_array('draft_review', $forward_revision_states) || in_array('draft_approved', $forward_revision_states)) {            $newer_draft_revision = $this->getHeaviestDraftRevision($forward_revision_states);
-            if ($newer_draft_revision->vid < $current_revision->vid) {
-              $new_latest_revision = $newer_draft_revision;
-            }
-          }
-          break;
-
-      }
-
-      if (isset($new_latest_revision) && $new_latest_revision->vid !== $latest_revision->vid) {
-        $state_map = [
-          'draft_review' => 'draft_needs_review',
-        ];
-
-        $new_latest_revision_state = $state_map[$new_latest_revision->state] ?? $new_latest_revision->state;
+        $new_latest_revision_state = $state_map[$newer_draft_revision->state] ?? $newer_draft_revision->state;
 
         $new_latest_revision = $this->entityTypeManager
           ->getStorage('node')
-          ->loadRevision($new_latest_revision->vid);
+          ->loadRevision($newer_draft_revision->vid);
 
         $new_latest_revision->createDuplicate();
         $new_latest_revision->set('moderation_state', $new_latest_revision_state);
         $new_latest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision.&emsp;|&emsp;') . $new_latest_revision->getRevisionLogMessage());
         $new_latest_revision->save();
 
-        $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $current_vid]);
+        $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
 
         return TRUE;
       }
@@ -248,25 +201,6 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     }
 
     return $heaviest_revision;
-  }
-
-  /**
-   * Get the latest revision of a specified state.
-   *
-   * @param array $forward_revisions
-   *   The revisions to iterate through.
-   * @param string $state
-   *   The state to look for.
-   *
-   * @return object
-   *   The latest revision in the specified state.
-   */
-  private function getNewestRevisionByState(array $forward_revisions, string $state) {
-    foreach ($forward_revisions as $fr) {
-      if ($fr->state == $state) {
-        return $fr;
-      }
-    }
   }
 
 }
