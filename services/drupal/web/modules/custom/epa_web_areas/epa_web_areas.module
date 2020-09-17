@@ -315,3 +315,23 @@ function epa_web_areas_toolbar() {
   ];
   return $items;
 }
+
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_web_areas_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'entity_access' && isset($implementations['group'])) {
+    unset($implementations['group']);
+  }
+}
+
+/**
+ * Implements hook_entity_access().
+ */
+function epa_web_areas_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account) {
+  if ($entity->getEntityTypeId() == 'node' && $operation == 'clone') {
+    $operation = 'update';
+  }
+  return group_entity_access($entity, $operation, $account);
+}
