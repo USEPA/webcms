@@ -472,10 +472,10 @@ data "aws_arn" "target_group" {
 # than 50 requests/target, indicating a high volume of traffic spread across too few
 # containers. If the metric goes above this threshold, ECS will add replicas of the
 # Drupal task.
-resource "aws_appautoscaling_policy" "drupal_autoscaling" {
+resource "aws_appautoscaling_policy" "drupal_autoscaling_elb" {
   count = length(aws_appautoscaling_target.drupal)
 
-  name        = "webcms-drupal-scaling-${local.env-suffix}"
+  name        = "webcms-drupal-scaling-elb-${local.env-suffix}"
   policy_type = "TargetTrackingScaling"
 
   # These identify what we're scaling (see the autoscaling target above)
@@ -497,6 +497,31 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling" {
     predefined_metric_specification {
       predefined_metric_type = "ALBRequestCountPerTarget"
       resource_label         = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
+    }
+  }
+}
+
+# We define a second autoscaling policy to track high CPU usage. If CPU is above this
+# threshold (but the ELB autoscaling policy hasn't triggered), then that indicates that
+# there is a large amount of backend traffic, and we should scale accordingly.
+resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
+  count = length(aws_appautoscaling_target.drupal)
+
+  name        = "webcms-drupal-scaling-cpu-${local.env-suffix}"
+  policy_type = "TargetTrackingScaling"
+
+  resource_id        = aws_appautoscaling_target.drupal[count.index].id
+  scalable_dimension = aws_appautoscaling_target.drupal[count.index].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.drupal[count.index].service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 60
+
+    scale_in_cooldown  = 5 * 60
+    scale_out_cooldown = 60
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
   }
 }
