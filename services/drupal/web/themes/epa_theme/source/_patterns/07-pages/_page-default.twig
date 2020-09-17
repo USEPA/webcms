@@ -43,6 +43,11 @@
   {% endblock %}
   {% block search %}
     {% include '@components/search/search--epa/search--epa.twig' %}
+    {% if show_admin_info %}
+      {% include '@components/_toggle-admin/toggle-admin.twig' with {
+        'modifier_classes': 'margin-top-1',
+      } %}
+    {% endif %}
   {% endblock %}
   {% block navigation %}
     {% embed '@components/nav/nav--epa/nav--epa.twig' with {
