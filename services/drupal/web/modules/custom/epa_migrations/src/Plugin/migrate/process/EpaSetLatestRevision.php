@@ -10,6 +10,7 @@ use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Drupal\node\Entity\Node;
+use Drupal\pathauto\PathautoState;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -101,6 +102,12 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       // If the node doesn't exist in D8, we can't do anything here.
       return FALSE;
     }
+    else {
+      // If we have a node, turn on 'generate automatic alias' and continue with
+      // revision logic.
+      $this->pathautoOn($node);
+    }
+
     // Get timestamp and state for the current revision.
     $d7_current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['timestamp', 'state'])
@@ -201,6 +208,17 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     }
 
     return $heaviest_revision;
+  }
+
+  /**
+   * Turn on 'generate automatic URL alias.
+   *
+   * @param \Drupal\node\Entity\Node $node
+   *   The node entity.
+   */
+  private function pathautoOn(Node $node) {
+    $node->set('path', ['pathauto' => PathautoState::CREATE]);
+    $node->save();
   }
 
 }
