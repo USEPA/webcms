@@ -60,4 +60,16 @@ function epa_theme_theme_suggestions_views_view_unformatted_alter(array &$sugges
   $suggestions[] = 'views_view_unformatted__' . $view->id();
   $suggestions[] = 'views_view_unformatted__' . $view->current_display;
   $suggestions[] = 'views_view_unformatted__' . $view->id() . '__' . $view->current_display;
+
+  // Add a template suggestion for all dynamic list views.
+  $dynamic_list_views = [
+    'dynamic_content_list',
+    'dynamic_event_list',
+    'dynamic_faq_list',
+    'dynamic_news_release_list',
+    'dynamic_public_notice_list',
+  ];
+  if (in_array($view->id(), $dynamic_list_views)) {
+    $suggestions[] = 'views_view_unformatted__dynamic_list';
+  }
 }
