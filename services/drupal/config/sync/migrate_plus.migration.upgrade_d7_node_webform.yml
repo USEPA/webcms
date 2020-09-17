@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: yMqzX6s6oi1BQMLsOZsfcgYZTN2q45AXHGXleSmgFQk
+  default_config_hash: WZiZXeRwJYknBHMZGzJYuVh_cG0Ygc1fvIB8iFzWIXI
 id: upgrade_d7_node_webform
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -160,6 +160,10 @@ process:
     -
       plugin: get
       source: nres_state
+  path/pathauto:
+    plugin: default_value
+    default_value: 0
+  path/alias: alias
 destination:
   plugin: 'entity:node'
   default_bundle: webform

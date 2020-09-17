@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: '-H6YEGp9le4P9OdHu5lZgFEeJ_5N0kts0l7sAlulbOc'
+  default_config_hash: JWpd_U1vdAMw-hC42qfI2hgx8BR3TZuy5v2cbzocMHU
 id: upgrade_d7_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -247,6 +247,10 @@ process:
     -
       plugin: get
       source: last_published
+  path/pathauto:
+    plugin: default_value
+    default_value: 0
+  path/alias: alias
 destination:
   plugin: 'entity:node'
   default_bundle: news_release
