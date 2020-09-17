@@ -9,6 +9,7 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
+use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -93,79 +94,113 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $nid = $value[0];
-    $current_vid = $value[1];
+    $d7_vid = $value[1];
 
+    $node = $this->entityTypeManager->getStorage('node')->load($nid);
+    if (!$node) {
+      // If the node doesn't exist in D8, we can't do anything here.
+      return FALSE;
+    }
     // Get timestamp and state for the current revision.
-    $current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
+    $d7_current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['timestamp', 'state'])
-      ->condition('nres.vid', $current_vid)
+      ->condition('nres.vid', $d7_vid)
       ->execute()
       ->fetchObject();
 
-    // Get the timestamp and state for the latest revision.
-    $latest_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
+    // Get all revisions modified since the current revision.
+    $d7_forward_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
       ->fields('nres', ['vid', 'timestamp', 'state'])
       ->condition('nres.nid', $nid)
-      ->orderBy('nres.vid', 'DESC')
-      ->execute()
-      ->fetchObject();
-
-    // Get all draft revisions modified since the current revision.
-    $draft_revisions = $this->d7Connection->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['vid', 'timestamp', 'state'])
-      ->condition('nres.nid', $nid)
-      ->condition('nres.state', ['draft_approved', 'draft_review', 'draft'], 'IN')
-      ->condition('nres.timestamp', $current_revision->timestamp, '>')
+      ->condition('nres.timestamp', $d7_current_revision->timestamp, '>')
       ->orderBy('nres.vid', 'DESC')
       ->execute()
       ->fetchAll();
 
-    if (count($draft_revisions) > 0) {
-      // Ensure the heaviest, newest (by timestamp) revision is the latest
-      // revision (by vid).
-      $state_weights = [
-        'draft_approved' => 300,
-        'draft_review' => 200,
-        'draft' => 100,
-      ];
+    // Initialize state mapping for state names that differ from d7 to d8.
+    $state_map = [
+      'draft_review' => 'draft_needs_review',
+    ];
 
-      $state_map = [
-        'draft_approved' => 'draft_approved',
-        'draft_review' => 'draft_needs_review',
-        'draft' => 'draft',
-      ];
+    // Load current revision in both D7 and D8 for a given node, compare vids.
+    //
+    // If they do not match, in D8 re-save the vid that we want to make the
+    // current revision (as obtained from D7), retaining its same state.
+    //
+    // If they do match, skip this step and goto forward revision logic.
+    if ($node->vid !== $d7_vid) {
+      // There's a vid mismatch, re-save d7_current_revision in D8 with the
+      // correct state.
+      $new_current_revision_state = $state_map[$d7_current_revision->state] ?? $d7_current_revision->state;
 
-      // Initialize heaviest revision data with most recent draft revision.
-      $heaviest_revision = $draft_revisions[0];
-      $heaviest_revision_weight = $state_weights[$heaviest_revision->state];
-      $heaviest_revision_state = $state_map[$heaviest_revision->state];
+      $new_current_revision = $this->entityTypeManager
+        ->getStorage('node')
+        ->loadRevision($d7_vid);
 
-      foreach ($draft_revisions as $dr) {
-        if ($state_weights[$dr->state] > $heaviest_revision_weight && $dr->timestamp > $heaviest_revision->timestamp) {
-          $heaviest_revision = $dr;
-          $heaviest_revision_weight = $state_weights[$dr->state];
-          $heaviest_revision_state = $state_map[$dr->state];
-        }
-      }
+      $new_current_revision->createDuplicate();
+      $new_current_revision->set('moderation_state', $new_current_revision_state);
+      $new_current_revision->setRevisionLogMessage(t('During D7 migration, this revision was re-set as the current revision.&emsp;|&emsp;') . $new_current_revision->getRevisionLogMessage());
+      $new_current_revision->save();
 
-      if ($heaviest_revision->vid !== $latest_revision->vid) {
-        $heaviest_revision = $this->entityTypeManager
+      $this->logger->notice('Updated current revision for Node ID: %nid,  D7 Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
+    }
+
+    // Now that we've handled any potential vid mismatches, process forward
+    // revisions to set the correct draft.
+    if (count($d7_forward_revisions) > 0) {
+
+      $newer_draft_revision = $this->getHeaviestDraftRevision($d7_forward_revisions);
+
+      if ($newer_draft_revision->vid < $d7_vid) {
+
+        $new_latest_revision_state = $state_map[$newer_draft_revision->state] ?? $newer_draft_revision->state;
+
+        $new_latest_revision = $this->entityTypeManager
           ->getStorage('node')
-          ->loadRevision($heaviest_revision->vid);
+          ->loadRevision($newer_draft_revision->vid);
 
-        $heaviest_revision->createDuplicate();
-        $heaviest_revision->set('moderation_state', $heaviest_revision_state);
-        $heaviest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision because it was edited after this node was last published.&emsp;|&emsp;') . $heaviest_revision->getRevisionLogMessage());
-        $heaviest_revision->save();
+        $new_latest_revision->createDuplicate();
+        $new_latest_revision->set('moderation_state', $new_latest_revision_state);
+        $new_latest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision.&emsp;|&emsp;') . $new_latest_revision->getRevisionLogMessage());
+        $new_latest_revision->save();
 
-        $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $current_vid]);
+        $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
 
         return TRUE;
       }
-
     }
 
     return FALSE;
+  }
+
+  /**
+   * Helper method to get the newest, heaviest draft revision.
+   *
+   * @param array $forward_revisions
+   *   The revisions to iterate through.
+   *
+   * @return object
+   *   The heaviest draft revision.
+   */
+  private function getHeaviestDraftRevision(array $forward_revisions) {
+    $state_weights = [
+      'draft_approved' => 300,
+      'draft_review' => 200,
+      'draft' => 100,
+    ];
+
+    // Initialize heaviest revision data with most recent forward revision.
+    $heaviest_revision = $forward_revisions[0];
+    $heaviest_revision_weight = $state_weights[$heaviest_revision->state];
+
+    foreach ($forward_revisions as $fr) {
+      if ($state_weights[$fr->state] > $heaviest_revision_weight && $fr->timestamp > $heaviest_revision->timestamp) {
+        $heaviest_revision = $fr;
+        $heaviest_revision_weight = $state_weights[$fr->state];
+      }
+    }
+
+    return $heaviest_revision;
   }
 
 }
