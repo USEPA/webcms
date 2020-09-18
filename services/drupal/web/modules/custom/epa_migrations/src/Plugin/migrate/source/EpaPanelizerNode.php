@@ -136,6 +136,15 @@ class EpaPanelizerNode extends Node {
       $row->setSourceProperty('panes', $panes);
     }
 
+    // Add node alias.
+    $query = $this->select('url_alias', 'ua')
+      ->fields('ua', ['alias']);
+    $query->condition('ua.source', 'node/' . $row->getSourceProperty('nid'));
+    $alias = $query->execute()->fetchField();
+    if (!empty($alias)) {
+      $row->setSourceProperty('alias', '/' . $alias);
+    }
+
     return parent::prepareRow($row);
   }
 

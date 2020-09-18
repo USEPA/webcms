@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: pTUYTWvQv8Y6mbEf2IazU0iPe-4woITrV25cFk-IL7M
+  default_config_hash: k_YMgVWHR5lk40Jzno9VnBVDEd0m0Y6UPOX62lPoMxs
 id: upgrade_d7_node_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -353,6 +353,10 @@ process:
     -
       plugin: get
       source: last_published
+  path/pathauto:
+    plugin: default_value
+    default_value: 0
+  path/alias: alias
 destination:
   plugin: 'entity:node'
   default_bundle: public_notice
