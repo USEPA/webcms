@@ -1,0 +1,17 @@
+diff --git a/src/Handler/CurlMultiHandler.php b/src/Handler/CurlMultiHandler.php
+index 564c95f4..702594a4 100644
+--- a/src/Handler/CurlMultiHandler.php
++++ b/src/Handler/CurlMultiHandler.php
+@@ -120,6 +120,12 @@ class CurlMultiHandler
+         if ($this->active &&
+             curl_multi_select($this->_mh, $this->selectTimeout) === -1
+         ) {
++            // If we encounter CURLM_RECURSIVE_API_CALL, throw an exception to abort
++            // processing.
++            if (curl_multi_errno($this->_mh) === 8) {
++              throw new \Exception("Exception: curlm_recursive_api_call");
++            }
++
+             // Perform a usleep if a select returns -1.
+             // See: https://bugs.php.net/bug.php?id=61141
+             usleep(250);
