@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "default" {
 
 resource "aws_rds_cluster_parameter_group" "params" {
   name   = "webcms-params-${local.env-suffix}"
-  family = "aurora5.6"
+  family = "aurora5.7"
 
   # The innodb_large_prefix parameter expands the key size from 767 bytes to ~3000 bytes,
   # enabling the use of indexes on VARCHAR(255) columns when that column uses the utf8m4
@@ -18,13 +18,6 @@ resource "aws_rds_cluster_parameter_group" "params" {
   parameter {
     name  = "innodb_large_prefix"
     value = 1
-  }
-
-  # Set the InnoDB file format to Barracuda: the Antelope format doesn't respect the
-  # innodb_large_prefix option.
-  parameter {
-    name  = "innodb_file_format"
-    value = "Barracuda"
   }
 
   # Bump the max allowed packet to 64MB (default is 1-4MB, depending on server version).
@@ -39,11 +32,11 @@ resource "aws_rds_cluster_parameter_group" "params" {
 }
 
 resource "aws_rds_cluster" "db" {
-  cluster_identifier = "webcms-db-${local.env-suffix}"
+  cluster_identifier = "webcms-rds-${local.env-suffix}"
 
-  # Aurora Serverless doesn't support engine versions (for MySQL, it's fixed at 5.6)
-  engine      = "aurora"
-  engine_mode = "serverless"
+  engine         = "aurora-mysql"
+  engine_mode    = "provisioned"
+  engine_version = "5.7.mysql_aurora.2.09.0"
 
   database_name   = local.database-name
   master_username = var.db-username
@@ -68,15 +61,6 @@ resource "aws_rds_cluster" "db" {
 
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.database.id]
-  # We don't set the availability zones manually here - Aurora auto-assigns 3 AZs which
-  # should be sufficient.
-
-  scaling_configuration {
-    auto_pause               = var.db-auto-pause
-    min_capacity             = var.db-min-capacity
-    max_capacity             = var.db-max-capacity
-    seconds_until_auto_pause = 21600 # 6 * 3600 = 6 hours
-  }
 
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DB"
@@ -87,4 +71,17 @@ resource "aws_rds_cluster" "db" {
   lifecycle {
     ignore_changes = [master_password]
   }
+}
+
+resource "aws_rds_cluster_instance" "db_instance" {
+  count = var.db-instance-count
+
+  identifier     = "webcms-rds-instance-${count.index}-${local.env-suffix}"
+  instance_class = var.db-instance-type
+
+  engine         = aws_rds_cluster.cluster.engine
+  engine_version = aws_rds_cluster.cluster.engine_version
+
+  cluster_identifier   = aws_rds_cluster.cluster.cluster_identifier
+  db_subnet_group_name = aws_rds_cluster.cluster.db_subnet_group_name
 }

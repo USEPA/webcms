@@ -177,23 +177,15 @@ variable "db-password" {
   type        = string
 }
 
-variable "db-auto-pause" {
-  description = "Whether or not to enable cluster auto-pause"
-  type        = bool
-  default     = false
+variable "db-instance-type" {
+  description = "Type of instance to use for the Aurora cluster"
+  type        = string
 }
 
-# Capacity is specified in Aurora Capacity Units (ACUs) - these should be powers of two
-# from 1 to 256.
-# cf. https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html#aurora-serverless.how-it-works.auto-scaling
-variable "db-min-capacity" {
-  description = "Minimum capacity for the database cluster"
-  type        = number
-  default     = 1
-}
-
-variable "db-max-capacity" {
-  description = "Maximum capacity for the database cluster"
+# "Primary" here means the always-on instances that can be promoted to the writer instance
+# during a failover event.
+variable "db-instance-count" {
+  description = "Number of primary DB servers in the Aurora cluster"
   type        = number
 }
 

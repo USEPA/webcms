@@ -280,6 +280,48 @@ resource "aws_security_group_rule" "database_access_ingress" {
   source_security_group_id = aws_security_group.database_access.id
 }
 
+resource "aws_security_group" "proxy" {
+  name        = "webcms-proxy-sg-${local.env-suffix}"
+  description = "Security group for RDS proxies"
+
+  vpc_id = local.vpc-id
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Proxy"
+  })
+}
+
+resource "aws_security_group" "proxy_access" {
+  name        = "webcms-proxy-access-sg-${local.env-suffix}"
+  description = "Security group for access to RDS proxies"
+
+  egress {
+    description = "Allow outgoing connections to MySQL proxies"
+
+    protocol        = "tcp"
+    from_port       = 3306
+    to_port         = 3306
+    security_groups = [aws_security_group.proxy.id]
+  }
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Proxy Access"
+  })
+}
+
+resource "aws_security_group_rule" "proxy_access_ingress" {
+  description = "Allows incoming connections to MySQL proxies"
+
+  security_group_id = aws_security_group.proxy.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.proxy_access.id
+}
+
 # Because Drupal tasks are run in the AWSVPC networking mode, we are able to assign
 # custom security groups to the container - this enables us to grant database access
 # to Drupal while denying it at the EC2 instance level.
