@@ -55,6 +55,13 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
  * - Hide type field on news releasees
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['actions']['submit'])) {
+    $submit_copy = $form['actions']['submit'];
+    $submit_copy['#group'] = 'revision_information';
+    $submit_copy['#weight'] = 100;
+    $form['revision_information']['submit_copy'] = $submit_copy;
+  }
+
   switch ($form_id) {
     case 'node_news_release_form':
     case 'node_news_release_edit_form':
