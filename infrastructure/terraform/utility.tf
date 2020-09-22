@@ -124,7 +124,10 @@ resource "aws_launch_template" "utility" {
     aws_security_group.utility.id,
 
     # Grant access from the utility server for administrative tasks
+    # Unlike Drupal, the utility server has access to both the DB and its proxy in order
+    # to be able to bypass the proxy.
     aws_security_group.database_access.id,
+    aws_security_group.proxy_access.id,
     aws_security_group.cache_access.id,
     aws_security_group.search_access.id,
 

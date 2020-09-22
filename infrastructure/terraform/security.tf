@@ -280,6 +280,8 @@ resource "aws_security_group_rule" "database_access_ingress" {
   source_security_group_id = aws_security_group.database_access.id
 }
 
+# The above notes with regards to the database and database_access security groups applies
+# to the proxy and proxy_access security groups as well.
 resource "aws_security_group" "proxy" {
   name        = "webcms-proxy-sg-${local.env-suffix}"
   description = "Security group for RDS proxies"
