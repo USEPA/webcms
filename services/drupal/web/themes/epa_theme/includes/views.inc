@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Implements template_preprocess_views_view().
+ * Implements hook_preprocess_views_view().
  */
 function epa_theme_preprocess_views_view(&$variables) {
   $variables['path'] = $variables['view']->getRequest()->getPathInfo();
 }
 
 /**
- * Implements template_preprocess_views_view_unformatted().
+ * Implements hook_preprocess_views_view_unformatted().
  */
 function epa_theme_preprocess_views_view_unformatted(&$variables) {
   $row_plugin = $variables['view']->display_handler->getPlugin('row');
