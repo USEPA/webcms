@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "proxy_secrets" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = "secretsmanager.${var.region}.amazonaws.com"
+      values   = "secretsmanager.${var.aws-region}.amazonaws.com"
     }
   }
 }
@@ -56,6 +56,7 @@ data "aws_iam_policy_document" "proxy_secrets" {
 resource "aws_iam_policy" "proxy_secrets" {
   name        = "${local.role-prefix}RDSProxySecretsAccess"
   description = "Grants the RDS proxy access to DB credentials"
+  policy      = data.aws_iam_policy_document.proxy_secrets.json
 }
 
 resource "aws_iam_role_policy_attachment" "proxy_secrets" {
