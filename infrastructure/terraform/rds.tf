@@ -10,7 +10,7 @@ resource "aws_db_subnet_group" "default" {
 
 resource "aws_rds_cluster_parameter_group" "params" {
   name   = "webcms-params-${local.env-suffix}"
-  family = "aurora5.7"
+  family = "aurora-mysql5.7"
 
   # The innodb_large_prefix parameter expands the key size from 767 bytes to ~3000 bytes,
   # enabling the use of indexes on VARCHAR(255) columns when that column uses the utf8m4
