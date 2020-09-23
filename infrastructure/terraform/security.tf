@@ -297,6 +297,8 @@ resource "aws_security_group" "proxy_access" {
   name        = "webcms-proxy-access-sg-${local.env-suffix}"
   description = "Security group for access to RDS proxies"
 
+  vpc_id = local.vpc-id
+
   egress {
     description = "Allow outgoing connections to MySQL proxies"
 
