@@ -79,9 +79,9 @@ resource "aws_rds_cluster_instance" "db_instance" {
   identifier     = "webcms-rds-instance-${count.index}-${local.env-suffix}"
   instance_class = var.db-instance-type
 
-  engine         = aws_rds_cluster.cluster.engine
-  engine_version = aws_rds_cluster.cluster.engine_version
+  engine         = aws_rds_cluster.db.engine
+  engine_version = aws_rds_cluster.db.engine_version
 
-  cluster_identifier   = aws_rds_cluster.cluster.cluster_identifier
-  db_subnet_group_name = aws_rds_cluster.cluster.db_subnet_group_name
+  cluster_identifier   = aws_rds_cluster.db.cluster_identifier
+  db_subnet_group_name = aws_rds_cluster.db.db_subnet_group_name
 }
