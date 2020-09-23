@@ -92,10 +92,10 @@ variable "alb-certificate" {
   type        = string
 }
 
-variable "alb-hostname" {
-  description = "Hostname for the ALB to listen to, in case it differs from the site-hostname variable."
-  type        = string
-  default     = null
+variable "alb-hostnames" {
+  description = "Additional hostnames for the load balancer to respond to in addition to the site-hostname variable"
+  type        = list(string)
+  default     = []
 }
 
 # Server-related variables
