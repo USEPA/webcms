@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "proxy_assume" {
   }
 }
 
-resource "aws_iam_role" "proxy_role" {
+resource "aws_iam_role" "proxy" {
   name        = "${local.role-prefix}RDSProxyRole"
   description = "Role for the cluster's RDS proxy"
 
@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "proxy_secrets" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = "secretsmanager.${var.aws-region}.amazonaws.com"
+      values   = ["secretsmanager.${var.aws-region}.amazonaws.com"]
     }
   }
 }
