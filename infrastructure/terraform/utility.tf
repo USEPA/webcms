@@ -124,7 +124,7 @@ resource "aws_launch_template" "utility" {
     aws_security_group.utility.id,
 
     # Grant access from the utility server for administrative tasks
-    aws_security_group.proxy_access.id,
+    aws_security_group.database_proxy_access.id,
     aws_security_group.cache_access.id,
     aws_security_group.search_access.id,
 
