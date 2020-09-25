@@ -53,6 +53,13 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
   }
 }
 
+function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $account = \Drupal::currentUser();
+  if (isset($form['field_allow_news_releases'])) {
+    $form['field_allow_news_releases']['#access'] = $account->hasPermission('permit news releases');
+  }
+}
+
 /**
  * Implements hook_block_access().
  *
