@@ -5,6 +5,13 @@ dependencies:
   config:
     - field.storage.node.field_paragraphs
     - node.type.page
+    - paragraphs.paragraphs_type.box
+    - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.from_library
+    - paragraphs.paragraphs_type.header
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
+    - paragraphs.paragraphs_type.slideshow
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -18,7 +25,7 @@ entity_type: node
 bundle: page
 label: Body
 description: ''
-required: false
+required: true
 translatable: true
 default_value: {  }
 default_value_callback: ''
@@ -79,6 +86,9 @@ settings:
         enabled: false
       press_officers:
         weight: -18
+        enabled: false
+      slide:
+        weight: 33
         enabled: false
       slideshow:
         enabled: true
