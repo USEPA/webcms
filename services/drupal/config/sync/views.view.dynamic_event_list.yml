@@ -428,6 +428,58 @@ display:
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
+        field_date_value:
+          id: field_date_value
+          table: node__field_date
+          field: field_date_value
+          relationship: none
+          group_type: group
+          admin_label: 'Event start date'
+          operator: '<='
+          value:
+            min: ''
+            max: ''
+            value: ''
+            type: offset
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_date_value_op
+            label: 'Event starts before'
+            description: 'Enter "+1 week" or "+1 month" or similar to limit to events starting within the next week or month, respectively.'
+            use_operator: false
+            operator: field_date_value_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_date_value
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            placeholder: ''
+            min_placeholder: ''
+            max_placeholder: ''
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: datetime
         field_date_value_1:
           id: field_date_value_1
           table: node__field_date
@@ -678,58 +730,6 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
-        field_date_value:
-          id: field_date_value
-          table: node__field_date
-          field: field_date_value
-          relationship: none
-          group_type: group
-          admin_label: 'Event start date'
-          operator: '<='
-          value:
-            min: ''
-            max: ''
-            value: ''
-            type: offset
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_date_value_op
-            label: 'Event starts before'
-            description: 'Enter "+1 week" or "+1 month" or similar to limit to events starting within the next week or month, respectively.'
-            use_operator: false
-            operator: field_date_value_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: field_date_value
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            placeholder: ''
-            min_placeholder: ''
-            max_placeholder: ''
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          plugin_id: datetime
       sorts:
         field_date_value:
           id: field_date_value
