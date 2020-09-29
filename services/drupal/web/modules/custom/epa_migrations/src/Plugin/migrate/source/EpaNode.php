@@ -16,6 +16,11 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 class EpaNode extends Node {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {
