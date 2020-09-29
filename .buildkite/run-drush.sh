@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+task_definition="webcms-drush-$WEBCMS_ENVIRONMENT"
+cluster="webcms-cluster-$WEBCMS_ENVIRONMENT"
 started_by="build/$WEBCMS_IMAGE_TAG"
 
 # This multi-line string is our Drush update script
@@ -31,8 +33,27 @@ overrides="$(
 
 network_configuration="$(cat drushvpc.json)"
 
-task_definition="webcms-drush-$WEBCMS_ENVIRONMENT"
-cluster="webcms-cluster-$WEBCMS_ENVIRONMENT"
+# First, stop the running Drupal tasks. We do this here to avoid an issue where requests
+# to containers running old versions of the Drupal task family may inadvertently cause
+# cache pollution during the Drush run. By stopping all tasks now, we can guarantee that
+# the Drupal service will start new tasks running the most up-to-date version of the task
+# definition.
+
+echo "--- Stopping Drupal Tasks"
+
+# The list-tasks command produces a JSON object like {taskArns: ["task", "task"]}, but the
+# stop-task API only accepts one task. This pipeline uses jq to make the returned JSON
+# more amenable to xargs, and xargs to stop tasks in parallel.
+aws ecs list-tasks --cluster "$cluster" --family "webcms-drupal-$WEBCMS_ENVIRONMENT" |
+  # Extract the ARN array and print out an ARN, one per line
+  jq -r '.taskArns[]' |
+  # Stop tasks two at a time. Here, -L1 means process one line at a time, and -P2 asks
+  # xargs to use up to two child processes at once. This lets us parallelize the otherwise
+  # sequential job of stopping ECS tasks. (The task ARN is prepended by xargs, so we don't
+  # need to specify a template string.)
+  xargs -L1 -P2 aws ecs stop-task --cluster "$cluster" --task
+
+echo "--- Running Drush"
 
 # The lines using $(jq . | sed) are doing pretty-printing with indentation:
 # - jq . tells jq to just copy the input JSON object to stdout, and it will pretty-print
@@ -43,7 +64,6 @@ cluster="webcms-cluster-$WEBCMS_ENVIRONMENT"
 
 # Output all of the information we need to know what we've passed on to AWS
 cat <<EOF
---- Running Drush
 Task definition: $task_definition
 Cluster: $cluster
 Started by: $started_by
