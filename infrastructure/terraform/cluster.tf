@@ -31,7 +31,7 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
     auto_scaling_group_arn = aws_autoscaling_group.servers.arn
 
     managed_scaling {
-      status          = "ENABLED"
+      status = "ENABLED"
 
       # Aim for 75% utilization of the autoscaling group
       target_capacity = 75

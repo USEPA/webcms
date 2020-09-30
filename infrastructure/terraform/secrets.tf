@@ -15,30 +15,30 @@ resource "random_pet" "secret_suffix" {
   length = 2
 }
 
-resource "aws_secretsmanager_secret" "db_root_password" {
-  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_root/password"
+resource "aws_secretsmanager_secret" "db_root_credentials" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_root/credentials"
   description = "Password for the WebCMS DB administrator"
 
   tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Secret: DB Root Password"
+    Name = "${local.name-prefix} Secret: DB Root Credentials"
   })
 }
 
-resource "aws_secretsmanager_secret" "db_app_password" {
-  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app/password"
+resource "aws_secretsmanager_secret" "db_app_credentials" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app/credentials"
   description = "Password for the WebCMS DB user"
 
   tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Secret: DB App Password"
+    Name = "${local.name-prefix} Secret: DB App Credentials"
   })
 }
 
-resource "aws_secretsmanager_secret" "db_app_d7_password" {
-  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app_d7/password"
+resource "aws_secretsmanager_secret" "db_app_d7_credentials" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/db_app_d7/credentials"
   description = "Password for the WebCMS' Drupal 7 database user"
 
   tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Secret: D7 DB Password"
+    Name = "${local.name-prefix} Secret: D7 DB Credentials"
   })
 }
 

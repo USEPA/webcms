@@ -763,10 +763,12 @@ $settings['entity_update_batch_size'] = 50;
  */
 $settings['entity_update_backup'] = TRUE;
 
+$credentials = json_decode(getenv('WEBCMS_DB_CREDS'), FALSE, 512, JSON_THROW_ON_ERROR);
+
 $databases['default']['default'] = [
   'database' => getenv('WEBCMS_DB_NAME'),
-  'username' => getenv('WEBCMS_DB_USER'),
-  'password' => getenv('WEBCMS_DB_PASS'),
+  'username' => $credentials->username,
+  'password' => $credentials->password,
   'driver' => 'mysql',
   'collation' => 'utf8mb4_general_ci',
   'host' => getenv('WEBCMS_DB_HOST'),
@@ -782,11 +784,15 @@ $databases['default']['default'] = [
   ],
 ];
 
+$credentials = json_decode(getenv('WEBCMS_DB_CREDS_D7'), FALSE, 512, JSON_THROW_ON_ERROR);
+
 // Override migration group settings for database connection.
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['database'] = getenv('WEBCMS_DB_NAME_D7');
-$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['username'] = getenv('WEBCMS_DB_USER_D7');
-$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['password'] = getenv('WEBCMS_DB_PASS_D7');
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['username'] = $credentials->username;
+$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['password'] = $credentials->password;
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['host'] = getenv('WEBCMS_DB_HOST');
+
+unset($credentials);
 
 // Use instance credentials since we're in an AWS environment
 $config['s3fs.settings']['use_instance_profile'] = TRUE;

@@ -15,15 +15,9 @@ locals {
     { name = "WEBCMS_ENV_STATE", value = var.site-env-state },
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
 
-    # DB hostname
-    { name = "WEBCMS_DB_HOST", value = aws_rds_cluster.db.endpoint },
-
-    # Drupal 8 info
-    { name = "WEBCMS_DB_USER", value = local.database-user },
+    # DB info
+    { name = "WEBCMS_DB_HOST", value = aws_db_proxy.proxy.endpoint },
     { name = "WEBCMS_DB_NAME", value = local.database-name },
-
-    # Drupal 7 info - used for migration source
-    { name = "WEBCMS_DB_USER_D7", value = local.database-user-d7 },
     { name = "WEBCMS_DB_NAME_D7", value = local.database-name-d7 },
 
     # Mail
@@ -46,8 +40,8 @@ locals {
 
   # Secrets Manager bindings for Drupal containers
   drupal-secrets = [
-    { name = "WEBCMS_DB_PASS", valueFrom = aws_secretsmanager_secret.db_app_password.arn },
-    { name = "WEBCMS_DB_PASS_D7", valueFrom = aws_secretsmanager_secret.db_app_d7_password.arn },
+    { name = "WEBCMS_DB_CREDS", valueFrom = aws_secretsmanager_secret.db_app_credentials.arn },
+    { name = "WEBCMS_DB_CREDS_D7", valueFrom = aws_secretsmanager_secret.db_app_d7_credentials.arn },
     { name = "WEBCMS_HASH_SALT", valueFrom = aws_secretsmanager_secret.hash_salt.arn },
     { name = "WEBCMS_MAIL_PASS", valueFrom = aws_secretsmanager_secret.mail_pass.arn },
     { name = "WEBCMS_SAML_SP_KEY", valueFrom = aws_secretsmanager_secret.saml_sp_key.arn },
@@ -56,7 +50,7 @@ locals {
   # Security groups used by Drupal containers
   drupal-security-groups = [
     aws_security_group.drupal_task.id,
-    aws_security_group.database_access.id,
+    aws_security_group.proxy_access.id,
     aws_security_group.cache_access.id,
     aws_security_group.search_access.id,
   ]

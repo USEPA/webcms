@@ -9,6 +9,7 @@
   - [`site-env-state`](#site-env-state)
 - [First-Time Setup](#first-time-setup)
   - [Cluster Infrastructure](#cluster-infrastructure)
+  - [RDS Proxy](#rds-proxy)
   - [Secrets](#secrets)
     - [MySQL Root User](#mysql-root-user)
     - [MySQL WebCMS Users](#mysql-webcms-users)
@@ -52,23 +53,27 @@ When building out the cluster infrastruture for the first time, the variable `si
 
 First, `terraform apply` the templates _without_ setting any of these variables: `image-tag-nginx`, `image-tag-drupal`, or `image-tag-drush`. If any of these variables are present, the templates will perform a deployment and fail: there are no ECR repositories or image tags to pull from.
 
+### RDS Proxy
+
+Until Terraform can apply the proxy target configuration automatically, you will need to manually associate the WebCMS's Aurora cluster with the proxy. See the [RDS Proxy documentation](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html#rds-proxy-creating) on how to use the console to update the default target group.
+
 ### Secrets
 
 #### MySQL Root User
 
-Create a new (secure) password and save it to the `/webcms-<env>-<suffix>/db_root/password` secret.
+Create a new (secure) password for the root user. Save a structured key/value secret in `/webcms-<env>-<suffix>/db_root/credentials`, where `username` is set to the root user, and `password` is set to the new password.
 
 Next, log into the utility server using Session Manager. Using the Aurora endpoint from the RDS console, log in to MySQL and run this query:
 
 ```sql
-SET PASSWORD = PASSWORD('<new password>');
+ALTER USER IDENTIFIED BY '<new password>';
 ```
 
 Log out and run `truncate --size=0 ~/.mysql_history` to remove the password from the history file.
 
 #### MySQL WebCMS Users
 
-First, the Drupal 8 user. Create a new secure password using the same method as before. Save it to the `/webcms-<env>-<suffix>/db_app/password` secret.
+First, the Drupal 8 user. Create a new secure password using the same method as before. Save it and the username `webcms` in the `/webcms-<env>-<suffix>/db_app/credentials` secret.
 
 Next, run this query against Aurora:
 
@@ -79,7 +84,7 @@ GRANT ALL ON webcms.* TO 'webcms'@'%';
 
 Now, the Drupal 7 user. This user (and database) is used for the Drupal 7->Drupal 8 migration.
 
-Create a new secure password and save it to the `/webcms-<env>-<suffix>/db_app_d7/password` secret.
+As with the `webcms` user, create a new secure password and save it and the username `webcms_d7` in the `/webcms-<env>-<suffix>/db_app_d7/credentials` secret.
 
 Run this query against Aurora:
 

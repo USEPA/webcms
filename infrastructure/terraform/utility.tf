@@ -37,11 +37,11 @@ data "template_cloudinit_config" "utility" {
 
           D8 user: webcms
           D8 name: webcms
-          D8 password: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_password.name)}
+          D8 password: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_credentials.name)}
 
           D7 user: webcms_d7
           D7 name: webcms_d7
-          D7 password: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_d7_password.name)}
+          D7 password: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_d7_credentials.name)}
 
           Memcached: ${aws_elasticache_cluster.cache.configuration_endpoint}
 
@@ -85,7 +85,7 @@ data "template_cloudinit_config" "utility" {
           echo "Beginning dump"
           echo ""
           echo "You will be asked for the MySQL password twice. Please have it ready."
-          echo "Console link: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_password.name)}"
+          echo "Console link: https://console.aws.amazon.com/secretsmanager/home?region=${data.aws_region.current.name}#/secret?name=${urlencode(aws_secretsmanager_secret.db_app_credentials.name)}"
 
           # Create the file, clearing it out if it already exists
           echo > "$filename"
@@ -124,7 +124,7 @@ resource "aws_launch_template" "utility" {
     aws_security_group.utility.id,
 
     # Grant access from the utility server for administrative tasks
-    aws_security_group.database_access.id,
+    aws_security_group.database_proxy_access.id,
     aws_security_group.cache_access.id,
     aws_security_group.search_access.id,
 
