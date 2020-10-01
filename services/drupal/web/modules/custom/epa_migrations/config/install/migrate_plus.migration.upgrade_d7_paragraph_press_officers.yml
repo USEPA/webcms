@@ -14,8 +14,6 @@ label: 'Paragraphs (Press Officers)'
 source:
   plugin: d7_field_collection_item
   field_name: field_press_officers
-  high_water_property:
-    name: item_id
 process:
   langcode:
     -
@@ -32,11 +30,9 @@ process:
       source: field_person_name
   field_email/value:
     -
-      plugin: extract
-      source: field_email
-      index:
-        - 0
-        - email
+      plugin: skip_on_empty_array
+      source: field_email/0/email
+      method: process
   field_phone_numbers:
     -
       plugin: get
