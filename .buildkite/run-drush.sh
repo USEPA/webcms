@@ -8,12 +8,12 @@ started_by="build/$WEBCMS_IMAGE_TAG"
 
 # This multi-line string is our Drush update script
 # shellcheck disable=SC2016
-script='drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-format=integer
-drush --uri="$WEBCMS_SITE_URL" updb -y
-drush --uri="$WEBCMS_SITE_URL" cr
-drush --uri="$WEBCMS_SITE_URL" cim -y
-drush --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
-drush --uri="$WEBCMS_SITE_URL" cr'
+script='drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-format=integer
+drush --debug --uri="$WEBCMS_SITE_URL" updb -y
+drush --debug --uri="$WEBCMS_SITE_URL" cr
+drush --debug --uri="$WEBCMS_SITE_URL" cim -y
+drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
+drush --debug --uri="$WEBCMS_SITE_URL" cr'
 
 # Use jq to format the container overrides in a way that plays nicely with AWS ECS'
 # character count limitations on JSON input, as well as avoids potential issues with
