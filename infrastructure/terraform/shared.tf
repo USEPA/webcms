@@ -24,6 +24,8 @@ locals {
     { name = "WEBCMS_MAIL_USER", value = var.email-auth-user },
     { name = "WEBCMS_MAIL_FROM", value = var.email-from },
     { name = "WEBCMS_MAIL_HOST", value = var.email-host },
+    { name = "WEBCMS_MAIL_PORT", value = var.email-port },
+    { name = "WEBCMS_MAIL_PROTOCOL", value = var.email-protocol },
 
     # Injected host names
     { name = "WEBCMS_SEARCH_HOST", value = "https://${aws_elasticsearch_domain.es.endpoint}:443" },

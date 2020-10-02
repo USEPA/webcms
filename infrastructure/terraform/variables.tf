@@ -261,6 +261,16 @@ variable "email-host" {
   type        = string
 }
 
+variable "email-port" {
+  description = "SMTP port to connect to"
+  type        = number
+}
+
+variable "email-protocol" {
+  description = "SMTP encryption protocol. Options are 'standard' for none, 'ssl', or 'tls'."
+  type        = string
+}
+
 # Users
 # cf. iam.tf
 
