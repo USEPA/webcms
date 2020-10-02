@@ -24,7 +24,7 @@ locals {
     { name = "WEBCMS_MAIL_USER", value = var.email-auth-user },
     { name = "WEBCMS_MAIL_FROM", value = var.email-from },
     { name = "WEBCMS_MAIL_HOST", value = var.email-host },
-    { name = "WEBCMS_MAIL_PORT", value = toString(var.email-port) },
+    { name = "WEBCMS_MAIL_PORT", value = tostring(var.email-port) },
     { name = "WEBCMS_MAIL_PROTOCOL", value = var.email-protocol },
     { name = "WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS", value = var.email-enable-workflow-notifications ? "1" : "0" },
 
