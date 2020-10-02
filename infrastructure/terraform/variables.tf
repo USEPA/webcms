@@ -271,6 +271,11 @@ variable "email-protocol" {
   type        = string
 }
 
+variable "email-enable-workflow-notifications" {
+  description = "Enable this to allow the system to email notifications to content editors about workflow state changes. This should only be enabled with care; we do not want a non-production environment mailing 'real' users notifications that they need to come review their content."
+  type        = bool
+}
+
 # Users
 # cf. iam.tf
 

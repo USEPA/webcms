@@ -847,6 +847,7 @@ $config['smtp.settings']['smtp_from'] = getenv('WEBCMS_MAIL_FROM');
 $config['smtp.settings']['smtp_host'] = getenv('WEBCMS_MAIL_HOST');
 $config['smtp.settings']['smtp_port'] = getenv('WEBCMS_MAIL_PORT');
 $config['smtp.settings']['smtp_protocol'] = getenv('WEBCMS_MAIL_PROTOCOL');
+$settings['epa_workflow_notifications_enabled'] = (bool)getenv('WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS');
 
 $config['samlauth.authentication']['sp_entity_id'] = getenv('WEBCMS_SAML_SP_ENTITY_ID');
 $config['samlauth.authentication']['sp_x509_certificate'] = getenv('WEBCMS_SAML_SP_CERT');
