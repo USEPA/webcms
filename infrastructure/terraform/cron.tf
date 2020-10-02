@@ -164,6 +164,7 @@ resource "aws_cloudwatch_event_target" "cron" {
         name = "drush"
         command = [
           "/var/www/html/vendor/bin/drush",
+          "--debug",
           "--uri", "https://${var.site-hostname}",
           "cron"
         ]
