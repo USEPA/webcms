@@ -1,6 +1,9 @@
 <?php
 
 // Override SMTP settings
+// These specific overrides are no longer necessary if you're using the latest
+// .env file but we'll leave them here to avoid breaking things for people who
+// haven't added the port and protocol entries to their .env files.
 $config['smtp.settings']['smtp_port'] = 1025;
 $config['smtp.settings']['smtp_protocol'] = 'standard';
 

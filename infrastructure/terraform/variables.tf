@@ -261,6 +261,21 @@ variable "email-host" {
   type        = string
 }
 
+variable "email-port" {
+  description = "SMTP port to connect to"
+  type        = number
+}
+
+variable "email-protocol" {
+  description = "SMTP encryption protocol. Options are 'standard' for none, 'ssl', or 'tls'."
+  type        = string
+}
+
+variable "email-enable-workflow-notifications" {
+  description = "Enable this to allow the system to email notifications to content editors about workflow state changes. This should only be enabled with care; we do not want a non-production environment mailing 'real' users notifications that they need to come review their content."
+  type        = bool
+}
+
 # Users
 # cf. iam.tf
 
