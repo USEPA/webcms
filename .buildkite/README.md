@@ -59,13 +59,13 @@ The plan step outputs `out.plan`, the Terraform plan snapshot. This is saved as 
 - **Pipeline step:** `label: ":terraform: Apply"`
 - **Supporting code:** `.buildkite/terraform-apply.sh`
 - **Branch limitations:** Only run on pushes to these branches:
-  - `master`, which affects the dev environment
-  - `stable`, which affects the staging environment
+  - `integration`, which affects the dev environment
+  - `main`, which affects the staging environment
 - **Requirements:**
   - The Terraform state backend config (`backend.config` in the scripts)
   - The Terraform plan (`out.plan`) from the previous step
 
-This step continues the plan started in the first step. Our Buildkite pipeline has separated these steps in order to restrict applications only to those branches which correspond to environments (e.g., the `stable` branch represents the staging environment).
+This step continues the plan started in the first step. Our Buildkite pipeline has separated these steps in order to restrict applications only to those branches which correspond to environments (e.g., the `main` branch represents the staging environment).
 
 The plan output, `out.plan` is used instead of Terraform variables. This prevents rebuilds from accidentally rolling back updates to the branch - the plan file will be detected as stale, and Terraform will refuse to apply the stale plan.
 
@@ -76,8 +76,8 @@ NB. Since this step is already using Terraform, we capture the Drush AWSVPC conf
 - **Pipeline step:** `label: ":ecs: Run Drush updates"`
 - **Supporting code:** `.buildkite/run-drush.sh`
 - **Branch limitations:** Only run on pushes to these branches:
-  - `master`, which affects the dev environment
-  - `stable`, which affects the staging environment
+  - `integration`, which affects the dev environment
+  - `main`, which affects the staging environment
 - **Requirements:**
   - The Drush AWSVPC configuration (can obtain via `terraform output drush-vpc-config`)
   - The `jq` tool

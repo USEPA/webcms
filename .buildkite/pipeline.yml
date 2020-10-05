@@ -94,9 +94,9 @@ steps:
       - step: build
       - step: plan
 
-    # Only build on commits (not pull requests) to master/stable
+    # Only build on commits (not pull requests) to integration/main
     if: |
-      (build.branch == "master" || build.branch == "stable") &&
+      (build.branch == "integration" || build.branch == "main") &&
       build.pull_request.id == null
 
     # See the previous plan step for most of these values
@@ -128,9 +128,9 @@ steps:
   - label: ":ecs: Run Drush updates"
     command: bash .buildkite/run-drush.sh
 
-    # Only build on commits (not pull requests) to master/stable
+    # Only build on commits (not pull requests) to integration/main
     if: |
-      (build.branch == "master" || build.branch == "stable") &&
+      (build.branch == "integration" || build.branch == "main") &&
       build.pull_request.id == null
 
     # Run only if the previous deploy step succeeded
