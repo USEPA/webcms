@@ -1,14 +1,22 @@
 uuid: b8c91866-202e-4736-98dc-38c220aaf66f
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - user_permission_condition
 id: group_published_content
 label: 'Group Published Content'
 description: ''
 use_admin_theme: true
 path: '/group/{group}/published'
 access_logic: and
-access_conditions: {  }
+access_conditions:
+  -
+    id: user_permission
+    permission: 'access group overview'
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'
 parameters:
   group:
     machine_name: group

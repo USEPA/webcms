@@ -1,14 +1,22 @@
 uuid: bbfad793-8008-47d7-8356-a93fbba70ebe
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - user_permission_condition
 id: group_details
 label: 'Group Details'
 description: ''
 use_admin_theme: true
 path: '/group/{group}/details'
 access_logic: and
-access_conditions: {  }
+access_conditions:
+  -
+    id: user_permission
+    permission: 'access group overview'
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'
 parameters:
   group:
     machine_name: group
