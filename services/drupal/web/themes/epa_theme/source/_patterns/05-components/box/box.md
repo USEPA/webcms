@@ -4,6 +4,8 @@ title: Box
 state: complete
 ---
 
+Related link: [Web Standard: Boxes](https://www.epa.gov/web-policies-and-procedures/web-standard-boxes)
+
 __Variables:__
 * modifier_classes: [string] Classes to modify the default component styling.
 * title: [array] Title properties.
