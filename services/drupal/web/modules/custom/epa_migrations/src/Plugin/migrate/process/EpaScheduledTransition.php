@@ -139,7 +139,7 @@ class EpaScheduledTransition extends ProcessPluginBase implements ContainerFacto
         }
         else {
           // Postpone the scheduled transition date.
-          $postponed_workflow_date = strtotime('+30 days', $workflow_date);
+          $postponed_workflow_date = strtotime('+60 days', $workflow_date);
           $formatted_postponed_workflow_date = gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $postponed_workflow_date);
           return [
             [
