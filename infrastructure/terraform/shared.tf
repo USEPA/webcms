@@ -14,6 +14,7 @@ locals {
     { name = "WEBCMS_SITE_URL", value = "https://${var.site-hostname}" },
     { name = "WEBCMS_ENV_STATE", value = var.site-env-state },
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
+    { name = "WEBCMS_ENV_LANG", value = var.site-env-lang },
 
     # DB info
     { name = "WEBCMS_DB_HOST", value = aws_db_proxy.proxy.endpoint },

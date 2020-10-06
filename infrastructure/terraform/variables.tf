@@ -19,7 +19,12 @@ variable "site-env-state" {
 }
 
 variable "site-env-name" {
-  description = "Environment name of this deployment. Should be 'prod' in production."
+  description = "Environment name of this deployment. Should be 'prod' in production. Please add -es for Spanish site variants, like 'prod-es'."
+  type        = string
+}
+
+variable "site-env-lang" {
+  description = "The language for the site.  Can be left empty or set to 'en' for the main production site. For the spanish site this should be set to 'es'."
   type        = string
 }
 
