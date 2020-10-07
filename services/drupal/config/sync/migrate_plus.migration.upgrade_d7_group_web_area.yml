@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: UsNiqVLyu2q1WD67gAroy7eZOnqXsFICy7DxgFRXGJs
+  default_config_hash: z-z-Y79ElCzNdWO1I7_cmdFPIYbhHMRHlI4iQAmLjUg
 id: upgrade_d7_group_web_area
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -16,9 +16,6 @@ label: 'Groups (Web Area)'
 source:
   plugin: epa_web_area
   node_type: web_area
-  high_water_property:
-    name: nid
-    alias: 'n'
 process:
   id:
     -
@@ -77,6 +74,7 @@ process:
       plugin: entity_lookup
       value_key: mail
       entity_type: user
+      ignore_case: true
   field_machine_name:
     -
       plugin: get
