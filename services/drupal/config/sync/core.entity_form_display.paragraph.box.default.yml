@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_header_link
     - field.field.paragraph.box.field_image
     - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
@@ -19,6 +20,14 @@ targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_header_link:
+    weight: 2
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+    type: link_default
+    region: content
   field_image:
     weight: 1
     settings:
@@ -30,7 +39,7 @@ content:
     type: image_focal_point
     region: content
   field_link:
-    weight: 3
+    weight: 4
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -39,7 +48,7 @@ content:
     region: content
   field_paragraphs:
     type: paragraphs
-    weight: 2
+    weight: 3
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -56,7 +65,7 @@ content:
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 4
+    weight: 5
     settings: {  }
     third_party_settings: {  }
     type: options_select

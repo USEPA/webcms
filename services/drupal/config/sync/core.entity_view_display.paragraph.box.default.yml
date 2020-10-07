@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_header_link
     - field.field.paragraph.box.field_image
     - field.field.paragraph.box.field_link
     - field.field.paragraph.box.field_paragraphs
@@ -13,6 +14,7 @@ dependencies:
   module:
     - entity_reference_revisions
     - link
+    - linked_field
     - options
     - responsive_image
 id: paragraph.box.default
@@ -20,6 +22,18 @@ targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_header_link:
+    weight: 2
+    label: hidden
+    settings:
+      trim_length: null
+      url_only: false
+      url_plain: false
+      rel: '0'
+      target: '0'
+    third_party_settings: {  }
+    type: link
+    region: content
   field_image:
     type: responsive_image
     weight: 1
@@ -28,9 +42,15 @@ content:
     settings:
       responsive_image_style: responsive_box_image
       image_link: ''
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: field
+        destination: field_header_link
+        advanced: {  }
+        token: ''
   field_link:
-    weight: 4
+    weight: 5
     label: hidden
     settings:
       trim_length: 80
@@ -43,7 +63,7 @@ content:
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 2
+    weight: 3
     label: hidden
     settings:
       view_mode: default
@@ -51,7 +71,7 @@ content:
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 3
+    weight: 4
     label: hidden
     settings: {  }
     third_party_settings: {  }
@@ -62,7 +82,13 @@ content:
     label: hidden
     settings:
       link_to_entity: false
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: field
+        destination: field_header_link
+        advanced: {  }
+        token: ''
     type: string
     region: content
 hidden:
