@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: nLmnZrAOZ87N8idNC3ASDtMwz8cNpDgs98Rc-JwV6N4
+  default_config_hash: 79OMGPA09aJubOyYZConUvFNkkPGxfj_vdf-EzfoFtA
 id: upgrade_d7_group_content_node_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -24,16 +24,12 @@ source:
   d8_entity_type: node
   node_bundle: public_notice
   constants:
-    formatted_group_prefix: web_area-group_
-    formatted_d8_entity_type: node-
+    group_content_type: group_content_type_ab1954483ec46
 process:
   type:
     -
-      plugin: concat
-      source:
-        - constants/formatted_group_prefix
-        - constants/formatted_d8_entity_type
-        - bundle
+      plugin: get
+      source: constants/group_content_type
     -
       plugin: default_value
   gid:
