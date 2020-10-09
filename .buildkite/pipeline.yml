@@ -2,13 +2,6 @@
 # which branch this build is for. Feature branches only perform basic validation steps,
 # whereas for the main and integration branches, we perform a full deployment.
 
-env:
-  # Common image tag used across steps
-  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
-
-  # Base URL for image repositories
-  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-1.amazonaws.com
-
 steps:
   - label: ":pipeline: Feature"
     if: |

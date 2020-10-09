@@ -1,6 +1,17 @@
 # Unlike the feature branch pipeline (see feature.yml), this pipeline updates infrastructure
 # and deploys new code to the environment specified in WEBCMS_ENVIRONMENT.
 
+env:
+  # Ensure all jobs use these values from the agent environment
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+  WEBCMS_WORKSPACE: ${WEBCMS_WORKSPACE}
+
+  # Common image tag used across steps
+  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
+
+  # Base URL for image repositories
+  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-1.amazonaws.com
+
 steps:
   - label: ":docker: Build images"
     command: bash .buildkite/docker-build.sh
