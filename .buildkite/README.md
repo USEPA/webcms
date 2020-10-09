@@ -2,43 +2,107 @@
 
 ## Table of Contents
 
-* [Layout](#layout)
-* [Build Steps](#build-steps)
-    * [Docker Images](#docker-images)
-    * [Terraform Plan](#terraform-plan)
-    * [Terraform Apply](#terraform-apply)
-    * [Site Updates via Drush](#site-updates-via-drush)
-* [Other Links](#other-links)
+- [Table of Contents](#table-of-contents)
+- [Layout](#layout)
+- [Build Pipelines](#build-pipelines)
+  - [`pipeline.yml`](#pipelineyml)
+    - [Upload Feature Pipeline](#upload-feature-pipeline)
+    - [Upload Dev Deploy Pipeline](#upload-dev-deploy-pipeline)
+    - [Upload Stage Deploy Pipeline](#upload-stage-deploy-pipeline)
+    - [Upload Spanish Deploy Pipeline](#upload-spanish-deploy-pipeline)
+  - [`feature.yml`](#featureyml)
+    - [Docker Image Build](#docker-image-build)
+    - [Terraform Formatting Check](#terraform-formatting-check)
+    - [Terraform Plan](#terraform-plan)
+  - [`deploy.yml`](#deployyml)
+    - [Docker Image Push](#docker-image-push)
+    - [Terraform Apply](#terraform-apply)
+    - [Site Updates via Drush](#site-updates-via-drush)
+- [Plugins](#plugins)
+  - [`aws-parameters`](#aws-parameters)
+- [External Links](#external-links)
 
 ## Layout
 
 - `.buildkite/`: Buildkite configuration and supporting code
-  - `pipeline.yml` - Buildkite pipeline file
+  - `pipeline.yml` - Buildkite pipeline file to dispatch other pipelines
+  - `feature.yml` - Feature branch pipeline
+  - `deploy.yml` - Deployment pipeline
   - `*.sh` - Scripts supporting Buildkite steps
   - `plugins/` - Custom plugins
     - `aws-parameters/` - Custom plugin to download specific Parameter Store values
-    - `config/` - Exports shared configuration as environment variables
 
-## Build Steps
+## Build Pipelines
 
-### Docker Images
+### `pipeline.yml`
+
+#### Upload Feature Pipeline
+
+- **Pipeline step:** `label: ":pipeline: Feature"`
+- **Supporting code:** _(none)_
+- **Branch limitations:** Runs on any branch that is _not_ `main` or `integration`
+- **Next pipeline:** [`feature.yml`](#featureyml)
+
+This step simply uploads the `feature.yml` pipeline file for feature branches. For the `terraform plan` output, the workspace is set to the staging environment, as it is assumed that most feature branches target `main`.
+
+#### Upload Dev Deploy Pipeline
+
+- **Pipeline step:** `label: ":pipeline: Dev"`
+- **Supporting code:** _(none)_
+- **Branch limitations:** Only runs on the `integration` branch.
+- **Next pipeline:** [`deploy.yml`](#deployyml)
+
+This step uploads the `deploy.yml` pipeline file for the `integration` branch. The Terraform workspace is set to the development environment.
+
+#### Upload Stage Deploy Pipeline
+
+- **Pipeline step:** `label: ":pipeline: Stage"`
+- **Supporting code:** _(none)_
+- **Branch limitations:** Only runs on the `main` branch.
+- **Next pipeline:** [`deploy.yml`](#deployyml)
+
+This step uploads the `deploy.yml` pipeline file for the `main` branch. The Terraform workspace is set to the staging environment.
+
+#### Upload Spanish Deploy Pipeline
+
+- **Pipeline step:** `label: ":pipeline: Stage"`
+- **Supporting code:** _(none)_
+- **Branch limitations:** Only runs on the `main` branch.
+- **Next pipeline:** [`deploy.yml`](#deployyml)
+
+This step uploads the `deploy.yml` pipeline file for the `main` branch. The Terraform workspace is set to the Spanish-language environment.
+
+### `feature.yml`
+
+#### Docker Image Build
 
 - **Pipeline step:** `label: ":docker: Build images"`
-- **Supporting code:** `.buildkite/build-docker.sh`
-- **Branch limitations:** _(none)_
+- **Supporting code:** `.buildkite/docker-build.sh`
+- **Requirements:**
+  - Permissions to read/write to ECR
 
-This project uses three custom Docker images: one each for Drupal, nginx, and Drush. The images all share a base copy of the WebCMS' filesystem - this includes Drupal 8 core, third-party modules, custom code, and the compiled theme.
+For feature branches, we perform Docker image builds on the Buildkite agent servers. This serves two purposes:
 
-The Docker build step builds each of the custom images and pushes them to the current AWS account's ECR repositories. Buildkite plugins assume a role that is able to read and write to those repositories during the build.
+1. It acts as a sanity check of that branch's Docker build, and
+2. It ensures the agent's Docker layer cache is up to date.
 
-### Terraform Plan
+The concern over the layer cache stems almost entirely from the time needed to build the [AWS ElastiCache PHP extension](https://github.com/awslabs/aws-elasticache-cluster-client-memcached-for-php/). The WebCMS' containers are Alpine-based, so they can't use the prebuilt `.so` files that are provided.
+
+#### Terraform Formatting Check
+
+- **Pipeline step:** `label: ":terraform: Formatting`
+- **Supporting code:** _(none)_
+- **Requirements:** _(none)_
+
+We use [`terraform fmt`](https://www.terraform.io/docs/commands/fmt.html) to do a simple formatting check. Formatting violations are output as a diff, which can be fixed either manually or by running `terraform fmt` locally.
+
+#### Terraform Plan
 
 - **Pipeline step:** `label: ":terraform: Plan"`
-- **Supporting code:** `.buildkite/terraform-plan.sh`
-- **Branch limitations:** _(none)_
+- **Supporting code:** _(none)_
 - **Requirements:**
-  - The Terraform state backend config (`backend.config` in the scripts)
-  - A terraform variables file (`terraform.tfvars`)
+  - Permissions to read and write to this project's AWS resources (writes are needed to create locks in DynamoDB)
+  - Parameters from Parameter Store (see the [`aws-parameters`](#aws-parameters) plugin)
 
 Every push to this repository results in a Terraform plan being executed in Buildkite. We do this in order to validate a few assumptions:
 
@@ -47,39 +111,35 @@ Every push to this repository results in a Terraform plan being executed in Buil
 
 We do not assume that Buildkite servers have the `terraform` tool installed, so we perform this build in a Docker image provided by Hashicorp (see [`hashicorp/terraform`](https://hub.docker.com/r/hashicorp/terraform)).
 
-The Terraform script requires two external configuration files:
+### `deploy.yml`
 
-1. `backend.config`, the configuration values for the S3-backed state file, and
-2. `terraform.tfvars`, the Terraform variables file.
+#### Docker Image Push
 
-The plan step outputs `out.plan`, the Terraform plan snapshot. This is saved as a build artifact.
+- **Pipeline step:** `label: ":docker:" Build images"`
+- **Supporting code:** `.buildkite/docker-build.sh`
+- **Requirements:**
+  - Permission to read/write to ECR
 
-### Terraform Apply
+This step performs a Docker build and push to this environment's ECR repositories. Since all feature branches also perform Docker builds, it is assumed that this step is relatively efficient, re-using the layer cache to avoid having to rebuild the AWS ElastiCache extension.
+
+#### Terraform Apply
 
 - **Pipeline step:** `label: ":terraform: Apply"`
-- **Supporting code:** `.buildkite/terraform-apply.sh`
-- **Branch limitations:** Only run on pushes to these branches:
-  - `integration`, which affects the dev environment
-  - `main`, which affects the staging environment
+- **Supporting code:** _(none)_
 - **Requirements:**
-  - The Terraform state backend config (`backend.config` in the scripts)
-  - The Terraform plan (`out.plan`) from the previous step
+  - Permission to read/write to this project's AWS resources
+  - Parameters from Parameter Store (see the [`aws-parameters`](#aws-parameters) plugin)
 
-This step continues the plan started in the first step. Our Buildkite pipeline has separated these steps in order to restrict applications only to those branches which correspond to environments (e.g., the `main` branch represents the staging environment).
+This step performs a Terraform plan and then immediately applies it. The output of `terraform plan` is used as the changelog for this environment's infrastructure. Like the [Terraform Plan](#terraform-plan) step, this uses [`hashicorp/terraform`](https://hub.docker.com/r/hashicorp/terraform) to use the `terraform` command.
 
-The plan output, `out.plan` is used instead of Terraform variables. This prevents rebuilds from accidentally rolling back updates to the branch - the plan file will be detected as stale, and Terraform will refuse to apply the stale plan.
-
-NB. Since this step is already using Terraform, we capture the Drush AWSVPC configuration. See `drush-vpc-config` in `outputs.tf` and the step below.
-
-### Site Updates via Drush
+#### Site Updates via Drush
 
 - **Pipeline step:** `label: ":ecs: Run Drush updates"`
 - **Supporting code:** `.buildkite/run-drush.sh`
-- **Branch limitations:** Only run on pushes to these branches:
-  - `integration`, which affects the dev environment
-  - `main`, which affects the staging environment
 - **Requirements:**
-  - The Drush AWSVPC configuration (can obtain via `terraform output drush-vpc-config`)
+  - Permission to communicate with the AWS ECS
+  - The [Docker Image Push](#docker-image-push) and [Terraform Apply](#terraform-apply) steps must have completed successfully.
+  - The Drush AWSVPC configuration
   - The `jq` tool
 
 This step performs the Drush updates necessary to apply the new WebCMS configuration. Conceptually, the step is relatively simple, but the `run-drush.sh` script includes some extra code to present the task's status to the user.
@@ -95,13 +155,20 @@ The steps necessary are below:
    drush --uri="$WEBCMS_SITE_URL" cr
    ```
 2. Create a JSON object corresponding to the AWS ECS task overrides. We use the `jq` tool to preserve proper JSON syntax rather than relying on manual quoting.
-3. Save the Drush AWSVPC network configuration.
-4. Spawn a Drush task against the WebCMS cluster.
-5. Optionally, use the spawned task's ARN to wait on the task to exit. This way, builds can be failed if the task exits with a non-successful code.
+3. Spawn a Drush task against the WebCMS cluster.
+4. Optionally, use the spawned task's ARN to wait on the task to exit. This way, builds can be failed if the task exits with a non-successful code.
 
 Note: Drush logs are not returned by this step; instead, they are stored in CloudWatch.
 
-## Other Links
+## Plugins
+
+### `aws-parameters`
+
+This is a custom plugin that supports our use of Parameter Store as the source of truth for Terraform configuration. Since these templates are in use in multiple environments by multiple users, our variables are not tracked in Git.
+
+This plugin provides a `pre-command` script file. As the name implies, Buildkite executes this script as a hook before the pipeline step's command is run. In this particular plugins' case, we download the shared Terraform backend configuration (see [Partial Configuration](https://www.terraform.io/docs/backends/config.html#partial-configuration) in the Terraform docs) and the variables applicable to the current workspace.
+
+## External Links
 
 - [Buildkite](https://buildkite.com/)
 - [Buildkite docs](https://buildkite.com/docs)
