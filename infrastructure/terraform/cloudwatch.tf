@@ -193,7 +193,7 @@ resource "aws_cloudwatch_dashboard" "overview" {
           title = "EC2: Instances",
           stat  = "Maximum",
           metrics = [
-            ["AWS/EC2", "GroupInServiceInstances", "AutoscalingGroupName", aws_autoscaling_group.servers.name, { metric = "Minimum" }],
+            ["AWS/EC2", "GroupInServiceInstances", "AutoscalingGroupName", aws_autoscaling_group.servers.name, { stat = "Minimum" }],
             [".", "GroupTerminatingInstances", ".", ".", { color = local.dashboard-color-unhealthy }],
             [".", "GroupPendingInstances", ".", ".", { color = local.dashboard-color-secondary }],
           ],
