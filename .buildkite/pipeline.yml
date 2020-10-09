@@ -11,7 +11,9 @@ env:
 
 steps:
   - label: ":pipeline: Feature"
-    branches: '!main !integration'
+    if: |
+      (build.branch != "main" || build.branch != "integration") ||
+      build.pull_request.id != null
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
@@ -22,8 +24,7 @@ steps:
 
   # Upload the deploy pipeline from integration to the dev environment, disregarding PRs
   - label: ":pipeline: Dev"
-    branches: integration
-    if: build.pull_request.id == null
+    if: build.branch == "integration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
@@ -32,8 +33,7 @@ steps:
 
   # Upload the deploy pipeline from main to the stage environment, disregarding PRs
   - label: ":pipeline: Stage"
-    branches: main
-    if: build.pull_request.id == null
+    if: build.branch == "main" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
@@ -42,8 +42,7 @@ steps:
 
   # Also on the main branch, deploy to the Spanish-language test environment
   - label: ":pipeline: Español"
-    branches: main
-    if: build.pull_request.id == null
+    if: build.branch == "main" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
