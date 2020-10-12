@@ -23,6 +23,17 @@
 
   // Tweak styling in WYSIWYG editor.
   @if $wysiwyg {
+    // stylelint-disable
+    .cke_widget_wrapper:hover & {
+      outline: 2px solid #ffd25c;
+    }
+
+    .cke_widget_wrapper.cke_widget_focused &,
+    .cke_widget_wrapper.cke_widget_editable_focused & {
+      outline: 2px solid #47a4f5;
+    }
+    // stylelint-enable
+
     .media-library-item__edit {
       margin-bottom: rem(units(1));
     }
@@ -42,8 +53,12 @@
   font-size: font-size(body, 3xs);
   margin-top: rem(units(1));
 
-  // Show editable caption area in CKEditor when using Firefox.
-  &[contenteditable='true'] {
-    min-height: 1.3rem;
+  @if $wysiwyg {
+    // Show editable caption area in CKEditor when using Firefox.
+    &[contenteditable='true'] {
+      min-height: 1.3rem;
+      position: relative;
+      z-index: 1;
+    }
   }
 }
