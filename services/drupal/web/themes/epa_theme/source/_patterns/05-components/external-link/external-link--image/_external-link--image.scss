@@ -1,18 +1,22 @@
 // @file
 // Styles for an External Image Link.
 
+%external-link--image-after {
+  background-color: rgba(255, 255, 255, 0.825);
+  background-position: center;
+  background-size: units('105');
+  margin: 0 !important;
+  padding: units('105');
+  position: absolute;
+  right: units('05');
+  top: units('05');
+}
+
 .external-link--image {
   display: inline-block;
   position: relative;
 
   &::after {
-    background-color: rgba(255, 255, 255, 0.825);
-    background-position: center;
-    background-size: units('105');
-    margin: 0 !important;
-    padding: units('105');
-    position: absolute;
-    right: units('05');
-    top: units('05');
+    @extend %external-link--image-after;
   }
 }
