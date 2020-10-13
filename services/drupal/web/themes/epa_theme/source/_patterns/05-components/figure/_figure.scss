@@ -29,6 +29,13 @@
   }
 }
 
+.figure__media {
+  // Assume all links here surround an image.
+  a:not([href=''], [href*='.gov'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com']) {
+    @extend .external-link--image;
+  }
+}
+
 .figure__caption {
   caption-side: bottom;
   display: table-caption;
