@@ -30,8 +30,4 @@ get-parameter() {
 }
 
 get-parameter backend-config backend.config
-
-# Only download the variables if asked
-if test "${BUILDKITE_PLUGIN_AWS_PARAMETERS_VARIABLES:-}" == true; then
-  get-parameter "variables-$WEBCMS_ENVIRONMENT" terraform.tfvars
-fi
+get-parameter "variables-$WEBCMS_ENVIRONMENT" terraform.tfvars

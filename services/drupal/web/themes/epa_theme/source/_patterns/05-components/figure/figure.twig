@@ -1,3 +1,5 @@
+{{ attach_library('epa_theme/media_link') }}
+
 {% set classes = [
   'figure',
   modifier_classes ? modifier_classes,
@@ -5,7 +7,7 @@
 
 <figure class="{{ classes }}">
   <div class="figure__media">{{ media }}</div>
-  {% if caption %}
+  {% if caption is defined %}
     <figcaption class="figure__caption">{{ caption }}</figcaption>
   {% endif %}
 </figure>
@@ -13,19 +15,19 @@
 {% if is_demo %}
   <figure class="{{ classes }} is-centered">
     <div class="figure__media">{{ media }}</div>
-    {% if caption %}
+    {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Centered: </strong>{{ caption }}</figcaption>
     {% endif %}
   </figure>
   <figure class="{{ classes }} u-align-left">
     <div class="figure__media">{{ media }}</div>
-    {% if caption %}
+    {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Left aligned: </strong>{{ caption }}</figcaption>
     {% endif %}
   </figure>
   <figure class="{{ classes }} u-align-right">
     <div class="figure__media">{{ media }}</div>
-    {% if caption %}
+    {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Right aligned: </strong>{{ caption }}</figcaption>
     {% endif %}
   </figure>
