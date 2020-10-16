@@ -74,7 +74,7 @@ TEMPLATE;
           return sprintf($media_embed_replacement_template,
             $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
             $tag_info['fields']['field_image_alignment[und]'] ?? 'center',
-            html_entity_decode($tag_info['fields']['field_caption[und][0][value]']) ?? '',
+            htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '',
             $media_entity_uuid,
             $view_modes[$tag_info['view_mode']]
           );
