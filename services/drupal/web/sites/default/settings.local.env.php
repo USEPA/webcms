@@ -41,6 +41,4 @@ if (defined('Memcached::OPT_CLIENT_MODE')) {
 
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
 
-$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['port'] = '13306';
-$config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['host'] = 'host.docker.internal';
 ini_set('max_execution_time', 0);
