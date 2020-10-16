@@ -12,9 +12,11 @@ locals {
     { name = "WEBCMS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
     { name = "WEBCMS_S3_REGION", value = var.aws-region },
     { name = "WEBCMS_SITE_URL", value = "https://${var.site-hostname}" },
+    { name = "WEBCMS_SITE_HOSTNAME", value = var.site-hostname },
     { name = "WEBCMS_ENV_STATE", value = var.site-env-state },
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
     { name = "WEBCMS_ENV_LANG", value = var.site-env-lang },
+    { name = "WEBCMS_S3_USES_DOMAIN", value = var.site-s3-uses-domain ? "1" : "0" },
 
     # DB info
     { name = "WEBCMS_DB_HOST", value = aws_db_proxy.proxy.endpoint },
