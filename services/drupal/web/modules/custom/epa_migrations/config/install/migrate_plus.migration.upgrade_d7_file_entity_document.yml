@@ -32,8 +32,11 @@ process:
       source: constants/bundle
   name:
     -
-      plugin: get
+      plugin: str_replace
+      regex: true
       source: filename
+      search: '/\(\.?(pdf|xlsm?x?|excel|Microsoft Excel|docx?|Microsoft Word|rtf|Rich Text Format|zip)\)/i'
+      replace: ''
   created:
     -
       plugin: get
