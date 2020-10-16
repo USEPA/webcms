@@ -33,6 +33,11 @@ variable "site-s3-uses-domain" {
   type        = bool
 }
 
+variable "akamai-disabled" {
+  description = "Set to TRUE if this site isn't being served via Akamai; otherwise FALSE."
+  type        = bool
+}
+
 variable "akamai-api-host" {
   description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
   type        = string

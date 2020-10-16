@@ -19,6 +19,7 @@ locals {
     { name = "WEBCMS_S3_USES_DOMAIN", value = var.site-s3-uses-domain ? "1" : "0" },
 
     # Akamai
+    { name = "WEBCMS_AKAMAI_DISABLED", value = var.akamai-disabled ? "1" : "0" },
     { name = "WEBCMS_AKAMAI_API_HOST", value = var.akamai-api-host },
     { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", value = var.akamai-access-token },
     { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", value = var.akamai-client-token },
