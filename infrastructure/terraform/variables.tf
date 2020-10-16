@@ -33,6 +33,26 @@ variable "site-s3-uses-domain" {
   type        = bool
 }
 
+variable "akamai-api-host" {
+  description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
+  type        = string
+}
+
+variable "akamai-access-token" {
+  description = "Akamai access token."
+  type        = string
+}
+
+variable "akamai-client-token" {
+  description = "Akamai client token."
+  type        = string
+}
+
+variable "akamai-client-secret" {
+  description = "Akamai client secret."
+  type        = string
+}
+
 # Encryption-related variables
 variable "encryption-at-rest-key" {
   description = "Name of the AWS KMS key to use for encrypting at-rest data."
