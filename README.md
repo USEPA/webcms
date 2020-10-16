@@ -12,7 +12,7 @@
    f1 run aws s3 mb s3://drupal
    ```
 
-3. Finally, allow anonymous access to the `public/` prefix of the S3 bucket:
+3. Finally, allow anonymous access to the `public/` prefix of the S3 bucket: 
 
    ```
    f1 run aws s3api put-bucket-policy --bucket drupal --policy "$(cat services/minio/policy.json)"
