@@ -3,4 +3,14 @@
 
 .figure--thumbnail {
   max-width: rem(160px);
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    &.u-align-left,
+    &.u-align-right {
+      max-width: Min(
+        rem(160px),
+        calc(40% - #{rem(gesso-get-map(gutter-width))})
+      );
+    }
+  }
 }
