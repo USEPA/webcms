@@ -34,10 +34,10 @@ variable "site-s3-uses-domain" {
 }
 
 # Akamai variables
-variable "akamai-disabled" {
-  description = "Set to TRUE if this site isn't being served via Akamai; otherwise FALSE."
+variable "akamai-enabled" {
+  description = "Set to TRUE if this site is being served via Akamai; otherwise FALSE."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "akamai-api-host" {
