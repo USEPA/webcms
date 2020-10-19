@@ -33,6 +33,7 @@ variable "site-s3-uses-domain" {
   type        = bool
 }
 
+# Akamai variables
 variable "akamai-disabled" {
   description = "Set to TRUE if this site isn't being served via Akamai; otherwise FALSE."
   type        = bool
@@ -40,21 +41,6 @@ variable "akamai-disabled" {
 
 variable "akamai-api-host" {
   description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
-  type        = string
-}
-
-variable "akamai-access-token" {
-  description = "Akamai access token."
-  type        = string
-}
-
-variable "akamai-client-token" {
-  description = "Akamai client token."
-  type        = string
-}
-
-variable "akamai-client-secret" {
-  description = "Akamai client secret."
   type        = string
 }
 

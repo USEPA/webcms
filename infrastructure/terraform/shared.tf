@@ -21,9 +21,6 @@ locals {
     # Akamai
     { name = "WEBCMS_AKAMAI_DISABLED", value = var.akamai-disabled ? "1" : "0" },
     { name = "WEBCMS_AKAMAI_API_HOST", value = var.akamai-api-host },
-    { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", value = var.akamai-access-token },
-    { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", value = var.akamai-client-token },
-    { name = "WEBCMS_AKAMAI_CLIENT_SECRET", value = var.akamai-client-secret },
 
     # DB info
     { name = "WEBCMS_DB_HOST", value = aws_db_proxy.proxy.endpoint },
@@ -58,6 +55,9 @@ locals {
     { name = "WEBCMS_HASH_SALT", valueFrom = aws_secretsmanager_secret.hash_salt.arn },
     { name = "WEBCMS_MAIL_PASS", valueFrom = aws_secretsmanager_secret.mail_pass.arn },
     { name = "WEBCMS_SAML_SP_KEY", valueFrom = aws_secretsmanager_secret.saml_sp_key.arn },
+    { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", value = aws_secretsmanager_secret.akamai_access_token },
+    { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", value = aws_secretsmanager_secret.akamai_client_token },
+    { name = "WEBCMS_AKAMAI_CLIENT_SECRET", value = aws_secretsmanager_secret.akamai_client_secret },
   ]
 
   # Security groups used by Drupal containers
