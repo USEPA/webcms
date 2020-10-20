@@ -33,6 +33,19 @@ variable "site-s3-uses-domain" {
   type        = bool
 }
 
+# Akamai variables
+variable "akamai-enabled" {
+  description = "Set to TRUE if this site is being served via Akamai; otherwise FALSE."
+  type        = bool
+  default     = false
+}
+
+variable "akamai-api-host" {
+  description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
+  type        = string
+  default     = "https://xxxx-xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxx.luna.akamaiapis.net/"
+}
+
 # Encryption-related variables
 variable "encryption-at-rest-key" {
   description = "Name of the AWS KMS key to use for encrypting at-rest data."

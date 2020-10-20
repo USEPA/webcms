@@ -68,3 +68,30 @@ resource "aws_secretsmanager_secret" "saml_sp_key" {
     Name = "${local.name-prefix} Secret: SAML SP private key"
   })
 }
+
+resource "aws_secretsmanager_secret" "akamai_access_token" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/drupal/akamai_access_token"
+  description = "Akamai access token."
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: Akamai access token"
+  })
+}
+
+resource "aws_secretsmanager_secret" "akamai_client_token" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/drupal/akamai_client_token"
+  description = "Akamai client token."
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: Akamai client token"
+  })
+}
+
+resource "aws_secretsmanager_secret" "akamai_client_secret" {
+  name        = "/webcms-${local.env-suffix}-${random_pet.secret_suffix.id}/drupal/akamai_client_secret"
+  description = "Akamai client secret."
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Secret: Akamai client secret"
+  })
+}

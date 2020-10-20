@@ -349,6 +349,9 @@ data "aws_iam_policy_document" "task_secrets_access" {
       aws_secretsmanager_secret.hash_salt.arn,
       aws_secretsmanager_secret.mail_pass.arn,
       aws_secretsmanager_secret.saml_sp_key.arn,
+      aws_secretsmanager_secret.akamai_access_token.arn,
+      aws_secretsmanager_secret.akamai_client_token.arn,
+      aws_secretsmanager_secret.akamai_client_secret.arn,
     ]
   }
 }

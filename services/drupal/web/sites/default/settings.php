@@ -864,6 +864,9 @@ $config['samlauth.authentication']['idp_single_sign_on_service'] = getenv('WEBCM
 $config['samlauth.authentication']['idp_single_log_out_service'] = getenv('WEBCMS_SAML_IDP_SLO_URL');
 $config['samlauth.authentication']['idp_x509_certificate'] = getenv('WEBCMS_SAML_IDP_CERT');
 
+$config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
+$config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
+
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
