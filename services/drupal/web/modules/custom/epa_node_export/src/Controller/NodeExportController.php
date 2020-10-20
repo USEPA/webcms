@@ -214,7 +214,7 @@ class NodeExportController extends ControllerBase {
 
         exec("cd " . dirname($export_dir)
           . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix="
-          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/s3fs-js,/sites,/system,/themes,/sites,/misc "
+          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/s3fs-js,/sites,/system,/themes,/sites,/misc -X /themes/epa_theme/pattern-lab "
           . $url . ' 2>&1', $wget_output, $wget_status);
 
         // Log the output of wget if we hit an error (non-zero status code).
