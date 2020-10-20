@@ -43,7 +43,7 @@ variable "akamai-enabled" {
 variable "akamai-api-host" {
   description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
   type        = string
-  default     = null
+  default     = 'https://xxxx-xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxx.luna.akamaiapis.net/'
 }
 
 # Encryption-related variables
