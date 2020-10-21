@@ -135,7 +135,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field = $body_field_query->execute()->fetchAssoc();
 
           if (isset($body_field['value'])) {
-            $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager);
+            $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']);
 
             // Perform text processing to update/remove inline code.
             $body_field['value'] = $this->processText($body_field['value']);
@@ -158,7 +158,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
 
           // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
-          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
+          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']) : FALSE;
 
           // Perform text processing to update/remove inline code.
           $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
@@ -188,7 +188,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
 
           // Transform body field content.
           $body_field = $body_field_query->execute()->fetchAssoc() ?: [];
-          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager) : FALSE;
+          $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']) : FALSE;
 
           // Perform text processing to update/remove inline code.
           $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;

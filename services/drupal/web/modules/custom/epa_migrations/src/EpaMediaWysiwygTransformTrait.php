@@ -18,11 +18,13 @@ trait EpaMediaWysiwygTransformTrait {
    *   The content to search and transform embedded media.
    * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
    *   The entityTypeManager service.
+   * @param bool $remove_alignment
+   *   A flag to determine whether the alignment setting should be set to null.
    *
    * @return string
    *   The original wysiwyg_content with embedded media in D8 format.
    */
-  public function transformWysiwyg($wysiwyg_content, EntityTypeManager $entityTypeManager) {
+  public function transformWysiwyg($wysiwyg_content, EntityTypeManager $entityTypeManager, $remove_alignment = FALSE) {
     $view_modes = [
       'media_large' => 'large',
       'medium' => 'medium',
@@ -54,7 +56,7 @@ TEMPLATE;
   data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 
-    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes) {
+    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
       $decoder = new JsonDecode(TRUE);
 
       try {
@@ -71,9 +73,10 @@ TEMPLATE;
           );
         }
         else {
+          $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
           return sprintf($media_embed_replacement_template,
             $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
-            $tag_info['fields']['field_image_alignment[und]'] ?? 'center',
+            $alignment,
             htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '',
             $media_entity_uuid,
             $view_modes[$tag_info['view_mode']]
