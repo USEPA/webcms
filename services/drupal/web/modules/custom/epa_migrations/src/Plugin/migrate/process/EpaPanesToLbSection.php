@@ -198,6 +198,7 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
                 $region = $regions_by_column_number[$col_number];
               }
 
+              $pane['is_skinny_pane'] = $num_columns >= 3;
               $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
 
               if ($paragraphs) {
@@ -243,6 +244,7 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
         if ($shown) {
           $region = $regions_by_panel_name[$pane['panel']];
 
+          $pane['is_skinny_pane'] = !in_array($region, ['main', 'bottom']);
           $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
 
           if ($paragraphs) {
@@ -276,6 +278,7 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
         if ($shown) {
           $region = $regions_by_panel_name[$pane['panel']];
 
+          $pane['is_skinny_pane'] = $region == 'sidebar';
           $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
 
           if ($paragraphs) {
