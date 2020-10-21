@@ -14,7 +14,7 @@
 {% set sidenav = drupal_region('sidebar') %}
 
 {% set header_info %}
-  {% if sidenav %}
+  {% if sidenav is empty %}
     {% if node.field_wide_template.value %}
       {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
     {% else %}
