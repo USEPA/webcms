@@ -32,7 +32,7 @@ trait EpaMediaWysiwygTransformTrait {
       'full' => 'original',
       'teaser' => 'small',
       'media_small' => 'small',
-      'thumbnail' => 'small',
+      'thumbnail' => 'thumbnail',
       'block_header' => 'small',
       'small' => 'small',
     ];
