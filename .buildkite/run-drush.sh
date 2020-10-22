@@ -206,12 +206,12 @@ while true; do
   # Construct a direct link to the CloudWatch logs.
   IFS=/ read -ra parts <<<"$arn"
   log_group="/webcms-$WEBCMS_ENVIRONMENT/app-drush"
-  log_stream="drush/drush/${parts[1]}"
+  log_stream="drush/drush/${parts[-1]}"
   url="https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/${log_group//\//\$252F}/log-events/${log_stream//\//\$252F}"
 
   # Generate a nicely-formatted URL for the Buildkite logs
   # cf. https://buildkite.com/docs/pipelines/links-and-images-in-log-output#links
-  printf '\033]1339;%s\a\n' "url='$url';content='Task ${parts[1]}'"
+  printf '\033]1339;%s\a\n' "url='$url';content='Task ${parts[-1]}'"
   echo
 
   # Now that we've output all the information we know about, we can exit
