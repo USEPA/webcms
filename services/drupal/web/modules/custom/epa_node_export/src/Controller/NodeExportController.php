@@ -65,13 +65,6 @@ class NodeExportController extends ControllerBase {
   protected $logger;
 
   /**
-   * The currently active request object.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
-   */
-  protected $request;
-
-  /**
    * The settings service.
    *
    * @var \Drupal\Core\Site\Settings
@@ -96,13 +89,12 @@ class NodeExportController extends ControllerBase {
    * @param \Drupal\Core\Site\Settings $settings
    *   The settings service.
    */
-  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger, Request $request, Settings $settings) {
+  public function __construct(DateFormatterInterface $date_formatter, EpaCoreHelper $epa_core_helper, FileSystemInterface $file_system, Client $http_client, LoggerInterface $logger, Settings $settings) {
     $this->dateFormatter = $date_formatter;
     $this->epaCoreHelper = $epa_core_helper;
     $this->fileSystem = $file_system;
     $this->httpClient = $http_client;
     $this->logger = $logger;
-    $this->request = $request;
     $this->settings = $settings;
   }
 
@@ -116,7 +108,6 @@ class NodeExportController extends ControllerBase {
       $container->get('file_system'),
       $container->get('http_client'),
       $container->get('logger.factory')->get('epa_node_export'),
-      $container->get('request_stack')->getCurrentRequest(),
       $container->get('settings')
     );
   }
@@ -140,13 +131,14 @@ class NodeExportController extends ControllerBase {
    * @param \Drupal\Core\Session\AccountInterface $account
    *   Run access checks for this account.
    *
+   * @param \Drupal\node\NodeInterface $node
+   *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
-  public function access(AccountInterface $account) {
+  public function access(AccountInterface $account, NodeInterface $node) {
     // Allow access to authenticated users if this node is published.
     if ($account->isAuthenticated()) {
-      $node = $this->request->attributes->get('node');
       if ($node->isPublished()) {
         return AccessResult::allowed();
       }
