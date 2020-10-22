@@ -15,6 +15,11 @@ use Drupal\migrate\Row;
 class EpaUser extends User {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {

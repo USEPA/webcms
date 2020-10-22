@@ -20,6 +20,11 @@ use Drupal\migrate\MigrateException;
 class EpaMultivalueField extends DrupalSqlBase {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {

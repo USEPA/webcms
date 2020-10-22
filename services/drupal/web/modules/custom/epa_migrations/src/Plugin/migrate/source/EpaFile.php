@@ -14,6 +14,12 @@ use Drupal\migrate\Plugin\migrate\source\SqlBase;
  */
 class EpaFile extends File {
 
+
+  /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
   /**
    * {@inheritdoc}
    */
