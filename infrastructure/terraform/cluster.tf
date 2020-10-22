@@ -58,12 +58,20 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
 resource "aws_ecs_cluster" "cluster" {
   name = local.cluster-name
 
-  # FARGATE adds the ability to launch tasks in Fargate; we primarily use this for Drush
-  # in order to protect it from the vagaries of autoscaling group resizes prematurely
-  # terminating it.
-  capacity_providers = [aws_ecs_capacity_provider.cluster_capacity.name, "FARGATE"]
+  capacity_providers = [
+    # This is the mixed spot instances pool for stateless functionality - namely, Drupal.
+    aws_ecs_capacity_provider.cluster_capacity.name,
 
-  # We assume that all services will use our autoscaling group as its capacity provider
+    # This is an AWS-managed serverless-style capacity provider for on-demand Drush tasks.
+    # It offers a reasonable balance of performance and cost.
+    "FARGATE",
+
+    # For extremely CPU-intensive applications, however, this capacity provider can be
+    # used to bring in an extremely powerful instance.
+    aws_ecs_capacity_provider.migration_capacity.name,
+  ]
+
+  # We assume that all services will use the default autoscaling group as its capacity provider
   default_capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.cluster_capacity.name
     weight            = 100
