@@ -15,6 +15,11 @@ use Drupal\migrate\Row;
 class EpaPanelizerNodeRevision extends NodeRevision {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {

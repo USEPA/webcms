@@ -21,6 +21,11 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 class EpaOgMembership extends DrupalSqlBase {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {

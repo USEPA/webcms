@@ -15,6 +15,10 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  * )
  */
 class EpaSixpackNode extends Node {
+  /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
 
   /**
    * Panel keys
