@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 8Ozukige-wMypIeVvcCCOlxZ8a7O-HLbmsl_MbeDtIQ
+  default_config_hash: eOJ3AOrRnkjXRx5uCCwZqSdH2qY5tjmGlufI9R3Fbos
 id: upgrade_d7_file_entity_document
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -23,6 +23,7 @@ source:
     name: fid
   constants:
     bundle: document
+  batch_size: 1000
 process:
   mid:
     -
@@ -37,7 +38,7 @@ process:
       plugin: str_replace
       regex: true
       source: filename
-      search: '/\(\.?(pdf|xlsm?x?|excel|Microsoft Excel|docx?|Microsoft Word|rtf|Rich Text Document|zip)\)/i'
+      search: '/\(\.?(pdf|xlsm?x?|excel|Microsoft Excel|docx?|Microsoft Word|rtf|Rich Text Format|zip)\)/i'
       replace: ''
   created:
     -
