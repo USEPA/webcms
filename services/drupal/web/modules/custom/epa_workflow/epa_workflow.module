@@ -418,7 +418,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   $form['revision_log']['#element_validate'] = ['_epa_workflow_form_validation_revision_log'];
 
   // Make the element visible when publish is selected on the latest revision.
-  if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
+  if ($form['#form_id'] == 'content_moderation_entity_moderation_form' && isset($form['new_state'])) {
     $compliance_checkbox['#states'] = [
       'visible' => [
         ':input[name="new_state"]' => ['value' => 'published'],
