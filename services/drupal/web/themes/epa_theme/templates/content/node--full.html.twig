@@ -13,9 +13,16 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
 {% set header_info %}
-  {% if sidenav is empty %}
+  {% if display_sidenav %}
     {% if node.field_wide_template.value %}
+      {% set display_sidenav = false %}
       {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
     {% else %}
       {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
@@ -55,15 +62,6 @@
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
 {% endif %}
 
-{% set display_sidenav = false %}
-
-{% if sidenav|render|striptags|trim %}
-  {% set display_sidenav = true %}
-{% endif %}
-
-{% if node.field_wide_template.value %}
-  {% set display_sidenav = false %}
-{% endif %}
 
 {% if display_sidenav %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
