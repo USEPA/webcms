@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: tS53kouJjyTd_r6cYztHSbW2ZZwUJQq7t-ZvOhFdCJI
+  default_config_hash: Mz2Wolpj2GZ5ofoREAm35fBNXfC7Vr_nQuihVOAWJac
 id: upgrade_d7_file
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -43,15 +43,16 @@ process:
       plugin: urlencode
   uri:
     -
-      plugin: file_copy
-      file_exists: 'use existing'
-      source:
-        - '@source_full_path'
-        - uri
+      plugin: get
+      source: uri
   filemime:
     -
       plugin: get
       source: filemime
+  filesize:
+    -
+      plugin: get
+      source: filesize
   status:
     -
       plugin: get

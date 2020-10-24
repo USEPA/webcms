@@ -39,17 +39,25 @@ process:
         - filepath
     -
       plugin: urlencode
+  # uri:
+  #   -
+  #     plugin: file_copy
+  #     file_exists: 'use existing'
+  #     source:
+  #       - '@source_full_path'
+  #       - uri
   uri:
     -
-      plugin: file_copy
-      file_exists: 'use existing'
-      source:
-        - '@source_full_path'
-        - uri
+      plugin: get
+      source: uri
   filemime:
     -
       plugin: get
       source: filemime
+  filesize:
+    -
+      plugin: get
+      source: filesize
   status:
     -
       plugin: get
