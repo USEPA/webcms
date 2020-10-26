@@ -61,7 +61,7 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
     $split_content = $this->extractBlockHeader($body_field['value']);
 
     // Convert D7 media to D8 media.
-    $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager);
+    $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager, $record['is_skinny_pane']);
 
     // Perform text processing to update/remove inline code.
     $body_field['value'] = $this->processText($body_field['value']);

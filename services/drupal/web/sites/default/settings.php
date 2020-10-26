@@ -799,6 +799,13 @@ $config['s3fs.settings']['use_instance_profile'] = TRUE;
 $config['s3fs.settings']['bucket'] = getenv('WEBCMS_S3_BUCKET');
 $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
+// Optionally serve our S3 files off the same domain as the site.
+// We'll be doing this in production using Akamai to proxy the requests to S3.
+if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
+  $config['s3fs.settings']['use_cname'] = TRUE;
+  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default/files';
+}
+
 $settings['s3fs.use_s3_for_public'] = TRUE;
 $settings['s3fs.use_s3_for_private'] = TRUE;
 
@@ -856,6 +863,9 @@ $config['samlauth.authentication']['idp_entity_id'] = getenv('WEBCMS_SAML_IDP_ID
 $config['samlauth.authentication']['idp_single_sign_on_service'] = getenv('WEBCMS_SAML_IDP_SSO_URL');
 $config['samlauth.authentication']['idp_single_log_out_service'] = getenv('WEBCMS_SAML_IDP_SLO_URL');
 $config['samlauth.authentication']['idp_x509_certificate'] = getenv('WEBCMS_SAML_IDP_CERT');
+
+$config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
+$config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';

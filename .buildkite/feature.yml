@@ -1,0 +1,99 @@
+# This is the feature branch pipeline. It does not update any infrastructure, but instead
+# performs sanity checks of the templates to verify that they meet minimum standards.
+
+env:
+  # Ensure all jobs use these values from the agent environment
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+  WEBCMS_WORKSPACE: ${WEBCMS_WORKSPACE}
+
+  # Common image tag used across steps
+  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
+
+  # Base URL for image repositories
+  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-1.amazonaws.com
+
+steps:
+  - label: ":docker: Build images"
+    command: bash .buildkite/docker-build.sh
+
+    # Limit build concurrency to 1 per branch: this throttles overlapping builds
+    concurrency_group: epa-webcms-d8/build-$BUILDKITE_BRANCH
+    concurrency: 1
+
+    plugins:
+      # Assume cross-account build role
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+
+      # Log in to ECR repositories
+      # NB. This is not the latest version of the plugin, but we have to downgrade in order
+      # to play nice with aws-assume-role.
+      - ecr#v1.2.0:
+          login: true
+          no-include-email: true
+
+  - label: ":terraform: Formatting"
+    plugins:
+      - docker#v3.5.0:
+          image: hashicorp/terraform:0.12.24
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            # Use terraform fmt's diff to verify that the templates meet formatting
+            # standards
+            - |
+              cd infrastructure/terraform
+              terraform fmt -diff -check
+
+  - label: ":terraform: Plan"
+
+    # Only allow one Terraform run at a time (Terraform takes out a lock in DynamoDB when
+    # it plans)
+    concurrency_group: epa-webcms-d8/terraform
+    concurrency: 1
+
+    plugins:
+      # Assume the Terraform role for maximum permissions
+      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
+          # Use a 30-minute duration for credentials to minimize the time spent in this
+          # nearly-administrative role
+          duration: 1800
+
+      # Load AWS parameters: we do this here because hashicorp/terraform does not include
+      # the AWS CLI, so we need to obtain these configuration values before executing
+      # Terraform in Docker.
+      - ./.buildkite/plugins/aws-parameters: {}
+
+      # Perform a Terraform plan in the provided Docker image
+      - docker#v3.5.0:
+          image: hashicorp/terraform:0.12.24
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            # Script steps:
+            # 1. In the terraform directory, initialize the plugins
+            # 2. Select the current workspace
+            # 3. Perform an in-memory plan to show what resources would change as a result
+            #    of the templates.
+            - |
+              cd infrastructure/terraform
+
+              terraform init -input=false -backend-config=backend.config
+              terraform workspace select "$WEBCMS_WORKSPACE"
+
+              terraform plan \
+                -input=false \
+                -var image-tag-drupal="$WEBCMS_IMAGE_TAG" \
+                -var image-tag-drush="$WEBCMS_IMAGE_TAG" \
+                -var image-tag-nginx="$WEBCMS_IMAGE_TAG"
+
+          environment:
+            # Forward build variables
+            - WEBCMS_IMAGE_TAG
+            - WEBCMS_WORKSPACE
+
+            # Forward STS-assumed credentials
+            - AWS_ACCESS_KEY_ID
+            - AWS_SECRET_ACCESS_KEY
+            - AWS_SESSION_TOKEN

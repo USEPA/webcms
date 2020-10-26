@@ -18,7 +18,7 @@ source:
   plugin: epa_d7_file
   scheme: public
   high_water_property:
-    name: fid
+    name: timestamp
   constants:
     source_base_path: https://www.epa.gov
 process:
@@ -39,16 +39,25 @@ process:
         - filepath
     -
       plugin: urlencode
+  # uri:
+  #   -
+  #     plugin: file_copy
+  #     file_exists: 'use existing'
+  #     source:
+  #       - '@source_full_path'
+  #       - uri
   uri:
     -
-      plugin: file_copy
-      source:
-        - '@source_full_path'
-        - uri
+      plugin: get
+      source: uri
   filemime:
     -
       plugin: get
       source: filemime
+  filesize:
+    -
+      plugin: get
+      source: filesize
   status:
     -
       plugin: get

@@ -22,18 +22,12 @@ source:
   d8_entity_type: node
   node_bundle: public_notice
   constants:
-    # The group machine name with '-group_' appended.
-    formatted_group_prefix: 'web_area-group_'
-    # The destination entity type with a trailing dash (-) appended.
-    formatted_d8_entity_type: 'node-'
+    group_content_type: group_content_type_ab1954483ec46
 process:
   type:
     -
-      plugin: concat
-      source:
-        - constants/formatted_group_prefix
-        - constants/formatted_d8_entity_type
-        - bundle
+      plugin: get
+      source: constants/group_content_type
     -
       plugin: default_value
   gid:

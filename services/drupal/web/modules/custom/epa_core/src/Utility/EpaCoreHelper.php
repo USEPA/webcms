@@ -34,7 +34,7 @@ class EpaCoreHelper {
 
     // Set alias_string to machine name.
     // If $alias_string is empty fallback to node's title.
-    if (!$entity->get('field_machine_name')->isEmpty()) {
+    if ($entity->hasField('field_machine_name') && !$entity->get('field_machine_name')->isEmpty()) {
       $alias_string = $entity->get('field_machine_name')->value;
     }
     if (empty($alias_string)) {

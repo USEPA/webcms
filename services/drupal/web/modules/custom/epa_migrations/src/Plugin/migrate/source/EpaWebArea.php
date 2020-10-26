@@ -15,6 +15,11 @@ use Drupal\migrate\Row;
 class EpaWebArea extends Node {
 
   /**
+   * {@inheritDoc}
+   */
+  protected $batchSize = 1000;
+
+  /**
    * {@inheritdoc}
    */
   public function query() {

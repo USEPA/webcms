@@ -57,7 +57,7 @@ class EpaNodeContentPaneToParagraph extends EpaPaneToParagraph {
   public function createParagraph($row, $record, $configuration) {
     // Transform body field content.
     $body_field = $row->get('body');
-    $body_field[0]['value'] = $this->transformWysiwyg($body_field[0]['value'], $this->entityTypeManager);
+    $body_field[0]['value'] = $this->transformWysiwyg($body_field[0]['value'], $this->entityTypeManager, $record['is_skinny_pane']);
     $body_field[0]['value'] = $this->processText($body_field[0]['value']);
 
     // Append files to the body field for document node types.
