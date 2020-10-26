@@ -36,7 +36,7 @@ resource "aws_rds_cluster_parameter_group" "params" {
 
   # Log any queries that took longer than this many seconds
   parameter {
-    name = "long_query_time"
+    name  = "long_query_time"
     value = 0.125
   }
 
