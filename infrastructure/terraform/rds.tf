@@ -26,6 +26,20 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 64 * (1024 * 1024)
   }
 
+  # Slow query logging
+
+  # Enable the slow query log
+  parameter {
+    name  = "slow_query_log"
+    value = 1
+  }
+
+  # Log any queries that took longer than this many seconds
+  parameter {
+    name = "long_query_time"
+    value = 0.125
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DB parameters"
   })
