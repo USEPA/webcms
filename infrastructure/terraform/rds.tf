@@ -52,6 +52,8 @@ resource "aws_rds_cluster_parameter_group" "params" {
   parameter {
     name  = "performance_schema"
     value = 1
+
+    apply_method = "pending-reboot"
   }
 
   tags = merge(local.common-tags, {
