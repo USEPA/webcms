@@ -26,6 +26,34 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 64 * (1024 * 1024)
   }
 
+  # Slow query logging
+
+  # Enable the slow query log
+  parameter {
+    name  = "slow_query_log"
+    value = 1
+  }
+
+  # Log any queries that took longer than this many seconds
+  parameter {
+    name  = "long_query_time"
+    value = 0.125
+  }
+
+  # Log any queries not using indexes - if this is too much, we can throttle the amount of
+  # queries per minute that MySQL logs.
+  parameter {
+    name  = "log_queries_not_using_indexes"
+    value = 1
+  }
+
+  # Enable the performance schema - the defaults that ship with the MySQL server are more
+  # than likely enough for what we'll need.
+  parameter {
+    name  = "performance_schema"
+    value = 1
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} DB parameters"
   })
