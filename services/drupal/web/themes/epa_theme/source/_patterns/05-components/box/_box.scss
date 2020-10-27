@@ -24,8 +24,19 @@ div.box__title {
   @extend %h3;
 }
 
+.box__image-link {
+  &:not([href=''], [href*='.gov'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com']) {
+    @extend .external-link--image;
+  }
+
+  &::after {
+    @extend %external-link--image-after;
+  }
+}
+
 %box--with-borders {
   > .box__title,
+  > .box__image-link > .box__image,
   > .box__image,
   > .box__content,
   > .box__footer {
@@ -50,10 +61,14 @@ div.box__title {
     text-align: center;
   }
 
-  > .box__image {
+  > .box__image,
+  > .box__image-link > .box__image {
     border-bottom: 0;
     margin: 0;
+  }
 
+  > .box__image,
+  > .box__image-link {
     + .box__content {
       border-top: 0;
     }
