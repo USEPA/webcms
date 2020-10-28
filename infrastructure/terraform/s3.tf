@@ -26,14 +26,10 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
   })
 }
 
-# Create a random identifier for the logs bucket
-resource "random_id" "elb_logs_bucket" {
-  byte_length = 16
-  prefix      = "webcms-logs-${local.env-suffix}-"
-}
-
+# Create an S3 bucket using a random identifier (this is only used for administration so
+# the name doesn't have to be pretty)
 resource "aws_s3_bucket" "elb_logs" {
-  bucket = random_id.elb_logs_bucket.b64_url
+  bucket_prefix = "webcms-logs-${local.env-suffix}-"
 
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} ELB Logs"
