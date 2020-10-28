@@ -31,6 +31,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(menu pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
+    $pattern .= 'class=".*?(tablesorter).*?"|';
     $pattern .= 'class=".*?(highlighted).*?"|';
     $pattern .= 'class=".*?(govdelivery-form).*?"|';
     $pattern .= 'class=".*?(epa-archive-link).*?"|';
@@ -110,6 +111,10 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
+              $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'tablesorter':
               $doc = $this->singleClassReplacement($doc);
               break;
 
@@ -473,6 +478,15 @@ trait EpaWysiwygTextProcessingTrait {
     if ($table_elements) {
       foreach ($table_elements as $table_element) {
         $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
+      }
+    }
+
+    // Tables with tablesorter class.
+    $tablesorter_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " tablesorter ")]');
+
+    if ($tablesorter_elements) {
+      foreach ($tablesorter_elements as $tablesorter_element) {
+        $tablesorter_element->setAttribute('class', str_replace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
       }
     }
 
