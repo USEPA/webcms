@@ -14,6 +14,9 @@ resource "aws_lb" "frontend" {
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Load Balancer"
   })
+
+  # Explicitly depend on the S3 bucket policy that enables the ALB to deliver logs
+  depends_on = [aws_s3_bucket_policy.elb_logs_delivery]
 }
 
 # Target group for Drupal container tasks
