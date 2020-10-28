@@ -97,6 +97,7 @@ data "aws_iam_policy_document" "elb_logs_access" {
   statement {
     sid       = "aclAccess"
     effect    = "Allow"
+    actions   = ["s3:GetBucketAcl"]
     resources = ["arn:aws:s3:::${aws_s3_bucket.elb_logs.bucket}"]
 
     principals {
