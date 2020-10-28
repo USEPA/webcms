@@ -25,3 +25,27 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
     ]
   })
 }
+
+# Create a random identifier for the logs bucket
+resource "random_id" "elb_logs_bucket" {
+  byte_length = 16
+  prefix      = "webcms-logs-${local.env-suffix}-"
+}
+
+resource "aws_s3_bucket" "elb_logs" {
+  bucket = random_id.elb_logs_bucket.b64_url
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} ELB Logs"
+  })
+}
+
+# Don't allow any public access to the ELB logging bucket
+resource "aws_s3_bucket_public_access_block" "elb_logs" {
+  bucket = aws_s3_bucket.elb_logs.bucket
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
