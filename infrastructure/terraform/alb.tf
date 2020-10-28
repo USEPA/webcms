@@ -6,6 +6,11 @@ resource "aws_lb" "frontend" {
   security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
 
+  access_logs {
+    bucket  = aws_s3_bucket.elb_logs.bucket
+    enabled = true
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Load Balancer"
   })
