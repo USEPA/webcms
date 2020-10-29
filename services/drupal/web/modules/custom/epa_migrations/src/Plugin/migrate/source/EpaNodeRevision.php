@@ -77,6 +77,8 @@ class EpaNodeRevision extends NodeRevision {
     $did = $this->select('panelizer_entity', 'pe')
       ->fields('pe', ['did'])
       ->condition('pe.revision_id', $row->getSourceProperty('vid'))
+      ->condition('pe.entity_id', $row->getSourceProperty('nid'))
+      ->condition('pe.entity_type', 'node')
       ->execute()
       ->fetchField();
 

@@ -43,7 +43,7 @@ class EpaSixpackNode extends Node {
 
   static public function limitQuery(SelectInterface $query) {
     // Nodes with six_pack layouts only.
-    $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id');
+    $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
     $query->innerJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->condition('pe.did', 0, '<>');
     $query->condition('pd.layout', 'six_pack', '=');
@@ -117,6 +117,8 @@ class EpaSixpackNode extends Node {
     $did = $this->select('panelizer_entity', 'pe')
       ->fields('pe', ['did'])
       ->condition('pe.revision_id', $row->getSourceProperty('vid'))
+      ->condition('pe.revision_id', $row->getSourceProperty('vid'))
+      ->condition('pe.entity_id', $row->getSourceProperty('nid'))
       ->execute()
       ->fetchField();
 
