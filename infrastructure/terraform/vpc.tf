@@ -204,7 +204,7 @@ resource "aws_vpc_endpoint" "s3" {
 
 locals {
   # Place Systems Manager endpoints into the VPC in order to further secure the connection
-  ssm-endpoints = ["ssm", "ec2", "ec2messages", "ssmmessages"]
+  ssm-endpoints = var.vpc-create-interfaces ? ["ssm", "ec2", "ec2messages", "ssmmessages"] : []
 }
 
 data "aws_vpc_endpoint_service" "ssm" {
