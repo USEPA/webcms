@@ -68,6 +68,12 @@ variable "vpc-existing-gateway" {
   default     = null
 }
 
+variable "vpc-create-interfaces" {
+  description = "Should endpoint interfaces be created for EC2 and SSM?"
+  type        = bool
+  default     = true
+}
+
 variable "vpc-subnet-block" {
   description = "CIDR block to use when allocating subnets. Defaults to using the full CIDR range of the VPC."
   type        = string
