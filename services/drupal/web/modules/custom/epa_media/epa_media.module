@@ -96,7 +96,7 @@ function epa_media_form_media_form_alter(&$form, \Drupal\Core\Form\FormStateInte
     $source_field_name = $media->getSource()->getConfiguration()['source_field'];
     if ($media->{$source_field_name}->entity instanceof FileInterface) {
       $scheme = \Drupal::service('stream_wrapper_manager')->getScheme($media->{$source_field_name}->entity->uri->value);
-      if ($scheme === 'public') {
+      if ($scheme !== 'private') {
         $form['field_limit_file_accessibility']['#access'] = FALSE;
       }
     }
