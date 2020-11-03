@@ -85,3 +85,20 @@ function epa_media_media_delete(MediaInterface $media) {
     }
   }
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_media_form_media_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  $media = $form_state->getFormObject()->getEntity();
+  // Only proceed if media exists and has the field we care about.
+  if ($media->id() && $media->hasField('field_limit_file_accessibility')) {
+    $source_field_name = $media->getSource()->getConfiguration()['source_field'];
+    if ($media->{$source_field_name}->entity instanceof FileInterface) {
+      $scheme = \Drupal::service('stream_wrapper_manager')->getScheme($media->{$source_field_name}->entity->uri->value);
+      if ($scheme === 'public') {
+        $form['field_limit_file_accessibility']['#access'] = FALSE;
+      }
+    }
+  }
+}
