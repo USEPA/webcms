@@ -24,9 +24,11 @@ dependencies:
     - field.field.node.faq.field_scheduled_transition
     - field.field.node.faq.field_type
     - node.type.faq
+    - workflows.workflow.epa_default
   module:
     - content_moderation
     - datetime
+    - entitygroupfield
     - field_group
     - shs
     - text
@@ -89,7 +91,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 6
+      weight: 8
       format_type: tabs
       format_settings:
         id: ''
@@ -104,7 +106,7 @@ mode: default
 content:
   body:
     type: text_textarea_with_summary
-    weight: 2
+    weight: 4
     region: content
     settings:
       rows: 9
@@ -114,9 +116,19 @@ content:
     third_party_settings: {  }
   created:
     type: datetime_timestamp
-    weight: 8
+    weight: 10
     region: content
     settings: {  }
+    third_party_settings: {  }
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 1
+    region: content
+    settings:
+      required: true
+      label: 'Group name'
+      help_text: ''
+      multiple: false
     third_party_settings: {  }
   field_channel:
     weight: 13
@@ -154,7 +166,7 @@ content:
     type: datetime_default
     region: content
   field_faq_taxonomy_topics:
-    weight: 3
+    weight: 5
     settings:
       match_operator: CONTAINS
       size: 60
@@ -164,7 +176,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_geographic_locations:
-    weight: 15
+    weight: 14
     settings:
       display_node_count: false
       create_new_items: false
@@ -174,7 +186,7 @@ content:
     type: options_shs
     region: content
   field_hublinks:
-    weight: 5
+    weight: 7
     settings:
       match_operator: CONTAINS
       size: 60
@@ -229,7 +241,7 @@ content:
     type: datetime_default
     region: content
   field_question:
-    weight: 1
+    weight: 2
     settings:
       rows: 5
       placeholder: ''
@@ -237,7 +249,7 @@ content:
     type: string_textarea
     region: content
   field_related_questions:
-    weight: 4
+    weight: 6
     settings:
       match_operator: CONTAINS
       size: 60
@@ -254,13 +266,13 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 2
+    weight: 3
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
-    weight: 12
+    weight: 14
     settings: {  }
     third_party_settings: {  }
     type: moderation_state_default
@@ -269,21 +281,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 9
+    weight: 11
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 11
+    weight: 13
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 10
+    weight: 12
     region: content
     third_party_settings: {  }
   title:
@@ -296,7 +308,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 7
+    weight: 9
     region: content
     settings:
       match_operator: CONTAINS
@@ -305,7 +317,7 @@ content:
       match_limit: 10
     third_party_settings: {  }
   url_redirects:
-    weight: 50
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }

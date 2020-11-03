@@ -50,6 +50,12 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     if (!empty($group)) {
       $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
     }
+
+    // Hide group field from users who do not have the permission to reassign content
+    if (isset($form['entitygroupfield'])) {
+      $user = \Drupal::currentUser();
+      $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
+    }
   }
 }
 

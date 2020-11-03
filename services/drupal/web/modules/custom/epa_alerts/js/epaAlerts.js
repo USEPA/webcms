@@ -9,9 +9,9 @@
         var alertContext = drupalSettings.epaAlerts.context;
 
         var viewInfo = {
-          view_name: `${alertContext}_alerts`,
+          view_name: alertContext + '_alerts',
           view_display_id: 'default',
-          view_dom_id: `js-view-dom-id-${alertContext}_alerts_default`,
+          view_dom_id: 'js-view-dom-id-' + alertContext + '_alerts_default',
         };
 
         var ajaxSettings = {
@@ -22,15 +22,15 @@
         var getAlerts = Drupal.ajax(ajaxSettings);
 
         getAlerts.commands.insert = function (ajax, response, status) {
-          if (response.selector == `.js-view-dom-id-js-view-dom-id-${alertContext}_alerts_default`) {
+          if (response.selector == '.js-view-dom-id-js-view-dom-id-' + alertContext + '_alerts_default') {
             var responseHTML = $.parseHTML(response.data);
             var noResults = $(responseHTML).find('.view__empty').length > 0 ? true : false;
 
             if (!noResults) {
-              $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).hide().html(response.data).slideDown();
+              $('.js-view-dom-id-epa-alerts--' + alertContext, context).hide().html(response.data).slideDown();
 
               // Call Drupal.attachBehaviors() on added content.
-              $(`.js-view-dom-id-epa-alerts--${alertContext}`, context).each(function (index, element) {
+              $('.js-view-dom-id-epa-alerts--' + alertContext, context).each(function (index, element) {
                 if (element.nodeType === Node.ELEMENT_NODE) {
                   Drupal.attachBehaviors(element);
                 }
