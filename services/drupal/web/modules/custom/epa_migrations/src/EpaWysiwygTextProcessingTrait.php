@@ -31,6 +31,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(menu pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
+    $pattern .= 'class=".*?(tablesorter).*?"|';
     $pattern .= 'class=".*?(highlighted).*?"|';
     $pattern .= 'class=".*?(govdelivery-form).*?"|';
     $pattern .= 'class=".*?(epa-archive-link).*?"|';
@@ -110,6 +111,10 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
+              $doc = $this->singleClassReplacement($doc);
+              break;
+
+            case 'tablesorter':
               $doc = $this->singleClassReplacement($doc);
               break;
 
@@ -243,7 +248,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($page_top_links as $link) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($link);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 
@@ -270,7 +277,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($exit_epa_links as $link) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($link);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 
@@ -297,7 +306,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($pdf_disclaimer_elements as $element) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($element);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 
@@ -473,6 +484,15 @@ trait EpaWysiwygTextProcessingTrait {
     if ($table_elements) {
       foreach ($table_elements as $table_element) {
         $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
+      }
+    }
+
+    // Tables with tablesorter class.
+    $tablesorter_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " tablesorter ")]');
+
+    if ($tablesorter_elements) {
+      foreach ($tablesorter_elements as $tablesorter_element) {
+        $tablesorter_element->setAttribute('class', str_replace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
       }
     }
 

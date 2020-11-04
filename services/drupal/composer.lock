@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "38772db59b43300d909f40c5c8e58622",
+    "content-hash": "cc4d7d0de13ff93476d6b3bae9ef448a",
     "packages": [
         {
             "name": "akamai-open/edgegrid-auth",
@@ -2694,7 +2694,7 @@
                 "shasum": "15c2bff3b16082d7c0c82b747472af2b956e278f"
             },
             "require": {
-                "drupal/core": "*"
+                "drupal/core": "^8"
             },
             "type": "drupal-module",
             "extra": {
@@ -2705,6 +2705,9 @@
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
                     }
+                },
+                "patches_applied": {
+                    "Do not affect permissions for non-reusable blocks": "https://www.drupal.org/files/issues/2020-11-03/block_content_permissions-ignore_non_reusable_blocks-3180549-2.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -3708,7 +3711,8 @@
                     "#3165306 - Add type column to entity revision tables": "https://www.drupal.org/files/issues/2020-09-16/add-type-on-entity-revision-tables-3165306-20.patch",
                     "Change icon for media library in CKEditor": "patches/drupal-switch-ckeditor-media-library-icon-2.patch",
                     "Improve performance of LatestRevision Views filter": "https://www.drupal.org/files/issues/2019-11-29/drupal-latest_revision_views_filter_performance-2949939-8.patch",
-                    "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch"
+                    "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch",
+                    "#3047022 - Properly handle block_content access control for revisions": "https://www.drupal.org/files/issues/2020-09-24/3047022-44.patch"
                 }
             },
             "autoload": {
@@ -4741,27 +4745,30 @@
         },
         {
             "name": "drupal/entitygroupfield",
-            "version": "1.0.0-alpha1",
+            "version": "1.0.0-alpha2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/entitygroupfield.git",
-                "reference": "1.0.0-alpha1"
+                "reference": "1.0.0-alpha2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/entitygroupfield-1.0.0-alpha1.zip",
-                "reference": "1.0.0-alpha1",
-                "shasum": "b248b49c43276e452f75c70f2b0130f2dde3a6e5"
+                "url": "https://ftp.drupal.org/files/projects/entitygroupfield-1.0.0-alpha2.zip",
+                "reference": "1.0.0-alpha2",
+                "shasum": "a6eedf0c4297f0c011a927ff0a916d57fd8c8829"
             },
             "require": {
                 "drupal/core": "^8.8 || ^9",
-                "drupal/group": "*"
+                "drupal/group": "~1.0"
+            },
+            "require-dev": {
+                "drupal/variationcache": "~1.0"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "1.0.0-alpha1",
-                    "datestamp": "1593041314",
+                    "version": "1.0.0-alpha2",
+                    "datestamp": "1598843615",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Alpha releases are not covered by Drupal security advisories."
@@ -4774,18 +4781,21 @@
             ],
             "authors": [
                 {
-                    "name": "dww",
-                    "homepage": "https://www.drupal.org/user/46549"
+                    "name": "Derek Wright",
+                    "homepage": "https://www.drupal.org/u/dww",
+                    "role": "Maintainer"
                 },
                 {
-                    "name": "jidrone",
-                    "homepage": "https://www.drupal.org/user/1769194"
+                    "name": "Ivan Duarte",
+                    "homepage": "https://www.drupal.org/u/jidrone",
+                    "role": "Co-Maintainer"
                 }
             ],
             "description": "Defines a field to view and edit the groups associated with content.",
-            "homepage": "https://www.drupal.org/project/entitygroupfield",
+            "homepage": "http://drupal.org/project/entitygroupfield",
             "support": {
-                "source": "https://git.drupalcode.org/project/entitygroupfield"
+                "source": "https://git.drupalcode.org/project/entitygroupfield",
+                "issues": "https://drupal.org/project/issues/entitygroupfield"
             }
         },
         {
@@ -7641,12 +7651,9 @@
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-3.x": "3.x-dev"
-                },
                 "drupal": {
                     "version": "8.x-3.0-alpha13",
-                    "datestamp": "1531121921",
+                    "datestamp": "1568890385",
                     "security-coverage": {
                         "status": "not-covered",
                         "message": "Alpha releases are not covered by Drupal security advisories."
@@ -7654,7 +7661,8 @@
                 },
                 "patches_applied": {
                     "Allow using 'localhost' for CNAME": "https://www.drupal.org/files/issues/2019-08-19/s3fs-localhost-3075876-2-D8.patch",
-                    "Module should initialize default credentials provider instead of instance profile when use_instance_profile is TRUE": "https://www.drupal.org/files/issues/2020-03-24/3122091-2-s3fs-default-provider.patch"
+                    "Module should initialize default credentials provider instead of instance profile when use_instance_profile is TRUE": "https://www.drupal.org/files/issues/2020-03-24/3122091-2-s3fs-default-provider.patch",
+                    "Detect https correctly": "https://www.drupal.org/files/issues/2020-11-04/s3fs-https_not_detected-3180682-3.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -7664,7 +7672,7 @@
             "authors": [
                 {
                     "name": "Abhishek Anand",
-                    "homepage": "https://www.drupal.org/user/2655479",
+                    "homepage": "https://www.drupal.org/user/213194",
                     "email": "fly2abhishek@gmail.com"
                 },
                 {
@@ -9441,36 +9449,32 @@
         },
         {
             "name": "drupal/webform_migrate",
-            "version": "1.1.0",
+            "version": "dev-1.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/webform_migrate.git",
-                "reference": "8.x-1.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/webform_migrate-8.x-1.1.zip",
-                "reference": "8.x-1.1",
-                "shasum": "09ac96f73429cfae2b5e47be9557a1e9ccea4fcb"
+                "reference": "2638e99160dcad1f9a1d4484cbd0e8435ed3cb0c"
             },
             "require": {
-                "drupal/core": "~8.0",
+                "drupal/core": "^8.8 || ^9",
                 "drupal/webform": "*",
                 "drupal/webform_node": "*"
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
                 "drupal": {
-                    "version": "8.x-1.1",
-                    "datestamp": "1547087580",
+                    "version": "8.x-1.1+10-dev",
+                    "datestamp": "1597007792",
                     "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
                     }
                 },
                 "patches_applied": {
-                    "Multiple states not showing on webform migrate": "https://www.drupal.org/files/issues/2019-11-04/multiple_states_not_showing_on_webform_migrate-3092123-13338162.patch",
-                    "When migrating conditions, skip states that don't exist in D8": "https://www.drupal.org/files/issues/2020-07-06/condition-unsupported-flag.patch"
+                    "Properly encode YAML string values": "patches/webform-migrate-d7-yaml-encoding.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -9478,6 +9482,10 @@
                 "GPL-2.0+"
             ],
             "authors": [
+                {
+                    "name": "andriyun",
+                    "homepage": "https://www.drupal.org/user/1277538"
+                },
                 {
                     "name": "heshanlk",
                     "homepage": "https://www.drupal.org/user/199102"
@@ -9499,7 +9507,8 @@
             "support": {
                 "source": "http://cgit.drupalcode.org/webform_migrate",
                 "issues": "http://drupal.org/project/issues/webform_migrate"
-            }
+            },
+            "time": "2020-08-09T20:56:14+00:00"
         },
         {
             "name": "drupal/webform_node",
@@ -14529,6 +14538,7 @@
         "drupal/user_permission_condition": 20,
         "drupal/views_ajax_get": 5,
         "drupal/viewsreference_filter": 15,
+        "drupal/webform_migrate": 20,
         "drupal/workflow_buttons": 10
     },
     "prefer-stable": true,

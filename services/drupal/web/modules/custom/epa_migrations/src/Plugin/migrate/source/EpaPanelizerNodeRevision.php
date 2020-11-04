@@ -31,7 +31,7 @@ class EpaPanelizerNodeRevision extends NodeRevision {
     // * six_pack
     // Exclude nodes that use the twocol_page layout for all node types except
     // web_area.
-    $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id');
+    $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
     $query->innerJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->condition('pe.did', 0, '<>');
     $query->condition('pd.layout', 'onecol_page', '<>');
@@ -89,6 +89,8 @@ class EpaPanelizerNodeRevision extends NodeRevision {
     $did = $this->select('panelizer_entity', 'pe')
       ->fields('pe', ['did'])
       ->condition('pe.revision_id', $row->getSourceProperty('vid'))
+      ->condition('pe.entity_id', $row->getSourceProperty('nid'))
+      ->condition('pe.entity_type', 'node')
       ->execute()
       ->fetchField();
 
