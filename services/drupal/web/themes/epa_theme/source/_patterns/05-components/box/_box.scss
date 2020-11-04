@@ -24,8 +24,19 @@ div.box__title {
   @extend %h3;
 }
 
+.box__image-link {
+  &:not([href=''], [href*='.gov'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com']) {
+    @extend .external-link--image;
+  }
+
+  &::after {
+    @extend %external-link--image-after;
+  }
+}
+
 %box--with-borders {
   > .box__title,
+  > .box__image-link > .box__image,
   > .box__image,
   > .box__content,
   > .box__footer {
@@ -33,14 +44,28 @@ div.box__title {
   }
 
   > .box__title,
+  > .box__title > .box__title-link,
   > .box__content,
   > .box__footer {
     padding: rem(units(2));
   }
 
+  > .box__title > .box__title-link {
+    display: block;
+    margin: rem(units(2)) * -1;
+
+    &::after {
+      @include svg-background-important(external-link--white);
+    }
+  }
+
   > .box__title,
   > .box__footer {
     background-color: gesso-grayscale(gray-5);
+    color: gesso-grayscale(white);
+  }
+
+  > .box__title > .box__title-link {
     color: gesso-grayscale(white);
   }
 
@@ -50,10 +75,14 @@ div.box__title {
     text-align: center;
   }
 
-  > .box__image {
+  > .box__image,
+  > .box__image-link > .box__image {
     border-bottom: 0;
     margin: 0;
+  }
 
+  > .box__image,
+  > .box__image-link {
     + .box__content {
       border-top: 0;
     }

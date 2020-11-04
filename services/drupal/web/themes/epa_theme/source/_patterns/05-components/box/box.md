@@ -13,6 +13,7 @@ __Variables:__
   * url: [string] URL for title link.
   * icon: [string] Name of icon to the left of the title.
   * text: [string] Title text.
+* image_url: [string] URL for image link.
 * img: [array] Image properties.
   * small: [array] Small image properties.
     * src: [string] Small image source.
