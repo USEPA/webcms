@@ -248,7 +248,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($page_top_links as $link) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($link);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 
@@ -275,7 +277,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($exit_epa_links as $link) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($link);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 
@@ -302,7 +306,9 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($pdf_disclaimer_elements as $element) {
         // Delete the element and any parent elements that are now empty.
         $element_to_remove = $this->determineElementToRemove($element);
-        $element_to_remove->parentNode->removeChild($element_to_remove);
+        if ($element_to_remove->parentNode) {
+          $element_to_remove->parentNode->removeChild($element_to_remove);
+        }
       }
     }
 

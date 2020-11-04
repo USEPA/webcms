@@ -801,9 +801,9 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
 // Optionally serve our S3 files off the same domain as the site.
 // We'll be doing this in production using Akamai to proxy the requests to S3.
-if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_URL')) {
+if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
   $config['s3fs.settings']['use_cname'] = TRUE;
-  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_URL') .'/sites/default/files';
+  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default/files';
 }
 
 $settings['s3fs.use_s3_for_public'] = TRUE;
