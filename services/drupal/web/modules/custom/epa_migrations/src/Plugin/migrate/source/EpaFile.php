@@ -4,6 +4,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\source;
 
 use Drupal\file\Plugin\migrate\source\d7\File;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Row;
 
 /**
  * EPA Drupal 7 file source from database. Limit to files that are used.
@@ -34,6 +35,19 @@ class EpaFile extends File {
     // Call our grandparent's initailzeIterator(). Calling our parent's iterator
     // would overwrite the changes made above.
     return SqlBase::initializeIterator();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function prepareRow(Row $row) {
+    if (!parent::prepareRow($row)) {
+      return FALSE;
+    }
+
+    // filename is just based on the uri
+    $row->setSourceProperty('filename', basename($row->getSourceProperty('uri')));
+    return TRUE;
   }
 
 }
