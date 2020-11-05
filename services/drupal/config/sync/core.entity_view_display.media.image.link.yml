@@ -11,7 +11,7 @@ dependencies:
     - field.field.media.image.field_media_image
     - media.type.image
   module:
-    - image
+    - epa_wysiwyg
     - layout_builder
     - media_inline_embed
 third_party_settings:
@@ -26,21 +26,13 @@ bundle: image
 mode: link
 content:
   field_media_image:
-    weight: 1
-    label: hidden
-    settings:
-      image_style: ''
-    third_party_settings: {  }
-    type: image_url
-    region: content
-  name:
-    type: string
     weight: 0
-    region: content
     label: hidden
     settings:
-      link_to_entity: false
+      show_extension: 0
     third_party_settings: {  }
+    type: epa_media_file_link_formatter
+    region: content
 hidden:
   created: true
   entitygroupfield: true
@@ -50,6 +42,7 @@ hidden:
   field_limit_file_accessibility: true
   group_content: true
   langcode: true
+  name: true
   search_api_excerpt: true
   thumbnail: true
   uid: true
