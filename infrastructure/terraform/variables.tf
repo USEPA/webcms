@@ -369,3 +369,9 @@ variable "saml-idp-cert" {
   description = "Public x509 certificate of the IdP."
   type        = string
 }
+
+variable "saml-force-saml-login" {
+  description = "When set to true, users are redirected when visiting the Drupal login page and instead required to login via SAML."
+  type        = bool
+  default     = false
+}
