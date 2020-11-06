@@ -14,12 +14,13 @@ label: 'Nodes (Webform)'
 source:
   plugin: epa_node
   node_type: webform
-
+  constants:
+    formatted_webform_prefix: 'webform_'
 process:
   nid:
     -
       plugin: get
-      source: tnid
+      source: nid
   vid:
     -
       plugin: get
@@ -73,10 +74,6 @@ process:
     -
       plugin: get
       source: timestamp
-  comment_node_webform/0/status:
-    -
-      plugin: get
-      source: comment
   _html_paragraphs:
     plugin: migration_lookup
     migration: upgrade_d7_node_webform_paragraph_html
@@ -153,6 +150,12 @@ process:
       process:
         moderation_state: 'moderation_state'
         value: 'value'
+  webform:
+    -
+      plugin: concat
+      source:
+        - constants/formatted_webform_prefix
+        - nid
   moderation_state:
     -
       plugin: get
