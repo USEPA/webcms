@@ -46,6 +46,7 @@ locals {
     { name = "WEBCMS_SAML_IDP_SSO_URL", value = var.saml-idp-sso-url },
     { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml-idp-slo-url },
     { name = "WEBCMS_SAML_IDP_CERT", value = var.saml-idp-cert },
+    { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml-force-saml-login ? "1" : "0" },
   ]
 
   # Secrets Manager bindings for Drupal containers

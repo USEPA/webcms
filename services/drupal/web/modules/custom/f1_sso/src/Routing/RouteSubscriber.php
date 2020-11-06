@@ -12,7 +12,12 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   protected function alterRoutes(RouteCollection $collection) {
     if (Settings::get('f1_sso_enabled', FALSE)) {
-      if (($route = $collection->get('user.login'))) {
+      foreach (['user.login.http', 'user.pass.http', 'user.pass'] as $routename) {
+        if ($route = $collection->get($routename)) {
+          $route->setRequirement('_access', 'FALSE');
+        }
+      }
+      if ($route = $collection->get('user.login')) {
         $route->setDefaults(['_controller' => '\\Drupal\\f1_sso\\Controller\\SSOController::userLogin']);
         $route->setOption('no_cache', TRUE);
       }
