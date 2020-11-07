@@ -36,9 +36,8 @@ steps:
   - label: ":terraform: Apply"
     key: apply-$WEBCMS_ENVIRONMENT
 
-    # Only allow one Terraform run at a time, regardless of branch. Terraform takes out a
-    # lock during plans or applies, so this avoids contention with feature branch builds.
-    concurrency_group: epa-webcms-d8/terraform
+    # Perform Terraform runs gated by workspace - each workspace's locks are independent.
+    concurrency_group: epa-webcms-d8/terraform-$WEBCMS_WORKSPACE
     concurrency: 1
 
     plugins:

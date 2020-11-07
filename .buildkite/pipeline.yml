@@ -39,3 +39,11 @@ steps:
     env:
       WEBCMS_ENVIRONMENT: espanol
       WEBCMS_WORKSPACE: espanol
+
+  - label: ":pipeline: QA"
+    if: build.branch == "main" && build.pull_request.id == null
+
+    command: buildkite-agent pipeline upload .buildkite/deploy.yml
+    env:
+      WEBCMS_ENVIRONMENT: qa
+      WEBCMS_WORKSPACE: qa
