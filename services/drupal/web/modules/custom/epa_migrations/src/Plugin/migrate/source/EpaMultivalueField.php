@@ -15,6 +15,7 @@ use Drupal\migrate\MigrateException;
  *
  * @MigrateSource(
  *   id = "epa_multivalue_field",
+ *   source_module = "field"
  * )
  */
 class EpaMultivalueField extends DrupalSqlBase {

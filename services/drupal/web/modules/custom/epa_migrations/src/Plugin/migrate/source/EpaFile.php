@@ -10,7 +10,8 @@ use Drupal\migrate\Row;
  * EPA Drupal 7 file source from database. Limit to files that are used.
  *
  * @MigrateSource(
- *   id = "epa_d7_file"
+ *   id = "epa_d7_file",
+ *   source_module = "file"
  * )
  */
 class EpaFile extends File {

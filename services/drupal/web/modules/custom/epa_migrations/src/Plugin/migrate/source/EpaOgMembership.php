@@ -16,6 +16,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  *
  * @MigrateSource(
  *   id = "epa_og_membership",
+ *   source_module= "epa_og"
  * )
  */
 class EpaOgMembership extends DrupalSqlBase {

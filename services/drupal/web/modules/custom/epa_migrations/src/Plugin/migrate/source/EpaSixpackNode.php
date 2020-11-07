@@ -12,6 +12,7 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  *
  * @MigrateSource(
  *   id = "epa_sixpack_node",
+ *   source_module = "node"
  * )
  */
 class EpaSixpackNode extends Node {

@@ -10,6 +10,7 @@ use Drupal\migrate\Row;
  *
  * @MigrateSource(
  *   id = "epa_og_menu_link",
+ *    source_module = "menu"
  * )
  */
 class EpaOgMenuLink extends MenuLink {
