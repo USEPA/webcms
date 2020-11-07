@@ -10,6 +10,7 @@ use Drupal\migrate\Row;
  *
  * @MigrateSource(
  *   id = "epa_web_area",
+ *   source_module = "node"
  * )
  */
 class EpaWebArea extends Node {

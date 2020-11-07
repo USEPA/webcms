@@ -11,6 +11,7 @@ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
  *
  * @MigrateSource(
  *   id = "epa_node",
+ *   source_module = "node"
  * )
  */
 class EpaNode extends Node {

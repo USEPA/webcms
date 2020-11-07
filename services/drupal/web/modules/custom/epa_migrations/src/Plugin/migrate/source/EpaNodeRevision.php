@@ -10,6 +10,7 @@ use Drupal\migrate\Row;
  *
  * @MigrateSource(
  *   id = "epa_node_revision",
+ *   source_module = "node"
  * )
  */
 class EpaNodeRevision extends NodeRevision {

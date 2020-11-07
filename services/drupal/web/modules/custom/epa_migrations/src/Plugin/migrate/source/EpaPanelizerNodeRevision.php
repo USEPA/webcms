@@ -10,6 +10,7 @@ use Drupal\migrate\Row;
  *
  * @MigrateSource(
  *   id = "epa_panelizer_node_revision",
+ *   source_module = "node"
  * )
  */
 class EpaPanelizerNodeRevision extends NodeRevision {

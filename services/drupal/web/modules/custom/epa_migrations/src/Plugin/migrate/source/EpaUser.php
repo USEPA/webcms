@@ -10,6 +10,7 @@ use Drupal\migrate\Row;
  *
  * @MigrateSource(
  *   id = "epa_user",
+ *   source_module = "user"
  * )
  */
 class EpaUser extends User {
