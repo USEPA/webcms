@@ -47,9 +47,8 @@ steps:
 
   - label: ":terraform: Plan"
 
-    # Only allow one Terraform run at a time (Terraform takes out a lock in DynamoDB when
-    # it plans)
-    concurrency_group: epa-webcms-d8/terraform
+    # Only allow one Terraform run at a time on a per-workspace basis.
+    concurrency_group: epa-webcms-d8/terraform-$WEBCMS_WORKSPACE
     concurrency: 1
 
     plugins:
