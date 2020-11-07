@@ -32,7 +32,7 @@ class EpaMigrationsSubscriber implements EventSubscriberInterface {
   public function __construct() {
     $this->staticCache = &drupal_static('epa_node_migration');
 
-    $this->pregPatternNodeMigrations = '/upgrade_d7_node_.*|upgrade_d7_group_content_node|upgrade_d7_webform/';
+    $this->pregPatternNodeMigrations = '/upgrade_d7_node_.*|upgrade_d7_group_content_*|upgrade_d7_webform_.*/';
   }
 
   /**
