@@ -5,21 +5,29 @@
 #
 # Terraform's random provider is somewhat strange if you're not used to it: it stores
 # the randomly-generated value in its state in order to ensure that the value is consistent
-# between plan/apply runs (that is, it's only ever generated once). It's possible to force
-# Terraform to generate a new random ID by using the taint command:
-#
-# $ terraform taint random_pet.capacity_provider
-#
-# This causes Terraform to mark the value as needing regeneration on its next run.
+# between plan/apply runs (that is, it's only ever generated once). If there is more
 #
 # Further reading:
 # * https://www.terraform.io/docs/providers/aws/r/ecs_capacity_provider.html
 # * https://www.terraform.io/docs/providers/random/index.html
 
+# Save scaling factors as locals because we use them for keepers
+locals {
+  # Scale by 2 EC2s or 10% of the group's max capacity, whichever is greater
+  ecs-min-step-size = max(2, ceil(0.10 * var.server-max-capacity))
+
+  ecs-max-step-size = var.server-max-capacity
+}
+
 resource "random_pet" "capacity_provider" {
   # A length of 2 gives us a pet name plus an adjective, which can hopefully give a
   # useful mnemonic when looking at the capacity provider list.
   length = 2
+
+  keepers = {
+    minimum_scaling_step_size = local.ecs-min-step-size
+    maximum_scaling_step_size = local.ecs-max-step-size
+  }
 }
 
 # Create the cluster's capacity provider first
@@ -36,9 +44,8 @@ resource "aws_ecs_capacity_provider" "cluster_capacity" {
       # Aim for 75% utilization of the autoscaling group
       target_capacity = 75
 
-      # Scale by 2 EC2s or 10% of the group's max capacity, whichever is greater
-      minimum_scaling_step_size = max(2, ceil(0.10 * var.server-max-capacity))
-      maximum_scaling_step_size = var.server-max-capacity
+      minimum_scaling_step_size = local.ecs-min-step-size
+      maximum_scaling_step_size = local.ecs-max-step-size
     }
 
     # managed_termination_protection = "ENABLED"
