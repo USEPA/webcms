@@ -108,6 +108,13 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->moderationEntity = $moderation_entity;
     $this->setContentEntityRevision();
     $this->contentEntityRevision->setSyncing(TRUE);
+    $revision_log = $this->contentEntityRevision->revision_log->value;
+    if (!$this->contentEntityRevision->isNewRevision() && $this->contentEntityRevision->revision_log->value == '')  {
+      // Have to set this in order to avoid having empty log messages set to
+      // the value of the current default revision when re-saving non-default revisions.
+      // We're fighting code in core's Node::preSaveRevision()
+      $this->contentEntityRevision->revision_log->setValue(' ');
+    }
     if (isset($this->contentEntityRevision->epa_revision_automated->value) && $this->contentEntityRevision->epa_revision_automated->value) {
       $this->isAutomated = TRUE;
       $this->contentEntityRevision->set('epa_revision_automated', NULL);
