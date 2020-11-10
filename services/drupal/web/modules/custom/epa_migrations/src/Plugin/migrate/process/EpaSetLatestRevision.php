@@ -127,6 +127,9 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     // Initialize state mapping for state names that differ from d7 to d8.
     $state_map = [
       'draft_review' => 'draft_needs_review',
+      'published_review' => 'published_needs_review',
+      'published_expire' => 'published_day_til_expire',
+      'queued_for_archive' => 'published_expiring',
     ];
 
     // Load current revision in both D7 and D8 for a given node, compare vids.
