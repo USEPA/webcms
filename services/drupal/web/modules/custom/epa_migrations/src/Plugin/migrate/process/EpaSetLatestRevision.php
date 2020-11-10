@@ -11,6 +11,7 @@ use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Drupal\node\Entity\Node;
 use Drupal\pathauto\PathautoState;
+use Drupal\redirect\Exception\RedirectLoopException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -221,7 +222,14 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
    */
   private function pathautoOn(Node $node) {
     $node->set('path', ['pathauto' => PathautoState::CREATE]);
-    $node->save();
+
+    try {
+      $node->save();
+    }
+    catch (RedirectLoopException $e) {
+      $this->logger->notice('There was a problem enabling pathauto for nid: %nid. Caught RedirectLoopException: %message', ['%nid' => $node->id(), '%message' => $e->getMessage()]);
+    }
+
   }
 
 }
