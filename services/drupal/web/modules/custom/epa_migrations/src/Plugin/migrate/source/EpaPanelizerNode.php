@@ -86,7 +86,7 @@ class EpaPanelizerNode extends Node {
         'published_review' => 'published_needs_review',
         'published_expire' => 'published_day_til_expire',
         'draft_review' => 'draft_needs_review',
-        'queued_for_archive' => 'published_expiring',
+        'queued_for_archive' => 'unpublished',
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
