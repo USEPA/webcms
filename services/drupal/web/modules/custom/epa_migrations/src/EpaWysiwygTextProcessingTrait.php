@@ -662,7 +662,7 @@ trait EpaWysiwygTextProcessingTrait {
     $xpath = new \DOMXPath($doc);
 
     // Pullquote elements.
-    $elements = $xpath->query('//p[contains(concat(" ", @class, " "), " pullquote ")]');
+    $elements = $xpath->query('//*[contains(concat(" ", @class, " "), " pullquote ")]');
 
     if ($elements) {
       foreach ($elements as $element) {
@@ -671,7 +671,9 @@ trait EpaWysiwygTextProcessingTrait {
 
         // Extract the citation.
         $citation_element = $xpath->query('span[contains(concat(" ", @class, " " ), " author ")]');
-        $citation = str_replace('—', '', $citation_element->firstChild->nodeValue);
+        if ($citation_element) {
+          $citation = str_replace('—', '', $citation_element->firstChild->nodeValue);
+        }
 
         // Build the new element.
         if ($citation) {
