@@ -140,6 +140,18 @@ resource "aws_launch_template" "utility" {
     name = aws_iam_instance_profile.utility_profile.name
   }
 
+  block_device_mappings {
+    device_name = "/dev/xvda"
+
+    ebs {
+      encrypted             = true
+      kms_key_id            = var.encryption-at-rest-key
+      volume_size           = 32
+      volume_type           = "gp2"
+      delete_on_termination = true
+    }
+  }
+
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Utility"
   })
