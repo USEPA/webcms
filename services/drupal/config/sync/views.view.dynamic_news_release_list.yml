@@ -17,6 +17,7 @@ dependencies:
     - taxonomy
     - user
     - views_autocomplete_filters
+    - views_custom_cache_tag
 id: dynamic_news_release_list
 label: 'Dynamic List: News Releases'
 module: views
@@ -36,8 +37,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:news_release'
       query:
         type: views_query
         options:

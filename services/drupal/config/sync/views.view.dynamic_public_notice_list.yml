@@ -18,6 +18,7 @@ dependencies:
     - taxonomy
     - user
     - views_autocomplete_filters
+    - views_custom_cache_tag
 id: dynamic_public_notice_list
 label: 'Dynamic List: Public Notices'
 module: views
@@ -37,12 +38,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: time
+        type: custom_tag
         options:
-          results_lifespan: 3600
-          results_lifespan_custom: 0
-          output_lifespan: 3600
-          output_lifespan_custom: 0
+          custom_tag: 'node_list:public_notice'
       query:
         type: views_query
         options:

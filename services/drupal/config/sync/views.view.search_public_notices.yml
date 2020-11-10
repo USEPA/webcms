@@ -8,6 +8,7 @@ dependencies:
     - search_api
     - user
     - views_autocomplete_filters
+    - views_custom_cache_tag
 id: search_public_notices
 label: 'Search Public Notices'
 module: views
@@ -27,8 +28,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:public_notice'
       query:
         type: views_query
         options:
@@ -298,8 +300,9 @@ display:
           ajax_get: false
       path: publicnotices/notices-search
       cache:
-        type: search_api_tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:public_notice'
       defaults:
         cache: false
       exposed_block: true

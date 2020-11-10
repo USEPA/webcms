@@ -16,6 +16,7 @@ dependencies:
     - taxonomy
     - user
     - views_autocomplete_filters
+    - views_custom_cache_tag
 id: dynamic_faq_list
 label: 'Dynamic List: Frequent Questions'
 module: views
@@ -35,8 +36,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:faq'
       query:
         type: views_query
         options:

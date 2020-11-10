@@ -8,6 +8,7 @@ dependencies:
     - search_api
     - user
     - views_autocomplete_filters
+    - views_custom_cache_tag
 id: search_faqs
 label: 'Search FAQs'
 module: views
@@ -27,8 +28,9 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: search_api_tag
-        options: {  }
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:faq'
       query:
         type: views_query
         options:
@@ -285,7 +287,9 @@ display:
       path: faqs/search
       exposed_block: true
       cache:
-        type: none
+        type: custom_tag
+        options:
+          custom_tag: 'node_list:faq'
       defaults:
         cache: false
     cache_metadata:
