@@ -102,33 +102,46 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
-    $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
-    preg_match($pattern, $wysiwyg_content, $matches);
+    $pattern = '/\[\[(.+?"type":"media".+?)\]\]/s';
+    $split = preg_split($pattern, $wysiwyg_content, 2, PREG_SPLIT_DELIM_CAPTURE);
+    /**
+     * $split is:
+     *   [0 => before string, 1 => captured JSON, 2 => after string]
+     * OR:
+     *   [0 => full string]
+     * OR:
+     *   false
+     */
 
-    if ($matches['tag_info']) {
+    if ($split && count($split) === 3) {
+      list( $before, $captured, $after) = $split;
       try {
         $decoder = new JsonDecode(TRUE);
-        $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
+        $tag_info = $decoder->decode($captured, JsonEncoder::FORMAT);
         if ($tag_info['view_mode'] == 'block_header') {
           $block_header = [
             'target_id' => $tag_info['fid'],
             'alt' => $tag_info['attributes']['alt'],
           ];
 
+          $wysiwyg_content = $before . $after;
+          // TODO remove empty anchor link, set block_header_url to its href
+
           return [
-            'block_header' => $block_header,
-            'wysiwyg_content' => str_replace('[[' . $matches['tag_info'] . ']]', '', $wysiwyg_content),
+            'block_header_img' => $block_header,
+            // TODO Add 'block_header_url'
+            'wysiwyg_content' => $wysiwyg_content,
           ];
         }
 
       }
       catch (\Exception $e) {
-        \Drupal::logger('epa_migrations')->notice('Caught exception: ' . $e->getMessage() . ' while trying to process this json: ' . $matches['tag_info']);
+        \Drupal::logger('epa_migrations')->notice('Caught exception: ' . $e->getMessage() . ' while trying to process this json: ' . $captured);
       }
     }
 
     return [
-      'block_header' => NULL,
+      'block_header_img' => NULL,
       'wysiwyg_content' => $wysiwyg_content,
     ];
   }

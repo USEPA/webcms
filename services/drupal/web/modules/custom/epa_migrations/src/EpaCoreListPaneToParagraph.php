@@ -85,7 +85,7 @@ class EpaCoreListPaneToParagraph extends EpaPaneToParagraph {
       ],
       $configuration['title'] ?? $configuration['override_title_text'] ?? '',
       $box_style,
-      $split_content['block_header']
+      $split_content['block_header_img']
     );
 
   }
