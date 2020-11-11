@@ -16,6 +16,10 @@ migration_group: migrate_drupal_7
 label: 'Set latest revision for Nodes'
 source:
   plugin: d7_node
+  high_water_property:
+    name: nid
+    alias: n
+  batch_size: 1000
 process:
   _set_latest_revision:
     -
