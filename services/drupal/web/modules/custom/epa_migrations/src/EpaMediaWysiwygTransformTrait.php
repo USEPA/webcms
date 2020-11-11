@@ -102,7 +102,7 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
-    $pattern = '/\[\[(.+?"type":"media".+?)\]\]/s';
+    $pattern = '~\[\[(.+?"type":"media".+?)\]\]~s';
     $split = preg_split($pattern, $wysiwyg_content, 2, PREG_SPLIT_DELIM_CAPTURE);
     /**
      * $split is:
@@ -124,13 +124,23 @@ TEMPLATE;
             'alt' => $tag_info['attributes']['alt'],
           ];
 
-          $wysiwyg_content = $before . $after;
-          // TODO remove empty anchor link, set block_header_url to its href
+          // If an anchor starts in $before and ends in $after, we
+          // remove the link and capture its href. Allow only whitespace
+          // other than that media object. These patterns aren't bulletproof
+          // but if they fail, it just leaves an empty link.
+          $p1 = '~(.*)<a [^>]*\bhref="([^"]+)"[^>]*>\s*~';
+          $p2 = '~\s*</a>(.*)~';
+
+          $url = NULL;
+          if (preg_match($p1, $before, $m1) && preg_match($p2, $after, $m2)) {
+            list (, $before, $url) = $m1;
+            list (, $after) = $m2;
+          }
 
           return [
+            'block_header_url' => $url,
             'block_header_img' => $block_header,
-            // TODO Add 'block_header_url'
-            'wysiwyg_content' => $wysiwyg_content,
+            'wysiwyg_content' => $before . $after,
           ];
         }
 
@@ -141,6 +151,7 @@ TEMPLATE;
     }
 
     return [
+      'block_header_url' => NULL,
       'block_header_img' => NULL,
       'wysiwyg_content' => $wysiwyg_content,
     ];
