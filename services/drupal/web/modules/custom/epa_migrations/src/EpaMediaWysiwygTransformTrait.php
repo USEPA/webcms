@@ -137,6 +137,10 @@ TEMPLATE;
             list (, $after) = $m2;
           }
 
+          if ($url !== NULL) {
+            $url = $this->normalizeUrl($url);
+          }
+
           return [
             'block_header_url' => $url,
             'block_header_img' => $block_header,
@@ -155,6 +159,22 @@ TEMPLATE;
       'block_header_img' => NULL,
       'wysiwyg_content' => $wysiwyg_content,
     ];
+  }
+
+  protected function normalizeUrl($url) {
+    if (preg_match('~^https?:~', $url)) {
+      return $url;
+    }
+
+    if (preg_match('~^//([^/]+)/(.*)~', $url, $matches)) {
+      // Protocol-relative, uncommon but valid
+      list (, $domain, $path) = $matches;
+      return "https://$domain/$path";
+    }
+
+    // Assume internal. This will turn relative paths to absolute,
+    // but there's nothing we can really do about that.
+    return "internal:/" . ltrim($url, '/');
   }
 
 }
