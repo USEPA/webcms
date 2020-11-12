@@ -153,6 +153,18 @@ TEMPLATE;
             $url = $this->normalizeUrl($url);
           }
 
+          // Let's try to remove the surrounding figure div as well
+          $p1 = '~(.*)<div [^>]*\bclass="([^"]+)"[^>]*>\s*~';
+          $class_pattern = '~\bfigure\b~';
+          $p2 = '~\s*</div>(.*)~';
+          if (preg_match($p1, $before, $m1)
+            && preg_match($class_pattern, $m1[2])
+            && preg_match($p2, $after, $m2)
+          ) {
+            list (, $before) = $m1;
+            list (, $after) = $m2;
+          }
+
           return [
             'block_header_url' => $url,
             'block_header_img' => $block_header,
