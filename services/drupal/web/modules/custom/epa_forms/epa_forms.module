@@ -8,6 +8,7 @@
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\webform\Entity\Webform;
 
@@ -153,4 +154,41 @@ function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
     return;
   }
   return \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+}
+
+/**
+ * Implements hook_token_info().
+ *
+ * Define custom EPA forms tokens.
+ */
+function epa_forms_token_info() {
+  $info['tokens']['site']['web-form-confirmation-message'] = array(
+    'name' => t('Webform: Confirmation message'),
+    'description' => t('The default confirmation message for webforms.'),
+  );
+
+  return $info;
+}
+
+
+/**
+ * Implements hook_tokens().
+ *
+ * Replace tokens with token values
+ */
+function epa_forms_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
+  $replacements = array();
+
+  if ($type == 'site') {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        // If the web form confirmation message token is found
+        case 'web-form-confirmation-message':
+          $replacements[$original] = $message = \Drupal::config('webform.settings')->get('settings')['default_confirmation_message'];
+          break;
+      }
+    }
+  }
+
+  return $replacements;
 }
