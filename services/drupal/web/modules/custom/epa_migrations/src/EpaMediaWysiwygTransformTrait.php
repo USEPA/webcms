@@ -115,6 +115,18 @@ TEMPLATE;
 
     if ($split && count($split) === 3) {
       list( $before, $captured, $after) = $split;
+      if (strpos($captured, '}]]') !== false) {
+        // Well, this is embarrassing. The pattern captured past the first media block's
+        // closing }]] and matched "type":"media" in a second block. We're just going to
+        // bail because the case we care about starts with a block_header first.
+        // TODO split by the pattern ~(\[\[{|}\]\])~ and use a state machine to process.
+        return [
+          'block_header_url' => NULL,
+          'block_header_img' => NULL,
+          'wysiwyg_content' => $wysiwyg_content,
+        ];
+      }
+
       try {
         $decoder = new JsonDecode(TRUE);
         $tag_info = $decoder->decode($captured, JsonEncoder::FORMAT);
