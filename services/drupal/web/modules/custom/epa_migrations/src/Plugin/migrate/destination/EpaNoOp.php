@@ -40,7 +40,13 @@ class EpaNoOp extends DestinationBase {
    * {@inheritdoc}
    */
   public function getIds() {
-    return [];
+    return [
+      'id' => [
+        'type' => 'integer',
+        'unsigned' => FALSE,
+        'size' => 'big',
+      ],
+    ];
   }
 
   /**
@@ -54,9 +60,7 @@ class EpaNoOp extends DestinationBase {
    * {@inheritdoc}
    */
   public function import(Row $row, array $old_destination_id_values = []) {
-    // The no-op always succeeds. Returning TRUE here prevents a 'failed'
-    // being thrown. However, it also gives no indication of progress.
-    return TRUE;
+    return $row->getSourceIdValues() ?? TRUE;
   }
 
 }
