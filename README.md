@@ -30,6 +30,14 @@
 
 9. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
+# Testing migrations
+
+To load a D7 DB copy for testing:
+
+```
+gunzip < cleaned-d7-db.sql.gz | f1 drush sqlc --db-url mysql://web_d7:web_d7@mysql:3306/web_d7
+```
+
 # Other READMEs
 
 - Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
