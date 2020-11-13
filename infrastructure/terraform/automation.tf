@@ -216,7 +216,7 @@ locals {
       Api              = "DescribeInstanceStatus"
       PropertySelector = "$.InstanceStatuses[0].InstanceStatus.Details[0].Status"
       DesiredValues    = ["passed"]
-      InstanceIds      = ["{{ runInstances.InstanceIds }}"]
+      InstanceIds      = ["{{ runInstance.InstanceIds }}"]
     }
   }
 
