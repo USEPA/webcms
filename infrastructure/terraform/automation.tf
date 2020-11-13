@@ -179,11 +179,12 @@ locals {
       InstanceType           = "t3a.small"
       IamInstanceProfileName = aws_iam_instance_profile.ec2_automation_profile.name
 
-      # Use the same security group settings as the utility instance; we need to access
-      # S3 and the RDS proxy but nothing else in the VPC.
+      # Use the automated server security group and also grant access to the RDS proxy
+      # and VPC interfaces.
       SecurityGroupIds = [
-        aws_security_group.utility.id,
+        aws_security_group.automation.id,
         aws_security_group.proxy_access.id,
+        aws_security_group.interface_access.id,
       ]
 
       # Use a large ephemeral volume due to the large size of uncompressed DB dumps.
@@ -307,7 +308,7 @@ resource "aws_ssm_document" "d7_load_database" {
           # 3. Obtain the D7 login credentials
           # 4. Load the dump into MySQL through the RDS proxy
           Parameters = {
-            executionTimeOut = tostring(8 * 60 * 60)
+            executionTimeout = tostring(8 * 60 * 60)
             workingDirectory = "/tmp"
             commands         = <<-EOF
               set -euo pipefail
@@ -407,7 +408,7 @@ resource "aws_ssm_document" "d8_dump_database" {
           # 4. Compress the database
           # 5. Upload the compressed file to S3
           Parameters = {
-            executionTimeOut = tostring(8 * 60 * 60)
+            executionTimeout = tostring(8 * 60 * 60)
             workingDirectory = "/tmp"
             commands         = <<-EOF
               set -euo pipefail

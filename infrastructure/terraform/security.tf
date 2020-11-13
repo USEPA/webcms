@@ -569,3 +569,34 @@ resource "aws_security_group_rule" "search_access_ingress" {
 
   source_security_group_id = aws_security_group.search_access.id
 }
+
+# Security group for automated EC2 instances. They need arbitrary outbound HTTP in order
+# to be able to access AWS APIs that we have not yet provided VPC interfaces for.
+resource "aws_security_group" "automation" {
+  name        = "webcms-automation-${local.env-suffix}"
+  description = "Security group for automated EC2 instances"
+
+  vpc_id = local.vpc-id
+
+  egress {
+    description = "Allow outbound HTTP"
+
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow outbound HTTPS"
+
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} Automated Instances"
+  })
+}
