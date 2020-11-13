@@ -30,7 +30,7 @@ widget:
     show_reset_link: false
     reset_text: 'Show all'
     hide_reset_when_no_selection: false
-query_operator: and
+query_operator: or
 use_hierarchy: false
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
@@ -44,12 +44,6 @@ processor_configs:
       sort: 20
     settings:
       sort: ASC
-  count_widget_order:
-    processor_id: count_widget_order
-    weights:
-      sort: 30
-    settings:
-      sort: DESC
   date_item:
     processor_id: date_item
     weights:
@@ -58,12 +52,12 @@ processor_configs:
       date_display: actual_date
       granularity: 5
       date_format: ''
-  display_value_widget_order:
-    processor_id: display_value_widget_order
+  raw_value_widget_order:
+    processor_id: raw_value_widget_order
     weights:
-      sort: 40
+      sort: 50
     settings:
-      sort: ASC
+      sort: DESC
   url_processor_handler:
     processor_id: url_processor_handler
     weights:

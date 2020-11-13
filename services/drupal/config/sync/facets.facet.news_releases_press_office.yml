@@ -23,14 +23,14 @@ widget:
   type: links
   config:
     show_numbers: true
-    soft_limit: 5
+    soft_limit: 0
     soft_limit_settings:
       show_less_label: 'Show less'
       show_more_label: 'Show more'
     show_reset_link: false
     reset_text: 'Show all'
     hide_reset_when_no_selection: false
-query_operator: and
+query_operator: or
 use_hierarchy: true
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
@@ -43,17 +43,11 @@ processor_configs:
     weights:
       sort: 20
     settings:
-      sort: ASC
-  count_widget_order:
-    processor_id: count_widget_order
-    weights:
-      sort: 30
-    settings:
       sort: DESC
-  display_value_widget_order:
-    processor_id: display_value_widget_order
+  term_weight_widget_order:
+    processor_id: term_weight_widget_order
     weights:
-      sort: 40
+      sort: 60
     settings:
       sort: ASC
   translate_entity:
