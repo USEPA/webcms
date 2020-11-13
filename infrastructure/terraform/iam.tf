@@ -729,7 +729,7 @@ data "aws_iam_policy_document" "user_automation_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.aws-region}:${data.aws_account_id.current.id}:*"
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:*"
     ]
   }
 
@@ -752,8 +752,8 @@ data "aws_iam_policy_document" "user_automation_policy" {
     ]
 
     resources = [
-      "arn:aws:ssm:${var.aws-region}:${data.aws_account_id.current.id}:document/${aws_ssm_document.d7_load_database.name}",
-      "arn:aws:ssm:${var.aws-region}:${data.aws_account_id.current.id}:document/${aws_ssm_document.d8_dump_database.name}",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/${aws_ssm_document.d7_load_database.name}",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/${aws_ssm_document.d8_dump_database.name}",
     ]
   }
 
@@ -763,8 +763,8 @@ data "aws_iam_policy_document" "user_automation_policy" {
     actions = ["ssm:StartAutomationExecution"]
 
     resources = [
-      "arn:aws:ssm:${var.aws-region}:${data.aws_account_id.current.id}:automation-definition/${aws_ssm_document.d7_load_database.name}:*",
-      "arn:aws:ssm:${var.aws-region}:${data.aws_account_id.current.id}:automation-definition/${aws_ssm_document.d8_dump_database.name}:*",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:automation-definition/${aws_ssm_document.d7_load_database.name}:*",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:automation-definition/${aws_ssm_document.d8_dump_database.name}:*",
     ]
   }
 }

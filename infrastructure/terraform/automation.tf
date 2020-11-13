@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "ssm_automation_assume_role_policy" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
-    principal {
+    principals {
       type        = "Service"
       identifiers = ["ssm.amazonaws.com"]
     }
@@ -51,7 +51,7 @@ resource "aws_iam_policy" "ssm_automation_pass_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_automation_pass_role" {
-  role       = aws_iam_role.ssm_automation.name
+  role       = aws_iam_role.ssm_automation_role.name
   policy_arn = aws_iam_policy.ssm_automation_pass_role.arn
 }
 
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "ec2_automation_assume_role_policy" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
 
-    principal {
+    principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
