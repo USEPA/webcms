@@ -717,8 +717,8 @@ data "aws_iam_policy_document" "user_automation_policy" {
 
   # To determine: can these automation execution-related permissions be further limited in scope?
   statement {
-    sid       = "viewExecutions"
-    effect    = "Allow"
+    sid    = "viewExecutions"
+    effect = "Allow"
 
     actions = [
       "ssm:DescribeAutomationExecutions",
@@ -734,9 +734,9 @@ data "aws_iam_policy_document" "user_automation_policy" {
   }
 
   statement {
-    sid = "listDocuments"
-    effect = "Allow"
-    actions = ["ssm:ListDocuments"]
+    sid       = "listDocuments"
+    effect    = "Allow"
+    actions   = ["ssm:ListDocuments"]
     resources = ["*"]
   }
 
@@ -758,8 +758,8 @@ data "aws_iam_policy_document" "user_automation_policy" {
   }
 
   statement {
-    sid = "executeDocuments"
-    effect = "Allow"
+    sid     = "executeDocuments"
+    effect  = "Allow"
     actions = ["ssm:StartAutomationExecution"]
 
     resources = [
@@ -770,9 +770,9 @@ data "aws_iam_policy_document" "user_automation_policy" {
 }
 
 resource "aws_iam_policy" "user_automation_policy" {
-  name = "${local.role-prefix}UserAutomationExecutionPolicy"
+  name        = "${local.role-prefix}UserAutomationExecutionPolicy"
   description = "Grants permission to view and run automation documents that load and restore MySQL database dumps."
-policy = data.aws_iam_policy_document.user_automation_policy.json
+  policy      = data.aws_iam_policy_document.user_automation_policy.json
 }
 
 resource "aws_iam_group" "webcms_administrators" {
@@ -810,7 +810,7 @@ resource "aws_iam_group_policy_attachment" "webcm_administrators_s3_access" {
 }
 
 resource "aws_iam_group_policy_attachment" "webcms_administrators_automation_access" {
-  group = aws_iam_group.webcms_administrators.name
+  group      = aws_iam_group.webcms_administrators.name
   policy_arn = aws_iam_policy.user_automation_policy.arn
 }
 
