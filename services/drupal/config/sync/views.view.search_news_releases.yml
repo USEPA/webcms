@@ -8,7 +8,6 @@ dependencies:
     - search_api
     - user
     - views_autocomplete_filters
-    - views_custom_cache_tag
 id: search_news_releases
 label: 'Search News Releases'
 module: views
@@ -28,9 +27,8 @@ display:
         options:
           perm: 'access content'
       cache:
-        type: custom_tag
-        options:
-          custom_tag: 'node_list:news_release'
+        type: search_api_tag
+        options: {  }
       query:
         type: views_query
         options:
@@ -298,12 +296,8 @@ display:
           ajax_get: false
       path: newsreleases/search
       exposed_block: true
-      cache:
-        type: custom_tag
-        options:
-          custom_tag: 'node_list:news_release'
       defaults:
-        cache: false
+        cache: true
     cache_metadata:
       max-age: -1
       contexts:
