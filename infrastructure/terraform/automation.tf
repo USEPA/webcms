@@ -170,7 +170,7 @@ locals {
   # Step 1. Spawn a new EC2 instance using our automated instance profile.
   ssm-run-instance = {
     name   = "runInstance"
-    action = "aws:RunInstances"
+    action = "aws:runInstances"
 
     inputs = {
       # Start a relatively small EC2 instance running stock Amazon Linux 2.
