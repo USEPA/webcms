@@ -672,8 +672,8 @@ resource "aws_iam_policy" "user_run_tasks_policy" {
   policy      = data.aws_iam_policy_document.user_run_tasks_policy[0].json
 }
 
-# Grants read access to the uploads bucket as well as read/write access to the objects in
-# it.
+# Grants read access to the both the uploads and backups buckets, as well as read/write
+# access to the objects in them.
 data "aws_iam_policy_document" "user_s3_access_policy" {
   version = "2012-10-17"
 
@@ -692,7 +692,7 @@ data "aws_iam_policy_document" "user_s3_access_policy" {
 
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.uploads.arn]
+    resources = [aws_s3_bucket.uploads.arn, aws_s3_bucket.backups.arn]
   }
 
   statement {
@@ -700,14 +700,79 @@ data "aws_iam_policy_document" "user_s3_access_policy" {
 
     effect    = "Allow"
     actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
-    resources = ["${aws_s3_bucket.uploads.arn}/*"]
+    resources = ["${aws_s3_bucket.uploads.arn}/*", "${aws_s3_bucket.backups.arn}/*"]
   }
 }
 
 resource "aws_iam_policy" "user_s3_access_policy" {
   name        = "${local.role-prefix}UserS3AccessPolicy"
-  description = "Grants access to the uploads S3 bucket"
+  description = "Grants access to the uploads and backups buckets"
   policy      = data.aws_iam_policy_document.user_s3_access_policy.json
+}
+
+# Grants WebCMS administrators access to the Systems Manager automation documents to
+# manage the database (see automation.tf).
+data "aws_iam_policy_document" "user_automation_policy" {
+  version = "2012-10-17"
+
+  # To determine: can these automation execution-related permissions be further limited in scope?
+  statement {
+    sid    = "viewExecutions"
+    effect = "Allow"
+
+    actions = [
+      "ssm:DescribeAutomationExecutions",
+      "ssm:GetAutomationExecution",
+      "ssm:DescribeAutomationStepExecutions",
+      "ssm:ListCommands",
+      "ssm:StopAutomationExecution",
+    ]
+
+    resources = [
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:*"
+    ]
+  }
+
+  statement {
+    sid       = "listDocuments"
+    effect    = "Allow"
+    actions   = ["ssm:ListDocuments"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "viewDocuments"
+    effect = "Allow"
+
+    actions = [
+      "ssm:DescribeDocument",
+      "ssm:DescribeDocumentParameters",
+      "ssm:GetDocument",
+      "ssm:DescribeDocumentPermission",
+    ]
+
+    resources = [
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/${aws_ssm_document.d7_load_database.name}",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:document/${aws_ssm_document.d8_dump_database.name}",
+    ]
+  }
+
+  statement {
+    sid     = "executeDocuments"
+    effect  = "Allow"
+    actions = ["ssm:StartAutomationExecution"]
+
+    resources = [
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:automation-definition/${aws_ssm_document.d7_load_database.name}:*",
+      "arn:aws:ssm:${var.aws-region}:${data.aws_caller_identity.current.account_id}:automation-definition/${aws_ssm_document.d8_dump_database.name}:*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "user_automation_policy" {
+  name        = "${local.role-prefix}UserAutomationExecutionPolicy"
+  description = "Grants permission to view and run automation documents that load and restore MySQL database dumps."
+  policy      = data.aws_iam_policy_document.user_automation_policy.json
 }
 
 resource "aws_iam_group" "webcms_administrators" {
@@ -742,6 +807,11 @@ resource "aws_iam_group_policy_attachment" "webcms_administrators_secrets_access
 resource "aws_iam_group_policy_attachment" "webcm_administrators_s3_access" {
   group      = aws_iam_group.webcms_administrators.name
   policy_arn = aws_iam_policy.user_s3_access_policy.arn
+}
+
+resource "aws_iam_group_policy_attachment" "webcms_administrators_automation_access" {
+  group      = aws_iam_group.webcms_administrators.name
+  policy_arn = aws_iam_policy.user_automation_policy.arn
 }
 
 resource "aws_iam_group_policy_attachment" "webcm_administrators_run_tasks" {

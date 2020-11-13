@@ -3,6 +3,10 @@
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
+data "aws_kms_alias" "secretsmanager" {
+  name = "alias/aws/secretsmanager"
+}
+
 # We use separate definitions for the web-facing Drupal tasks and scheduled Drush cron
 # scripts for a few reasons (such as avoiding spawning nginx), so we share the values
 # here.
