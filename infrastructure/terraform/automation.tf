@@ -236,10 +236,20 @@ locals {
   }
 }
 
+# Create a random ID in order to force Terraform to recreate automation documents.
+resource "random_id" "automation" {
+  byte_length = 4
+
+  # This keeper needs to be bumped whenever an automation document changes.
+  keepers = {
+    version = 1
+  }
+}
+
 # Create an automation document that loads a D7 backup from the backups bucket into the
 # database.
 resource "aws_ssm_document" "d7_load_database" {
-  name          = "WebCMS-${local.env-title}-D7LoadDatabase"
+  name          = "WebCMS-${local.env-title}-D7LoadDatabase-${random_id.automation.hex}"
   document_type = "Automation"
 
   content = jsonencode({
@@ -349,10 +359,14 @@ resource "aws_ssm_document" "d7_load_database" {
   })
 
   tags = local.common-tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ssm_document" "d8_dump_database" {
-  name          = "WebCMS-${local.env-title}-D8DumpDatabase"
+  name          = "WebCMS-${local.env-title}-D8DumpDatabase-${random_id.automation.hex}"
   document_type = "Automation"
 
   content = jsonencode({
@@ -451,4 +465,10 @@ resource "aws_ssm_document" "d8_dump_database" {
       local.ssm-cleanup
     ]
   })
+
+  tags = local.common-tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
