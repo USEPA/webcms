@@ -307,7 +307,7 @@ resource "aws_ssm_document" "d7_load_database" {
           # 3. Obtain the D7 login credentials
           # 4. Load the dump into MySQL through the RDS proxy
           Parameters = {
-            executionTimeOut = tostring(8 * 60 * 60)
+            executionTimeout = tostring(8 * 60 * 60)
             workingDirectory = "/tmp"
             commands         = <<-EOF
               set -euo pipefail
@@ -407,7 +407,7 @@ resource "aws_ssm_document" "d8_dump_database" {
           # 4. Compress the database
           # 5. Upload the compressed file to S3
           Parameters = {
-            executionTimeOut = tostring(8 * 60 * 60)
+            executionTimeout = tostring(8 * 60 * 60)
             workingDirectory = "/tmp"
             commands         = <<-EOF
               set -euo pipefail
