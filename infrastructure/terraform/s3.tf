@@ -111,3 +111,23 @@ resource "aws_s3_bucket_policy" "elb_logs_delivery" {
   bucket = aws_s3_bucket.elb_logs.bucket
   policy = data.aws_iam_policy_document.elb_logs_access.json
 }
+
+# Create a bucket to house DB backups
+resource "aws_s3_bucket" "backups" {
+  bucket_prefix = "webcms-db-backups-${local.env-suffix}-"
+
+  tags = merge(local.common-tags, {
+    Name = "${local.name-prefix} DB Backups"
+  })
+}
+
+# As with the ELB logs bucket, this bucket is fully private. No public access should be
+# permitted.
+resource "aws_s3_bucket_public_access_block" "backups" {
+  bucket = aws_s3_bucket.backups.bucket
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}

@@ -22,3 +22,13 @@ resource "aws_cloudwatch_log_group" "agent" {
 resource "aws_cloudwatch_log_group" "fpm_metrics" {
   name = "/webcms-${local.env-suffix}/fpm-metrics"
 }
+
+# Log group for SSM automation for the D7 DB
+resource "aws_cloudwatch_log_group" "ssm_d7_automation" {
+  name = "/webcms-${local.env-suffix}/d7-automation"
+}
+
+# Log group for SSM automation for the D8 DB
+resource "aws_cloudwatch_log_group" "ssm_d8_automation" {
+  name = "/webcms-${local.env-suffix}/d8-automation"
+}

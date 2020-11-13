@@ -21,10 +21,6 @@ resource "aws_iam_role" "proxy" {
   tags = local.common-tags
 }
 
-data "aws_kms_alias" "secretsmanager" {
-  name = "alias/aws/secretsmanager"
-}
-
 data "aws_iam_policy_document" "proxy_secrets" {
   version = "2012-10-17"
 
