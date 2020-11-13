@@ -179,11 +179,12 @@ locals {
       InstanceType           = "t3a.small"
       IamInstanceProfileName = aws_iam_instance_profile.ec2_automation_profile.name
 
-      # Use the same security group settings as the utility instance; we need to access
-      # S3 and the RDS proxy but nothing else in the VPC.
+      # Use the automated server security group and also grant access to the RDS proxy
+      # and VPC interfaces.
       SecurityGroupIds = [
-        aws_security_group.utility.id,
+        aws_security_group.automation.id,
         aws_security_group.proxy_access.id,
+        aws_security_group.interface_access.id,
       ]
 
       # Use a large ephemeral volume due to the large size of uncompressed DB dumps.

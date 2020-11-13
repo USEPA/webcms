@@ -570,6 +570,8 @@ resource "aws_security_group_rule" "search_access_ingress" {
   source_security_group_id = aws_security_group.search_access.id
 }
 
+# Security group for automated EC2 instances. They need arbitrary outbound HTTP in order
+# to be able to access AWS APIs that we have not yet provided VPC interfaces for.
 resource "aws_security_group" "automation" {
   name        = "webcms-automation-${local.env-suffix}"
   description = "Security group for automated EC2 instances"
