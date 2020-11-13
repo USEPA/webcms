@@ -389,7 +389,7 @@ resource "aws_ssm_document" "d8_dump_database" {
         action = "aws:runCommand"
 
         timeoutSeconds = 8 * 60 * 60
-        onFailure      = "step:TerminateInstance"
+        onFailure      = "step:terminateInstance"
 
         inputs = {
           DocumentName = "AWS-RunShellScript"
