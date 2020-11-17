@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: RWnml2F2A0jgkT1CTBAA2PCxgQyTF96_Nlwyd-tDXsU
+  default_config_hash: 5a7ORvX_JUf9rdMnSlaRbQKlKEXcZMAiViIIhtooHaE
 id: upgrade_d7_file_entity_audio
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -67,6 +67,10 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  uid:
+    -
+      plugin: get
+      source: uid
 destination:
   plugin: 'entity:media'
   bundle: audio
