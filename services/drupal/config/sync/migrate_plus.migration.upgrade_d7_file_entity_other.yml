@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: 3yGgFGWJ99NkMC_S_gaxVVp28AmsARxBMJrYZ6imS7w
+  default_config_hash: nUBMgn3z48RYPxAWF2zNVUxe7NVaWztDrmUWY2bls6U
 id: upgrade_d7_file_entity_other
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -61,6 +61,10 @@ process:
     -
       plugin: d7_metatag_entities
       source: pseudo_d7_metatag_entities
+  uid:
+    -
+      plugin: get
+      source: uid
 destination:
   plugin: 'entity:media'
   bundle: other
