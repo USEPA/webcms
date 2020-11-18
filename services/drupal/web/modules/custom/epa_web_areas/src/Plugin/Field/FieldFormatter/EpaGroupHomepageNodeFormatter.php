@@ -20,7 +20,7 @@ use Drupal\entitygroupfield\Plugin\Field\FieldFormatter\ParentGroupFormatterTrai
  *   label = @Translation("EPA Group Homepage Node label"),
  *   description = @Translation("Display Group's homepage node, link to it if desired."),
  *   field_types = {
- *     "group_content"
+ *     "entitygroupfield"
  *   }
  * )
  */

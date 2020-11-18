@@ -23,9 +23,9 @@
   {% if display_sidenav %}
     {% if node.field_wide_template.value %}
       {% set display_sidenav = false %}
-      {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
     {% else %}
-      {{ node.group_content|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
     {% endif %}
   {% else %}
     {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
