@@ -831,8 +831,9 @@ switch ($env_lang) {
 // Disable the 'Automatically create redirects when URL aliases are changed'
 // redirect setting during migration.
 switch ($env_state) {
-  case 'run':
   case 'migration':
+    $settings['redirect.settings']['auto_redirect'] = false;
+  case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
       Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
@@ -843,8 +844,6 @@ switch ($env_state) {
     }
 
     $settings['cache']['default'] = 'cache.backend.memcache';
-  case 'migration':
-    $settings['redirect.settings']['auto_redirect'] = false;
     break;
 }
 
