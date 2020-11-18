@@ -825,10 +825,14 @@ switch ($env_lang) {
     break;
 }
 
-// Only activate Memcache if we're in the 'run' ENV_STATE. We need to do this because
+// Only activate Memcache if we're in the 'run' or 'migration' ENV_STATE. We need to do this because
 // setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
+// Disable the 'Automatically create redirects when URL aliases are changed'
+// redirect setting during migration.
 switch ($env_state) {
+  case 'migration':
+    $settings['redirect.settings']['auto_redirect'] = false;
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
