@@ -41,6 +41,22 @@ class EpaFile extends File {
   /**
    * {@inheritdoc}
    */
+  public function query() {
+    $query = parent::query();
+
+    // Remove core's timestamp sorting because this causes problems mixing
+    // with our use of fid high water mark. We don't use timestamp high water
+    // because it isn't unique, and stops/restarts can result in files being
+    // skipped.
+    $sort =& $query->getOrderBy();
+    unset($sort['f.timestamp']);
+
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row) {
     if (!parent::prepareRow($row)) {
       return FALSE;
