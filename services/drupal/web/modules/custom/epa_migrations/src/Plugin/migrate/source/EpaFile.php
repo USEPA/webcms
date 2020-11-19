@@ -44,13 +44,12 @@ class EpaFile extends File {
   public function query() {
     $query = parent::query();
 
-    // Don't use timestamp highwater because it isn't unique, and stops/restarts
-    // can result in files being skipped. Remove the parent's sort and replace
-    // with fid.
+    // Remove core's timestamp sorting because this causes problems mixing
+    // with our use of fid high water mark. We don't use timestamp high water
+    // because it isn't unique, and stops/restarts can result in files being
+    // skipped.
     $sort =& $query->getOrderBy();
     unset($sort['f.timestamp']);
-    // Use fid highwater mark
-    $query->orderBy('f.fid');
 
     return $query;
   }
