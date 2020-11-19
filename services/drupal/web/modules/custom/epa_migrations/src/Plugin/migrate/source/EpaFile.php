@@ -41,6 +41,23 @@ class EpaFile extends File {
   /**
    * {@inheritdoc}
    */
+  public function query() {
+    $query = parent::query();
+
+    // Don't use timestamp highwater because it isn't unique, and stops/restarts
+    // can result in files being skipped. Remove the parent's sort and replace
+    // with fid.
+    $sort =& $query->getOrderBy();
+    unset($sort['f.timestamp']);
+    // Use fid highwater mark
+    $query->orderBy('f.fid');
+
+    return $query;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row) {
     if (!parent::prepareRow($row)) {
       return FALSE;
