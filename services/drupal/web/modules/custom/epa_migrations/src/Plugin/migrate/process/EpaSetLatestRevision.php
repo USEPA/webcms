@@ -130,7 +130,7 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       'draft_review' => 'draft_needs_review',
       'published_review' => 'published_needs_review',
       'published_expire' => 'published_day_til_expire',
-      'queued_for_archive' => 'published_expiring',
+      'queued_for_archive' => 'unpublished',
     ];
 
     // Load current revision in both D7 and D8 for a given node, compare vids.
