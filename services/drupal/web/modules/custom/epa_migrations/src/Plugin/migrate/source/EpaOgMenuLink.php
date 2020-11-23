@@ -26,7 +26,8 @@ class EpaOgMenuLink extends MenuLink {
   public function query() {
     $query = parent::query();
 
-    $query->condition('ml.menu_name', 'menu-og-%', 'LIKE');
+    $query->leftJoin('og_menu', 'om', 'ml.menu_name = om.menu_name');
+    $query->condition('om.menu_name', NULL, 'IS NOT NULL');
 
     return $query;
   }
