@@ -215,18 +215,6 @@ path_redirect_migrations=(
 # this array. See the run_migration function for how this is used.
 declare -A expected_unprocessed=(
   # (syntax note: the square brackets are required)
-
-  # Documents
-  [upgrade_d7_node_document]=15
-  [upgrade_d7_node_revision_document]=115
-
-  # Nodes
-  [upgrade_d7_node_web_area]=703
-  [upgrade_d7_node_page]=647
-
-  # Node Revisions
-  [upgrade_d7_node_revision_web_area]=26706
-  [upgrade_d7_node_revision_page]=8076
 )
 
 # Import taxonomy terms, groups, and users.
