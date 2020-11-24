@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
@@ -101,7 +102,7 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     $node = $this->entityTypeManager->getStorage('node')->load($nid);
     if (!$node) {
       // If the node doesn't exist in D8, we can't do anything here.
-      return FALSE;
+      throw new MigrateException('Unable to load node to set latest revision');
     }
     else {
       // If we have a node, turn on 'generate automatic alias' and continue with
@@ -176,12 +177,10 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
         $new_latest_revision->save();
 
         $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
-
-        return TRUE;
       }
     }
 
-    return FALSE;
+    return TRUE;
   }
 
   /**
