@@ -27,7 +27,7 @@ class EpaNodeRevision extends NodeRevision {
     // Get the default Node query.
     $query = parent::query();
 
-    $query->leftJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
+    $query->leftJoin('panelizer_entity', 'pe', 'nr.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
     $query->leftJoin('panels_display', 'pd', 'pe.did = pd.did');
 
     // Only include records where one of the following is true:
