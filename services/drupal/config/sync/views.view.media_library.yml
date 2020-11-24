@@ -10,7 +10,6 @@ dependencies:
     module:
       - media_library
   module:
-    - group
     - image
     - media
     - media_library
@@ -446,49 +445,6 @@ display:
           plugin_id: media_status
           id: status_extra
           group_type: group
-        uid_current:
-          id: uid_current
-          table: users
-          field: uid_current
-          relationship: gc__user
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: ''
-            label: 'Is the logged in user'
-            description: null
-            use_operator: false
-            operator: uid_current_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_current
-            required: true
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: true
-          group_info:
-            label: Groups
-            description: ''
-            identifier: uid_current
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value: '1'
-          entity_type: user
-          plugin_id: user_current
       sorts:
         created:
           id: created
@@ -560,67 +516,6 @@ display:
           entity_type: media
           entity_field: uid
           plugin_id: standard
-        group_content:
-          id: group_content
-          table: media_field_data
-          field: group_content
-          relationship: none
-          group_type: group
-          admin_label: 'Media group content'
-          required: false
-          group_content_plugins:
-            'group_media:document': '0'
-            'group_media:image': '0'
-            'group_media:remote_video': '0'
-          entity_type: media
-          plugin_id: group_content_to_entity_reverse
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
-          group_type: group
-          admin_label: Group
-          required: false
-          entity_type: group_content
-          entity_field: gid
-          plugin_id: standard
-        group_content_id:
-          id: group_content_id
-          table: groups_field_data
-          field: group_content_id
-          relationship: gid
-          group_type: group
-          admin_label: 'Group content'
-          required: false
-          group_content_plugins:
-            group_membership: group_membership
-            'group_media:document': '0'
-            'group_media:image': '0'
-            'group_media:remote_video': '0'
-            'group_node:event': '0'
-            'group_node:faq': '0'
-            'group_node:news_release': '0'
-            'group_node:page': '0'
-            'group_node:public_notice': '0'
-            'group_node:regulation': '0'
-            'group_node:webform': '0'
-            'group_node:web_area': '0'
-            'group_menu:menu': '0'
-          entity_type: group
-          plugin_id: group_to_group_content
-        gc__user:
-          id: gc__user
-          table: group_content__entity_id
-          field: gc__user
-          relationship: group_content_id
-          group_type: group
-          admin_label: 'Group content User'
-          required: false
-          group_content_plugins:
-            group_membership: '0'
-          entity_type: group_content
-          plugin_id: group_content_to_entity
       display_extenders: {  }
       use_ajax: true
       css_class: 'media-library-view js-media-library-view'
@@ -1200,49 +1095,6 @@ display:
           plugin_id: media_status
           id: status_extra
           group_type: group
-        uid_current:
-          id: uid_current
-          table: users
-          field: uid_current
-          relationship: gc__user
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: ''
-            label: 'Is the logged in user'
-            description: null
-            use_operator: false
-            operator: uid_current_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_current
-            required: true
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: true
-          group_info:
-            label: Groups
-            description: ''
-            identifier: uid_current
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value: '1'
-          entity_type: user
-          plugin_id: user_current
       filter_groups:
         operator: AND
         groups:
@@ -1705,49 +1557,6 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
-        uid_current:
-          id: uid_current
-          table: users
-          field: uid_current
-          relationship: gc__user
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: ''
-            label: 'Is the logged in user'
-            description: null
-            use_operator: false
-            operator: uid_current_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_current
-            required: true
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: true
-          group_info:
-            label: Groups
-            description: ''
-            identifier: uid_current
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value: '1'
-          entity_type: user
-          plugin_id: user_current
       filter_groups:
         operator: AND
         groups:
@@ -2337,49 +2146,6 @@ display:
           entity_type: media
           entity_field: default_langcode
           plugin_id: boolean
-        uid_current:
-          id: uid_current
-          table: users
-          field: uid_current
-          relationship: gc__user
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: ''
-            label: 'Is the logged in user'
-            description: null
-            use_operator: false
-            operator: uid_current_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_current
-            required: true
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: true
-          group_info:
-            label: Groups
-            description: ''
-            identifier: uid_current
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items:
-              1:
-                title: 'My Groups'
-                operator: '='
-                value: '1'
-          entity_type: user
-          plugin_id: user_current
       filter_groups:
         operator: AND
         groups:
