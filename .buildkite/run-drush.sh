@@ -78,17 +78,44 @@ Update script:
 $(sed -e 's/^/  /' <<<"$script")
 EOF
 
-# Run a Drush task, capturing the task's ARN for later (that's the jq line at the end)
-arn="$(
+# Run a Drush task, capturing the result for inspection
+result="$(
   aws ecs run-task \
     --task-definition "$task_definition" \
     --cluster "$cluster" \
     --overrides "$overrides" \
     --network-configuration "$network_configuration" \
     --capacity-provider capacityProvider=FARGATE,weight=1,base=1 \
-    --started-by "$started_by" |
-    jq -r '.tasks[0].taskArn'
+    --started-by "$started_by"
 )"
+
+# The RunTask API returns failures as an array of { reason: string; failure?: string }
+# objects. First, check to see if we received any from the API.
+failure_count="$(jq '.failures | length' <<<"$result")"
+if test "$failure_count" -gt 0; then
+  # Write to stderr (we'll be exiting at the end of this block, so it's safe to do this
+  # redirection).
+  exec >&2
+
+  echo
+  echo "Failed to run task. Errors follow:"
+
+  # Since the error messages may be an array of arbitrary length, we use jq to reformat
+  # the array into a bulleted list for Buildkite.
+  jq -r '
+    .failures
+    | map(if .detail then "* \(.reason) (\(.detail))" else "* \(.reason)" end)
+    | join("\n")
+  ' <<<"$result"
+
+  # Force Buildkite to expand this output
+  echo "^^^ +++"
+
+  # Fail
+  exit 1
+fi
+
+arn="$(jq -r '.tasks[0].taskArn' <<<"$result")"
 
 echo "--- Waiting on task ARN $arn"
 
