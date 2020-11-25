@@ -51,7 +51,7 @@ aws ecs list-tasks --cluster "$cluster" --family "webcms-drupal-$WEBCMS_ENVIRONM
   # xargs to use up to two child processes at once. This lets us parallelize the otherwise
   # sequential job of stopping ECS tasks. (The task ARN is prepended by xargs, so we don't
   # need to specify a template string.)
-  xargs -L1 -P2 aws ecs stop-task --cluster "$cluster" --task
+  xargs -L1 -P2 aws ecs stop-task --cluster "$cluster" --query 'task.taskArn' --task
 
 echo "--- Running Drush"
 
