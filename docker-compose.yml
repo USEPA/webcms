@@ -148,6 +148,12 @@ services:
         source: es-data
         target: /usr/share/elasticsearch/data
 
+  localstack:
+    image: localstack/localstack:0.12.2
+    environment:
+      LOCALSTACK_SERVICES: logs
+      LOCALSTACK_START_WEB: '0'
+
 # Persistent storage volumes. Volumes allow for data to survive container shutdown.
 volumes:
   es-data: null
