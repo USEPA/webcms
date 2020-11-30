@@ -7,7 +7,7 @@
 #   - drushvpc-stage.json must be in cwd
 #   - AWS_PROFILE is set appropriately
 #
-# USAGE: bash scripts/aws/start-stage-migration.sh
+# USAGE: bash scripts/start-stage-migration.sh
 #
 # [1] See /services/drupal/scripts/ecs/drush-migrate.sh
 
@@ -42,3 +42,6 @@ arn="$(
     --started-by "$started_by" |
     jq -r '.tasks[0].taskArn'
 )"
+
+echo "Task ARN: $arn"
+echo "https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/webcms-cluster-stage/tasks/$arn/details"
