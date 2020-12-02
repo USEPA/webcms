@@ -18,6 +18,7 @@ run_migration() {
   local total batches unprocessed
   local start finish time
   local i
+  local halted
 
   # Get the migration name
   migration="$1"
@@ -42,12 +43,29 @@ run_migration() {
       --limit=$batch_size \
       --continue-on-failure \
       "$migration"
+
+    # Check if we've asked to halt. Migration's own status field isn't really reliable
+    # for discerning whether a migration has been stopped or completed.
+    halted=$(drush state-get epa.migrations_halted)
+    if test -n "$halted"; then
+      # We check again and exit below
+      break
+    fi
   done
 
+  # Calculate the difference in seconds for some timing statistics
   finish="$(date +%s)"
+  time=$((finish - start))
 
   # Determine how many unprocessed items were left behind by the migration.
   unprocessed="$(drush ms "$migration" --field=unprocessed)"
+
+  if test -n "$halted"; then
+    echo "[$migration] Halted ($unprocessed unprocessed of $total)"
+    echo "Halting migration script, deleting halt signal"
+    drush state-del epa.migrations_halted
+    exit 1
+  fi
 
   # If we don't have any special expected count, default to zero.
   expected="${expected_unprocessed[$migration]:-0}"
@@ -57,9 +75,6 @@ run_migration() {
     echo "[$migration] Encountered $unprocessed unprocessed items; expecting $expected" >&2
     return 1
   fi
-
-  # Calculate the difference in seconds for some timing statistics
-  time=$((finish - start))
 
   echo "[$migration] Done ($total in ${time}s)"
 }

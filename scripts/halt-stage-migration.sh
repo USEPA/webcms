@@ -1,22 +1,27 @@
 #!/bin/bash
 
-# Local script to kick off the ECS task to run the drush migration script [1] on
+# Local script to halt the ECS task running our migration [1] on
 # the webcms-cluster-stage cluster.
 #
 # Requirements:
 #   - drushvpc-stage.json must be in cwd
 #   - AWS_PROFILE is set appropriately
 #
-# USAGE: bash scripts/start-stage-migration.sh
-#
-# if you need to stop this, use scripts/halt-stage-migration.sh
+# USAGE: bash scripts/halt-stage-migration.sh
 #
 # [1] See /services/drupal/scripts/ecs/drush-migrate.sh
 
 set -euo pipefail
 
 started_by="bschumacher"
-script='drush-migrate'
+
+# Our migration will just carry on to the next mim unless it finds
+# the halt state var, so we set that before requesting a stop.
+script=$(cat <<EOF
+  drush state-set epa.migrations_halted true
+  drush mst --all
+EOF
+)
 
 # Use jq to format the container overrides in a way that plays nicely with
 # AWS ECS' character count limitations on JSON input, as well as avoids
