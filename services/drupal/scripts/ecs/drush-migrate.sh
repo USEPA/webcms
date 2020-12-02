@@ -46,10 +46,14 @@ run_migration() {
 
     # Check if we've asked to halt. Migration's own status field isn't really reliable
     # for discerning whether a migration has been stopped or completed.
-    halted=$(drush state-get epa.migrations_halted)
+    halted="$(drush state-get epa.migrations_halted)"
     if test -n "$halted"; then
-      # We check again and exit below
-      break
+      # Output the num unprocessed and exit
+      unprocessed="$(drush ms "$migration" --field=unprocessed)"
+      echo "[$migration] Halted ($unprocessed unprocessed of $total)"
+      echo "Halting migration script, deleting halt signal"
+      drush state-del epa.migrations_halted
+      exit 1
     fi
   done
 
@@ -59,13 +63,6 @@ run_migration() {
 
   # Determine how many unprocessed items were left behind by the migration.
   unprocessed="$(drush ms "$migration" --field=unprocessed)"
-
-  if test -n "$halted"; then
-    echo "[$migration] Halted ($unprocessed unprocessed of $total)"
-    echo "Halting migration script, deleting halt signal"
-    drush state-del epa.migrations_halted
-    exit 1
-  fi
 
   # If we don't have any special expected count, default to zero.
   expected="${expected_unprocessed[$migration]:-0}"
