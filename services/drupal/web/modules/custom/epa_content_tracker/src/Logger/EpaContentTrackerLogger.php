@@ -105,7 +105,7 @@ class EpaContentTrackerLogger {
 
     switch($entity->getEntityTypeId()) {
       case 'node':
-        $alias = $entity->toUrl()->toString();
+        $alias = 'base:'. $entity->toUrl()->toString();
         break;
       case 'media':
         $alias = $this->getAliasFromMedia($entity);
@@ -146,7 +146,7 @@ class EpaContentTrackerLogger {
     $file = File::load($file_id);
 
     if ($file !== NULL) {
-      return $file->createFileUrl();
+      return $file->getFileUri();
     }
   }
 
