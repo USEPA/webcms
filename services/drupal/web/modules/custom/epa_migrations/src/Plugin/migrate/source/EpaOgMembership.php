@@ -30,8 +30,14 @@ class EpaOgMembership extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->select('epa_og_og_membership', 'eoom')
-      ->condition('eoom.entity_type', $this->configuration['d7_entity_type'])
+    if (isset($this->configuration['use_og_table'])) {
+      $query = $this->select('og_membership', 'eoom');
+    }
+    else {
+      $query = $this->select('epa_og_og_membership', 'eoom');
+    }
+
+    $query->condition('eoom.entity_type', $this->configuration['d7_entity_type'])
       ->fields('eoom', ['etid', 'gid']);
 
     if (isset($this->configuration['node_bundle'])) {
