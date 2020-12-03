@@ -84,7 +84,7 @@ run_migration() {
 
   # If we don't have any special expected count, default to zero.
   expected="$(trim $(drush state-get epa.allowed_unprocessed.$migration))"
-  expected="${$expected:-0}"
+  expected="${expected:-0}"
 
   # If the unprocessed count is above the threshold, return a failure.
   if test "$remaining" -gt "$expected"; then
