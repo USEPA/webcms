@@ -27,7 +27,7 @@ filters:
     id: filter_htmlcorrector
     provider: filter
     status: false
-    weight: -41
+    weight: -40
     settings: {  }
   filter_html:
     id: filter_html
@@ -58,7 +58,7 @@ filters:
   linkit:
     id: linkit
     provider: linkit
-    status: true
+    status: false
     weight: -49
     settings:
       title: true
@@ -74,8 +74,8 @@ filters:
         document: document
         other: other
       allowed_view_modes:
-        link_with_description: link_with_description
         link: link
+        link_with_description: link_with_description
         link_with_metadata: link_with_metadata
   filter_caption:
     id: filter_caption
@@ -87,26 +87,26 @@ filters:
     id: editor_file_reference
     provider: editor
     status: false
-    weight: -38
+    weight: -37
     settings: {  }
   filter_html_image_secure:
     id: filter_html_image_secure
     provider: filter
     status: false
-    weight: -36
+    weight: -35
     settings: {  }
   filter_url:
     id: filter_url
     provider: filter
     status: false
-    weight: -40
+    weight: -39
     settings:
       filter_url_length: 72
   filter_autop:
     id: filter_autop
     provider: filter
     status: false
-    weight: -37
+    weight: -36
     settings: {  }
   filter_align:
     id: filter_align
@@ -118,7 +118,7 @@ filters:
     id: filter_html_escape
     provider: filter
     status: false
-    weight: -39
+    weight: -38
     settings: {  }
   token_filter:
     id: token_filter
@@ -137,9 +137,15 @@ filters:
     id: filter_pathologic
     provider: pathologic
     status: true
-    weight: -42
+    weight: -41
     settings:
       settings_source: global
       local_settings:
         protocol_style: full
         local_paths: ''
+  epa_filter_links:
+    id: epa_filter_links
+    provider: epa_wysiwyg
+    status: true
+    weight: -42
+    settings: {  }
