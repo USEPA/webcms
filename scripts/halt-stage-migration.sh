@@ -52,3 +52,4 @@ arn="$(
 )"
 
 echo "Task ARN: $arn"
+echo "Find it here: https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/webcms-cluster-stage/tasks"

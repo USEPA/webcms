@@ -1,22 +1,23 @@
 #!/bin/bash
 
-# Local script to kick off the ECS task to run the drush migration script [1] on
-# the webcms-cluster-stage cluster.
+# Local script to set expected unprocessed counts for the migration.
 #
 # Requirements:
 #   - drushvpc-stage.json must be in cwd
 #   - AWS_PROFILE is set appropriately
 #
-# USAGE: bash scripts/start-stage-migration.sh
-#
-# if you need to stop this, use scripts/halt-stage-migration.sh
-#
-# [1] See /services/drupal/scripts/ecs/drush-migrate.sh
+# USAGE: bash scripts/allow-unprocessed.sh
 
 set -euo pipefail
 
 started_by="bschumacher"
-script='drush-migrate'
+
+# e.g. drush state-set epa.allowed_unprocessed.upgrade_d7_node_revision_document 1
+
+script=$(cat <<EOF
+  drush state-set epa.allowed_unprocessed.upgrade_d7_node_revision_document 1
+EOF
+)
 
 # Use jq to format the container overrides in a way that plays nicely with
 # AWS ECS' character count limitations on JSON input, as well as avoids
