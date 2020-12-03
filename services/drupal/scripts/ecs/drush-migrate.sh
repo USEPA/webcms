@@ -15,7 +15,7 @@ batch_size=1000
 # in the expected_unprocessed array, then this function returns a non-zero exit code.
 run_migration() {
   local migration
-  local total batches unprocessed
+  local total batches unprocessed remaining
   local start finish time
   local i
   local halted
@@ -23,17 +23,23 @@ run_migration() {
   # Get the migration name
   migration="$1"
 
-  # Determine the number of entities to process, and divide that by the batch size.
-  total="$(drush ms "$migration" --field=total)"
-  batches=$((total / batch_size))
+  # If already done, skip.
+  unprocessed="$(drush ms "$migration" --field=unprocessed)"
+  if [[ "$unprocessed" =~ ^0 ]]; then
+    echo "[$migration] Bypassing, 0 remaining"
+    return 0
+  fi
 
-  # Add an extra batch if the total entities isn't a clean multiple of the batch size
+  # Determine the number of entities to process, and divide that by the batch size.
+  batches=$((unprocessed / batch_size))
+
+  # Add an extra batch if the unprocessed entities isn't a clean multiple of the batch size
   # (bash doesn't use floating point, so we can't use a rounding function here).
-  if (((total % batch_size) != 0)); then
+  if (((unprocessed % batch_size) != 0)); then
     ((batches += 1))
   fi
 
-  echo "[$migration] Importing $total entities"
+  echo "[$migration] Importing $unprocessed entities"
   start="$(date +%s)"
 
   # Run the migration
@@ -48,9 +54,9 @@ run_migration() {
     # for discerning whether a migration has been stopped or completed.
     halted="$(drush state-get epa.migrations_halted)"
     if test -n "$halted"; then
-      # Output the num unprocessed and exit
-      unprocessed="$(drush ms "$migration" --field=unprocessed)"
-      echo "[$migration] Halted ($unprocessed unprocessed of $total)"
+      # Output the num remaining and exit
+      remaining="$(drush ms "$migration" --field=unprocessed)"
+      echo "[$migration] Halted ($remaining unprocessed of $unprocessed)"
       echo "Halting migration script, deleting halt signal"
       drush state-del epa.migrations_halted
       exit 1
@@ -62,18 +68,19 @@ run_migration() {
   time=$((finish - start))
 
   # Determine how many unprocessed items were left behind by the migration.
-  unprocessed="$(drush ms "$migration" --field=unprocessed)"
+  remaining="$(drush ms "$migration" --field=unprocessed)"
+  total="$(drush ms "$migration" --field=total)"
 
   # If we don't have any special expected count, default to zero.
   expected="${expected_unprocessed[$migration]:-0}"
 
   # If the unprocessed count is above the threshold, return a failure.
-  if test "$unprocessed" -gt "$expected"; then
-    echo "[$migration] Encountered $unprocessed unprocessed items; expecting $expected" >&2
+  if test "$remaining" -gt "$expected"; then
+    echo "[$migration] Encountered $remaining unprocessed items; expecting $expected" >&2
     return 1
   fi
 
-  echo "[$migration] Done ($total in ${time}s)"
+  echo "[$migration] Done ($unprocessed in ${time}s in this batch, total $total)"
 }
 
 # Usage:

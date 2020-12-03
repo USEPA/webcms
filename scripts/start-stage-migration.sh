@@ -40,7 +40,7 @@ arn="$(
     --task-definition webcms-drush-stage \
     --cluster webcms-cluster-stage \
     --overrides "$overrides" \
-    --capacity-provider-strategy=FARGATE,weight=1,base=1 \
+    --capacity-provider-strategy "capacityProvider=FARGATE,weight=1,base=1" \
     --network-configuration "$(cat drushvpc-stage.json)" \
     --started-by "$started_by" |
     jq -r '.tasks[0].taskArn'
