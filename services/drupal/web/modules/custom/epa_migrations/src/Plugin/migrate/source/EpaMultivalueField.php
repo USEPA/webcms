@@ -35,6 +35,9 @@ class EpaMultivalueField extends DrupalSqlBase {
       $query = $this->select($field_table, 'fd')
         ->fields('fd');
 
+      // Add an expression to let us generate a unique field for use as high water mark.
+      $query->addExpression('CONCAT(fd.revision_id, "-", fd.delta)', 'unique_id');
+
       if ($this->configuration['bundle']) {
         $query->condition('fd.bundle', $this->configuration['bundle']);
       }
