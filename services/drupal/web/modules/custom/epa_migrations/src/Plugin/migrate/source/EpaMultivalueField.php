@@ -171,16 +171,15 @@ class EpaMultivalueField extends DrupalSqlBase {
         // We check against NULL because 0 is an acceptable value for the high
         // water mark.
         if ($high_water !== NULL) {
-          $conditions->condition(self::HIGH_WATER_EXPRESSION, $high_water, '>');
-          $condition_added = TRUE;
+          // Note this used to use the conditions API
+          $this->query->where(self::HIGH_WATER_EXPRESSION . " > :hw", [
+            'hw' => $high_water,
+          ]);
         }
         // Always sort by the high water field, to ensure that the first run
         // (before we have a high water value) also has the results in a
         // consistent order.
         $this->query->orderBy(self::HIGH_WATER_ALIAS);
-      }
-      if ($condition_added) {
-        $this->query->condition($conditions);
       }
       // If the query has a group by, our added fields need it too, to keep the
       // query valid.
