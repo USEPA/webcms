@@ -168,7 +168,7 @@ document_migrations=(
   upgrade_d7_node_revision_document_panelizer
 )
 
-paragraph_migrations=(
+paragraph_migrations1=(
   upgrade_d7_paragraph_applicants_or_respondents
   upgrade_d7_paragraph_cfr
   upgrade_d7_paragraph_docket
@@ -176,7 +176,9 @@ paragraph_migrations=(
   upgrade_d7_paragraph_legal_authorities
   upgrade_d7_paragraph_locations_of_prop_actions
   upgrade_d7_paragraph_press_officers
-  upgrade_d7_node_web_area_paragraph_banner_slide
+)
+
+paragraph_migrations2=(
   upgrade_d7_node_web_area_paragraph_banner
   upgrade_d7_node_revision_web_area_paragraph_banner
   upgrade_d7_node_news_release_paragraph_html
@@ -262,7 +264,18 @@ drush s3fs-refresh-cache
 
 run_migration_group "Media Entities" "${media_entity_migrations[@]}"
 run_migration_group "Documents" "${document_migrations[@]}"
-run_migration_group "Paragraphs" "${paragraph_migrations[@]}"
+run_migration_group "Paragraphs 1" "${paragraph_migrations1[@]}"
+
+echo "Running banner slide upgrade migration"
+migration=upgrade_d7_node_web_area_paragraph_banner_slide
+drush mim --update "$migration"
+remaining="$(trim $(drush ms "$migration" --field=unprocessed))"
+if test "$remaining" -gt 0; then
+  echo "[$migration] Encountered $remaining unprocessed items; expecting 0" >&2
+  exit 1
+fi
+
+run_migration_group "Paragraphs 2" "${paragraph_migrations2[@]}"
 run_migration_group "Nodes" "${node_migrations[@]}"
 run_migration_group "Node Revisions" "${node_revision_migrations[@]}"
 run_migration_group "Webforms" "${webform_migrations[@]}"
