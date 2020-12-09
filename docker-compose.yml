@@ -12,7 +12,7 @@ services:
     volumes:
       - ${F1_TLS_CERT}:/etc/nginx/ssl/local.crt:ro,cached
       - ${F1_TLS_KEY}:/etc/nginx/ssl/local.key:ro,cached
-      - ./services/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,cached
+      - ./services/nginx:/etc/nginx/conf.d:ro,cached
       - ./services/drupal/web:/var/www/html/web:cached
       - type: volume
         source: fs-data
