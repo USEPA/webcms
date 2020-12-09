@@ -13,5 +13,9 @@ function f1_sso_user_login($account) {
     }
   }
 
-  \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', '/admin/content/my-web-areas');
+  // Only overwrite destination if we don't already have one set.
+  if (empty(\Drupal::service('request_stack')->getCurrentRequest()->query->get('destination'))) {
+    \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', '/admin/content/my-web-areas');
+  }
+
 }
