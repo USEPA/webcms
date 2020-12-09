@@ -46,12 +46,11 @@ class EpaFilterLinks extends FilterBase {
       /** @var \DOMElement $element */
       try {
         $href = $element->getAttribute('href');
-        $scheme = StreamWrapperManager::getScheme($href);
 
-        if (empty($scheme)) {
+        // @todo: improve this to support any type of entity. Will require
+        // more intelligently loading routes.
+        if (strpos($href, '/node/') === 0) {
           $url = Url::fromUri("internal:". $href);
-          // @todo: improve this to support any type of entity. Will require
-          // more intelligently loading routes.
           if ($url->isRouted() && $url->getRouteName() == 'entity.node.canonical' && $parameters = $url->getRouteParameters()) {
               $element->setAttribute('href', $url->toString());
               $entity = Node::load($parameters['node']);
