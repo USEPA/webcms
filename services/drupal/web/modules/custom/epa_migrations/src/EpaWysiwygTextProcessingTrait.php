@@ -609,7 +609,7 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($elements as $element) {
 
         // Replace class.
-        $element->setAttribute('class', str_replace($element->attributes->getNamedItem('class')->value, 'menu pipeline', 'list list--pipeline'));
+        $element->setAttribute('class', self::classReplace('menu pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
 
         // Remove menu-item class from children.
         $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);
