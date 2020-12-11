@@ -59,7 +59,8 @@ trait EpaWysiwygTextProcessingTrait {
         if ($key > 0) {
           // Get unique values with array_unique, then remove any empty strings
           // with array_filter, and finally get the remaining match text.
-          $match = array_pop(array_filter(array_unique($match_strings)));
+          $non_empty_strings = array_filter(array_unique($match_strings));
+          $match = array_pop($non_empty_strings);
 
           switch ($match) {
             case 'box':
