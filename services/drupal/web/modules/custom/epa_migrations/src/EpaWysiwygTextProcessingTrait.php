@@ -175,22 +175,33 @@ trait EpaWysiwygTextProcessingTrait {
       throw new \InvalidArgumentException('$from and $to not the same length');
     }
 
-    // We'll surround search strings with spaces so a match will never happen
-    // within a word.
-    $surround = function ($str) {
-      return " $str ";
+    // Work with maps so we get unique elements for free
+    $create_map = function ($str) {
+      $map = [];
+      foreach (preg_split('~\s+~', $str, -1, PREG_SPLIT_NO_EMPTY) as $name) {
+        $map[$name] = true;
+      }
+      return $map;
     };
 
-    // Normalize whitespace and surround the full classname
-    $classname = $surround(preg_replace('~\s+~', ' ', $classname));
+    $class_map = $create_map($classname);
 
-    return trim(
-      str_replace(
-        array_map($surround, $searches),
-        array_map($surround, $replacements),
-        $classname
-      )
-    );
+    foreach ($searches as $i => $search) {
+      $search_map = $create_map($search);
+      $diff = array_diff_assoc($class_map, $search_map);
+
+      // If all in search were found, we'll see size of $class_map
+      // change by the size of $search_map.
+      if (count($class_map) - count($diff) === count($search_map)) {
+        // We just need to re-add the replacement names
+        $class_map = array_merge(
+          $diff,
+          $create_map($replacements[$i])
+        );
+      }
+    }
+
+    return implode(' ', array_keys($class_map));
   }
 
   /**
@@ -212,6 +223,8 @@ trait EpaWysiwygTextProcessingTrait {
     if ($related_info_boxes) {
       foreach ($related_info_boxes as $key => $rib_wrapper) {
         // Replace div classes on box wrapper.
+        // Note: done with classReplace, so even "special foo box" will be properly
+        // recognized as matching "box special".
         $searches = [
           'box multi related-info',
           'box multi highlight',
