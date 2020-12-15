@@ -1,0 +1,14 @@
+diff --git a/src/Plugin/Field/FieldFormatter/ScheduledPublishGenericFormatter.php b/src/Plugin/Field/FieldFormatter/ScheduledPublishGenericFormatter.php
+index 1094b98..19c862f 100644
+--- a/src/Plugin/Field/FieldFormatter/ScheduledPublishGenericFormatter.php
++++ b/src/Plugin/Field/FieldFormatter/ScheduledPublishGenericFormatter.php
+@@ -204,7 +204,8 @@ class ScheduledPublishGenericFormatter extends FormatterBase implements Containe
+       ->load($strDateFormat);
+     if ($dateFormat !== NULL) {
+       $pattern = $dateFormat->getPattern();
+-      $drupalDateTime = DrupalDateTime::createFromFormat(ScheduledPublish::DATETIME_STORAGE_FORMAT, $strDateTime);
++      $drupalDateTime = DrupalDateTime::createFromFormat(ScheduledPublish::DATETIME_STORAGE_FORMAT, $strDateTime, ScheduledPublish::STORAGE_TIMEZONE);
++      $drupalDateTime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
+       return $drupalDateTime->format($pattern);
+     }
+     $this->logger->error($this->t('Date format: "' . $this->getSetting('date_format') . '" could not be found!'));
