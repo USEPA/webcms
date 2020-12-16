@@ -28,9 +28,9 @@ overrides="$(
     {
       "name": "drush",
       "command": ["/bin/sh", "-ec", $script],
-      "memory": 8192
     }
-  ]
+  ],
+  "memory": "8192"
 }
 '
 )"
