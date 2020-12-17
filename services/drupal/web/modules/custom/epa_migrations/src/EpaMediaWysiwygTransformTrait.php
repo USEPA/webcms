@@ -67,7 +67,7 @@ TEMPLATE;
           );
         }
         else {
-          $doc = new DOMDocument();
+          $doc = new \DOMDocument();
           $el = $doc->createElement('drupal-media');
           $el->setAttribute('data-entity-type', 'media');
           $el->setAttribute('data-entity-uuid', $media_entity_uuid);
@@ -76,9 +76,9 @@ TEMPLATE;
           $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
           $el->setAttribute('data-align',$alignment);
 
-          $caption = htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '';
+          $caption = stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]'] ?? ''));
           if (!empty($caption)) {
-            $el->setAttribute('data-caption',$caption);
+            $el->setAttribute('data-caption', $caption);
           }
 
           $alt = $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '';
