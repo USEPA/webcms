@@ -37,7 +37,9 @@ trait EpaMediaWysiwygTransformTrait {
       'small' => 'small',
     ];
 
-    $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
+    // We pull in any [[{...}]] to make sure we don't match multiple. We'll
+    // check for "type":"media" and valid JSON later.
+    $pattern = '/\[\[(?<tag_info>{.+?})\]\]/s';
 
     $inline_embed_replacement_template = <<<'TEMPLATE'
 <drupal-inline-media
@@ -51,6 +53,11 @@ TEMPLATE;
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
     $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
+      if (strpos($matches['tag_info'], '"type":"media"') === FALSE) {
+        // We don't have JSON or it's not a media block
+        return $matches[0];
+      }
+
       $decoder = new JsonDecode(TRUE);
 
       try {
@@ -112,7 +119,9 @@ TEMPLATE;
     // Fix these malformed JSON strings
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
-    $pattern = '~\[\[(.+?"type":"media".+?)\]\]~s';
+    // We pull in any [[{...}]] to make sure we don't match multiple. We'll
+    // check for "type":"media" and valid JSON later.
+    $pattern = '/\[\[({.+?})\]\]/s';
     $split = preg_split($pattern, $wysiwyg_content, 2, PREG_SPLIT_DELIM_CAPTURE);
     /**
      * $split is:
@@ -125,11 +134,11 @@ TEMPLATE;
 
     if ($split && count($split) === 3) {
       list( $before, $captured, $after) = $split;
-      if (strpos($captured, '}]]') !== false) {
-        // Well, this is embarrassing. The pattern captured past the first media block's
-        // closing }]] and matched "type":"media" in a second block. We're just going to
-        // bail because the case we care about starts with a block_header first.
-        // TODO split by the pattern ~(\[\[{|}\]\])~ and use a state machine to process.
+
+      if (strpos($captured, '"type":"media"') === FALSE) {
+        // We don't have JSON or it's not a media block. Maybe ideally we'd fish
+        // through multiple [[{...}]] until we found a type:media one, but probably
+        // not worth the effort here.
         return [
           'block_header_url' => NULL,
           'block_header_img' => NULL,
