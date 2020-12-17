@@ -42,6 +42,3 @@ if (defined('Memcached::OPT_CLIENT_MODE')) {
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
 
 ini_set('max_execution_time', 0);
-
-$class_loader->addPsr4('Drupal\\webprofiler\\', [ __DIR__ . '/../../modules/contrib/devel/webprofiler/src']);
-$settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
