@@ -39,16 +39,6 @@ trait EpaMediaWysiwygTransformTrait {
 
     $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
 
-    $media_embed_replacement_template = <<<'TEMPLATE'
-<drupal-media
-  alt="%s"
-  data-align="%s"
-  data-caption="%s"
-  data-entity-type="media"
-  data-entity-uuid="%s"
-  data-view-mode="%s"></drupal-media>
-TEMPLATE;
-
     $inline_embed_replacement_template = <<<'TEMPLATE'
 <drupal-inline-media
   data-align="center"
@@ -60,7 +50,7 @@ TEMPLATE;
     // Fix these malformed JSON strings
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
-    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
+    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
       $decoder = new JsonDecode(TRUE);
 
       try {
@@ -77,14 +67,27 @@ TEMPLATE;
           );
         }
         else {
+          $doc = new DOMDocument();
+          $el = $doc->createElement('drupal-media');
+          $el->setAttribute('data-entity-type', 'media');
+          $el->setAttribute('data-entity-uuid', $media_entity_uuid);
+          $el->setAttribute('data-view-mode', $view_modes[$tag_info['view_mode']]);
+
           $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
-          return sprintf($media_embed_replacement_template,
-            $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
-            $alignment,
-            htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '',
-            $media_entity_uuid,
-            $view_modes[$tag_info['view_mode']]
-          );
+          $el->setAttribute('data-align',$alignment);
+
+          $caption = htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '';
+          if (!empty($caption)) {
+            $el->setAttribute('data-caption',$caption);
+          }
+
+          $alt = $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '';
+          if (!empty($alt)) {
+            $el->setAttribute('alt',$alt);
+          }
+
+          $doc->appendChild($el);
+          return $doc->saveHTML();
         }
       }
       catch (\Exception $e) {
