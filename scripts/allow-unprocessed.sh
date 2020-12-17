@@ -15,7 +15,7 @@ started_by="bschumacher"
 # e.g. drush state-set epa.allowed_unprocessed.upgrade_d7_node_revision_document 1
 
 script=$(cat <<EOF
-
+  drush state-set epa.allowed_unprocessed.upgrade_d7_node_revision_page_panelizer 1
 EOF
 )
 
