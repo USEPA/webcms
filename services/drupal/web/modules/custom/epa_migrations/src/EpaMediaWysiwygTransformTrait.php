@@ -57,6 +57,9 @@ TEMPLATE;
   data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 
+    // Fix these malformed JSON strings
+    $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
+
     $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
       $decoder = new JsonDecode(TRUE);
 
@@ -103,6 +106,9 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
+    // Fix these malformed JSON strings
+    $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
+
     $pattern = '~\[\[(.+?"type":"media".+?)\]\]~s';
     $split = preg_split($pattern, $wysiwyg_content, 2, PREG_SPLIT_DELIM_CAPTURE);
     /**
