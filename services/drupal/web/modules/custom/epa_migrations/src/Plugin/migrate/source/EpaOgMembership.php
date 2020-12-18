@@ -82,7 +82,7 @@ class EpaOgMembership extends DrupalSqlBase {
     $entity = $this->entityTypeManager->getStorage($type)->load($etid);
     if (!$entity) {
       // Entity can't be found, so ignore row
-      return $this->ignoreRow($row, "etid '$etid' failed to load");
+      return $this->ignoreRow($row, "Unable to migrate group relationship due to missing '$type' entity with ID '$etid'.");
     }
 
     // Make the label for this entity available as a source property.
