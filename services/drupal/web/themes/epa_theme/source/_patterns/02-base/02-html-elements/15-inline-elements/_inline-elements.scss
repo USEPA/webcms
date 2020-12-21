@@ -51,6 +51,14 @@ abbr {
   &[title] {
     border-bottom: 1px dotted;
     text-decoration: none;
+
+    @include breakpoint(max-width gesso-breakpoint(tablet)) {
+      border-bottom: 0;
+
+      &::after {
+        content: ' (' attr(title) ')';
+      }
+    }
   }
 
   &:hover {
@@ -58,8 +66,12 @@ abbr {
   }
 
   @media print {
-    &[title]::after {
-      content: ' (' attr(title) ')';
+    &[title] {
+      border-bottom: 0;
+
+      &::after {
+        content: ' (' attr(title) ')';
+      }
     }
   }
 }
