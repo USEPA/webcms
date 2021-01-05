@@ -62,25 +62,28 @@ TEMPLATE;
       try {
         $tag_info = $decoder->decode($matches['tag_info'], JsonEncoder::FORMAT);
 
-        $media_entity_uuid = $entityTypeManager->getStorage('media')
+        $media_entity = $entityTypeManager->getStorage('media')
           ->load($tag_info['fid']);
+        $media_entity_uuid = $media_entity ? $media_entity->uuid() : 0;
 
-        $media_entity_uuid = $media_entity_uuid ? $media_entity_uuid->uuid() : 0;
-
+        // Return an inline media embed.
         if ($tag_info['view_mode'] === 'media_link') {
           return sprintf($inline_embed_replacement_template,
             $media_entity_uuid
           );
         }
+        // Return a full media embed.
         else {
           $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
-          return sprintf($media_embed_replacement_template,
+          $media_embed = sprintf($media_embed_replacement_template,
             $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
             $alignment,
             htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '',
             $media_entity_uuid,
             $view_modes[$tag_info['view_mode']]
           );
+
+          return $media_embed;
         }
       }
       catch (\Exception $e) {
