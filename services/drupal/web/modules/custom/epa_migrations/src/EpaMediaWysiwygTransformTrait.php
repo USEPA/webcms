@@ -83,6 +83,14 @@ TEMPLATE;
             $view_modes[$tag_info['view_mode']]
           );
 
+          // If the 'link to original' setting is selected in D7, wrap the media
+          // embed in a link to the original image.
+          $link_to_original = $tag_info['fields']['field_original_image_link[und]'];
+          if ($link_to_original == 1 && $media_entity->bundle->entity->label() == 'Image') {
+            $original_image_url = $media_entity->field_media_image->entity->createFileUrl(TRUE);
+            $media_embed = "<a href=\"{$original_image_url}\">" . $media_embed . "</a>";
+          }
+
           return $media_embed;
         }
       }
