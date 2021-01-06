@@ -75,7 +75,7 @@ TEMPLATE;
           $el->setAttribute('data-view-mode', $view_modes[$tag_info['view_mode']]);
 
           $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
-          $el->setAttribute('data-align',$alignment);
+          $el->setAttribute('data-align', $alignment);
 
           $caption = stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]'] ?? ''));
           if (!empty($caption)) {
@@ -84,10 +84,23 @@ TEMPLATE;
 
           $alt = $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '';
           if (!empty($alt)) {
-            $el->setAttribute('alt',$alt);
+            $el->setAttribute('alt', $alt);
           }
 
-          $doc->appendChild($el);
+          // If the 'link to original' setting is selected in D7, wrap the
+          // <drupal-media> element in a link to the original image.
+          $link_to_original = $tag_info['fields']['field_original_image_link[und]'];
+          if ($link_to_original == 1 && $media_entity && $media_entity->bundle->entity->label() == 'Image') {
+            $original_image_url = $media_entity->field_media_image->entity->createFileUrl();
+            $link_element = $doc->createElement('a');
+            $link_element->setAttribute('href', $original_image_url);
+            $link_element->appendChild($el);
+            $doc->appendChild($link_element);
+          }
+          else {
+            $doc->appendChild($el);
+          }
+
           return $doc->saveHTML();
         }
       }
