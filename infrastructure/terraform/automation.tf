@@ -365,6 +365,125 @@ resource "aws_ssm_document" "d7_load_database" {
   }
 }
 
+# Create an automation document that loads a D8 backup from the backups bucket into the
+# database.
+resource "aws_ssm_document" "d8_load_database" {
+  name          = "WebCMS-${local.env-title}-D8Load-Database-${random_id.automation.hex}"
+  document_type = "Automation"
+
+  content = jsonencode({
+    schemaVersion = "0.3"
+    description   = <<-EOF
+      # Load D8 Database Automation
+
+      This automation loads a copy of a D8 database dump into the `webcms` DB.
+      The dump must be present in the DB backups bucket (s3://${aws_s3_bucket.backups.bucket})
+      and be saved as a gzip-compressed `.sql` file.
+
+      ## Parameters
+
+      * `BackupName` - the path to the database dump in S3.
+      * `InstanceAMI` - this parameter exists due to a limitation in Systems Manager. Leave
+        it blank in order to use the latest Amazon Linux 2 image when automation runs.
+    EOF
+
+    # Run this document as our SSM service role
+    assumeRole = aws_iam_role.ssm_automation_role.arn
+
+    parameters = {
+      BackupName = {
+        type        = "String"
+        description = "Name of the DB in the backups bucket (s3://${aws_s3_bucket.backups.bucket})"
+      }
+
+      # Systems Manager won't let us directly reference the AMI parameter in our document,
+      # so we have to use this default value to have SSM read it.
+      InstanceAMI = {
+        type        = "String"
+        description = "Amazon Linux 2 AMI to run on the instance. Defaults to the latest."
+        default     = "{{ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}"
+      }
+    }
+
+    mainSteps = [
+      # Use the shared steps to spawn the instance
+      local.ssm-run-instance,
+      local.ssm-instance-warmup,
+
+      # Run our import script on the instance
+      {
+        name   = "runImportScript"
+        action = "aws:runCommand"
+
+        # Wait up to 8 hours
+        timeoutSeconds = 8 * 60 * 60
+
+        # Terminate the instance on failure
+        onFailure = "step:terminateInstance"
+
+        inputs = {
+          DocumentName = "AWS-RunShellScript"
+          InstanceIds  = "{{ runInstance.InstanceIds }}"
+
+          # Send automation logs to CloudWatch
+          CloudWatchOutputConfig = {
+            CloudWatchLogGroupName  = aws_cloudwatch_log_group.ssm_d8_automation.name
+            CloudWatchOutputEnabled = true
+          }
+
+          # Script steps:
+          # 1. Install necessary CLI tools
+          # 2. Download the backup from S3 and decompress it
+          # 3. Obtain the D7 login credentials
+          # 4. Load the dump into MySQL through the RDS proxy
+          Parameters = {
+            executionTimeout = tostring(8 * 60 * 60)
+            workingDirectory = "/tmp"
+            commands         = <<-EOF
+              set -euo pipefail
+
+              yum install -y awscli jq mariadb
+
+              echo "Downloading {{ BackupName }} from S3"
+
+              aws s3 cp s3://${aws_s3_bucket.backups.bucket}/{{ BackupName }} ./d8.sql.gz
+              gunzip ./d8.sql.gz
+
+              credentials="$(
+                aws --region=${var.aws-region} \
+                secretsmanager get-secret-value \
+                  --secret-id ${aws_secretsmanager_secret.db_app_credentials.id} |
+                  jq -r .SecretString
+              )"
+
+              username="$(jq -r .username <<<"$credentials")"
+              password="$(jq -r .password <<<"$credentials")"
+
+              echo "Loading {{ BackupName }} into MySQL"
+
+              mysql \
+                --host=${aws_db_proxy.proxy.endpoint} \
+                --user="$username" \
+                --password="$password" \
+                webcms \
+                <./d8.sql
+            EOF
+          }
+        }
+      },
+
+      # Clean up the instance
+      local.ssm-cleanup
+    ]
+  })
+
+  tags = local.common-tags
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_ssm_document" "d8_dump_database" {
   name          = "WebCMS-${local.env-title}-D8DumpDatabase-${random_id.automation.hex}"
   document_type = "Automation"

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b2fc43041a32afb522f48f837e443b1c",
+    "content-hash": "1d0fa2a5c01460bbde9932552d080c61",
     "packages": [
         {
             "name": "akamai-open/edgegrid-auth",
@@ -1504,6 +1504,16 @@
             ],
             "description": "Provides a way to patch Composer packages.",
             "time": "2018-10-24T15:51:16+00:00"
+        },
+        {
+            "name": "d3/d3",
+            "version": "v3.5.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/d3/d3",
+                "reference": "v3.5.17"
+            },
+            "type": "drupal-library"
         },
         {
             "name": "dflydev/dot-access-configuration",
@@ -3714,7 +3724,8 @@
                     "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch",
                     "#3047022 - Properly handle block_content access control for revisions": "https://www.drupal.org/files/issues/2020-09-24/3047022-44.patch",
                     "Allow choosing moderation state when reverting revisions": "https://www.drupal.org/files/issues/2020-06-25/2906568-50.patch",
-                    "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2020-11-11/drupal_core-mediaembed_default_view_mode-3109289-24.patch"
+                    "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2020-11-11/drupal_core-mediaembed_default_view_mode-3109289-24.patch",
+                    "Fixes inability to edit block in Layout Builder on a revision that has been reverted": "https://www.drupal.org/files/issues/2020-09-07/3053881-34.patch"
                 }
             },
             "autoload": {
@@ -4299,6 +4310,143 @@
             "time": "2019-07-25T00:03:26+00:00"
         },
         {
+            "name": "drupal/devel",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/project/devel.git",
+                "reference": "4.0.1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/devel-4.0.1.zip",
+                "reference": "4.0.1",
+                "shasum": "cf2458de1cbac00a88ed26ae3da2cf331e1bc047"
+            },
+            "require": {
+                "doctrine/common": "^2.7",
+                "drupal/core": "^8.8 || ^9",
+                "symfony/var-dumper": "^4 || ^5"
+            },
+            "conflict": {
+                "kint-php/kint": "<3"
+            },
+            "require-dev": {
+                "composer/installers": "^1",
+                "cweagans/composer-patches": "~1.0",
+                "drupal/core-composer-scaffold": "^8.0",
+                "drupal/core-dev": "^8.0",
+                "drupal/core-recommended": "^8.0",
+                "drush/drush": "^10",
+                "mglaman/phpstan-drupal": "^0.12",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^0.12",
+                "zaporylie/composer-drupal-optimizations": "^1.0"
+            },
+            "suggest": {
+                "kint-php/kint": "Kint provides an informative display of arrays/objects. Useful for debugging and developing."
+            },
+            "type": "drupal-module",
+            "extra": {
+                "drupal": {
+                    "version": "4.0.1",
+                    "datestamp": "1600300079",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                },
+                "installer-paths": {
+                    "web/core": [
+                        "type:drupal-core"
+                    ],
+                    "web/libraries/{$name}": [
+                        "type:drupal-library"
+                    ],
+                    "web/modules/contrib/{$name}": [
+                        "type:drupal-module"
+                    ],
+                    "web/profiles/{$name}": [
+                        "type:drupal-profile"
+                    ],
+                    "web/themes/{$name}": [
+                        "type:drupal-theme"
+                    ],
+                    "drush/{$name}": [
+                        "type:drupal-drush"
+                    ]
+                },
+                "drupal-scaffold": {
+                    "locations": {
+                        "web-root": "web/"
+                    }
+                },
+                "drush": {
+                    "services": {
+                        "drush.services.yml": "^9 || ^10"
+                    }
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    ".spoons/ScriptHandler.php"
+                ]
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "scripts": {
+                "si": [
+                    "drush si -v --db-url=${SIMPLETEST_DB:-mysql://root:password@mariadb/db}"
+                ],
+                "phpcs": [
+                    "phpcs --runtime-set ignore_warnings_on_exit 1 --runtime-set ignore_errors_on_exit 1 web/modules/custom"
+                ],
+                "lint": [
+                    "parallel-lint --exclude web --exclude vendor ."
+                ],
+                "webserver": [
+                    "cd web && php -S 0.0.0.0:8888 .ht.router.php"
+                ],
+                "chromedriver": [
+                    "chromedriver --port=9515 --verbose --whitelisted-ips --log-path=/tmp/chromedriver.log --no-sandbox"
+                ],
+                "unit": [
+                    "phpunit --verbose web/modules/custom"
+                ],
+                "phpstan": [
+                    "phpstan analyse web/modules/custom"
+                ],
+                "stylelint": [
+                    "yarn --silent --cwd web/core stylelint --formatter verbose --config ./.stylelintrc.json ../modules/custom/**/*.css"
+                ],
+                "eslint": [
+                    "yarn --silent --cwd web/core eslint -c ./.eslintrc.json ../modules/custom"
+                ],
+                "post-update-cmd": [
+                    "Spoons\\ScriptHandler::createSymlinks"
+                ]
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "drupalspoons",
+                    "homepage": "https://www.drupal.org/user/3647684"
+                },
+                {
+                    "name": "moshe weitzman",
+                    "homepage": "https://www.drupal.org/user/23"
+                }
+            ],
+            "description": "Various blocks, pages, and functions for developers.",
+            "homepage": "https://www.drupal.org/project/devel",
+            "support": {
+                "source": "https://gitlab.com/drupalspoons/devel",
+                "issues": "https://gitlab.com/drupalspoons/devel/-/issues",
+                "slack": "https://drupal.slack.com/archives/C012WAW1MH6"
+            }
+        },
+        {
             "name": "drupal/diff",
             "version": "1.0.0",
             "source": {
@@ -4694,6 +4842,9 @@
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
                     }
+                },
+                "patches_applied": {
+                    "Do not load all entities when generating sample values": "https://www.drupal.org/files/issues/2020-09-24/3084661-generatesamplevalue-loads-all-exiting-entities-1.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -7127,7 +7278,8 @@
                     }
                 },
                 "patches_applied": {
-                    "Fix integrity constraint violation when embedding paragraphs on blocks in layout builder": "https://www.drupal.org/files/issues/2019-07-10/paragraphs-set_langcode_widgets-2901390-29.patch"
+                    "Fix integrity constraint violation when embedding paragraphs on blocks in layout builder": "https://www.drupal.org/files/issues/2019-07-10/paragraphs-set_langcode_widgets-2901390-29.patch",
+                    "Fixes paragraphs not rendering on current revision when they have been edited on forward revision": "https://www.drupal.org/files/issues/2020-07-08/access-controll-issue-3090200-22.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -7821,16 +7973,13 @@
                 "shasum": "9b517bbc350037e656bdab6c31cca3d1fd8bc3b7"
             },
             "require": {
-                "drupal/core": "*"
+                "drupal/core": "^8"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-3.x": "3.x-dev"
-                },
                 "drupal": {
                     "version": "8.x-3.3",
-                    "datestamp": "1573667285",
+                    "datestamp": "1580739201",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -7840,6 +7989,9 @@
                     "services": {
                         "drush.services.yml": "^9"
                     }
+                },
+                "patches_applied": {
+                    "Improve timezone handling to fix EPAD8-1069.  Remove this patch if we update to scheduled_publish v3.9 or above.": "patches/scheduled_publish-fix_timezone_without_updating_to_v3.9.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -9431,7 +9583,7 @@
                     }
                 },
                 "patches_applied": {
-                    "Provide mechanism to override exposed sorts": "https://www.drupal.org/files/issues/2020-09-02/viewsreference_filter-exposed_sorts-3168765-2.patch",
+                    "Provide mechanism to override exposed sorts + ensure filters that have non-default IDs do not get ignored.": "patches/viewsreference_filter-combined-patch-3187765-2-and-3168765-2.patch",
                     "Declare dependency on Views": "https://www.drupal.org/files/issues/2020-09-11/viewsreference_filter-dependency_on_views-3170372-2-1.0.0-alpha1.patch",
                     "Display description text on filters": "https://www.drupal.org/files/issues/2020-09-11/viewsreference_filter-display_descriptions-3170494-2.patch",
                     "Allow different settings for different blocks": "https://www.drupal.org/files/issues/2020-10-20/viewsreference_filter-shared_config-3132416-3.patch"
@@ -10533,6 +10685,16 @@
             "time": "2019-07-01T23:21:34+00:00"
         },
         {
+            "name": "highlightjs/highlight.js",
+            "version": "9.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/highlightjs/highlight.js",
+                "reference": "9.7.0"
+            },
+            "type": "drupal-library"
+        },
+        {
             "name": "jakub-onderka/php-console-color",
             "version": "v0.2",
             "source": {
@@ -10668,6 +10830,76 @@
                 "search"
             ],
             "time": "2019-07-20T01:13:04+00:00"
+        },
+        {
+            "name": "kint-php/kint",
+            "version": "3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kint-php/kint.git",
+                "reference": "335ac1bcaf04d87df70d8aa51e8887ba2c6d203b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kint-php/kint/zipball/335ac1bcaf04d87df70d8aa51e8887ba2c6d203b",
+                "reference": "335ac1bcaf04d87df70d8aa51e8887ba2c6d203b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.6"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0",
+                "phpunit/phpunit": "^4.0",
+                "seld/phar-utils": "^1.0",
+                "symfony/finder": "^2.0 || ^3.0 || ^4.0",
+                "vimeo/psalm": "^3.0"
+            },
+            "suggest": {
+                "ext-ctype": "Simple data type tests",
+                "ext-iconv": "Provides fallback detection for ambiguous legacy string encodings such as the Windows and ISO 8859 code pages",
+                "ext-mbstring": "Provides string encoding detection",
+                "kint-php/kint-js": "Provides a simplified dump to console.log()",
+                "kint-php/kint-twig": "Provides d() and s() functions in twig templates",
+                "symfony/polyfill-ctype": "Replacement for ext-ctype if missing",
+                "symfony/polyfill-iconv": "Replacement for ext-iconv if missing",
+                "symfony/polyfill-mbstring": "Replacement for ext-mbstring if missing"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "init.php"
+                ],
+                "psr-4": {
+                    "Kint\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Vollebregt",
+                    "homepage": "https://github.com/jnvsor"
+                },
+                {
+                    "name": "Rokas Šleinius",
+                    "homepage": "https://github.com/raveren"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/kint-php/kint/graphs/contributors"
+                }
+            ],
+            "description": "Kint - debugging tool for PHP developers",
+            "homepage": "https://kint-php.github.io/kint/",
+            "keywords": [
+                "debug",
+                "kint",
+                "php"
+            ],
+            "time": "2019-10-17T18:05:24+00:00"
         },
         {
             "name": "kub-at/php-simple-html-dom-parser",

@@ -20,7 +20,8 @@
       "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch",
       "#3047022 - Properly handle block_content access control for revisions": "https://www.drupal.org/files/issues/2020-09-24/3047022-44.patch",
       "Allow choosing moderation state when reverting revisions":  "https://www.drupal.org/files/issues/2020-06-25/2906568-50.patch",
-      "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2020-11-11/drupal_core-mediaembed_default_view_mode-3109289-24.patch"
+      "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2020-11-11/drupal_core-mediaembed_default_view_mode-3109289-24.patch",
+      "Fixes inability to edit block in Layout Builder on a revision that has been reverted": "https://www.drupal.org/files/issues/2020-09-07/3053881-34.patch"
     },
     "drupal/s3fs": {
       "Allow using 'localhost' for CNAME": "https://www.drupal.org/files/issues/2019-08-19/s3fs-localhost-3075876-2-D8.patch",
@@ -62,7 +63,8 @@
         "Add option to email Revision Author": "patches/content-moderation-notifications-3133940-2-rolled-to-apply-with-3015275.patch"
     },
     "drupal/paragraphs": {
-      "Fix integrity constraint violation when embedding paragraphs on blocks in layout builder": "https://www.drupal.org/files/issues/2019-07-10/paragraphs-set_langcode_widgets-2901390-29.patch"
+      "Fix integrity constraint violation when embedding paragraphs on blocks in layout builder": "https://www.drupal.org/files/issues/2019-07-10/paragraphs-set_langcode_widgets-2901390-29.patch",
+      "Fixes paragraphs not rendering on current revision when they have been edited on forward revision": "https://www.drupal.org/files/issues/2020-07-08/access-controll-issue-3090200-22.patch"
     },
     "drupal/subpathauto": {
       "Shows page not found when url has encoded characters": "https://www.drupal.org/files/issues/shows_page_not_found-2865039-3.patch"
@@ -105,7 +107,7 @@
       "Trigger AJAX refresh when display is changed": "https://www.drupal.org/files/issues/2020-09-02/viewsreference-ajax_after_display_selection-3166490-3.patch"
     },
     "drupal/viewsreference_filter": {
-      "Provide mechanism to override exposed sorts": "https://www.drupal.org/files/issues/2020-09-02/viewsreference_filter-exposed_sorts-3168765-2.patch",
+      "Provide mechanism to override exposed sorts + ensure filters that have non-default IDs do not get ignored.": "patches/viewsreference_filter-combined-patch-3187765-2-and-3168765-2.patch",
       "Declare dependency on Views": "https://www.drupal.org/files/issues/2020-09-11/viewsreference_filter-dependency_on_views-3170372-2-1.0.0-alpha1.patch",
       "Display description text on filters": "https://www.drupal.org/files/issues/2020-09-11/viewsreference_filter-display_descriptions-3170494-2.patch",
       "Allow different settings for different blocks": "https://www.drupal.org/files/issues/2020-10-20/viewsreference_filter-shared_config-3132416-3.patch"
@@ -119,6 +121,12 @@
     "drupal/media_inline_embed": {
       "Improve template suggestions": "https://www.drupal.org/files/issues/2020-11-05/media_inline_embed-template_suggestions-3180977-2.patch",
       "Ensure view mode is always added to embeds": "https://www.drupal.org/files/issues/2020-11-11/media_inline_embed-ensure_view_mode-3182019-2.patch"
+    },
+    "drupal/entity_reference_revisions": {
+      "Do not load all entities when generating sample values": "https://www.drupal.org/files/issues/2020-09-24/3084661-generatesamplevalue-loads-all-exiting-entities-1.patch"
+    },
+    "drupal/scheduled_publish": {
+      "Improve timezone handling to fix EPAD8-1069.  Remove this patch if we update to scheduled_publish v3.9 or above.": "patches/scheduled_publish-fix_timezone_without_updating_to_v3.9.patch"
     }
   }
 }

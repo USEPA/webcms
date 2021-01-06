@@ -47,7 +47,10 @@ function _epa_content_tracker_process_moderated_entity(ContentModerationStateInt
   $entity_type = $moderated_entity->content_entity_type_id->value;
   if ($node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value)) {
     $logger = new EpaContentTrackerLogger();
-    if ('published' == $moderated_entity->moderation_state->value) {
+    $env_state = getenv('WEBCMS_ENV_STATE');
+    // Have to make special accommodations for migration since nodes will not proceed through the normal workflow.
+    if ('published' == $moderated_entity->moderation_state->value ||
+      ($env_state === 'migration' && in_array($moderated_entity->moderation_state->value, ['published','published_day_til_expire','published_expiring','published_needs_review']))) {
       $logger->update($node);
     }
     elseif ('unpublished' == $moderated_entity->moderation_state->value) {
@@ -180,7 +183,7 @@ function epa_content_tracker_views_data() {
   $data['epa_content_tracker']['alias'] = [
     'title' => t('Entity alias'),
     'help' => t('The path alias of the entity that was changed or deleted.'),
-    'field' => ['id' => 'standard'],
+    'field' => ['id' => 'epa_content_alias'],
     'filter' => ['id' => 'string'],
     'sort' => ['id' => 'standard'],
   ];

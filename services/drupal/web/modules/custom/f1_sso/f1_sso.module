@@ -1,1 +1,21 @@
 <?php
+/**
+ * Implements hook_user_login().
+ */
+function f1_sso_user_login($account) {
+  // The samlauth module passes around the destination in the RelayState
+  // parameter and if it's already planning on redirecting to a non-standard
+  // (non- /saml/login) destination then we leave this alone and don't add our
+  // own redirect.
+  if (\Drupal::service('current_route_match')->getRouteName() === 'samlauth.saml_controller_acs' && $relayState = \Drupal::service('request_stack')->getCurrentRequest()->get('RelayState')) {
+    if (stristr($relayState, '/saml/login') === FALSE) {
+      return;
+    }
+  }
+
+  // Only overwrite destination if we don't already have one set.
+  if (empty(\Drupal::service('request_stack')->getCurrentRequest()->query->get('destination'))) {
+    \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', '/admin/content/my-web-areas');
+  }
+
+}

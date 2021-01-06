@@ -833,6 +833,7 @@ switch ($env_lang) {
 switch ($env_state) {
   case 'migration':
     $settings['redirect.settings']['auto_redirect'] = false;
+    $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
@@ -883,6 +884,11 @@ $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
 
 // Ensure we force the site to use the "include" method of shielding pages
 $config['shield.settings']['method'] = 1;
+
+if (in_array($env_name, ['local','dev','qa'])) {
+  $class_loader->addPsr4('Drupal\\webprofiler\\', [ __DIR__ . '/../../modules/contrib/devel/webprofiler/src']);
+  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
+}
 
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';

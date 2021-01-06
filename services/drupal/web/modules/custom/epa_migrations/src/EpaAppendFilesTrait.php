@@ -55,6 +55,7 @@ trait EpaAppendFilesTrait {
 <drupal-inline-media
   data-align="center"
   data-entity-type="media"
+  data-view-mode="link_with_description"
   data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 

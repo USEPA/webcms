@@ -28,6 +28,23 @@ class EpaNode extends Node {
     // Get the default Node query.
     $query = parent::query();
 
+    $query->leftJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
+    $query->leftJoin('panels_display', 'pd', 'pe.did = pd.did');
+
+    // Only include records where one of the following is true:
+    // * There's no layout record (no panelizer override)
+    // * Uses panelizer onecol_page layotu
+    // * Users panelizer twocol_page layout and IS NOT a web area node
+    $and = $query->andConditionGroup()
+      ->condition('pd.layout', 'twocol_page')
+      ->condition('n.type', 'web_area', '!=');
+    $or = $query->orConditionGroup()
+      ->condition('pe.did', NULL, 'IS NULL')
+      ->condition('pe.did', 0)
+      ->condition('pd.layout', 'onecol_page')
+      ->condition($and);
+
+    $query->condition($or);
     return $query;
   }
 
@@ -71,7 +88,7 @@ class EpaNode extends Node {
         'published_review' => 'published_needs_review',
         'published_expire' => 'published_day_til_expire',
         'draft_review' => 'draft_needs_review',
-        'queued_for_archive' => 'published_expiring',
+        'queued_for_archive' => 'unpublished',
       ];
 
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
@@ -98,7 +115,7 @@ class EpaNode extends Node {
     //   'sidebar' panes.
     //
     // First, initialize the 'layout' source property as NULL so we can properly
-    // process nodes that do not have a record in the 'panelizer_entith' table.
+    // process nodes that do not have a record in the 'panelizer_entity' table.
     $row->setSourceProperty('layout', NULL);
 
     // Get the Display ID for the current revision.
@@ -121,29 +138,16 @@ class EpaNode extends Node {
         ->execute()
         ->fetchField();
 
-      // Determine whether to skip this row, or add data.
-      if (!in_array($layout, ['onecol_page', 'twocol_page']) ||
-         ($type === 'web_area' && $layout === 'twocol_page')) {
-        // Skip this row if:
-        // 1. the node uses a panelizer layout other than onecol_page or
-        // twocol_page.
-        // 2. the node type is web_area and it's using twcol_page layout
-        // We'll migrate these nodes with the epa_panelizer_node source plugin.
-        return FALSE;
-      }
-      else {
-        // Update the 'layout' property to its actual value.
-        $row->setSourceProperty('layout', $layout);
+      // Update the 'layout' property to its actual value.
+      $row->setSourceProperty('layout', $layout);
 
-        // Fetch the main_col panes and add the result as a source property.
-        $main_col_panes = $this->fetchPanes('main_col', $did);
-        $row->setSourceProperty('main_col_panes', $main_col_panes);
+      // Fetch the main_col panes and add the result as a source property.
+      $main_col_panes = $this->fetchPanes('main_col', $did);
+      $row->setSourceProperty('main_col_panes', $main_col_panes);
 
-        // Fetch the sidebar panes and add the result as a source property.
-        $sidebar_panes = $this->fetchPanes('sidebar', $did);
-        $row->setSourceProperty('sidebar_panes', $sidebar_panes);
-
-      }
+      // Fetch the sidebar panes and add the result as a source property.
+      $sidebar_panes = $this->fetchPanes('sidebar', $did);
+      $row->setSourceProperty('sidebar_panes', $sidebar_panes);
     }
     else {
       // Return the body content as 'main_col_panes' so it can be converted to

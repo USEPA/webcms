@@ -36,11 +36,34 @@
   <head>
     <head-placeholder token="{{ placeholder_token|raw }}">
     <title>{{ head_title|safe_join(' | ') }}</title>
+    <link rel="icon" type="image/x-icon" href="/themes/epa_theme/images/favicon.ico">
+    <meta name="msapplication-TileColor" content="#FFFFFF">
+    <meta name="msapplication-TileImage" content="/themes/epa_theme/images/favicon-144.png">
+    <meta name="application-name" content="{{ siteName }}">
+    <meta name="msapplication-config" content="/themes/epa_theme/images/ieconfig.xml">
+    <link rel="apple-touch-icon-precomposed" sizes="196x196" href="/themes/epa_theme/images/favicon-196.png">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/themes/epa_theme/images/favicon-152.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/themes/epa_theme/images/favicon-144.png">
+    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/themes/epa_theme/images/favicon-120.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/themes/epa_theme/images/favicon-114.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/themes/epa_theme/images/favicon-72.png">
+    <link rel="apple-touch-icon-precomposed" href="/themes/epa_theme/images/favicon-180.png">
+    <link rel="icon" href="/themes/epa_theme/images/favicon-32.png" sizes="32x32">
     <css-placeholder token="{{ placeholder_token|raw }}">
     <js-placeholder token="{{ placeholder_token|raw }}">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-L8ZB');</script>
+    <!-- End Google Tag Manager -->
   </head>
   <body{{ attributes.addClass(body_classes).setAttribute('id', body_id) }}>
     {% include '@components/skiplinks/skiplinks.twig' %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-L8ZB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     {{ page_top }}
     {{ page }}
     {{ page_bottom }}

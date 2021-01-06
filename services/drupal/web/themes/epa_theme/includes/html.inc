@@ -14,7 +14,6 @@ function epa_theme_preprocess(&$vars) {
   }
 }
 
-
 /**
  * Implements hook_preprocess_html().
  */
@@ -41,4 +40,12 @@ function epa_theme_preprocess_html(&$vars, $hook) {
       $vars['page_js'] = $node->field_page_head->value;
     }
   }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function epa_theme_preprocess_page(&$vars, $hook) {
+  $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+  $vars['language'] = $language;
 }

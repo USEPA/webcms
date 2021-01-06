@@ -59,7 +59,8 @@ trait EpaWysiwygTextProcessingTrait {
         if ($key > 0) {
           // Get unique values with array_unique, then remove any empty strings
           // with array_filter, and finally get the remaining match text.
-          $match = array_pop(array_filter(array_unique($match_strings)));
+          $non_empty_strings = array_filter(array_unique($match_strings));
+          $match = array_pop($non_empty_strings);
 
           switch ($match) {
             case 'box':
@@ -148,6 +149,62 @@ trait EpaWysiwygTextProcessingTrait {
   }
 
   /**
+   * Safely make replacements within a DOM classname
+   *
+   * @param string | string[] $searches
+   *   Classnames needing replacement
+   *
+   * @param string | string[] $replacements
+   *   Replacement classnames
+   *
+   * @param string $classname
+   *   A DOM classname
+   *
+   * @return string
+   *   Replacement classname with replacements made
+   */
+  public static function classReplace($searches, $replacements, $classname) {
+    if (!is_array($searches)) {
+      $searches = [$searches];
+    }
+    if (!is_array($replacements)) {
+      $replacements = [$replacements];
+    }
+
+    if (count($searches) !== count($replacements)) {
+      throw new \InvalidArgumentException('$from and $to not the same length');
+    }
+
+    // Work with maps so we get unique elements for free
+    $create_map = function ($str) {
+      $map = [];
+      foreach (preg_split('~\s+~', $str, -1, PREG_SPLIT_NO_EMPTY) as $name) {
+        $map[$name] = true;
+      }
+      return $map;
+    };
+
+    $class_map = $create_map($classname);
+
+    foreach ($searches as $i => $search) {
+      $search_map = $create_map($search);
+      $diff = array_diff_assoc($class_map, $search_map);
+
+      // If all in search were found, we'll see size of $class_map
+      // change by the size of $search_map.
+      if (count($class_map) - count($diff) === count($search_map)) {
+        // We just need to re-add the replacement names
+        $class_map = array_merge(
+          $diff,
+          $create_map($replacements[$i])
+        );
+      }
+    }
+
+    return implode(' ', array_keys($class_map));
+  }
+
+  /**
    * Transform Related Info Box.
    *
    * @param \DOMDocument $doc
@@ -166,7 +223,9 @@ trait EpaWysiwygTextProcessingTrait {
     if ($related_info_boxes) {
       foreach ($related_info_boxes as $key => $rib_wrapper) {
         // Replace div classes on box wrapper.
-        $box_classes = [
+        // Note: done with classReplace, so even "special foo box" will be properly
+        // recognized as matching "box special".
+        $searches = [
           'box multi related-info',
           'box multi highlight',
           'box multi news',
@@ -178,11 +237,9 @@ trait EpaWysiwygTextProcessingTrait {
           'box multi',
           'right',
           'left',
-          'clear-right',
-          'clear-left',
         ];
 
-        $box_replacement_classes = [
+        $replacements = [
           'box box--related-info',
           'box box--highlight',
           'box box--news',
@@ -194,12 +251,10 @@ trait EpaWysiwygTextProcessingTrait {
           'box box--multipurpose',
           'u-align-right',
           'u-align-left',
-          'u-clear-right',
-          'u-clear-left',
         ];
 
         $wrapper_classes = $rib_wrapper->attributes->getNamedItem('class')->value;
-        $wrapper_classes = str_replace($box_classes, $box_replacement_classes, $wrapper_classes);
+        $wrapper_classes = self::classReplace($searches, $replacements, $wrapper_classes);
         $rib_wrapper->setAttribute('class', $wrapper_classes);
 
         // Change child H2 to div and replace classes.
@@ -207,7 +262,7 @@ trait EpaWysiwygTextProcessingTrait {
         if ($heading) {
           $box_title = $doc->createElement('div', $heading->nodeValue);
           $box_title_classes = $heading->attributes->getNamedItem('class')->value;
-          $box_title_classes = str_replace('pane-title', 'box__title', $box_title_classes);
+          $box_title_classes = self::classReplace('pane-title', 'box__title', $box_title_classes);
           $box_title->setAttribute('class', $box_title_classes);
           $heading->parentNode->replaceChild($box_title, $heading);
         }
@@ -216,7 +271,7 @@ trait EpaWysiwygTextProcessingTrait {
         $box_content = $xpath->query('div[contains(@class, "pane-content")]', $rib_wrapper)[0];
         if ($box_content) {
           $box_content_classes = $box_content->attributes->getNamedItem('class')->value;
-          $box_content_classes = str_replace('pane-content', 'box__content', $box_content_classes);
+          $box_content_classes = self::classReplace('pane-content', 'box__content', $box_content_classes);
           $box_content->setAttribute('class', $box_content_classes);
         }
 
@@ -341,14 +396,14 @@ trait EpaWysiwygTextProcessingTrait {
           $parent_element->removeAttribute('id');
           $uls = $xpath->query('ul[contains(concat(" ", @class, " "), " tabs ") or @id="tabsnav"]', $parent_element);
           foreach ($uls as $ul) {
-            $ul->setAttribute('class', str_replace('tabs', '', $ul->attributes->getNamedItem('class')->value));
+            $ul->setAttribute('class', self::classReplace('tabs', '', $ul->attributes->getNamedItem('class')->value));
             if ($ul->attributes->getNamedItem('id')->value == 'tabsnav') {
               $ul->removeAttribute('id');
             }
           }
         }
         else {
-          $parent_element->setAttribute('class', str_replace('tabs', '', $parent_element->attributes->getNamedItem('class')->value));
+          $parent_element->setAttribute('class', self::classReplace('tabs', '', $parent_element->attributes->getNamedItem('class')->value));
           if ($parent_element->attributes->getNamedItem('id')->value == 'tabsnav') {
             $parent_element->removeAttribute('id');
           }
@@ -356,12 +411,12 @@ trait EpaWysiwygTextProcessingTrait {
 
         $lis = $xpath->query('li[contains(concat(" ", @class, " "), " active ")]', $parent_element);
         foreach ($lis as $li) {
-          $li->setAttribute('class', str_replace('active', '', $li->attributes->getNamedItem('class')->value));
+          $li->setAttribute('class', self::classReplace('active', '', $li->attributes->getNamedItem('class')->value));
         }
 
         $links = $xpath->query('a[contains(concat(" ", @class, " "), " menu-internal ")]', $parent_element);
         foreach ($links as $link) {
-          $link->setAttribute('class', str_replace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
+          $link->setAttribute('class', self::classReplace('menu-internal', '', $link->attributes->getNamedItem('class')->value));
         }
 
       }
@@ -389,7 +444,7 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($accordion_elements) {
       foreach ($accordion_elements as $ul) {
-        $ul->setAttribute('class', str_replace('accordion', '', $ul->attributes->getNamedItem('class')->value));
+        $ul->setAttribute('class', self::classReplace('accordion', '', $ul->attributes->getNamedItem('class')->value));
         $lis = $xpath->query('li', $ul);
 
         foreach ($lis as $li) {
@@ -403,7 +458,7 @@ trait EpaWysiwygTextProcessingTrait {
           $divs = $xpath->query('div[contains(concat(" ", @class, " "), " accordion-pane ")]', $li);
           foreach ($divs as $div) {
             // Remove old classes, id, and any 'display: none' styles.
-            $div->setAttribute('class', str_replace(['accordion-pane', 'is-closed'], '', $div->attributes->getNamedItem('class')->value));
+            $div->setAttribute('class', self::classReplace(['accordion-pane', 'is-closed'], ['', ''], $div->attributes->getNamedItem('class')->value));
             $div->removeAttribute('id');
             $div->setAttribute('style', str_replace('style="display: none;"', '', $div->attributes->getNamedItem('style')->array_count_values));
           }
@@ -483,7 +538,7 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($table_elements) {
       foreach ($table_elements as $table_element) {
-        $table_element->setAttribute('class', str_replace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
+        $table_element->setAttribute('class', self::classReplace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
       }
     }
 
@@ -492,7 +547,7 @@ trait EpaWysiwygTextProcessingTrait {
 
     if ($tablesorter_elements) {
       foreach ($tablesorter_elements as $tablesorter_element) {
-        $tablesorter_element->setAttribute('class', str_replace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
+        $tablesorter_element->setAttribute('class', self::classReplace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
       }
     }
 
@@ -500,7 +555,7 @@ trait EpaWysiwygTextProcessingTrait {
     $highlighted_headings = $xpath->query('//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]');
     if ($highlighted_headings) {
       foreach ($highlighted_headings as $heading) {
-        $heading->setAttribute('class', str_replace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
+        $heading->setAttribute('class', self::classReplace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
       }
     }
 
@@ -537,7 +592,7 @@ trait EpaWysiwygTextProcessingTrait {
           // Remove col class from children.
           $children = $xpath->query('div[contains(concat(" ", @class, " "), " col ")]', $element);
           foreach ($children as $child) {
-            $child->setAttribute('class', str_replace('col', '', $child->attributes->getNamedItem('class')->value));
+            $child->setAttribute('class', self::classReplace('col', '', $child->attributes->getNamedItem('class')->value));
           }
         }
 
@@ -568,12 +623,12 @@ trait EpaWysiwygTextProcessingTrait {
       foreach ($elements as $element) {
 
         // Replace class.
-        $element->setAttribute('class', str_replace($element->attributes->getNamedItem('class')->value, 'menu pipeline', 'list list--pipeline'));
+        $element->setAttribute('class', self::classReplace('menu pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
 
         // Remove menu-item class from children.
         $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);
         foreach ($children as $child) {
-          $child->setAttribute('class', str_replace('menu-item', '', $child->attributes->getNamedItem('class')->value));
+          $child->setAttribute('class', self::classReplace('menu-item', '', $child->attributes->getNamedItem('class')->value));
         }
       }
     }
@@ -601,32 +656,32 @@ trait EpaWysiwygTextProcessingTrait {
     if ($elements) {
       foreach ($elements as $element) {
         // Replace the class on the form element.
-        $element->setAttribute('class', str_replace('govdelivery-form', 'govdelivery', $element->attributes->getNamedItem('class')->value));
+        $element->setAttribute('class', self::classReplace('govdelivery-form', 'govdelivery', $element->attributes->getNamedItem('class')->value));
 
         // Replace classes.
         $fieldset = $xpath->query('fieldset[contains(concat(" ", @class, " "), " govdelivery-fieldset ")]', $element)[0];
         if ($fieldset) {
-          $fieldset->setAttribute('class', str_replace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
+          $fieldset->setAttribute('class', self::classReplace('govdelivery-fieldset', 'govdelivery__fieldset', $fieldset->attributes->getNamedItem('class')->value));
         }
 
         $legend = $xpath->query('legend[contains(concat(" ", @class, " "), " govdelivery-legend ")]', $element)[0];
         if ($legend) {
-          $legend->setAttribute('class', str_replace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
+          $legend->setAttribute('class', self::classReplace('govdelivery-legend', 'govdelivery__legend h3', $legend->attributes->getNamedItem('class')->value));
         }
 
         $label = $xpath->query('label[contains(concat(" ", @class, " "), " element-invisible ")]', $element)[0];
         if ($label) {
-          $label->setAttribute('class', str_replace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
+          $label->setAttribute('class', self::classReplace('element-invisible', 'form-item__label u-visually-hidden', $label->attributes->getNamedItem('class')->value));
         }
 
         $input = $xpath->query('input[contains(concat(" ", @class, " "), " govdelivery-text ")]', $element)[0];
         if ($input) {
-          $input->setAttribute('class', str_replace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
+          $input->setAttribute('class', self::classReplace('govdelivery-text form-text', 'form-item__email', $input->attributes->getNamedItem('class')->value));
         }
 
         $button = $xpath->query('button[contains(concat(" ", @class, " "), " govdelivery-submit ")]', $element)[0];
         if ($button) {
-          $button->setAttribute('class', str_replace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
+          $button->setAttribute('class', self::classReplace('govdelivery-submit', 'button', $button->attributes->getNamedItem('class')->value));
         }
 
         // Wrap label and input in a new div.
@@ -725,7 +780,7 @@ trait EpaWysiwygTextProcessingTrait {
         $span_element->setAttribute('class', 'usa-tag');
 
         // Update the a class and remove title attribute.
-        $element->setAttribute('class', str_replace('epa-archive-link', 'tag-link', $element->attributes->getNamedItem('class')->value));
+        $element->setAttribute('class', self::classReplace('epa-archive-link', 'tag-link', $element->attributes->getNamedItem('class')->value));
         $element->removeAttribute('title');
 
         $element->replaceChild($span_element, $element->firstChild);

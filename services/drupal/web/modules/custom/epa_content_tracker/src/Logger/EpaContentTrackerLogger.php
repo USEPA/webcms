@@ -146,7 +146,7 @@ class EpaContentTrackerLogger {
     $file = File::load($file_id);
 
     if ($file !== NULL) {
-      return $file->createFileUrl();
+      return $file->getFileUri();
     }
   }
 

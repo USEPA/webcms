@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Local script to run drush command(s) in an ECS task on
+# the webcms-cluster-stage cluster.
+#
+# Requirements:
+#   - drushvpc-stage.json must be in cwd
+#   - AWS_PROFILE is set appropriately
+#
+# USAGE: bash scripts/stage-command.sh
+#
+
+set -euo pipefail
+
+script=$(cat <<EOF
+  drush ms
+EOF
+)
+
+started_by="bschumacher"
+
+# Use jq to format the container overrides in a way that plays nicely with
+# AWS ECS' character count limitations on JSON input, as well as avoids
+# potential issues with quoting
+overrides="$(
+  jq -cn --arg script "$script" '
+{
+  "containerOverrides": [
+    {
+      "name": "drush",
+      "command": ["/bin/sh", "-ec", $script],
+    }
+  ]
+}
+'
+)"
+
+# Run a Drush task, capturing the task's ARN for later (that's the jq line at the end)
+arn="$(
+  aws ecs run-task \
+    --task-definition webcms-drush-stage \
+    --cluster webcms-cluster-stage \
+    --overrides "$overrides" \
+    --capacity-provider-strategy "capacityProvider=FARGATE,weight=1,base=1" \
+    --network-configuration "$(cat drushvpc-stage.json)" \
+    --started-by "$started_by" |
+    jq -r '.tasks[0].taskArn'
+)"
+
+echo "ARN: $arn"
+echo "Find it here: https://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/webcms-cluster-stage/tasks"

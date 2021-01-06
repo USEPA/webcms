@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_migrations\Plugin\migrate\source;
 
+use Drupal\epa_migrations\EpaIgnoreRowTrait;
 use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
@@ -20,6 +21,7 @@ use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
  * )
  */
 class EpaOgMembership extends DrupalSqlBase {
+  use EpaIgnoreRowTrait;
 
   /**
    * {@inheritDoc}
@@ -30,8 +32,14 @@ class EpaOgMembership extends DrupalSqlBase {
    * {@inheritdoc}
    */
   public function query() {
-    $query = $this->select('epa_og_og_membership', 'eoom')
-      ->condition('eoom.entity_type', $this->configuration['d7_entity_type'])
+    if (isset($this->configuration['use_og_table'])) {
+      $query = $this->select('og_membership', 'eoom');
+    }
+    else {
+      $query = $this->select('epa_og_og_membership', 'eoom');
+    }
+
+    $query->condition('eoom.entity_type', $this->configuration['d7_entity_type'])
       ->fields('eoom', ['etid', 'gid']);
 
     if (isset($this->configuration['node_bundle'])) {
@@ -72,19 +80,18 @@ class EpaOgMembership extends DrupalSqlBase {
 
     // Load the D8 entity.
     $entity = $this->entityTypeManager->getStorage($type)->load($etid);
-
-    if ($entity) {
-      // Make the label for this entity available as a source property.
-      $row->setSourceProperty('label', $entity->label());
-
-      // Make the bundle for this entity available as a source property.
-      $row->setSourceProperty('bundle', $entity->bundle());
-
-      return parent::prepareRow($row);
+    if (!$entity) {
+      // Entity can't be found, so ignore row
+      return $this->ignoreRow($row, "Unable to migrate group relationship due to missing '$type' entity with ID '$etid'.");
     }
-    else {
-      return FALSE;
-    }
+
+    // Make the label for this entity available as a source property.
+    $row->setSourceProperty('label', $entity->label());
+
+    // Make the bundle for this entity available as a source property.
+    $row->setSourceProperty('bundle', $entity->bundle());
+
+    return parent::prepareRow($row);
   }
 
 }

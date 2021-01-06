@@ -227,7 +227,7 @@ FROM nginx:mainline-alpine AS nginx
 COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the nginx configuration and the startup script
-COPY default.conf status.conf /etc/nginx/conf.d/
+COPY default.conf status.conf *.map /etc/nginx/conf.d/
 COPY scripts/ecs/nginx-entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
@@ -257,3 +257,7 @@ RUN set -ex \
 
 # Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
+
+# Copy th emigration script into /usr/local/bin as a command
+COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
+RUN chmod +x /usr/local/bin/drush-migrate

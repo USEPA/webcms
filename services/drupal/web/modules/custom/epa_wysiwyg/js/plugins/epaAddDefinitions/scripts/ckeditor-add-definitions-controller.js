@@ -657,7 +657,7 @@ var CKEditorAddDefinitions = (function(my, $, undefined) {
 
   // Create and return a new DOM element which contains all markup for a term and associated definition.
   function createTermNode(occurrenceNum, entryDefinition) {
-    var entryTerm = '%TERM%';
+    var entryTerm = '%TERM% ';
     var definition = document.createElement('span');
     definition.setAttribute('class', 'definition js-definition');
 

@@ -39,24 +39,18 @@ trait EpaMediaWysiwygTransformTrait {
 
     $pattern = '/\[\[(?<tag_info>.+?"type":"media".+?)\]\]/s';
 
-    $media_embed_replacement_template = <<<'TEMPLATE'
-<drupal-media
-  alt="%s"
-  data-align="%s"
-  data-caption="%s"
-  data-entity-type="media"
-  data-entity-uuid="%s"
-  data-view-mode="%s"></drupal-media>
-TEMPLATE;
-
     $inline_embed_replacement_template = <<<'TEMPLATE'
 <drupal-inline-media
   data-align="center"
   data-entity-type="media"
+  data-view-mode="link_with_description"
   data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 
-    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $media_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
+    // Fix these malformed JSON strings
+    $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
+
+    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
       $decoder = new JsonDecode(TRUE);
 
       try {
@@ -74,24 +68,27 @@ TEMPLATE;
         }
         // Return a full media embed.
         else {
-          $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
-          $media_embed = sprintf($media_embed_replacement_template,
-            $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '',
-            $alignment,
-            htmlentities(stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]']))) ?? '',
-            $media_entity_uuid,
-            $view_modes[$tag_info['view_mode']]
-          );
+          $doc = new \DOMDocument();
+          $el = $doc->createElement('drupal-media');
+          $el->setAttribute('data-entity-type', 'media');
+          $el->setAttribute('data-entity-uuid', $media_entity_uuid);
+          $el->setAttribute('data-view-mode', $view_modes[$tag_info['view_mode']]);
 
-          // If the 'link to original' setting is selected in D7, wrap the media
-          // embed in a link to the original image.
-          $link_to_original = $tag_info['fields']['field_original_image_link[und]'];
-          if ($link_to_original == 1 && $media_entity->bundle->entity->label() == 'Image') {
-            $original_image_url = $media_entity->field_media_image->entity->createFileUrl(TRUE);
-            $media_embed = "<a href=\"{$original_image_url}\">" . $media_embed . "</a>";
+          $alignment = $remove_alignment ? '' : $tag_info['fields']['field_image_alignment[und]'] ?? 'center';
+          $el->setAttribute('data-align',$alignment);
+
+          $caption = stripslashes(urldecode($tag_info['fields']['field_caption[und][0][value]'] ?? ''));
+          if (!empty($caption)) {
+            $el->setAttribute('data-caption', $caption);
           }
 
-          return $media_embed;
+          $alt = $tag_info['fields']['field_file_image_alt_text[und][0][value]'] ?? '';
+          if (!empty($alt)) {
+            $el->setAttribute('alt',$alt);
+          }
+
+          $doc->appendChild($el);
+          return $doc->saveHTML();
         }
       }
       catch (\Exception $e) {
@@ -113,6 +110,9 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
+    // Fix these malformed JSON strings
+    $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
+
     $pattern = '~\[\[(.+?"type":"media".+?)\]\]~s';
     $split = preg_split($pattern, $wysiwyg_content, 2, PREG_SPLIT_DELIM_CAPTURE);
     /**
