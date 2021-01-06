@@ -1,6 +1,6 @@
 ---
 el: .site-logo
-title: Site Logo
+title: Spanish Site Logo
 state: complete
 ---
 
