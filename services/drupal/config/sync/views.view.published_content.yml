@@ -45,7 +45,7 @@ display:
       pager:
         type: mini
         options:
-          items_per_page: 20
+          items_per_page: 50
           offset: 0
           id: 0
           total_pages: null
@@ -125,14 +125,14 @@ display:
               empty_column: false
               responsive: priority-low
             field_review_deadline:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
               responsive: ''
             name:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
@@ -723,6 +723,54 @@ display:
           plugin_id: bundle
           entity_type: node
           entity_field: type
+        uid:
+          id: uid
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_op
+            label: Author
+            description: ' '
+            use_operator: false
+            operator: uid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          entity_field: uid
+          plugin_id: user_name
         moderation_state:
           id: moderation_state
           table: node_field_data
@@ -772,18 +820,6 @@ display:
             group_items: {  }
           entity_type: node
           plugin_id: moderation_state_filter
-        status_extra:
-          id: status_extra
-          table: node_field_data
-          field: status_extra
-          operator: '='
-          value: false
-          plugin_id: node_status
-          group: 1
-          entity_type: node
-          expose:
-            operator_limit_selection: false
-            operator_list: {  }
         status_1:
           id: status_1
           table: node_field_data
@@ -878,7 +914,9 @@ display:
         operator: AND
         groups:
           1: AND
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     display_plugin: default
     display_title: Master
     id: default
@@ -889,7 +927,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user
         - 'user.node_grants:view'
         - user.permissions
       max-age: -1
@@ -927,7 +964,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user
         - 'user.node_grants:view'
         - user.permissions
       max-age: -1
