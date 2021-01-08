@@ -8,6 +8,7 @@ import Drupal from 'drupal';
       const now = Date.now();
 
       definitions.forEach((definition, index) => {
+        const parent = definition.parentNode;
         const trigger = definition.querySelector('.js-definition__trigger');
         const tooltip = definition.querySelector('.js-definition__tooltip');
         const definitionId = `definition-${now}-${index}`;
@@ -17,28 +18,30 @@ import Drupal from 'drupal';
         tooltip.setAttribute('aria-hidden', true);
 
         definition.addEventListener('mouseenter', event => {
-          openTooltip(tooltip);
+          openTooltip(tooltip, parent);
         });
 
         definition.addEventListener('mouseleave', event => {
-          closeTooltip(tooltip);
+          closeTooltip(tooltip, parent);
         });
 
         definition.addEventListener('focusin', event => {
-          openTooltip(tooltip);
+          openTooltip(tooltip, parent);
         });
 
         definition.addEventListener('focusout', event => {
-          closeTooltip(tooltip);
+          closeTooltip(tooltip, parent);
         });
       });
 
-      function openTooltip(tooltip) {
+      function openTooltip(tooltip, parent) {
         tooltip.setAttribute('aria-hidden', false);
+        parent.style.position = 'relative';
       }
 
-      function closeTooltip(tooltip) {
+      function closeTooltip(tooltip, parent) {
         tooltip.setAttribute('aria-hidden', true);
+        parent.style.position = null;
       }
     },
   };
