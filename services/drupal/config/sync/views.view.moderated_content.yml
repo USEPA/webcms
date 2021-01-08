@@ -52,7 +52,7 @@ display:
       pager:
         type: mini
         options:
-          items_per_page: 20
+          items_per_page: 50
           offset: 0
           id: 0
           total_pages: null
@@ -115,7 +115,7 @@ display:
               empty_column: false
               responsive: ''
             name:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
@@ -786,9 +786,9 @@ display:
           plugin_id: views_autocomplete_filters_string
         type:
           id: type
-          table: node_field_data
+          table: node_field_revision
           field: type
-          relationship: nid
+          relationship: none
           group_type: group
           admin_label: ''
           operator: in
@@ -797,10 +797,12 @@ display:
           exposed: true
           expose:
             operator_id: type_op
-            label: 'Content type'
+            label: Type
             description: ''
             use_operator: false
             operator: type_op
+            operator_limit_selection: false
+            operator_list: {  }
             identifier: type
             required: false
             remember: false
@@ -808,10 +810,13 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
               administrator: '0'
             reduce: false
-            operator_limit_selection: false
-            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -827,6 +832,54 @@ display:
           entity_type: node
           entity_field: type
           plugin_id: bundle
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_1_op
+            label: Author
+            description: ' '
+            use_operator: false
+            operator: uid_1_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          entity_field: uid
+          plugin_id: user_name
         moderation_state:
           id: moderation_state
           table: node_field_revision
@@ -942,7 +995,9 @@ display:
           entity_field: gid
           plugin_id: standard
       arguments: {  }
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
       filter_groups:
         operator: AND
         groups:
