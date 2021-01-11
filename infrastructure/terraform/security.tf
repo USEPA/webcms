@@ -1,90 +1,3 @@
-resource "aws_security_group" "interface" {
-  name        = "webcms-interface-sg-${local.env-suffix}"
-  description = "Security group for AWS interface endpoints"
-
-  vpc_id = local.vpc-id
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Interface"
-  })
-}
-
-# In some cases, the interface egress rule isn't enough to allow access. This security
-# group has explicit permission to access the VPC endpoint interfaces, albeit in a somewhat
-# more narrow range.
-resource "aws_security_group" "interface_access" {
-  name        = "webcms-interface-access-sg-${local.env-suffix}"
-  description = "Security group for access to VPC endpoints"
-
-  vpc_id = local.vpc-id
-
-  egress {
-    description = "Allow outgoing HTTP connections"
-
-    protocol        = "tcp"
-    from_port       = 80
-    to_port         = 80
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  egress {
-    description = "Allow outgoing HTTPS connections"
-
-    protocol        = "tcp"
-    from_port       = 443
-    to_port         = 443
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Interface Access"
-  })
-}
-
-# Allow permissive access to the VPC endpoints. Since the interface security group is only
-# ever applied to AWS VPC endpoints, this is safe since the AWS APIs themselves are
-# protected by IAM rules.
-resource "aws_security_group_rule" "interface_vpc_ingress" {
-  description = "Allows permissive access to all endpoints"
-
-  security_group_id = aws_security_group.interface.id
-
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 0
-  to_port   = 65535
-
-  cidr_blocks = [local.vpc-cidr-block]
-}
-
-# In other cases, the rules below allow HTTP and HTTPS access in case an explicit security
-# group is needed.
-resource "aws_security_group_rule" "interface_access_http_ingress" {
-  description = "Allows HTTP ingress from the interface access group"
-
-  security_group_id = aws_security_group.interface.id
-
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 80
-  to_port   = 80
-
-  source_security_group_id = aws_security_group.interface_access.id
-}
-
-resource "aws_security_group_rule" "interface_access_https_ingress" {
-  description = "Allow HTTPS ingress from the interface access group"
-
-  security_group_id = aws_security_group.interface.id
-
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 443
-  to_port   = 443
-
-  source_security_group_id = aws_security_group.interface_access.id
-}
-
 resource "aws_security_group" "load_balancer" {
   name        = "webcms-alb-sg-${local.env-suffix}"
   description = "Security group for the WebCMS load balancers"
@@ -116,17 +29,15 @@ resource "aws_security_group" "load_balancer" {
   })
 }
 
-# NB. This is only the security group for the EC2 instances in the cluster, _not_ the
-# ECS tasks that will be running in containers. These servers only need enough permissions
-# to communicate with the ECS API and a few other AWS services.
-resource "aws_security_group" "server" {
-  name        = "webcms-ec2-sg-${local.env-suffix}"
-  description = "Security group for the WebCMS EC2 instances"
+resource "aws_security_group" "utility" {
+  name        = "webcms-utility-sg-${local.env-suffix}"
+  description = "Security group for utility servers"
 
   vpc_id = local.vpc-id
 
+  # Allow HTTP/HTTPS access
   egress {
-    description = "Allow outgoing HTTP traffic"
+    description = "Allow outbound HTTP access"
 
     protocol    = "tcp"
     from_port   = 80
@@ -135,82 +46,12 @@ resource "aws_security_group" "server" {
   }
 
   egress {
-    description = "Allow outgoing HTTPS traffic"
+    description = "Allow outbound HTTPS access"
 
     protocol    = "tcp"
     from_port   = 443
     to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow access to VPC endpoint services"
-
-    protocol        = "tcp"
-    from_port       = 0
-    to_port         = 0
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Cluster Server"
-  })
-}
-
-resource "aws_security_group_rule" "server_extra_ingress" {
-  for_each = toset(var.server-security-ingress)
-
-  description       = "Allows ingress from security scanners to the ECS instances"
-  security_group_id = aws_security_group.server.id
-
-  type      = "ingress"
-  from_port = 0
-  to_port   = 65535
-  protocol  = "all"
-
-  source_security_group_id = each.value
-}
-
-resource "aws_security_group" "utility" {
-  name        = "webcms-utility-sg-${local.env-suffix}"
-  description = "Security group for utility servers"
-
-  vpc_id = local.vpc-id
-
-  egress {
-    description = "Allow access to VPC endpoint services"
-
-    protocol        = "tcp"
-    from_port       = 0
-    to_port         = 65535
-    security_groups = [aws_security_group.interface.id]
-  }
-
-  # We have to allow HTTP access to the gateway from the utility server because we install
-  # the mariadb package.
-  # The reason for this is that Amazon Linux 2 yum repositories are configured to use
-  # the domain amazonlinux.us-east-1.amazonaws.com, which is a CNAME for the domain
-  # s3.dualstack.us-east-1.amazonaws.com.
-  # Over HTTP, this is perfectly acceptable. But over HTTPS, the TLS verification step
-  # fails because the amazonlinux subdomain isn't in the SNI domain list.
-  # Until we can find an alternate means of installing the package, we're stuck with
-  # allowing unencrypted access to S3 from this host.
-  egress {
-    description = "Allow HTTP access to the S3 gateway"
-
-    protocol        = "tcp"
-    from_port       = 80
-    to_port         = 80
-    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
-  }
-
-  egress {
-    description = "Allow HTTPS access to the S3 gateway"
-
-    protocol        = "tcp"
-    from_port       = 443
-    to_port         = 443
-    prefix_list_ids = [aws_vpc_endpoint.s3.prefix_list_id]
   }
 
   tags = merge(local.common-tags, {
@@ -409,18 +250,6 @@ resource "aws_security_group_rule" "drupal_https_egress" {
   from_port   = 443
   to_port     = 443
   cidr_blocks = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group_rule" "drupal_interface_egress" {
-  description = "Allow access to VPC endpoint services"
-
-  security_group_id = aws_security_group.drupal_task.id
-
-  type                     = "egress"
-  protocol                 = "tcp"
-  from_port                = 0
-  to_port                  = 0
-  source_security_group_id = aws_security_group.interface.id
 }
 
 resource "aws_security_group_rule" "drupal_smtp_egress" {

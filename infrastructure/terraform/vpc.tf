@@ -201,29 +201,3 @@ resource "aws_vpc_endpoint" "s3" {
     Name = "${local.name-prefix} S3 Gateway"
   })
 }
-
-locals {
-  # Place Systems Manager endpoints into the VPC in order to further secure the connection
-  ssm-endpoints = var.vpc-create-interfaces ? ["ssm", "ec2", "ec2messages", "ssmmessages"] : []
-}
-
-data "aws_vpc_endpoint_service" "ssm" {
-  for_each = toset(local.ssm-endpoints)
-
-  service = each.value
-}
-
-resource "aws_vpc_endpoint" "ssm" {
-  for_each = toset(local.ssm-endpoints)
-
-  vpc_id              = local.vpc-id
-  service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
-  vpc_endpoint_type   = "Interface"
-  private_dns_enabled = true
-  security_group_ids  = [aws_security_group.interface.id]
-  subnet_ids          = aws_subnet.private.*.id
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} SSM Interface: ${each.value}"
-  })
-}
