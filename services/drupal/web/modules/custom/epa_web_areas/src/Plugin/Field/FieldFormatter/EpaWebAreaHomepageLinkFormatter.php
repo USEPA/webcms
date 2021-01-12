@@ -44,6 +44,9 @@ class EpaWebAreaHomepageLinkFormatter extends EntityReferenceFormatterBase {
 
       $homepage = $entity->field_homepage->entity;
       $label = $entity->label();
+      if (empty($homepage)) {
+        return $elements;
+      }
       // If the link is to be displayed and the entity has a uri, display a
       // link.
       if (!$homepage->isNew()) {
