@@ -17,12 +17,10 @@ import Drupal from 'drupal';
         tooltip.setAttribute('id', definitionId);
         tooltip.setAttribute('aria-hidden', true);
 
-        definition.addEventListener('mouseenter', event => {
-          openTooltip(tooltip, parent);
-        });
-
-        definition.addEventListener('mouseleave', event => {
-          closeTooltip(tooltip, parent);
+        trigger.addEventListener('click', event => {
+          if (tooltip.getAttribute('aria-hidden')) {
+            trigger.focus();
+          }
         });
 
         definition.addEventListener('focusin', event => {
