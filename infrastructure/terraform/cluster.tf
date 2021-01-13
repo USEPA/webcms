@@ -380,13 +380,6 @@ resource "aws_ecs_service" "drupal" {
     security_groups = local.drupal-security-groups
   }
 
-  # Ask ECS to prioritize spreading tasks across available EC2 instances before running
-  # multiple copies on a server. This should alleviate downtime
-  ordered_placement_strategy {
-    field = "instanceId"
-    type  = "spread"
-  }
-
   # Ignore changes to the desired_count attribute - we assume that the application
   # autoscaling rules will take over
   lifecycle {
