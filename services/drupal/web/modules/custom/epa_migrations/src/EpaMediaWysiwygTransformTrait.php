@@ -90,7 +90,7 @@ TEMPLATE;
           // If the 'link to original' setting is selected in D7, wrap the
           // <drupal-media> element in a link to the original image.
           $link_to_original = $tag_info['fields']['field_original_image_link[und]'];
-          if ($link_to_original == 1 && $media_entity && $media_entity->bundle->entity->label() == 'Image') {
+          if (!empty($link_to_original) && $link_to_original == 1 && $media_entity && $media_entity->bundle->entity->label() == 'Image') {
             $original_image_url = $media_entity->field_media_image->entity->createFileUrl();
             $link_element = $doc->createElement('a');
             $link_element->setAttribute('href', $original_image_url);
