@@ -3,3 +3,16 @@ purgers:
     order_index: 2
     instance_id: d56e9792a2
     plugin_id: akamai_tag
+processors:
+  -
+    plugin_id: drush_purge_queue_work
+    status: true
+  -
+    plugin_id: drush_purge_invalidate
+    status: true
+  -
+    plugin_id: lateruntime
+    status: false
+  -
+    plugin_id: purge_ui_block_processor
+    status: true

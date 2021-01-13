@@ -494,3 +494,28 @@ function _epa_workflow_form_validation_revision_log($element, FormStateInterface
     }
   }
 }
+
+/**
+ * Implements hook_cron().
+ */
+function epa_workflow_cron() {
+  $env_state = getenv('WEBCMS_ENV_STATE');
+  if ($env_state !== 'migration') {
+    /**
+     * @var ScheduledPublishCron $scheduledPublishUpdate
+     */
+    $scheduledPublishUpdate = \Drupal::service('scheduled_publish.update');
+    $scheduledPublishUpdate->doUpdate();
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_workflow_module_implements_alter(&$implementations, $hook) {
+  // We need control over this hook implementation so that we can stop
+  // automated transitions during migrations.
+  if ($hook == 'cron' && isset($implementations['scheduled_publish'])) {
+    unset($implementations['scheduled_publish']);
+  }
+}

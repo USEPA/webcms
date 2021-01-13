@@ -1,19 +1,19 @@
-uuid: a02a5e33-06e6-48cc-b44f-62aeb05a58a3
+uuid: 7b13432c-5386-470f-bcc4-971558de80d4
 langcode: en
 status: true
 dependencies:
   module:
-    - update
-title: 'Update indexes'
-id: update_cron
+    - purge_processor_cron
+title: 'Default cron handler'
+id: purge_processor_cron_cron
 weight: 0
-module: update
-callback: update_cron
+module: purge_processor_cron
+callback: purge_processor_cron_cron
 scheduler:
   id: simple
   configuration:
     rules:
-      - '0+@ 0 * * *'
+      - '*/5+@ * * * *'
 launcher:
   id: serial
   configuration:
