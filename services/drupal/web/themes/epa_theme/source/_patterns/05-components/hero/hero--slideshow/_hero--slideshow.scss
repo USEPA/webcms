@@ -13,4 +13,17 @@
       margin-bottom: 0;
     }
   }
+
+  // Use CSS grid to set equal height slides.
+  @supports (display: grid) {
+    flex-grow: 1;
+    height: 100%;
+
+    @include breakpoint(max-width gesso-breakpoint(tablet)) {
+      .grid-container,
+      .usa-hero__callout {
+        height: 100%;
+      }
+    }
+  }
 }
