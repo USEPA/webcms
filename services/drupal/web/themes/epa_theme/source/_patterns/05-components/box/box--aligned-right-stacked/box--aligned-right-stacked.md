@@ -1,5 +1,5 @@
 ---
-el: .box.is-aligned-right.clear-right
+el: .box.u-align-right.u-clear-right
 title: Right-aligned Box, Stacked
 state: inprogress
 ---
