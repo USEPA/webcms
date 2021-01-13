@@ -81,8 +81,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.drupal.name,
-          awslogs-region = var.aws-region
+          awslogs-group         = aws_cloudwatch_log_group.drupal.name,
+          awslogs-region        = var.aws-region
+          awslogs-stream-prefix = "drupal"
         }
       }
     },
@@ -122,8 +123,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.nginx.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.nginx.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "nginx"
         }
       }
     },
@@ -155,8 +157,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.agent.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.agent.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "cloudwatch"
         }
       }
     },
@@ -307,8 +310,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.fpm_metrics.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.fpm_metrics.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "fpm-metrics"
         }
       }
     }
