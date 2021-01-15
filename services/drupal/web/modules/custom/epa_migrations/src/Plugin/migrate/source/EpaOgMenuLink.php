@@ -28,7 +28,7 @@ class EpaOgMenuLink extends MenuLink {
 
     $query->leftJoin('og_menu', 'om', 'ml.menu_name = om.menu_name');
     $query->condition('om.menu_name', NULL, 'IS NOT NULL');
-
+    $query->fields('om', ['gid']);
     return $query;
   }
 
@@ -36,10 +36,9 @@ class EpaOgMenuLink extends MenuLink {
    * {@inheritdoc}
    */
   public function prepareRow(Row $row) {
-    // Change menu name from 'menu-og-id' to 'group-id-menu'.
-    $pattern = '/menu-og-(\d+)/';
-    $replacement = 'group-${1}-menu';
-    $row->setSourceProperty('d8_menu_name', preg_replace($pattern, $replacement, $row->getSourceProperty('menu_name')));
+    // Standardize D8 menu name to 'group-id-menu'.
+    $gid = $row->getSourceProperty('gid');
+    $row->setSourceProperty('d8_menu_name', "group-${gid}-menu");
 
     return parent::prepareRow($row);
   }
