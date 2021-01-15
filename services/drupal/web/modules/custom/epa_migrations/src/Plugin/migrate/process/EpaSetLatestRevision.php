@@ -140,7 +140,7 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     // current revision (as obtained from D7), retaining its same state.
     //
     // If they do match, skip this step and goto forward revision logic.
-    if ($node->vid !== $d7_vid) {
+    if ($node->get('vid')->value !== $d7_vid) {
       // There's a vid mismatch, re-save d7_current_revision in D8 with the
       // correct state.
       $new_current_revision_state = $state_map[$d7_current_revision->state] ?? $d7_current_revision->state;
@@ -163,7 +163,9 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
 
       $newer_draft_revision = $this->getHeaviestDraftRevision($d7_forward_revisions);
 
-      if ($newer_draft_revision->vid < $d7_vid) {
+      // If the newer draft revision has a vid lower than the current revision,
+      // we want to give it a new vid so it is set as the latest revision.
+      if ($newer_draft_revision->vid < $node->get('vid')->value) {
 
         $new_latest_revision_state = $state_map[$newer_draft_revision->state] ?? $newer_draft_revision->state;
 
