@@ -104,11 +104,6 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       // If the node doesn't exist in D8, we can't do anything here.
       throw new MigrateException('Unable to load node to set latest revision');
     }
-    else {
-      // If we have a node, turn on 'generate automatic alias' and continue with
-      // revision logic.
-      $this->pathautoOn($node);
-    }
 
     // Get timestamp and state for the current revision.
     $d7_current_revision = $this->d7Connection->select('node_revision_epa_states', 'nres')
@@ -181,6 +176,9 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
         $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
       }
     }
+
+    // Now that we've set the correct latest revision, let's turn on pathauto.
+    $this->pathautoOn($node);
 
     return TRUE;
   }
