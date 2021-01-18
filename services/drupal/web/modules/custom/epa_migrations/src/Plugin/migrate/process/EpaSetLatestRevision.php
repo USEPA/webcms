@@ -161,7 +161,7 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
 
       // If the newer draft revision has a vid lower than the latest revision,
       // we want to give it a new vid so it is set as the latest revision.
-      $d8_latest_revision_id = $node_storage->getLatestRevisionId($node->id);
+      $d8_latest_revision_id = $node_storage->getLatestRevisionId($node->id());
       if ($newer_draft_revision->vid < $d8_latest_revision_id) {
 
         $new_latest_revision_state = $state_map[$newer_draft_revision->state] ?? $newer_draft_revision->state;
