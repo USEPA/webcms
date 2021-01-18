@@ -99,7 +99,8 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     $nid = $value[0];
     $d7_vid = $value[1];
 
-    $node = $this->entityTypeManager->getStorage('node')->load($nid);
+    $node_storage = $this->entityTypeManager->getStorage('node');
+    $node = $node_storage->load($nid);
     if (!$node) {
       // If the node doesn't exist in D8, we can't do anything here.
       throw new MigrateException('Unable to load node to set latest revision');
@@ -135,7 +136,7 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     // current revision (as obtained from D7), retaining its same state.
     //
     // If they do match, skip this step and goto forward revision logic.
-    if ($node->get('vid')->value !== $d7_vid) {
+    if ($node->getRevisionId() !== $d7_vid) {
       // There's a vid mismatch, re-save d7_current_revision in D8 with the
       // correct state.
       $new_current_revision_state = $state_map[$d7_current_revision->state] ?? $d7_current_revision->state;
@@ -158,9 +159,10 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
 
       $newer_draft_revision = $this->getHeaviestDraftRevision($d7_forward_revisions);
 
-      // If the newer draft revision has a vid lower than the current revision,
+      // If the newer draft revision has a vid lower than the latest revision,
       // we want to give it a new vid so it is set as the latest revision.
-      if ($newer_draft_revision->vid < $node->get('vid')->value) {
+      $d8_latest_revision_id = $node_storage->getLatestRevisionId($node->id);
+      if ($newer_draft_revision->vid < $d8_latest_revision_id) {
 
         $new_latest_revision_state = $state_map[$newer_draft_revision->state] ?? $newer_draft_revision->state;
 
