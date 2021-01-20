@@ -53,7 +53,7 @@ resource "aws_lb_target_group" "drupal_https_target_group" {
   name = "webcms-drupal-https-tg-${local.env-suffix}"
 
   port              = 443
-  protocol          = "TLS"
+  protocol          = "TCP"
   target_type       = "ip"
   vpc_id            = local.vpc-id
   proxy_protocol_v2 = true
