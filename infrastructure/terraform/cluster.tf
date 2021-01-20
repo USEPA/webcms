@@ -484,48 +484,6 @@ resource "aws_appautoscaling_target" "drupal" {
   service_namespace  = "ecs"
 }
 
-# Read out the ARNs for the load balancer and Drupal target group (used below)
-data "aws_arn" "alb" {
-  arn = aws_lb.frontend.arn
-}
-
-data "aws_arn" "target_group" {
-  arn = aws_lb_target_group.drupal_target_group.arn
-}
-
-# Define an autoscaling rule. We scale when the load balancer reports an average of more
-# than 50 requests/target, indicating a high volume of traffic spread across too few
-# containers. If the metric goes above this threshold, ECS will add replicas of the
-# Drupal task.
-resource "aws_appautoscaling_policy" "drupal_autoscaling_elb" {
-  count = length(aws_appautoscaling_target.drupal)
-
-  name        = "webcms-drupal-scaling-elb-${local.env-suffix}"
-  policy_type = "TargetTrackingScaling"
-
-  # These identify what we're scaling (see the autoscaling target above)
-  # NB. Since these resources are all conditionally created, we key on count.index to
-  # avoid Terraform warnings about resource lists.
-  resource_id        = aws_appautoscaling_target.drupal[count.index].id
-  scalable_dimension = aws_appautoscaling_target.drupal[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.drupal[count.index].service_namespace
-
-  # Autoscaling rules: What is the condition that triggers scaling of the above target?
-  target_tracking_scaling_policy_configuration {
-    target_value = 50
-
-    # Wait 5 minutes before scaling in, but only 1 for scaling out.
-    scale_in_cooldown  = 5 * 60
-    scale_out_cooldown = 60
-
-    # Which metrics are we monitoring
-    predefined_metric_specification {
-      predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
-    }
-  }
-}
-
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this
 # threshold (but the ELB autoscaling policy hasn't triggered), then that indicates that
 # there is a large amount of backend traffic, and we should scale accordingly.
