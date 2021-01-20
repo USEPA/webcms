@@ -484,6 +484,11 @@ resource "aws_appautoscaling_target" "drupal" {
   service_namespace  = "ecs"
 }
 
+# Read out the ARNs for the load balancer and Drupal target group (used below)
+data "aws_arn" "alb" {
+  arn = aws_lb.frontend.arn
+}
+
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this
 # threshold (but the ELB autoscaling policy hasn't triggered), then that indicates that
 # there is a large amount of backend traffic, and we should scale accordingly.
