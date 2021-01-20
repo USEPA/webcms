@@ -489,6 +489,10 @@ data "aws_arn" "alb" {
   arn = aws_lb.frontend.arn
 }
 
+data "aws_arn" "target_group" {
+  arn = aws_lb_target_group.drupal_https_target_group.arn
+}
+
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this
 # threshold (but the ELB autoscaling policy hasn't triggered), then that indicates that
 # there is a large amount of backend traffic, and we should scale accordingly.
