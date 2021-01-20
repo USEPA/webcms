@@ -26,7 +26,7 @@ resource "aws_lb_listener" "frontend_http" {
   protocol          = "TCP"
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb
   }
 }
@@ -81,8 +81,7 @@ resource "aws_lb_listener" "frontend_https" {
   certificate_arn   = var.alb-certificate
 
   default_action {
-    type = "forward"
-
+    type             = "forward"
     target_group_arn = aws_lb_target_group.drupal_https_target_group.arn
   }
 }

@@ -175,10 +175,10 @@ resource "aws_ecs_task_definition" "drupal_task" {
         # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
         # the region and bucket name because in us-east-1, the domain isn't easy to
         # construct via "$bucket.s3-$region.amazonaws.com".
-        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name }
+        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name },
 
         # Pass all the valid domain names as $WEBCMS_SERVER_NAMES
-        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.site-hostname], var.alb-hostnames)) }
+        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.site-hostname], var.alb-hostnames)) },
       ]
 
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
