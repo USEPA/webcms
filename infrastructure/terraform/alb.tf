@@ -33,10 +33,11 @@ resource "aws_lb_listener" "frontend_http" {
 resource "aws_lb_target_group" "drupal_http_target_group" {
   name = "webcms-drupal-http-tg-${local.env-suffix}"
 
-  port        = 80
-  protocol    = "TCP"
-  target_type = "ip"
-  vpc_id      = local.vpc-id
+  port              = 80
+  protocol          = "TCP"
+  target_type       = "ip"
+  vpc_id            = local.vpc-id
+  proxy_protocol_v2 = true
 
   # For the HTTP endpoint, we use cheap TCP checks instead of HTTP health checks.
   health_check {
@@ -51,10 +52,11 @@ resource "aws_lb_target_group" "drupal_http_target_group" {
 resource "aws_lb_target_group" "drupal_https_target_group" {
   name = "webcms-drupal-https-tg-${local.env-suffix}"
 
-  port        = 443
-  protocol    = "TLS"
-  target_type = "ip"
-  vpc_id      = local.vpc-id
+  port              = 443
+  protocol          = "TLS"
+  target_type       = "ip"
+  vpc_id            = local.vpc-id
+  proxy_protocol_v2 = true
 
   # Have the load balancer target the PHP-FPM status port (:8080) instead of the Drupal
   # application. In an ideal world, we could hit / to determine if Drupal is still
