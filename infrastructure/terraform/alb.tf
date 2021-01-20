@@ -27,7 +27,7 @@ resource "aws_lb_listener" "frontend_http" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb
+    target_group_arn = aws_lb_target_group.drupal_http_target_group.arn
   }
 }
 

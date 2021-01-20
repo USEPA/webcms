@@ -438,7 +438,14 @@ resource "aws_ecs_service" "drupal" {
   load_balancer {
     container_name   = "nginx"
     container_port   = 80
-    target_group_arn = aws_lb_target_group.drupal_target_group.arn
+    target_group_arn = aws_lb_target_group.drupal_http_target_group.arn
+  }
+
+  # Advertise port 443 to the load balancer
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = 443
+    target_group_arn = aws_lb_target_group.drupal_https_target_group.arn
   }
 
   # Since we're running our tasks in AWSVPC mode, we have to give extra VPC configuration.
