@@ -3,7 +3,6 @@ resource "aws_lb" "frontend" {
   name               = "webcms-frontend-${local.env-suffix}"
   internal           = false
   load_balancer_type = "network"
-  security_groups    = [aws_security_group.load_balancer.id]
   subnets            = aws_subnet.public.*.id
 
   access_logs {

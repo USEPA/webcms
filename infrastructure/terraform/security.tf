@@ -85,37 +85,6 @@ resource "aws_security_group_rule" "interface_access_https_ingress" {
   source_security_group_id = aws_security_group.interface_access.id
 }
 
-resource "aws_security_group" "load_balancer" {
-  name        = "webcms-alb-sg-${local.env-suffix}"
-  description = "Security group for the WebCMS load balancers"
-
-  vpc_id = local.vpc-id
-
-  # We allow port 80 in order to perform HTTP -> HTTPS redirection here instead of at the
-  # app level.
-  ingress {
-    description = "Allow incoming HTTP traffic"
-
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
-    cidr_blocks = var.alb-ingress
-  }
-
-  ingress {
-    description = "Allow incoming HTTPS traffic"
-
-    protocol    = "tcp"
-    from_port   = 443
-    to_port     = 443
-    cidr_blocks = var.alb-ingress
-  }
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Load Balancer"
-  })
-}
-
 # NB. This is only the security group for the EC2 instances in the cluster, _not_ the
 # ECS tasks that will be running in containers. These servers only need enough permissions
 # to communicate with the ECS API and a few other AWS services.
@@ -435,55 +404,43 @@ resource "aws_security_group_rule" "drupal_smtp_egress" {
   cidr_blocks = ["0.0.0.0/0"]
 }
 
-# Rule: egress from load balancers to Drupal
-resource "aws_security_group_rule" "lb_drupal_egress" {
-  description = "Allow outgoing connections from ALBs to Drupal tasks"
-
-  security_group_id = aws_security_group.load_balancer.id
-
-  type                     = "egress"
-  protocol                 = "tcp"
-  from_port                = 80
-  to_port                  = 80
-  source_security_group_id = aws_security_group.drupal_task.id
-}
-
-# Rule: ingress to Drupal from load balancers
-# This is the reverse of the above rule
+# Rule: ingress to Drupal (port 80) from load balancers
 resource "aws_security_group_rule" "drupal_lb_ingress" {
-  description = "Allow incoming connections from ALBs to Drupal tasks"
+  description = "Allow incoming connections from ALBs to Drupal tasks on port 80"
 
   security_group_id = aws_security_group.drupal_task.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 80
-  to_port                  = 80
-  source_security_group_id = aws_security_group.load_balancer.id
+  type        = "ingress"
+  protocol    = "tcp"
+  from_port   = 80
+  to_port     = 80
+  cidr_blocks = [for mapping in aws_lb.frontend.subnet_mapping : "${mapping.private_ipv4_address}/32"]
 }
 
-resource "aws_security_group_rule" "lb_drupal_ping_egress" {
-  description = "Allow outgoing connections from ALBs to the PHP-FPM /ping endpoint"
+# Rule: ingress to Drupal (port 443) from load balancers
+resource "aws_security_group_rule" "drupal_lb_ingress" {
+  description = "Allow incoming connections from ALBs to Drupal tasks on port 443"
 
-  security_group_id = aws_security_group.load_balancer.id
+  security_group_id = aws_security_group.drupal_task.id
 
-  type                     = "egress"
-  protocol                 = "tcp"
-  from_port                = 8080
-  to_port                  = 8080
-  source_security_group_id = aws_security_group.drupal_task.id
+  type        = "ingress"
+  protocol    = "tcp"
+  from_port   = 443
+  to_port     = 443
+  cidr_blocks = [for mapping in aws_lb.frontend.subnet_mapping : "${mapping.private_ipv4_address}/32"]
 }
 
+# Rule: ingress to Drupal (port 8008) from load balancers
 resource "aws_security_group_rule" "drupal_lb_ping_ingress" {
   description = "Allow incoming connections from ALBs to the PHP-FPM /ping endpoint"
 
   security_group_id = aws_security_group.drupal_task.id
 
-  type                     = "ingress"
-  protocol                 = "tcp"
-  from_port                = 8080
-  to_port                  = 8080
-  source_security_group_id = aws_security_group.load_balancer.id
+  type        = "ingress"
+  protocol    = "tcp"
+  from_port   = 8080
+  to_port     = 8080
+  cidr_blocks = [for mapping in aws_lb.frontend.subnet_mapping : "${mapping.private_ipv4_address}/32"]
 }
 
 resource "aws_security_group" "cache" {
