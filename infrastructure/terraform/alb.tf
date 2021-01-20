@@ -43,7 +43,6 @@ resource "aws_lb_target_group" "drupal_http_target_group" {
   health_check {
     enabled  = true
     interval = 30
-    timeout  = 5
     port     = 80
     protocol = "TCP"
   }
