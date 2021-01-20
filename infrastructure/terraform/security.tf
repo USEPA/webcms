@@ -405,7 +405,7 @@ resource "aws_security_group_rule" "drupal_smtp_egress" {
 }
 
 # Rule: ingress to Drupal (port 80) from load balancers
-resource "aws_security_group_rule" "drupal_lb_ingress" {
+resource "aws_security_group_rule" "drupal_lb_http_ingress" {
   description = "Allow incoming connections from ALBs to Drupal tasks on port 80"
 
   security_group_id = aws_security_group.drupal_task.id
@@ -418,7 +418,7 @@ resource "aws_security_group_rule" "drupal_lb_ingress" {
 }
 
 # Rule: ingress to Drupal (port 443) from load balancers
-resource "aws_security_group_rule" "drupal_lb_ingress" {
+resource "aws_security_group_rule" "drupal_lb_https_ingress" {
   description = "Allow incoming connections from ALBs to Drupal tasks on port 443"
 
   security_group_id = aws_security_group.drupal_task.id
