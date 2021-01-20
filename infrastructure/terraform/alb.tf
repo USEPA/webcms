@@ -64,7 +64,6 @@ resource "aws_lb_target_group" "drupal_https_target_group" {
   health_check {
     enabled  = true
     interval = 30
-    timeout  = 10
     path     = "/ping"
     port     = 8080
     protocol = "HTTP"
