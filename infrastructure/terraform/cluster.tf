@@ -184,9 +184,14 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true,
 
-      # Expose port 80 from the task. This is an HTTP port and is thus suitable for granting
-      # access to a load balancer.
-      portMappings = [{ containerPort = 80 }],
+      # Expose ports 80 and 443 from the task. These are both unencrypted HTTP ports; the
+      # difference is that port 80 is used for the HTTP->HTTPS upgrade, and port 443 is
+      # used to forward requests to Drupal. (The load balancer handles TLS termination
+      # for us.)
+      portMappings = [
+        { containerPort = 80 },
+        { containerPort = 443 },
+      ],
 
       dependsOn = [
         { containerName = "drupal", condition = "START" }
