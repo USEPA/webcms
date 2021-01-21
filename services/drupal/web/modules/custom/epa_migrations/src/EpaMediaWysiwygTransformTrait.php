@@ -154,7 +154,8 @@ TEMPLATE;
       try {
         $decoder = new JsonDecode(TRUE);
         $tag_info = $decoder->decode($captured, JsonEncoder::FORMAT);
-        if ($tag_info['view_mode'] == 'block_header') {
+        if ($tag_info['view_mode'] == 'block_header' ||
+            ($tag_info['attributes']['width'] == 325 && $tag_info['attributes']['height'] == 100)) {
           $block_header = [
             'target_id' => $tag_info['fid'],
             'alt' => $tag_info['attributes']['alt'],
