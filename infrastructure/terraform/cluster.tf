@@ -104,15 +104,23 @@ resource "aws_ecs_task_definition" "drupal_task" {
         # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
         # the region and bucket name because in us-east-1, the domain isn't easy to
         # construct via "$bucket.s3-$region.amazonaws.com".
-        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name }
+        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name },
+
+        # Pass all the valid domain names as $WEBCMS_SERVER_NAMES
+        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.site-hostname], var.alb-hostnames)) },
       ]
 
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true,
 
-      # Expose port 80 from the task. This is an HTTP port and is thus suitable for granting
-      # access to a load balancer.
-      portMappings = [{ containerPort = 80 }],
+      # Expose ports 80 and 443 from the task. These are both unencrypted HTTP ports; the
+      # difference is that port 80 is used for the HTTP->HTTPS upgrade, and port 443 is
+      # used to forward requests to Drupal. (The load balancer handles TLS termination
+      # for us.)
+      portMappings = [
+        { containerPort = 80 },
+        { containerPort = 443 },
+      ],
 
       dependsOn = [
         { containerName = "drupal", condition = "START" }
@@ -367,7 +375,14 @@ resource "aws_ecs_service" "drupal" {
   load_balancer {
     container_name   = "nginx"
     container_port   = 80
-    target_group_arn = aws_lb_target_group.drupal_target_group.arn
+    target_group_arn = aws_lb_target_group.drupal_http_target_group.arn
+  }
+
+  # Advertise port 443 to the load balancer
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = 443
+    target_group_arn = aws_lb_target_group.drupal_https_target_group.arn
   }
 
   # Since we're running our tasks in AWSVPC mode, we have to give extra VPC configuration.
@@ -405,40 +420,7 @@ data "aws_arn" "alb" {
 }
 
 data "aws_arn" "target_group" {
-  arn = aws_lb_target_group.drupal_target_group.arn
-}
-
-# Define an autoscaling rule. We scale when the load balancer reports an average of more
-# than 50 requests/target, indicating a high volume of traffic spread across too few
-# containers. If the metric goes above this threshold, ECS will add replicas of the
-# Drupal task.
-resource "aws_appautoscaling_policy" "drupal_autoscaling_elb" {
-  count = length(aws_appautoscaling_target.drupal)
-
-  name        = "webcms-drupal-scaling-elb-${local.env-suffix}"
-  policy_type = "TargetTrackingScaling"
-
-  # These identify what we're scaling (see the autoscaling target above)
-  # NB. Since these resources are all conditionally created, we key on count.index to
-  # avoid Terraform warnings about resource lists.
-  resource_id        = aws_appautoscaling_target.drupal[count.index].id
-  scalable_dimension = aws_appautoscaling_target.drupal[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.drupal[count.index].service_namespace
-
-  # Autoscaling rules: What is the condition that triggers scaling of the above target?
-  target_tracking_scaling_policy_configuration {
-    target_value = 50
-
-    # Wait 5 minutes before scaling in, but only 1 for scaling out.
-    scale_in_cooldown  = 5 * 60
-    scale_out_cooldown = 60
-
-    # Which metrics are we monitoring
-    predefined_metric_specification {
-      predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
-    }
-  }
+  arn = aws_lb_target_group.drupal_https_target_group.arn
 }
 
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this
