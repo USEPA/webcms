@@ -184,7 +184,6 @@ locals {
       SecurityGroupIds = [
         aws_security_group.automation.id,
         aws_security_group.proxy_access.id,
-        aws_security_group.interface_access.id,
       ]
 
       # Use a large ephemeral volume due to the large size of uncompressed DB dumps.

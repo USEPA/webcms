@@ -143,63 +143,6 @@ resource "aws_cloudwatch_dashboard" "overview" {
 
   dashboard_body = jsonencode({
     widgets = [
-      # Column 0: EC2 metrics from the autoscaling group
-      # (0, 0): CPU utilization
-      merge(local.dashboard-widget-base, {
-        x = 0,
-        y = 0,
-        properties = merge(local.dashboard-view-base, {
-          title = "EC2: CPU",
-          stat  = "Average",
-          metrics = [
-            ["AWS/EC2", "CPUUtilization", "AutoScalingGroupName", aws_autoscaling_group.servers.name],
-          ],
-        }),
-      }),
-
-      # (0, 1): network activity (in/out)
-      merge(local.dashboard-widget-base, {
-        x = 0,
-        y = 1,
-        properties = merge(local.dashboard-view-base, {
-          title = "EC2: Network",
-          stat  = "Average",
-          # See comments above for the meaning of `"."`
-          metrics = [
-            ["AWS/EC2", "NetworkIn", "AutoscalingGroupName", aws_autoscaling_group.servers.name],
-            [".", "NetworkOut", ".", "."],
-          ],
-        }),
-      }),
-
-      # (0, 2): autoscaling group activity
-      merge(local.dashboard-widget-base, {
-        x = 0,
-        y = 2,
-
-        annotations = {
-          horizontal = [
-            { color = local.dashboard-color-annotation, label = "Max Instances", value = aws_autoscaling_group.servers.max_size },
-          ],
-        },
-
-        # We plot the maximum number of pending/terminating instances to show whole
-        # numbers of EC2 instances being brought into/out of service against the minimum
-        # number of in-service (i.e., running) instances. This avoids CloudWatch smoothing
-        # over values using the average. (This statistic is reported on a 60-second basis,
-        # and a 5-minute period will inevitably have fractional instances being reported
-        # since we only add one EC2 instance at a time.)
-        properties = merge(local.dashboard-view-base, {
-          title = "EC2: Instances",
-          stat  = "Maximum",
-          metrics = [
-            ["AWS/EC2", "GroupInServiceInstances", "AutoscalingGroupName", aws_autoscaling_group.servers.name, { stat = "Minimum" }],
-            [".", "GroupTerminatingInstances", ".", ".", { color = local.dashboard-color-unhealthy }],
-            [".", "GroupPendingInstances", ".", ".", { color = local.dashboard-color-secondary }],
-          ],
-        }),
-      }),
-
       # Column 1: ECS and Memcached activity
       # (1, 0): Drupal CPU/memory
       merge(local.dashboard-widget-base, {
