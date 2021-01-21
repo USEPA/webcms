@@ -84,12 +84,7 @@ display:
           view_modes:
             'entity:node':
               news_release: teaser
-      fields:
-        title:
-          id: title
-          table: search_api_index_news_releases
-          field: title
-          plugin_id: search_api_field
+      fields: {  }
       filters:
         type:
           id: type
@@ -291,7 +286,6 @@ display:
     cache_metadata:
       max-age: -1
       contexts:
-        - 'languages:language_content'
         - 'languages:language_interface'
         - url
         - url.query_args
@@ -731,6 +725,11 @@ display:
         options:
           grouping: {  }
           description: ''
+      pager:
+        type: some
+        options:
+          items_per_page: 15
+          offset: 0
     cache_metadata:
       max-age: -1
       contexts:
@@ -760,7 +759,6 @@ display:
     cache_metadata:
       max-age: -1
       contexts:
-        - 'languages:language_content'
         - 'languages:language_interface'
         - url
         - url.query_args
