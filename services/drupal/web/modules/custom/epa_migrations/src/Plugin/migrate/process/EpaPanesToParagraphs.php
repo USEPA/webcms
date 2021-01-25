@@ -4,6 +4,7 @@ namespace Drupal\epa_migrations\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\epa_migrations\EpaAppendFilesTrait;
 use Drupal\epa_migrations\EpaCoreHtmlPaneToParagraph;
 use Drupal\epa_migrations\EpaCoreListPaneToParagraph;
 use Drupal\epa_migrations\EpaFieldablePanelsPaneToParagraph;
@@ -40,6 +41,7 @@ class EpaPanesToParagraphs extends ProcessPluginBase implements ContainerFactory
   // Helper function to create an HTML paragraph.
   use EpaCreateParagraphsTrait;
 
+  use EpaAppendFilesTrait;
   use EpaMediaWysiwygTransformTrait;
   use EpaWysiwygTextProcessingTrait;
 
@@ -156,6 +158,16 @@ class EpaPanesToParagraphs extends ProcessPluginBase implements ContainerFactory
 
         // Perform text processing to update/remove inline code.
         $v['value'] = $this->processText($v['value']);
+
+        // Append files to the body field for document node types.
+        if ($row->getSourceProperty('type') === 'document') {
+          $fids = $row->getSourceProperty('field_file');
+
+          if ($fids) {
+            $v['value'] = $this->appendFiles($v['value'], $fids, $this->entityTypeManager);
+          }
+
+        }
 
         $paragraph = $this->createHtmlParagraph($v);
         $paragraph_ids[] = [
