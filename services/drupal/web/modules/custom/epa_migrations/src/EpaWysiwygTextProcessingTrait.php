@@ -28,7 +28,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(accordion).*?"|';
     $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
     $pattern .= 'class=".*?(row).*?"|';
-    $pattern .= 'class=".*?(menu pipeline).*?"|';
+    $pattern .= 'class=".*?(pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
     $pattern .= 'class=".*?(tablesorter).*?"|';
@@ -103,7 +103,7 @@ trait EpaWysiwygTextProcessingTrait {
               $doc = $this->transformColumns($doc);
               break;
 
-            case 'menu pipeline':
+            case 'pipeline':
               $doc = $this->transformPipelineUls($doc);
               break;
 
@@ -112,15 +112,22 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath ='//table[contains(concat(" ", @class, " "), " nostyle ")]';
+              $old_class = 'nostyle';
+              $new_classes = 'usa-table--unstyled';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
-
             case 'tablesorter':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath = '//table[contains(concat(" ", @class, " "), " tablesorter ")]';
+              $old_class = 'tablesorter';
+              $new_classes = 'usa-table usa-table--sortable';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
-
             case 'highlighted':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath = '//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]';
+              $old_class = 'highlighted';
+              $new_classes = 'highlight';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
 
             case 'govdelivery-form':
@@ -521,7 +528,7 @@ trait EpaWysiwygTextProcessingTrait {
   }
 
   /**
-   * Update a single class on an element.
+   * Replace a class on an element.
    *
    * @param \DOMDocument $doc
    *   The document to search and replace.
@@ -529,33 +536,15 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with updated classes.
    */
-  private function singleClassReplacement(DOMDocument $doc) {
+  private function simpleClassReplacement(DOMDocument $doc, $xpath, $old_class, $new_classes): DOMDocument {
     // Create a DOM XPath object for searching the document.
-    $xpath = new \DOMXPath($doc);
+    $xpath_doc = new \DOMXPath($doc);
 
-    // Tables with nostyle classes.
-    $table_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " nostyle ")]');
+    $elements = $xpath_doc->query($xpath);
 
-    if ($table_elements) {
-      foreach ($table_elements as $table_element) {
-        $table_element->setAttribute('class', self::classReplace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
-      }
-    }
-
-    // Tables with tablesorter class.
-    $tablesorter_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " tablesorter ")]');
-
-    if ($tablesorter_elements) {
-      foreach ($tablesorter_elements as $tablesorter_element) {
-        $tablesorter_element->setAttribute('class', self::classReplace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
-      }
-    }
-
-    // Headings with highlighted class.
-    $highlighted_headings = $xpath->query('//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]');
-    if ($highlighted_headings) {
-      foreach ($highlighted_headings as $heading) {
-        $heading->setAttribute('class', self::classReplace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
+    if ($elements) {
+      foreach ($elements as $element) {
+        $element->setAttribute('class', self::classReplace($old_class, $new_classes, $element->attributes->getNamedItem('class')->value));
       }
     }
 
@@ -617,13 +606,17 @@ trait EpaWysiwygTextProcessingTrait {
     $xpath = new \DOMXPath($doc);
 
     // Row elements.
-    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " menu pipeline ")]');
+    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " pipeline ")]');
 
     if ($elements) {
       foreach ($elements as $element) {
 
-        // Replace class.
+        // Replace class.  Sometimes this got the additional "menu" class applied to it, sometimes not.
+        // Running both these commands ensures we do the replacement regardless of whether "menu" exists, and
+        // ensures the "menu" class is removed from this, but only when paired with the "pipeline" class
+        // (I don't think we want to universally remove the menu class everywhere it's used).
         $element->setAttribute('class', self::classReplace('menu pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
+        $element->setAttribute('class', self::classReplace('pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
 
         // Remove menu-item class from children.
         $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);
