@@ -113,6 +113,7 @@ class EpaNodeRevision extends NodeRevision {
       ->fields('pp')
       ->condition('pp.did', $did)
       ->condition('pp.panel', $panel)
+      ->orderBy('pp.position')
       ->execute()
       ->fetchAll();
   }
