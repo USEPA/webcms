@@ -149,6 +149,7 @@ class EpaNode extends Node {
       ->fields('pp')
       ->condition('pp.did', $did)
       ->condition('pp.panel', $panel)
+      ->orderBy('pp.position')
       ->execute()
       ->fetchAll();
   }

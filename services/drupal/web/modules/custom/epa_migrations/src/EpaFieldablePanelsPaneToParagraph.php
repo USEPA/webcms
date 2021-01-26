@@ -167,6 +167,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
             ->condition('fpp_links.revision_id', $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_url', 'link');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_title', 'title');
+          $links_query->orderBy('fpp_links.delta');
 
           $links = $links_query->execute()->fetchAll();
 
@@ -193,9 +194,10 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // Perform text processing to update/remove inline code.
           $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
 
-          $links_query = $this->d7Connection->select('field_data_field_epa_node_list_ref', 'fpp_links')
+          $links_query = $this->d7Connection->select('field_revision_field_epa_node_list_ref', 'fpp_links')
             ->condition("fpp_links.revision_id", $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_node_list_ref_target_id', 'entity');
+          $links_query->orderBy('fpp_links.delta');
 
           $links = $links_query->execute()->fetchAll();
 

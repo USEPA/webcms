@@ -91,6 +91,7 @@ class EpaDocuments extends ProcessPluginBase implements ContainerFactoryPluginIn
       $referenced_documents = $this->d7Connection->select('field_data_field_file', 'fdff')
         ->fields('fdff', ['field_file_fid'])
         ->condition('fdff.entity_id', $nid)
+        ->orderBy('fdff.delta')
         ->execute()
         ->fetchAll();
 
