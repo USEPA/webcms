@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Contains epa_rss.module.
+ */
+
+use Drupal\search_api\Query\QueryInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_search_api_query_alter().
+ */
+function epa_rss_search_api_query_alter(QueryInterface &$query) {
+  $epa_rss_feed_to_page_mapping = [
+    'views_feed:search_news_releases__feed_1' => 'search_api:views_page__search_news_releases__page_1',
+    'views_feed:search_public_notices__feed_1' => 'search_api:views_page__search_public_notices__page_1',
+    'views_feed:search_faqs__feed_1' => 'search_api:views_page__search_faqs__page_1',
+  ];
+
+  // Alter the feed query to match the page query.
+  $search_id = $query->getSearchId();
+  if (array_key_exists($search_id, $epa_rss_feed_to_page_mapping)) {
+    $facet_manager = \Drupal::service('facets.manager');
+    $facet_manager->alterQuery($query, $epa_rss_feed_to_page_mapping[$search_id]);
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view-rss.html.twig.
+ */
+function epa_rss_preprocess_views_view_rss(&$variables) {
+  // Set the link variable to the current route, rather than the view's
+  // configured path, which won't have the facets.
+  $url_options['absolute'] = TRUE;
+  $variables['link'] = Url::fromRoute('<current>', [], $url_options)->toString();
+}
