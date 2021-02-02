@@ -17,9 +17,20 @@
   {{- fields.id.content }}-{{ fields.revision_id.content -}}
 {%- endset %}
 
+{% set label -%}
+  {%- if type == 'information' -%}
+    {{- 'Information'|t -}}
+  {%- elseif type == 'emergency' -%}
+    {{- 'Emergency'|t -}}
+  {%- elseif type == 'warning' -%}
+    {{- 'Warning'|t -}}
+  {% endif %}
+{%- endset %}
+
 {% include '@components/sitewide-alert/sitewide-alert.twig' with {
   'modifier_classes': classes,
   'show_close': show_close,
   'hash': hash,
+  'label': label,
   'content': fields.field_formatted_long_text.content,
 } %}
