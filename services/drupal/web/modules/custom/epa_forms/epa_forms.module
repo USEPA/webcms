@@ -102,6 +102,12 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
         '#markup' => t('This action will also remove any associated webform entity and <strong>delete its submissions</strong>.'),
       ];
       break;
+
+    case 'webform_settings_submissions_form':
+      if (isset($form['submission_behaviors']['form_remote_addr'])) {
+        unset($form['submission_behaviors']['form_remote_addr']);
+      }
+      break;
   }
 }
 
