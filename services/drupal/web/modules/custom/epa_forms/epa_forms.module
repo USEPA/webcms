@@ -105,7 +105,7 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
 
     case 'webform_settings_submissions_form':
       if (isset($form['submission_behaviors']['form_remote_addr'])) {
-        unset($form['submission_behaviors']['form_remote_addr']);
+        $form['submission_behaviors']['form_remote_addr']['#access'] = FALSE;
       }
       break;
   }
