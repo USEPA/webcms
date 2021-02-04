@@ -447,27 +447,27 @@
         },
         {
             "name": "commerceguys/addressing",
-            "version": "v1.0.5",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/commerceguys/addressing.git",
-                "reference": "2d048bfdb3b79f2d87f5d5b078769c059eaa3eb1"
+                "reference": "6df5c0eea9d1f370095585eef1b08f4dff73d51f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/commerceguys/addressing/zipball/2d048bfdb3b79f2d87f5d5b078769c059eaa3eb1",
-                "reference": "2d048bfdb3b79f2d87f5d5b078769c059eaa3eb1",
+                "url": "https://api.github.com/repos/commerceguys/addressing/zipball/6df5c0eea9d1f370095585eef1b08f4dff73d51f",
+                "reference": "6df5c0eea9d1f370095585eef1b08f4dff73d51f",
                 "shasum": ""
             },
             "require": {
                 "doctrine/collections": "~1.0",
-                "php": ">=5.5.0"
+                "php": ">=7.0.8"
             },
             "require-dev": {
                 "mikey179/vfsstream": "1.*",
-                "phpunit/phpunit": "~4.0",
+                "phpunit/phpunit": "^6.0",
                 "squizlabs/php_codesniffer": "2.*",
-                "symfony/validator": ">=3.2"
+                "symfony/validator": "^3.4"
             },
             "suggest": {
                 "symfony/validator": "to validate addresses"
@@ -502,7 +502,7 @@
                 "localization",
                 "postal"
             ],
-            "time": "2019-06-27T10:43:27+00:00"
+            "time": "2020-12-05T18:16:35+00:00"
         },
         {
             "name": "composer/installers",
@@ -2126,42 +2126,42 @@
         },
         {
             "name": "drupal/address",
-            "version": "1.7.0",
+            "version": "1.9.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/address.git",
-                "reference": "8.x-1.7"
+                "reference": "8.x-1.9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/address-8.x-1.7.zip",
-                "reference": "8.x-1.7",
-                "shasum": "dab23a510090e59e3e6bc77faa517b523ad048ae"
+                "url": "https://ftp.drupal.org/files/projects/address-8.x-1.9.zip",
+                "reference": "8.x-1.9",
+                "shasum": "c7e6406d88c6d6be9e8fe0091040d67012bdbf05"
             },
             "require": {
-                "commerceguys/addressing": "^1.0.0",
-                "drupal/core": "^8.6"
+                "commerceguys/addressing": "^1.0.7",
+                "drupal/core": "^8.8 || ^9"
             },
             "require-dev": {
                 "drupal/token": "^1.0"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-1.7",
-                    "datestamp": "1559642884",
+                    "version": "8.x-1.9",
+                    "datestamp": "1604422821",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
                     }
+                },
+                "patches_applied": {
+                    "Stop performing subdivision-level postal code validation": "https://www.drupal.org/files/issues/2020-11-29/2828128-38-disable-subdivision-postal-code-validation.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
             "license": [
-                "GPL-2.0+"
+                "GPL-2.0-or-later"
             ],
             "authors": [
                 {
@@ -2175,6 +2175,10 @@
                 {
                     "name": "googletorp",
                     "homepage": "https://www.drupal.org/user/386230"
+                },
+                {
+                    "name": "jsacksick",
+                    "homepage": "https://www.drupal.org/user/972218"
                 },
                 {
                     "name": "mglaman",
@@ -5997,6 +6001,9 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
                 "drupal": {
                     "version": "8.x-1.0",
                     "datestamp": "1579042983",
@@ -6957,6 +6964,9 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-4.x": "4.x-dev"
+                },
                 "drupal": {
                     "version": "8.x-4.2",
                     "datestamp": "1555683487",
@@ -7008,6 +7018,9 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
                 "drupal": {
                     "version": "8.x-1.0",
                     "datestamp": "1540915380",
@@ -7062,6 +7075,9 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-4.x": "4.x-dev"
+                },
                 "drupal": {
                     "version": "8.x-4.5",
                     "datestamp": "1574693285",
@@ -7082,12 +7098,16 @@
             ],
             "authors": [
                 {
-                    "name": "drupalspoons",
-                    "homepage": "https://www.drupal.org/user/3647684"
+                    "name": "heddn",
+                    "homepage": "https://www.drupal.org/user/1463982"
                 },
                 {
                     "name": "mikeryan",
                     "homepage": "https://www.drupal.org/user/4420"
+                },
+                {
+                    "name": "moshe weitzman",
+                    "homepage": "https://www.drupal.org/user/23"
                 }
             ],
             "description": "Tools to assist in developing and running migrations.",
@@ -7123,6 +7143,9 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-3.x": "3.x-dev"
+                },
                 "drupal": {
                     "version": "8.x-3.1",
                     "datestamp": "1574693581",
@@ -7143,12 +7166,28 @@
             ],
             "authors": [
                 {
-                    "name": "drupalspoons",
-                    "homepage": "https://www.drupal.org/user/3647684"
+                    "name": "abhishek-anand",
+                    "homepage": "https://www.drupal.org/user/468982"
+                },
+                {
+                    "name": "heddn",
+                    "homepage": "https://www.drupal.org/user/1463982"
+                },
+                {
+                    "name": "ksenzee",
+                    "homepage": "https://www.drupal.org/user/139855"
                 },
                 {
                     "name": "mikeryan",
                     "homepage": "https://www.drupal.org/user/4420"
+                },
+                {
+                    "name": "ultimike",
+                    "homepage": "https://www.drupal.org/user/51132"
+                },
+                {
+                    "name": "xjm",
+                    "homepage": "https://www.drupal.org/user/65776"
                 }
             ],
             "description": "Drush support for direct upgrades from older Drupal versions.",
@@ -9700,7 +9739,7 @@
             "extra": {
                 "drupal": {
                     "version": "8.x-5.11",
-                    "datestamp": "1589389825",
+                    "datestamp": "1588787959",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -9838,7 +9877,7 @@
             "version": "5.11.0",
             "require": {
                 "drupal/core": "^8.7.7 || ^9",
-                "drupal/webform": "*"
+                "drupal/webform": "self.version"
             },
             "type": "metapackage",
             "extra": {
