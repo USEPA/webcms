@@ -170,12 +170,14 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
           ->getStorage('node')
           ->loadRevision($newer_draft_revision->vid);
 
-        $new_latest_revision->createDuplicate();
-        $new_latest_revision->set('moderation_state', $new_latest_revision_state);
-        $new_latest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision.&emsp;|&emsp;') . $new_latest_revision->getRevisionLogMessage());
-        $new_latest_revision->save();
+        if ($new_latest_revision) {
+          $new_latest_revision->createDuplicate();
+          $new_latest_revision->set('moderation_state', $new_latest_revision_state);
+          $new_latest_revision->setRevisionLogMessage(t('During D7 migration, this revision was set as the latest revision.&emsp;|&emsp;') . $new_latest_revision->getRevisionLogMessage());
+          $new_latest_revision->save();
 
-        $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
+          $this->logger->notice('Updated latest revision for Node ID: %nid,  Revision ID: %vid.', ['%nid' => $nid, '%vid' => $d7_vid]);
+        }
       }
     }
 
