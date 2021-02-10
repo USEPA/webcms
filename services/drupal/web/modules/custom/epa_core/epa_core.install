@@ -8,7 +8,7 @@ function epa_core_install() {
   _epa_core_create_news_release_type_term();
 
   // Add index
-  db_query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
+  \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
 }
 
 /**
@@ -23,7 +23,7 @@ function epa_core_update_8001() {
  */
 function epa_core_update_8002() {
   // Add index
-  db_query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
+  \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
 }
 
 /**
