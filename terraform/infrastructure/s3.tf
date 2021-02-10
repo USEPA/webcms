@@ -1,39 +1,66 @@
 resource "aws_s3_bucket" "uploads" {
-  bucket = var.s3-bucket-name
+  for_each = local.sites
 
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Uploads"
-  })
+  bucket_prefix = "webcms-${each.key}-uploads-"
+
+  versioning {
+    enabled = true
+  }
+
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = var.tags
+}
+
+# This policy allows anonymous reads to the /public/ prefix of the uploads bucket, which
+# we need in order to satisfy s3fs - it only uses one bucket for both public and private
+# files.
+data "aws_iam_policy_document" "uploads_policy" {
+  for_each = local.sites
+
+  version = "2012-10-17"
+
+  statement {
+    sid       = "AddPerm"
+    effect    = "Allow"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.uploads[each.key].arn}/public/*"]
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "uploads_policy" {
-  bucket = aws_s3_bucket.uploads.bucket
+  for_each = local.sites
 
-  # This policy allows anonymous reads to the /public/ prefix of the uploads bucket, which
-  # we need in order to satisfy s3fs - it only uses one bucket for both public and private
-  # files.
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "AddPerm",
-        Effect    = "Allow"
-        Principal = "*"
-        Action    = ["s3:GetObject"]
-        Resource  = ["arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/public/*"]
-      }
-    ]
-  })
+  bucket = aws_s3_bucket.uploads[each.key].bucket
+
+  policy = data.aws_iam_policy_document.uploads_policy[each.key].json
 }
 
 # Create an S3 bucket using a random identifier (this is only used for administration so
 # the name doesn't have to be pretty)
 resource "aws_s3_bucket" "elb_logs" {
-  bucket_prefix = "webcms-logs-${local.env-suffix}-"
+  bucket_prefix = "webcms-${var.environment}-elb-logs-"
 
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} ELB Logs"
-  })
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = var.tags
 }
 
 # Don't allow any public access to the ELB logging bucket
@@ -46,21 +73,6 @@ resource "aws_s3_bucket_public_access_block" "elb_logs" {
   restrict_public_buckets = true
 }
 
-# Generate a bucket policy that grants access to the ELB logging bucket per
-# https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html#access-logging-bucket-permissions
-locals {
-  elb-accounts = {
-    "us-east-1"     = "127311923021"
-    "us-east-2"     = "033677994240"
-    "us-west-1"     = "027434742980"
-    "us-west-2"     = "797873946194"
-    "us-gov-west-1" = "048591011584"
-    "us-gov-east-1" = "190560391635"
-  }
-
-  elb-log-path = "arn:aws:s3:::${aws_s3_bucket.elb_logs.bucket}/AWSLogs/${data.aws_caller_identity.current.account_id}"
-}
-
 data "aws_iam_policy_document" "elb_logs_access" {
   version = "2012-10-17"
 
@@ -68,11 +80,11 @@ data "aws_iam_policy_document" "elb_logs_access" {
     sid       = "rootDelivery"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${local.elb-log-path}/*"]
+    resources = ["${aws_s3_bucket.elb_logs.arn}/AWSLogs/*"]
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.elb-accounts[var.aws-region]}:root"]
+      identifiers = [data.aws_elb_service_account.main.arn]
     }
   }
 
@@ -80,7 +92,7 @@ data "aws_iam_policy_document" "elb_logs_access" {
     sid       = "elbDelivery"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${local.elb-log-path}/*"]
+    resources = ["${aws_s3_bucket.elb_logs.arn}/AWSLogs/*"]
 
     principals {
       type        = "Service"
@@ -98,7 +110,7 @@ data "aws_iam_policy_document" "elb_logs_access" {
     sid       = "aclAccess"
     effect    = "Allow"
     actions   = ["s3:GetBucketAcl"]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.elb_logs.bucket}"]
+    resources = [aws_s3_bucket.elb_logs.arn]
 
     principals {
       type        = "Service"
@@ -114,11 +126,17 @@ resource "aws_s3_bucket_policy" "elb_logs_delivery" {
 
 # Create a bucket to house DB backups
 resource "aws_s3_bucket" "backups" {
-  bucket_prefix = "webcms-db-backups-${local.env-suffix}-"
+  bucket_prefix = "webcms-${var.environment}-backups-"
 
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} DB Backups"
-  })
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = var.tags
 }
 
 # As with the ELB logs bucket, this bucket is fully private. No public access should be

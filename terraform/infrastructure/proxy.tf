@@ -1,3 +1,7 @@
+data "aws_kms_alias" "secretsmanager" {
+  name = "alias/aws/secretsmanager"
+}
+
 data "aws_iam_policy_document" "proxy_assume" {
   version = "2012-10-17"
 
@@ -13,12 +17,12 @@ data "aws_iam_policy_document" "proxy_assume" {
 }
 
 resource "aws_iam_role" "proxy" {
-  name        = "${local.role-prefix}RDSProxyRole"
+  name        = "WebCMS-${var.environment}-Proxy"
   description = "Role for the cluster's RDS proxy"
 
   assume_role_policy = data.aws_iam_policy_document.proxy_assume.json
 
-  tags = local.common-tags
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "proxy_secrets" {
@@ -29,10 +33,10 @@ data "aws_iam_policy_document" "proxy_secrets" {
     effect  = "Allow"
     actions = ["secretsmanager:GetSecretValue"]
 
-    resources = [
-      aws_secretsmanager_secret.db_app_credentials.arn,
-      aws_secretsmanager_secret.db_app_d7_credentials.arn,
-    ]
+    resources = concat(
+      [for secret in aws_secretsmanager_secret.db_d8_credentials : secret.arn],
+      [for secret in aws_secretsmanager_secret.db_d7_credentials : secret.arn],
+    )
   }
 
   statement {
@@ -44,13 +48,13 @@ data "aws_iam_policy_document" "proxy_secrets" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = ["secretsmanager.${var.aws-region}.amazonaws.com"]
+      values   = ["secretsmanager.${var.aws_region}.amazonaws.com"]
     }
   }
 }
 
 resource "aws_iam_policy" "proxy_secrets" {
-  name        = "${local.role-prefix}RDSProxySecretsAccess"
+  name        = "WebCMS-${var.environment}-ProxySecretsAccess"
   description = "Grants the RDS proxy access to DB credentials"
   policy      = data.aws_iam_policy_document.proxy_secrets.json
 }
@@ -61,28 +65,27 @@ resource "aws_iam_role_policy_attachment" "proxy_secrets" {
 }
 
 resource "aws_db_proxy" "proxy" {
-  name = "webcms-db-proxy-${local.env-suffix}"
+  name = "webcms-${var.environment}-proxy"
 
   role_arn               = aws_iam_role.proxy.arn
   engine_family          = "MYSQL"
-  vpc_subnet_ids         = aws_subnet.private[*].id
-  vpc_security_group_ids = [aws_security_group.proxy.id, aws_security_group.database_access.id]
+  vpc_subnet_ids         = local.private_subnets
+  vpc_security_group_ids = [data.aws_ssm_parameter.proxy_security_group.value]
 
-  auth {
-    iam_auth    = "DISABLED"
-    auth_scheme = "SECRETS"
-    secret_arn  = aws_secretsmanager_secret.db_app_credentials.arn
+  dynamic "auth" {
+    for_each = concat(
+      values(aws_secretsmanager_secret.db_d8_credentials),
+      values(aws_secretsmanager_secret.db_d7_credentials),
+    )
+
+    content {
+      iam_auth    = "DISABLED"
+      auth_scheme = "SECRETS"
+      secret_arn  = auth.value.arn
+    }
   }
 
-  auth {
-    iam_auth    = "DISABLED"
-    auth_scheme = "SECRETS"
-    secret_arn  = aws_secretsmanager_secret.db_app_d7_credentials.arn
-  }
-
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} RDS Proxy"
-  })
+  tags = var.tags
 }
 
 resource "aws_db_proxy_default_target_group" "proxy" {
@@ -93,4 +96,11 @@ resource "aws_db_proxy_default_target_group" "proxy" {
     max_connections_percent      = 100
     max_idle_connections_percent = 50
   }
+}
+
+resource "aws_db_proxy_target" "proxy" {
+  db_proxy_name     = aws_db_proxy.proxy.name
+  target_group_name = aws_db_proxy_default_target_group.proxy.name
+
+  db_cluster_identifier = aws_rds_cluster.db.cluster_identifier
 }
