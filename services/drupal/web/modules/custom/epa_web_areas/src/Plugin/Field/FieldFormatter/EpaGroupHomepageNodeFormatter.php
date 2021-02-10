@@ -51,7 +51,7 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
 
       // Set the node in the correct language for display.
       if ($homepage instanceof TranslatableInterface) {
-        $homepage = \Drupal::entityManager()->getTranslationFromContext($homepage, $langcode);
+        $homepage = \Drupal::service('entity.repository')->getTranslationFromContext($homepage, $langcode);
       }
 
       $access = $this->checkAccess($homepage);
