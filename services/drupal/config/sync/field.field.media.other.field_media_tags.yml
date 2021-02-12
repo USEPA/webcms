@@ -1,21 +1,21 @@
-uuid: 3f38fcea-43ed-45c2-8070-d0a422f84607
+uuid: f97cbb6b-e0b0-40b3-8fb1-60fff7977579
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_keywords
-    - media.type.audio
-    - taxonomy.vocabulary.keywords
+    - field.storage.media.field_media_tags
+    - media.type.other
+    - taxonomy.vocabulary.media_tags
   module:
     - custom_add_another
 third_party_settings:
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
-id: media.audio.field_keywords
-field_name: field_keywords
+id: media.other.field_media_tags
+field_name: field_media_tags
 entity_type: media
-bundle: audio
+bundle: other
 label: Tags
 description: ''
 required: false
@@ -26,10 +26,10 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      keywords: keywords
+      media_tags: media_tags
     sort:
       field: name
       direction: asc
-    auto_create: true
+    auto_create: false
     auto_create_bundle: ''
 field_type: entity_reference
