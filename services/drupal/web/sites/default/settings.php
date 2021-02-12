@@ -876,7 +876,7 @@ $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED')
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
-$config_directories['sync'] = '../config/sync';
+$settings['config_sync_directory'] = '../config/sync';
 
 // Set all managed files to be marked as "temporary" and therefore subject to
 // garbage collection when their usage drops to zero.

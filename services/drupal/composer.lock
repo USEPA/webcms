@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ebdd2be32d686b45859ee8d4ce7b03a1",
+    "content-hash": "3551906acac0377ddfcf7dfb136a9ab9",
     "packages": [
         {
             "name": "akamai-open/edgegrid-auth",
@@ -3574,6 +3574,17 @@
             "time": "2020-04-30T19:54:32+00:00"
         },
         {
+            "name": "drupal/content_moderation_revert",
+            "version": "8.x-1.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupalcode.org/sandbox/sam-3118829.git",
+                "reference": "refs/heads/8.x-1.x"
+            },
+            "type": "drupal-module",
+            "time": "2020-03-10T05:11:39+00:00"
+        },
+        {
             "name": "drupal/core",
             "version": "9.1.4",
             "source": {
@@ -5456,7 +5467,7 @@
                     }
                 },
                 "patches_applied": {
-                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2020-08-13/group-support_string_entity_ids-2797793-215.patch",
+                    "Entities identified by strings as group content": "https://www.drupal.org/files/issues/2020-11-18/group-support_string_entity_ids-2797793-239.patch",
                     "Get a token of a node's parent group to create a pathauto pattern": "https://www.drupal.org/files/issues/2020-02-21/group-gnode_tokens-2774827-62.patch",
                     "Node update hook is triggered upon group content create": "https://www.drupal.org/files/issues/2019-09-13/group-2872697-33.patch",
                     "Fix user permissions on creating new content but not associating existing content": "https://www.drupal.org/files/issues/2019-01-04/2842630-20.patch",
@@ -8930,50 +8941,66 @@
         },
         {
             "name": "drupal/webform",
-            "version": "5.13.0",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/webform.git",
-                "reference": "8.x-5.13"
+                "reference": "6.0.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/webform-8.x-5.13.zip",
-                "reference": "8.x-5.13",
-                "shasum": "2dfca686adb7eea2dc1c4d96b42ea7a1e0330500"
+                "url": "https://ftp.drupal.org/files/projects/webform-6.0.1.zip",
+                "reference": "6.0.1",
+                "shasum": "3ddc95895dcd446325432eae286910cd8e056da7"
             },
             "require": {
-                "drupal/core": "^8.7.7 || ^9"
+                "drupal/core": "^8.8 || ^9"
             },
             "require-dev": {
-                "drupal/address": "~1.4",
+                "drupal/address": "~1.0",
                 "drupal/bootstrap": "~3.0",
                 "drupal/captcha": "~1.0",
-                "drupal/chosen": "~2.6",
-                "drupal/devel": "*",
-                "drupal/entity_print": "^2.1",
+                "drupal/chosen": "~3.0",
+                "drupal/clientside_validation": "~3.0",
+                "drupal/clientside_validation_jquery": "*",
+                "drupal/devel": "~3.0",
+                "drupal/entity": "~1.0",
+                "drupal/entity_print": "~2.0",
                 "drupal/gnode": "*",
-                "drupal/group": "~1.0",
-                "drupal/mailsystem": "~4.1",
-                "drupal/select2": "~1.1",
+                "drupal/group": "1.0",
+                "drupal/jquery_ui": "~1.0",
+                "drupal/jquery_ui_checkboxradio": "~1.0",
+                "drupal/jquery_ui_datepicker": "~1.0",
+                "drupal/lingotek": "~3.0",
+                "drupal/mailsystem": "~4.0",
+                "drupal/paragraphs": "~1.0",
+                "drupal/select2": "~1.0",
                 "drupal/smtp": "~1.0",
-                "drupal/telephone_validation": "^2.2",
-                "drupal/token": "~1.3",
+                "drupal/styleguide": "~1.0",
+                "drupal/telephone_validation": "~2.0",
+                "drupal/token": "~1.0",
+                "drupal/variationcache": "~1.0",
                 "drupal/webform_access": "*",
                 "drupal/webform_attachment": "*",
+                "drupal/webform_clientside_validation": "*",
                 "drupal/webform_devel": "*",
                 "drupal/webform_entity_print": "*",
                 "drupal/webform_group": "*",
                 "drupal/webform_node": "*",
                 "drupal/webform_options_limit": "*",
                 "drupal/webform_scheduled_email": "*",
+                "drupal/webform_share": "*",
                 "drupal/webform_ui": "*"
+            },
+            "suggest": {
+                "drupal/jquery_ui_checkboxradio": "Provides jQuery UI Checkboxradio library. Required by the Webform jQueryUI Buttons module. The Webform jQueryUI Buttons module is deprecated because jQueryUI is no longer maintained.",
+                "drupal/jquery_ui_datepicker": "Provides jQuery UI Datepicker library. Required to support datepickers. The Webform jQueryUI Datepicker module is deprecated because jQueryUI is no longer maintained."
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-5.13",
-                    "datestamp": "1589661354",
+                    "version": "6.0.1",
+                    "datestamp": "1612453373",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -17307,6 +17334,7 @@
         "drupal/akamai": 15,
         "drupal/auto_entitylabel": 10,
         "drupal/content_moderation_notifications": 20,
+        "drupal/content_moderation_revert": 20,
         "drupal/entity_clone": 10,
         "drupal/entitygroupfield": 15,
         "drupal/facets_pretty_paths": 20,
