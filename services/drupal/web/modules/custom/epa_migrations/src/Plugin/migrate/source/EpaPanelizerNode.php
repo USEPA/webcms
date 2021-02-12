@@ -74,15 +74,7 @@ class EpaPanelizerNode extends Node {
       $row->setSourceProperty('field_modified_review_deadline', [0 => ['value' => $review_deadline->format('Y-m-d H:i:s')]]);
     }
 
-    // Get the revision moderation state and timestamp.
-    $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state'])
-      ->condition('nres.vid', $row->getSourceProperty('vid'))
-      ->execute()
-      ->fetchAll();
-
-    if ($state_data) {
-      $state_data = array_shift($state_data);
+    if ($state = $row->getSourceProperty('state')) {
       $state_map = [
         'unpublished' => 'unpublished',
         'draft' => 'draft',
@@ -94,7 +86,7 @@ class EpaPanelizerNode extends Node {
         'queued_for_archive' => 'unpublished',
       ];
 
-      $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
+      $row->setSourceProperty('nres_state', $state_map[$state]);
     }
 
     // Get the timestamp for the latest published revision.
@@ -110,34 +102,9 @@ class EpaPanelizerNode extends Node {
       $row->setSourceProperty('last_published', gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $last_published));
     }
 
-    // To prepare rows for import into fields, we're going to:
-    // - Add a 'layout' source property for use during processing.
-    // - Add a 'panes' source property containing query results for all panes.
-    //
-    // First, initialize the 'layout' source property as NULL so we can properly
-    // process nodes that do not have a record in the 'panelizer_entity' table.
-    $row->setSourceProperty('layout', NULL);
-
-    // Get the Display ID for the current revision.
-    $did = $this->select('panelizer_entity', 'pe')
-      ->fields('pe', ['did'])
-      ->condition('pe.revision_id', $row->getSourceProperty('vid'))
-      ->condition('pe.entity_id', $row->getSourceProperty('nid'))
-      ->condition('pe.entity_type', 'node')
-      ->execute()
-      ->fetchField();
+    $did = $row->getSourceProperty('did');
 
     if ($did) {
-      // Get the Panelizer layout for this display.
-      $layout = $this->select('panels_display', 'pd')
-        ->fields('pd', ['layout'])
-        ->condition('pd.did', $did)
-        ->execute()
-        ->fetchField();
-
-      // Update the 'layout' property to its actual value.
-      $row->setSourceProperty('layout', $layout);
-
       // Fetch the panes and add the result as a source property.
       $panes = $this->select('panels_pane', 'pp')
         ->fields('pp')
