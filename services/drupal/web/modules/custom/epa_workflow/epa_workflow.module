@@ -217,6 +217,11 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         '_epa_workflow_node_view_moderation_form_submit',
       ];
     }
+
+    $form['current']['#required'] = TRUE;
+    $form['current']['#value'] = NULL;
+
+    $form['new_state']['#required'] = TRUE;
   }
 
   if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
