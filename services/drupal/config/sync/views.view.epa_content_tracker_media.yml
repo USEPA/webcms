@@ -5,7 +5,7 @@ dependencies:
   config:
     - field.storage.group.field_publisher
     - field.storage.media.field_description
-    - field.storage.media.field_keywords
+    - field.storage.media.field_media_tags
   module:
     - epa_content_tracker
     - group
@@ -92,7 +92,7 @@ display:
             field_publisher:
               alias: Publisher
               raw_output: false
-            field_keywords:
+            field_media_tags:
               alias: keywords
               raw_output: false
       fields:
@@ -516,10 +516,10 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
-        field_keywords:
-          id: field_keywords
-          table: media__field_keywords
-          field: field_keywords
+        field_media_tags:
+          id: field_media_tags
+          table: media__field_media_tags
+          field: field_media_tags
           relationship: related_media
           group_type: group
           admin_label: ''
@@ -781,7 +781,7 @@ display:
       tags:
         - 'config:field.storage.group.field_publisher'
         - 'config:field.storage.media.field_description'
-        - 'config:field.storage.media.field_keywords'
+        - 'config:field.storage.media.field_media_tags'
   rest_export:
     display_plugin: rest_export
     id: rest_export
@@ -816,7 +816,7 @@ display:
       tags:
         - 'config:field.storage.group.field_publisher'
         - 'config:field.storage.media.field_description'
-        - 'config:field.storage.media.field_keywords'
+        - 'config:field.storage.media.field_media_tags'
   rest_export_deleted:
     display_plugin: rest_export
     id: rest_export_deleted
