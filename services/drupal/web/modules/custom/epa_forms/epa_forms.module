@@ -30,6 +30,7 @@ function epa_forms_node_insert(EntityInterface $entity) {
     $id .= '_' . $entity->id();
 
     $settings = Webform::getDefaultSettings();
+    $settings['form_remote_addr'] = FALSE;
     $third_party_settings['epa_forms'] = ['nid' => $entity->id()];
 
     $webform = Webform::create([
@@ -100,6 +101,12 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
       $form['webform_description'] = [
         '#markup' => t('This action will also remove any associated webform entity and <strong>delete its submissions</strong>.'),
       ];
+      break;
+
+    case 'webform_settings_submissions_form':
+      if (isset($form['submission_behaviors']['form_remote_addr'])) {
+        $form['submission_behaviors']['form_remote_addr']['#access'] = FALSE;
+      }
       break;
   }
 }
