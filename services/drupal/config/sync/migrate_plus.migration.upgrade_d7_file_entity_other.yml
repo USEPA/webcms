@@ -6,7 +6,7 @@ dependencies:
     module:
       - epa_migrations
 _core:
-  default_config_hash: krTWGSd1l2uTcbflH6qJhfgyUxhrgm9vtU0GNUr7X6M
+  default_config_hash: TOV5s-_exkCabPVXdUQTUvtyoC0YZdrojFlp-Ockpsc
 id: upgrade_d7_file_entity_other
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -47,12 +47,20 @@ process:
     -
       plugin: get
       source: fid
-  field_keywords:
+  field_media_tags:
     -
       plugin: sub_process
-      source: field_keywords
+      source: field_keywords_data
       process:
-        target_id: tid
+        target_id:
+          plugin: entity_generate
+          source: tid
+          value_key: tid
+          values:
+            name: name
+          bundle_key: vid
+          entity_type: taxonomy_term
+          bundle: media_tags
   og_group_ref:
     -
       plugin: get
