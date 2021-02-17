@@ -3,9 +3,9 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.media.other.field_keywords
     - field.field.media.other.field_limit_file_accessibility
     - field.field.media.other.field_media_file_1
+    - field.field.media.other.field_media_tags
     - media.type.other
   module:
     - file
@@ -26,10 +26,17 @@ content:
     third_party_settings: {  }
     type: file_default
     region: content
+  field_media_tags:
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
 hidden:
   created: true
   entitygroupfield: true
-  field_keywords: true
   field_limit_file_accessibility: true
   langcode: true
   name: true

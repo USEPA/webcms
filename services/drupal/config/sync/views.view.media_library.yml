@@ -5,7 +5,7 @@ dependencies:
   config:
     - core.entity_view_mode.media.media_library
     - image.style.media_library
-    - taxonomy.vocabulary.keywords
+    - taxonomy.vocabulary.media_tags
   enforced:
     module:
       - media_library
@@ -259,10 +259,10 @@ display:
           entity_field: name
           plugin_id: field
       filters:
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -271,22 +271,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -305,7 +307,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -909,10 +911,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -921,22 +923,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -955,7 +959,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -1381,10 +1385,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -1393,22 +1397,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -1427,7 +1433,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -1970,10 +1976,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -1982,22 +1988,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -2016,7 +2024,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
