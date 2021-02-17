@@ -4,25 +4,15 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.media.media_library
-    - field.field.media.other.field_keywords
     - field.field.media.other.field_limit_file_accessibility
     - field.field.media.other.field_media_file_1
+    - field.field.media.other.field_media_tags
     - media.type.other
 id: media.other.media_library
 targetEntityType: media
 bundle: other
 mode: media_library
 content:
-  field_keywords:
-    type: entity_reference_autocomplete
-    weight: 1
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
     weight: 2
@@ -48,6 +38,7 @@ hidden:
   created: true
   entitygroupfield: true
   field_media_file_1: true
+  field_media_tags: true
   path: true
   replace_file: true
   status: true

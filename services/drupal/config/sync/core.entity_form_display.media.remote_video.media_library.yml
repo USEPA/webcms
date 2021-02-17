@@ -6,9 +6,9 @@ dependencies:
     - core.entity_form_mode.media.media_library
     - field.field.media.remote_video.field_caption
     - field.field.media.remote_video.field_directory
-    - field.field.media.remote_video.field_keywords
     - field.field.media.remote_video.field_limit_file_accessibility
     - field.field.media.remote_video.field_media_oembed_video
+    - field.field.media.remote_video.field_media_tags
     - media.type.remote_video
   module:
     - text
@@ -30,16 +30,6 @@ content:
   field_directory:
     type: entity_reference_autocomplete
     weight: 3
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  field_keywords:
-    type: entity_reference_autocomplete
-    weight: 4
     region: content
     settings:
       match_operator: CONTAINS
@@ -79,6 +69,7 @@ content:
 hidden:
   created: true
   entitygroupfield: true
+  field_media_tags: true
   path: true
   status: true
   uid: true
