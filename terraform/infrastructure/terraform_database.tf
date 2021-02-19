@@ -37,6 +37,11 @@ resource "aws_iam_role_policy_attachment" "terraform_database_tfstate_access" {
   policy_arn = aws_iam_policy.terraform_database_tfstate_access.arn
 }
 
+resource "aws_iam_role_policy_attachment" "terraform_database_locks_access" {
+  role = aws_iam_role.terraform_database_task.name
+  policy_arn = aws_iam_policy.terraform_locks_access.arn
+}
+
 data "aws_iam_policy_document" "terraform_database_secrets_access" {
   version = "2012-10-17"
 
