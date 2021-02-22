@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3551906acac0377ddfcf7dfb136a9ab9",
+    "content-hash": "d2ff603565b57dd3caa7e001b469d7e8",
     "packages": [
         {
             "name": "akamai-open/edgegrid-auth",
@@ -6500,17 +6500,11 @@
         },
         {
             "name": "drupal/migrate_plus",
-            "version": "5.1.0",
+            "version": "dev-5.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/migrate_plus.git",
-                "reference": "8.x-5.1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/migrate_plus-8.x-5.1.zip",
-                "reference": "8.x-5.1",
-                "shasum": "1257427ab0c64459c3c1e42bb2a98d3114b77163"
+                "reference": "02102dae4df88e5a35d3914cc19b6f14ea05ef1a"
             },
             "require": {
                 "drupal/core": "^8.8 || ^9",
@@ -6518,7 +6512,8 @@
             },
             "require-dev": {
                 "drupal/migrate_example_advanced_setup": "*",
-                "drupal/migrate_example_setup": "*"
+                "drupal/migrate_example_setup": "*",
+                "drush/drush": "^10"
             },
             "suggest": {
                 "ext-soap": "*",
@@ -6526,12 +6521,20 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-5.x": "5.x-dev"
+                },
                 "drupal": {
-                    "version": "8.x-5.1",
-                    "datestamp": "1588261060",
+                    "version": "8.x-5.1+19-dev",
+                    "datestamp": "1609780126",
                     "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
+                    }
+                },
+                "drush": {
+                    "services": {
+                        "drush.services.yml": "^9 || ^10"
                     }
                 }
             },
@@ -6557,7 +6560,8 @@
                 "source": "https://git.drupalcode.org/project/migrate_plus",
                 "issues": "https://www.drupal.org/project/issues/migrate_plus",
                 "slack": "#migrate"
-            }
+            },
+            "time": "2021-01-05T21:03:13+00:00"
         },
         {
             "name": "drupal/migrate_process_skip",
@@ -6613,32 +6617,36 @@
         },
         {
             "name": "drupal/migrate_tools",
-            "version": "4.5.0",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/migrate_tools.git",
-                "reference": "8.x-4.5"
+                "reference": "8.x-5.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/migrate_tools-8.x-4.5.zip",
-                "reference": "8.x-4.5",
-                "shasum": "06390b359bf53c50a30f2d6dc4c7542bfb1fe7ca"
+                "url": "https://ftp.drupal.org/files/projects/migrate_tools-8.x-5.0.zip",
+                "reference": "8.x-5.0",
+                "shasum": "b7c91aa6f7de9d6d548f65f83c8736e47e5926a1"
             },
             "require": {
-                "drupal/core": "^8 || ^9",
-                "drupal/migrate_plus": "^4 || ^5"
+                "drupal/core": "^8.8 | ^9",
+                "drupal/migrate_plus": "^5",
+                "php": ">=7.1"
             },
             "require-dev": {
-                "drupal/migrate_plus": "4.x-dev",
-                "drupal/migrate_source_csv": "^2.2",
+                "drupal/migrate_plus": "^5",
+                "drupal/migrate_source_csv": "^3",
                 "drush/drush": "^10"
+            },
+            "suggest": {
+                "drush/drush": "^9 || ^10"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-4.5",
-                    "datestamp": "1574693285",
+                    "version": "8.x-5.0",
+                    "datestamp": "1588260531",
                     "security-coverage": {
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
@@ -6656,20 +6664,22 @@
             ],
             "authors": [
                 {
-                    "name": "drupalspoons",
-                    "homepage": "https://www.drupal.org/user/3647684"
+                    "name": "Mike Ryan",
+                    "homepage": "https://www.drupal.org/u/mikeryan",
+                    "role": "Maintainer"
                 },
                 {
-                    "name": "mikeryan",
-                    "homepage": "https://www.drupal.org/user/4420"
+                    "name": "Lucas Hedding",
+                    "homepage": "https://www.drupal.org/u/heddn",
+                    "role": "Maintainer"
                 }
             ],
             "description": "Tools to assist in developing and running migrations.",
             "homepage": "http://drupal.org/project/migrate_tools",
             "support": {
-                "source": "http://cgit.drupalcode.org/migrate_tools",
-                "issues": "http://drupal.org/project/migrate_tools",
-                "irc": "irc://irc.freenode.org/drupal-migrate"
+                "source": "https://git.drupalcode.org/project/migrate_tools",
+                "issues": "https://www.drupal.org/project/issues/migrate_tools",
+                "slack": "#migrate"
             }
         },
         {
@@ -7629,7 +7639,8 @@
                     }
                 },
                 "patches_applied": {
-                    "Port D7 feature allowing protecting pages by path": "https://www.drupal.org/files/issues/2020-07-14/2822720_include-exclude-pages_64.patch"
+                    "Port D7 feature allowing protecting pages by path": "https://www.drupal.org/files/issues/2020-07-14/2822720_include-exclude-pages_64.patch",
+                    "D9 compatibility": "https://www.drupal.org/files/issues/2021-01-27/shield-dependency-3194989-2.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -13302,7 +13313,7 @@
         },
         {
             "name": "symfony/polyfill-php72",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php72.git",
@@ -13361,7 +13372,7 @@
         },
         {
             "name": "symfony/polyfill-php73",
-            "version": "v1.22.0",
+            "version": "v1.22.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php73.git",
@@ -17362,6 +17373,7 @@
         "drupal/media_inline_embed": 20,
         "drupal/media_migration": 15,
         "drupal/mediaelement": 20,
+        "drupal/migrate_plus": 20,
         "drupal/module_filter": 20,
         "drupal/page_manager": 10,
         "drupal/path_redirect_import": 10,

@@ -792,6 +792,16 @@ $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['password'] = $credentials->password;
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['host'] = getenv('WEBCMS_DB_HOST');
 
+$databases['migrate']['default'] = [
+  'database' => getenv('WEBCMS_DB_NAME_D7'),
+  'username' => $credentials->username,
+  'password' => $credentials->password,
+  'driver' => 'mysql',
+  'collation' => 'utf8mb4_general_ci',
+  'host' => getenv('WEBCMS_DB_HOST'),
+  'port' => 3306,
+];
+
 unset($credentials);
 
 // Use instance credentials since we're in an AWS environment
