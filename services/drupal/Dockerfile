@@ -261,6 +261,3 @@ COPY --from=drupal /var/www/html /var/www/html
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate
-
-COPY scripts/ecs/drush-migrate-test-paragraph-counts.sh /usr/local/bin/drush-migrate-test-paragraph-counts
-RUN chmod +x /usr/local/bin/drush-migrate-test-paragraph-counts
