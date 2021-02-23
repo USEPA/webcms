@@ -181,7 +181,9 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       }
     }
 
-    // Now that we've set the correct latest revision, let's turn on pathauto.
+    // Now that we've set the correct revisions, let's refresh our node
+    // entity and turn on pathauto.
+    $node = $node_storage->load($nid);
     $this->pathautoOn($node);
 
     return TRUE;
