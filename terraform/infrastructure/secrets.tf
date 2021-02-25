@@ -1,6 +1,3 @@
-# Secrets in this file are not initialized; remember to populate them on the first run of
-# the Terraform template.
-
 resource "aws_secretsmanager_secret" "db_root_credentials" {
   name        = "/webcms/${var.environment}/db-root-credentials"
   description = "Credentials for the WebCMS DB administrator"
@@ -10,8 +7,12 @@ resource "aws_secretsmanager_secret" "db_root_credentials" {
   tags = var.tags
 }
 
+# Populate the root credentials with the randomly-generated password from rds.tf. This is
+# needed for the database initialization task to create the application-specific
+# credentials.
+
 resource "aws_secretsmanager_secret_version" "db_root_credentials" {
-  secret_id     = aws_secretsmanager_secret.db_root_credentials.id
+  secret_id = aws_secretsmanager_secret.db_root_credentials.id
 
   secret_string = jsonencode({
     username = "root"
@@ -22,6 +23,9 @@ resource "aws_secretsmanager_secret_version" "db_root_credentials" {
     ignore_changes = [secret_string, version_stages]
   }
 }
+
+# The D8 and D7 credentials are populated by the database initialization task on its first
+# run.
 
 resource "aws_secretsmanager_secret" "db_d8_credentials" {
   for_each = local.sites
@@ -44,6 +48,9 @@ resource "aws_secretsmanager_secret" "db_d7_credentials" {
 
   tags = var.tags
 }
+
+# Secrets below this line are not populated by Terraform; they will need to be set after
+# Terraform has run but before the first deployment.
 
 resource "aws_secretsmanager_secret" "hash_salt" {
   for_each = local.sites
