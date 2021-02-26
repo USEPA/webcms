@@ -1,0 +1,38 @@
+diff --git a/core/modules/datetime/src/Plugin/views/filter/Date.php b/core/modules/datetime/src/Plugin/views/filter/Date.php
+index f73a675fef..008b61d49d 100644
+--- a/core/modules/datetime/src/Plugin/views/filter/Date.php
++++ b/core/modules/datetime/src/Plugin/views/filter/Date.php
+@@ -5,6 +5,7 @@
+ use Drupal\Component\Datetime\DateTimePlus;
+ use Drupal\Core\Datetime\DateFormatterInterface;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\Core\Form\FormStateInterface;
+ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
+ use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
+ use Drupal\views\FieldAPIHandlerTrait;
+@@ -179,4 +180,25 @@ protected function getOffset($time, $timezone) {
+     return $origin_offset;
+   }
+ 
++  /**
++   * {@inheritDoc}
++   */
++  public function validateExposed(&$form, FormStateInterface $form_state) {
++    if (empty($this->options['exposed'])) {
++      return;
++    }
++
++    // Validate whether the provided value can be converted to a DateTimePlus
++    // class.
++    $value = &$form_state->getValue($this->options['expose']['identifier']);
++    if ($value) {
++      $datetime = new DateTimePlus($value);
++      if ($datetime->hasErrors()) {
++        $form_state->setError($form[$this->options['expose']['identifier']], $this->t('Invalid date format.'));
++      }
++    }
++
++    parent::validateExposed($form, $form_state);
++  }
++
+ }
