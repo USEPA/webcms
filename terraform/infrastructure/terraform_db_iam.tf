@@ -1,3 +1,12 @@
+resource "aws_iam_role" "terraform_database_exec" {
+  name        = "WebCMS-${var.environment}-TerraformDatabaseExecution"
+  description = "Role to execute the Terraform-based database initialization process"
+
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
+
+  tags = var.tags
+}
+
 resource "aws_iam_role" "terraform_database_task" {
   name        = "WebCMS-${var.environment}-TerraformDatabaseTask"
   description = "Role for the Terraform-based database initialization process"
@@ -38,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "terraform_database_tfstate_access" {
 }
 
 resource "aws_iam_role_policy_attachment" "terraform_database_locks_access" {
-  role = aws_iam_role.terraform_database_task.name
+  role       = aws_iam_role.terraform_database_task.name
   policy_arn = aws_iam_policy.terraform_locks_access.arn
 }
 

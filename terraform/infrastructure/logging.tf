@@ -49,3 +49,10 @@ resource "aws_cloudwatch_log_group" "traefik" {
 
   tags = var.tags
 }
+
+# Log group for any Terraform runs performed inside the ECS cluster
+resource "aws_cloudwatch_log_group" "terraform" {
+  name = "/webcms/${var.environment}/terraform"
+
+  tags = var.tags
+}
