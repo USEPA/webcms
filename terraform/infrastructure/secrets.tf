@@ -1,3 +1,5 @@
+#region Database credentials
+
 resource "aws_secretsmanager_secret" "db_root_credentials" {
   name        = "/webcms/${var.environment}/db-root-credentials"
   description = "Credentials for the WebCMS DB administrator"
@@ -48,6 +50,10 @@ resource "aws_secretsmanager_secret" "db_d7_credentials" {
 
   tags = var.tags
 }
+
+#endregion
+
+#region Application secrets
 
 # Secrets below this line are not populated by Terraform; they will need to be set after
 # Terraform has run but before the first deployment.
@@ -117,3 +123,5 @@ resource "aws_secretsmanager_secret" "akamai_client_secret" {
 
   tags = var.tags
 }
+
+#endregion

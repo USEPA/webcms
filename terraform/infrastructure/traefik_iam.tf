@@ -7,6 +7,8 @@ resource "aws_iam_role" "traefik_task" {
   tags = var.tags
 }
 
+# Traefik needs to be able to see ECS resources. (TODO: Determine if we should scope this
+# policy to just the WebCMS application cluster.)
 # cf. https://doc.traefik.io/traefik/providers/ecs/
 data "aws_iam_policy_document" "traefik_ecs_access" {
   version = "2012-10-17"
@@ -39,6 +41,9 @@ resource "aws_iam_role_policy_attachment" "traefik_ecs_access" {
   role       = aws_iam_role.traefik_task.name
   policy_arn = aws_iam_policy.traefik_ecs_access.arn
 }
+
+# The execution role only needs standard execution permissions - we do not bind secrets
+# or other sensitive values to the router.
 
 resource "aws_iam_role" "traefik_exec" {
   name        = "WebCMS-${var.environment}-TraefikExecution"

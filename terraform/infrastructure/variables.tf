@@ -3,7 +3,21 @@ variable "aws_region" {
   type        = string
 }
 
-# Module-wide variables
+#region Backend
+
+variable "backend_state" {
+  description = "Name of the external S3 bucket in which state is stored"
+  type = string
+}
+
+variable "backend_locks" {
+  description = "Name of the DynamoDB table to use for locking state"
+  type = string
+}
+
+#endregion
+
+#region Module
 
 variable "environment" {
   description = "Name of the environment corresponding to this VPC (e.g., preproduction, production)"
@@ -21,7 +35,9 @@ variable "tags" {
   default     = {}
 }
 
-# Load balancer variables
+#endregion
+
+#region Load balancer
 # cf. load_balancer.tf
 
 variable "lb_default_certificate" {
@@ -35,7 +51,9 @@ variable "lb_extra_certificates" {
   default     = []
 }
 
-# Database variables
+#endregion
+
+#region RDS/Aurora
 # cf. rds.tf
 
 variable "db_instance_type" {
@@ -50,7 +68,9 @@ variable "db_instance_count" {
   type        = number
 }
 
-# Search variables
+#endregion
+
+#region Elasticsearch
 # cf. search.tf
 
 variable "search_instance_type" {
@@ -83,7 +103,9 @@ variable "search_availability_zones" {
   type        = number
 }
 
-# Cache variables
+#endregion
+
+#region Elasticache
 # cf. cache.tf
 
 variable "cache_instance_type" {
@@ -95,3 +117,5 @@ variable "cache_instance_count" {
   description = "Number of ElastiCache nodes in this cluster"
   type        = number
 }
+
+#endregion

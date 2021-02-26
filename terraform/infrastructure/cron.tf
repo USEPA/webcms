@@ -29,6 +29,7 @@ data "aws_iam_policy_document" "events_task_execution" {
   # CloudWatch's events schedule. This is necessary due to our usage of the referenced
   # roles.
   # cf. https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduled_tasks.html
+  # and https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html
   statement {
     sid     = "passTaskRoles"
     actions = ["iam:PassRole"]

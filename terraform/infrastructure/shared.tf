@@ -1,3 +1,5 @@
+#region VPC parameters
+
 data "aws_ssm_parameter" "vpc_id" {
   name = "/webcms/${var.environment}/vpc/id"
 }
@@ -14,6 +16,10 @@ locals {
   public_subnets  = split(",", data.aws_ssm_parameter.public_subnets.value)
   private_subnets = split(",", data.aws_ssm_parameter.private_subnets.value)
 }
+
+#endregion
+
+#region Security group parameters
 
 data "aws_ssm_parameter" "database_security_group" {
   name = "/webcms/${var.environment}/security-groups/database"
@@ -38,6 +44,12 @@ data "aws_ssm_parameter" "drupal_security_group" {
 data "aws_ssm_parameter" "traefik_security_group" {
   name = "/webcms/${var.environment}/security-groups/traefik"
 }
+
+data "aws_ssm_parameter" "terraform_database_security_group" {
+  name = "/webcms/${var.environment}/security-groups/terraform-database"
+}
+
+#endregion
 
 locals {
   languages = ["en", "es"]

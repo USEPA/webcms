@@ -1,3 +1,5 @@
+#region Drupal-specific
+
 resource "aws_ssm_parameter" "drupal_iam_task" {
   for_each = local.sites
 
@@ -27,6 +29,10 @@ resource "aws_ssm_parameter" "drupal_s3_bucket" {
 
   tags = var.tags
 }
+
+#endregion
+
+#region Log groups
 
 resource "aws_ssm_parameter" "php_fpm_log_group" {
   for_each = local.sites
@@ -77,6 +83,10 @@ resource "aws_ssm_parameter" "fpm_metrics_log_group" {
 
   tags = var.tags
 }
+
+#endregion
+
+#region Secrets Manager ARNs
 
 resource "aws_ssm_parameter" "db_d8_credentials" {
   for_each = local.sites
@@ -157,3 +167,25 @@ resource "aws_ssm_parameter" "akamai_client_secret" {
 
   tags = var.tags
 }
+
+#endregion
+
+#region Terraform configuration
+
+resource "aws_ssm_parameter" "terraform_state" {
+  name = "/webcms/${var.environment}/terraform/state"
+  type = "String"
+  value = aws_s3_bucket.tfstate.bucket
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "terraform_locks" {
+  name = "/webcms/${var.environment}/terraform/locks"
+  type = "String"
+  value = aws_dynamodb_table.terraform_locks.arn
+
+  tags = var.tags
+}
+
+#endregion

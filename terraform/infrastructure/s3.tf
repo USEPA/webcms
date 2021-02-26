@@ -1,3 +1,5 @@
+#region Uploads
+
 resource "aws_s3_bucket" "uploads" {
   for_each = local.sites
 
@@ -47,8 +49,10 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
   policy = data.aws_iam_policy_document.uploads_policy[each.key].json
 }
 
-# Create an S3 bucket using a random identifier (this is only used for administration so
-# the name doesn't have to be pretty)
+#endregion
+
+#region Load balancer logs
+
 resource "aws_s3_bucket" "elb_logs" {
   bucket_prefix = "webcms-${var.environment}-elb-logs-"
 
@@ -124,6 +128,10 @@ resource "aws_s3_bucket_policy" "elb_logs_delivery" {
   policy = data.aws_iam_policy_document.elb_logs_access.json
 }
 
+#endregion
+
+#region DB backups
+
 # Create a bucket to house DB backups
 resource "aws_s3_bucket" "backups" {
   bucket_prefix = "webcms-${var.environment}-backups-"
@@ -149,3 +157,5 @@ resource "aws_s3_bucket_public_access_block" "backups" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+#endregion

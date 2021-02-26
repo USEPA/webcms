@@ -1,8 +1,6 @@
-data "aws_kms_alias" "secretsmanager" {
-  name = "alias/aws/secretsmanager"
-}
+#region Permissions
 
-data "aws_iam_policy_document" "proxy_assume" {
+ data "aws_iam_policy_document" "proxy_assume" {
   version = "2012-10-17"
 
   statement {
@@ -16,6 +14,8 @@ data "aws_iam_policy_document" "proxy_assume" {
   }
 }
 
+# Per the AWS documentation, we need to create an IAM role for the proxy to access the
+# various Secrets Manager credentials.
 resource "aws_iam_role" "proxy" {
   name        = "WebCMS-${var.environment}-Proxy"
   description = "Role for the cluster's RDS proxy"
@@ -25,6 +25,12 @@ resource "aws_iam_role" "proxy" {
   tags = var.tags
 }
 
+# Read out the default Secrets Manager ARN using the alias
+data "aws_kms_alias" "secretsmanager" {
+  name = "alias/aws/secretsmanager"
+}
+
+# Grant access to all site/lang secrets (but NOT the root credentials!)
 data "aws_iam_policy_document" "proxy_secrets" {
   version = "2012-10-17"
 
@@ -63,6 +69,10 @@ resource "aws_iam_role_policy_attachment" "proxy_secrets" {
   role       = aws_iam_role.proxy.name
   policy_arn = aws_iam_policy.proxy_secrets.arn
 }
+
+#endregion
+
+#region Resources
 
 resource "aws_db_proxy" "proxy" {
   name = "webcms-${var.environment}-proxy"
@@ -104,3 +114,5 @@ resource "aws_db_proxy_target" "proxy" {
 
   db_cluster_identifier = aws_rds_cluster.db.cluster_identifier
 }
+
+#endregion
