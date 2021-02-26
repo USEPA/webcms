@@ -1,3 +1,5 @@
+#region Security group names
+
 resource "aws_security_group" "database" {
   name        = "webcms-${var.environment}-database"
   description = "Security group for RDS/Aurora"
@@ -18,32 +20,6 @@ resource "aws_security_group" "proxy" {
   tags = merge(var.tags, {
     Name = "WebCMS RDS Proxy (${var.environment})"
   })
-}
-
-resource "aws_security_group_rule" "database_proxy_ingress" {
-  description = "Allows RDS to receive traffic from proxies"
-
-  security_group_id = aws_security_group.database.id
-
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 3306
-  to_port   = 3306
-
-  source_security_group_id = aws_security_group.proxy.id
-}
-
-resource "aws_security_group_rule" "proxy_database_egress" {
-  description = "Allows proxies to send traffic to RDS"
-
-  security_group_id = aws_security_group.proxy.id
-
-  type      = "egress"
-  protocol  = "tcp"
-  from_port = 3306
-  to_port   = 3306
-
-  source_security_group_id = aws_security_group.database.id
 }
 
 resource "aws_security_group" "elasticsearch" {
@@ -89,6 +65,77 @@ resource "aws_security_group" "drupal" {
     Name = "WebCMS Drupal (${var.environment})"
   })
 }
+
+resource "aws_security_group" "terraform_database" {
+  name = "webcms-${var.environment}-terraform-database"
+  description = "Security group for the Terraform database initialization task"
+
+  vpc_id = aws_vpc.vpc.id
+
+  tags = merge(var.tags, {
+    Name = "WebCMS Terraform DB (${var.environment})"
+  })
+}
+
+#endregion
+
+#region DB
+
+resource "aws_security_group_rule" "database_proxy_ingress" {
+  description = "Allows RDS to receive traffic from proxies"
+
+  security_group_id = aws_security_group.database.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.proxy.id
+}
+
+resource "aws_security_group_rule" "proxy_database_egress" {
+  description = "Allows proxies to send traffic to RDS"
+
+  security_group_id = aws_security_group.proxy.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.database.id
+}
+
+resource "aws_security_group_rule" "database_terraform_ingress" {
+  description = "Allows RDS to receive traffic from Terraform tasks"
+
+  security_group_id = aws_security_group.database.id
+
+  type = "ingress"
+  protocol=  "tcp"
+  from_port = 3306
+  to_port = 3306
+
+  source_security_group_id = aws_security_group.terraform_database.id
+}
+
+resource "aws_security_group_rule" "terraform_database_egress" {
+  description = "Allows Terraform tasks to send traffic to RDS"
+
+  security_group_id = aws_security_group.terraform_database.id
+
+  type = "egress"
+  protocol=  "tcp"
+  from_port = 3306
+  to_port = 3306
+
+  source_security_group_id = aws_security_group.database.id
+}
+
+#endregion
+
+#region Traefik
 
 # Allow outbound HTTPS egress for Traefik. This is necessary in order to allow pulling
 # Docker images on Fargate.
@@ -139,6 +186,10 @@ resource "aws_security_group_rule" "public_traefik_https_ingress" {
 
   cidr_blocks = aws_subnet.public[*].cidr_block
 }
+
+#endregion
+
+#region Drupal
 
 # Allow traffic on port 80 from Traefik to Drupal
 resource "aws_security_group_rule" "drupal_traefik_ingress" {
@@ -209,6 +260,10 @@ resource "aws_security_group_rule" "drupal_smtp_egress" {
 
   cidr_blocks = ["0.0.0.0/0"]
 }
+
+#endregion
+
+#region Services
 
 # Allow Drupal/Drush tasks access to the various internal services over their well-known
 # port numbers.
@@ -290,3 +345,22 @@ resource "aws_security_group_rule" "drupal_memcached_egress" {
 
   source_security_group_id = aws_security_group.memcached.id
 }
+
+#endregion
+
+#region Terraform Database
+
+resource "aws_security_group_rule" "terraform_database_https_egress" {
+  description = "Allows outbound HTTPS"
+
+  security_group_id = aws_security_group.terraform_database.id
+
+  type = "egress"
+  protocol = "tcp"
+  from_port = 443
+  to_port = 443
+
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+#endregion

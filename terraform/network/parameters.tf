@@ -1,6 +1,8 @@
 # Export resources from the network environment into Parameter Store so that the
 # infrastructure build can pick up on them.
 
+#region VPC
+
 resource "aws_ssm_parameter" "vpc_id" {
   name  = "/webcms/${var.environment}/vpc/id"
   type  = "String"
@@ -40,6 +42,10 @@ resource "aws_ssm_parameter" "private_cidrs" {
 
   tags = var.tags
 }
+
+#endregion
+
+#region Security groups
 
 resource "aws_ssm_parameter" "database_security_group" {
   name  = "/webcms/${var.environment}/security-groups/database"
@@ -88,3 +94,13 @@ resource "aws_ssm_parameter" "traefik_security_group" {
 
   tags = var.tags
 }
+
+resource "aws_ssm_parameter" "terraform_database_security_group" {
+  name = "/webcms/${var.environment}/security-groups/terraform-database"
+  type = "String"
+  value = aws_security_group.terraform_database.id
+
+  tags = var.tags
+}
+
+#endregion
