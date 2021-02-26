@@ -6,7 +6,7 @@
 - [Variables](#variables)
 - [Subnets](#subnets)
 - [Security Groups](#security-groups)
-- [SSM Parameters](#ssm-parameters)
+- [Outputs](#outputs)
 
 ## Variables
 
@@ -29,8 +29,26 @@ This module creates a number of security groups for the various resources in the
 - Drupal is permitted egress on ports 80 and 443, as well as outbound SMTP. This reference module uses port 587, but the actual port may differ in other environments.
 - The Traefik router permits ingress from public subnets. Since network load balancers don't support security groups, this is the best we can do.
 
-## SSM Parameters
+## Outputs
 
-In [parameters.tf](parameters.tf) we list the Parameter Store parameters that other Terraform runs will reference.
+In [parameters.tf](parameters.tf) we list the Parameter Store parameters that other Terraform runs will reference. The Terraform module in [infrastructure](../infrastructure) expects to be able to read these values. We use Parameter store for two reasons:
 
-Under `/webcms/${var.environment}/vpc`, we store the VPC-related parameters (VPC ID, public and private subnets, and public and private CIDRs). Under `/webcms/${var.environment}/security-groups`, we store the security group IDs for each named security group.
+1. The values are machine-readable identifiers and thus prone to typos if curated by hand, and
+2. These identifiers are unlikely to change (if they ever do).
+
+The parameters are stored under the Parameter Store path `/webcms/${var.environment}/`, and this module creates the following parameters:
+
+- VPC parameters:
+  - `/webcms/${var.environment}/vpc/id`: The VPC ID
+  - `/webcms/${var.environment}/vpc/public-subnets`: A comma-separated list of IDs for the public subnets
+  - `/webcms/${var.environment}/vpc/private-subnets`: As above, but for the private subnets
+  - `/webcms/${var.environment}/vpc/public-cidrs`: A comma-separated list of the public subnets' CIDR ranges
+  - `/webcms/${var.environment}/vpc/private-cidrs`: As above, but for the private subnets
+- Security group parameters:
+  - `/webcms/${var.environment}/security-groups/database`: ID of the RDS security group
+  - `/webcms/${var.environment}/security-groups/proxy`: ID of the RDS proxy security group
+  - `/webcms/${var.environment}/security-groups/elasticsearch`: ID of the Elasticsearch security group
+  - `/webcms/${var.environment}/security-groups/memcached`: ID of the ElastiCache security group
+  - `/webcms/${var.environment}/security-groups/drupal`: ID of the Drupal task security group
+  - `/webcms/${var.environment}/security-groups/traefik`: ID of the Traefik router security group
+  - `/webcms/${var.environment}/security-groups/terraform-database`: ID of the database intialization security group

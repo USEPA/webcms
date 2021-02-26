@@ -81,6 +81,14 @@ resource "aws_security_group" "terraform_database" {
 
 #region DB
 
+# Only two security groups are authorized to access the Aurora cluster directly:
+# 1. The RDS proxy
+# 2. The database initialization task
+#
+# All other access to the Aurora database must go through the RDS proxy. Limitations in
+# Drupal prevent us from performing in-app connection pooling, so we rely on the proxy's
+# ability to pool connections and mitigate transient connection issues during failover.
+
 resource "aws_security_group_rule" "database_proxy_ingress" {
   description = "Allows RDS to receive traffic from proxies"
 

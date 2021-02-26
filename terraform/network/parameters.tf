@@ -96,8 +96,8 @@ resource "aws_ssm_parameter" "traefik_security_group" {
 }
 
 resource "aws_ssm_parameter" "terraform_database_security_group" {
-  name = "/webcms/${var.environment}/security-groups/terraform-database"
-  type = "String"
+  name  = "/webcms/${var.environment}/security-groups/terraform-database"
+  type  = "String"
   value = aws_security_group.terraform_database.id
 
   tags = var.tags
