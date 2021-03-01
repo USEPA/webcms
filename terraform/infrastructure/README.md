@@ -11,6 +11,11 @@
 - [Module Inputs](#module-inputs)
   - [Variables](#variables)
   - [Parameter Store](#parameter-store)
+- [Resources](#resources)
+  - [WebCMS Services](#webcms-services)
+  - [WebCMS Support](#webcms-support)
+  - [Terraform Resources](#terraform-resources)
+- [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
 - [Post-Run Steps](#post-run-steps)
 - [Conventions](#conventions)
@@ -18,7 +23,7 @@
 
 ## About
 
-This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 8 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before
+This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 8 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before it can be deployed (see the next section).
 
 ## Prerequisites
 
@@ -74,8 +79,8 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
 
 - From the VPC, the module reads three parameters under the `/webcms/${var.environment}/vpc/` path:
   1. `/webcms/${var.environment}/vpc/id`: The ID of the VPC. This is used to identify the VPC for the load balancer's target groups.
-  2. `/webcms/${var.environment}/vpc/public-subnets`: The IDs (`sg-<hex>`) of the VPC's public subnets. We provide these to the load balancer since it's public-facing.
-  3. `/webcms/${var.environment}/vpc/private-subnets`: The IDs of the private subnets. Most resources are launched here.
+  2. `/webcms/${var.environment}/vpc/public-subnets`: A comma-separated list of the IDs (`sg-<hex>`) of the VPC's public subnets. We provide these to the load balancer since it's public-facing.
+  3. `/webcms/${var.environment}/vpc/private-subnets`: A list of subnet IDs corresponding to the VPC's private subnets. Most resources are deployed here.
 - The module also depends on pre-existing security groups.
   1. `/webcms/${var.environment}/security-groups/database`: The security group for the Aurora cluster
   2. `/webcms/${var.environment}/security-groups/proxy`: The security group for the RDS proxy
@@ -85,20 +90,55 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
   6. `/webcms/${var.environment}/security-groups/traefik`: The security group for the Traefik router
   7. `/webcms/${var.environment}/security-groups/terraform-database`: The security group for the database initialization task
 
+## Resources
+
+### WebCMS Services
+
+The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 8 WebCMS. Most of the resources in this category are fairly straightforward:
+
+- A network load balancer ([load_balancer.tf](load_balancer.tf))
+- An Aurora cluster ([rds.tf](rds.tf))
+- An Elasticache cluster ([cache.tf](cache.tf))
+- An Elasticsearch domain ([search.tf](search.tf))
+- An ECS cluster ([cluster.tf](cluster.tf))
+
+Special mention is due to two files. We use an RDS proxy ([proxy.tf](proxy.tf)) to manage connection pooling externally. Due to PHP's request-scoped nature, database connections are difficult to persist. Instead, we rely on the proxy to handle connections to the Aurora clutser from multiple containers as well as mitigate transient connection failures due to, e.g., failover during reader-to-write promotion.
+
+Since network load balancers do not perform request routing, we deploy [Traefik](https://traefik.io/) ([traefik_iam.tf](traefik_iam.tf), [traefik_service.tf](traefik_service.tf)). Traefik is able to [automatically discover configuration](https://doc.traefik.io/traefik/providers/ecs/) when running in ECS. This allows us to incrementally build up the routing configuration on a task-by-task basis, rather than having to define it up front. The router will monitor running containers across the services and balance load appropriately.
+
+### WebCMS Support
+
+Resources in this category are not systems that the WebCMS connects to (or receives connections from), but instead are somewhat lower-level elements that support external data. For example:
+
+- CloudWatch log groups ([logging.tf](logging.tf))
+- Secrets Manager secrets ([secrets.tf](secrets.tf))
+- ECR repositories ([ecr.tf](ecr.tf))
+- An EventBridge cron schecule ([cron.tf](cron.tf))
+
+### Terraform Resources
+
+This module creates some resources to support running Terraform against this infrastructure's resources. In particular, this supports the [database initialization](../database) and [WebCMS](../webcms) modules. We create an S3 bucket using encryption at rest and a DynamoDB table for locks.
+
+## Module Outputs
+
 ## How to Run
 
+This module can be run in any environment that has permission to modify the relevant AWS account's infrastructrure resources.
+
 ## Post-Run Steps
+
+Before proceeding with deploying Drupal, be sure to read the database module's [docmentation](../database) in order to create the users (and their credentials) for Drupal.
 
 ## Conventions
 
 Files in this module are broken down roughly by the service being deployed. Pwrmissions granted to each service are provided in that file. For example, both the RDS proxy and its IAM role are defined in [proxy.tf](proxy.tf).
 
-Files that define many resources of the same time are broken down by `#region`/`#endregion` markers to make navigation easier for editors that understand them.
+Files that define many resources of the same type are broken down by `#region`/`#endregion` markers to make navigation easier for editors that understand them.
 
 ## Known Issues
 
 - Initial deployments may fail due to a race condition with the load balancer and the Traefik service. Terraform will attempt to register the service with ECS before the listeners are fully ready.
 
-  The race condition is transient; a second run will successfully deploy the Traefik service.
+  The race condition is transient; a second `terraform apply` will successfully deploy Traefik.
 
 - Due to [hashicorp/terraform-provider-aws#17010](https://github.com/hashicorp/terraform-provider-aws/issues/17010), we cannot upgrade the provider from 3.21.0 until the underlying API issue is resolved.
