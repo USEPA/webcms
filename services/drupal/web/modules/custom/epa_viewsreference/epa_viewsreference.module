@@ -1,0 +1,13 @@
+<?php
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function epa_viewsreference_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+  $plugin_id = $context['widget']->getPluginId();
+  // Hide the control that allows users to expose filters on dynamic lists.
+  if ($plugin_id === 'viewsreference_select' && isset($element["options"]["exposed_filters"]["vr_exposed_filters_visible"])) {
+    $element["options"]["exposed_filters"]["vr_exposed_filters_visible"]['#access'] = FALSE;
+  }
+}
