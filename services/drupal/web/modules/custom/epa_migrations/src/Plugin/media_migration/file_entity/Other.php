@@ -30,10 +30,6 @@ class Other extends FileBase {
    */
   public function getDestinationMediaTypeLabel() {
     return 'Other';
-    // return implode(' ', array_filter([
-    //   'Other',
-    //   $this->configuration['scheme'] === 'public' ? NULL : "({$this->configuration['scheme']})",
-    // ]));
   }
 
 }
