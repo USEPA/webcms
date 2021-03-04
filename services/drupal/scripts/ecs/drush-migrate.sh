@@ -58,6 +58,7 @@ run_migration() {
     echo "[$migration] Importing ($((i + 1))/$batches batches)"
     drush mim \
       --limit=$batch_size \
+      --force \
       "$migration"
 
     # Check if we've asked to halt. Migration's own status field isn't really reliable
