@@ -131,7 +131,7 @@ Before proceeding with deploying Drupal, be sure to read the database module's [
 
 ## Conventions
 
-Files in this module are broken down roughly by the service being deployed. Pwrmissions granted to each service are provided in that file. For example, both the RDS proxy and its IAM role are defined in [proxy.tf](proxy.tf).
+Files in this module are broken down roughly by the service being deployed. Permissions granted to each service are provided in that file. For example, both the RDS proxy and its IAM role are defined in [proxy.tf](proxy.tf).
 
 Files that define many resources of the same type are broken down by `#region`/`#endregion` markers to make navigation easier for editors that understand them.
 
@@ -140,5 +140,7 @@ Files that define many resources of the same type are broken down by `#region`/`
 - Initial deployments may fail due to a race condition with the load balancer and the Traefik service. Terraform will attempt to register the service with ECS before the listeners are fully ready.
 
   The race condition is transient; a second `terraform apply` will successfully deploy Traefik.
+
+- If you haven't created a Secrets Manager secret before in this region, the lookup of the KMS alias `alias/aws/secretsmanager` will fail. The solution is to create a throwaway secret and delete it immediately. The default KMS key will be created automatically, and the Terraform run will proceed.
 
 - Due to [hashicorp/terraform-provider-aws#17010](https://github.com/hashicorp/terraform-provider-aws/issues/17010), we cannot upgrade the provider from 3.21.0 until the underlying API issue is resolved.
