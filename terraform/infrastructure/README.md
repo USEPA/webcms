@@ -81,6 +81,8 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
   1. `/webcms/${var.environment}/vpc/id`: The ID of the VPC. This is used to identify the VPC for the load balancer's target groups.
   2. `/webcms/${var.environment}/vpc/public-subnets`: A comma-separated list of the IDs (`sg-<hex>`) of the VPC's public subnets. We provide these to the load balancer since it's public-facing.
   3. `/webcms/${var.environment}/vpc/private-subnets`: A list of subnet IDs corresponding to the VPC's private subnets. Most resources are deployed here.
+  4. `/webcms/${var.environment}/vpc/public-cidrs`: A comma-separated list of the CIDRs (e.g., `10.0.0.0/24`) of the VPC's public subnets. The Traefik router uses these for respecting the load balancer's [PROXY protocol](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-target-groups.html#proxy-protocol) headers.
+  5. `/webcms/${var.environment}/vpc/private-cidrs`: A list of subnet IDs corresponding to the VPC's private CIDRs.
 - The module also depends on pre-existing security groups.
   1. `/webcms/${var.environment}/security-groups/database`: The security group for the Aurora cluster
   2. `/webcms/${var.environment}/security-groups/proxy`: The security group for the RDS proxy
