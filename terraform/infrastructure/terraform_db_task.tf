@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "terraform_database_task" {
   cpu    = 256
   memory = 1024
 
-  container_definition = jsonencode([
+  container_definitions = jsonencode([
     {
       name  = "terraform"
       image = "${aws_ecr_repository.terraform_database.repository_url}:latest"
