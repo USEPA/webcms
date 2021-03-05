@@ -121,6 +121,13 @@ This module creates some resources to support running Terraform against this inf
 
 ## Module Outputs
 
+This module's [outputs](outputs.tf) can be categorized as follows:
+
+* Database initialization outputs
+  * `terraform_db_ecr`: The ECR URL of the initialization task's repository. Use this to build and tag the initialization task's container.
+  * `terraform_db_task`: The name of the initialization task's family. Used in the ECS RunTask API.
+  * `terraform_db_awsvpc`: An object representing the AWSVPC network configuration. This is also used by the RunTask API and is required for Fargate-based tasks; see [`networkConfiguration`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-networkConfiguration) in the API documentation and [Fargate task networking](https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-task-networking.html) in the ECS documentation for more.
+
 ## How to Run
 
 This module can be run in any environment that has permission to modify the relevant AWS account's infrastructrure resources.
