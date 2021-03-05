@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "traefik_ecs_access" {
 
     actions = [
       "ecs:ListClusters",
+      "ecs:ListTasks",
       "ecs:DescribeClusters",
       "ecs:DescribeTasks",
       "ecs:DescribeContainerInstances",
