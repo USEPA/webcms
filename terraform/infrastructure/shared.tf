@@ -17,6 +17,19 @@ locals {
   private_subnets = split(",", data.aws_ssm_parameter.private_subnets.value)
 }
 
+data "aws_ssm_parameter" "public_cidrs" {
+  name = "/webcms/${var.environment}/vpc/public-cidrs"
+}
+
+data "aws_ssm_parameter" "private_cidrs" {
+  name = "/webcms/${var.environment}/vpc/private-cidrs"
+}
+
+locals {
+  public_cidrs  = split(",", data.aws_ssm_parameter.public_cidrs.value)
+  private_cidrs = split(",", data.aws_ssm_parameter.private_cidrs.value)
+}
+
 #endregion
 
 #region Security group parameters

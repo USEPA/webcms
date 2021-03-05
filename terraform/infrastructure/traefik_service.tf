@@ -34,7 +34,7 @@ resource "aws_ecs_task_definition" "traefik" {
 
         # Honor the NLB's PROXY protocol
         "--entryPoints.web.proxyProtocol=true",
-        "--entryPoints.web.proxyProtocol.trustedIPs=${join(",", local.public_subnets)}",
+        "--entryPoints.web.proxyProtocol.trustedIPs=${join(",", local.public_cidrs)}",
 
         # Redirect HTTP traffic to HTTPS
         "--entryPoints.web.http.redirections.entryPoint.to=websecure",
@@ -45,7 +45,7 @@ resource "aws_ecs_task_definition" "traefik" {
 
         # Honor the NLB's PROXY protocol
         "--entryPoints.websecure.proxyProtocol=true",
-        "--entryPoints.websecure.proxyProtocol.trustedIPs=${join(",", local.public_subnets)}",
+        "--entryPoints.websecure.proxyProtocol.trustedIPs=${join(",", local.public_cidrs)}",
       ]
 
       portMappings = [
