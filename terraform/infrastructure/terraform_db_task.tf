@@ -17,9 +17,7 @@ resource "aws_ecs_task_definition" "terraform_database_task" {
       image = "${aws_ecr_repository.terraform_database.repository_url}:latest"
 
       environment = [
-        # See terraform/database/variables.tf for the names of these values
-        { name = "TF_VAR_backend_storage", value = aws_s3_bucket.tfstate.bucket },
-        { name = "TF_VAR_backend_logs", value = aws_dynamodb_table.terraform_locks.name },
+        # See terraform/database/variables.tf for more on these
         { name = "TF_VAR_aws_region", value = var.aws_region },
         {
           name = "TF_VAR_sites",
@@ -33,7 +31,11 @@ resource "aws_ecs_task_definition" "terraform_database_task" {
         },
 
         # Pass in the MySQL provider's endpoint; see https://registry.terraform.io/providers/winebarrel/mysql/latest/docs#argument-reference
-        { name = "TF_VAR_mysql_endpoint", value = "${aws_rds_cluster.db.endpoint}:3306" }
+        { name = "TF_VAR_mysql_endpoint", value = "${aws_rds_cluster.db.endpoint}:3306" },
+
+        # See terraform/database/README.md for more on why these are regular env vars
+        { name = "BACKEND_STORAGE", value = aws_s3_bucket.tfstate.bucket },
+        { name = "BACKEND_LOCKS", value = aws_dynamodb_table.terraform_locks.name },
       ]
 
       secrets = [

@@ -8,6 +8,7 @@
 - [Module Inputs](#module-inputs)
   - [Variables](#variables)
   - [Parameter Store](#parameter-store)
+  - [Environment Variables](#environment-variables)
 - [Resources](#resources)
   - [Database Resources](#database-resources)
   - [Secrets Manager Versions](#secrets-manager-versions)
@@ -36,9 +37,6 @@ Inputs to this module are bound automatically during the definition of the initi
 - Database credentials
   - `mysql_endpoint`: The connection string for the Aurora cluster. This cannot be the endpoint of the RDS proxy; the proxy does not have access to the root database credentials and thus will refuse authentication attempts by this module.
   - `mysql_credentials`: The username and password for the cluster's root user. This must be an object like `{ username, password }` (the default format for credentials in Secrets Manager).
-- Backend configuration
-  - `backend_storage`: The name (not ARN) of the S3 bucket in which this module's state will be kept. This module stores its state under `database.tfstate` in that bucket.
-  - `backend_locks`: The name (not ARN) of the DynamoDB table used to lock Terraform runs.
 - Site data
   - `sites`: A map of `(site, language)` pairs to information about the site's credentials. The keys of the map are in the format `"<site>-<lang>"` (e.g., `"dev-es"`) and the values are:
     - `name`: the name of the site (e.g., `"dev"`)
@@ -49,6 +47,10 @@ Inputs to this module are bound automatically during the definition of the initi
 ### Parameter Store
 
 This module does not read from Parameter Store.
+
+### Environment Variables
+
+Because Terraform does not allow variable references in backend configuration, the name of the S3 storage backend and the DynamoDB locks table are provided as environment varibles named `$BACKEND_STORAGE` and `$BACKEND_LOCKS`, respectively. See the Terraform docs on [partial configuration](https://www.terraform.io/docs/language/settings/backends/configuration.html#partial-configuration) for more.
 
 ## Resources
 

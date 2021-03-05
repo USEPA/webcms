@@ -14,5 +14,7 @@ RUN terraform fmt -diff -check && terraform validate
 ENTRYPOINT \
   set -exu \
   && terraform init \
+    -backend-config="bucket=$BACKEND_STORAGE" \
+    -backend-config="dynamodb_table=$BACKEND_LOCKS" \
   && terraform plan -out plan \
   && terraform apply plan
