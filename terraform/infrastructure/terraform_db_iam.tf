@@ -1,3 +1,5 @@
+#region Execution Role
+
 resource "aws_iam_role" "terraform_database_exec" {
   name        = "WebCMS-${var.environment}-TerraformDatabaseExecution"
   description = "Role to execute the Terraform-based database initialization process"
@@ -6,6 +8,38 @@ resource "aws_iam_role" "terraform_database_exec" {
 
   tags = var.tags
 }
+
+resource "aws_iam_role_policy_attachment" "terraform_database_exec" {
+  role       = aws_iam_role.terraform_database_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+data "aws_iam_policy_document" "terraform_database_credentials_access" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "read"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [aws_secretsmanager_secret.db_root_credentials.arn]
+  }
+}
+
+resource "aws_iam_policy" "terraform_database_credentials_access" {
+  name        = "WebCMS-${var.environment}-TerraformDatabaseRootCredsAccess"
+  description = "Allows binding the root RDS credentials to the Terraform database task"
+
+  policy = data.aws_iam_policy_document.terraform_database_credentials_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_database_credentials_access" {
+  role       = aws_iam_role.terraform_database_exec.name
+  policy_arn = aws_iam_policy.terraform_database_credentials_access.arn
+}
+
+#endregion
+
+#region Task Role
 
 resource "aws_iam_role" "terraform_database_task" {
   name        = "WebCMS-${var.environment}-TerraformDatabaseTask"
@@ -82,3 +116,5 @@ resource "aws_iam_role_policy_attachment" "terraform_database_secrets_access" {
   role       = aws_iam_role.terraform_database_task.name
   policy_arn = aws_iam_policy.terraform_database_secrets_access.arn
 }
+
+#endregion

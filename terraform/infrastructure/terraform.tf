@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "terraform_locks_access" {
     sid       = "itemAccess"
     effect    = "Allow"
     actions   = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:DeleteItem"]
-    resources = ["${aws_dynamodb_table.terraform_locks.arn}/*"]
+    resources = [aws_dynamodb_table.terraform_locks.arn]
   }
 }
 
