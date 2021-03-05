@@ -67,7 +67,7 @@ resource "aws_security_group" "drupal" {
 }
 
 resource "aws_security_group" "terraform_database" {
-  name = "webcms-${var.environment}-terraform-database"
+  name        = "webcms-${var.environment}-terraform-database"
   description = "Security group for the Terraform database initialization task"
 
   vpc_id = aws_vpc.vpc.id
@@ -120,10 +120,10 @@ resource "aws_security_group_rule" "database_terraform_ingress" {
 
   security_group_id = aws_security_group.database.id
 
-  type = "ingress"
-  protocol=  "tcp"
+  type      = "ingress"
+  protocol  = "tcp"
   from_port = 3306
-  to_port = 3306
+  to_port   = 3306
 
   source_security_group_id = aws_security_group.terraform_database.id
 }
@@ -133,10 +133,10 @@ resource "aws_security_group_rule" "terraform_database_egress" {
 
   security_group_id = aws_security_group.terraform_database.id
 
-  type = "egress"
-  protocol=  "tcp"
+  type      = "egress"
+  protocol  = "tcp"
   from_port = 3306
-  to_port = 3306
+  to_port   = 3306
 
   source_security_group_id = aws_security_group.database.id
 }
@@ -363,10 +363,10 @@ resource "aws_security_group_rule" "terraform_database_https_egress" {
 
   security_group_id = aws_security_group.terraform_database.id
 
-  type = "egress"
-  protocol = "tcp"
+  type      = "egress"
+  protocol  = "tcp"
   from_port = 443
-  to_port = 443
+  to_port   = 443
 
   cidr_blocks = ["0.0.0.0/0"]
 }

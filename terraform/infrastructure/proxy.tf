@@ -1,6 +1,6 @@
 #region Permissions
 
- data "aws_iam_policy_document" "proxy_assume" {
+data "aws_iam_policy_document" "proxy_assume" {
   version = "2012-10-17"
 
   statement {

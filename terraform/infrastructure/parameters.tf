@@ -173,16 +173,16 @@ resource "aws_ssm_parameter" "akamai_client_secret" {
 #region Terraform configuration
 
 resource "aws_ssm_parameter" "terraform_state" {
-  name = "/webcms/${var.environment}/terraform/state"
-  type = "String"
+  name  = "/webcms/${var.environment}/terraform/state"
+  type  = "String"
   value = aws_s3_bucket.tfstate.bucket
 
   tags = var.tags
 }
 
 resource "aws_ssm_parameter" "terraform_locks" {
-  name = "/webcms/${var.environment}/terraform/locks"
-  type = "String"
+  name  = "/webcms/${var.environment}/terraform/locks"
+  type  = "String"
   value = aws_dynamodb_table.terraform_locks.arn
 
   tags = var.tags
