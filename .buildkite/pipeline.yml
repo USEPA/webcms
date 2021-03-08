@@ -4,7 +4,7 @@
 
 steps:
   - label: ":pipeline: Feature"
-    if: build.branch != "main" && build.branch != "integration"
+    if: build.branch != "main" && build.branch != "integration" && build.branch != "D9-migration-test"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
