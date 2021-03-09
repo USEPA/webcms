@@ -13,11 +13,17 @@ use Drupal\filter\Render\FilteredMarkup;
  */
 function epa_theme_preprocess_filter_caption(&$vars) {
   $dom = Html::load($vars['node']);
-  // Make media attributes available in caption template
   foreach ($dom->getElementsByTagName('drupal-media') as $node) {
     $new_node = $node->cloneNode(TRUE);
+
+    // Re-insert the caption attribute into the media tag so that it is available
+    // when rendering the media itself. This allows us to make decisions during
+    // media rendering based upon whether or not there's a caption.
     $new_node->setAttribute('data-caption', $vars['caption']);
     $node->parentNode->replaceChild($new_node,$node);
+
+    // Grab the view mode and alignment info from the embedded media tag and make
+    // it available to the filter-caption template.
     foreach (['data-view-mode' => 'view_mode','data-align' => 'align'] as $attribute => $var) {
       $vars[$var] = $node->getAttribute($attribute);
     }
