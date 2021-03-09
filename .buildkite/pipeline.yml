@@ -15,7 +15,7 @@ steps:
 
   # Upload the deploy pipeline from integration to the dev environment, disregarding PRs
   - label: ":pipeline: Dev"
-    if: build.branch == "integration" && build.pull_request.id == null
+    if: build.branch == "EPAD8-1130-D9-update" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
