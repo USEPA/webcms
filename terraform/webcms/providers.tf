@@ -1,11 +1,8 @@
-provider "aws" {
-  version = "~> 3.7"
-  region  = var.aws-region
+terraform {
+  required_version = ">= 0.14"
+  backend "s3" {}
 }
 
-terraform {
-  # Backend configuration is left unspecified here: there should be an external backend
-  # configuration file used on each `terraform init`
-  # cf. https://www.terraform.io/docs/backends/config.html#partial-configuration
-  backend "s3" {}
+provider "aws" {
+  region = var.aws_region
 }

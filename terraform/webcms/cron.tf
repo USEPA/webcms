@@ -16,9 +16,7 @@ data "aws_iam_policy_document" "events_assume_role_policy" {
 # This task definition depends on a built and published Drush image, so we have to
 # conditionally create it the same way we did for drupal_task.
 resource "aws_ecs_task_definition" "drush_task" {
-  count = var.image-tag-drush != null ? 1 : 0
-
-  family             = "webcms-drush-${local.env-suffix}"
+  family             = "webcms-drush-${local.env_suffix}"
   network_mode       = "awsvpc"
   task_role_arn      = data.aws_ssm_parameter.drupal_iam_task.value
   execution_role_arn = data.aws_ssm_parameter.drupal_iam_exec.value
@@ -32,7 +30,7 @@ resource "aws_ecs_task_definition" "drush_task" {
   container_definitions = jsonencode([
     {
       name  = "drush"
-      image = "${data.aws_ssm_parameter.ecr_repository_drush_url.value}:${var.image-tag-drush}"
+      image = "${data.aws_ssm_parameter.ecr_repository_drush_url.value}:${var.image_tag_drush}"
 
       # By explicitly emptying these values, we allow task overrides to effectively
       # take precedence over what is specified in the container. This enables us
@@ -44,8 +42,8 @@ resource "aws_ecs_task_definition" "drush_task" {
       workingDirectory = "/var/www/html"
 
       # Use shared bindings so that Drush tasks can connect the same way Drupal does
-      environment = local.drupal-environment
-      secrets     = local.drupal-secrets
+      environment = local.drupal_environment
+      secrets     = local.drupal_secrets
 
       # Unlike the Drupal container, this uses the drush log group in order to make the
       # logs for scheduled tasks easier to separate from the main Drupal PHP-FPM logs.
@@ -54,25 +52,25 @@ resource "aws_ecs_task_definition" "drush_task" {
 
         options = {
           awslogs-group         = data.aws_ssm_parameter.drush_log_group.value
-          awslogs-region        = var.aws-region
+          awslogs-region        = var.aws_region
           awslogs-stream-prefix = "drush"
         }
       }
     }
   ])
 
-  tags = merge(local.common-tags, {
-    Name = "${local.name-prefix} Task - Drush"
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix} Task - Drush"
   })
 }
 
 resource "aws_cloudwatch_event_target" "cron" {
   count = length(aws_ecs_task_definition.drush_task)
 
-  target_id = "WebCMS${local.env-title}CronTask"
-  arn       = aws_ecs_cluster.cluster.arn
-  rule      = aws_cloudwatch_event_rule.cron.name
-  role_arn  = aws_iam_role.events.arn
+  target_id = "WebCMS${local.env_title}CronTask"
+  arn       = data.aws_ssm_parameter.ecs_cluster_arn.value
+  rule      = data.aws_ssm_parameter.cloudwatch_event_rule_cron.value
+  role_arn  = data.aws_ssm_parameter.aws_iam_role_events.value
 
   ecs_target {
     launch_type         = "FARGATE"
@@ -80,8 +78,8 @@ resource "aws_cloudwatch_event_target" "cron" {
     task_definition_arn = aws_ecs_task_definition.drush_task[count.index].arn
 
     network_configuration {
-      subnets         = aws_subnet.private.*.id
-      security_groups = local.drupal-security-groups
+      subnets         = data.aws_ssm_parameter.private_subnets.value
+      security_groups = local.drupal_security_groups
     }
   }
 
@@ -92,7 +90,7 @@ resource "aws_cloudwatch_event_target" "cron" {
         command = [
           "/var/www/html/vendor/bin/drush",
           "--debug",
-          "--uri", "https://${var.site-hostname}",
+          "--uri", "https://${var.site_hostname}",
           "cron"
         ]
       }

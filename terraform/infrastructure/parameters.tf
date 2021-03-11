@@ -130,6 +130,56 @@ resource "aws_ssm_parameter" "drupal_s3_bucket" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "elastic_cache_endpoint" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/elastic-cache-endpoint"
+  type  = "String"
+  value = aws_elasticache_cluster.cache[each.key].configuration_endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "aws_db_proxy_endpoint" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-db-proxy-endpoint"
+  type  = "String"
+  value = aws_db_proxy.proxy[each.key].endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "aws_elasticsearch_endpoint" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-elasticsearch-endpoint"
+  type  = "String"
+  value = aws_elasticsearch_domain.es[each.key].endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "cloudwatch_event_rule_cron" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/cloudwatch-event-rule-cron"
+  type  = "String"
+  value = aws_cloudwatch_event_rule.cron[each.key].name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "aws_iam_role_events" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-iam-role-events"
+  type  = "String"
+  value = aws_iam_role.events[each.key].arn
+
+  tags = var.tags
+}
+
 #endregion
 
 #region Log groups
