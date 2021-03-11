@@ -6,7 +6,7 @@
 # deployment, but it does mean that it's possible to accidentally deregister the service
 # if the variables aren't created. Be sure not to do this.
 
-# First, define the Drupal ECS task. An ECS task is the lower-level definition of what
+# Define the Drupal ECS task. An ECS task is the lower-level definition of what
 # containers to run and their configuration (permissions, volumes, etc.).
 # Creating a task definition does not, by itself, define the actual web-facing application.
 resource "aws_ecs_task_definition" "drupal_task" {
@@ -307,6 +307,70 @@ resource "aws_ecs_task_definition" "drupal_task" {
   tags = merge(local.common-tags, {
     Name = "${local.name-prefix} Task - Drupal"
   })
+}
+
+# Create the actual ECS service that serves Drupal traffic. This uses the Drupal task
+# definition from above as its template, and adds the configuration ECS needs in order
+# to know how many copies to run, what the scaling rules are, and how to route traffic
+# to it from a load balancer.
+#
+# NB. Be careful with parameters here; Terraform will often force replacement of a service
+# instead of an update which can result in downtime.
+resource "aws_ecs_service" "drupal" {
+  # We don't want to replicate the conditional for the drupal/nginx image tags, so we
+  # simply echo the count of the task resource we're depending on. This will carry forward
+  # to the autoscaling rules below.
+  count = length(aws_ecs_task_definition.drupal_task)
+
+  name            = "webcms-drupal-${local.env-suffix}"
+  cluster         = data.aws_ssm_parameter.ecs_cluster_arn.value
+  desired_count   = 1
+  task_definition = aws_ecs_task_definition.drupal_task[count.index].arn
+
+  health_check_grace_period_seconds = 0
+
+  # We leave the launch_type and scheduling_strategy to their defaults, which are EC2
+  # and REPLICA, respectively.
+
+  capacity_provider_strategy {
+    base              = 0
+    capacity_provider = "FARGATE"
+    weight            = 100
+  }
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  # Advertise the nginx container's port 80 to the load balancer.
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = 80
+    target_group_arn = data.aws_ssm_parameter.drupal_http_target_group.value
+  }
+
+  # Advertise port 443 to the load balancer
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = 443
+    target_group_arn = data.aws_ssm_parameter.drupal_https_target_group.value
+  }
+
+  # Since we're running our tasks in AWSVPC mode, we have to give extra VPC configuration.
+  # We launch the Drupal tasks into our private subnet (which means that they don't get
+  # public-facing IPs), and attach the Drupal-specific VPC rules to each task.
+  network_configuration {
+    subnets          = data.aws_ssm_parameter.private_subnets.value
+    assign_public_ip = false
+
+    security_groups = local.drupal-security-groups
+  }
+
+  # Ignore changes to the desired_count attribute - we assume that the application
+  # autoscaling rules will take over
+  lifecycle {
+    ignore_changes = [desired_count]
+  }
 }
 
 # Define the Drupal service as an autoscaling target. Effectively, this configuration

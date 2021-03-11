@@ -78,6 +78,10 @@ data "aws_ssm_parameter" "drupal_https_target_group" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/https-target-group"
 }
 
+data "aws_ssm_parameter" "drupal_http_target_group" {
+  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/http-target-group"
+}
+
 data "aws_ssm_parameter" "ecr_repository_drush_url" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecr-repo-drush-url"
 }
@@ -118,6 +122,14 @@ data "aws_ssm_parameter" "ecs_cluster_name" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_name"
 }
 
+data "aws_ssm_parameter" "ecs_cluster_arn" {
+  name  = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_arn"
+}
+
 data "aws_ssm_parameter" "drush_log_group" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/drush"
+}
+
+data "aws_ssm_parameter" "private_subnets" {
+  name = "/webcms/${var.environment}/vpc/private-subnets"
 }

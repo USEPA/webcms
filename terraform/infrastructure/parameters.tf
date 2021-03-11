@@ -50,6 +50,16 @@ resource "aws_ssm_parameter" "drupal_https_target_group" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "drupal_http_target_group" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/http-target-group"
+  type  = "String"
+  value = aws_lb_target_group.drupal_http_target_group.arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "ecr_repository_drush_url" {
   for_each = local.sites
 
@@ -96,6 +106,16 @@ resource "aws_ssm_parameter" "ecs_cluster_name" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs_cluster_name"
   type  = "String"
   value = aws_ecs_cluster.cluster.name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecs_cluster_arn" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs_cluster_arn"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.arn
 
   tags = var.tags
 }
