@@ -20,6 +20,86 @@ resource "aws_ssm_parameter" "drupal_iam_exec" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "drupal_ecs_service" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs-service"
+  type  = "String"
+  value = aws_ecs_service.drupal[count.index].name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "alb_frontend" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/alb-frontend"
+  type  = "String"
+  value = aws_lb.frontend.arn
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "drupal_https_target_group" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/https-target-group"
+  type  = "String"
+  value = aws_lb_target_group.drupal_https_target_group.arn
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_repository_drush_url" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-drush-url"
+  type  = "String"
+  value = aws_ecr_repository.drush.repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_repository_drupal_url" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-drupal-url"
+  type  = "String"
+  value = aws_ecr_repository.drupal.repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_repository_nginx_url" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-nginx-url"
+  type  = "String"
+  value = aws_ecr_repository.nginx.repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "bucket_regional_domain_name" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/bucket-regional-domain-name"
+  type  = "String"
+  value = aws_s3_bucket.uploads.bucket_regional_domain_name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecs_cluster_name" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs_cluster_name"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.name
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "drupal_s3_bucket" {
   for_each = local.sites
 
@@ -60,6 +140,16 @@ resource "aws_ssm_parameter" "drush_log_group" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drush"
   type  = "String"
   value = aws_cloudwatch_log_group.drush[each.key].name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "drupal_log_group" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drupal"
+  type  = "String"
+  value = aws_cloudwatch_log_group.drupal[each.key].name
 
   tags = var.tags
 }
