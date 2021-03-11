@@ -70,14 +70,6 @@ data "aws_ssm_parameter" "drupal_ecs_service" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs-service"
 }
 
-data "aws_ssm_parameter" "drupal_https_target_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/https-target-group"
-}
-
-data "aws_ssm_parameter" "drupal_http_target_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/http-target-group"
-}
-
 data "aws_ssm_parameter" "ecr_repository_drush_url" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecr-repo-drush-url"
 }
