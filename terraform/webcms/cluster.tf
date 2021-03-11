@@ -342,20 +342,6 @@ resource "aws_ecs_service" "drupal" {
     type = "ECS"
   }
 
-  # Advertise the nginx container's port 80 to the load balancer.
-  load_balancer {
-    container_name   = "nginx"
-    container_port   = 80
-    target_group_arn = data.aws_ssm_parameter.drupal_http_target_group.value
-  }
-
-  # Advertise port 443 to the load balancer
-  load_balancer {
-    container_name   = "nginx"
-    container_port   = 443
-    target_group_arn = data.aws_ssm_parameter.drupal_https_target_group.value
-  }
-
   # Since we're running our tasks in AWSVPC mode, we have to give extra VPC configuration.
   # We launch the Drupal tasks into our private subnet (which means that they don't get
   # public-facing IPs), and attach the Drupal-specific VPC rules to each task.
@@ -383,15 +369,6 @@ resource "aws_appautoscaling_target" "drupal" {
   resource_id        = "service/${data.aws_ssm_parameter.ecs_cluster_name.value}/${data.aws_ssm_parameter.drupal_ecs_service[count.index].value}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-}
-
-# Read out the ARNs for the load balancer and Drupal target group (used below)
-data "aws_arn" "alb" {
-  arn = data.aws_ssm_parameter.alb_frontend.value
-}
-
-data "aws_arn" "target_group" {
-  arn = data.aws_ssm_parameter.drupal_https_target_group.value
 }
 
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this

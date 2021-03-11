@@ -70,10 +70,6 @@ data "aws_ssm_parameter" "drupal_ecs_service" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs-service"
 }
 
-data "aws_ssm_parameter" "alb_frontend" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/alb-frontend"
-}
-
 data "aws_ssm_parameter" "drupal_https_target_group" {
   name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/https-target-group"
 }
@@ -123,7 +119,7 @@ data "aws_ssm_parameter" "ecs_cluster_name" {
 }
 
 data "aws_ssm_parameter" "ecs_cluster_arn" {
-  name  = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_arn"
+  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_arn"
 }
 
 data "aws_ssm_parameter" "drush_log_group" {
