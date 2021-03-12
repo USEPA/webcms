@@ -71,37 +71,3 @@ resource "aws_cloudwatch_event_rule" "cron" {
   # Run cron every 5 minutes
   schedule_expression = "rate(5 minutes)"
 }
-
-resource "aws_cloudwatch_event_target" "cron" {
-  count = length(aws_ecs_task_definition.drush_task)
-
-  target_id = "WebCMS${local.env-title}CronTask"
-  arn       = aws_ecs_cluster.cluster.arn
-  rule      = aws_cloudwatch_event_rule.cron.name
-  role_arn  = aws_iam_role.events.arn
-
-  ecs_target {
-    launch_type         = "FARGATE"
-    task_count          = 1
-    task_definition_arn = aws_ecs_task_definition.drush_task[count.index].arn
-
-    network_configuration {
-      subnets         = aws_subnet.private.*.id
-      security_groups = local.drupal-security-groups
-    }
-  }
-
-  input = jsonencode({
-    containerOverrides = [
-      {
-        name = "drush"
-        command = [
-          "/var/www/html/vendor/bin/drush",
-          "--debug",
-          "--uri", "https://${var.site-hostname}",
-          "cron"
-        ]
-      }
-    ]
-  })
-}
