@@ -65,7 +65,7 @@ resource "aws_iam_role_policy_attachment" "events_task_execution" {
 }
 
 resource "aws_cloudwatch_event_rule" "cron" {
-  name        = "${local.role-prefix}CronSchedule"
+  name        = "WebCMS-${var.environment}-CronSchedule"
   description = "Invokes Drush cron"
 
   # Run cron every 5 minutes
