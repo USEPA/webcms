@@ -63,3 +63,11 @@ resource "aws_iam_role_policy_attachment" "events_task_execution" {
   role       = aws_iam_role.events.name
   policy_arn = aws_iam_policy.events_task_execution.arn
 }
+
+resource "aws_cloudwatch_event_rule" "cron" {
+  name        = "WebCMS-${var.environment}-CronSchedule"
+  description = "Invokes Drush cron"
+
+  # Run cron every 5 minutes
+  schedule_expression = "rate(5 minutes)"
+}

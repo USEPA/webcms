@@ -1,3 +1,71 @@
+#region Cluster information
+
+resource "aws_ssm_parameter" "ecs_cluster_name" {
+  name  = "/webcms/${var.environment}/ecs/cluster-name"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecs_cluster_arn" {
+  name  = "/webcms/${var.environment}/ecs/cluster-arn"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.arn
+
+  tags = var.tags
+}
+
+#endregion
+
+#region Service endpoints
+
+resource "aws_ssm_parameter" "elasticache_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/elasticache"
+  type  = "String"
+  value = aws_elasticache_cluster.cache.configuration_endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "rds_proxy_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/rds-proxy"
+  type  = "String"
+  value = aws_db_proxy.proxy.endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "elasticsearch_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/elasticsearch"
+  type  = "String"
+  value = aws_elasticsearch_domain.es.endpoint
+
+  tags = var.tags
+}
+
+#endregion
+
+#region Cron
+
+resource "aws_ssm_parameter" "cron_event_rule" {
+  name  = "/webcms/${var.environment}/cron/event-rule"
+  type  = "String"
+  value = aws_cloudwatch_event_rule.cron.name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "cron_event_role" {
+  name  = "/webcms/${var.environment}/cron/event-role"
+  type  = "String"
+  value = aws_iam_role.events.arn
+
+  tags = var.tags
+}
+
+#endregion
+
 #region Drupal-specific
 
 resource "aws_ssm_parameter" "drupal_iam_task" {
@@ -26,6 +94,16 @@ resource "aws_ssm_parameter" "drupal_s3_bucket" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/s3-bucket"
   type  = "String"
   value = aws_s3_bucket.uploads[each.key].bucket
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "drupal_s3_domain" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/s3-domain"
+  type  = "String"
+  value = aws_s3_bucket.uploads[each.key].bucket_regional_domain_name
 
   tags = var.tags
 }
