@@ -1,119 +1,177 @@
-data "aws_secretsmanager_secret" "db_root_credentials" {
-  name = "/webcms/${var.environment}/db-root-credentials"
+#region VPC
+
+data "aws_ssm_parameter" "private_subnets" {
+  name = "/webcms/${var.environment}/vpc/private-subnets"
 }
 
-data "aws_secretsmanager_secret" "db_d8_credentials" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/db-d8-credentials"
-}
-
-data "aws_secretsmanager_secret" "db_d7_credentials" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/db-d7-credentials"
-}
-
-data "aws_secretsmanager_secret" "hash_salt" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal-hash-salt"
-}
-
-data "aws_secretsmanager_secret" "mail_pass" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/mail-password"
-}
-
-data "aws_secretsmanager_secret" "saml_sp_key" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/saml-sp-key"
-}
-
-data "aws_secretsmanager_secret" "akamai_access_token" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/akamai-access-token"
-}
-
-data "aws_secretsmanager_secret" "akamai_client_token" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/akamai-client-token"
-}
-
-data "aws_secretsmanager_secret" "akamai_client_secret" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/akamai-client-secret"
-}
-
-data "aws_ssm_parameter" "elastic_cache_endpoint" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/elastic-cache-endpoint"
-}
-
-data "aws_ssm_parameter" "drupal_s3_bucket" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/s3-bucket"
-}
-
-data "aws_ssm_parameter" "aws_db_proxy_endpoint" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/aws_db_proxy_endpoint"
-}
-
-data "aws_ssm_parameter" "aws_elasticsearch_endpoint" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/aws-elasticsearch-endpoint"
-}
-#
-data "aws_ssm_parameter" "database_security_group" {
-  name = "/webcms/${var.environment}/security-groups/database"
-}
-
-data "aws_ssm_parameter" "proxy_security_group" {
-  name = "/webcms/${var.environment}/security-groups/proxy"
-}
-
-data "aws_ssm_parameter" "elasticsearch_security_group" {
-  name = "/webcms/${var.environment}/security-groups/elasticsearch"
-}
-
-data "aws_ssm_parameter" "memcached_security_group" {
-  name = "/webcms/${var.environment}/security-groups/memcached"
+locals {
+  private_subnets = split(",", data.aws_ssm_parameter.private_subnets.value)
 }
 
 data "aws_ssm_parameter" "drupal_security_group" {
   name = "/webcms/${var.environment}/security-groups/drupal"
 }
 
-data "aws_ssm_parameter" "traefik_security_group" {
-  name = "/webcms/${var.environment}/security-groups/traefik"
+#endregion
+
+#region Cluster information
+
+data "aws_ssm_parameter" "ecs_cluster_name" {
+  name = "/webcms/${var.environment}/ecs/cluster-name"
 }
 
-data "aws_ssm_parameter" "terraform_database_security_group" {
-  name = "/webcms/${var.environment}/security-groups/terraform-database"
+data "aws_ssm_parameter" "ecs_cluster_arn" {
+  name = "/webcms/${var.environment}/ecs/cluster-arn"
 }
+
+#endregion
+
+#region Service endpoints
+
+data "aws_ssm_parameter" "elasticache_endpoint" {
+  name = "/webcms/${var.environment}/endpoints/elasticache"
+}
+
+data "aws_ssm_parameter" "rds_proxy_endpoint" {
+  name = "/webcms/${var.environment}/endpoints/rds-proxy"
+}
+
+data "aws_ssm_parameter" "elasticsearch_endpoint" {
+  name = "/webcms/${var.environment}/endpoints/elasticsearch"
+}
+
+#region Cron
+
+data "aws_ssm_parameter" "cron_event_rule" {
+  name = "/webcms/${var.environment}/cron/event-rule"
+}
+
+data "aws_ssm_parameter" "cron_event_role" {
+  name = "/webcms/${var.environment}/cron/event-role"
+}
+
+#endregion
+
+#region Drupal-specific
+
+data "aws_ssm_parameter" "drupal_iam_task" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-task"
+}
+
+data "aws_ssm_parameter" "drupal_iam_exec" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-execution"
+}
+
+data "aws_ssm_parameter" "drupal_s3_bucket" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/s3-bucket"
+}
+
+data "aws_ssm_parameter" "drupal_s3_domain" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/s3-domain"
+}
+
+#endregion
+
+#region Log groups
+
+data "aws_ssm_parameter" "php_fpm_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/php-fpm"
+}
+
+data "aws_ssm_parameter" "nginx_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/nginx"
+}
+
+data "aws_ssm_parameter" "drush_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/drush"
+}
+
+data "aws_ssm_parameter" "agent_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/cloudwatch-agent"
+}
+
+data "aws_ssm_parameter" "fpm_metrics_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/fpm-metrics"
+}
+
+#endregion
+
+#region Secrets Manager ARNs
+
+data "aws_ssm_parameter" "db_d8_credentials" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials"
+}
+
+data "aws_ssm_parameter" "db_d7_credentials" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials"
+}
+
+data "aws_ssm_parameter" "hash_salt" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt"
+}
+
+data "aws_ssm_parameter" "mail_pass" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password"
+}
+
+data "aws_ssm_parameter" "saml_sp_key" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key"
+}
+
+data "aws_ssm_parameter" "akamai_access_token" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-access-token"
+}
+
+data "aws_ssm_parameter" "akamai_client_token" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-token"
+}
+
+data "aws_ssm_parameter" "akamai_client_secret" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-secret"
+}
+
+#endregion
+
+#region Locals
 
 locals {
-  env_suffix       = var.site_env_name
-  env_title        = title(var.site_env_name)
-  name_prefix      = "WebCMS ${local.env_title}"
-  database_name    = "webcms"
-  database_user    = "webcms"
-  database_name_d7 = "webcms_d7"
-  database_user_d7 = "webcms_d7"
+  #region Secret bindings
+
   drupal_secrets = [
-    { name = "WEBCMS_DB_CREDS", valueFrom = data.aws_secretsmanager_secret.db_d8_credentials.name },
-    { name = "WEBCMS_DB_CREDS_D7", valueFrom = data.aws_secretsmanager_secret.db_d7_credentials.name },
-    { name = "WEBCMS_HASH_SALT", valueFrom = data.aws_secretsmanager_secret.hash_salt.name },
-    { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_secretsmanager_secret.mail_pass.name },
-    { name = "WEBCMS_SAML_SP_KEY", valueFrom = data.aws_secretsmanager_secret.saml_sp_key.name },
-    { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", valueFrom = data.aws_secretsmanager_secret.akamai_access_token.name },
-    { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", valueFrom = data.aws_secretsmanager_secret.akamai_client_token.name },
-    { name = "WEBCMS_AKAMAI_CLIENT_SECRET", valueFrom = data.aws_secretsmanager_secret.akamai_client_secret.name },
+    { name = "WEBCMS_DB_CREDS", valueFrom = data.aws_ssm_parameter.db_d8_credentials.value },
+    { name = "WEBCMS_DB_NAME", valueFrom = "${data.aws_ssm_parameter.db_d8_credentials.value}:username" },
+
+    { name = "WEBCMS_DB_CREDS_D7", valueFrom = data.aws_ssm_parameter.db_d7_credentials.value },
+    { name = "WEBCMS_DB_NAME_D7", valueFrom = "${data.aws_ssm_parameter.db_d7_credentials.value}:username" },
+
+    { name = "WEBCMS_HASH_SALT", valueFrom = data.aws_ssm_parameter.hash_salt.value },
+    { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_ssm_parameter.mail_pass.value },
+    { name = "WEBCMS_SAML_SP_KEY", valueFrom = data.aws_ssm_parameter.saml_sp_key.value },
+    { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_access_token.value },
+    { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_client_token.value },
+    { name = "WEBCMS_AKAMAI_CLIENT_SECRET", valueFrom = data.aws_ssm_parameter.akamai_client_secret.value },
   ]
+
+  #endregion
+
+  #region Environment variables
+
   drupal_environment = [
     { name = "WEBCMS_S3_BUCKET", value = data.aws_ssm_parameter.drupal_s3_bucket.value },
     { name = "WEBCMS_S3_REGION", value = var.aws_region },
-    { name = "WEBCMS_SITE_URL", value = "https://${var.site_hostname}" },
-    { name = "WEBCMS_SITE_HOSTNAME", value = var.site_hostname },
-    { name = "WEBCMS_ENV_STATE", value = var.site_env_state },
-    { name = "WEBCMS_ENV_NAME", value = var.site_env_name },
-    { name = "WEBCMS_ENV_LANG", value = var.sites.lang },
-    { name = "WEBCMS_S3_USES_DOMAIN", value = var.site_s3_uses_domain ? "1" : "0" },
+    { name = "WEBCMS_SITE_URL", value = "https://${var.drupal_hostname}" },
+    { name = "WEBCMS_SITE_HOSTNAME", value = var.drupal_hostname },
+    { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
+    { name = "WEBCMS_ENV_NAME", value = var.site },
+    { name = "WEBCMS_ENV_LANG", value = var.lang },
+    { name = "WEBCMS_S3_USES_DOMAIN", value = var.drupal_use_s3_domain ? "1" : "0" },
 
     # Akamai
     { name = "WEBCMS_AKAMAI_ENABLED", value = var.akamai_enabled ? "1" : "0" },
     { name = "WEBCMS_AKAMAI_API_HOST", value = var.akamai_api_host },
 
     # DB info
-    { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.aws_db_proxy_endpoint.value },
-    { name = "WEBCMS_DB_NAME", value = local.database_name },
-    { name = "WEBCMS_DB_NAME_D7", value = local.database_name_d7 },
+    { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
 
     # Mail
     { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
@@ -124,8 +182,8 @@ locals {
     { name = "WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS", value = var.email_enable_workflow_notifications ? "1" : "0" },
 
     # Injected host names
-    { name = "WEBCMS_SEARCH_HOST", value = "https://${data.aws_ssm_parameter.aws_elasticsearch_endpoint.value}:443" },
-    { name = "WEBCMS_CACHE_HOST", value = data.aws_ssm_parameter.elastic_cache_endpoint.value },
+    { name = "WEBCMS_SEARCH_HOST", value = "https://${data.aws_ssm_parameter.elasticsearch_endpoint.value}:443" },
+    { name = "WEBCMS_CACHE_HOST", value = data.aws_ssm_parameter.elasticache_endpoint.value },
 
     # SAML
     { name = "WEBCMS_SAML_SP_ENTITY_ID", value = var.saml_sp_entity_id },
@@ -136,85 +194,8 @@ locals {
     { name = "WEBCMS_SAML_IDP_CERT", value = var.saml_idp_cert },
     { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml_force_saml_login ? "1" : "0" },
   ]
-  drupal_security_groups = [
-    data.aws_ssm_parameter.database_security_group.value,
-    data.aws_ssm_parameter.proxy_security_group.value,
-    data.aws_ssm_parameter.elasticsearch_security_group.value,
-    data.aws_ssm_parameter.memcached_security_group.value,
-    data.aws_ssm_parameter.drupal_security_group,
-    data.aws_ssm_parameter.traefik_security_group.value,
-    data.aws_ssm_parameter.terraform_database_security_group,
-  ]
-  common_tags = {
-    Group       = "webcms"
-    Environment = var.site_env_name
-  }
+
+  #endregion
 }
 
-data "aws_ssm_parameter" "drupal_iam_task" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/iam-task"
-}
-
-data "aws_ssm_parameter" "drupal_iam_exec" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/iam-execution"
-}
-
-data "aws_ssm_parameter" "drupal_ecs_service" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs-service"
-}
-
-data "aws_ssm_parameter" "ecr_repository_drush_url" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecr-repo-drush-url"
-}
-
-data "aws_ssm_parameter" "ecr_repository_drupal_url" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecr-repo-drupal-url"
-}
-
-data "aws_ssm_parameter" "drupal_log_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/drupal"
-}
-
-data "aws_ssm_parameter" "ecr_repository_nginx_url" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecr-repo-nginx-url"
-}
-
-data "aws_ssm_parameter" "bucket_regional_domain_name" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/bucket-regional-domain-name"
-}
-
-data "aws_ssm_parameter" "nginx_log_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/nginx"
-}
-
-data "aws_ssm_parameter" "agent_log_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/cloudwatch-agent"
-}
-
-data "aws_ssm_parameter" "fpm_metrics_log_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/fpm-metrics"
-}
-
-data "aws_ssm_parameter" "ecs_cluster_name" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_name"
-}
-
-data "aws_ssm_parameter" "ecs_cluster_arn" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/ecs_cluster_arn"
-}
-
-data "aws_ssm_parameter" "drush_log_group" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/log-groups/drush"
-}
-
-data "aws_ssm_parameter" "private_subnets" {
-  name = "/webcms/${var.environment}/vpc/private-subnets"
-}
-
-data "aws_ssm_parameter" "cloudwatch_event_rule_cron" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/cloudwatch-event-rule-cron"
-}
-
-data "aws_ssm_parameter" "aws_iam_role_events" {
-  name = "/webcms/${var.environment}/${var.sites.site}/${var.sites.lang}/drupal/aws-iam-role-events"
-}
+#endregion

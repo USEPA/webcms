@@ -1,16 +1,8 @@
-# Resources below this line are conditionally created if the image-tag-nginx and image-tag-drupal
-# variables are not null.
-#
-# The intention is to allow a bootstrapping phase where all of the deployment-related
-# resources (most importantly, the ECR repositories) are created before attempting a task
-# deployment, but it does mean that it's possible to accidentally deregister the service
-# if the variables aren't created. Be sure not to do this.
-
 # Define the Drupal ECS task. An ECS task is the lower-level definition of what
 # containers to run and their configuration (permissions, volumes, etc.).
 # Creating a task definition does not, by itself, define the actual web-facing application.
 resource "aws_ecs_task_definition" "drupal_task" {
-  family             = "webcms-drupal-${local.env_suffix}"
+  family             = "webcms-${var.environment}-${var.site}-${var.lang}-drupal"
   network_mode       = "awsvpc"
   task_role_arn      = data.aws_ssm_parameter.drupal_iam_task.value
   execution_role_arn = data.aws_ssm_parameter.drupal_iam_exec.value
@@ -34,31 +26,31 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # able to communicate (since the IP address will vary).
       name = "drupal"
 
-      # Service updates are triggered when either of these two references changes.
-      image = "${data.aws_ssm_parameter.ecr_repository_drupal_url.value}:${var.image_tag_drupal}",
+      # Service updates are triggered if the image name changes
+      image = var.image_tag_drupal
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
-      essential = true,
+      essential = true
 
       # Inject the S3 information needed to connect for s3fs (cf. shared.tf)
-      environment = local.drupal_environment,
+      environment = local.drupal_environment
 
       # Inject the DB credentials needed (cf. shared.tf)
-      secrets = local.drupal_secrets,
+      secrets = local.drupal_secrets
 
       # Expose port 9000 inside the task. This is a FastCGI port, not an HTTP one, so it
       # won't be of use to anyone save for nginx. Most importantly, this means that this
       # port should NOT be exposed to a load balancer.
-      portMappings = [{ containerPort = 9000 }],
+      portMappings = [{ containerPort = 9000 }]
 
-      # Shunt logs to the Drupal CloudWatch log group
+      # Shunt logs to the PHP-FPM CloudWatch log group
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
 
         options = {
-          awslogs-group         = data.aws_ssm_parameter.drupal_log_group.value,
+          awslogs-group         = data.aws_ssm_parameter.php_fpm_log_group.value
           awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "drupal"
+          awslogs-stream-prefix = "php-fpm"
         }
       }
     },
@@ -67,35 +59,44 @@ resource "aws_ecs_task_definition" "drupal_task" {
     # because nginx is specialized for HTTP server tasks, and any task we can perform in
     # nginx removes some of the PHP overhead.
     {
-      name = "nginx",
+      name = "nginx"
 
-      # As with the Drupal definition, service updates are triggered when these change.
-      image = "${data.aws_ssm_parameter.ecr_repository_nginx_url.value}:${var.image_tag_nginx}",
+      # As with the Drupal definition, service updates are triggered when this changes
+      image = var.image_tag_nginx
+
+      # Docker labels are how we communicate our routing preferences to Traefik. These settings
+      # correspond to Traefik's own configuration names. Specifically, we make use of router
+      # configuration to dynamically create a Router (see https://doc.traefik.io/traefik/routing/routers/)
+      # when this task launches in ECS.
+      dockerLabels = {
+        # Advertise to Traefik that we want to receive traffic
+        "traefik.enable" = "true"
+
+        # Tell Traefik to allow any hostname provided in variables. The expression on the right is
+        # a map over the list of domains, which expands to a Traefik routing rule like the below:
+        #  Rule: Host(`example.org`) || Host(`example.com`)
+        "traefik.http.routers.${var.site}_${var.lang}.rule" = join(" || ", formatlist("Host(`%s`)", concat([var.drupal_hostname], var.drupal_extra_hostnames)))
+      }
 
       environment = [
         # See nginx.conf in services/drupal for why this is needed.
-        { name = "WEBCMS_DOMAIN", value = var.site_hostname },
+        { name = "WEBCMS_DOMAIN", value = var.drupal_hostname },
 
         # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
         # the region and bucket name because in us-east-1, the domain isn't easy to
         # construct via "$bucket.s3-$region.amazonaws.com".
-        { name = "WEBCMS_S3_DOMAIN", value = data.aws_ssm_parameter.bucket_regional_domain_name.value },
+        { name = "WEBCMS_S3_DOMAIN", value = data.aws_ssm_parameter.drupal_s3_domain.value },
 
         # Pass all the valid domain names as $WEBCMS_SERVER_NAMES
-        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.site_hostname], var.alb_hostnames)) },
+        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.drupal_hostname], var.drupal_extra_hostnames)) },
       ]
 
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
-      essential = true,
+      essential = true
 
-      # Expose ports 80 and 443 from the task. These are both unencrypted HTTP ports; the
-      # difference is that port 80 is used for the HTTP->HTTPS upgrade, and port 443 is
-      # used to forward requests to Drupal. (The load balancer handles TLS termination
-      # for us.)
-      portMappings = [
-        { containerPort = 80 },
-        { containerPort = 443 },
-      ],
+      # Expose port 80 from the task. This port is not connected to the load balancer; instead,
+      # Traefik routes to it after matching hostnames.
+      portMappings = [{ containerPort = 80 }]
 
       dependsOn = [
         { containerName = "drupal", condition = "START" }
@@ -106,8 +107,8 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group         = data.aws_ssm_parameter.nginx_log_group,
-          awslogs-region        = var.aws_region,
+          awslogs-group         = data.aws_ssm_parameter.nginx_log_group.value
+          awslogs-region        = var.aws_region
           awslogs-stream-prefix = "nginx"
         }
       }
@@ -115,20 +116,20 @@ resource "aws_ecs_task_definition" "drupal_task" {
     # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
     # the epa_metrics module for what we export to the agent.
     {
-      name  = "cloudwatch",
-      image = "amazon/cloudwatch-agent:latest",
+      name  = "cloudwatch"
+      image = "amazon/cloudwatch-agent:latest"
 
       # The agent reads its JSON-formatted configuration from the environment in containers
       environment = [
         {
-          name = "CW_CONFIG_CONTENT",
+          name = "CW_CONFIG_CONTENT"
           # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
           value = jsonencode({
             metrics = {
               namespace = "WebCMS",
               metrics_collected = {
                 statsd = {
-                  service_address = ":8125",
+                  service_address = ":8125"
                 },
               },
             },
@@ -137,11 +138,11 @@ resource "aws_ecs_task_definition" "drupal_task" {
       ],
 
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
 
         options = {
-          awslogs-group         = data.aws_ssm_parameter.agent_log_group,
-          awslogs-region        = var.aws_region,
+          awslogs-group         = data.aws_ssm_parameter.agent_log_group.value
+          awslogs-region        = var.aws_region
           awslogs-stream-prefix = "cloudwatch"
         }
       }
@@ -153,10 +154,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
       image = "alpine:latest"
 
       environment = [
-        {
-          name  = "WEBCMS_ENV_NAME"
-          value = var.site_env_name
-        },
+        { name = "WEBCMS_ENV_NAME", value = "${var.site}-${var.lang}" },
 
         # This is the map needed for mapping PHP-FPM metrics to CloudWatch. The keys are
         # the metric names output by PHP-FPM, and the values have two expected fields:
@@ -289,26 +287,19 @@ resource "aws_ecs_task_definition" "drupal_task" {
         COMMAND
       ]
 
-      dockerLabels = {
-        "traefik.enable"                  = "true"
-        "traefik.http.routers.test1.rule" = "Host(${var.site_hostname})"
-      }
-
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
 
         options = {
-          awslogs-group         = data.aws_ssm_parameter.fpm_metrics_log_group,
-          awslogs-region        = var.aws_region,
+          awslogs-group         = data.aws_ssm_parameter.fpm_metrics_log_group.value
+          awslogs-region        = var.aws_region
           awslogs-stream-prefix = "fpm-metrics"
         }
       }
     }
   ])
 
-  tags = merge(local.common_tags, {
-    Name = "${local.name_prefix} Task - Drupal"
-  })
+  tags = var.tags
 }
 
 # Create the actual ECS service that serves Drupal traffic. This uses the Drupal task
@@ -319,26 +310,17 @@ resource "aws_ecs_task_definition" "drupal_task" {
 # NB. Be careful with parameters here; Terraform will often force replacement of a service
 # instead of an update which can result in downtime.
 resource "aws_ecs_service" "drupal" {
-  # We don't want to replicate the conditional for the drupal/nginx image tags, so we
-  # simply echo the count of the task resource we're depending on. This will carry forward
-  # to the autoscaling rules below.
-  count = length(aws_ecs_task_definition.drupal_task)
-
-  name            = "webcms-drupal-${local.env_suffix}"
+  name            = "webcms-${var.environment}-${var.site}-${var.lang}-drupal"
   cluster         = data.aws_ssm_parameter.ecs_cluster_arn.value
   desired_count   = 1
-  task_definition = aws_ecs_task_definition.drupal_task[count.index].arn
+  task_definition = aws_ecs_task_definition.drupal_task.arn
 
   health_check_grace_period_seconds = 0
 
-  # We leave the launch_type and scheduling_strategy to their defaults, which are EC2
-  # and REPLICA, respectively.
-
-  capacity_provider_strategy {
-    base              = 0
-    capacity_provider = "FARGATE"
-    weight            = 100
-  }
+  # Since we are referencing JSON keys in secrets, we need to use platform version 1.4.0 (this is
+  # not yet LATEST at the time of writing).
+  launch_type = "FARGATE"
+  platform_version = "1.4.0"
 
   deployment_controller {
     type = "ECS"
@@ -348,43 +330,40 @@ resource "aws_ecs_service" "drupal" {
   # We launch the Drupal tasks into our private subnet (which means that they don't get
   # public-facing IPs), and attach the Drupal-specific VPC rules to each task.
   network_configuration {
-    subnets          = data.aws_ssm_parameter.private_subnets.value
+    subnets          = local.private_subnets
     assign_public_ip = false
 
-    security_groups = local.drupal_security_groups
+    security_groups = [data.aws_ssm_parameter.drupal_security_group.value]
   }
 
   # Ignore changes to the desired_count attribute - we assume that the application
-  # autoscaling rules will take over
+  # autoscaling rules will take over after deployment.
   lifecycle {
     ignore_changes = [desired_count]
   }
+
+  tags = var.tags
 }
 
 # Define the Drupal service as an autoscaling target. Effectively, this configuration
 # asks AWS to monitor the desired count of Drupal service replicas.
 resource "aws_appautoscaling_target" "drupal" {
-  count = length(data.aws_ssm_parameter.drupal_ecs_service.value)
-
-  min_capacity       = var.cluster_min_capacity
-  max_capacity       = var.cluster_max_capacity
-  resource_id        = "service/${data.aws_ssm_parameter.ecs_cluster_name.value}/${data.aws_ssm_parameter.drupal_ecs_service[count.index].value}"
+  min_capacity       = var.drupal_min_capacity
+  max_capacity       = var.drupal_max_capacity
+  resource_id        = "service/${data.aws_ssm_parameter.ecs_cluster_name.value}/${aws_ecs_service.drupal.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
 
-# We define a second autoscaling policy to track high CPU usage. If CPU is above this
-# threshold (but the ELB autoscaling policy hasn't triggered), then that indicates that
-# there is a large amount of backend traffic, and we should scale accordingly.
+# We define an autoscaling policy to track high CPU usage. When CPU is above this threshold, ECS
+# will add more Drupal tasks until
 resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
-  count = length(aws_appautoscaling_target.drupal)
-
-  name        = "webcms-drupal-scaling-cpu-${local.env_suffix}"
+  name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-cpu"
   policy_type = "TargetTrackingScaling"
 
-  resource_id        = aws_appautoscaling_target.drupal[count.index].id
-  scalable_dimension = aws_appautoscaling_target.drupal[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.drupal[count.index].service_namespace
+  resource_id        = aws_appautoscaling_target.drupal.id
+  scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.drupal.service_namespace
 
   target_tracking_scaling_policy_configuration {
     target_value = 60
