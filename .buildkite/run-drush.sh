@@ -12,7 +12,6 @@ script='drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --
 drush --debug --uri="$WEBCMS_SITE_URL" updb -y
 drush --debug --uri="$WEBCMS_SITE_URL" cr
 drush --debug --uri="$WEBCMS_SITE_URL" cim -y
-drush --uri="$WEBCMS_SITE_URL" ib --choice safe
 drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
 drush --debug --uri="$WEBCMS_SITE_URL" cr'
 
