@@ -1,3 +1,71 @@
+#region Cluster information
+
+resource "aws_ssm_parameter" "ecs_cluster_name" {
+  name  = "/webcms/${var.environment}/ecs/cluster-name"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecs_cluster_arn" {
+  name  = "/webcms/${var.environment}/ecs/cluster-arn"
+  type  = "String"
+  value = aws_ecs_cluster.cluster.arn
+
+  tags = var.tags
+}
+
+#endregion
+
+#region Service endpoints
+
+resource "aws_ssm_parameter" "elasticache_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/elasticache"
+  type  = "String"
+  value = aws_elasticache_cluster.cache.configuration_endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "rds_proxy_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/rds-proxy"
+  type  = "String"
+  value = aws_db_proxy.proxy.endpoint
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "elasticsearch_endpoint" {
+  name  = "/webcms/${var.environment}/endpoints/elasticsearch"
+  type  = "String"
+  value = aws_elasticsearch_domain.es.endpoint
+
+  tags = var.tags
+}
+
+#endregion
+
+#region Cron
+
+resource "aws_ssm_parameter" "cron_event_rule" {
+  name  = "/webcms/${var.environment}/cron/event-rule"
+  type  = "String"
+  value = aws_cloudwatch_event_rule.cron.name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "cron_event_role" {
+  name  = "/webcms/${var.environment}/cron/event-role"
+  type  = "String"
+  value = aws_iam_role.events.arn
+
+  tags = var.tags
+}
+
+#endregion
+
 #region Drupal-specific
 
 resource "aws_ssm_parameter" "drupal_iam_task" {
@@ -20,106 +88,6 @@ resource "aws_ssm_parameter" "drupal_iam_exec" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "drupal_ecs_service" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs-service"
-  type  = "String"
-  value = aws_ecs_service.drupal[count.index].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "alb_frontend" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/alb-frontend"
-  type  = "String"
-  value = aws_lb.frontend.arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "drupal_https_target_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/https-target-group"
-  type  = "String"
-  value = aws_lb_target_group.drupal_https_target_group.arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "drupal_http_target_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/http-target-group"
-  type  = "String"
-  value = aws_lb_target_group.drupal_http_target_group.arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_repository_drush_url" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-drush-url"
-  type  = "String"
-  value = aws_ecr_repository.drush.repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_repository_drupal_url" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-drupal-url"
-  type  = "String"
-  value = aws_ecr_repository.drupal.repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_repository_nginx_url" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecr-repo-nginx-url"
-  type  = "String"
-  value = aws_ecr_repository.nginx.repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "bucket_regional_domain_name" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/bucket-regional-domain-name"
-  type  = "String"
-  value = aws_s3_bucket.uploads.bucket_regional_domain_name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecs_cluster_name" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs_cluster_name"
-  type  = "String"
-  value = aws_ecs_cluster.cluster.name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecs_cluster_arn" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/ecs_cluster_arn"
-  type  = "String"
-  value = aws_ecs_cluster.cluster.arn
-
-  tags = var.tags
-}
-
 resource "aws_ssm_parameter" "drupal_s3_bucket" {
   for_each = local.sites
 
@@ -130,52 +98,12 @@ resource "aws_ssm_parameter" "drupal_s3_bucket" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "elastic_cache_endpoint" {
+resource "aws_ssm_parameter" "drupal_s3_domain" {
   for_each = local.sites
 
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/elastic-cache-endpoint"
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/s3-domain"
   type  = "String"
-  value = aws_elasticache_cluster.cache[each.key].configuration_endpoint
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "aws_db_proxy_endpoint" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-db-proxy-endpoint"
-  type  = "String"
-  value = aws_db_proxy.proxy[each.key].endpoint
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "aws_elasticsearch_endpoint" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-elasticsearch-endpoint"
-  type  = "String"
-  value = aws_elasticsearch_domain.es[each.key].endpoint
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "cloudwatch_event_rule_cron" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/cloudwatch-event-rule-cron"
-  type  = "String"
-  value = aws_cloudwatch_event_rule.cron[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "aws_iam_role_events" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/aws-iam-role-events"
-  type  = "String"
-  value = aws_iam_role.events[each.key].arn
+  value = aws_s3_bucket.uploads[each.key].bucket_regional_domain_name
 
   tags = var.tags
 }
@@ -210,16 +138,6 @@ resource "aws_ssm_parameter" "drush_log_group" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drush"
   type  = "String"
   value = aws_cloudwatch_log_group.drush[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "drupal_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drupal"
-  type  = "String"
-  value = aws_cloudwatch_log_group.drupal[each.key].name
 
   tags = var.tags
 }
