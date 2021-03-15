@@ -811,6 +811,13 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
 // Optionally serve our S3 files off the same domain as the site.
 // We'll be doing this in production using Akamai to proxy the requests to S3.
+
+// We're currently getting away with something kind of tricky here.  As long as
+// the specified domain does not specify a port, the code in S3FS will just accept
+// the domain as-specified, including the path, which is appropriate for our
+// production use-case. If we specify a port (as we do for local dev with minio),
+// then we can't also specify a path due to the way the S3FS module extracts the
+// port, so then we have to rely on the patch we wrote here: https://www.drupal.org/node/3203137
 if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
   $config['s3fs.settings']['use_cname'] = TRUE;
   $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default/files';

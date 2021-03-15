@@ -18,6 +18,12 @@ $settings['s3fs.secret_key'] = 'minio_secret';
 
 // Override the endpoint used by s3fs in order to talk to Minio.
 $config['s3fs.settings']['use_customhost'] = TRUE;
+
+// This relies on this patch: https://www.drupal.org/node/3203137 -- it causes
+// the bucket name (drupal, in this case) to be tacked on to the end of the
+// domain. We can't just add /drupal to the domain because the S3FS module
+// doesn't allow that to work in the way we need if you've also specified a port,
+// as we have.
 $config['s3fs.settings']['use_path_style_endpoint'] = TRUE;
 $config['s3fs.settings']['hostname'] = 'minio:9000';
 
