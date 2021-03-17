@@ -166,7 +166,6 @@ RUN mkdir web
 # Copy "base" Composer scripts and patches first - we assume these change less frequently
 # than composer.json and friends
 COPY ./scripts scripts
-COPY ./console console
 COPY ./patches patches
 
 # Copy Composer manifest files

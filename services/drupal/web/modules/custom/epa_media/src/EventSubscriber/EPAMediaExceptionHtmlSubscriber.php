@@ -3,7 +3,7 @@
 namespace Drupal\epa_media\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\DefaultExceptionHtmlSubscriber;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -22,7 +22,7 @@ class EPAMediaExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
   /**
    * {@inheritdoc}
    */
-  public function on403(GetResponseForExceptionEvent $event) {
+  public function on403(ExceptionEvent $event) {
     $request = $event->getRequest();
     $attributes = $request->attributes;
     // If a private file is throwing a 403, then obscure the file's existence
@@ -33,16 +33,16 @@ class EPAMediaExceptionHtmlSubscriber extends DefaultExceptionHtmlSubscriber {
       'image.style_private',
     ];
     if ($attributes->get('scheme') == 'private' && in_array($attributes->get('_route'), $restricted_routes)) {
-      $event->setException(new NotFoundHttpException());
+      $event->setThrowable(new NotFoundHttpException());
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function onException(GetResponseForExceptionEvent $event) {
+  public function onException(ExceptionEvent $event) {
     // Only handle 403 exceptions.
-    $exception = $event->getException();
+    $exception = $event->getThrowable();
     if ($exception instanceof HttpExceptionInterface && $exception->getStatusCode() === 403) {
       parent::onException($event);
     }
