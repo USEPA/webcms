@@ -93,12 +93,15 @@ plan:
 # action.
 apply:
   stage: deploy
+  tags:
+    - docker
+    - stg
   environment:
     name: production
   script:
-    - terraform apply -input=false $PLAN
+    - gitlab-terraform apply
   dependencies:
     - plan
   when: manual
   only:
-    - master
+    - IaC
