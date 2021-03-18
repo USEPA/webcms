@@ -154,8 +154,10 @@ TEMPLATE;
       try {
         $decoder = new JsonDecode(TRUE);
         $tag_info = $decoder->decode($captured, JsonEncoder::FORMAT);
-        if ($tag_info['view_mode'] == 'block_header' ||
-            ($tag_info['attributes']['width'] == 325 && $tag_info['attributes']['height'] == 100)) {
+        $view_mode = $tag_info['view_mode'] ?? '';
+        $width = $tag_info['attributes']['width'] ?? '';
+        $height = $tag_info['attributes']['height'] ?? '';
+        if ($view_mode == 'block_header' || ($width == 325 && $height == 100)) {
           $block_header = [
             'target_id' => $tag_info['fid'],
             'alt' => $tag_info['attributes']['alt'],
