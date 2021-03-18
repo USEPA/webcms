@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: ZAjZYeXxOPMuggtyAqBCxJTE3ll2t0idhtibBZuUC3c
+  default_config_hash: RM694_L5kB5abL8M9rm1il4sXYA-q9QSN9oTmZNwqWw
 id: upgrade_d7_node_document_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -204,6 +204,10 @@ process:
     plugin: default_value
     default_value: 0
   path/alias: alias
+  field_last_published:
+    -
+      plugin: get
+      source: last_published
 destination:
   plugin: 'entity:node'
   default_bundle: page

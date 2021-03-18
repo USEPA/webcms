@@ -188,7 +188,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    */
   private function getTimestampFromIso8601(string $dateIso8601): int {
     $datetime = new DateTime($dateIso8601, new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
-    $datetime->setTimezone(new \DateTimeZone(drupal_get_user_timezone()));
+    $datetime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
     return $datetime->getTimestamp();
   }
