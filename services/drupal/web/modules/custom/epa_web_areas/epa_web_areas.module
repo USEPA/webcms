@@ -360,3 +360,11 @@ function epa_web_areas_entity_access(\Drupal\Core\Entity\EntityInterface $entity
   }
   return group_entity_access($entity, $operation, $account);
 }
+
+function epa_web_areas_preprocess_node(&$variables) {
+  $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($variables['node']);
+  $group = reset($groups);
+  if ($group && $group->hasField('field_navigation_style')) {
+    $variables['nav_style'] = $group->field_navigation_style->value;
+  }
+}
