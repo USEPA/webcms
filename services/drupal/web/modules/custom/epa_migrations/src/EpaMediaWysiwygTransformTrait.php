@@ -89,7 +89,7 @@ TEMPLATE;
 
           // If the 'link to original' setting is selected in D7, wrap the
           // <drupal-media> element in a link to the original image.
-          $link_to_original = $tag_info['fields']['field_original_image_link[und]'];
+          $link_to_original = $tag_info['fields']['field_original_image_link[und]'] ?? '';
           if (!empty($link_to_original) && $link_to_original == 1 && $media_entity && $media_entity->bundle->entity->label() == 'Image') {
             $original_image_url = $media_entity->field_media_image->entity->createFileUrl();
             $link_element = $doc->createElement('a');
@@ -167,8 +167,8 @@ TEMPLATE;
           // remove the link and capture its href. Allow only whitespace
           // other than that media object. These patterns aren't bulletproof
           // but if they fail, it just leaves an empty link.
-          $p1 = '~(.*)<a [^>]*\bhref="([^"]+)"[^>]*>\s*~';
-          $p2 = '~\s*</a>(.*)~';
+          $p1 = '~(.*)<a [^>]*\bhref="([^"]+)"[^>]*>\s*~s';
+          $p2 = '~\s*</a>(.*)~s';
 
           $url = NULL;
           if (preg_match($p1, $before, $m1) && preg_match($p2, $after, $m2)) {
@@ -181,9 +181,9 @@ TEMPLATE;
           }
 
           // Let's try to remove the surrounding figure div as well
-          $p1 = '~(.*)<div [^>]*\bclass="([^"]+)"[^>]*>\s*~';
+          $p1 = '~(.*)<div [^>]*\bclass="([^"]+)"[^>]*>\s*~s';
           $class_pattern = '~\bfigure\b~';
-          $p2 = '~\s*</div>(.*)~';
+          $p2 = '~\s*</div>(.*)~s';
           if (preg_match($p1, $before, $m1)
             && preg_match($class_pattern, $m1[2])
             && preg_match($p2, $after, $m2)
