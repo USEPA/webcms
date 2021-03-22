@@ -48,7 +48,7 @@ class EpaUser extends User {
       // Iterate through each group and find any applicable roles.
       foreach ($groups as $gid) {
         $gid = $gid['gid'];
-
+        $groups_with_roles[$gid] = [];
         foreach ($roles as $role) {
           if ($role['gid'] === $gid) {
             $groups_with_roles[$gid][] = $role['rid'];

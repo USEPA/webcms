@@ -4,7 +4,7 @@
 
 steps:
   - label: ":pipeline: Feature"
-    if: build.branch != "main" && build.branch != "integration" && build.branch != "D9-migration-test" && build.branch != "EPAD8-1130-D9-update"
+    if: build.branch != "main" && build.branch != "integration" && build.branch != "migration"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
@@ -15,7 +15,7 @@ steps:
 
   # Upload the deploy pipeline from integration to the dev environment, disregarding PRs
   - label: ":pipeline: Dev"
-    if: build.branch == "EPAD8-1130-D9-update" && build.pull_request.id == null
+    if: build.branch == "integration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
@@ -25,7 +25,7 @@ steps:
   # Upload the deploy pipeline from main to the stage environment, disregarding PRs
   # NOTE: `build.branch` is temporarily changed from "main" to "D9-migration-test"
   - label: ":pipeline: Stage"
-    if: build.branch == "D9-migration-test" && build.pull_request.id == null
+    if: build.branch == "migration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:

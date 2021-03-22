@@ -29,7 +29,7 @@ class EpaFileEntityItem extends FileEntityItem {
     // because it isn't unique, and stops/restarts can result in files being
     // skipped.
     $sort =& $query->getOrderBy();
-    unset($sort['f.timestamp']);
+    unset($sort['fm.timestamp']);
 
     return $query;
   }

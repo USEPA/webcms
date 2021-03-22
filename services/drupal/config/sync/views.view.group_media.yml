@@ -83,14 +83,14 @@ display:
           columns:
             name: name
             bundle: bundle
-            status: status
+            uid: uid
             changed: changed
             created: created
+            edit_media: edit_media
+            delete_media: delete_media
             view_group_content: view_group_content
             edit_group_content: edit_group_content
             delete_group_content: delete_group_content
-            edit_media: edit_media
-            delete_media: delete_media
             dropbutton: dropbutton
           info:
             name:
@@ -107,13 +107,13 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            status:
+            uid:
               sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
-              responsive: priority-low
+              responsive: ''
             changed:
               sortable: true
               default_sort_order: desc
@@ -128,6 +128,20 @@ display:
               separator: ''
               empty_column: false
               responsive: priority-medium
+            edit_media:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            delete_media:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             view_group_content:
               sortable: false
               default_sort_order: asc
@@ -143,20 +157,6 @@ display:
               empty_column: false
               responsive: ''
             delete_group_content:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            edit_media:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            delete_media:
               sortable: false
               default_sort_order: asc
               align: ''
@@ -1096,7 +1096,9 @@ display:
           entity_type: group_content
           entity_field: gid
           plugin_id: group_id
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
       filter_groups:
         operator: AND
         groups:
