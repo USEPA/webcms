@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "events_task_execution" {
 }
 
 resource "aws_iam_policy" "events_task_execution" {
-  name   = "WebCMS-${var.environment}-EventsTaskExecution"
+  name   = "Customer-WebCMS-${var.environment}-EventsTaskExecution"
   policy = data.aws_iam_policy_document.events_task_execution.json
 }
 
