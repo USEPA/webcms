@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "terraform_database_tfstate_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_tfstate_access" {
-  name        = "WebCMS-${var.environment}-TerraformDatabaseTFStateAccess"
+  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseTFStateAccess"
   description = "Grants access to database.tfstate"
 
   policy = data.aws_iam_policy_document.terraform_database_tfstate_access.json
