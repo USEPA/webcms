@@ -47,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "traefik_ecs_access" {
 # or other sensitive values to the router.
 
 resource "aws_iam_role" "traefik_exec" {
-  name        = "WebCMS-${var.environment}-TraefikExecution"
+  name        = "Customer-WebCMS-${var.environment}-TraefikExecution"
   description = "Execution role for the Traefik router"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
