@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "terraform_database_secrets_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_secrets_access" {
-  name        = "WebCMS-${var.environment}-TerraformDatabaseSecretsAccess"
+  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseSecretsAccess"
   description = "Grants access to the DB credentials for initialization"
 
   policy = data.aws_iam_policy_document.terraform_database_secrets_access.json
