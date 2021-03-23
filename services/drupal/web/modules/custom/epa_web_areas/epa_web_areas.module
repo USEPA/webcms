@@ -231,6 +231,8 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
               $query['media_library_allowed_types'] = array_unique($query['media_library_allowed_types']);
               $query['media_library_selected_type'] = 'document';
             }
+            // Open the table view of the picker by default.
+            $query['views_display_id'] = 'widget_table';
             $query['media_library_opener_parameters']['group'] = $group->id();
             $query['hash'] = MediaLibraryState::create($query['media_library_opener_id'], $query['media_library_allowed_types'], $query['media_library_selected_type'], $query['media_library_remaining'], $query['media_library_opener_parameters'])->getHash();
             $query = http_build_query($query);

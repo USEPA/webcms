@@ -102,3 +102,12 @@ function epa_media_form_media_form_alter(&$form, \Drupal\Core\Form\FormStateInte
     }
   }
 }
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function epa_media_preprocess_media_library_wrapper(&$variables) {
+  // Adds CSS to space the tabs correctly in the media picker since we swapped
+  // their positions.
+  $variables['#attached']['library'][] =  'epa_media/swap-picker-tabs';
+}
