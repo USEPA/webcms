@@ -14,7 +14,7 @@ data "aws_iam_policy_document" "events_assume_role_policy" {
 }
 
 resource "aws_iam_role" "events" {
-  name        = "WebCMS-${var.environment}-Cron"
+  name        = "Customer-WebCMS-${var.environment}-Cron"
   description = "IAM role for the CloudWatch cron schedule"
 
   assume_role_policy = data.aws_iam_policy_document.events_assume_role_policy.json
