@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "terraform_database_credentials_access
 #region Task Role
 
 resource "aws_iam_role" "terraform_database_task" {
-  name        = "WebCMS-${var.environment}-TerraformDatabaseTask"
+  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseTask"
   description = "Role for the Terraform-based database initialization process"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
