@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "drupal_publish_metrics" {
 }
 
 resource "aws_iam_policy" "drupal_publish_metrics" {
-  name        = "WebCMS-${var.environment}-PublishMetrics"
+  name        = "Customer-WebCMS-${var.environment}-PublishMetrics"
   description = "Permits publishing CloudWatch metrics"
 
   policy = data.aws_iam_policy_document.drupal_publish_metrics.json
