@@ -1,7 +1,7 @@
 # Create the user-facing load balancer for the ECS cluster
 resource "aws_lb" "load_balancer" {
   name               = "webcms-${var.environment}"
-  internal           = false
+  internal           = true
   load_balancer_type = "network"
   subnets            = local.public_subnets
 
