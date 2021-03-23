@@ -60,7 +60,7 @@ data "aws_iam_policy_document" "proxy_secrets" {
 }
 
 resource "aws_iam_policy" "proxy_secrets" {
-  name        = "WebCMS-${var.environment}-ProxySecretsAccess"
+  name        = "Customer-WebCMS-${var.environment}-ProxySecretsAccess"
   description = "Grants the RDS proxy access to DB credentials"
   policy      = data.aws_iam_policy_document.proxy_secrets.json
 }
