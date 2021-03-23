@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "terraform_locks_access" {
 }
 
 resource "aws_iam_policy" "terraform_locks_access" {
-  name        = "WebCMS-${var.environment}-TerraformLocksAccess"
+  name        = "Customer-WebCMS-${var.environment}-TerraformLocksAccess"
   description = "Grants read-write access to the TerraformLocks table"
 
   policy = data.aws_iam_policy_document.terraform_locks_access.json
