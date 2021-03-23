@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "proxy_assume" {
 # Per the AWS documentation, we need to create an IAM role for the proxy to access the
 # various Secrets Manager credentials.
 resource "aws_iam_role" "proxy" {
-  name        = "WebCMS-${var.environment}-Proxy"
+  name        = "Customer-WebCMS-${var.environment}-Proxy"
   description = "Role for the cluster's RDS proxy"
 
   assume_role_policy = data.aws_iam_policy_document.proxy_assume.json
