@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "drupal_secrets_access" {
 resource "aws_iam_policy" "drupal_secrets_access" {
   for_each = local.sites
 
-  name        = "WebCMS-${var.environment}-${each.key}-SecretsAccess"
+  name        = "Customer-WebCMS-${var.environment}-${each.key}-SecretsAccess"
   description = "Grants access to the WebCMS' secrets"
 
   policy = data.aws_iam_policy_document.drupal_secrets_access[each.key].json
