@@ -4,7 +4,7 @@
 resource "aws_iam_role" "drupal_exec" {
   for_each = local.sites
 
-  name        = "WebCMS-${var.environment}-${each.key}-DrupalExecution"
+  name        = "Customer-WebCMS-${var.environment}-${each.key}-DrupalExecution"
   description = "WebCMS task execution role"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
