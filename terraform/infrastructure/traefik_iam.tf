@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "traefik_ecs_access" {
 }
 
 resource "aws_iam_policy" "traefik_ecs_access" {
-  name        = "WebCMS-${var.environment}-TraefikECSAccess"
+  name        = "Customer-WebCMS-${var.environment}-TraefikECSAccess"
   description = "Grants read-only access to ECS for Traefik"
 
   policy = data.aws_iam_policy_document.traefik_ecs_access.json
