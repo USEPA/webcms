@@ -1,5 +1,5 @@
 resource "aws_iam_role" "traefik_task" {
-  name        = "WebCMS-${var.environment}-TraefikTask"
+  name        = "Customer-WebCMS-${var.environment}-TraefikTask"
   description = "Task role for the Traefik router"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
