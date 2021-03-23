@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "terraform_database_credentials_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_credentials_access" {
-  name        = "WebCMS-${var.environment}-TerraformDatabaseRootCredsAccess"
+  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseRootCredsAccess"
   description = "Allows binding the root RDS credentials to the Terraform database task"
 
   policy = data.aws_iam_policy_document.terraform_database_credentials_access.json
