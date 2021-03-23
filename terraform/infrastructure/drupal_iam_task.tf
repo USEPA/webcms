@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "drupal_s3_access" {
 resource "aws_iam_policy" "drupal_s3_access" {
   for_each = local.sites
 
-  name        = "WebCMS-${var.environment}-${each.key}-DrupalS3Access"
+  name        = "Customer-WebCMS-${var.environment}-${each.key}-DrupalS3Access"
   description = "Grants read/write access to the ${each.key} S3 bucket"
 
   policy = data.aws_iam_policy_document.drupal_s3_access[each.key].json
