@@ -1,7 +1,7 @@
 #region Execution Role
 
 resource "aws_iam_role" "terraform_database_exec" {
-  name        = "WebCMS-${var.environment}-TerraformDatabaseExecution"
+  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseExecution"
   description = "Role to execute the Terraform-based database initialization process"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
