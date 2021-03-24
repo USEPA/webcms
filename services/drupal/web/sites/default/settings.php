@@ -851,6 +851,7 @@ switch ($env_state) {
   case 'migration':
     $settings['redirect.settings']['auto_redirect'] = false;
     $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
+    $config['auto_entitylabel.settings.node.faq']['status'] = 0;
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
