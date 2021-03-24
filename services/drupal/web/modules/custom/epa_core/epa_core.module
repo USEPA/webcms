@@ -531,10 +531,29 @@ function epa_core_entity_operation_alter(array &$operations, EntityInterface $en
  * Implements theme_preprocess_form_element().
  */
 function epa_core_preprocess_form_element(array &$variables) {
-  $field_types = [
-    'checkbox',
-  ];
-  if (\Drupal::service('router.admin_context')->isAdminRoute() && !in_array($variables['element']['#type'], $field_types)) {
-    $variables['description_display'] = 'before';
+
+  if (\Drupal::service('router.admin_context')->isAdminRoute()) {
+    $field_types = [
+      'checkbox',
+    ];
+    if (!in_array($variables['element']['#type'], $field_types)) {
+      $variables['description_display'] = 'before';
+    }
+
+    // Remove the help text indicating that a URL must be external for link
+    // fields used in paragraphs on the Regulation content type.
+    $regulation_paragraphs_link_field_names = [
+      'field_legal_authorities[0][subform][field_link][0][uri]',
+      'field_federal_register_citations[0][subform][field_link][0][uri]',
+      'field_cfr[0][subform][field_link][0][uri]',
+      'field_docket_numbers[0][subform][field_link][0][uri]',
+    ];
+    if (in_array($variables['name'], $regulation_paragraphs_link_field_names)) {
+      foreach ($variables['description']['content']['#items'] as $index => $help_text) {
+        if (strval($help_text) == 'This must be an external URL such as <em class="placeholder">http://example.com</em>.') {
+          unset($variables['description']['content']['#items'][$index]);
+        }
+      }
+    }
   }
 }
