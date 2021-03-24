@@ -27,6 +27,7 @@ dependencies:
     - workflows.workflow.epa_default
   module:
     - content_moderation
+    - cshs
     - datetime
     - entitygroupfield
     - field_group
@@ -168,12 +169,14 @@ content:
   field_faq_taxonomy_topics:
     weight: 5
     settings:
-      match_operator: CONTAINS
-      size: 60
-      placeholder: ''
-      match_limit: 10
+      parent: '0'
+      hierarchy_depth: '0'
+      required_depth: '0'
+      level_labels: ''
+      force_deepest: false
+      save_lineage: 0
     third_party_settings: {  }
-    type: entity_reference_autocomplete
+    type: cshs
     region: content
   field_geographic_locations:
     weight: 14
