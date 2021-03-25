@@ -3,20 +3,6 @@ variable "aws_region" {
   type        = string
 }
 
-#region Backend
-
-variable "backend_state" {
-  description = "Name of the external S3 bucket in which state is stored"
-  type        = string
-}
-
-variable "backend_locks" {
-  description = "Name of the DynamoDB table to use for locking state"
-  type        = string
-}
-
-#endregion
-
 #region Module
 
 variable "environment" {
