@@ -458,6 +458,29 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
       _epa_core_augment_datetime_description($element['#description']);
     }
   }
+
+
+  if ($plugin_id == 'link_default') {
+    $test = 'test';
+  }
+
+  // If a link field only supports external links remove the confusing help text
+  // the widget provides by default.
+  // The complicated logic here is necessary because the structure of this text
+  // differs depending on whether the field has additional descriptive text configured.
+  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
+    if ((is_array($element["uri"]["#description"])
+      && is_array($element["uri"]["#description"]['#items'])
+      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
+    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
+      if (isset($element["#description"])) {
+        $element["uri"]["#description"] = $element["#description"];
+      }
+      else {
+        unset($element["uri"]["#description"]);
+      }
+    }
+  }
 }
 
 /**
