@@ -14,6 +14,7 @@
 - [Resources](#resources)
   - [WebCMS Services](#webcms-services)
   - [WebCMS Support](#webcms-support)
+  - [Routing](#routing)
   - [Terraform Resources](#terraform-resources)
 - [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
@@ -106,8 +107,6 @@ The majority of the resources created by this module are deployments of AWS serv
 
 Special mention is due to two files. We use an RDS proxy ([proxy.tf](proxy.tf)) to manage connection pooling externally. Due to PHP's request-scoped nature, database connections are difficult to persist. Instead, we rely on the proxy to handle connections to the Aurora clutser from multiple containers as well as mitigate transient connection failures due to, e.g., failover during reader-to-write promotion.
 
-Since network load balancers do not perform request routing, we deploy [Traefik](https://traefik.io/) ([traefik_iam.tf](traefik_iam.tf), [traefik_service.tf](traefik_service.tf)). Traefik is able to [automatically discover configuration](https://doc.traefik.io/traefik/providers/ecs/) when running in ECS. This allows us to incrementally build up the routing configuration on a task-by-task basis, rather than having to define it up front. The router will monitor running containers across the services and balance load appropriately.
-
 ### WebCMS Support
 
 Resources in this category are not systems that the WebCMS connects to (or receives connections from), but instead are somewhat lower-level elements that support external data. For example:
@@ -116,6 +115,10 @@ Resources in this category are not systems that the WebCMS connects to (or recei
 - Secrets Manager secrets ([secrets.tf](secrets.tf))
 - ECR repositories ([ecr.tf](ecr.tf))
 - An EventBridge cron schecule ([cron.tf](cron.tf))
+
+### Routing
+
+Since network load balancers do not perform request routing, we deploy [Traefik](https://traefik.io/) ([traefik_iam.tf](traefik_iam.tf), [traefik_service.tf](traefik_service.tf)). Traefik is able to [automatically discover configuration](https://doc.traefik.io/traefik/providers/ecs/) when running in ECS. This allows us to incrementally build up the routing configuration on a task-by-task basis, rather than having to define it up front. The router will monitor running containers across the services and balance load appropriately.
 
 ### Terraform Resources
 
