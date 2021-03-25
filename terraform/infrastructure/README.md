@@ -19,6 +19,8 @@
 - [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
 - [Post-Run Steps](#post-run-steps)
+  - [Initialize the Database](#initialize-the-database)
+  - [Populate Secrets](#populate-secrets)
 - [Conventions](#conventions)
 - [Known Issues](#known-issues)
 
@@ -139,7 +141,21 @@ This module can be run in any environment that has permission to modify the rele
 
 ## Post-Run Steps
 
+### Initialize the Database
+
 Before proceeding with deploying Drupal, be sure to read the database module's [docmentation](../database) in order to create the users (and their credentials) for Drupal.
+
+### Populate Secrets
+
+There are a number of sensitive values that must be populated by an administrator before the WebCMS can be deployed. We list them below. Note that all of the secrets here are simple strings and not JSON-formatted. If updating these values in the AWS console, ensure that you are editing "Plaintext" instead of "Secret key/value".
+
+1. The Drupal hash salt must be generated and saved in `/webcms/${var.environment}/${site}/${lang}/drupal-hash-salt`. This value **must** differ between site/language combinations in order to prevent one-time tokens such as password resets from being reused. Use a secure random number generator such as the `openssl rand` utility to generate a large number of bytes (at least 32).
+2. For email, the SMTP password must be saved in the secret `/webcms/${var.environment}/${site}/${lang}/mail-password`.
+3. An x509 certificate and private key will need to be generated for each Drupal site and language. The private key needs to be set in `/webcms/${var.environment}/${site}/${lang}/saml-sp-key`.
+4. If Akamai is being used, access credentials will need to be created and stored. See the [Getting Started](https://developer.akamai.com/api/getting-started) documentation for more information. We store three secrets based on these credentials:
+   1. `/webcms/${var.environment}/${site}/${lang}/akamai-access-token`
+   2. `/webcms/${var.environment}/${site}/${lang}/akamai-client-token`
+   3. `/webcms/${var.environment}/${site}/${lang}/akamai-client-secret`
 
 ## Conventions
 
