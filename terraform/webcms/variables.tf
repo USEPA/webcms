@@ -86,7 +86,7 @@ variable "drupal_state" {
 
   validation {
     condition     = contains(["run", "build"], var.drupal_state)
-    error_message = "The Drupal state must be either 'build' or 'run'."
+    error_message = "The Drupal state must be either 'build' or 'run'. Please see the README for more information."
   }
 }
 
