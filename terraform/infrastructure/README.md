@@ -6,8 +6,8 @@
 - [About](#about)
 - [Prerequisites](#prerequisites)
   - [VPC](#vpc)
-  - [Terraform State and Locks](#terraform-state-and-locks)
   - [TLS Certificates](#tls-certificates)
+  - [Terraform Backend](#terraform-backend)
 - [Module Inputs](#module-inputs)
   - [Variables](#variables)
   - [Parameter Store](#parameter-store)
@@ -31,15 +31,15 @@ This directory contains a Terraform module that deploys the infrastructure resou
 
 This module assumes it will be deployed into a pre-existing VPC and will be the only module deployed into that VPC. The VPC must have, at a minimum, two types of subnets (public and private), and security groups for each of the deployed resources. We maintain a [reference module](../network) that shows an example set up, as well as the outputs it is expected to create (see [Parameter Store](#parameter-store) under "Module Inputs" below).
 
-### Terraform State and Locks
-
-As written, this module assumes that its state will be stored externally in S3 (see documentation on the [S3 backend](https://www.terraform.io/docs/language/settings/backends/s3.html)). The S3 bucket in which state is stored must already exist. The module also assumes that Terraform will be able to use DynamoDB as its lock backend.
-
-If some other backend will be used, create an [override file](https://www.terraform.io/docs/language/files/override.html) named `backend_override.tf` and provide the backend configuration details there.
-
 ### TLS Certificates
 
 This module does not automatically provision TLS certificates. Since they are required for TLS traffic with the load balancer, these must be created beforehand and made accessible in either AWS Certificate Manager (ACM) or AWS IAM. Record the ARN(s) of any certificates to associate with the load balancer and provide them to the module.
+
+### Terraform Backend
+
+This module _does not_ include a backend. You will need to provide a backend configuration (conventionally, we call this `backend.tf`) in the directory in order for Terraform to use remote state and locks.
+
+For example, you may store the configuration in S3 or AWS Parameter Store and copy them to the directory, or use GitLab Enterprise's [environment variables](https://docs.gitlab.com/ee/ci/variables/#custom-cicd-variables-of-type-file) functionality to provide this.
 
 ## Module Inputs
 
