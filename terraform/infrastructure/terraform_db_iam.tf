@@ -1,7 +1,7 @@
 #region Execution Role
 
 resource "aws_iam_role" "terraform_database_exec" {
-  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseExecution"
+  name        = "${var.iam_prefix}-${var.environment}-TerraformDatabaseExecution"
   description = "Role to execute the Terraform-based database initialization process"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "terraform_database_credentials_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_credentials_access" {
-  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseRootCredsAccess"
+  name        = "${var.iam_prefix}-${var.environment}-TerraformDatabaseRootCredsAccess"
   description = "Allows binding the root RDS credentials to the Terraform database task"
 
   policy = data.aws_iam_policy_document.terraform_database_credentials_access.json
@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "terraform_database_credentials_access
 #region Task Role
 
 resource "aws_iam_role" "terraform_database_task" {
-  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseTask"
+  name        = "${var.iam_prefix}-${var.environment}-TerraformDatabaseTask"
   description = "Role for the Terraform-based database initialization process"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "terraform_database_tfstate_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_tfstate_access" {
-  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseTFStateAccess"
+  name        = "${var.iam_prefix}-${var.environment}-TerraformDatabaseTFStateAccess"
   description = "Grants access to database.tfstate"
 
   policy = data.aws_iam_policy_document.terraform_database_tfstate_access.json
@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "terraform_database_secrets_access" {
 }
 
 resource "aws_iam_policy" "terraform_database_secrets_access" {
-  name        = "Customer-WebCMS-${var.environment}-TerraformDatabaseSecretsAccess"
+  name        = "${var.iam_prefix}-${var.environment}-TerraformDatabaseSecretsAccess"
   description = "Grants access to the DB credentials for initialization"
 
   policy = data.aws_iam_policy_document.terraform_database_secrets_access.json

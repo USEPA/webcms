@@ -23,6 +23,16 @@ variable "tags" {
 
 #endregion
 
+#region IAM
+
+variable "iam_prefix" {
+  description = "Custom prefix for auto-generated IAM roles and policies"
+  type        = string
+  default     = "WebCMS"
+}
+
+#endregion
+
 #region Load balancer
 # cf. load_balancer.tf
 

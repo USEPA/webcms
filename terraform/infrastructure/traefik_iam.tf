@@ -1,5 +1,5 @@
 resource "aws_iam_role" "traefik_task" {
-  name        = "Customer-WebCMS-${var.environment}-TraefikTask"
+  name        = "${var.iam_prefix}-${var.environment}-TraefikTask"
   description = "Task role for the Traefik router"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "traefik_ecs_access" {
 }
 
 resource "aws_iam_policy" "traefik_ecs_access" {
-  name        = "Customer-WebCMS-${var.environment}-TraefikECSAccess"
+  name        = "${var.iam_prefix}-${var.environment}-TraefikECSAccess"
   description = "Grants read-only access to ECS for Traefik"
 
   policy = data.aws_iam_policy_document.traefik_ecs_access.json
@@ -47,7 +47,7 @@ resource "aws_iam_role_policy_attachment" "traefik_ecs_access" {
 # or other sensitive values to the router.
 
 resource "aws_iam_role" "traefik_exec" {
-  name        = "Customer-WebCMS-${var.environment}-TraefikExecution"
+  name        = "${var.iam_prefix}-${var.environment}-TraefikExecution"
   description = "Execution role for the Traefik router"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json

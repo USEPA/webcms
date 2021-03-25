@@ -4,7 +4,7 @@
 resource "aws_iam_role" "drupal_task" {
   for_each = local.sites
 
-  name        = "Customer-WebCMS-${var.environment}-${each.key}-DrupalTask"
+  name        = "${var.iam_prefix}-${var.environment}-${each.key}-DrupalTask"
   description = "WebCMS task-level role"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -43,7 +43,7 @@ data "aws_iam_policy_document" "drupal_s3_access" {
 resource "aws_iam_policy" "drupal_s3_access" {
   for_each = local.sites
 
-  name        = "Customer-WebCMS-${var.environment}-${each.key}-DrupalS3Access"
+  name        = "${var.iam_prefix}-${var.environment}-${each.key}-DrupalS3Access"
   description = "Grants read/write access to the ${each.key} S3 bucket"
 
   policy = data.aws_iam_policy_document.drupal_s3_access[each.key].json
@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "drupal_publish_metrics" {
 }
 
 resource "aws_iam_policy" "drupal_publish_metrics" {
-  name        = "Customer-WebCMS-${var.environment}-PublishMetrics"
+  name        = "${var.iam_prefix}-${var.environment}-PublishMetrics"
   description = "Permits publishing CloudWatch metrics"
 
   policy = data.aws_iam_policy_document.drupal_publish_metrics.json
