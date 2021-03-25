@@ -58,9 +58,7 @@ Drupal cannot install to an empty database. We recommend the usage of the databa
 
 ### Terraform Backend
 
-This module _does not_ include a backend. You will need to provide a backend configuration (conventionally, we call this `backend.tf`) in the directory in order for Terraform to use remote state and locks.
-
-For example, you may store the configuration in S3 or AWS Parameter Store and copy them to the directory, or use GitLab Enterprise's [environment variables](https://docs.gitlab.com/ee/ci/variables/#custom-cicd-variables-of-type-file) functionality to provide this.
+See the [parent directory's README](../) for instructions on using a backend for remote state and locking.
 
 ### Built Images
 

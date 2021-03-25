@@ -21,7 +21,6 @@
 - [Post-Run Steps](#post-run-steps)
   - [Initialize the Database](#initialize-the-database)
   - [Populate Secrets](#populate-secrets)
-- [Conventions](#conventions)
 - [Known Issues](#known-issues)
 
 ## About
@@ -40,9 +39,7 @@ This module does not automatically provision TLS certificates. Since they are re
 
 ### Terraform Backend
 
-This module _does not_ include a backend. You will need to provide a backend configuration (conventionally, we call this `backend.tf`) in the directory in order for Terraform to use remote state and locks.
-
-For example, you may store the configuration in S3 or AWS Parameter Store and copy them to the directory, or use GitLab Enterprise's [environment variables](https://docs.gitlab.com/ee/ci/variables/#custom-cicd-variables-of-type-file) functionality to provide this.
+See the [parent directory's README](../) for instructions on using a backend for remote state and locking.
 
 ## Module Inputs
 
@@ -156,12 +153,6 @@ There are a number of sensitive values that must be populated by an administrato
    1. `/webcms/${var.environment}/${site}/${lang}/akamai-access-token`
    2. `/webcms/${var.environment}/${site}/${lang}/akamai-client-token`
    3. `/webcms/${var.environment}/${site}/${lang}/akamai-client-secret`
-
-## Conventions
-
-Files in this module are broken down roughly by the service being deployed. Permissions granted to each service are provided in that file. For example, both the RDS proxy and its IAM role are defined in [proxy.tf](proxy.tf).
-
-Files that define many resources of the same type are broken down by `#region`/`#endregion` markers to make navigation easier for editors that understand them.
 
 ## Known Issues
 

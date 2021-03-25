@@ -3,6 +3,9 @@
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
+- [About](#about)
+- [Prerequisites](#prerequisites)
+  - [Terraform Backend](#terraform-backend)
 - [Module Inputs](#module-inputs)
   - [Variables](#variables)
   - [Parameter Store](#parameter-store)
@@ -12,6 +15,18 @@
 - [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
 - [Post-Run Steps](#post-run-steps)
+
+## About
+
+This module serves as a light "reference architecture" for the WebCMS' VPC needs. It is oriented towards a commercial AWS with no special considerations.
+
+The intention of this module is not necessarily to be run, but instead to document the WebCMS' minimum requirements for subnetting, security groups, and Parameter Store parameters.
+
+## Prerequisites
+
+### Terraform Backend
+
+See the [parent directory's README](../) for instructions on using a backend for remote state and locking.
 
 ## Module Inputs
 
