@@ -238,7 +238,7 @@ function epa_workflow_preprocess_form_element_label(array &$variables) {
   // 'required' variable to TRUE here allows the template to render the field as
   // if it were required without interfering with the actual form validation.
   $element = $variables['element'];
-  if ($element['#id'] == 'edit-revision-log') {
+  if (isset($element['#id']) && $element['#id'] == 'edit-revision-log') {
     $variables['required'] = TRUE;
   }
 }
