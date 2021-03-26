@@ -49,9 +49,8 @@ This module expects inputs from two sources: Terraform variables and Parameter S
 
 - Provider variables
   - `aws_region`: This tells the provider which region this module is being deployed in.
-- Backend variables (see the [s3 backend documentation](https://www.terraform.io/docs/language/settings/backends/s3.html)). If overriding to use a different backend (see [the above section on state](#terraform-state-and-locks)), set these to the empty string.
-  - `backend_state`: The name of the S3 bucket that stores this module's state.the empty string.
-  - `backend_locks`: The name of the DynamoDB table used to lock the backend.
+- Naming variables
+  - `iam_prefix`: The name prefix of all IAM resources. This defaults to the string `"WebCMS"` but can be changed if a different convention is desired (or required).
 - Module variables
   - `environment`: The name of the environment this module covers. The word "environment" here means something like pre-production or production. A single environment may hold multiple sites (indeed, it will always have at least two: one each for English and Spanish).
   - `sites`: A `list(string)` of sites this environment will be running. This is most likely going to be `["dev", "stage"]` for a pre-production environment, and `["prod"]` for a production environment.
