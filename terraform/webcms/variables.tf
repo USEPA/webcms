@@ -7,7 +7,7 @@ variable "aws_region" {
 
 #endregion
 
-#region Deploy target variables
+#region Deployment variables
 
 variable "environment" {
   description = "Name of the environment corresponding to this VPC (e.g., preproduction, production)"
@@ -35,22 +35,8 @@ variable "tags" {
   default     = {}
 }
 
-#endregion
-
-#region Image tags
-
-variable "image_tag_drupal" {
-  description = "The full reference (<url>:<tag>) to the built Drupal image."
-  type        = string
-}
-
-variable "image_tag_nginx" {
-  description = "The full reference (<url>:<image>) to the built nginx image."
-  type        = string
-}
-
-variable "image_tag_drush" {
-  description = "The full reference (<url>:<tag>) to the built Drush image."
+variable "image_tag" {
+  description = "The image tag to apply to all custom (non-mirrored) images. This should vary on a per-build basis, such as using <branch>-<build> to associate each image with the CI build."
   type        = string
 }
 

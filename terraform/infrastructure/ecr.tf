@@ -29,3 +29,34 @@ resource "aws_ecr_repository" "drush" {
 
   tags = var.tags
 }
+
+# Create a custom repo for the Alpine-based metrics sidecar. See services/metrics for more
+# information.
+resource "aws_ecr_repository" "metrics" {
+  for_each = toset(var.sites)
+
+  name = "webcms-${var.environment}-${each.key}-fpm-metrics"
+
+  tags = var.tags
+}
+
+# The repositories here are mirrors of images on the Docker Hub. We bring them inside the
+# AWS perimeter because we are required to statically analyze *all* images prior to
+# deployment - not just custom ones.
+#
+# Mirrors are treated as being environment-wide resources, and thus do not have a for_each
+# associated with them.
+
+# This mirrors docker.io/amazon/cloudwatch-agent:latest
+resource "aws_ecr_repository" "cloudwatch_agent_mirror" {
+  name = "webcms-${var.environment}-aws-cloudwatch"
+
+  tags = var.tags
+}
+
+# This mirrors docker.io/traefik:<version>
+resource "aws_ecr_repository" "traefik_mirror" {
+  name = "webcms-${var.environment}-traefik"
+
+  tags = var.tags
+}

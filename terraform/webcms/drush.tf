@@ -14,7 +14,7 @@ resource "aws_ecs_task_definition" "drush_task" {
   container_definitions = jsonencode([
     {
       name  = "drush"
-      image = var.image_tag_drush
+      image = "${data.aws_ssm_parameter.ecr_drush.value}:${var.image_tag}"
 
       # By explicitly emptying these values, we allow task overrides to effectively
       # take precedence over what is specified in the container. This enables us

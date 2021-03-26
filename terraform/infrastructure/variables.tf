@@ -47,6 +47,12 @@ variable "lb_extra_certificates" {
   default     = []
 }
 
+variable "lb_internal" {
+  description = "Whether or not this environment's NLB is internal."
+  type        = bool
+  default     = false
+}
+
 #endregion
 
 #region RDS/Aurora
