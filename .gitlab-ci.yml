@@ -10,7 +10,7 @@ image:
 variables:
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
-  TF_ROOT: ${CI_PROJECT_DIR}/terraform/infrastructure
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform/webcms
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
   #Run in an automated fashion without console input
@@ -75,7 +75,7 @@ validate:
   script:
     - gitlab-terraform validate
   only:
-    - IaC
+    - f1-IaC-updates
 
 plan:
   stage: build
@@ -91,7 +91,7 @@ plan:
     reports:
       terraform: ${TF_ROOT}/plan.json
   only:
-    - IaC
+    - f1-IaC-updates
 
 # Separate apply job for manual launching Terraform as it can be destructive
 # action.
@@ -105,4 +105,4 @@ apply:
     - plan
   when: manual
   only:
-    - IaC
+    - f1-IaC-updates
