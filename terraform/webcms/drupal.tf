@@ -26,8 +26,8 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # able to communicate (since the IP address will vary).
       name = "drupal"
 
-      # Service updates are triggered if the image name changes
-      image = var.image_tag_drupal
+      # Service updates are triggered if var.image_tag changes
+      image = "${data.aws_ssm_parameter.ecr_drupal.value}:${var.image_tag}"
 
       # If this container exits for any reason, mark the task as unhealthy and force a restart
       essential = true
@@ -54,15 +54,14 @@ resource "aws_ecs_task_definition" "drupal_task" {
         }
       }
     },
+
     # nginx container. As mentioned above, this container exists primarily to route
     # requests. We use nginx separately instead of, for example, Apache and mod_php
     # because nginx is specialized for HTTP server tasks, and any task we can perform in
     # nginx removes some of the PHP overhead.
     {
       name = "nginx"
-
-      # As with the Drupal definition, service updates are triggered when this changes
-      image = var.image_tag_nginx
+      image = "${data.aws_ssm_parameter.ecr_nginx.value}:${var.image_tag}"
 
       # Docker labels are how we communicate our routing preferences to Traefik. These settings
       # correspond to Traefik's own configuration names. Specifically, we make use of router
@@ -113,11 +112,12 @@ resource "aws_ecs_task_definition" "drupal_task" {
         }
       }
     },
+
     # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
     # the epa_metrics module for what we export to the agent.
     {
       name  = "cloudwatch"
-      image = "amazon/cloudwatch-agent:latest"
+      image = "${data.aws_ssm_parameter.ecr_cloudwatch.value}:latest"
 
       # The agent reads its JSON-formatted configuration from the environment in containers
       environment = [
@@ -148,143 +148,15 @@ resource "aws_ecs_task_definition" "drupal_task" {
       }
     },
 
-    # This is a small Alpine container used to report metrics from FPM to CloudWatch
+    # Report FPM metrics to CloudWatch using the custom metrics container. See the
+    # services/metrics directory for more.
     {
       name  = "metrics"
-      image = "alpine:latest"
+      image = "${data.aws_ssm_parameter.ecr_metrics.value}:${image_tag}"
 
       environment = [
+        { name = "AWS_REGION", value = var.aws_region },
         { name = "WEBCMS_ENV_NAME", value = "${var.site}-${var.lang}" },
-
-        # This is the map needed for mapping PHP-FPM metrics to CloudWatch. The keys are
-        # the metric names output by PHP-FPM, and the values have two expected fields:
-        # - name: the CloudWatch metric name (usually in PascalCase)
-        # - unit: the CloudWatch unit (typically Count or Seconds)
-        #
-        # The keys of the FPM status JSON are listed here:
-        # - "pool": the FPM pool name
-        # - "process manager": the kind of FPM process manager (one of "static",
-        #   "dynamic", or "ondemand")
-        # - "start time": the UNIX timestamp when PHP-FPM started
-        # - "start since": the number of seconds since the start time
-        # - "accepted conn": number of requests accepted by the pool
-        # - "listen queue": the size of PHP-FPM's socket backlog
-        # - "max listen queue": the maximum number of requests in the pending queue seen
-        #   since FPM started
-        # - "listen queue len": the number of pending connections
-        # - "idle processes": number of inactive PHP-FPM workers
-        # - "active processes": number of active workers
-        # - "total workers": number of workers, both idle and active
-        # - "max active processes": highest number of active processes since PHP-FPM
-        #   started
-        # - "max children reached": the number of times PHP-FPM has reached the maximum
-        #   worker size (only applicable for dynamic/ondemand process managers)
-        #
-        # We don't track every metric since some of them are redundant in the face of
-        # CloudWatch metric math, but we report a significant subset. The metrics we track
-        # are listed in the object below.
-        {
-          name = "WEBCMS_METRICS_MAP"
-          value = jsonencode({
-            # Track the age of the FPM process in order to allow us to convert counts to
-            # counts per second
-            "start since" = {
-              name = "Age"
-              unit = "Seconds"
-            }
-            "accepted conn" = {
-              name = "RequestsAccepted"
-              unit = "Count"
-            }
-            "listen queue" = {
-              name = "RequestsPending"
-              unit = "Count"
-            }
-            # By reporting the listen queue length, we can track the size of the listen
-            # queue as a percentage (using RequestsPending/ListenQueueLength), which gives
-            # us a good estimate of backlog pressure at the FPM socket level.
-            "listen queue len" = {
-              name = "ListenQueueLength"
-              unit = "Count"
-            }
-            "idle processes" = {
-              name = "ProcessesIdle"
-              unit = "Count"
-            }
-            "active processes" = {
-              name = "ProcessesActive"
-              unit = "Count"
-            }
-            # We report this value in order to compute MaxChildrenReached/Age. This value
-            # is the rate at which PHP-FPM hits its maximum workers. The closer it gets to
-            # 1, the harder it means PHP-FPM is working.
-            "max children reached" = {
-              name = "MaxChildrenReached"
-              unit = "Count"
-            }
-          })
-        },
-
-        {
-          name = "WEBCMS_METRICS_SCRIPT"
-
-          # This is a jq script (https://stedolan.github.io/jq) that processes the metrics
-          # map against the output of PHP-FPM's status page.
-          #
-          # It is a simple array loop that expands { key, value } pairs from the
-          # $WEBCMS_METRICS_MAP, looks up the key in the PHP-FPM output, and then formats
-          # the result as a set of CloudWatch metrics.
-          #
-          # The beginning of the script is a variable assignment, ". as $input", which
-          # saves the input stream (the JSON output from curl) as a variable, and switches
-          # over to looping over the entries of the $metrics variable (the parsed JSON
-          # of $WEBCMS_METRICS_MAP).
-          #
-          # The to_entries function converts an object into an array of { key, value }
-          # objects, where key is the JSON key (e.g., "idle processes") and value is the
-          # object value - in this case, it will be the { name, unit } pair.
-          #
-          # After that, the map() function constructs a CloudWatch-formatted value
-          # suitable for passing to `aws cloudwatch put-metric-data`, which handles the
-          # heavy lifting of publishing the PHP-FPM metrics.
-          value = <<-SCRIPT
-            . as $input
-            | $metrics
-            | to_entries
-            | map({
-              MetricName: .value.name,
-              Unit: .value.unit,
-              Value: $input[.key],
-              Timestamp: now | floor,
-              Dimensions: [
-                { Name: "Environment", Value: "\($ENV.WEBCMS_ENV_NAME)" }
-              ]
-            })
-          SCRIPT
-        },
-      ]
-
-      # The inline shell script here scrapes PHP-FPM's metrics every 60 seconds and
-      # reports them back to CloudWatch. It uses the inline jq script and metrics
-      # configuration (see above) to transform the FPM output to what the
-      # `put-metric-data` command expects.
-      entrypoint = ["/bin/sh", "-c"]
-      command = [
-        <<-COMMAND
-        apk add --no-cache aws-cli curl jq
-
-        while true; do
-          sleep 60
-
-          input="$(curl -s http://localhost:8080/status?json)"
-          echo "PHP-FPM metrics: $input"
-
-          metrics="$(echo "$input" | jq -c "$WEBCMS_METRICS_SCRIPT" --argjson metrics "$WEBCMS_METRICS_MAP")"
-          echo "CloudWatch metrics: $metrics"
-
-          aws cloudwatch --region=${var.aws_region} put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
-        done
-        COMMAND
       ]
 
       logConfiguration = {

@@ -72,6 +72,30 @@ data "aws_ssm_parameter" "drupal_s3_domain" {
 
 #endregion
 
+#region ECR
+
+data "aws_ssm_parameter" "ecr_drupal" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/drupal"
+}
+
+data "aws_ssm_parameter" "ecr_nginx" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/nginx"
+}
+
+data "aws_ssm_parameter" "ecr_drush" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/drush"
+}
+
+data "aws_ssm_parameter" "ecr_metrics" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/metrics"
+}
+
+data "aws_ssm_parameter" "ecr_clouwatch" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/clouwatch"
+}
+
+#endregion
+
 #region Log groups
 
 data "aws_ssm_parameter" "php_fpm_log_group" {

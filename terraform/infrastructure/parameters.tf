@@ -110,6 +110,60 @@ resource "aws_ssm_parameter" "drupal_s3_domain" {
 
 #endregion
 
+#region ECR
+
+resource "aws_ssm_parameter" "ecr_drupal" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/drupal"
+  type  = "String"
+  value = aws_ecr_repository.drupal[each.value.site].repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_nginx" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/nginx"
+  type  = "String"
+  value = aws_ecr_repository.nginx[each.value.site].repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_drush" {
+for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/drush"
+  type  = "String"
+  value = aws_ecr_repository.drush[each.value.site].repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_metrics" {
+for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/metrics"
+  type  = "String"
+  value = aws_ecr_repository.metrics[each.value.site].repository_url
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "ecr_cloudwatch" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/cloudwatch"
+  type  = "String"
+  value = aws_ecr_repository.cloudwatch_agent_mirror.repository_url
+
+  tags = var.tags
+}
+
+#endregion
+
 #region Log groups
 
 resource "aws_ssm_parameter" "php_fpm_log_group" {

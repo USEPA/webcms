@@ -13,7 +13,6 @@
   - [Variables](#variables)
     - [Provider Variables](#provider-variables)
     - [Deployment Variables](#deployment-variables)
-    - [Image Variables](#image-variables)
     - [Drupal Variables](#drupal-variables)
       - [The `drupal_state` Variable](#the-drupal_state-variable)
       - [Sensitive Values](#sensitive-values)
@@ -62,7 +61,7 @@ See the [parent directory's README](../) for instructions on using a backend for
 
 ### Built Images
 
-The images for Drupal, nginx, and Drush must have been built before this module is deployed. See [How to Run](#how-to-run) for more information.
+The images for Drupal, nginx, Drush, and the metrics sidecar must have been built before this module is deployed. See [How to Run](#how-to-run) for more information.
 
 ## Module Inputs
 
@@ -84,16 +83,7 @@ These variables influence the deployment as a whole; generally, they determine t
 - `site`: A string indicating which site in the environment is being deployed to. For example, we may be deploying a `dev` site to the pre-production environment.
 - `lang`: Which language (`en` for English, `es` for Spanish) this deployment covers. The template only deploys one site at a time in order to allow for finer-grained deployment logic (e.g., only deploying one language, or deploying both in parallel).
 - `tags`: An optional `map(string)` of tags to apply to AWS resources. Useful for cost-tracking tags or resource groups.
-
-#### Image Variables
-
-These identify which Docker images are being used by this deployment. Each variable is identified by the full `<registry>/<repository>:<tag>` format, such as `123412341234.dkr.ecr.us-east-1.amazonaws.com/webcms-preproduction-dev-drupal:example-123`.
-
-**NB.** If these values don't change between runs, Terraform will not update the ECS service. We suggest tagging images based on the branch and build number (this is the `example-123` in the example above).
-
-- `image_tag_drupal`: The full repository:tag for the built Drupal image.
-- `image_tag_nginx`: As above, but for the built nginx image.
-- `image_tag_drush`: As above, but for Drush.
+- `image_tag`: The build tag for custom images.
 
 #### Drupal Variables
 
@@ -234,7 +224,7 @@ Deployments can be broken down into three steps: build images, apply Terraform, 
 
 ### Build Images
 
-There are three custom Docker images: Drupal, nginx, and Drush. While it is possible to build these in parallel, it is probably best to build them in serial and push after deployments. A sample shell script is below:
+There are four custom Docker images: Drupal, nginx, Drush, and the metrics sidecar. While it is possible to build these in parallel, it is probably best to build them in serial and push after deployments. A sample shell script is below:
 
 ```sh
 #!/bin/bash
@@ -250,12 +240,16 @@ docker build services/drupal --tag "<drupal repository>:$BUILD_TAG" --target dru
 # Build nginx next, using the same tagging format.
 docker build services/drupal --tag "<nginx repository>:$BUILD_TAG" --target nginx
 
-# Finally, build Drush.
+# Finally, Drush.
 docker build services/drupal --tag "<drush repository>:$BUILD_TAG" --target drush
 
 docker push "<drupal repository>:$BUILD_TAG"
 docker push "<nginx repository>:$BUILD_TAG"
 docker push "<drush repository>:$BUILD_TAG"
+
+# Now, build the metrics sidecar.
+docker build services/metrics --tag "<metrics repository>:$BUILD_TAG"
+docker push "<metrics repository>:$BUILD_TAG"
 ```
 
 Note that this script does not cover authenticating with ECR or other topics; see the AWS CLI's documentation on authenticating with ECR:
@@ -269,7 +263,7 @@ Note that this script does not cover authenticating with ECR or other topics; se
 
    Note that this will most likely require copying a CI/CD-generated file to `terraform/webcms/backend.tf` and calling `terraform init` to allow Terraform to connect to the new backend.
 
-2. Arrange for all Terraform variables to be set. These variables can be set in the environment (in the case of values shared by all branches), set in the CLI, or provided via a `terraform.tfvars` file. Note that, at a minimum, you will want to ensure that the `image_tag_drupal`, `image_tag_nginx`, and `image_tag_drush` variables differ on a per-apply basis.
+2. Arrange for all Terraform variables to be set. These variables can be set in the environment (in the case of values shared by all branches), set in the CLI, or provided via a `terraform.tfvars` file.
 
 3. Perform one `terraform apply` per site being updated. Generally, we recommend only updating one site per branch, but both languages (English and Spanish).
 

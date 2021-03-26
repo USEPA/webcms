@@ -14,6 +14,7 @@
 - [Resources](#resources)
   - [WebCMS Services](#webcms-services)
   - [WebCMS Support](#webcms-support)
+  - [ECR Mirrors](#ecr-mirrors)
   - [Routing](#routing)
   - [Terraform Resources](#terraform-resources)
 - [Module Outputs](#module-outputs)
@@ -21,6 +22,7 @@
 - [Post-Run Steps](#post-run-steps)
   - [Initialize the Database](#initialize-the-database)
   - [Populate Secrets](#populate-secrets)
+  - [Mirror Images](#mirror-images)
 - [Known Issues](#known-issues)
 
 ## About
@@ -58,6 +60,7 @@ This module expects inputs from two sources: Terraform variables and Parameter S
 - Load balancer variables
   - `lb_default_certificate`: The ARN of a certificate (in IAM or ACM) to attach to the load balancer.
   - `lb_extra_certificates`: An optional list of additional certificate ARNs to attach to the load balancer. This supports adding extra TLS authentication while not disrupting requests being sent to the NLB.
+  - `lb_internal`: Whether or not this environment's NLB is internal. This should be `true` in ordinary AWS deployments, but can be `false` if there is some other public ingress to the WebCMS.
 - RDS & Aurora variables
   - `db_instance_type`: A supported [instance type](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html) for the Aurora reader and writer instances.
   - `db_instance_count`: Number of reader/writer instances. In a production environment, this should be greater than one in order to support fast failover.
@@ -114,6 +117,15 @@ Resources in this category are not systems that the WebCMS connects to (or recei
 - ECR repositories ([ecr.tf](ecr.tf))
 - An EventBridge cron schecule ([cron.tf](cron.tf))
 
+### ECR Mirrors
+
+We mirror public images from the Docker Hub in AWS. This meets two use cases:
+
+1. Fargate tasks do not have arbirary outbound HTTPS access in some AWS environments, so pulling directly from the Docker Hub is not supported, and
+2. Security requirements dictate that all images be made available for static analysis.
+
+The simplest way to meet these requirements is to simply copy images from the Docker Hub into ECR.
+
 ### Routing
 
 Since network load balancers do not perform request routing, we deploy [Traefik](https://traefik.io/) ([traefik_iam.tf](traefik_iam.tf), [traefik_service.tf](traefik_service.tf)). Traefik is able to [automatically discover configuration](https://doc.traefik.io/traefik/providers/ecs/) when running in ECS. This allows us to incrementally build up the routing configuration on a task-by-task basis, rather than having to define it up front. The router will monitor running containers across the services and balance load appropriately.
@@ -152,6 +164,24 @@ There are a number of sensitive values that must be populated by an administrato
    1. `/webcms/${var.environment}/${site}/${lang}/akamai-access-token`
    2. `/webcms/${var.environment}/${site}/${lang}/akamai-client-token`
    3. `/webcms/${var.environment}/${site}/${lang}/akamai-client-secret`
+
+### Mirror Images
+
+The [ECR mirrors](#ecr-mirrors) need to be populated. There are two: [Traefik](https://hub.docker.com/_/traefik) and the [Amazon CloudWatch Agent](https://hub.docker.com/r/amazon/cloudwatch-agent).
+
+These steps should suffice to mirror the images from the Docker Hub to ECR. Remember to [authenticate with ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html#registry-auth-token) prior to running the `docker push` commands.
+
+```sh
+docker pull traefik:2.4
+docker tag traefik:2.4 <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-traefik:2.4
+docker push <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-traefik:2.4
+
+docker pull amazon/cloudwatch-agent:latest
+docker tag amazon/cloudwatch-agent:latest <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
+docker push <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
+```
+
+In order to capture updates to these images, these pull/push steps should be run on an automated schedule.
 
 ## Known Issues
 
