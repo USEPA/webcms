@@ -14,42 +14,46 @@ variables:
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
   #Run in an automated fashion without console input
-  #TF_IN_AUTOMATION: 1 
-  #TF_INPUT: 0 
-  
+  #TF_IN_AUTOMATION: 1
+  #TF_INPUT: 0
+
   TF_VAR_aws_region: "us-east-1"
-  
+
   # Module-wide variables
   TF_VAR_environment: "preproduction"
-  TF_VAR_sites: '["dev"]'
+  TF_VAR_site: 'dev'
+  TF_VAR_lang: 'en'
   TF_VAR_tags: "{}"
 
-  # Load balancer variables
-  # cf. load_balancer.tf
-  TF_VAR_lb_default_certificate: "arn:aws:iam::665817092260:server-certificate/LBEPACertificate"
-  TF_VAR_lb_extra_certificates: "[]"
+  TF_VAR_image_tag_drupal: '...'
+  TF_VAR_image_tag_nginx: '...'
+  TF_VAR_image_tag_drush: '...'
 
-  # Database variables
-  # cf. rds.tf
-  TF_VAR_db_instance_type: "db.t3.small"
-  TF_VAR_db_instance_count: 1
+  TF_VAR_drupal_hostname: '...'
+  TF_VAR_drupal_extra_hostnames: '[]'
 
-  # Search variables
-  # cf. search.tf
-  TF_VAR_search_instance_type: "r5.xlarge.elasticsearch"
-  TF_VAR_search_instance_count: 1
-  TF_VAR_search_instance_storage: 10
-  TF_VAR_search_dedicated_node_type: ""
-  TF_VAR_search_dedicated_node_count: 0
-  TF_VAR_search_availability_zones: 2
-  
-  # Cache variables
-  # cf. cache.tf
-  TF_VAR_cache_instance_type: "cache.t3.small"
-  TF_VAR_cache_instance_count: 1
+  TF_VAR_drupal_min_capacity: '1'
+  TF_VAR_drupal_max_capacity: '5'
+  TF_VAR_drupal_use_s3_domain: 'false'
+  TF_VAR_drupal_state: 'build'
 
-  
+  TF_VAR_email_auth_user: junk
+  TF_VAR_email_from: 'noreply@example.com'
+  TF_VAR_email_host: 'localhost'
+  TF_VAR_email_port: '1234'
+  TF_VAR_email_enable_workflow_notifications: 'false'
+  TF_VAR_email_protocol: 'tls'
 
+  TF_VAR_akamai_enabled: 'false'
+  TF_VAR_akamai_api_host: 'junk'
+
+  TF_VAR_saml_sp_entity_id: ''
+  TF_VAR_saml_sp_cert: ''
+  TF_VAR_saml_idp_id: ''
+  TF_VAR_saml_idp_sso_url: ''
+  TF_VAR_saml_idp_slo_url: ''
+  TF_VAR_saml_idp_cert: ''
+  TF_VAR_saml_force_saml_login: 'false'
 
 cache:
   key: development
@@ -61,7 +65,7 @@ before_script:
   - pwd
   - gitlab-terraform --version
   - gitlab-terraform init
-  
+
 stages:
   - validate
   - build
