@@ -74,6 +74,8 @@ validate:
     - docker
   script:
     - gitlab-terraform validate
+  only:
+    - IaC
 
 plan:
   stage: build
@@ -88,6 +90,8 @@ plan:
       - ${TF_ROOT}/plan.cache
     reports:
       terraform: ${TF_ROOT}/plan.json
+  only:
+    - IaC
 
 # Separate apply job for manual launching Terraform as it can be destructive
 # action.
