@@ -10,10 +10,10 @@
   - [Documentation Structure](#documentation-structure)
   - [File Layout](#file-layout)
 - [Modules](#modules)
-  - [Network](#network)
+  - [Network Reference Architecture](#network-reference-architecture)
   - [Infrastructure](#infrastructure)
-  - [Database](#database)
-  - [WebCMS](#webcms)
+  - [Database Initialization](#database-initialization)
+  - [WebCMS Application Deployment](#webcms-application-deployment)
 
 ## About
 
@@ -45,13 +45,13 @@ Resources are identified according to this hierarchy. For example, an environmen
 
 Each module's README is organized by roughly this structure:
 
-* About: indicates what module this directory covers
-* Prerequisites: anything that must be completed before the module should be run
-* Module inputs: Terraform variables and AWS Parameter Store values that need to be set before running the module
-* Resources: a high-level overview of what AWS resources are created
-* Module outputs: what the module creates/outputs that may be of use to users or other modules
-* How to run: special instructions for running a module, or steps that need to be completed alongside a Terraform run to further apply updates
-* Post-run steps: actions to take after the first run (or re-initialization) of this module
+* **About**: indicates what module this directory covers
+* **Prerequisites**: anything that must be completed before the module should be run
+* **Module inputs**: Terraform variables and AWS Parameter Store values that need to be set before running the module
+* **Resources**: a high-level overview of what AWS resources are created
+* **Module outputs**: what the module creates/outputs that may be of use to users or other modules
+* **How to run**: special instructions for running a module, or steps that need to be completed alongside a Terraform run to further apply updates
+* **Post-run steps**: actions to take after the first run (or re-initialization) of this module
 
 ### File Layout
 
@@ -61,7 +61,7 @@ Module files are broken down roughly by the AWS service being deployed. Permissi
 
 The modules are listed here in the order in which they should be run (or followed). Each subsequent module builds on the first, requiring resources and Parameter Store values for those created elements.
 
-### Network
+### Network Reference Architecture
 
 **Directory:** [`network`](network) ([README](network/README.md))
 
@@ -73,13 +73,13 @@ This module defines the WebCMS' minimum VPC requirements. As mentioned in the RE
 
 This module defines the WebCMS' infrastructure. This module defines environment-wide storage resources such as Aurora and Elasticache clusters, compute resources such as an ECS cluster, and some site- and language-specific resources such as CloudWatch log groups and Secrets Manager secrets.
 
-### Database
+### Database Initialization
 
 **Directory:** [`database`](database) ([README](database/README.md))
 
 This module is a special database initialization module. Instead of defining an EC2-based infrastructure separate from the WebCMS' Fargate-based compute system, we instead define a Terraform module that can be run in a container to set up usernames and password for Drupal. This needs to be run in a container since it must be run inside the environment's VPC - it has to send SQL queries to the Aurora cluster, which does not have a publicly-accessible IP address. This module creates strong, random passwords for each site and language's user, and updates both the database and Secrets Manager with this information.
 
-### WebCMS
+### WebCMS Application Deployment
 
 **Directory:** [`webcms`](webcms) ([README](webcms/README.md))
 
