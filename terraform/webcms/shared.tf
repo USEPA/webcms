@@ -90,8 +90,8 @@ data "aws_ssm_parameter" "ecr_metrics" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/metrics"
 }
 
-data "aws_ssm_parameter" "ecr_clouwatch" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/clouwatch"
+data "aws_ssm_parameter" "ecr_cloudwatch" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/cloudwatch"
 }
 
 #endregion

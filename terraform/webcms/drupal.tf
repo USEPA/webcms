@@ -152,7 +152,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
     # services/metrics directory for more.
     {
       name  = "metrics"
-      image = "${data.aws_ssm_parameter.ecr_metrics.value}:${image_tag}"
+      image = "${data.aws_ssm_parameter.ecr_metrics.value}:${var.image_tag}"
 
       environment = [
         { name = "AWS_REGION", value = var.aws_region },
