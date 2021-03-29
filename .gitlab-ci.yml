@@ -10,8 +10,8 @@ image:
 variables:
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
-  TF_ROOT: ${CI_PROJECT_DIR}/terraform/webcms
-  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform/infrastructure
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
   #Run in an automated fashion without console input
   #TF_IN_AUTOMATION: 1
@@ -52,6 +52,34 @@ variables:
   TF_VAR_saml_idp_slo_url: ''
   TF_VAR_saml_idp_cert: ''
   TF_VAR_saml_force_saml_login: 'false'
+
+  # Load balancer variables
+  # cf. load_balancer.tf
+  TF_VAR_lb_default_certificate: "arn:aws:iam::665817092260:server-certificate/LBEPACertificate"
+  TF_VAR_lb_extra_certificates: "[]"
+  TF_VAR_lb_internal: "true"
+
+  # Database variables
+  # cf. rds.tf
+  TF_VAR_db_instance_type: "db.t3.small"
+  TF_VAR_db_instance_count: 1
+
+  # Search variables
+  # cf. search.tf
+  TF_VAR_search_instance_type: "r5.xlarge.elasticsearch"
+  TF_VAR_search_instance_count: 1
+  TF_VAR_search_instance_storage: 10
+  TF_VAR_search_dedicated_node_type: ""
+  TF_VAR_search_dedicated_node_count: 0
+  TF_VAR_search_availability_zones: 2
+  
+  # Cache variables
+  # cf. cache.tf
+  TF_VAR_cache_instance_type: "cache.t3.small"
+  TF_VAR_cache_instance_count: 1
+
+  #IAM Prefix
+  TF_VAR_iam_prefix: "Customer"
 
 cache:
   key: development
