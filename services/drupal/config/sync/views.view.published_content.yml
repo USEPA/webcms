@@ -81,6 +81,7 @@ display:
             field_review_deadline: field_review_deadline
             name: name
             operations: operations
+            gid: gid
           info:
             nid:
               sortable: true
@@ -139,6 +140,13 @@ display:
               empty_column: false
               responsive: priority-low
             operations:
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            gid:
+              sortable: true
+              default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
@@ -234,11 +242,11 @@ display:
           settings:
             link_to_entity: true
           plugin_id: field
-        label:
-          id: label
-          table: groups_field_data
-          field: label
-          relationship: gid
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
           group_type: group
           admin_label: ''
           label: 'Web Area'
@@ -282,11 +290,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: value
-          type: string
+          click_sort_column: target_id
+          type: entity_reference_label
           settings:
-            link_to_entity: true
-          group_column: value
+            link: true
+          group_column: target_id
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -296,8 +304,8 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-          entity_type: group
-          entity_field: label
+          entity_type: group_content
+          entity_field: gid
           plugin_id: field
         type:
           id: type
@@ -625,29 +633,29 @@ display:
           plugin_id: string
           entity_type: node
           entity_field: title
-        label:
-          id: label
-          table: groups_field_data
-          field: label
-          relationship: gid
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
           group_type: group
           admin_label: ''
-          operator: contains
-          value: ''
+          operator: or
+          value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: label_op
+            operator_id: gid_op
             label: 'Web Area'
             description: ''
             use_operator: false
-            operator: label_op
+            operator: gid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: web-area
+            identifier: gid
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
@@ -657,14 +665,7 @@ display:
               system_editor: '0'
               system_webmaster: '0'
               administrator: '0'
-            placeholder: ''
-            autocomplete_filter: 1
-            autocomplete_min_chars: '0'
-            autocomplete_items: '10'
-            autocomplete_field: label
-            autocomplete_raw_suggestion: 1
-            autocomplete_raw_dropdown: 1
-            autocomplete_dependent: 0
+            reduce: false
           is_grouped: false
           group_info:
             label: ''
@@ -677,9 +678,20 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          entity_type: group
-          entity_field: label
-          plugin_id: views_autocomplete_filters_string
+          reduce_duplicates: false
+          handler: 'default:group'
+          handler_settings:
+            target_bundles:
+              web_area: web_area
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            auto_create_bundle: ''
+          widget: autocomplete
+          entity_type: group_content
+          entity_field: gid
+          plugin_id: entity_reference
         type:
           id: type
           table: node_field_data
@@ -898,17 +910,6 @@ display:
             'group_node:web_area': '0'
           entity_type: node
           plugin_id: group_content_to_entity_reverse
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
-          group_type: group
-          admin_label: Group
-          required: false
-          entity_type: group_content
-          entity_field: gid
-          plugin_id: standard
       show_admin_links: false
       filter_groups:
         operator: AND
