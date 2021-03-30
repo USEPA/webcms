@@ -64,21 +64,23 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // get the vid for this fpid from the current revision table to ensure
           // we're getting data for the current version of the reusable pane.
           $fpid = $id;
-          $vid = array_pop($this->d7Connection->select('fieldable_panels_panes', 'fpp')
+          $vid = $this->d7Connection->select('fieldable_panels_panes', 'fpp')
             ->fields('fpp', ['vid'])
             ->condition('fpp.fpid', $id)
             ->execute()
-            ->fetchCol());
+            ->fetchCol();
+          $vid = array_pop($vid);
           break;
 
         case 'vid':
           // If we are working with a 'vid' then the pane is not reusable. Let's
           // get the fpid for this vid from the revision table.
-          $fpid = array_pop($this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
+          $fpid = $this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
             ->fields('fppr', ['fpid'])
             ->condition('fppr.vid', $id)
             ->execute()
-            ->fetchCol());
+            ->fetchCol();
+          $fpid = array_pop($fpid);
           $vid = $id;
           break;
       }

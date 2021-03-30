@@ -90,7 +90,7 @@ class LinkWithEntityTitleOrLinkTextFormatter extends LinkFormatter {
       $url = $this->buildUrl($item);
 
       // If the url is internal, try to get the linked entity's title.
-      if (empty($settings['url_only']) && $url->isRouted()) {
+      if (empty($settings['url_only']) && $url->isRouted() && empty($item->title)) {
         $url_params = $url->getRouteParameters();
         $entity_type = key($url_params);
         $entity = $this->entityTypeManager->getStorage($entity_type)->load($url_params[$entity_type]);

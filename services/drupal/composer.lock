@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05caf3dc2d4482a6c3ca2351a83978ff",
+    "content-hash": "4571bb62d2504c7c9e1bca541eb253c6",
     "packages": [
         {
             "name": "akamai-open/edgegrid-auth",
@@ -3815,7 +3815,8 @@
                     "Validation for views datetime filter": "patches/views-exposed-datetime-validation-2.patch",
                     "Off-canvas style issues": "https://www.drupal.org/files/issues/2021-01-06/off-canvas-style-resets-2958588-13.patch",
                     "Fix off-canvas style issues that pertain to multi-select lists": "https://www.drupal.org/files/issues/2020-01-28/drupal_core-settings_tray_multiple_select_css-3080698-9.patch",
-                    "Fix method signatures (this fixes an error that gets thrown by Ultimate Cron)": "https://www.drupal.org/files/issues/2021-02-08/3128548-59.patch"
+                    "Fix method signatures (this fixes an error that gets thrown by Ultimate Cron)": "https://www.drupal.org/files/issues/2021-02-08/3128548-59.patch",
+                    "Add Views autocomplete filter for all entity reference fields": "https://www.drupal.org/files/issues/2021-03-06/2429699-389.patch"
                 }
             },
             "autoload": {
@@ -5955,6 +5956,9 @@
                         "status": "covered",
                         "message": "Covered by Drupal's security advisory policy"
                     }
+                },
+                "patches_applied": {
+                    "Fix validation problem where iframe would not dismiss": "https://www.drupal.org/files/issues/2021-03-22/layout_builder_iframe_modal-avoid_validation_ajax_trap-3202523-10.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -8089,17 +8093,11 @@
         },
         {
             "name": "drupal/smtp",
-            "version": "1.0.0",
+            "version": "dev-1.x",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/smtp.git",
-                "reference": "8.x-1.0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/smtp-8.x-1.0.zip",
-                "reference": "8.x-1.0",
-                "shasum": "c40cc7a3c20d3f743e3a4e53f4cc296748da89fd"
+                "reference": "84dce21833db85ce526e773dcda9471be887ccd7"
             },
             "require": {
                 "drupal/core": "^8.8 || ^9",
@@ -8110,16 +8108,20 @@
             },
             "type": "drupal-module",
             "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev",
+                    "dev-8.x-1.x": "1.x-dev"
+                },
                 "drupal": {
-                    "version": "8.x-1.0",
-                    "datestamp": "1601070985",
+                    "version": "8.x-1.0+5-dev",
+                    "datestamp": "1605911243",
                     "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
+                        "status": "not-covered",
+                        "message": "Dev releases are not covered by Drupal security advisories."
                     }
                 },
-                "branch-alias": {
-                    "dev-8.x-1.x": "1.x-dev"
+                "patches_applied": {
+                    "Fixes invalid address: (Reply-To) error": "https://www.drupal.org/files/issues/2021-03-11/smtp_invalid-address_reply-to_3191046_13.patch"
                 }
             },
             "notification-url": "https://packages.drupal.org/8/downloads",
@@ -8161,7 +8163,8 @@
             "support": {
                 "source": "https://git.drupalcode.org/project/smtp",
                 "issues": "https://www.drupal.org/project/issues/smtp"
-            }
+            },
+            "time": "2020-11-20T22:27:04+00:00"
         },
         {
             "name": "drupal/structure_sync",
@@ -9512,8 +9515,7 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "patches_applied": {
-                    "Fix autocomplete": "https://www.drupal.org/files/issues/2021-03-02/viewsreference_filter-autocomplete_problems-3201294-2.patch",
-                    "Provide mechanism to override exposed sorts.": "https://www.drupal.org/files/issues/2021-02-09/viewsreference_filter-exposed_sorts-3168765-4.patch",
+                    "Fix autocomplete": "https://www.drupal.org/files/issues/2021-03-26/viewsreference_filter-autocomplete_problems-and-sort-combined-3201294-6--3168765-4.patch",
                     "Allow different settings for different blocks": "https://www.drupal.org/files/issues/2020-10-20/viewsreference_filter-shared_config-3132416-3.patch",
                     "Fix views dependency declaration": "https://git.drupalcode.org/project/viewsreference_filter/-/merge_requests/1.diff"
                 }
@@ -17609,6 +17611,7 @@
         "drupal/redirect_metrics": 5,
         "drupal/samlauth": 20,
         "drupal/shield": 20,
+        "drupal/smtp": 20,
         "drupal/webform_migrate": 20,
         "drupal_git/custom_add_another": 20,
         "drupal_git/date_range_formatter": 20,

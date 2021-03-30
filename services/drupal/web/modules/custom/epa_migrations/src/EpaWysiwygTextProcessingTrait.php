@@ -499,6 +499,11 @@ trait EpaWysiwygTextProcessingTrait {
         $term = $element->firstChild->nodeValue;
         $definition = $element->lastChild->lastChild->nodeValue;
 
+        // Ensure the last child is a DOMElement and extract the name attribute.
+        if ($element->lastChild->nodeType == 1) {
+          $definition_name_attr = $element->lastChild->getAttribute('name');
+        }
+
         // Build the new element.
         $button_element = $doc->createElement('button', $term);
         $button_element->setAttribute('class', 'definition__trigger js-definition__trigger');
@@ -509,6 +514,10 @@ trait EpaWysiwygTextProcessingTrait {
         $span_element = $doc->createElement('span');
         $span_element->setAttribute('class', 'definition__tooltip js-definition__tooltip');
         $span_element->setAttribute('role', 'tooltip');
+        if (!empty($definition_name_attr)) {
+          $span_element->setAttribute('name', $definition_name_attr);
+        }
+
         $span_element->appendChild($dfn_element);
 
         $definition_text_node = $doc->createTextNode($definition);

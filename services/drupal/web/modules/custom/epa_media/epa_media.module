@@ -13,6 +13,7 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
+use Drupal\media\IFrameMarkup;
 use Drupal\media\MediaInterface;
 
 /**
@@ -89,7 +90,7 @@ function epa_media_media_delete(MediaInterface $media) {
 /**
  * Implements hook_form_alter().
  */
-function epa_media_form_media_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+function epa_media_form_media_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $media = $form_state->getFormObject()->getEntity();
   // Only proceed if media exists and has the field we care about.
   if ($media->id() && $media->hasField('field_limit_file_accessibility')) {
@@ -100,5 +101,24 @@ function epa_media_form_media_form_alter(&$form, \Drupal\Core\Form\FormStateInte
         $form['field_limit_file_accessibility']['#access'] = FALSE;
       }
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function epa_media_preprocess_media_library_wrapper(&$variables) {
+  // Adds CSS to space the tabs correctly in the media picker since we swapped
+  // their positions.
+  $variables['#attached']['library'][] =  'epa_media/swap-picker-tabs';
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function epa_media_preprocess_media_oembed_iframe(&$variables)
+{
+  if (strpos((string) $variables['media'], 'youtube.com') !== FALSE) {
+    $variables['media'] = IFrameMarkup::create(str_replace('youtube.com/', 'youtube-nocookie.com/', $variables['media']));
   }
 }
