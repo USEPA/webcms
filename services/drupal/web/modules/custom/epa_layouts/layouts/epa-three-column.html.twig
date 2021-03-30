@@ -13,20 +13,24 @@
 {% endif %}
 
 {% if columns > 1 %}
-  <div class="l-grid l-grid--{{ columns }}-col">
-
+  {%
+    set classes = [
+    'l-grid',
+    'l-grid--' ~ columns  ~ '-col'
+  ]
+  %}
+  <div{{ attributes.addClass(classes) }}>
     {% if content.first|render %}
-      <div>{{ content.first }}</div>
+      <div{{ region_attributes.first }}>{{ content.first }}</div>
     {% endif %}
 
     {% if content.second|render %}
-      <div>{{ content.second }}</div>
+      <div{{ region_attributes.second }}>{{ content.second }}</div>
     {% endif %}
 
     {% if content.third|render %}
-      <div>{{ content.third }}</div>
+      <div{{ region_attributes.third }}>{{ content.third }}</div>
     {% endif %}
-
   </div>
 {% else %}
   {{ content.first }}
