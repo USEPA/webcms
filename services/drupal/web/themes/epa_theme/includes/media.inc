@@ -50,3 +50,9 @@ function epa_theme_preprocess_responsive_image(&$vars) {
     $vars['img_element']['#attributes']['class'][] = 'box__image';
   }
 }
+
+function epa_theme_preprocess_image(&$vars) {
+  if (empty($vars['attributes']['alt'])) {
+    $vars['attributes']['alt'] = '';
+  }
+}
