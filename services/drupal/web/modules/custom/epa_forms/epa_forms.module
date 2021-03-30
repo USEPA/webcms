@@ -30,7 +30,7 @@ function epa_forms_node_insert(EntityInterface $entity) {
     $id .= '_' . $entity->id();
 
     $settings = Webform::getDefaultSettings();
-    $settings['form_remote_addr'] = FALSE;
+    $settings['form_disable_remote_addr'] = TRUE;
 
     $webform = Webform::create([
       'id' => $id,
@@ -102,8 +102,8 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
       break;
 
     case 'webform_settings_submissions_form':
-      if (isset($form['submission_behaviors']['form_remote_addr'])) {
-        $form['submission_behaviors']['form_remote_addr']['#access'] = FALSE;
+      if (isset($form['submission_behaviors']['form_disable_remote_addr'])) {
+        $form['submission_behaviors']['form_disable_remote_addr']['#access'] = FALSE;
       }
       break;
   }
