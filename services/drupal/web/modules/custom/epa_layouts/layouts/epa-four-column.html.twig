@@ -23,8 +23,6 @@
       'l-grid--' ~ columns  ~ '-col'
   ]
   %}
-{%  endif %}
-
 <div{{ attributes.addClass(classes) }}>
   {% if content.first|render %}
     <div{{ region_attributes.first }}>{{ content.first }}</div>
@@ -42,3 +40,9 @@
     <div{{ region_attributes.fourth }}>{{ content.fourth }}</div>
   {% endif %}
 </div>
+{% else %}
+  {{ content.first }}
+  {{ content.second }}
+  {{ content.third }}
+  {{ content.fourth }}
+{% endif %}
