@@ -111,6 +111,16 @@ function epa_media_preprocess_media_library_wrapper(&$variables) {
   // Adds CSS to space the tabs correctly in the media picker since we swapped
   // their positions.
   $variables['#attached']['library'][] =  'epa_media/swap-picker-tabs';
+
+  if (isset($variables["element"]["menu"]["#links"]) && is_array($variables["element"]["menu"]["#links"])) {
+    foreach ($variables["element"]["menu"]["#links"] as $key => $link) {
+      if (isset($link['url'])) {
+        $query = $link['url']->getOption('query');
+        $query['views_display_id'] = 'widget_table';
+        $link['url']->setOption('query', $query);
+      }
+    }
+  }
 }
 
 /**
