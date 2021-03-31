@@ -12,12 +12,12 @@ export default function(threshold = 200, smoothScroll = true) {
       backToTop.setAttribute('aria-hidden', 'true');
       const scrollHandler = () => {
         if (
-          window.scrollY >= threshold &&
+          window.pageYOffset >= threshold &&
           backToTop.getAttribute('aria-hidden') === 'true'
         ) {
           backToTop.setAttribute('aria-hidden', 'false');
         } else if (
-          window.scrollY < threshold &&
+          window.pageYOffset < threshold &&
           backToTop.getAttribute('aria-hidden', 'false')
         ) {
           backToTop.setAttribute('aria-hidden', 'true');
