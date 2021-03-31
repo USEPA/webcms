@@ -24,3 +24,4 @@ __Variables:__
   * url: [string] URL for footer link.
   * icon: [string] Name of icon to the left of the footer text.
   * text: [string] Footer text.
+* role: [string] Optional ARIA role.
