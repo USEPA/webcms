@@ -71,7 +71,7 @@ resource "mysql_grant" "d8_grant" {
 
   user       = mysql_user.d8_user[each.key].user
   host       = mysql_user.d8_user[each.key].host
-  database   = mysql_database.d7_database[each.key].name
+  database   = mysql_database.d8_database[each.key].name
   privileges = ["ALL PRIVILEGES"]
 }
 
