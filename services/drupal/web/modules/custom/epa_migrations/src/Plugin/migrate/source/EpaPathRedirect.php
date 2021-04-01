@@ -19,6 +19,7 @@ class EpaPathRedirect extends PathRedirect {
     $query = $this->select('redirect', 'p')->fields('p');
     $query->leftJoin('url_alias', 'a', 'a.source = p.redirect');
     $query->where('a.alias != p.source OR a.source IS NULL');
+    $query->distinct();
     return $query;
   }
 }
