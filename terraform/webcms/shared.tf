@@ -163,10 +163,8 @@ locals {
 
   drupal_secrets = [
     { name = "WEBCMS_DB_CREDS", valueFrom = data.aws_ssm_parameter.db_d8_credentials.value },
-    { name = "WEBCMS_DB_NAME", valueFrom = "${data.aws_ssm_parameter.db_d8_credentials.value}:username" },
 
     { name = "WEBCMS_DB_CREDS_D7", valueFrom = data.aws_ssm_parameter.db_d7_credentials.value },
-    { name = "WEBCMS_DB_NAME_D7", valueFrom = "${data.aws_ssm_parameter.db_d7_credentials.value}:username" },
 
     { name = "WEBCMS_HASH_SALT", valueFrom = data.aws_ssm_parameter.hash_salt.value },
     { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_ssm_parameter.mail_pass.value },
@@ -196,6 +194,8 @@ locals {
 
     # DB info
     { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
+    { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },
+    { name = "WEBCMS_DB_NAME_D7", valueFrom = "webcms_${var.site}_${var.lang}_d7" },
 
     # Mail
     { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
