@@ -60,7 +60,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
     # because nginx is specialized for HTTP server tasks, and any task we can perform in
     # nginx removes some of the PHP overhead.
     {
-      name = "nginx"
+      name  = "nginx"
       image = "${data.aws_ssm_parameter.ecr_nginx.value}:${var.image_tag}"
 
       # Docker labels are how we communicate our routing preferences to Traefik. These settings
@@ -191,7 +191,7 @@ resource "aws_ecs_service" "drupal" {
 
   # Since we are referencing JSON keys in secrets, we need to use platform version 1.4.0 (this is
   # not yet LATEST at the time of writing).
-  launch_type = "FARGATE"
+  launch_type      = "FARGATE"
   platform_version = "1.4.0"
 
   deployment_controller {
