@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: Tmx2AmN_dNNzZPceCIs9wGq8kavafYIQ3z8scqtrHpY
+  default_config_hash: AmUMdzeaQ-tnVhBop7WnIJDOo66FXyC2Nv8Hp9sTDQ8
 id: upgrade_d7_node_news_release
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -213,17 +213,16 @@ process:
         target_id: tid
   field_type:
     -
-      plugin: sub_process
-      source: field_type
-      process:
-        target_id:
-          -
-            plugin: default_value
-            default_value: 'News Release'
-          -
-            plugin: entity_lookup
-            entity_type: taxonomy_term
-            value_key: name
+      plugin: default_value
+      default_value: 'News Release'
+    -
+      plugin: entity_generate
+      entity_type: taxonomy_term
+      value_key: name
+      bundle_key: vid
+      bundle: type
+      default_values:
+        field_term_days_til_review: '730'
   field_metatag:
     -
       plugin: d7_metatag_entities

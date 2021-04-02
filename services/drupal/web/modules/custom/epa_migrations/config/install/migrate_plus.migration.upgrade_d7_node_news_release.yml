@@ -211,17 +211,17 @@ process:
         target_id: tid
   field_type:
     -
-      plugin: sub_process
-      source: field_type
-      process:
-        target_id:
-          -
-            plugin: default_value
-            default_value: 'News Release'
-          -
-            plugin: entity_lookup
-            entity_type: taxonomy_term
-            value_key: name
+      plugin: default_value
+      default_value: 'News Release'
+    -
+      plugin: entity_generate
+      entity_type: taxonomy_term
+      value_key: name
+      bundle_key: vid
+      bundle: type
+      default_values:
+        field_term_days_til_review: '730'
+
   field_metatag:
     -
       plugin: d7_metatag_entities
