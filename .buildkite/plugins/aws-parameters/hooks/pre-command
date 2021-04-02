@@ -1,33 +1,56 @@
 #!/bin/bash
 
-# This script downloads AWS Parameter Store values and saves them as files to the checkout
-# prior to the Buildkite command step executing, making it ideal to load configuration
-# files.
+# This script loads AWS Parameter Store values and either saves them to the file system or
+# exports them as environment variables.
+#
+# The plugin's configuration schema is as follows:
+#
+# plugins:
+# - ./.buildkite/plugins/aws-parameters:
+#     params:
+#     - key: /parameter/store/path
+#       file: /path/to/file
+#
+# Both 'key' and 'file' are required.
+
+# A small bash syntax note: ${!foo} is dereference syntax; if foo=BAR, then ${!foo} is the
+# same as ${BAR}, which is how we can create keys and read their values dynamically.
 
 set -euo pipefail
 
-echo "~~~ :aws: Loading parameters..."
+echo "~~~ :aws: Loading parameters"
 
-# Usage:
-#   get-parameter NAME FILE
-#
-# NAME: The name of a Parameter Store parameter. The prefix /buildkite/terraform is
-#       automatically applied.
-# FILE: The destination file in the infrastructure/terraform directory.
-#
-# This function copies an AWS Parameter Store parameter into a destination file. This is
-# mostly intended to be used for downloading data to be used during the Terraform-related
-# steps.
-get-parameter() {
-  local -r name="/buildkite/terraform/$1"
-  local -r file="infrastructure/terraform/$2"
+i=0
+while true; do
+  prefix="BUILDKITE_PLUGIN_AWS_PARAMETERS_PARAMS_${i}"
 
-  aws ssm get-parameter --name "$name" |
-    jq -r '.Parameter.Value' \
-      >"$file"
+  key_name="${prefix}_KEY"
+  file_name="${prefix}_FILE"
 
-  echo "Loaded parameter $name into $file"
-}
+  # If there is no key variable at this location, we assume we've reached the end of the
+  # parameter list.
+  if test -z "${!key_name:-}"; then
+    break
+  fi
 
-get-parameter backend-config backend.config
-get-parameter "variables-$WEBCMS_ENVIRONMENT" terraform.tfvars
+  # On the other hand, if the file is missing, this is a hard configuration error and we
+  # cannot proceed.
+  if test -z "${!file_name:-}"; then
+    echo "A file name is required to save the parameter '${!key_name}'" >&2
+    echo "^^^ +++"
+    exit 1
+  fi
+
+  key="${!key_name}"
+  file="${!file_name}"
+
+  echo "Loading $key into $file"
+
+  aws --out text \
+    ssm get-parameter \
+      --name "$key" \
+      --query 'Parameter.Value' \
+    >"$file"
+
+  i=$((i + 1))
+done

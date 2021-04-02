@@ -2,48 +2,55 @@
 # which branch this build is for. Feature branches only perform basic validation steps,
 # whereas for the main and integration branches, we perform a full deployment.
 
+env:
+  # Common image tag used across steps
+  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
+
+  # Base URL for image repositories
+  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-2.amazonaws.com
+
 steps:
+  # For all feature branches, only perform build & validation steps. Nothing is deployed
+  # in this pipeline.
   - label: ":pipeline: Feature"
     if: build.branch != "main" && build.branch != "integration"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
-      # We specify the staging environment since most feature branches target main instead
+      # We specify the staging site since most feature branches target main instead
       # of integration
-      WEBCMS_ENVIRONMENT: stage
-      WEBCMS_WORKSPACE: stage
+      WEBCMS_ENVIRONMENT: preproduction
+      WEBCMS_SITE: stage
 
-  # Upload the deploy pipeline from integration to the dev environment, disregarding PRs
+  # Steps below this line are gated by build.branch matching a specific branch, and
+  # build.pull_request_id == null, which prevents Buildkite from doing deployments if the
+  # targeted branch is the source in a PR. (This is a rare but observed occurrence.)
+  - label: ":pipeline: Infrastructure"
+    if: build.branch == "integration" && build.pull_request.id == null
+
+    command: buildkite-agent pipeline upload .buildkite/infrastructure.yml
+    env:
+      WEBCMS_ENVIRONMENT: preproduction
+
+  # As with the above wait, we have to ensure the infrastructure was successfully deployed
+  # before continuing. (Note that in the case of non-main branches, the network and
+  # infrastructure steps are skipped, and the waits incur no penalty.)
+  - wait: ~
+
+  # On the integration branch, we deploy the dev site
   - label: ":pipeline: Dev"
     if: build.branch == "integration" && build.pull_request.id == null
 
-    command: buildkite-agent pipeline upload .buildkite/deploy.yml
+    command: buildkite-agent pipeline upload .buildkite/webcms.yml
     env:
-      WEBCMS_ENVIRONMENT: dev
-      WEBCMS_WORKSPACE: default
+      WEBCMS_ENVIRONMENT: preproduction
+      WEBCMS_SITE: dev
 
-  # Upload the deploy pipeline from main to the stage environment, disregarding PRs
+  # On the main branch, we deploy the stage site
   - label: ":pipeline: Stage"
     if: build.branch == "main" && build.pull_request.id == null
 
-    command: buildkite-agent pipeline upload .buildkite/deploy.yml
+    command: buildkite-agent pipeline upload .buildkite/webcms.yml
     env:
-      WEBCMS_ENVIRONMENT: stage
-      WEBCMS_WORKSPACE: stage
-
-  # Also on the main branch, deploy to the Spanish-language test environment
-  - label: ":pipeline: Español"
-    if: build.branch == "main" && build.pull_request.id == null
-
-    command: buildkite-agent pipeline upload .buildkite/deploy.yml
-    env:
-      WEBCMS_ENVIRONMENT: espanol
-      WEBCMS_WORKSPACE: espanol
-
-  - label: ":pipeline: QA"
-    if: build.branch == "main" && build.pull_request.id == null
-
-    command: buildkite-agent pipeline upload .buildkite/deploy.yml
-    env:
-      WEBCMS_ENVIRONMENT: qa
-      WEBCMS_WORKSPACE: qa
+      WEBCMS_ENVIRONMENT: preproduction
+      WEBCMS_SITE: stage

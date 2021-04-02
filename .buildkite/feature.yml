@@ -4,95 +4,56 @@
 env:
   # Ensure all jobs use these values from the agent environment
   WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
-  WEBCMS_WORKSPACE: ${WEBCMS_WORKSPACE}
-
-  # Common image tag used across steps
-  WEBCMS_IMAGE_TAG: $BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER
-
-  # Base URL for image repositories
-  WEBCMS_REPO_URL: 316981092358.dkr.ecr.us-east-1.amazonaws.com
+  WEBCMS_SITE: ${WEBCMS_SITE}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG}
+  WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
 
 steps:
   - label: ":docker: Build images"
-    command: bash .buildkite/docker-build.sh
+    command: bash .buildkite/build-images.sh
 
     # Limit build concurrency to 1 per branch: this throttles overlapping builds
-    concurrency_group: epa-webcms-d8/build-$BUILDKITE_BRANCH
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
     concurrency: 1
 
     plugins:
-      # Assume cross-account build role
-      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
+      # Assume cross-account build role. We don't log in directly to ECR as Kaniko is able
+      # to do that for us.
+      - cultureamp/aws-assume-role#v0.1.0:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
 
-      # Log in to ECR repositories
-      # NB. This is not the latest version of the plugin, but we have to downgrade in order
-      # to play nice with aws-assume-role.
-      - ecr#v1.2.0:
-          login: true
-          no-include-email: true
-
+  # Perform a Terraform formatting check. See the terraform-fmt.sh script for more details
+  # on what is executed in this step.
   - label: ":terraform: Formatting"
     plugins:
       - docker#v3.5.0:
-          image: hashicorp/terraform:0.12.29
+          image: hashicorp/terraform:0.14.9
           entrypoint: /bin/sh
-          command:
-            - -ec
-            # Use terraform fmt's diff to verify that the templates meet formatting
-            # standards
-            - |
-              cd infrastructure/terraform
-              terraform fmt -diff -check
+          command: [.buildkite/terraform-fmt.sh]
 
-  - label: ":terraform: Plan"
+  # For feature branches, we plan three modules: network, infrastructure, and webcms. This
+  # way, all branches can be evaluated for their potential impact on existing
+  # infrastructure. These plans can all be executed in parallel, meaning that they should
+  # have only a minimal impact on build time.
 
-    # Only allow one Terraform run at a time on a per-workspace basis.
-    concurrency_group: epa-webcms-d8/terraform-$WEBCMS_WORKSPACE
-    concurrency: 1
+  - label: ":pipeline: :terraform: network"
+    command: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/network
+      WEBCMS_TF_MODULE: network
 
-    plugins:
-      # Assume the Terraform role for maximum permissions
-      - cultureamp/aws-assume-role#28c5ceccb0d5cbef2c592a57579fd4c6a2869bd7:
-          role: arn:aws:iam::316981092358:role/BuildkiteRoleForTerraform
-          # Use a 30-minute duration for credentials to minimize the time spent in this
-          # nearly-administrative role
-          duration: 1800
+  - label: ":pipeline: :terraform: infrastructure"
+    command: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/infrastructure
+      WEBCMS_TF_MODULE: infrastructure
 
-      # Load AWS parameters: we do this here because hashicorp/terraform does not include
-      # the AWS CLI, so we need to obtain these configuration values before executing
-      # Terraform in Docker.
-      - ./.buildkite/plugins/aws-parameters: {}
-
-      # Perform a Terraform plan in the provided Docker image
-      - docker#v3.5.0:
-          image: hashicorp/terraform:0.12.29
-          entrypoint: /bin/sh
-          command:
-            - -ec
-            # Script steps:
-            # 1. In the terraform directory, initialize the plugins
-            # 2. Select the current workspace
-            # 3. Perform an in-memory plan to show what resources would change as a result
-            #    of the templates.
-            - |
-              cd infrastructure/terraform
-
-              terraform init -input=false -backend-config=backend.config
-              terraform workspace select "$WEBCMS_WORKSPACE"
-
-              terraform plan \
-                -input=false \
-                -var image-tag-drupal="$WEBCMS_IMAGE_TAG" \
-                -var image-tag-drush="$WEBCMS_IMAGE_TAG" \
-                -var image-tag-nginx="$WEBCMS_IMAGE_TAG"
-
-          environment:
-            # Forward build variables
-            - WEBCMS_IMAGE_TAG
-            - WEBCMS_WORKSPACE
-
-            # Forward STS-assumed credentials
-            - AWS_ACCESS_KEY_ID
-            - AWS_SECRET_ACCESS_KEY
-            - AWS_SESSION_TOKEN
+  # We arbitrarily choose English for a Terraform plan. The two sites' configurations
+  # should not be so different that this will miss subtleties with Spanish-language
+  # deployments.
+  - label: ":pipeline: :terraform: webcms"
+    command: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/en
+      WEBCMS_TF_MODULE: webcms
+      WEBCMS_LANG: en

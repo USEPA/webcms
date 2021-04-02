@@ -1,0 +1,69 @@
+# This file performs a deployment of the WebCMS to a specific site. It covers both English
+# and Spanish, and deploys them in parallel.
+#
+# The steps executed by this pipeline are as follows:
+#
+# 1. First, use Kaniko to build this project's Docker images. The images share enough
+#    layers that we deem it cheaper to build them all on the same host instead of
+#    parallelizing.
+# 2. We use a wait step to force Buildkite to pause until the image build completed
+#    successfully. If the build failed, then we most likely wouldn't have a full set of
+#    images to deploy and thus wouldn't be able to continue safely.
+# 3. We use the terraform.apply.yml template to
+
+steps:
+  - label: ":docker: Build images"
+    command: bash .buildkite/build-images.sh
+
+    # Limit Docker builds to one per branch, to avoid overutilizing the Buildkite agent
+    # pool.
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
+    concurrency: 1
+
+    plugins:
+      # While Kaniko has native support for authenticating with ECR, it does not have any
+      # support for AssumeRole-based credentials. We have to assume the role here, and
+      # rely on the build-images.sh script to propagate the authentication variables into
+      # the Kaniko container.
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+
+  - wait: ~
+
+  - label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/en
+      WEBCMS_TF_MODULE: webcms
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: en
+
+  - label: ":terraform: WebCMS (${WEBCMS_SITE}-es)"
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/es
+      WEBCMS_TF_MODULE: webcms
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: es
+
+  - wait: ~
+
+  - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
+    depends_on:
+      - terraform-${WEBCMS_SITE}-en
+
+    command: bash .buildkite/run-drush.sh
+    env:
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: en
+
+  - label: ":ecs: Drush (${WEBCMS_SITE}-es)"
+    depends_on:
+      - terraform-${WEBCMS_SITE}-es
+
+    command: bash .buildkite/run-drush.sh
+    env:
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: en

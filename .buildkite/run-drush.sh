@@ -2,9 +2,12 @@
 
 set -euo pipefail
 
-task_definition="webcms-drush-$WEBCMS_ENVIRONMENT"
-cluster="webcms-cluster-$WEBCMS_ENVIRONMENT"
-started_by="build/$WEBCMS_IMAGE_TAG"
+# Hard fail immediately if none of these required variables are set.
+
+: "${WEBCMS_ENVIRONMENT:?The variable WEBCMS_ENVIRONMENT is required}"
+: "${WEBCMS_SITE:?The variable WEBCMS_SITE is required}"
+: "${WEBCMS_LANG:?The variable WEBCMS_LANG is required}"
+: "${WEBCMS_IMAGE_TAG:?The variable WEBCMS_IMAGE_TAG is required}"
 
 # This multi-line string is our Drush update script
 # shellcheck disable=SC2016
@@ -14,6 +17,20 @@ drush --debug --uri="$WEBCMS_SITE_URL" cr
 drush --debug --uri="$WEBCMS_SITE_URL" cim -y
 drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
 drush --debug --uri="$WEBCMS_SITE_URL" cr'
+
+get_ssm_parameter() {
+  aws \
+      --out text \
+    ssm get-parameter \
+      --name "/webcms/$WEBCMS_ENVIRONMENT/$1" \
+      --query Parameter.Value
+}
+
+drush_family="webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_LANG-drush"
+drupal_family="webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_LANG-drupal"
+
+cluster="$(get_ssm_parameter ecs/cluster-name)"
+started_by="build/$WEBCMS_IMAGE_TAG"
 
 # Use jq to format the container overrides in a way that plays nicely with AWS ECS'
 # character count limitations on JSON input, as well as avoids potential issues with
@@ -31,7 +48,12 @@ overrides="$(
 '
 )"
 
-network_configuration="$(cat drushvpc.json)"
+private_subnets="$(get_ssm_parameter vpc/private-subnets)"
+security_group="$(get_ssm_parameter security-groups/drupal)"
+
+# This is the shorthand object for AWSVPC network configuration. See `aws vpc run-task
+# help` for more.
+network_configuration="awsvpcConfiguration={subnets=[$private_subnets],securityGroups=[$security_group],assignPublicIp=DISABLED}"
 
 # First, stop the running Drupal tasks. We do this here to avoid an issue where requests
 # to containers running old versions of the Drupal task family may inadvertently cause
@@ -44,7 +66,7 @@ echo "--- Stopping Drupal Tasks"
 # The list-tasks command produces a JSON object like {taskArns: ["task", "task"]}, but the
 # stop-task API only accepts one task. This pipeline uses jq to print task ARNs line by line.
 task_list="$(
-  aws ecs list-tasks --cluster "$cluster" --family "webcms-drupal-$WEBCMS_ENVIRONMENT" |
+  aws ecs list-tasks --cluster "$cluster" --family "$drupal_family" |
   jq -r '.taskArns[]'
 )"
 
@@ -69,7 +91,7 @@ echo "--- Running Drush"
 
 # Output all of the information we need to know what we've passed on to AWS
 cat <<EOF
-Task definition: $task_definition
+Task definition: $drush_family
 Cluster: $cluster
 Started by: $started_by
 
@@ -86,7 +108,7 @@ EOF
 # Run a Drush task, capturing the result for inspection
 result="$(
   aws ecs run-task \
-    --task-definition "$task_definition" \
+    --task-definition "$drush_family" \
     --cluster "$cluster" \
     --overrides "$overrides" \
     --network-configuration "$network_configuration" \

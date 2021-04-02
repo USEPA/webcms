@@ -60,3 +60,58 @@ resource "aws_ecr_repository" "traefik_mirror" {
 
   tags = var.tags
 }
+
+# Finally, we create a cache repository for Kaniko-based builds. This repository has some
+# lifecycle policies that aggressively expire images in order to avoid an arbitrarily large
+# cache from building up (see below).
+resource "aws_ecr_repository" "kaniko_cache" {
+  name = "webcms-${var.environment}-cache"
+
+  tags = var.tags
+}
+
+# The cache repository has two expiration rules:
+# 1. If for any reason an image is untagged, expire it after 48 hours.
+# 2. All images expire after two weeks.
+#
+# These rules are designed to strike a balance between ECR storage costs and build
+# convenience.
+resource "aws_ecr_lifecycle_policy" "kaniko_cache" {
+  repository = aws_ecr_repository.kaniko_cache.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Quickly expire untagged images"
+
+        selection = {
+          tagStatus   = "untagged"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 2
+        }
+
+        action = {
+          type = "expire"
+        }
+      },
+
+      {
+        rulePriority = 2
+        description  = "Expire all images"
+
+        selection = {
+          tagStatus   = "any"
+          countType   = "sinceImagePushed"
+          countUnit   = "days"
+          countNumber = 14
+        }
+
+        action = {
+          type = "expire"
+        }
+      },
+    ]
+  })
+}
