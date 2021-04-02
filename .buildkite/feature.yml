@@ -10,7 +10,7 @@ env:
 
 steps:
   - label: ":docker: Build images"
-    command: bash .buildkite/docker-build.sh
+    command: bash .buildkite/build-images.sh
 
     # Limit build concurrency to 1 per branch: this throttles overlapping builds
     concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
@@ -27,9 +27,9 @@ steps:
   - label: ":terraform: Formatting"
     plugins:
       - docker#v3.5.0:
-          image: hashicorp/terraform:${TERRAFORM_VERSION}
+          image: hashicorp/terraform:v0.14.9
           entrypoint: /bin/sh
-          command: .buildkite/terraform-fmt.sh
+          command: [.buildkite/terraform-fmt.sh]
 
   # For feature branches, we plan three modules: network, infrastructure, and webcms. This
   # way, all branches can be evaluated for their potential impact on existing

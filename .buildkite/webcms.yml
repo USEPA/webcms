@@ -13,7 +13,7 @@
 
 steps:
   - label: ":docker: Build images"
-    command: bash .buildkite/docker-build.sh
+    command: bash .buildkite/build-images.sh
 
     # Limit Docker builds to one per branch, to avoid overutilizing the Buildkite agent
     # pool.
@@ -23,7 +23,7 @@ steps:
     plugins:
       # While Kaniko has native support for authenticating with ECR, it does not have any
       # support for AssumeRole-based credentials. We have to assume the role here, and
-      # rely on the docker-build.sh script to propagate the authentication variables into
+      # rely on the build-images.sh script to propagate the authentication variables into
       # the Kaniko container.
       - cultureamp/aws-assume-role#v0.1.0:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
