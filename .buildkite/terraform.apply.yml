@@ -15,7 +15,7 @@ env:
   WEBCMS_LANG: ${WEBCMS_LANG:-}
 
 steps:
-  - label: ":terraform: ${WEBCMS_TF_MODULE} (${WEBCMS_SITE} ${WEBCMS_LANG})"
+  - label: ":terraform: Apply ${WEBCMS_TF_MODULE} (${WEBCMS_SITE} ${WEBCMS_LANG})"
 
     concurrency_group: $BUILDKITE_PIPELINE_SLUG/terraform-${WEBCMS_TF_MODULE}-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-${WEBCMS_LANG}
     concurrency: 1
