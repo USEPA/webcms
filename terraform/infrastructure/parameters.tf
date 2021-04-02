@@ -133,7 +133,7 @@ resource "aws_ssm_parameter" "ecr_nginx" {
 }
 
 resource "aws_ssm_parameter" "ecr_drush" {
-for_each = local.sites
+  for_each = local.sites
 
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/drush"
   type  = "String"
@@ -143,7 +143,7 @@ for_each = local.sites
 }
 
 resource "aws_ssm_parameter" "ecr_metrics" {
-for_each = local.sites
+  for_each = local.sites
 
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/metrics"
   type  = "String"
