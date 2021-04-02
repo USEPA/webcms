@@ -26,7 +26,7 @@ steps:
   # build.pull_request_id == null, which prevents Buildkite from doing deployments if the
   # targeted branch is the source in a PR. (This is a rare but observed occurrence.)
   - label: ":pipeline: Infrastructure"
-    if: build.branch == "integration" && build.pull_request_id == null
+    if: build.branch == "integration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/infrastructure.yml
     env:
