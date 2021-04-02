@@ -1,0 +1,51 @@
+steps:
+  # Apply any pending updates to the VPC for this environment
+  - label: ":pipeline: :terraform: network"
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
+    env:
+      WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+      WEBCMS_TF_MODULE: network
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/network
+
+  # Copy images from the Docker Hub into the AWS perimeter
+  - label: ":docker: Mirror Images"
+    command:
+      # Traefik (used for routing behind the NLB)
+      - docker pull traefik:2.4
+      - docker tag traefik:2.4 ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:2.4
+      - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:2.4
+
+      # AWS CloudWatch agent (used to send statsd metrics)
+      - docker pull amazon/cloudwatch-agent
+      - docker tag amazon/cloudwatch-agent ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch
+      - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch
+
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/mirror-$BUILDKITE_BRANCH
+    concurrency: 1
+
+    plugins:
+      # First, assume the cross-account Docker build role
+      - cultureamp/aws-assume-role#aea2dc1ae6be19eec04de73518ef3f0070ae5f41:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+
+      # Next, log in using the assumed role to the
+      - ecr#v2.3.0:
+          login: true
+          region: us-east-2
+          no-include-email: true
+
+  # Wait on the above to to succeed before continuing
+  - wait: ~
+
+  # Next, we apply pending updates to the infrastructure (i.e., AWS resources & services).
+  # This step has to wait for the VPC due to the dependency on networking component IDs
+  # (subnets, security groups, and the VPC itself).
+  - label: ":pipeline: :terraform: infrastructure"
+    if: build.branch == "main" && build.pull_request.id == null
+
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+    env:
+      WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+      WEBCMS_TF_MODULE: infrastructure
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/infrastructure
