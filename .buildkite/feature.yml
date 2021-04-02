@@ -37,7 +37,7 @@ steps:
   # have only a minimal impact on build time.
 
   - label: ":pipeline: :terraform: network"
-    comand: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
+    command: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
     env:
       WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/network
       WEBCMS_TF_MODULE: network
