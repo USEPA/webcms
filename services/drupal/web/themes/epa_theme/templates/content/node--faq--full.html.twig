@@ -1,0 +1,95 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
+{% set header_info %}
+  {% if nav_style == 'sidebar_navigation' %}
+    {% if node.field_wide_template.value %}
+      {% set display_sidenav = false %}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
+    {% else %}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+    {% endif %}
+  {% else %}
+    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+  {% endif %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
+{% set local_tasks %}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+  {{ content.epa_content_moderation_control }}
+{% endset %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set has_footer = false %}
+
+{% if footer|render|striptags|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
+
+{% if display_sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': content.field_question,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': content|without('epa_content_moderation_control', 'field_question'),
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': content.field_question,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': content|without('epa_content_moderation_control', 'field_question'),
+    'footer': footer,
+  } %}
+{% endif %}
