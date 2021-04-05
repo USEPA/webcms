@@ -29,7 +29,7 @@ if test -n "$role_arn"; then
   if ! output="$(
     aws sts assume-role \
       --role-arn "$role_arn" \
-      --role-session-name "$BUILDKITE_PIPELINE_SLUG/$BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER"
+      --role-session-name "$BUILDKITE_PIPELINE_SLUG@$BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER"
   )"; then
     echo "Failed to assume role $role_arn" >&2
     echo "^^^ +++"
