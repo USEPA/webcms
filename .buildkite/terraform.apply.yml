@@ -24,6 +24,7 @@ steps:
 
     plugins:
       - ./.buildkite/plugins/aws-parameters:
+          role: arn:aws:iam::316981092358:role/BuildkiteParameterReadRole
           params:
             - key: ${WEBCMS_SSM_NAMESPACE}/backend
               file: terraform/${WEBCMS_TF_MODULE}/backend.tf
