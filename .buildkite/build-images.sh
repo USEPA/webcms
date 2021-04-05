@@ -42,6 +42,8 @@ readonly -a drupal_targets=(
 #
 # See the Kaniko README for more details: https://github.com/GoogleContainerTools/kaniko#readme
 for target in "${drupal_targets[@]}"; do
+  echo "--- :docker: Build $target"
+
   docker run \
       --rm \
       --tty \
@@ -68,6 +70,8 @@ done
 # here is much less involved (it's just Alpine plus some scripts), so we use less
 # aggressive cache settings for Kaniko. See the previous comment block for the flags
 # passed to Docker and Kaniko.
+
+echo "--- :docker: Build fpm-metrics"
 
 docker run \
     --rm \
