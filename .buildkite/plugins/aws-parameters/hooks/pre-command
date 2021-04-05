@@ -75,7 +75,7 @@ while true; do
     ssm get-parameter \
       --name "$key" \
       --query 'Parameter.Value' \
-    >"$file"
+  | tee "$file"
 
   i=$((i + 1))
 done
