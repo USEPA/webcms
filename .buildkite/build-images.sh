@@ -49,9 +49,9 @@ for target in "${drupal_targets[@]}"; do
       --volume "$PWD/services/drupal:/workspace" \
       --volume "$BUILDKITE_PIPELINE_SLUG:/mnt/cache" \
       --volume "$PWD/kaniko-config.json:/kaniko/.docker/config.json" \
-      --environment AWS_ACCESS_KEY_ID \
-      --environment AWS_SECRET_ACCESS_KEY \
-      --environment AWS_SESSION_TOKEN \
+      --env AWS_ACCESS_KEY_ID \
+      --env AWS_SECRET_ACCESS_KEY \
+      --env AWS_SESSION_TOKEN \
     gcr.io/kaniko-project/executor:latest \
       --context=/workspace \
       --cache \
@@ -75,9 +75,9 @@ docker run \
     --interactive \
     --volume "$PWD/services/metrics:/workspace" \
     --volume "$PWD/kaniko-config.json:/kaniko/.docker/config.json" \
-    --environment AWS_ACCESS_KEY_ID \
-    --environment AWS_SECRET_ACCESS_KEY \
-    --environment AWS_SESSION_TOKEN \
+    --env AWS_ACCESS_KEY_ID \
+    --env AWS_SECRET_ACCESS_KEY \
+    --env AWS_SESSION_TOKEN \
   gcr.io/kaniko-project/executor:latest \
     --context=/workspace \
     --destination="$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG"
