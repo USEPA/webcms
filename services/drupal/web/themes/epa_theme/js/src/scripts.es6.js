@@ -9,6 +9,7 @@ import navigation from './modules/navigation';
 import banner from 'uswds/src/js/components/banner.js';
 import tablesort from './modules/tablesort';
 import backToTop from './modules/_back-to-top.es6';
+import 'svgxuse';
 
 (function() {
   'use strict';
