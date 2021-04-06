@@ -156,7 +156,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM forumone/composer:1.8 AS deps
+FROM composer:2 AS deps
 
 WORKDIR /app
 
