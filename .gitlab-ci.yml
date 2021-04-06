@@ -10,8 +10,8 @@ image:
 variables:
   PLAN: plan.tfplan
   JSON_PLAN_FILE: tfplan.json
-  TF_ROOT: ${CI_PROJECT_DIR}/terraform/webcms
-  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform/infrastructure
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
   #Run in an automated fashion without console input
   #TF_IN_AUTOMATION: 1
@@ -67,7 +67,7 @@ variables:
 
   # Search variables
   # cf. search.tf
-  TF_VAR_search_instance_type: "r5.xlarge.elasticsearch"
+  TF_VAR_search_instance_type: "t3.medium.elasticsearch"
   TF_VAR_search_instance_count: 1
   TF_VAR_search_instance_storage: 10
   TF_VAR_search_dedicated_node_type: ""
