@@ -2,15 +2,10 @@
 
 namespace Drupal\epa_core\EventSubscriber;
 
-use Drupal\Component\Utility\Xss;
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\seckit\SeckitInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -64,7 +59,7 @@ class EpaCoreEventSubscriber implements EventSubscriberInterface {
 
     // Execute necessary functions.
     if ($this->config->get('seckit_csrf.origin')) {
-      $this->seckitOrigin($event);
+      //$this->seckitOrigin($event);
     }
   }
 
