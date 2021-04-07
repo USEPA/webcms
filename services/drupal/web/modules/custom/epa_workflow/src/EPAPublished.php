@@ -46,6 +46,66 @@ class EPAPublished extends EPAModeration {
         }
       }
     }
+
+    $env_state = getenv('WEBCMS_ENV_STATE');
+    if ($env_state !== 'migration' && $this->contentEntityRevision->getEntityTypeId() == 'node') {
+      $node = $this->contentEntityRevision;
+      if ($node->bundle() == 'public_notice') {
+        // Automatically populate notice's field_geographic_locations field with
+        // data from field_location_of_prop_action to avoid making users enter it
+        // twice.
+        $geo_location_terms = [];
+        if (!$node->field_locations_of_prop_actions->isEmpty()) {
+          foreach ($node->field_locations_of_prop_actions as $item) {
+            if (is_object($item->entity)) {
+              $location = $item->entity;
+              if (!$location->field_state_or_territory->isEmpty()) {
+                $geo_location_terms[] = [
+                  'target_id' => $location->field_state_or_territory->target_id,
+                ];
+              }
+            }
+          }
+        }
+        $node->set('field_geographic_locations', $geo_location_terms);
+
+        // Set computed date based on extension and due date. If neither are set, clear it.
+        // If only extension date is set, do nothing.
+        $due_date = $node->field_comments_due_date->value;
+        $extension_date = $node->field_comments_extension_date->value;
+
+        if ($due_date) {
+          if ($extension_date) {
+            $node->set('field_computed_comments_due_date', $extension_date);
+          }
+          else {
+            $node->set('field_computed_comments_due_date', $due_date);
+          }
+        }
+        elseif (!$extension_date) {
+          $node->set('field_computed_comments_due_date', NULL);
+        }
+
+        // If computed date was set, use it. Otherwise set a date 90 days out.
+        if ($computed_date = $node->field_computed_comments_due_date->value) {
+          $node->set('field_notice_sort_date', $computed_date);
+        }
+        else {
+          $date = new DrupalDateTime();
+          $date->add(new \DateInterval("P90D"));
+
+          // Set field value
+          $node->set('field_notice_sort_date', $date->format('Y-m-d'));
+        }
+      }
+      if ($node->bundle() == 'news_release') {
+        $term = taxonomy_term_load_multiple_by_name('news release', 'type');
+        if (!empty($term)) {
+          $term = reset($term);
+          $node->field_type = $term->id();
+        }
+      }
+    }
   }
 
 }
