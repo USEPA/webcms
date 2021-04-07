@@ -21,6 +21,7 @@ locals {
     { name = "WEBCMS_ENV_NAME", value = var.site-env-name },
     { name = "WEBCMS_ENV_LANG", value = var.site-env-lang },
     { name = "WEBCMS_S3_USES_DOMAIN", value = var.site-s3-uses-domain ? "1" : "0" },
+    { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = var.site-csrf-origin-whitelist },
 
     # Akamai
     { name = "WEBCMS_AKAMAI_ENABLED", value = var.akamai-enabled ? "1" : "0" },

@@ -33,6 +33,11 @@ variable "site-s3-uses-domain" {
   type        = bool
 }
 
+variable "site-csrf-origin-whitelist" {
+  description = "Comma separated list of trustworthy sources. The domain of the SAML IdP will need to be entered here. Do not enter the site's own URL - it is automatically added. Syntax of the source is: [protocol] :// [host] : [port] . E.g, http://example.com, https://example.com, https://www.example.com, http://www.example.com:8080"
+  type        = string
+}
+
 # Akamai variables
 variable "akamai-enabled" {
   description = "Set to TRUE if this site is being served via Akamai; otherwise FALSE."

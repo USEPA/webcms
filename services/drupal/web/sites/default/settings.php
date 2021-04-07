@@ -866,6 +866,10 @@ switch ($env_state) {
     break;
 }
 
+if ($origin_whitelist = getenv('WEBCMS_CSRF_ORIGIN_WHITELIST')) {
+  $config['seckit.settings']['seckit_csrf']['origin_whitelist'] = $origin_whitelist;
+}
+
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
 // is made.
 $config['elasticsearch_connector.cluster.elasticsearch']['url'] = getenv('WEBCMS_SEARCH_HOST');
