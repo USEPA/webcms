@@ -45,3 +45,12 @@ function epa_theme_theme_suggestions_form_alter(array &$suggestions, array $vari
   $form_id = $variables['element']['#form_id'];
   $suggestions[] = 'form__' . $form_id;
 }
+
+/**
+ * Implements hook_theme_preprocess_webform().
+ */
+function epa_theme_preprocess_webform(array &$variables) {
+  if (isset($variables['element']['webform_message'][0]) && $variables['element']['webform_message'][0]['#message_type'] == 'warning') {
+    $variables['has_warning_message'] = TRUE;
+  }
+}
