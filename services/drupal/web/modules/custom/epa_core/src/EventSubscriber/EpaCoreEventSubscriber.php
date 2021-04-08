@@ -59,7 +59,7 @@ class EpaCoreEventSubscriber implements EventSubscriberInterface {
 
     // Execute necessary functions.
     if ($this->config->get('seckit_csrf.origin')) {
-      //$this->seckitOrigin($event);
+      $this->seckitOrigin($event);
     }
   }
 
