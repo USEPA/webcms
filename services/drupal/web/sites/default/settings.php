@@ -895,6 +895,8 @@ $settings['f1_sso_enabled'] = (bool)getenv('WEBCMS_SAML_FORCE_SAML_LOGIN');
 $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
+$config['webform.settings']['settings']['default_form_exception_message'] = '';
+
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
