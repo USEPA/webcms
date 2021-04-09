@@ -6,3 +6,8 @@ services:
     class: Drupal\epa_core\Config\EpaCoreOverrider
     tags:
       - { name: config.factory.override, priority: 5 }
+  epa_core.subscriber:
+    class: Drupal\epa_core\EventSubscriber\EpaCoreEventSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }

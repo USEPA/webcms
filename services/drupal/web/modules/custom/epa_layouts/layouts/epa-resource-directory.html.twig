@@ -1,8 +1,8 @@
 {% set row_a %}
   {% if content.a1|render and content.a2|render %}
     <div class="l-grid l-grid--2-col">
-      <div>{{ content.a1 }}</div>
-      <div>{{ content.a2 }}</div>
+      <div{{ region_attributes.a1 }}>{{ content.a1 }}</div>
+      <div{{ region_attributes.a2 }}>{{ content.a2 }}</div>
     </div>
   {% else %}
     {{ content.a1 }}
@@ -13,8 +13,8 @@
 {% set row_b %}
   {% if content.b1|render and content.b2|render %}
     <div class="l-grid l-grid--2-col">
-      <div>{{ content.b1 }}</div>
-      <div>{{ content.b2 }}</div>
+      <div{{ region_attributes.b1 }}>{{ content.b1 }}</div>
+      <div{{ region_attributes.b2 }}>{{ content.b2 }}</div>
     </div>
   {% else %}
     {{ content.b1 }}
@@ -25,8 +25,8 @@
 {% set row_c %}
   {% if content.c1|render and content.a2|render %}
     <div class="l-grid l-grid--2-col">
-      <div>{{ content.c1 }}</div>
-      <div>{{ content.c2 }}</div>
+      <div{{ region_attributes.c1 }}>{{ content.c1 }}</div>
+      <div{{ region_attributes.c2 }}>{{ content.c2 }}</div>
     </div>
   {% else %}
     {{ content.c1 }}
@@ -35,19 +35,24 @@
 {% endset %}
 
 {% set main_content %}
-  {{ content.main }}
+  {% if content.main|render %}
+    <div{{ region_attributes.main }}>{{ content.main }}</div>
+  {% endif %}
   {{ row_a }}
   {{ row_b }}
   {{ row_c }}
-  {{ content.bottom }}
+  {% if content.bottom|render %}
+    <div{{ region_attributes.bottom }}>{{ content.bottom }}</div>
+  {% endif %}
 {% endset %}
 
 {% if main_content|trim and content.sidebar|render %}
+  {% set sidebar_classes = ['l-sidebar__sidebar'] %}
   <div class="l-sidebar">
     <div class="l-sidebar__main">
       {{ main_content }}
     </div>
-    <div class="l-sidebar__sidebar">
+    <div{{ region_attributes.sidebar.addClass(sidebar_classes) }}>
       {{ content.sidebar }}
     </div>
   </div>

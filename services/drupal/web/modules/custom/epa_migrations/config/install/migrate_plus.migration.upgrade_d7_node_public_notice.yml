@@ -69,8 +69,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -211,15 +211,6 @@ process:
     -
       plugin: get
       source: field_language
-  _para_field_locations_of_prop_actions:
-    -
-      plugin: flatten
-      source: field_location_of_prop_action
-    -
-      plugin: array_shift
-    -
-      plugin: migration_lookup
-      migration:
   field_locations_of_prop_actions:
     -
       plugin: single_value

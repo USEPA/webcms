@@ -5,3 +5,27 @@
     display: none;
   }
 }
+
+@include at-media('tablet') {
+  // Fix for Edge 16, which enthusiastically believes it can support mask
+  // but cannot actually do so.
+  @supports (-ms-ime-align: auto) and (mask: url('')) {
+    .usa-banner__button,
+    .usa-banner__button:hover,
+    .usa-banner__button[aria-expanded='false'],
+    .usa-banner__button[aria-expanded='true'],
+    .usa-banner__button[aria-expanded='true']:hover {
+      &::after {
+        background: transparent url('../images/chevron.svg') no-repeat center /
+          8px 5px;
+        mask: none;
+      }
+    }
+
+    .usa-banner__button[aria-expanded='true'] {
+      &::after {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}

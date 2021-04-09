@@ -69,8 +69,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -204,7 +204,7 @@ process:
   _banner_paragraphs:
     plugin: migration_lookup
     migration: upgrade_d7_node_web_area_paragraph_banner
-    source: vid
+    source: nid
   field_banner:
     -
       plugin: sub_process

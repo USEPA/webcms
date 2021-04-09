@@ -1,9 +1,9 @@
-uuid: 9b3755c7-518e-410f-b45a-ca2a18f21ebe
+uuid: 84503287-d85b-48d2-800a-a043847a69ba
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.media.link
+    - core.entity_view_mode.media.link_with_description
     - field.field.media.other.field_limit_file_accessibility
     - field.field.media.other.field_media_file_1
     - field.field.media.other.field_media_tags
@@ -13,21 +13,21 @@ dependencies:
     - layout_builder
     - media_inline_embed
 third_party_settings:
+  media_inline_embed:
+    embed_inline: false
   layout_builder:
     allow_custom: false
     enabled: false
-  media_inline_embed:
-    embed_inline: true
-id: media.other.link
+id: media.other.link_with_description
 targetEntityType: media
 bundle: other
-mode: link
+mode: link_with_description
 content:
   field_media_file_1:
-    label: hidden
+    label: visually_hidden
     weight: 0
     settings:
-      show_extension: 0
+      show_extension: true
     third_party_settings: {  }
     type: epa_media_file_link_formatter
     region: content

@@ -851,6 +851,7 @@ switch ($env_state) {
   case 'migration':
     $settings['redirect.settings']['auto_redirect'] = false;
     $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
+    $config['auto_entitylabel.settings.node.faq']['status'] = 0;
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
@@ -863,6 +864,10 @@ switch ($env_state) {
 
     $settings['cache']['default'] = 'cache.backend.memcache';
     break;
+}
+
+if ($origin_whitelist = getenv('WEBCMS_CSRF_ORIGIN_WHITELIST')) {
+  $config['seckit.settings']['seckit_csrf']['origin_whitelist'] = $origin_whitelist;
 }
 
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
@@ -889,6 +894,8 @@ $settings['f1_sso_enabled'] = (bool)getenv('WEBCMS_SAML_FORCE_SAML_LOGIN');
 
 $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
+
+$config['webform.settings']['settings']['default_form_exception_message'] = '';
 
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';

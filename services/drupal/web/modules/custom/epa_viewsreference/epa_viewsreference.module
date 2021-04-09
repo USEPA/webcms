@@ -8,6 +8,16 @@ function epa_viewsreference_field_widget_form_alter(array &$element, FormStateIn
   $plugin_id = $context['widget']->getPluginId();
 
   if ($plugin_id === 'viewsreference_select') {
+    if (!empty($element['options']['limit'])) {
+      $element['options']['limit']['#title'] = t('Number of results (results per page if using a pager).');
+      $element['options']['limit']['#description'] = t('Please enter a value between 1 and 100');
+      $element['options']['limit']['#type'] = 'number';
+      $element['options']['limit']['#min'] = 1;
+      $element['options']['limit']['#max'] = 100;
+      if (empty($element['options']['limit']['#default_value'])) {
+        $element['options']['limit']['#default_value'] = 5;
+      }
+    }
 
     // Use "details" containers since they are themed better in layout builder UI
     if (isset($element["options"]["exposed_filters"]['#type'])) {

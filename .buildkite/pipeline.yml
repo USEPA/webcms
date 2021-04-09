@@ -23,7 +23,6 @@ steps:
       WEBCMS_WORKSPACE: default
 
   # Upload the deploy pipeline from main to the stage environment, disregarding PRs
-  # NOTE: `build.branch` is temporarily changed from "main" to "D9-migration-test"
   - label: ":pipeline: Stage"
     if: build.branch == "migration" && build.pull_request.id == null
 
@@ -34,7 +33,7 @@ steps:
 
   # Also on the main branch, deploy to the Spanish-language test environment
   - label: ":pipeline: Español"
-    if: build.branch == "main" && build.pull_request.id == null
+    if: build.branch == "migration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:

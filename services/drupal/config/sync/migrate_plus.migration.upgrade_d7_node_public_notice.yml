@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 4excHnh_h-3CHxar84lCQqErBpKI8xjUi0PNUo0KbYg
+  default_config_hash: LxZiJbLT45ffDW4SF-qXkOxib8PGTEeFIRWaYpWa9DU
 id: upgrade_d7_node_public_notice
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -71,8 +71,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -213,15 +213,6 @@ process:
     -
       plugin: get
       source: field_language
-  _para_field_locations_of_prop_actions:
-    -
-      plugin: flatten
-      source: field_location_of_prop_action
-    -
-      plugin: array_shift
-    -
-      plugin: migration_lookup
-      migration: null
   field_locations_of_prop_actions:
     -
       plugin: single_value

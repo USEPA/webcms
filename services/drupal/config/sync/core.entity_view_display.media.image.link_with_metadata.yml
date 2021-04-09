@@ -1,9 +1,9 @@
-uuid: f74705d2-d82a-4c4c-a262-b68b5609d403
+uuid: 30d755c1-4726-45c3-aa10-40d21970b3ee
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.media.link
+    - core.entity_view_mode.media.link_with_metadata
     - field.field.media.image.field_legacy_caption
     - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
@@ -20,16 +20,16 @@ third_party_settings:
   layout_builder:
     allow_custom: false
     enabled: false
-id: media.image.link
+id: media.image.link_with_metadata
 targetEntityType: media
 bundle: image
-mode: link
+mode: link_with_metadata
 content:
   field_media_image:
     weight: 0
     label: hidden
     settings:
-      show_extension: 0
+      show_extension: '1'
     third_party_settings: {  }
     type: epa_media_file_link_formatter
     region: content
