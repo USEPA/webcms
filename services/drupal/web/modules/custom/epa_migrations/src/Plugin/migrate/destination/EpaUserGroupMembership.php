@@ -100,7 +100,7 @@ class EpaUserGroupMembership extends EntityUser {
     // Create authmap entry for everyone but superuser.
     if ($entity->id() != 1) {
       $external_auth = \Drupal::service('externalauth.externalauth');
-      $external_auth->linkExistingAccount($entity->name, 'samlauth', $entity);
+      $external_auth->linkExistingAccount($entity->name->value, 'samlauth', $entity);
     }
 
     return [$entity->id()];
