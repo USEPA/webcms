@@ -71,7 +71,9 @@ while true; do
 
   echo "Loading $key into $file"
 
-  aws --out text \
+  aws \
+    --region us-east-2 \
+    --out text \
     ssm get-parameter \
       --name "$key" \
       --query 'Parameter.Value' \
