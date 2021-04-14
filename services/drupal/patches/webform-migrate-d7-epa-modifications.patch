@@ -1,5 +1,5 @@
 diff --git a/src/Plugin/migrate/source/d7/D7Webform.php b/src/Plugin/migrate/source/d7/D7Webform.php
-index 7633c98..9fc1159 100644
+index 7633c98..3962011 100644
 --- a/src/Plugin/migrate/source/d7/D7Webform.php
 +++ b/src/Plugin/migrate/source/d7/D7Webform.php
 @@ -182,9 +182,16 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
@@ -16,7 +16,7 @@ index 7633c98..9fc1159 100644
 +    $trim_json_encode = function ($str) {
 +      return json_encode(trim($str));
 +    };
-
+ 
 +    $output = '';
      $query = $this->select('webform_component', 'wc');
      $query->fields('wc', [
@@ -26,7 +26,7 @@ index 7633c98..9fc1159 100644
        $indent = str_repeat(' ', $element['depth'] * 2);
        $extra = unserialize($element['extra']);
 -      $description = $this->cleanString($extra['description']);
-
+ 
        // Create an option list if there are items for this element.
        $options = '';
 @@ -301,18 +307,23 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
@@ -60,18 +60,25 @@ index 7633c98..9fc1159 100644
              }
            }
          }
-@@ -353,7 +364,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
-           elseif (!empty($extra['multiple']) && count($valid_options) == 1) {
-             $select_type = 'checkbox';
-             list($key, $desc) = explode('|', $extra['items']);
--            $markup .= "$indent  '#description': \"" . $this->cleanString($desc) . "\"\n";
-+            $markup .= "$indent  '#description': {$json_encode($desc)}\n";
+@@ -347,14 +358,9 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+           if (!empty($extra['aslist'])) {
+             $select_type = 'select';
            }
+-          elseif (!empty($extra['multiple']) && count($valid_options) > 1) {
++          elseif (!empty($extra['multiple'])) {
+             $select_type = 'checkboxes';
+           }
+-          elseif (!empty($extra['multiple']) && count($valid_options) == 1) {
+-            $select_type = 'checkbox';
+-            list($key, $desc) = explode('|', $extra['items']);
+-            $markup .= "$indent  '#description': \"" . $this->cleanString($desc) . "\"\n";
+-          }
            else {
              $select_type = 'radios';
-@@ -399,7 +410,9 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+           }
+@@ -399,7 +405,9 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
            break;
-
+ 
          case 'markup':
 -          $markup .= "$indent  '#type': processed_text\n$indent  '#format': full_html\n$indent  '#text': \"" . $this->cleanString($element['value']) . "\"\n";
 +          $markup .= "$indent  '#type': processed_text\n";
@@ -79,18 +86,18 @@ index 7633c98..9fc1159 100644
 +          $markup .= "$indent  '#text': {$json_encode($element['value'])}\n";
            $element['value'] = '';
            break;
-
-@@ -470,7 +483,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+ 
+@@ -470,7 +478,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
            break;
-
+ 
          case 'pagebreak':
 -          $output = str_replace('{' . $current_page . '_title}', $current_page_title, $output);
 +          $output = str_replace('{' . $current_page . '_title}', json_encode($current_page_title), $output);
            $current_page = $element['form_key'];
            $markup .= "$indent  '#type': webform_wizard_page\n  '#title': {" . $current_page . "_title}\n";
            $current_page_title = $element['name'];
-@@ -504,7 +517,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
-
+@@ -504,7 +512,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+ 
        // Add common fields.
        if (!empty(trim($element['value'])) && (empty($valid_options) || in_array($element['value'], $valid_options))) {
 -        $markup .= "$indent  '#default_value': '" . str_replace(array('\'', "\n", "\r"), array('"', '\n', ''), trim($element['value'])) . "' \n";
@@ -98,7 +105,7 @@ index 7633c98..9fc1159 100644
        }
        if (!empty($extra['field_prefix'])) {
          $markup .= "$indent  '#field_prefix': " . $extra['field_prefix'] . "\n";
-@@ -520,8 +533,8 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+@@ -520,8 +528,8 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
          $markup .= "$indent  '#title_display': " . $title_display . "\n";
        }
        if ($element['type'] != 'pagebreak') {
@@ -109,8 +116,8 @@ index 7633c98..9fc1159 100644
        }
        if (!empty($element['required'])) {
          $markup .= "$indent  '#required': true\n";
-@@ -548,7 +561,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
-
+@@ -548,7 +556,7 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+ 
      if ($multiPage) {
        // Replace the final page title.
 -      $output = str_replace('{' . $current_page . '_title}', $current_page_title, $output);
@@ -118,10 +125,10 @@ index 7633c98..9fc1159 100644
      }
      return ['elements' => $output, 'xref' => $xref];
    }
-@@ -827,13 +840,6 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+@@ -827,13 +835,6 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
      return $str;
    }
-
+ 
 -  /**
 -   * {@inheritdoc}
 -   */
@@ -132,8 +139,8 @@ index 7633c98..9fc1159 100644
    /**
     * {@inheritdoc}
     */
-@@ -943,14 +949,11 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
-
+@@ -943,14 +944,11 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+ 
    protected function buildItemsString($itemsArray, $baseIndent = '') {
      $preparedItems = array_map(function($item) use ($baseIndent) {
 -      return $baseIndent . '  ' . $this->encapsulateString($item[0]) . ': ' . $this->encapsulateString($item[1]);
@@ -141,7 +148,7 @@ index 7633c98..9fc1159 100644
 +      $json_encode = 'json_encode';
 +      return "$baseIndent  {$json_encode($item[0])}: {$json_encode($item[1])}";
      }, $itemsArray);
-
+ 
      return implode("\n", $preparedItems);
    }
 -
