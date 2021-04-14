@@ -1,5 +1,5 @@
 diff --git a/src/Plugin/migrate/source/d7/D7Webform.php b/src/Plugin/migrate/source/d7/D7Webform.php
-index 7633c98..ab42047 100644
+index 7633c98..ffb17f7 100644
 --- a/src/Plugin/migrate/source/d7/D7Webform.php
 +++ b/src/Plugin/migrate/source/d7/D7Webform.php
 @@ -182,9 +182,16 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
@@ -163,7 +163,7 @@ index 7633c98..ab42047 100644
 +          // Otherwise, if there are fewer element names than there are
 +          // conditions, remove the states from the webform and log a message
 +          // indicating this webform's conditionals will need to be recreated.
-+          elseif (count(array_unique($element_names) !== count($conditions))) {
++          elseif (count(array_unique($element_names)) !== count($conditions)) {
 +            \Drupal::logger('epa_migrations')->notice('Webform conditional removed from form with nid: ' . $nid);
 +          }
 +        }
