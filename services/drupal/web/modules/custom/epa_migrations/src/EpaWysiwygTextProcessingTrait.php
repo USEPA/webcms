@@ -8,17 +8,25 @@ use DOMDocument;
  * Helpers to reformat/strip inline HTML.
  */
 trait EpaWysiwygTextProcessingTrait {
+  /**
+   * A string indicating the type of paragraph this text will be wrapped in.
+   *
+   * @var string
+   */
+  protected $wrapperContext;
 
   /**
    * Transform inline html in wysiwyg content.
    *
    * @param string $wysiwyg_content
    *   The content to search and transform inline html.
-   *
+   * @param string $context
+   *   The context the type of paragraph this text will be wrapped in.
    * @return string
    *   The original wysiwyg_content with transformed inline html.
    */
-  public function processText($wysiwyg_content) {
+  public function processText($wysiwyg_content, $wrapper_context = NULL) {
+    $this->wrapperContext = $wrapper_context;
 
     $pattern = '/';
     $pattern .= 'class=".*?(box).*?"|';
@@ -246,6 +254,7 @@ trait EpaWysiwygTextProcessingTrait {
           'left',
         ];
 
+        // Note the remaining replacements for left and right are added below.
         $replacements = [
           'box box--related-info',
           'box box--highlight',
@@ -256,9 +265,20 @@ trait EpaWysiwygTextProcessingTrait {
           'box box--rss',
           'box box--blog',
           'box box--multipurpose',
-          'u-align-right',
-          'u-align-left',
         ];
+
+        if ($this->wrapperContext == 'box') {
+          // If this box is stored within a box paragraph, we want to strip
+          // the left and right alignment classes from the box.
+          $replacements[] = 'test-replacement-left';
+          $replacements[] = 'test-replacement-right';
+        }
+        else {
+          // This box is not stored within a box paragraph, let's replace the
+          // left and right alignment classes on the box.
+          $replacements[] = 'u-align-right';
+          $replacements[] = 'u-align-left';
+        }
 
         $wrapper_classes = $rib_wrapper->attributes->getNamedItem('class')->value;
         $wrapper_classes = self::classReplace($searches, $replacements, $wrapper_classes);
