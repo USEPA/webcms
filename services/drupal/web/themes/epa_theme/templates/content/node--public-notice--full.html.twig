@@ -13,8 +13,14 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
 {% set header_info %}
-  {% if sidenav %}
+  {% if nav_style == 'sidebar_navigation' %}
     {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
   {% else %}
     {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
@@ -85,7 +91,7 @@
   {{ 'Public Notice'|t }}: {{ label }}
 {% endset %}
 
-{% if sidenav|render|striptags|trim %}
+{% if display_sidenav %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_footer': has_footer,
