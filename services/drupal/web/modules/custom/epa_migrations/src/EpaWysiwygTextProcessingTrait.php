@@ -270,8 +270,8 @@ trait EpaWysiwygTextProcessingTrait {
         if ($this->wrapperContext == 'box') {
           // If this box is stored within a box paragraph, we want to strip
           // the left and right alignment classes from the box.
-          $replacements[] = 'test-replacement-left';
-          $replacements[] = 'test-replacement-right';
+          $replacements[] = '';
+          $replacements[] = '';
         }
         else {
           // This box is not stored within a box paragraph, let's replace the
