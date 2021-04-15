@@ -8,10 +8,7 @@
 use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -199,7 +196,7 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         $group = $parameter;
         break;
       }
-      elseif ($parameter instanceof EntityInterface || $parameter instanceof OverridesSectionStorage) {
+      elseif ($parameter instanceof ContentEntityInterface   || $parameter instanceof OverridesSectionStorage) {
         // If in layout builder, grab the entity from section storage.
         if ($parameter instanceof OverridesSectionStorage) {
           $contexts = $parameter->getContexts();
