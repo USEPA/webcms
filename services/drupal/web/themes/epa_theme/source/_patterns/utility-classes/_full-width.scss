@@ -1,11 +1,17 @@
 // @file
 // Full-width utility class
+:root {
+  --scrollbar-width: 0;
+}
 
 .u-full-width {
   left: 50%;
   margin-left: -50vw;
+  margin-left: calc(-50vw + var(--scrollbar-width) / 2);
   margin-right: -50vw;
+  margin-right: calc(-50vw + var(--scrollbar-width) / 2);
   position: relative;
   right: 50%;
   width: 100vw;
+  width: calc(100vw - var(--scrollbar-width));
 }
