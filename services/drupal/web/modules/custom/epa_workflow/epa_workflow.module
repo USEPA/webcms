@@ -224,7 +224,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['new_state']['#required'] = TRUE;
   }
 
-  if (in_array($form_id,['content_moderation_entity_moderation_form']) || isset($form['node_bulk_form'])) {
+  if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
     _epa_workflow_add_compliance_checkboxes($form);
   }
 }
