@@ -1,5 +1,5 @@
 diff --git a/src/Plugin/migrate/source/d7/D7Webform.php b/src/Plugin/migrate/source/d7/D7Webform.php
-index 7633c98..3962011 100644
+index 7633c98..ffb17f7 100644
 --- a/src/Plugin/migrate/source/d7/D7Webform.php
 +++ b/src/Plugin/migrate/source/d7/D7Webform.php
 @@ -182,9 +182,16 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
@@ -125,7 +125,53 @@ index 7633c98..3962011 100644
      }
      return ['elements' => $output, 'xref' => $xref];
    }
-@@ -827,13 +835,6 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+@@ -681,6 +689,45 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+       if (empty($states)) {
+         return FALSE;
+       }
++      // If we're adding a conditional that consists of multiple values for
++      // the same element, then construct a regex pattern match, like:
++      // ^(value1|value2|value3|..valueN)$.
++      foreach ($states as $state_type => $conditions) {
++        // $state type is either 'visible' or 'invisible'.
++        if (count($conditions) > 1) {
++          $element_names = [];
++          $condition_values = [];
++          // Iterate through the conditions to see if they're all acting on the
++          // same element.
++          foreach ($conditions as $condition) {
++            foreach ($condition as $element_key => $condition_value) {
++              $element_names[] = $element_key;
++              $condition_values[] = $condition_value['value'];
++            }
++          }
++          // If each condition is acting on the same element, then combine the
++          // condition values into a pattern.
++          if (count(array_unique($element_names)) == 1) {
++            $pattern = '^(';
++            $pattern .= implode('|', $condition_values) . ')$';
++            $states[$state_type] = [
++              0 => [
++                $element_names[0] => [
++                  'value' => [
++                    'pattern' => $pattern,
++                  ],
++                ],
++              ],
++            ];
++          }
++          // Otherwise, if there are fewer element names than there are
++          // conditions, remove the states from the webform and log a message
++          // indicating this webform's conditionals will need to be recreated.
++          elseif (count(array_unique($element_names)) !== count($conditions)) {
++            \Drupal::logger('epa_migrations')->notice('Webform conditional removed from form with nid: ' . $nid);
++          }
++        }
++      }
+       return $states;
+     }
+     else {
+@@ -827,13 +874,6 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
      return $str;
    }
  
@@ -139,7 +185,7 @@ index 7633c98..3962011 100644
    /**
     * {@inheritdoc}
     */
-@@ -943,14 +944,11 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
+@@ -943,14 +983,11 @@ class D7Webform extends DrupalSqlBase implements ImportAwareInterface, RollbackA
  
    protected function buildItemsString($itemsArray, $baseIndent = '') {
      $preparedItems = array_map(function($item) use ($baseIndent) {
