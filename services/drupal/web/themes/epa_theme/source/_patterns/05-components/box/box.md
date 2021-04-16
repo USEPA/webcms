@@ -25,3 +25,4 @@ __Variables:__
   * icon: [string] Name of icon to the left of the footer text.
   * text: [string] Footer text.
 * role: [string] Optional ARIA role.
+* label: [string] Accessible label for this component.
