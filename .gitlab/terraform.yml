@@ -1,0 +1,190 @@
+# This file contains the necessary steps to execute Terraform modules. It arranges for the
+# GitLab Terraform helper (see https://gitlab.com/gitlab-org/terraform-images) to execute
+# various steps in the Terraform module development cycle.
+#
+# Input variables needed by this file:
+#
+# Jobs that trigger this pipeline should set these variables:
+# - WEBCMS_ENVIRONMENT, the environment name (e.g., preproduction or production).
+# - WEBCMS_IMAGE_TAG, the unique tag for images associated with this build.
+# - WEBCMS_SITE (optional), the site name (e.g., dev or stage).
+# - WEBCMS_LANG (optional), the language code (e.g., en or es).
+# - TF_MODULE, the name of the Terraform module to execute. This will correspond to a
+#   subdirectory of terraform/ in this repository.
+# - TF_STATE_NAME, the name of the Terraform state key in GitLab's Terraform storage. The
+#   Terraform helper will use this to compute the full `$TF_HTTP_ADDRESS` from the
+#   defaults.
+#
+# The CI/CD project configuration should set these variables:
+# - AWS_REGION, the region in which the runner is executing.
+# - TERRAFORM_TFVARS, the path to a GitLab-injected file variable. See below for more
+#   information.
+
+# For reasons mentioned in the terraform/ directory's README, the WebCMS project does not
+# have a single canonical Terraform module _or_ state. For a single installation of the
+# WebCMS, there are a minimum of two modules and three states the CI/CD project needs to
+# manage:
+#
+# 1. The state of the infrastructure module.
+# 2. The state of the webcms module for the English site.
+# 3. The state of the webcms module for the Spanish site.
+#
+# As a result of this variability, we require that the CI/CD project configuration inject
+# the Terraform variables. It isn't feasible to store the TF_VAR_* variables in a CI/CD
+# file due to the complexity of conditional inclusion and merging of files.
+#
+# Jobs that trigger this pipeline are required to define the GitLab environment to which
+# this pipeline applies. This allows the project administrator to use scoped variables
+# (see [envs]) to define the variables on a narrow basis. For comparison's sake, a similar
+# (albeit Buildkite-specific) implementation using AWS Parameter Store can be found in
+# .buildkite/terraform.plan.yml, storing the configuration externally instead of within
+# the CI/CD project configuration.
+#
+# [envs]: https://docs.gitlab.com/ee/ci/environments/index.html#cicd-variables-for-environments-and-deployments
+#
+# This pipelines assumes that Terraform input variables are provided as a path to a file
+# in .tfvars format (see [tfvars]) in GitLab. This This implies that the configuration should
+# be stored as a file type variable (see [types]) in Gitlab The variable should be scoped to
+# the GitLab environment named by the job that triggered this pipeline. See .gitlab-ci.yml
+# for the naming convention in use there.
+#
+# [tfvars]: https://www.terraform.io/docs/language/values/variables.html#assigning-values-to-root-module-variables
+# [types]: https://docs.gitlab.com/ee/ci/variables/README.html#cicd-variable-types
+
+# We define three stages, which correspond 1:1 to the Terraform commands of the same name.
+stages:
+  - init
+  - validate
+  - plan
+  - apply
+
+# As with .gitlab-ci.yml, all jobs are executed in a Docker runner.
+default:
+  tags:
+    - docker
+
+# This is the base template for all jobs in this pipeline.
+.terraform:
+  image:
+    name: registry.gitlab.com/gitlab-org/terraform-images/releases/0.14:latest
+    entrypoint: ['']
+
+  variables:
+    # Derive the root from the project directory and module name
+    TF_ROOT: $CI_PROJECT_DIR/terraform/$TF_MODULE
+
+    # Tell Terraform we are running in automation and should fail if it finds missing inputs
+    # instead of attempting to read from the console.
+    TF_INPUT: '0'
+    TF_IN_AUTOMATION: '1'
+
+    # Proxy input variables from our convention to variables recognizable by Terraform. We
+    # can do this unconditionally because Terraform only inspects the environment when it
+    # sees a declaration, sparing us from spurious warnings about values for undeclared
+    # variables.
+    TF_VAR_environment: ${WEBCMS_ENVIRONMENT}
+    TF_VAR_site: ${WEBCMS_SITE}
+    TF_VAR_lang: ${WEBCMS_LANG}
+    TF_VAR_image_tag: ${WEBCMS_IMAGE_TAG}
+    TF_VAR_aws_region: ${AWS_REGION}
+
+  # Use a granular cache for Terraform providers, bucketing by both module and branch.
+  cache:
+    key: tf-${TF_MODULE}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - ${TF_ROOT}/.terraform
+
+  # Every job begins execution in the module's root directory with:
+  # 1. An empty http backend configuration to be filled in by the gitlab-terraform helper,
+  #    and
+  # 2. A copy of the GitLab-injected TERRAFORM_TFVARS file variable. (This variable is a
+  #    reference to a path in a temporary directory, so we copy it in order to allow
+  #    Terraform to see it automatically.)
+  #
+  # We do not explicitly invoke `gitlab-terraform init` because the helper script does
+  # this automatically as needed.
+  before_script:
+    - cd $TF_ROOT
+    - echo 'terraform { backend "http" {} }' >backend.tf
+    - cp "$TERRAFORM_TFVARS" terraform.tfvars
+
+#region Steps
+
+# Steps here are largely based off of the recommendations in GitLab's documentation and
+# templates repository. We use a slightly customized version of the template steps
+#
+# See:
+# - https://docs.gitlab.com/ee/user/infrastructure/
+# - https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Terraform/Base.latest.gitlab-ci.yml
+
+# Initialize the providers and backend
+init:
+  extends: .terraform
+  stage: init
+
+  script:
+    - gitlab-terraform init
+
+# Validate syntax and configuration
+validate:
+  extends: .terraform
+  stage: validate
+
+  script:
+    - gitlab-terraform validate
+
+# Perform a plan, uploading the plan files as GitLab artifacts.
+plan:
+  extends: .terraform
+  stage: plan
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+# Perform an apply. Note that this is not always automatic; see the comments above the rules
+# for more.
+apply:
+  extends: .terraform
+  stage: apply
+
+  # Download the plan files from the previous step.
+  dependencies: [plan]
+
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
+
+    - when: never
+
+#endregion

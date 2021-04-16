@@ -1,0 +1,190 @@
+# This file includes all of the image build jobs needed for the WebCMS and its
+# (third-party) dependencies. The steps here use the Kaniko project's Docker image,
+# allowing us to build images inside of our Docker-based GitLab runner. For more
+# information, see https://docs.gitlab.com/ee/ci/docker/using_kaniko.html.
+#
+# Input variables needed by this file:
+#
+# Jobs that trigger this pipeline should set these variables:
+# - WEBCMS_ENVIRONMENT, the environment name (e.g., preproduction or production).
+# - WEBCMS_SITE, the site name (e.g., dev or stage).
+# - WEBCMS_IMAGE_TAG, the unique tag for images associated with this build.
+#
+# The CI/CD project configuration should set these variables:
+# - WEBCMS_REPO_URL, the base URL for this AWS account's ECR repository.
+#
+# Some notes about reading the scripts in this file follow:
+#
+# 1. The `>-` sequence is a pair of YAML instructions: the `>` ("folded") character
+#    indicates that newlines should be folded into spaces, and the `-` ("chomp") character
+#    indicates that the final newline should be removed.
+#
+#    This allows us to break up long command lines with newlines while the result turns
+#    into a long single-line string. This can be verified with the `yq` utility:
+#
+#        $ yq '.[".kaniko"].variables.KANIKO_CACHE_ARGS' .gitlab/docker.yml
+#        "--cache --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache"
+#
+# 2. The arguments passed to Kaniko are relatively straightforward and can be compared to
+#    `docker build`, with some differences:
+#
+#    1. Kaniko's layer cache is not persisted to disk. Instead, we use a dedicated caching
+#       ECR repository.
+#    2. Kaniko exposes tuning parameters for its build caching logic, which we utilize for
+#       the more expensive Drupal-based builds.
+#    3. Unlike `docker build`, Kaniko requires a tag for built images and uses that tag to
+#       push to a registry.
+#
+#    Most of these are due to the containerized nature of Kaniko itself; unlike Docker, it
+#    cannot make the assumption that it is executing in a long-lived environment with
+#    local persistent storage.
+
+# Jobs are broken down into two stages: build and copy. These are not used for
+# sequencing/ordering; instead, they signify what Kaniko is doing. The build stage is for
+# jobs that build an image directly from source in this repository - in addition to the
+# obvious Drupal-based images, this also includes the custom FPM metrics sidecar and the
+# database Terraform image. The copy stage is for jobs that mirror Docker Hub images. We
+# have to use Kaniko for this as well since we do not have access to Docker-in-Docker.
+stages:
+  - build
+  - copy
+
+# As with .gitlab-ci.yml, all jobs are executed in a Docker runner.
+default:
+  tags:
+    - docker
+
+# This is the template job for all Kaniko builds. Every job, regardless of what is being
+# built or copied, uses this configuration:
+# 1. Builds are executed in the latest Kaniko image,
+# 2. Builds can opt into remote layer caching by adding $KANIKO_CACHE_ARGS to their
+#    script, and
+# 3. A before_script ensures that AWS ECR is added to Kaniko's credential store.
+.kaniko:
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: ['']
+
+  variables:
+    KANIKO_CACHE_ARGS: >-
+      --cache
+      --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
+
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+
+#region Image builds
+
+# We build Drupal-based images using another parallel:matrix: to cut down on the repetition
+# of the fairly long invocation of the Kaniko command line.
+
+build:drupal:
+  extends: .kaniko
+  stage: build
+
+  # These correspond to the three production targets in services/drupal/Dockerfile. The
+  # ordering here is important for builds with a limited pool of servers: by ensuring that
+  # the Drupal build is executed first, it increases the chances that expensive
+  # intermediate layers (such as building the ElastiCache client or building the theme)
+  # already exist by the time the nginx and Drush targets need to copy that data.
+  parallel:
+    matrix:
+      - WEBCMS_TARGET: [drupal, nginx, drush]
+
+  # In addition to the shared cache arguments, we provide additional settings to tune
+  # Kaniko's caching behavior. This is due to the large number of files and steps in the
+  # WebCMS Dockerfile:
+  #
+  # - We skip stages that don't apply to this build target.
+  #
+  # - We use the faster but less accurate redo snapshot mode, under the assumption that
+  #   changes in files like composer.json or custom modules will be sufficient to disrupt
+  #   the metadata cache.
+  #
+  # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
+  #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
+  #   improve build performance by 75%".
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --skip-unused-stages
+          --snapshotMode=redo
+          --use-new-run
+          --context=$CI_PROJECT_DIR/services/drupal
+          --target=$WEBCMS_TARGET
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+
+# Build the FPM metrics sidecar container.
+build:metrics:
+  extends: .kaniko
+  stage: build
+
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --context=$CI_PROJECT_DIR/services/metrics
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+
+# On the main and live branches (the tracking branches for the AWS environments), we also
+# build the database Terraform container. See the terraform/database/ directory for more
+# information.
+build:database:
+  extends: .kaniko
+  stage: build
+  only: [main, live]
+
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --context=$CI_PROJECT_DIR/terraform/database
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
+
+#endregion
+
+#region Docker Hub mirrors
+
+# As mentioned in the comments above, this stage is for mirroring Docker Hub images. Our
+# GitLab CI/CD environment is restricted - we aren't permitted access to the Docker daemon
+# and thus can't use Docker-in-Docker. Fortunately, we can slightly misuse Kaniko to
+# accomplish this task by creating an empty workspace with a single-line Dockerfile
+# referencing the image and tag we want to mirror. By performing a "build" in this
+# workspace, Kaniko will pull the image, retag it with the ECR destination, and push it.
+# This bypasses the need for the `docker pull` and `docker push` commands.
+
+# Jobs in this stage will almost always only execute on branches that track AWS
+# infrastructure: this typically means that we mirror only on the main and live branches.
+
+# Mirror the AWS CloudWatch agent image using the latest tag.
+copy:cloudwatch:
+  extends: .kaniko
+  stage: copy
+  only: [main, live]
+
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
+    - >-
+        /kaniko/executor
+          --context=/workspace
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+
+# Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
+# in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
+copy:traefik:
+  extends: .kaniko
+  stage: copy
+  only: [main, live]
+
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM traefik:2.4' >/workspace/Dockerfile
+    - >-
+        /kaniko/executor
+          --context=/workspace
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
+
+#endregion

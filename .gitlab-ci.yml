@@ -1,140 +1,256 @@
-# Entrypoint is also needed as image by default set `terraform` binary as an
-# entrypoint.
-image:
-  name: registry.gitlab.com/gitlab-org/terraform-images/releases/0.14:v0.8.0
-  entrypoint:
-    - '/usr/bin/env'
-    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
-
-# Default output file for Terraform plan
-variables:
-  PLAN: plan.tfplan
-  JSON_PLAN_FILE: tfplan.json
-  TF_ROOT: ${CI_PROJECT_DIR}/terraform/webcms
-  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
-
-  #Run in an automated fashion without console input
-  #TF_IN_AUTOMATION: 1
-  #TF_INPUT: 0
-
-  TF_VAR_aws_region: "us-east-1"
-
-  # Module-wide variables
-  TF_VAR_environment: "preproduction"
-  TF_VAR_site: 'dev'
-  TF_VAR_sites: '["dev"]'
-  TF_VAR_lang: 'en'
-  TF_VAR_tags: "{}"
-
-  TF_VAR_image_tag: 'initial'
-
-  TF_VAR_drupal_hostname: 'stage-www.epa.gov'
-  TF_VAR_drupal_extra_hostnames: '["webcms-preproduction-6e916a8cff574d28.elb.us-east-1.amazonaws.com"]'
-
-  TF_VAR_drupal_min_capacity: '1'
-  TF_VAR_drupal_max_capacity: '5'
-  TF_VAR_drupal_use_s3_domain: 'false'
-  TF_VAR_drupal_state: 'run'
-
-  TF_VAR_email_auth_user: junk
-  TF_VAR_email_from: 'noreply@example.com'
-  TF_VAR_email_host: 'localhost'
-  TF_VAR_email_port: '25'
-  TF_VAR_email_enable_workflow_notifications: 'false'
-  TF_VAR_email_protocol: 'tls'
-
-  TF_VAR_akamai_enabled: 'false'
-  TF_VAR_akamai_api_host: 'junk'
-
-  TF_VAR_saml_sp_entity_id: 'epa-webcms-d8-stage'
-  TF_VAR_saml_sp_cert: 'MIID9zCCAt+gAwIBAgIJAP6ONdnDpyuzMA0GCSqGSIb3DQEBCwUAMIGRMQswCQYDVQQGEwJ1czEXMBUGA1UECAwOTm9ydGggQ2Fyb2xpbmExDDAKBgNVBAcMA1JUUDEoMCYGA1UECgwfRW52aXJvbm1lbnRhbCBQcm90ZWN0aW9uIEFnZW5jeTEVMBMGA1UECwwMT01TL09JVE8vRUhEMRowGAYDVQQDDBFzdGFnZS13d3cuZXBhLmdvdjAeFw0yMTA0MTMxNTU1MTdaFw0zMTA0MTExNTU1MTdaMIGRMQswCQYDVQQGEwJ1czEXMBUGA1UECAwOTm9ydGggQ2Fyb2xpbmExDDAKBgNVBAcMA1JUUDEoMCYGA1UECgwfRW52aXJvbm1lbnRhbCBQcm90ZWN0aW9uIEFnZW5jeTEVMBMGA1UECwwMT01TL09JVE8vRUhEMRowGAYDVQQDDBFzdGFnZS13d3cuZXBhLmdvdjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAObX1JT/LFVe7P/lNkddJPZjix1FbBnQfkRnJ2jL0djtglL+KkJgpkp5dUmGfaGjmdygWVE0Gs4VWtabPcBdsFGPloQYsBj82HnomZMGCET4sSMO//ZoXvBPhfzvKut3MSHe382Iw6vjfsP4srdvnxVjOwk+0UNGSkwpDEkTJzr32u2eOVmtP2CBbtTrzy8VlsMCCEyNCb4Ffc4ZOGKiCqU6tFZVO+s48yI5yT/1IG5cIyJcuGkt16RXIn1V9Oz88aV/mBtgG3q/eyywmPJgkbZHPlFBIlAjFMJdz79U538i2xxWGD3j2/KgTDE99rzTZGCxH8vnaPPFBC3VkbSiInECAwEAAaNQME4wHQYDVR0OBBYEFHrDKmwlQFIvMz4f4/VFHDqFAnIUMB8GA1UdIwQYMBaAFHrDKmwlQFIvMz4f4/VFHDqFAnIUMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJz9es6zKvHxw0xrWbvAKMfENMNpD69051hwDZnCQcO+HgyGCwjGTQo0XD0JJIUcYCGMfkcRxfFQrzaZB3PwUsuTO/k0botCuFrCbeRSrrbqzu3JV0v+CbWpXhHDhI58jqE7mwGe9/EyQfLgJl9UYBooYK+kWpCElZReEh7+cHoJjAZJMEOFiqyCmzCOTmMDeR96rOixjbuRg3dCYIpII8YJKeR4G1QA3S/EpeMIvFVfWHCW0ijANMByhjim9DMxwU6xYzCOnoryJ1DMyPNUkRF+i24tgJnqcsjbVZZaBjhbsIlCZNcxAWbRBm44YKrzmR5kDTYeQOf7S9yGDDQ3pzI='
-  TF_VAR_saml_idp_id: 'https://wamssostg.epa.gov/oam/fed'
-  TF_VAR_saml_idp_sso_url: 'https://wamssostg.epa.gov/oamfed/idp/samlv20'
-  TF_VAR_saml_idp_slo_url: 'https://wamssostg.epa.gov/oamfed/idp/samlv20'
-  TF_VAR_saml_idp_cert: 'MIIB/DCCAWWgAwIBAgIBCjANBgkqhkiG9w0BAQUFADAjMSEwHwYDVQQDExh3YW1hcHBzdGcxLnJ0cG5jLmVwYS5nb3YwHhcNMTgwNTEwMTk0NDIwWhcNMjgwNTA3MTk0NDIwWjAjMSEwHwYDVQQDExh3YW1hcHBzdGcxLnJ0cG5jLmVwYS5nb3YwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKHvjCwWJzKM+fdkYKtzEfQB/IZNl3DwubMwUycnd3SpwBGgNxvWJypElhVwMUeQTnGSS2AM2DCgdWj1Dt1+kU3a4xAR0H3EPhRt3G7dmjBB1meYrQrmhLS0eS3brkf/joCVk/QcNZTrjY/YDi/CgBd9DKz4X4J42dSzEok06MnnAgMBAAGjQDA+MAwGA1UdEwEB/wQCMAAwDwYDVR0PAQH/BAUDAwfYADAdBgNVHQ4EFgQUggiWNOJ53jjr/6y1g6hQ8ksylTQwDQYJKoZIhvcNAQEFBQADgYEAlktlMPLs48kBVqB6i94LOQTl+dP4cgmk/PM8N6hBu7lICkyVZ8Clm4ffwg5V1uQwhH/IUOiMmUjL7rZ9lY0jfW54toSxewxCWMsMc5en9xKbgJQSuiHtqh6Q7dXvrsWtjtX5vRGCURUsNdjrjByGSnrF7v/BlGFAObfG6d6nWjo='
-  TF_VAR_saml_force_saml_login: 'false'
-
-  # Load balancer variables
-  # cf. load_balancer.tf
-  TF_VAR_lb_default_certificate: "arn:aws:iam::665817092260:server-certificate/LBEPACertificate"
-  TF_VAR_lb_extra_certificates: "[]"
-  TF_VAR_lb_internal: "true"
-
-  # Database variables
-  # cf. rds.tf
-  TF_VAR_db_instance_type: "db.t3.small"
-  TF_VAR_db_instance_count: 1
-
-  # Search variables
-  # cf. search.tf
-  TF_VAR_search_instance_type: "t3.medium.elasticsearch"
-  TF_VAR_search_instance_count: 1
-  TF_VAR_search_instance_storage: 10
-  TF_VAR_search_dedicated_node_type: ""
-  TF_VAR_search_dedicated_node_count: 0
-  TF_VAR_search_availability_zones: 2
-  
-  # Cache variables
-  # cf. cache.tf
-  TF_VAR_cache_instance_type: "cache.t3.small"
-  TF_VAR_cache_instance_count: 1
-
-  #IAM Prefix
-  TF_VAR_iam_prefix: "Customer"
-
-cache:
-  key: development
-  paths:
-    - ${TF_ROOT}/.terraform
-
-before_script:
-  - cd ${TF_ROOT}
-  - pwd
-  - cp $backend_tf backend.tf
-  - gitlab-terraform --version
-  - gitlab-terraform init
+# This file is the initial entrypoint for GitLab CI/CD builds. It serves primarily as a
+# "driver" for other jobs: instead of executing build logic itself, it identifies which
+# jobs pertain to the branch being built and dispatches those. (The exception to this is
+# the Drush logic, which is encapsulated by a Node.js script in the ci/ directory.)
 
 stages:
-  - validate
+  # Applications of the infrastructure Terraform module. This has to occur first because,
+  # without it, Docker builds could attempt to push to empty ECR repositories.
+  - infrastructure
+
+  # Docker builds
   - build
-  - test
+
+  # Applications of the webcms Terraform module
   - deploy
 
-validate:
-  stage: validate
+  # Drush
+  - update
+
+# Our GitLab runner environment is Docker-based, so we apply this tag to every step.
+default:
   tags:
     - docker
-  script:
-    - gitlab-terraform validate
-  only:
-    - f1-IaC-updates
 
-plan:
+# Define this variable once here and allow it to cascade down into jobs and child
+# pipelines.
+variables:
+  WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+
+#region Templates
+
+# Jobs defined in this section are template jobs (the leading dot tells GitLab to
+# unconditionally ignore them when assembling a pipeline graph). The templates are named
+# after the stage in which they execute, and serve as central locations for the
+# boilerplate that each step needs to execute. The pipelines here are not complicated in
+# the sense that there are a large _variety_ of steps involved; there is instead a large
+# _number_ of steps, and cutting down on repetitious information helps avoid visual noise
+# when reading this file.
+#
+# Each template is guaranteed to include the following items:
+# 1. The stage in which the job should execute
+# 2. The actual job logic itself (which pipeline to trigger or which script to execute).
+#
+# While some templates may have additional supporting definitions/conveniences, extensions
+# MUST provide the following:
+# 1. Which environment ($WEBCMS_ENVIRONMENT) this job applies to.
+# 2. Where applicable, the site ($WEBCMS_SITE) and language ($WEBCMS_LANG) this job
+#    applies to.
+# 3. Any throttling/parallelism limitations (e.g., the resource_group: keyword).
+# 4. Branch limitations.
+#
+# Some of this information could be automatically derived in the template, but this can
+# very easily cause confusion, so we instead mandate that jobs that extend a template
+# repeat the logic to provide clarity on when a job is executed by GitLab, and how
+# parallel it is permitted to be.
+
+# Infrastructure jobs apply the Terraform module of the same name. They always trigger
+# the Terraform pipeline with $TF_MODULE set to the same value.
+.infrastructure:
+  stage: infrastructure
+
+  trigger:
+    include: .gitlab/terraform.yml
+    strategy: depend
+
+  variables:
+    TF_MODULE: infrastructure
+
+# Build jobs perform a Kaniko build. We create a child pipeline due to the number of
+# images that are built (at least Drupal, nginx, and Drush).
+.build:
   stage: build
-  tags:
-    - docker
-  script:
-    - gitlab-terraform plan
-    - gitlab-terraform plan-json
-  artifacts:
-    name: plan
-    paths:
-      - ${TF_ROOT}/plan.cache
-    reports:
-      terraform: ${TF_ROOT}/plan.json
-  only:
-    - f1-IaC-updates
 
-# Separate apply job for manual launching Terraform as it can be destructive
-# action.
-apply:
+  trigger:
+    include: .gitlab/docker.yml
+    strategy: depend
+
+# Deploy jobs use Terraform to create/update the ECS task definitions and services that
+# make up the Drupal WebCMS.
+.deploy:
   stage: deploy
-  tags:
-    - docker
+
+  trigger:
+    include: .gitlab/terraform.yml
+    strategy: depend
+
+  variables:
+    TF_MODULE: webcms
+
+# Update jobs invoke Drush to perform the necessary maintenance commands (drush updb,
+# drush cim) against the freshly-updated cluster. See the ci/ directory for more
+# information on the update script.
+.update:
+  stage: update
+
+  # Run inside a Node.js image. At the time of writing, Node.js 14 is the latest stable
+  # version.
+  image:
+    name: node:14-alpine
+    entrypoint: ['']
+
+  # See the comments below for why the npm cache is redirected.
   script:
-    - gitlab-terraform apply
-  dependencies:
-    - plan
-  when: manual
-  only:
-    - f1-IaC-updates
+    - cd $CI_PROJECT_DIR/ci
+    - npm ci --production --prefer-offline --cache .npm
+    - node drush.js
+
+  # Per https://docs.gitlab.com/ee/ci/caching/#cache-nodejs-dependencies, GitLab doesn't
+  # support caching outside the project directory, so we have to relocate the .npm cache
+  # directory inside the project root.
+  cache:
+    key: npm-drush
+    paths: ci/.npm
+
+#endregion
+
+#region Preproduction
+
+# Jobs in this region affect the preproduction environment. Per convention, the
+# preproduction environment encompasses two sites: development and staging, hence
+# the subregions below the infrastructure step.
+
+# Preproduction infrastructure builds are triggered only by the 'main' branch.
+infrastructure:preproduction:
+  extends: .infrastructure
+  only: [main]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
+
+  # The resource_group option tells GitLab to prevent overlapping runs, regardless of how
+  # many builds were triggered. (Without this, Terraform would raise an error due to
+  # finding a lock already present.)
+  #
+  # The environment here is used primarily to serve as a scoping mechanism for the
+  # TF_VAR_* variables; without this, different environments would clobber each other's
+  # variables depending on what was defined. We use the "infra/" prefix to distinguish
+  # infrastructure-level GitLab environments and site- and language-level GitLab
+  # environments.
+  #
+  # Note that this means that while this repository distinguishes between environments,
+  # sites, and languages, this CI file tells GitLab to call any combination of the three
+  # an "environment". Be aware of this when reading that key in these definitions.
+  resource_group: infra/preproduction
+  environment:
+    name: infra/preproduction
+    deployment_tier: staging
+
+#region Development
+
+# Jobs that apply to the dev site, for both English and Spanish (when differentiated).
+
+# Build all of the dev images with Kaniko. Unlike most of the other jobs here, we do not
+# need to define resource_group: since image builds can safely overlap (the tags are unique
+# by branch and commit), nor do we need to define environment: because the image builds
+# do not have inputs that should be tracked outside of the repository.
+build:dev:
+  extends: .build
+  only: [integration]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+# Deploy both English and Spanish to dev. We use the parallel:matrix: feature to loop over
+# both language codes.
+deploy:dev:
+  extends: .deploy
+  only: [integration]
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
+    deployment_tier: development
+
+# Deploy both English and Spanish, using the same parallel:matrix: feature as above.
+update:dev:
+  extends: .update
+  only: [integration]
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+  # Note that while we want to prevent overlapping Drush runs, we don't also include an
+  # environment here because, like the Docker image builds, there are no inputs outside
+  # of the provided $WEBCMS_* variables.
+  resource_group: drush/dev-$WEBCMS_LANG
+
+#endregion
+
+#region Staging
+
+# The jobs here follow the same pattern as the development jobs, so instead of repeating
+# the comments here, we note the differences:
+#
+# 1. Jobs are limited to the 'main' branch instead of 'integration'.
+# 2. The site name is 'stage' instead of 'dev'.
+
+build:stage:
+  extends: .build
+  only: [main]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+
+deploy:stage:
+  extends: .deploy
+  only: [main]
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+    deployment_tier: staging
+
+update:stage:
+  extends: .update
+  only: [main]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+
+  resource_group: drush/stage-$WEBCMS_LANG
+
+#endregion
+
+#endregion
