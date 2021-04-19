@@ -6,10 +6,14 @@
 stages:
   # Applications of the infrastructure Terraform module. This has to occur first because,
   # without it, Docker builds could attempt to push to empty ECR repositories.
-  - infrastructure
-
+  - infrastructure_preprod_init
+  - infrastructure_preprod_validate
+  - infrastructure_preprod_plan
+  - infrastructure_preprod_apply
+  
   # Docker builds
   - build
+  - copy
 
   # Applications of the webcms Terraform module
   - deploy
@@ -28,6 +32,122 @@ variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 #region Templates
+
+# This is the base template for all jobs in this pipeline.
+.terraform:
+  image:
+    name: registry.gitlab.com/gitlab-org/terraform-images/releases/0.14:latest
+    entrypoint: ['']
+
+  variables:
+    # Derive the root from the project directory and module name
+    TF_ROOT: $CI_PROJECT_DIR/terraform/$TF_MODULE
+
+    # Tell Terraform we are running in automation and should fail if it finds missing inputs
+    # instead of attempting to read from the console.
+    TF_INPUT: '0'
+    TF_IN_AUTOMATION: '1'
+
+    # Proxy input variables from our convention to variables recognizable by Terraform. We
+    # can do this unconditionally because Terraform only inspects the environment when it
+    # sees a declaration, sparing us from spurious warnings about values for undeclared
+    # variables.
+    TF_VAR_environment: ${WEBCMS_ENVIRONMENT}
+    TF_VAR_site: ${WEBCMS_SITE}
+    TF_VAR_lang: ${WEBCMS_LANG}
+    TF_VAR_image_tag: ${WEBCMS_IMAGE_TAG}
+    TF_VAR_aws_region: ${AWS_REGION}
+
+  # Use a granular cache for Terraform providers, bucketing by both module and branch.
+  cache:
+    key: tf-${TF_MODULE}-${CI_COMMIT_REF_SLUG}
+    paths:
+      - ${TF_ROOT}/.terraform
+
+  # Every job begins execution in the module's root directory with:
+  # 1. An empty http backend configuration to be filled in by the gitlab-terraform helper,
+  #    and
+  # 2. A copy of the GitLab-injected TERRAFORM_TFVARS file variable. (This variable is a
+  #    reference to a path in a temporary directory, so we copy it in order to allow
+  #    Terraform to see it automatically.)
+  #
+  # We do not explicitly invoke `gitlab-terraform init` because the helper script does
+  # this automatically as needed.
+  before_script:
+    - cd $TF_ROOT
+    - echo 'terraform { backend "http" {} }' >backend.tf
+    - cp "$TERRAFORM_TFVARS" terraform.tfvars
+
+.init:
+  extends: .terraform
+  stage: infrastructure_init
+
+  script:
+    - gitlab-terraform init
+
+.validate:
+  extends: .terraform
+  stage: infrastructure_validate
+  needs: [".init"]
+
+  script:
+    - gitlab-terraform validate
+
+# Perform a plan, uploading the plan files as GitLab artifacts.
+.plan:
+  extends: .terraform
+  stage: infrastructure_plan
+  needs: [".validate"]
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+.apply:
+  extends: .terraform
+  stage: infrastructure_apply
+  needs: [".init"]
+
+  # Download the plan files from the previous step.
+  dependencies: [plan]
+
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
+
+    - when: never
+
+
 
 # Jobs defined in this section are template jobs (the leading dot tells GitLab to
 # unconditionally ignore them when assembling a pipeline graph). The templates are named
@@ -57,12 +177,9 @@ variables:
 # Infrastructure jobs apply the Terraform module of the same name. They always trigger
 # the Terraform pipeline with $TF_MODULE set to the same value.
 .infrastructure:
-  stage: infrastructure
-
-  trigger:
-    include: .gitlab/terraform.yml
-    strategy: depend
-
+  extends: .terraform
+  tags:
+    - docker
   variables:
     TF_MODULE: infrastructure
 
@@ -110,9 +227,163 @@ variables:
   # directory inside the project root.
   cache:
     key: npm-drush
-    paths: ci/.npm
+    paths: 
+        - ci/.npm
 
 #endregion
+
+# This is the template job for all Kaniko builds. Every job, regardless of what is being
+# built or copied, uses this configuration:
+# 1. Builds are executed in the latest Kaniko image,
+# 2. Builds can opt into remote layer caching by adding $KANIKO_CACHE_ARGS to their
+#    script, and
+# 3. A before_script ensures that AWS ECR is added to Kaniko's credential store.
+.kaniko:
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: ['']
+
+  variables:
+    KANIKO_CACHE_ARGS: >-
+      --cache
+      --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
+
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+
+#region Image builds
+
+# We build Drupal-based images using another parallel:matrix: to cut down on the repetition
+# of the fairly long invocation of the Kaniko command line.
+
+build:drupal:dev:
+  extends: .kaniko
+  stage: build
+  only: [integration]
+
+  # These correspond to the three production targets in services/drupal/Dockerfile. The
+  # ordering here is important for builds with a limited pool of servers: by ensuring that
+  # the Drupal build is executed first, it increases the chances that expensive
+  # intermediate layers (such as building the ElastiCache client or building the theme)
+  # already exist by the time the nginx and Drush targets need to copy that data.
+  parallel:
+    matrix:
+      - WEBCMS_TARGET: [drupal, nginx, drush]
+
+  # In addition to the shared cache arguments, we provide additional settings to tune
+  # Kaniko's caching behavior. This is due to the large number of files and steps in the
+  # WebCMS Dockerfile:
+  #
+  # - We skip stages that don't apply to this build target.
+  #
+  # - We use the faster but less accurate redo snapshot mode, under the assumption that
+  #   changes in files like composer.json or custom modules will be sufficient to disrupt
+  #   the metadata cache.
+  #
+  # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
+  #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
+  #   improve build performance by 75%".
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --skip-unused-stages
+          --snapshotMode=redo
+          --use-new-run
+          --context=$CI_PROJECT_DIR/services/drupal
+          --target=$WEBCMS_TARGET
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+# Build the FPM metrics sidecar container.
+build:metrics:dev:
+  extends: .kaniko
+  stage: build
+  only: [integration]
+
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --context=$CI_PROJECT_DIR/services/metrics
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+# On the main and live branches (the tracking branches for the AWS environments), we also
+# build the database Terraform container. See the terraform/database/ directory for more
+# information.
+build:database:dev:
+  extends: .kaniko
+  stage: build
+  only: [integration]
+
+  script:
+    - >-
+        /kaniko/executor
+          $KANIKO_CACHE_ARGS
+          --context=$CI_PROJECT_DIR/terraform/database
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+#endregion
+
+#region Docker Hub mirrors
+
+# As mentioned in the comments above, this stage is for mirroring Docker Hub images. Our
+# GitLab CI/CD environment is restricted - we aren't permitted access to the Docker daemon
+# and thus can't use Docker-in-Docker. Fortunately, we can slightly misuse Kaniko to
+# accomplish this task by creating an empty workspace with a single-line Dockerfile
+# referencing the image and tag we want to mirror. By performing a "build" in this
+# workspace, Kaniko will pull the image, retag it with the ECR destination, and push it.
+# This bypasses the need for the `docker pull` and `docker push` commands.
+
+# Jobs in this stage will almost always only execute on branches that track AWS
+# infrastructure: this typically means that we mirror only on the main and live branches.
+
+# Mirror the AWS CloudWatch agent image using the latest tag.
+copy:cloudwatch:dev:
+  extends: .kaniko
+  stage: copy
+  only: [integration]
+
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
+    - >-
+        /kaniko/executor
+          --context=/workspace
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+# Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
+# in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
+copy:traefik:dev:
+  extends: .kaniko
+  stage: copy
+  only: [integration]
+
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM traefik:2.4' >/workspace/Dockerfile
+    - >-
+        /kaniko/executor
+          --context=/workspace
+          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+#endregion
+
 
 #region Preproduction
 
@@ -121,136 +392,59 @@ variables:
 # the subregions below the infrastructure step.
 
 # Preproduction infrastructure builds are triggered only by the 'main' branch.
-infrastructure:preproduction:
+infrastructure:preproduction:init:
   extends: .infrastructure
-  only: [main]
-
+  stage: infrastructure_preprod_init
+  only:
+    refs:
+      - main
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
+  script:
+    - gitlab-terraform init
 
-  # The resource_group option tells GitLab to prevent overlapping runs, regardless of how
-  # many builds were triggered. (Without this, Terraform would raise an error due to
-  # finding a lock already present.)
-  #
-  # The environment here is used primarily to serve as a scoping mechanism for the
-  # TF_VAR_* variables; without this, different environments would clobber each other's
-  # variables depending on what was defined. We use the "infra/" prefix to distinguish
-  # infrastructure-level GitLab environments and site- and language-level GitLab
-  # environments.
-  #
-  # Note that this means that while this repository distinguishes between environments,
-  # sites, and languages, this CI file tells GitLab to call any combination of the three
-  # an "environment". Be aware of this when reading that key in these definitions.
-  resource_group: infra/preproduction
-  environment:
-    name: infra/preproduction
-    deployment_tier: staging
+infrastructure:preproduction:validate:
+  extends: .infrastructure
+  stage: infrastructure_preprod_validate
+  only:
+    refs:
+      - main
+  script:
+    - gitlab-terraform validate
 
-#region Development
+infrastructure:preproduction:plan:
+  extends: .infrastructure
+  stage: infrastructure_preprod_plan
+  only:
+    refs:
+      - main
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
 
-# Jobs that apply to the dev site, for both English and Spanish (when differentiated).
+infrastructure:preproduction:apply:
+  extends: .infrastructure
+  stage: infrastructure_preprod_apply
+  dependencies: ["infrastructure:preproduction:plan"]
+  script:
+    - gitlab-terraform apply
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
 
-# Build all of the dev images with Kaniko. Unlike most of the other jobs here, we do not
-# need to define resource_group: since image builds can safely overlap (the tags are unique
-# by branch and commit), nor do we need to define environment: because the image builds
-# do not have inputs that should be tracked outside of the repository.
-build:dev:
-  extends: .build
-  only: [integration]
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
 
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
+    - when: never
 
-# Deploy both English and Spanish to dev. We use the parallel:matrix: feature to loop over
-# both language codes.
-deploy:dev:
-  extends: .deploy
-  only: [integration]
-
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
-  resource_group: site/dev-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-    deployment_tier: development
-
-# Deploy both English and Spanish, using the same parallel:matrix: feature as above.
-update:dev:
-  extends: .update
-  only: [integration]
-
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
-
-  # Note that while we want to prevent overlapping Drush runs, we don't also include an
-  # environment here because, like the Docker image builds, there are no inputs outside
-  # of the provided $WEBCMS_* variables.
-  resource_group: drush/dev-$WEBCMS_LANG
-
-#endregion
-
-#region Staging
-
-# The jobs here follow the same pattern as the development jobs, so instead of repeating
-# the comments here, we note the differences:
-#
-# 1. Jobs are limited to the 'main' branch instead of 'integration'.
-# 2. The site name is 'stage' instead of 'dev'.
-
-build:stage:
-  extends: .build
-  only: [main]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
-
-deploy:stage:
-  extends: .deploy
-  only: [main]
-
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
-    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-
-  resource_group: site/stage-$WEBCMS_LANG
-  environment:
-    name: site/stage-$WEBCMS_LANG
-    deployment_tier: staging
-
-update:stage:
-  extends: .update
-  only: [main]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
-
-  resource_group: drush/stage-$WEBCMS_LANG
-
-#endregion
-
-#endregion
