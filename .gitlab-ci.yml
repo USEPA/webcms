@@ -610,3 +610,20 @@ deploy:dev:apply:
 
 #endregion
 
+update:dev:
+  extends: .update
+  only: [ci-work]
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+  # Note that while we want to prevent overlapping Drush runs, we don't also include an
+  # environment here because, like the Docker image builds, there are no inputs outside
+  # of the provided $WEBCMS_* variables.
+  resource_group: drush/dev-$WEBCMS_LANG
+
