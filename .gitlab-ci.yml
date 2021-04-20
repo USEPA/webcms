@@ -244,9 +244,7 @@ variables:
     entrypoint: ['']
 
   variables:
-    KANIKO_CACHE_ARGS: >-
-      --cache
-      --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
+    KANIKO_CACHE_ARGS: --cache --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
 
   before_script:
     - mkdir -p /kaniko/.docker
@@ -286,15 +284,14 @@ build:drupal:
   #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
   #   improve build performance by 75%".
   script:
-    - >-
-        /kaniko/executor
-          $KANIKO_CACHE_ARGS
-          --skip-unused-stages
-          --snapshotMode=redo
-          --use-new-run
-          --context=$CI_PROJECT_DIR/services/drupal
-          --target=$WEBCMS_TARGET
-          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --skip-unused-stages
+      --snapshotMode=redo
+      --use-new-run
+      --context=$CI_PROJECT_DIR/services/drupal
+      --target=$WEBCMS_TARGET
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
