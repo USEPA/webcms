@@ -75,7 +75,7 @@ variables:
   # this automatically as needed.
   before_script:
     - cd $TF_ROOT
-    - echo 'terraform {/n backend "http" {} /n}' >backend.tf
+    - cp $backend_ft backend.tf
     - cp "$TERRAFORM_TFVARS" terraform.tfvars
 
 init:
