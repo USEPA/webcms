@@ -401,6 +401,8 @@ infrastructure:preproduction:init:
     TF_STATE_NAME: dev
   script:
     - gitlab-terraform init
+  environment:
+    name: infra/preproduction
 
 infrastructure:preproduction:validate:
   extends: .infrastructure
@@ -413,6 +415,8 @@ infrastructure:preproduction:validate:
     TF_STATE_NAME: dev
   script:
     - gitlab-terraform validate
+  environment:
+    name: infra/preproduction
 
 infrastructure:preproduction:plan:
   extends: .infrastructure
@@ -426,6 +430,8 @@ infrastructure:preproduction:plan:
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
+  environment:
+    name: infra/preproduction
   artifacts:
     name: plan
     paths:
@@ -442,6 +448,8 @@ infrastructure:preproduction:apply:
     TF_STATE_NAME: dev
   script:
     - gitlab-terraform apply
+  environment:
+    name: infra/preproduction
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
