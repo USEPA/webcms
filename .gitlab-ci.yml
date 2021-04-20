@@ -257,7 +257,7 @@ variables:
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
 # of the fairly long invocation of the Kaniko command line.
 
-build:drupal:dev:
+build:drupal:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -270,6 +270,7 @@ build:drupal:dev:
   parallel:
     matrix:
       - WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_SITE: [dev,stage]
 
   # In addition to the shared cache arguments, we provide additional settings to tune
   # Kaniko's caching behavior. This is due to the large number of files and steps in the
@@ -296,7 +297,6 @@ build:drupal:dev:
           --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
 
 # Build the FPM metrics sidecar container.
 build:metrics:dev:
