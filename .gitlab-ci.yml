@@ -80,14 +80,14 @@ variables:
 
 init:
   extends: .terraform
-  stage: infrastructure_init
+  stage: infrastructure_preprod_init
 
   script:
     - gitlab-terraform init
 
 validate:
   extends: .terraform
-  stage: infrastructure_validate
+  stage: infrastructure_preprod_validate
   needs: ["init"]
 
   script:
@@ -96,7 +96,7 @@ validate:
 # Perform a plan, uploading the plan files as GitLab artifacts.
 plan:
   extends: .terraform
-  stage: infrastructure_plan
+  stage: infrastructure_preprod_plan
   needs: ["validate"]
 
   script:
