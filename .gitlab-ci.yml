@@ -410,6 +410,9 @@ infrastructure:preproduction:validate:
   only:
     refs:
       - ci-work
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
   script:
     - gitlab-terraform validate
 
@@ -419,6 +422,9 @@ infrastructure:preproduction:plan:
   only:
     refs:
       - ci-work
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -433,6 +439,9 @@ infrastructure:preproduction:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_apply
   dependencies: ["infrastructure:preproduction:plan"]
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
   script:
     - gitlab-terraform apply
   rules:
