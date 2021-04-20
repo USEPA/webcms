@@ -480,7 +480,7 @@ infrastructure:preproduction:apply:
 
 
 deploy:dev:init:
-  extends: .terraform
+  extends: .deploy
   stage: deploy:dev:init
   only:
     refs:
@@ -508,7 +508,7 @@ deploy:dev:init:
 
 # Validate syntax and configuration
 deploy:dev:validate:
-  extends: .terraform
+  extends: .deploy
   stage: deploy:dev:validate
   only:
     refs:
@@ -519,7 +519,7 @@ deploy:dev:validate:
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
 deploy:dev:plan:
-  extends: .terraform
+  extends: .deploy
   stage: deploy:dev:plan
   only:
     refs:
@@ -556,7 +556,7 @@ deploy:dev:plan:
 # Perform an apply. Note that this is not always automatic; see the comments above the rules
 # for more.
 deploy:dev:apply:
-  extends: .terraform
+  extends: .deploy
   stage: deploy:dev:apply
 
   # Download the plan files from the previous step.
