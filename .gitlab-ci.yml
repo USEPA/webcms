@@ -78,14 +78,14 @@ variables:
     - cp $backend_tf backend.tf
     - cp "$TERRAFORM_TFVARS" terraform.tfvars
 
-init:
+.init:
   extends: .terraform
   stage: infrastructure_preprod_init
 
   script:
     - gitlab-terraform init
 
-validate:
+.validate:
   extends: .terraform
   stage: infrastructure_preprod_validate
   needs: ["init"]
@@ -94,7 +94,7 @@ validate:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
-plan:
+.plan:
   extends: .terraform
   stage: infrastructure_preprod_plan
   needs: ["validate"]
@@ -397,7 +397,7 @@ infrastructure:preproduction:init:
   stage: infrastructure_preprod_init
   only:
     refs:
-      - main
+      - ci-work
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -409,7 +409,7 @@ infrastructure:preproduction:validate:
   stage: infrastructure_preprod_validate
   only:
     refs:
-      - main
+      - ci-work
   script:
     - gitlab-terraform validate
 
@@ -418,7 +418,7 @@ infrastructure:preproduction:plan:
   stage: infrastructure_preprod_plan
   only:
     refs:
-      - main
+      - ci-work
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
