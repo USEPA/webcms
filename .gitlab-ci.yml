@@ -78,26 +78,26 @@ variables:
     - echo 'terraform { backend "http" {} }' >backend.tf
     - cp "$TERRAFORM_TFVARS" terraform.tfvars
 
-.init:
+init:
   extends: .terraform
   stage: infrastructure_init
 
   script:
     - gitlab-terraform init
 
-.validate:
+validate:
   extends: .terraform
   stage: infrastructure_validate
-  needs: [".init"]
+  needs: ["init"]
 
   script:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
-.plan:
+plan:
   extends: .terraform
   stage: infrastructure_plan
-  needs: [".validate"]
+  needs: ["validate"]
 
   script:
     - gitlab-terraform plan
