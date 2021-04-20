@@ -302,11 +302,10 @@ build:metrics:dev:
   only: [integration]
 
   script:
-    - >-
-        /kaniko/executor
-          $KANIKO_CACHE_ARGS
-          --context=$CI_PROJECT_DIR/services/metrics
-          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --context=$CI_PROJECT_DIR/services/metrics
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -320,11 +319,10 @@ build:database:dev:
   only: [integration]
 
   script:
-    - >-
-        /kaniko/executor
-          $KANIKO_CACHE_ARGS
-          --context=$CI_PROJECT_DIR/terraform/database
-          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --context=$CI_PROJECT_DIR/terraform/database
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -353,10 +351,9 @@ copy:cloudwatch:dev:
   script:
     - mkdir -p /workspace
     - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
-    - >-
-        /kaniko/executor
-          --context=/workspace
-          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+    - /kaniko/executor
+      --context=/workspace
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -371,10 +368,9 @@ copy:traefik:dev:
   script:
     - mkdir -p /workspace
     - echo 'FROM traefik:2.4' >/workspace/Dockerfile
-    - >-
-        /kaniko/executor
-          --context=/workspace
-          --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
+    - /kaniko/executor
+      --context=/workspace
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
