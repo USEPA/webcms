@@ -610,6 +610,158 @@ deploy:dev:apply:
 
 #endregion
 
+
+
+
+
+
+
+deploy:stage:init:
+  extends: .deploy
+  stage: deploy:dev:init
+  only:
+    refs:
+      - ci-work
+  
+  when: manual
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform init
+
+# Validate syntax and configuration
+deploy:stage:validate:
+  extends: .deploy
+  stage: deploy:dev:validate
+  only:
+    refs:
+      - ci-work
+  
+  when: manual
+  
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform validate
+
+# Perform a plan, uploading the plan files as GitLab artifacts.
+deploy:stage:plan:
+  extends: .deploy
+  stage: deploy:dev:plan
+  only:
+    refs:
+      - ci-work
+  
+  when: manual
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+# Perform an apply. Note that this is not always automatic; see the comments above the rules
+# for more.
+deploy:stage:apply:
+  extends: .deploy
+  stage: deploy:dev:apply
+
+  # Download the plan files from the previous step.
+  dependencies: ["deploy:dev:plan"]
+
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+   
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
+
+    - when: never
+
+#endregion
+
+
+
+
+
+
+
+
+
 update:dev:
   extends: .update
   only: [ci-work]
