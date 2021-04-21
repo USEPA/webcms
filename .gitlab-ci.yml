@@ -455,18 +455,19 @@ infrastructure:preproduction:apply:
     - gitlab-terraform apply
   environment:
     name: infra/preproduction
-  rules:
-    - if: >-
-        $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-      when: manual
+  when: manual
+#   rules:
+#     - if: >-
+#         $TF_MODULE == "infrastructure" &&
+#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+#       when: manual
 
-    - if: >-
-        $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-      when: on_success
+#     - if: >-
+#         $TF_MODULE == "webcms" &&
+#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+#       when: on_success
 
-    - when: never
+#     - when: never
 
   
 
