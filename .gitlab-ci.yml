@@ -20,8 +20,10 @@ stages:
   - deploy:dev:plan
   - deploy:dev:apply
 
-  # Applications of the webcms Terraform module
-  - deploy
+  - deploy:stage:init
+  - deploy:stage:validate
+  - deploy:stage:plan
+  - deploy:stage:apply
 
   # Drush
   - update
@@ -305,7 +307,7 @@ variables:
  build:metrics:dev:
    extends: .kaniko
    stage: build
-   only: [integration]
+   only: [ci-work]
 
    script:
      - /kaniko/executor
@@ -322,7 +324,7 @@ variables:
  build:database:dev:
    extends: .kaniko
    stage: build
-   only: [integration]
+   only: [ci-work]
 
    script:
      - /kaniko/executor
@@ -628,7 +630,7 @@ deploy:dev:apply:
 
 deploy:stage:init:
   extends: .deploy
-  stage: deploy:dev:init
+  stage: deploy:stage:init
   only:
     refs:
       - ci-work
@@ -654,7 +656,7 @@ deploy:stage:init:
 # Validate syntax and configuration
 deploy:stage:validate:
   extends: .deploy
-  stage: deploy:dev:validate
+  stage: deploy:stage:validate
   only:
     refs:
       - ci-work
@@ -680,7 +682,7 @@ deploy:stage:validate:
 # Perform a plan, uploading the plan files as GitLab artifacts.
 deploy:stage:plan:
   extends: .deploy
-  stage: deploy:dev:plan
+  stage: deploy:stage:plan
   only:
     refs:
       - ci-work
@@ -715,7 +717,7 @@ deploy:stage:plan:
 # for more.
 deploy:stage:apply:
   extends: .deploy
-  stage: deploy:dev:apply
+  stage: deploy:stage:apply
 
   # Download the plan files from the previous step.
   dependencies: ["deploy:dev:plan"]
@@ -774,6 +776,7 @@ deploy:stage:apply:
 
 update:dev:
   extends: .update
+  stage: update
   only: [ci-work]
 
   parallel:
