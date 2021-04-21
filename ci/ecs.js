@@ -117,10 +117,6 @@ async function startDrushTask(script) {
         securityGroups: [securityGroup],
       },
     },
-
-    // This field is required by the types, but is allowed to be undefined. We do this to
-    // play nice with the @ts-check comment instead of suppress the error.
-    containerInstances: undefined,
   });
 
   const response = await client.send(command);
