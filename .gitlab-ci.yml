@@ -707,7 +707,7 @@ deploy:dev:apply-es:
 
 
 
-deploy:stage:init:
+.deploy:stage:init:
   extends: .deploy
   stage: deploy:stage:init
   only:
@@ -733,7 +733,7 @@ deploy:stage:init:
     - gitlab-terraform init
 
 # Validate syntax and configuration
-deploy:stage:validate:
+.deploy:stage:validate:
   extends: .deploy
   stage: deploy:stage:validate
   only:
@@ -759,7 +759,7 @@ deploy:stage:validate:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
-deploy:stage:plan:
+.deploy:stage:plan:
   extends: .deploy
   stage: deploy:stage:plan
   only:
@@ -794,7 +794,7 @@ deploy:stage:plan:
 
 # Perform an apply. Note that this is not always automatic; see the comments above the rules
 # for more.
-deploy:stage:apply:
+.deploy:stage:apply:
   extends: .deploy
   stage: deploy:stage:apply
 
