@@ -356,7 +356,7 @@ build:database:dev:
 copy:cloudwatch:dev:
   extends: .kaniko
   stage: copy
-  only: [integration]
+  only: [ci-work]
 
   script:
     - mkdir -p /workspace
@@ -373,7 +373,7 @@ copy:cloudwatch:dev:
 copy:traefik:dev:
   extends: .kaniko
   stage: copy
-  only: [integration]
+  only: [ci-work]
 
   script:
     - mkdir -p /workspace
