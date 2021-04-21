@@ -263,20 +263,20 @@ variables:
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
 # of the fairly long invocation of the Kaniko command line.
 
- build:drupal:
-   extends: .kaniko
-   stage: build
-   only: [ci-work]
+build:drupal:
+  extends: .kaniko
+  stage: build
+  only: [ci-work]
 
    # These correspond to the three production targets in services/drupal/Dockerfile. The
    # ordering here is important for builds with a limited pool of servers: by ensuring that
    # the Drupal build is executed first, it increases the chances that expensive
    # intermediate layers (such as building the ElastiCache client or building the theme)
    # already exist by the time the nginx and Drush targets need to copy that data.
-   parallel:
-     matrix:
-       - WEBCMS_TARGET: [drupal, nginx, drush]
-         WEBCMS_SITE: [dev,stage]
+  parallel:
+    matrix:
+      - WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_SITE: [dev,stage]
 
    # In addition to the shared cache arguments, we provide additional settings to tune
    # Kaniko's caching behavior. This is due to the large number of files and steps in the
@@ -291,49 +291,49 @@ variables:
    # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
-   script:
-     - /kaniko/executor
-       $KANIKO_CACHE_ARGS
-       --skip-unused-stages
-       --snapshotMode=redo
-       --use-new-run
-       --context=$CI_PROJECT_DIR/services/drupal
-       --target=$WEBCMS_TARGET
-       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-   variables:
-     WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --skip-unused-stages
+      --snapshotMode=redo
+      --use-new-run
+      --context=$CI_PROJECT_DIR/services/drupal
+      --target=$WEBCMS_TARGET
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
 
  # Build the FPM metrics sidecar container.
- build:metrics:dev:
-   extends: .kaniko
-   stage: build
-   only: [ci-work]
+build:metrics:dev:
+  extends: .kaniko
+  stage: build
+  only: [ci-work]
 
-   script:
-     - /kaniko/executor
-       $KANIKO_CACHE_ARGS
-       --context=$CI_PROJECT_DIR/services/metrics
-       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
-   variables:
-     WEBCMS_ENVIRONMENT: preproduction
-     WEBCMS_SITE: dev
+  script:
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --context=$CI_PROJECT_DIR/services/metrics
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
 
  # On the main and live branches (the tracking branches for the AWS environments), we also
  # build the database Terraform container. See the terraform/database/ directory for more
  # information.
- build:database:dev:
-   extends: .kaniko
-   stage: build
-   only: [ci-work]
+build:database:dev:
+  extends: .kaniko
+  stage: build
+  only: [ci-work]
 
-   script:
-     - /kaniko/executor
-       $KANIKO_CACHE_ARGS
-       --context=$CI_PROJECT_DIR/terraform/database
-       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
-   variables:
-     WEBCMS_ENVIRONMENT: preproduction
-     WEBCMS_SITE: dev
+  script:
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --context=$CI_PROJECT_DIR/terraform/database
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
 
  #endregion
 
@@ -351,37 +351,37 @@ variables:
  # infrastructure: this typically means that we mirror only on the main and live branches.
 
  # Mirror the AWS CloudWatch agent image using the latest tag.
- copy:cloudwatch:dev:
-   extends: .kaniko
-   stage: copy
-   only: [integration]
+copy:cloudwatch:dev:
+  extends: .kaniko
+  stage: copy
+  only: [integration]
 
-   script:
-     - mkdir -p /workspace
-     - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
-     - /kaniko/executor
-       --context=/workspace
-       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
-   variables:
-     WEBCMS_ENVIRONMENT: preproduction
-     WEBCMS_SITE: dev
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
+    - /kaniko/executor
+      --context=/workspace
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
 
  # Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
  # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
- copy:traefik:dev:
-   extends: .kaniko
-   stage: copy
-   only: [integration]
+copy:traefik:dev:
+  extends: .kaniko
+  stage: copy
+  only: [integration]
 
-   script:
-     - mkdir -p /workspace
-     - echo 'FROM traefik:2.4' >/workspace/Dockerfile
-     - /kaniko/executor
-       --context=/workspace
-       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
-   variables:
-     WEBCMS_ENVIRONMENT: preproduction
-     WEBCMS_SITE: dev
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM traefik:2.4' >/workspace/Dockerfile
+    - /kaniko/executor
+      --context=/workspace
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
 
 #endregion
 
