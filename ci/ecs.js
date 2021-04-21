@@ -93,7 +93,7 @@ async function startDrushTask(script) {
   const privateSubnets = await ssm.getParameter("vpc/private-subnets");
   const securityGroup = await ssm.getParameter("security-groups/drupal");
 
-  const command = new ECS.StartTaskCommand({
+  const command = new ECS.RunTaskCommand({
     cluster,
     taskDefinition,
 
@@ -107,6 +107,8 @@ async function startDrushTask(script) {
         { name: "drush", command: ["/bin/sh", "-exc", script] },
       ],
     },
+
+    launchType: 'FARGATE',
 
     // This network configuration is required by Fargate since it uses AWSVPC networking
     // exclusively.
