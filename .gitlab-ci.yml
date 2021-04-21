@@ -37,7 +37,7 @@ default:
 # pipelines.
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
-  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
+  
 
 #region Templates
 
@@ -190,6 +190,7 @@ variables:
     - docker
   variables:
     TF_MODULE: infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
 # Build jobs perform a Kaniko build. We create a child pipeline due to the number of
 # images that are built (at least Drupal, nginx, and Drush).
@@ -210,6 +211,7 @@ variables:
 
   variables:
     TF_MODULE: webcms
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
 
 # Update jobs invoke Drush to perform the necessary maintenance commands (drush updb,
 # drush cim) against the freshly-updated cluster. See the ci/ directory for more
