@@ -455,19 +455,18 @@ infrastructure:preproduction:apply:
     - gitlab-terraform apply
   environment:
     name: infra/preproduction
-  when: manual
-#   rules:
-#     - if: >-
-#         $TF_MODULE == "infrastructure" &&
-#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-#       when: manual
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: manual
 
-#     - if: >-
-#         $TF_MODULE == "webcms" &&
-#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-#       when: on_success
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: on_success
 
-#     - when: never
+    - when: never
 
   
 
@@ -597,8 +596,6 @@ deploy:dev:apply:
   script:
     - gitlab-terraform apply
 
-  when: manual
-
   # We use GitLab's rules to limit when we block the application of a Terraform module.
   #
   # There are three rules:
@@ -612,18 +609,18 @@ deploy:dev:apply:
   #
   # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
   # rule does not have an `if:` condition limiting when it applies.
-#   rules:
-#     - if: >-
-#         $TF_MODULE == "infrastructure" &&
-#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-#       when: manual
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: manual
 
-#     - if: >-
-#         $TF_MODULE == "webcms" &&
-#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-#       when: on_success
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: on_success
 
-#     - when: never
+    - when: never
     
 
 #endregion
