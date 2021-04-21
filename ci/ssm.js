@@ -57,4 +57,12 @@ async function getParameter(suffix) {
   return (cache[name] = response.Parameter.Value);
 }
 
+/**
+ * Destroy the background SSM client.
+ */
+function destroy() {
+  client.destroy();
+}
+
 exports.getParameter = getParameter;
+exports.destroy = destroy;
