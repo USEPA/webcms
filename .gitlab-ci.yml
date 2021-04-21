@@ -211,7 +211,7 @@ variables:
 
   variables:
     TF_MODULE: webcms
-    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-$WEBCMS_LANG
 
 # Update jobs invoke Drush to perform the necessary maintenance commands (drush updb,
 # drush cim) against the freshly-updated cluster. See the ci/ directory for more
@@ -265,7 +265,7 @@ variables:
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
 # of the fairly long invocation of the Kaniko command line.
 
-build:drupal:
+.build:drupal:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -306,7 +306,7 @@ build:drupal:
     WEBCMS_ENVIRONMENT: preproduction
 
  # Build the FPM metrics sidecar container.
-build:metrics:dev:
+.build:metrics:dev:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -323,7 +323,7 @@ build:metrics:dev:
  # On the main and live branches (the tracking branches for the AWS environments), we also
  # build the database Terraform container. See the terraform/database/ directory for more
  # information.
-build:database:dev:
+.build:database:dev:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -353,7 +353,7 @@ build:database:dev:
  # infrastructure: this typically means that we mirror only on the main and live branches.
 
  # Mirror the AWS CloudWatch agent image using the latest tag.
-copy:cloudwatch:dev:
+.copy:cloudwatch:dev:
   extends: .kaniko
   stage: copy
   only: [integration]
@@ -370,7 +370,7 @@ copy:cloudwatch:dev:
 
  # Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
  # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
-copy:traefik:dev:
+.copy:traefik:dev:
   extends: .kaniko
   stage: copy
   only: [integration]
@@ -517,7 +517,7 @@ deploy:dev:init:
     name: site/dev-$WEBCMS_LANG
 
   script:
-    - echo $TF_STATE_NAME
+    - echo $TF_ADDRESS
     - gitlab-terraform init
 
 # Validate syntax and configuration
