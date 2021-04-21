@@ -1,7 +1,7 @@
 #region Database credentials
 
 resource "aws_secretsmanager_secret" "db_root_credentials" {
-  name        = "/webcms/${var.environment}/db-root-credentials"
+  name        = "/webcms/${var.environment}/db-root-credentials_new"
   description = "Credentials for the WebCMS DB administrator"
 
   recovery_window_in_days = 0
