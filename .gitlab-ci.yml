@@ -532,20 +532,17 @@ deploy:dev:validate:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
-deploy:dev:plan:
+deploy:dev:plan-en:
   extends: .deploy
   stage: deploy:dev:plan
   only:
     refs:
       - ci-work
 
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
+    WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
@@ -567,22 +564,52 @@ deploy:dev:plan:
     reports:
       terraform: $TF_ROOT/plan.json
 
-# Perform an apply. Note that this is not always automatic; see the comments above the rules
-# for more.
-deploy:dev:apply:
+deploy:dev:plan-es:
   extends: .deploy
-  stage: deploy:dev:apply
-
-  # Download the plan files from the previous step.
-  dependencies: ["deploy:dev:plan"]
-
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
+  stage: deploy:dev:plan
+  only:
+    refs:
+      - ci-work
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+
+# Perform an apply. Note that this is not always automatic; see the comments above the rules
+# for more.
+deploy:dev:apply-en:
+  extends: .deploy
+  stage: deploy:dev:apply
+
+  # Download the plan files from the previous step.
+  dependencies: ["deploy:dev:plan-en"]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
@@ -622,6 +649,55 @@ deploy:dev:apply:
 
     - when: never
 
+deploy:dev:apply-es:
+  extends: .deploy
+  stage: deploy:dev:apply
+
+  # Download the plan files from the previous step.
+  dependencies: ["deploy:dev:plan-es"]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+      when: on_success
+
+    - when: never
 
 #endregion
 
