@@ -3,6 +3,7 @@
 const dedent = require("dedent");
 
 const ecs = require("./ecs");
+const ssm = require("./ssm");
 const ui = require("./ui");
 const util = require("./util");
 
@@ -14,12 +15,13 @@ const util = require("./util");
  * ecs.js.)
  */
 const drushScript = dedent`
-  drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-format=integer
-  drush --debug --uri="$WEBCMS_SITE_URL" updb -y
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
-  drush --debug --uri="$WEBCMS_SITE_URL" cim -y
-  drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
+  echo hello world
+  # drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-format=integer
+  # drush --debug --uri="$WEBCMS_SITE_URL" updb -y
+  # drush --debug --uri="$WEBCMS_SITE_URL" cr
+  # drush --debug --uri="$WEBCMS_SITE_URL" cim -y
+  # drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
+  # drush --debug --uri="$WEBCMS_SITE_URL" cr
 `;
 
 /**
@@ -110,10 +112,17 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  // Output a notification so the log is pre-expanded in Buildkite builds.
-  ui.notify();
+main()
+  .catch((error) => {
+    // Output a notification so the log is pre-expanded in Buildkite builds.
+    ui.notify();
 
-  console.error(String(error));
-  process.exitCode = 1;
-});
+    console.error(String(error));
+    process.exitCode = 1;
+  })
+  .then(() => {
+    // Destroy the client instances now that we're done in order to allow Node.js to clean
+    // up any event loop resources.
+    ecs.destroy();
+    ssm.destroy();
+  });
