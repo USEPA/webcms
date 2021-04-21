@@ -265,7 +265,7 @@ variables:
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
 # of the fairly long invocation of the Kaniko command line.
 
-.build:drupal:
+build:drupal:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -306,7 +306,7 @@ variables:
     WEBCMS_ENVIRONMENT: preproduction
 
  # Build the FPM metrics sidecar container.
-.build:metrics:dev:
+build:metrics:dev:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -323,7 +323,7 @@ variables:
  # On the main and live branches (the tracking branches for the AWS environments), we also
  # build the database Terraform container. See the terraform/database/ directory for more
  # information.
-.build:database:dev:
+build:database:dev:
   extends: .kaniko
   stage: build
   only: [ci-work]
@@ -353,7 +353,7 @@ variables:
  # infrastructure: this typically means that we mirror only on the main and live branches.
 
  # Mirror the AWS CloudWatch agent image using the latest tag.
-.copy:cloudwatch:dev:
+copy:cloudwatch:dev:
   extends: .kaniko
   stage: copy
   only: [integration]
@@ -370,7 +370,7 @@ variables:
 
  # Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
  # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
-.copy:traefik:dev:
+copy:traefik:dev:
   extends: .kaniko
   stage: copy
   only: [integration]
