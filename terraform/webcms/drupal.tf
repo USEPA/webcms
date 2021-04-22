@@ -38,11 +38,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # Inject the DB credentials needed (cf. shared.tf)
       secrets = local.drupal_secrets
 
-      # Expose port 9000 inside the task. This is a FastCGI port, not an HTTP one, so it
-      # won't be of use to anyone save for nginx. Most importantly, this means that this
-      # port should NOT be exposed to a load balancer.
-      portMappings = [{ containerPort = 9000 }]
-
       # Shunt logs to the PHP-FPM CloudWatch log group
       logConfiguration = {
         logDriver = "awslogs"
@@ -63,18 +58,26 @@ resource "aws_ecs_task_definition" "drupal_task" {
       name  = "nginx"
       image = "${data.aws_ssm_parameter.ecr_nginx.value}:${var.image_tag}"
 
-      # Docker labels are how we communicate our routing preferences to Traefik. These settings
-      # correspond to Traefik's own configuration names. Specifically, we make use of router
-      # configuration to dynamically create a Router (see https://doc.traefik.io/traefik/routing/routers/)
-      # when this task launches in ECS.
+      # Docker labels are how we communicate our routing preferences to Traefik. These
+      # settings correspond to Traefik's own configuration names. Specifically, we make
+      # use of router configuration to dynamically create a Router (see
+      # https://doc.traefik.io/traefik/routing/routers/) when this task launches in ECS.
       dockerLabels = {
         # Advertise to Traefik that we want to receive traffic
         "traefik.enable" = "true"
 
-        # Tell Traefik to allow any hostname provided in variables. The expression on the right is
-        # a map over the list of domains, which expands to a Traefik routing rule like the below:
-        #  Rule: Host(`example.org`) || Host(`example.com`)
+        # Tell Traefik to allow any hostname provided in variables. The expression on the
+        # right is a map over the list of domains, which expands to a Traefik routing rule
+        # like the below:
+        #
+        #     Rule: Host(`example.org`) || Host(`example.com`)
         "traefik.http.routers.${var.site}_${var.lang}.rule" = join(" || ", formatlist("Host(`%s`)", concat([var.drupal_hostname], var.drupal_extra_hostnames)))
+
+        # Only allow routing to this task via the "websecure" (port 443) entrypoint
+        "traefik.http.routers.${var.site}_${var.lang}.entrypoints" = "websecure"
+
+        # Ask Traefik to forward traffic to nginx port 443
+        "traefik.http.services.${var.site}_${var.lang}.loadbalancer.server.port" = "443"
       }
 
       environment = [
@@ -93,9 +96,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true
 
-      # Expose port 80 from the task. This port is not connected to the load balancer; instead,
-      # Traefik routes to it after matching hostnames.
-      portMappings = [{ containerPort = 80 }]
+      # Expose port 443 from the task. This port is not connected to the load balancer;
+      # instead, Traefik routes to it after matching hostnames.
+      portMappings = [{ containerPort = 443 }]
 
       dependsOn = [
         { containerName = "drupal", condition = "START" }
