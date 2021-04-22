@@ -15,10 +15,15 @@ stages:
   - build
   - copy
 
-  - deploy:dev:init
-  - deploy:dev:validate
-  - deploy:dev:plan
-  - deploy:dev:apply
+  - deploy:dev:init:en
+  - deploy:dev:validate:en
+  - deploy:dev:plan:en
+  - deploy:dev:apply:en
+
+  - deploy:dev:init:es
+  - deploy:dev:validate:es
+  - deploy:dev:plan:es
+  - deploy:dev:apply:es
 
   - deploy:stage:init
   - deploy:stage:validate
@@ -492,18 +497,15 @@ infrastructure:preproduction:apply:
 
 
 
-deploy:dev:init:
+deploy:dev:init:en:
   extends: .deploy
-  stage: deploy:dev:init
+  stage: deploy:dev:init:en
   only:
     refs:
       - ci-work
 
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
   variables:
+    WEBCMS_LANG: en
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -520,10 +522,47 @@ deploy:dev:init:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
-# Validate syntax and configuration
-deploy:dev:validate:
+deploy:dev:init:es:
   extends: .deploy
-  stage: deploy:dev:validate
+  stage: deploy:dev:init:es
+  only:
+    refs:
+      - ci-work
+
+  variables:
+    WEBCMS_LANG: es
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
+
+  script:
+    - echo $TF_ADDRESS
+    - gitlab-terraform init
+
+
+# Validate syntax and configuration
+deploy:dev:validate:en:
+  extends: .deploy
+  stage: deploy:dev:validate:en
+  only:
+    refs:
+      - ci-work
+
+  script:
+    - gitlab-terraform validate
+
+# Validate syntax and configuration
+deploy:dev:validate:es:
+  extends: .deploy
+  stage: deploy:dev:validate:es
   only:
     refs:
       - ci-work
@@ -534,7 +573,7 @@ deploy:dev:validate:
 # Perform a plan, uploading the plan files as GitLab artifacts.
 deploy:dev:plan-en:
   extends: .deploy
-  stage: deploy:dev:plan
+  stage: deploy:dev:plan:en
   only:
     refs:
       - ci-work
@@ -566,7 +605,7 @@ deploy:dev:plan-en:
 
 deploy:dev:plan-es:
   extends: .deploy
-  stage: deploy:dev:plan
+  stage: deploy:dev:plan:es
   only:
     refs:
       - ci-work
@@ -601,7 +640,7 @@ deploy:dev:plan-es:
 # for more.
 deploy:dev:apply-en:
   extends: .deploy
-  stage: deploy:dev:apply
+  stage: deploy:dev:apply:en
 
   # Download the plan files from the previous step.
   dependencies: ["deploy:dev:plan-en"]
@@ -651,7 +690,7 @@ deploy:dev:apply-en:
 
 deploy:dev:apply-es:
   extends: .deploy
-  stage: deploy:dev:apply
+  stage: deploy:dev:apply:es
 
   # Download the plan files from the previous step.
   dependencies: ["deploy:dev:plan-es"]
