@@ -522,7 +522,7 @@ deploy:dev:init:en:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
-deploy:dev:init:es:
+.deploy:dev:init:es:
   extends: .deploy
   stage: deploy:dev:init:es
   only:
@@ -560,7 +560,7 @@ deploy:dev:validate:en:
     - gitlab-terraform validate
 
 # Validate syntax and configuration
-deploy:dev:validate:es:
+.deploy:dev:validate:es:
   extends: .deploy
   stage: deploy:dev:validate:es
   only:
@@ -603,7 +603,7 @@ deploy:dev:plan-en:
     reports:
       terraform: $TF_ROOT/plan.json
 
-deploy:dev:plan-es:
+.deploy:dev:plan-es:
   extends: .deploy
   stage: deploy:dev:plan:es
   only:
@@ -688,7 +688,7 @@ deploy:dev:apply-en:
 
     - when: never
 
-deploy:dev:apply-es:
+.deploy:dev:apply-es:
   extends: .deploy
   stage: deploy:dev:apply:es
 
