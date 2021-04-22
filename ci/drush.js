@@ -3,7 +3,6 @@
 const dedent = require("dedent");
 
 const ecs = require("./ecs");
-const ssm = require("./ssm");
 const ui = require("./ui");
 const util = require("./util");
 
@@ -121,8 +120,5 @@ main()
     process.exitCode = 1;
   })
   .then(() => {
-    // Destroy the client instances now that we're done in order to allow Node.js to clean
-    // up any event loop resources.
-    ecs.destroy();
-    ssm.destroy();
+    process.exit();
   });

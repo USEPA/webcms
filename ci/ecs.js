@@ -199,14 +199,6 @@ async function getDrushStatus(task) {
   return { stopCode, stopReason: stoppedReason, exitCode, exitReason: reason };
 }
 
-/**
- * Destroy the background ECS client.
- */
-function destroy() {
-  client.destroy();
-}
-
 exports.stopRunningTasks = stopRunningTasks;
 exports.startDrushTask = startDrushTask;
 exports.getDrushStatus = getDrushStatus;
-exports.destroy = destroy;
