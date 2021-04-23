@@ -452,6 +452,10 @@ infrastructure:preproduction:plan:
 infrastructure:preproduction:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_apply
+  only:
+    refs:
+      - ci-work
+
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -460,18 +464,6 @@ infrastructure:preproduction:apply:
     - gitlab-terraform apply
   environment:
     name: infra/preproduction
-  rules:
-    - if: >-
-        $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-      when: manual
-
-    - if: >-
-        $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
-      when: on_success
-
-    - when: never
 
 
 
