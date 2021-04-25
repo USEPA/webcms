@@ -547,6 +547,13 @@ deploy:dev:validate:en:
   only:
     refs:
       - ci-work
+  
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
