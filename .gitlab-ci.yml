@@ -547,7 +547,8 @@ deploy:dev:validate:en:
   only:
     refs:
       - ci-work
-
+  environment:
+    name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform validate
 
