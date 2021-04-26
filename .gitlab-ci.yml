@@ -31,7 +31,8 @@ stages:
   - deploy:stage:apply
 
   # Drush
-  - update
+  - update:en
+  - update:es
 
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
@@ -514,7 +515,7 @@ deploy:dev:init:en:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
-.deploy:dev:init:es:
+deploy:dev:init:es:
   extends: .deploy
   stage: deploy:dev:init:es
   only:
@@ -560,13 +561,19 @@ deploy:dev:validate:en:
     - gitlab-terraform validate
 
 # Validate syntax and configuration
-.deploy:dev:validate:es:
+deploy:dev:validate:es:
   extends: .deploy
   stage: deploy:dev:validate:es
   only:
     refs:
       - ci-work
-
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform validate
 
@@ -603,7 +610,7 @@ deploy:dev:plan-en:
     reports:
       terraform: $TF_ROOT/plan.json
 
-.deploy:dev:plan-es:
+deploy:dev:plan-es:
   extends: .deploy
   stage: deploy:dev:plan:es
   only:
@@ -688,7 +695,7 @@ deploy:dev:apply-en:
 
     - when: never
 
-.deploy:dev:apply-es:
+deploy:dev:apply-es:
   extends: .deploy
   stage: deploy:dev:apply:es
 
@@ -894,9 +901,9 @@ deploy:dev:apply-en:
 
 
 
-update:dev:
+update:dev:en
   extends: .update
-  stage: update
+  stage: update:en
   only: [ci-work]
 
   parallel:
@@ -911,4 +918,21 @@ update:dev:
   # environment here because, like the Docker image builds, there are no inputs outside
   # of the provided $WEBCMS_* variables.
   resource_group: drush/dev-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
 
+update:dev:es
+  extends: .update
+  stage: update:es
+  only: [ci-work]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
+  # Note that while we want to prevent overlapping Drush runs, we don't also include an
+  # environment here because, like the Docker image builds, there are no inputs outside
+  # of the provided $WEBCMS_* variables.
+  resource_group: drush/dev-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
