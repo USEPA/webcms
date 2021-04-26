@@ -604,14 +604,49 @@ trait EpaWysiwygTextProcessingTrait {
         $num_cols = substr($classes, strpos($classes, 'cols-') + 5, 1);
 
         if ($num_cols) {
-          // Update class.
-          $element->setAttribute('class', "l-grid l-grid--{$num_cols}-col");
-
-          // Remove col class from children.
+          // Load the children to determine if we have unequal columns widths,
+          // as designated by a class formatted 'size-NofX'.
+          // If there are unequal columns then the parent classes will be
+          // 'grid-row grid-gap' and the child classes will be converted to
+          // 'grid-col-N' where N is based on a 12 column grid.
+          // Else, the parent classes will be 'l-grid l-grid--X-col' and we'll
+          // remove the 'col' class from the children.
+          $unequal_column_parent_classes = NULL;
           $children = $xpath->query('div[contains(concat(" ", @class, " "), " col ")]', $element);
           foreach ($children as $child) {
-            $child->setAttribute('class', self::classReplace('col', '', $child->attributes->getNamedItem('class')->value));
+            $classes = $child->attributes->getNamedItem('class')->value;
+            // See if we have a 'size-' class.
+            $size_class_start_char = strpos($classes, 'size-');
+            if ($size_class_start_char !== FALSE) {
+              // Extract the full 'size-NofX' class.
+              $size_class = substr($classes, $size_class_start_char, 9);
+              // Ensure the size class is exactly 9 characters and has the word
+              // 'of' as the 7th and 8th characters (0-indexed).
+              if (strlen($size_class) == 9 && strpos($size_class, 'of') === 6) {
+                // Extract the width of this column.
+                $col_width = substr($classes, ($size_class_start_char + 5), 1);
+                // Extract the total number of columns in the grid.
+                $num_unequal_cols = substr($classes, ($size_class_start_char + 8), 1);
+                // Convert the col_width to a 12 column grid.
+                if (is_numeric($col_width) && is_numeric($num_unequal_cols)) {
+                  $width_base_12 = round(($col_width / $num_unequal_cols) * 12);
+                  // $width_base_12 = $col_width * (12 / $num_unequal_cols);
+                  $child->setAttribute('class', self::classReplace(['col', $size_class], ['', "grid-col-$width_base_12"], $child->attributes->getNamedItem('class')->value));
+
+                  if (!$unequal_column_parent_classes) {
+                    $unequal_column_parent_classes = 'grid-row grid-gap';
+                  }
+                }
+              }
+            }
+            else {
+              // The columns should be equal, we'll remove the 'col' class.
+              $child->setAttribute('class', self::classReplace('col', '', $child->attributes->getNamedItem('class')->value));
+            }
           }
+
+          // Update parent class.
+          $element->setAttribute('class', $unequal_column_parent_classes ?? "l-grid l-grid--{$num_cols}-col");
         }
 
       }
