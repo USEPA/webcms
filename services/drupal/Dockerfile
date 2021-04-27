@@ -156,7 +156,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM forumone/composer:1.8 AS deps
+FROM composer:2 AS deps
 
 WORKDIR /app
 
@@ -166,7 +166,6 @@ RUN mkdir web
 # Copy "base" Composer scripts and patches first - we assume these change less frequently
 # than composer.json and friends
 COPY ./scripts scripts
-COPY ./console console
 COPY ./patches patches
 
 # Copy Composer manifest files
@@ -258,6 +257,6 @@ RUN set -ex \
 # Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
 
-# Copy th emigration script into /usr/local/bin as a command
+# Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate

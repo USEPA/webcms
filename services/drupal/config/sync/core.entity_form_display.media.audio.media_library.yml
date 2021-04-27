@@ -5,9 +5,9 @@ dependencies:
   config:
     - core.entity_form_mode.media.media_library
     - field.field.media.audio.field_author
-    - field.field.media.audio.field_keywords
     - field.field.media.audio.field_limit_file_accessibility
     - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.field_media_tags
     - field.field.media.audio.field_running_time
     - field.field.media.audio.field_transcript
     - media.type.audio
@@ -21,16 +21,6 @@ mode: media_library
 content:
   field_author:
     type: entity_reference_autocomplete
-    weight: 3
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  field_keywords:
-    type: entity_reference_autocomplete
     weight: 4
     region: content
     settings:
@@ -41,16 +31,25 @@ content:
     third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
-    weight: 5
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_running_time:
-    type: duration_widget
-    weight: 2
+  field_media_tags:
+    type: entity_reference_autocomplete
+    weight: 5
     region: content
     settings:
-      duration: ''
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_running_time:
+    type: duration_widget
+    weight: 3
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_transcript:
     type: file_generic

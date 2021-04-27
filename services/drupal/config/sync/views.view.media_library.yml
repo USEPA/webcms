@@ -5,7 +5,7 @@ dependencies:
   config:
     - core.entity_view_mode.media.media_library
     - image.style.media_library
-    - taxonomy.vocabulary.keywords
+    - taxonomy.vocabulary.media_tags
   enforced:
     module:
       - media_library
@@ -259,10 +259,10 @@ display:
           entity_field: name
           plugin_id: field
       filters:
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -271,22 +271,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -305,7 +307,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -537,25 +539,22 @@ display:
         - user.permissions
       tags:
         - 'config:core.entity_view_display.media.audio.default'
-        - 'config:core.entity_view_display.media.audio.link'
         - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
-        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_description'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
         - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
-        - 'config:core.entity_view_display.media.image.link'
+        - 'config:core.entity_view_display.media.image.link_with_metadata'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
-        - 'config:core.entity_view_display.media.other.link'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
@@ -909,10 +908,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -921,22 +920,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -955,7 +956,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -1111,25 +1112,22 @@ display:
         - user.permissions
       tags:
         - 'config:core.entity_view_display.media.audio.default'
-        - 'config:core.entity_view_display.media.audio.link'
         - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
-        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_description'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
         - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
-        - 'config:core.entity_view_display.media.image.link'
+        - 'config:core.entity_view_display.media.image.link_with_metadata'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
-        - 'config:core.entity_view_display.media.other.link'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
@@ -1144,8 +1142,10 @@ display:
     display_title: Widget
     position: 2
     display_options:
-      display_extenders: {  }
-      path: admin/content/media-widget
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: admin/content/media-widget-grid
       fields:
         rendered_entity:
           id: rendered_entity
@@ -1381,10 +1381,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -1393,22 +1393,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -1427,7 +1429,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -1604,20 +1606,20 @@ display:
           entity_field: bundle
           plugin_id: string
       header:
-        display_link_grid:
-          id: display_link_grid
-          table: views
-          field: display_link
-          display_id: widget
-          label: Grid
-          plugin_id: display_link
-          empty: true
         display_link_table:
           id: display_link_table
           table: views
           field: display_link
           display_id: widget_table
           label: Table
+          plugin_id: display_link
+          empty: true
+        display_link_grid:
+          id: display_link_grid
+          table: views
+          field: display_link
+          display_id: widget
+          label: Grid
           plugin_id: display_link
           empty: true
       css_class: 'media-library-view js-media-library-view media-library-view--widget'
@@ -1633,25 +1635,22 @@ display:
         - user.permissions
       tags:
         - 'config:core.entity_view_display.media.audio.default'
-        - 'config:core.entity_view_display.media.audio.link'
         - 'config:core.entity_view_display.media.audio.link_with_metadata'
         - 'config:core.entity_view_display.media.audio.media_library'
         - 'config:core.entity_view_display.media.document.default'
-        - 'config:core.entity_view_display.media.document.link'
         - 'config:core.entity_view_display.media.document.link_with_description'
         - 'config:core.entity_view_display.media.document.link_with_metadata'
         - 'config:core.entity_view_display.media.document.media_library'
         - 'config:core.entity_view_display.media.image.default'
         - 'config:core.entity_view_display.media.image.gallery'
         - 'config:core.entity_view_display.media.image.large'
-        - 'config:core.entity_view_display.media.image.link'
+        - 'config:core.entity_view_display.media.image.link_with_metadata'
         - 'config:core.entity_view_display.media.image.media_library'
         - 'config:core.entity_view_display.media.image.medium'
         - 'config:core.entity_view_display.media.image.original'
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
-        - 'config:core.entity_view_display.media.other.link'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
@@ -1666,8 +1665,10 @@ display:
     display_title: 'Widget (table)'
     position: 3
     display_options:
-      display_extenders: {  }
-      path: admin/content/media-widget-table
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: admin/content/media-widget
       style:
         type: table
         options:
@@ -1970,10 +1971,10 @@ display:
           fields:
             name: name
           plugin_id: views_autocomplete_filters_combine
-        field_keywords_target_id:
-          id: field_keywords_target_id
-          table: media__field_keywords
-          field: field_keywords_target_id
+        field_media_tags_target_id:
+          id: field_media_tags_target_id
+          table: media__field_media_tags
+          field: field_media_tags_target_id
           relationship: none
           group_type: group
           admin_label: ''
@@ -1982,22 +1983,24 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_keywords_target_id_op
-            label: Tags
+            operator_id: field_media_tags_target_id_op
+            label: Tag
             description: ''
             use_operator: false
-            operator: field_keywords_target_id_op
+            operator: field_media_tags_target_id_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: field_keywords_target_id
+            identifier: field_media_tags_target_id
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
-              metadata_administrator: '0'
               system_webmaster: '0'
               administrator: '0'
             reduce: false
@@ -2016,7 +2019,7 @@ display:
           reduce_duplicates: false
           type: textfield
           limit: true
-          vid: keywords
+          vid: media_tags
           hierarchy: false
           error_message: true
           plugin_id: taxonomy_index_tid
@@ -2193,20 +2196,20 @@ display:
           entity_field: bundle
           plugin_id: string
       header:
-        display_link_grid:
-          id: display_link_grid
-          table: views
-          field: display_link
-          display_id: widget
-          label: Grid
-          plugin_id: display_link
-          empty: true
         display_link_table:
           id: display_link_table
           table: views
           field: display_link
           display_id: widget_table
           label: Table
+          plugin_id: display_link
+          empty: true
+        display_link_grid:
+          id: display_link_grid
+          table: views
+          field: display_link
+          display_id: widget
+          label: Grid
           plugin_id: display_link
           empty: true
       css_class: 'media-library-view js-media-library-view media-library-view--widget'

@@ -15,7 +15,7 @@ services:
     decorates: scheduled_publish.update
     decoration_priority: 5
     public: false
-    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time']
+    arguments: ['@epa_workflow.scheduled_publish.update.inner', '@entity_type.bundle.info','@entity_field.manager','@entity_type.manager', '@datetime.time', '@content_moderation.moderation_information', '@logger.factory']
 
   epa_workflow.moderation_manager:
     class: Drupal\epa_workflow\EPAModerationManager

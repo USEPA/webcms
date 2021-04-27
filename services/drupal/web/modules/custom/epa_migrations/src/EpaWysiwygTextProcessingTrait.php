@@ -8,17 +8,25 @@ use DOMDocument;
  * Helpers to reformat/strip inline HTML.
  */
 trait EpaWysiwygTextProcessingTrait {
+  /**
+   * A string indicating the type of paragraph this text will be wrapped in.
+   *
+   * @var string
+   */
+  protected $wrapperContext;
 
   /**
    * Transform inline html in wysiwyg content.
    *
    * @param string $wysiwyg_content
    *   The content to search and transform inline html.
-   *
+   * @param string $context
+   *   The context the type of paragraph this text will be wrapped in.
    * @return string
    *   The original wysiwyg_content with transformed inline html.
    */
-  public function processText($wysiwyg_content) {
+  public function processText($wysiwyg_content, $wrapper_context = NULL) {
+    $this->wrapperContext = $wrapper_context;
 
     $pattern = '/';
     $pattern .= 'class=".*?(box).*?"|';
@@ -28,7 +36,7 @@ trait EpaWysiwygTextProcessingTrait {
     $pattern .= 'class=".*?(accordion).*?"|';
     $pattern .= 'class=".*?(termlookup-tooltip).*?"|';
     $pattern .= 'class=".*?(row).*?"|';
-    $pattern .= 'class=".*?(menu pipeline).*?"|';
+    $pattern .= 'class=".*?(pipeline).*?"|';
     $pattern .= 'class=".*?(pullquote).*?"|';
     $pattern .= 'class=".*?(nostyle).*?"|';
     $pattern .= 'class=".*?(tablesorter).*?"|';
@@ -103,7 +111,7 @@ trait EpaWysiwygTextProcessingTrait {
               $doc = $this->transformColumns($doc);
               break;
 
-            case 'menu pipeline':
+            case 'pipeline':
               $doc = $this->transformPipelineUls($doc);
               break;
 
@@ -112,15 +120,22 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath ='//table[contains(concat(" ", @class, " "), " nostyle ")]';
+              $old_class = 'nostyle';
+              $new_classes = 'usa-table--unstyled';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
-
             case 'tablesorter':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath = '//table[contains(concat(" ", @class, " "), " tablesorter ")]';
+              $old_class = 'tablesorter';
+              $new_classes = 'usa-table usa-table--sortable';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
-
             case 'highlighted':
-              $doc = $this->singleClassReplacement($doc);
+              $xpath = '//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]';
+              $old_class = 'highlighted';
+              $new_classes = 'highlight';
+              $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
 
             case 'govdelivery-form':
@@ -239,6 +254,7 @@ trait EpaWysiwygTextProcessingTrait {
           'left',
         ];
 
+        // Note the remaining replacements for left and right are added below.
         $replacements = [
           'box box--related-info',
           'box box--highlight',
@@ -249,9 +265,20 @@ trait EpaWysiwygTextProcessingTrait {
           'box box--rss',
           'box box--blog',
           'box box--multipurpose',
-          'u-align-right',
-          'u-align-left',
         ];
+
+        if ($this->wrapperContext == 'box') {
+          // If this box is stored within a box paragraph, we want to strip
+          // the left and right alignment classes from the box.
+          $replacements[] = '';
+          $replacements[] = '';
+        }
+        else {
+          // This box is not stored within a box paragraph, let's replace the
+          // left and right alignment classes on the box.
+          $replacements[] = 'u-align-right';
+          $replacements[] = 'u-align-left';
+        }
 
         $wrapper_classes = $rib_wrapper->attributes->getNamedItem('class')->value;
         $wrapper_classes = self::classReplace($searches, $replacements, $wrapper_classes);
@@ -492,6 +519,11 @@ trait EpaWysiwygTextProcessingTrait {
         $term = $element->firstChild->nodeValue;
         $definition = $element->lastChild->lastChild->nodeValue;
 
+        // Ensure the last child is a DOMElement and extract the name attribute.
+        if ($element->lastChild->nodeType == 1) {
+          $definition_name_attr = $element->lastChild->getAttribute('name');
+        }
+
         // Build the new element.
         $button_element = $doc->createElement('button', $term);
         $button_element->setAttribute('class', 'definition__trigger js-definition__trigger');
@@ -502,6 +534,10 @@ trait EpaWysiwygTextProcessingTrait {
         $span_element = $doc->createElement('span');
         $span_element->setAttribute('class', 'definition__tooltip js-definition__tooltip');
         $span_element->setAttribute('role', 'tooltip');
+        if (!empty($definition_name_attr)) {
+          $span_element->setAttribute('name', $definition_name_attr);
+        }
+
         $span_element->appendChild($dfn_element);
 
         $definition_text_node = $doc->createTextNode($definition);
@@ -521,7 +557,7 @@ trait EpaWysiwygTextProcessingTrait {
   }
 
   /**
-   * Update a single class on an element.
+   * Replace a class on an element.
    *
    * @param \DOMDocument $doc
    *   The document to search and replace.
@@ -529,33 +565,15 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with updated classes.
    */
-  private function singleClassReplacement(DOMDocument $doc) {
+  private function simpleClassReplacement(DOMDocument $doc, $xpath, $old_class, $new_classes): DOMDocument {
     // Create a DOM XPath object for searching the document.
-    $xpath = new \DOMXPath($doc);
+    $xpath_doc = new \DOMXPath($doc);
 
-    // Tables with nostyle classes.
-    $table_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " nostyle ")]');
+    $elements = $xpath_doc->query($xpath);
 
-    if ($table_elements) {
-      foreach ($table_elements as $table_element) {
-        $table_element->setAttribute('class', self::classReplace('nostyle', 'usa-table--unstyled', $table_element->attributes->getNamedItem('class')->value));
-      }
-    }
-
-    // Tables with tablesorter class.
-    $tablesorter_elements = $xpath->query('//table[contains(concat(" ", @class, " "), " tablesorter ")]');
-
-    if ($tablesorter_elements) {
-      foreach ($tablesorter_elements as $tablesorter_element) {
-        $tablesorter_element->setAttribute('class', self::classReplace('tablesorter', 'usa-table usa-table--sortable', $tablesorter_element->attributes->getNamedItem('class')->value));
-      }
-    }
-
-    // Headings with highlighted class.
-    $highlighted_headings = $xpath->query('//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]');
-    if ($highlighted_headings) {
-      foreach ($highlighted_headings as $heading) {
-        $heading->setAttribute('class', self::classReplace('highlighted', 'highlight', $heading->attributes->getNamedItem('class')->value));
+    if ($elements) {
+      foreach ($elements as $element) {
+        $element->setAttribute('class', self::classReplace($old_class, $new_classes, $element->attributes->getNamedItem('class')->value));
       }
     }
 
@@ -586,14 +604,49 @@ trait EpaWysiwygTextProcessingTrait {
         $num_cols = substr($classes, strpos($classes, 'cols-') + 5, 1);
 
         if ($num_cols) {
-          // Update class.
-          $element->setAttribute('class', "l-grid l-grid--{$num_cols}-col");
-
-          // Remove col class from children.
+          // Load the children to determine if we have unequal columns widths,
+          // as designated by a class formatted 'size-NofX'.
+          // If there are unequal columns then the parent classes will be
+          // 'grid-row grid-gap' and the child classes will be converted to
+          // 'grid-col-N' where N is based on a 12 column grid.
+          // Else, the parent classes will be 'l-grid l-grid--X-col' and we'll
+          // remove the 'col' class from the children.
+          $unequal_column_parent_classes = NULL;
           $children = $xpath->query('div[contains(concat(" ", @class, " "), " col ")]', $element);
           foreach ($children as $child) {
-            $child->setAttribute('class', self::classReplace('col', '', $child->attributes->getNamedItem('class')->value));
+            $classes = $child->attributes->getNamedItem('class')->value;
+            // See if we have a 'size-' class.
+            $size_class_start_char = strpos($classes, 'size-');
+            if ($size_class_start_char !== FALSE) {
+              // Extract the full 'size-NofX' class.
+              $size_class = substr($classes, $size_class_start_char, 9);
+              // Ensure the size class is exactly 9 characters and has the word
+              // 'of' as the 7th and 8th characters (0-indexed).
+              if (strlen($size_class) == 9 && strpos($size_class, 'of') === 6) {
+                // Extract the width of this column.
+                $col_width = substr($classes, ($size_class_start_char + 5), 1);
+                // Extract the total number of columns in the grid.
+                $num_unequal_cols = substr($classes, ($size_class_start_char + 8), 1);
+                // Convert the col_width to a 12 column grid.
+                if (is_numeric($col_width) && is_numeric($num_unequal_cols)) {
+                  $width_base_12 = round(($col_width / $num_unequal_cols) * 12);
+                  // $width_base_12 = $col_width * (12 / $num_unequal_cols);
+                  $child->setAttribute('class', self::classReplace(['col', $size_class], ['', "grid-col-$width_base_12"], $child->attributes->getNamedItem('class')->value));
+
+                  if (!$unequal_column_parent_classes) {
+                    $unequal_column_parent_classes = 'grid-row grid-gap';
+                  }
+                }
+              }
+            }
+            else {
+              // The columns should be equal, we'll remove the 'col' class.
+              $child->setAttribute('class', self::classReplace('col', '', $child->attributes->getNamedItem('class')->value));
+            }
           }
+
+          // Update parent class.
+          $element->setAttribute('class', $unequal_column_parent_classes ?? "l-grid l-grid--{$num_cols}-col");
         }
 
       }
@@ -617,13 +670,17 @@ trait EpaWysiwygTextProcessingTrait {
     $xpath = new \DOMXPath($doc);
 
     // Row elements.
-    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " menu pipeline ")]');
+    $elements = $xpath->query('//ul[contains(concat(" ", @class, " "), " pipeline ")]');
 
     if ($elements) {
       foreach ($elements as $element) {
 
-        // Replace class.
+        // Replace class.  Sometimes this got the additional "menu" class applied to it, sometimes not.
+        // Running both these commands ensures we do the replacement regardless of whether "menu" exists, and
+        // ensures the "menu" class is removed from this, but only when paired with the "pipeline" class
+        // (I don't think we want to universally remove the menu class everywhere it's used).
         $element->setAttribute('class', self::classReplace('menu pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
+        $element->setAttribute('class', self::classReplace('pipeline', 'list list--pipeline', $element->attributes->getNamedItem('class')->value));
 
         // Remove menu-item class from children.
         $children = $xpath->query('li[contains(concat(" ", @class, " "), " menu-item ")]', $element);

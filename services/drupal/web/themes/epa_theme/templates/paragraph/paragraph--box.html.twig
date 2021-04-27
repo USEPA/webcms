@@ -5,14 +5,16 @@
  */
 #}
 
+{% set box_style = content.field_style|field_value|render %}
+
 {% set classes = [
-  content.field_style|field_value|render ? 'box--' ~ content.field_style|field_value|render,
+  box_style ? 'box--' ~ box_style,
 ]|join(' ')|trim %}
 
 {% set icon = '' %}
-{% if content.field_style|field_value|render == 'alert' %}
+{% if box_style == 'alert' %}
   {% set icon = 'warning' %}
-{% elseif content.field_style|field_value|render == 'rss' %}
+{% elseif box_style == 'rss' %}
   {% set icon = 'rss' %}
 {% endif %}
 
@@ -31,5 +33,7 @@
     'text': content.field_link.0['#title'],
     'url': content.field_link.0['#url_title'],
   },
+  'role': box_style == 'alert' ? 'alert': false,
+  'label': box_style == 'alert' ? 'Alert'|t: false,
 } %}
 {% set catch_cache = content|render %}

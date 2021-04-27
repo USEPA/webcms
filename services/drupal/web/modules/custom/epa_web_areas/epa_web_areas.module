@@ -8,10 +8,7 @@
 use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -199,7 +196,7 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         $group = $parameter;
         break;
       }
-      elseif ($parameter instanceof EntityInterface || $parameter instanceof OverridesSectionStorage) {
+      elseif ($parameter instanceof ContentEntityInterface   || $parameter instanceof OverridesSectionStorage) {
         // If in layout builder, grab the entity from section storage.
         if ($parameter instanceof OverridesSectionStorage) {
           $contexts = $parameter->getContexts();
@@ -225,6 +222,14 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
           if (strpos($key, 'MediaLibrary_url')) {
             $parts = parse_url($value);
             parse_str($parts['query'], $query);
+            if ('media_inline_embed.opener.editor' == $query['media_library_opener_id'] && array_key_exists('document', $query['media_library_allowed_types'])) {
+              // Make document tab appear first
+              array_unshift($query['media_library_allowed_types'], 'document');
+              $query['media_library_allowed_types'] = array_unique($query['media_library_allowed_types']);
+              $query['media_library_selected_type'] = 'document';
+            }
+            // Open the table view of the picker by default.
+            $query['views_display_id'] = 'widget_table';
             $query['media_library_opener_parameters']['group'] = $group->id();
             $query['hash'] = MediaLibraryState::create($query['media_library_opener_id'], $query['media_library_allowed_types'], $query['media_library_selected_type'], $query['media_library_remaining'], $query['media_library_opener_parameters'])->getHash();
             $query = http_build_query($query);
@@ -359,4 +364,12 @@ function epa_web_areas_entity_access(\Drupal\Core\Entity\EntityInterface $entity
     $operation = 'update';
   }
   return group_entity_access($entity, $operation, $account);
+}
+
+function epa_web_areas_preprocess_node(&$variables) {
+  $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($variables['node']);
+  $group = reset($groups);
+  if ($group && $group->hasField('field_navigation_style')) {
+    $variables['nav_style'] = $group->field_navigation_style->value;
+  }
 }

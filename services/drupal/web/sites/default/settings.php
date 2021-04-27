@@ -792,6 +792,16 @@ $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['password'] = $credentials->password;
 $config['migrate_plus.migration_group.migrate_drupal_7']['shared_configuration']['source']['database']['host'] = getenv('WEBCMS_DB_HOST');
 
+$databases['migrate']['default'] = [
+  'database' => getenv('WEBCMS_DB_NAME_D7'),
+  'username' => $credentials->username,
+  'password' => $credentials->password,
+  'driver' => 'mysql',
+  'collation' => 'utf8mb4_general_ci',
+  'host' => getenv('WEBCMS_DB_HOST'),
+  'port' => 3306,
+];
+
 unset($credentials);
 
 // Use instance credentials since we're in an AWS environment
@@ -801,6 +811,13 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
 // Optionally serve our S3 files off the same domain as the site.
 // We'll be doing this in production using Akamai to proxy the requests to S3.
+
+// We're currently getting away with something kind of tricky here.  As long as
+// the specified domain does not specify a port, the code in S3FS will just accept
+// the domain as-specified, including the path, which is appropriate for our
+// production use-case. If we specify a port (as we do for local dev with minio),
+// then we can't also specify a path due to the way the S3FS module extracts the
+// port, so then we have to rely on the patch we wrote here: https://www.drupal.org/node/3203137
 if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
   $config['s3fs.settings']['use_cname'] = TRUE;
   $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default/files';
@@ -834,6 +851,7 @@ switch ($env_state) {
   case 'migration':
     $settings['redirect.settings']['auto_redirect'] = false;
     $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
+    $config['auto_entitylabel.settings.node.faq']['status'] = 0;
   case 'run':
     $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
     $settings['memcache']['options'] = [
@@ -846,6 +864,10 @@ switch ($env_state) {
 
     $settings['cache']['default'] = 'cache.backend.memcache';
     break;
+}
+
+if ($origin_whitelist = getenv('WEBCMS_CSRF_ORIGIN_WHITELIST')) {
+  $config['seckit.settings']['seckit_csrf']['origin_whitelist'] = $origin_whitelist;
 }
 
 // We don't authenticate with HTTP auth; we instead inject AWS SDK signatures when a request
@@ -873,10 +895,12 @@ $settings['f1_sso_enabled'] = (bool)getenv('WEBCMS_SAML_FORCE_SAML_LOGIN');
 $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
+$config['webform.settings']['settings']['default_form_exception_message'] = '';
+
 
 $settings['cache']['bins']['data'] = 'cache.backend.php';
 
-$config_directories['sync'] = '../config/sync';
+$settings['config_sync_directory'] = '../config/sync';
 
 // Set all managed files to be marked as "temporary" and therefore subject to
 // garbage collection when their usage drops to zero.

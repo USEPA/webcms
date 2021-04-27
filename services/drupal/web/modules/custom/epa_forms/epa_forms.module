@@ -30,13 +30,12 @@ function epa_forms_node_insert(EntityInterface $entity) {
     $id .= '_' . $entity->id();
 
     $settings = Webform::getDefaultSettings();
-    $third_party_settings['epa_forms'] = ['nid' => $entity->id()];
+    $settings['form_disable_remote_addr'] = TRUE;
 
     $webform = Webform::create([
       'id' => $id,
       'title' => $title,
       'settings' => $settings,
-      'third_party_settings' => $third_party_settings,
     ]);
     $webform->save();
 
@@ -101,6 +100,12 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
         '#markup' => t('This action will also remove any associated webform entity and <strong>delete its submissions</strong>.'),
       ];
       break;
+
+    case 'webform_settings_submissions_form':
+      if (isset($form['submission_behaviors']['form_disable_remote_addr'])) {
+        $form['submission_behaviors']['form_disable_remote_addr']['#access'] = FALSE;
+      }
+      break;
   }
 }
 
@@ -148,12 +153,17 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
  * Helper function to grab referencing node from webform.
  */
 function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
+  $query = \Drupal::entityQuery('node')
+    ->condition('type', 'webform')
+    ->condition('webform', $entity->id());
+  $results = $query->execute();
+  // We assume there's only a single node associated with each webform
+  $nid = reset($results);
   // Get node from webform.
-  $nid = $entity->getThirdPartySetting('epa_forms', 'nid');
   if (empty($nid)) {
     return;
   }
-  return \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+  return \Drupal::entityTypeManager()->getStorage('node')->load((int) $nid);
 }
 
 /**

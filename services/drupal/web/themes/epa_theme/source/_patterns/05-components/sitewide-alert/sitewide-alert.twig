@@ -8,6 +8,10 @@
 <div class="{{ classes }}"{% if hash %} data-alert="{{ hash }}"{% endif %}>
   <div class="l-constrain">
     <div class="sitewide-alert__body">
+      {%- if label -%}
+        <div class="u-visually-hidden">{{ label }}</div>
+      {%- endif -%}
+
       <div class="sitewide-alert__content">
         {{ content }}
       </div>

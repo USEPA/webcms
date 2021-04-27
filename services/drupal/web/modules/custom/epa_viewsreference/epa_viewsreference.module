@@ -1,0 +1,37 @@
+<?php
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function epa_viewsreference_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+  $plugin_id = $context['widget']->getPluginId();
+
+  if ($plugin_id === 'viewsreference_select') {
+    if (!empty($element['options']['limit'])) {
+      $element['options']['limit']['#title'] = t('Number of results (results per page if using a pager).');
+      $element['options']['limit']['#description'] = t('Please enter a value between 1 and 100');
+      $element['options']['limit']['#type'] = 'number';
+      $element['options']['limit']['#min'] = 1;
+      $element['options']['limit']['#max'] = 100;
+      if (empty($element['options']['limit']['#default_value'])) {
+        $element['options']['limit']['#default_value'] = 5;
+      }
+    }
+
+    // Use "details" containers since they are themed better in layout builder UI
+    if (isset($element["options"]["exposed_filters"]['#type'])) {
+      $element["options"]["exposed_filters"]['#type'] = 'details';
+      $element["options"]["exposed_filters"]['#open'] = TRUE;
+    }
+    if (isset($element["options"]["exposed_sorts"]['#type'])) {
+      $element["options"]["exposed_sorts"]['#type'] = 'details';
+      $element["options"]["exposed_sorts"]['#open'] = TRUE;
+    }
+
+    // Hide the control that allows users to expose filters on dynamic lists.
+    if (isset($element["options"]["exposed_filters"]["vr_exposed_filters_visible"])) {
+      $element["options"]["exposed_filters"]["vr_exposed_filters_visible"]['#access'] = FALSE;
+    }
+  }
+}

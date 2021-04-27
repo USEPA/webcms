@@ -20,7 +20,7 @@
 {% endif %}
 
 {% set header_info %}
-  {% if display_sidenav %}
+  {% if nav_style == 'sidebar_navigation' %}
     {% if node.field_wide_template.value %}
       {% set display_sidenav = false %}
       {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
@@ -60,6 +60,9 @@
 
 {% if node.field_language.value %}
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
 {% endif %}
 
 

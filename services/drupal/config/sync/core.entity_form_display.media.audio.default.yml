@@ -4,9 +4,9 @@ status: true
 dependencies:
   config:
     - field.field.media.audio.field_author
-    - field.field.media.audio.field_keywords
     - field.field.media.audio.field_limit_file_accessibility
     - field.field.media.audio.field_media_audio_file
+    - field.field.media.audio.field_media_tags
     - field.field.media.audio.field_running_time
     - field.field.media.audio.field_transcript
     - media.type.audio
@@ -19,16 +19,6 @@ bundle: audio
 mode: default
 content:
   field_author:
-    weight: 5
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: entity_reference_autocomplete
-    region: content
-  field_keywords:
     weight: 6
     settings:
       match_operator: CONTAINS
@@ -39,7 +29,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_limit_file_accessibility:
-    weight: 7
+    weight: 8
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
@@ -51,15 +41,24 @@ content:
     third_party_settings: {  }
     type: file_generic
     region: content
-  field_running_time:
-    weight: 4
+  field_media_tags:
+    weight: 7
     settings:
-      duration: ''
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_running_time:
+    weight: 5
+    settings: {  }
     third_party_settings: {  }
     type: duration_widget
     region: content
   field_transcript:
-    weight: 3
+    weight: 4
     settings:
       progress_indicator: throbber
     third_party_settings: {  }
@@ -81,7 +80,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   replace_file:
-    weight: 2
+    weight: 3
     region: content
     settings: {  }
     third_party_settings: {  }

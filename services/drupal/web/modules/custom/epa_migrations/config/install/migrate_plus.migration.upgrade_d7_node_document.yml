@@ -69,8 +69,8 @@ process:
       source: revision_uid
   revision_log:
     -
-      plugin: get
-      source: log
+      plugin: epa_generate_revision_log
+      source: vid
   revision_timestamp:
     -
       plugin: get
@@ -223,6 +223,10 @@ process:
     plugin: default_value
     default_value: 0
   path/alias: alias
+  field_last_published:
+    -
+      plugin: get
+      source: last_published
 destination:
   plugin: 'entity:node'
   default_bundle: page

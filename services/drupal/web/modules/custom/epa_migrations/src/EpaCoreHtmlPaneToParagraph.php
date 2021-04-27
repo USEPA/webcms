@@ -64,7 +64,7 @@ class EpaCoreHtmlPaneToParagraph extends EpaPaneToParagraph {
     $body_field['value'] = $this->transformWysiwyg($split_content['wysiwyg_content'], $this->entityTypeManager, $record['is_skinny_pane']);
 
     // Perform text processing to update/remove inline code.
-    $body_field['value'] = $this->processText($body_field['value']);
+    $body_field['value'] = $this->processText($body_field['value'], 'box');
 
     // Get box style from the settings array if it's there. Otherwise, use the
     // value in configuration.

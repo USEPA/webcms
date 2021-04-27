@@ -20,7 +20,7 @@
 {% endif %}
 
 {% set header_info %}
-  {% if display_sidenav %}
+  {% if nav_style == 'sidebar_navigation' %}
     {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
   {% else %}
     {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
@@ -55,12 +55,14 @@
 
 {% if node.field_language.value %}
   {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
 {% endif %}
 
 {% set body %}
   {{ content.field_date }}
   {{ content.field_location }}
-  <h2>Details</h2>
   {{ content|without(
     'epa_content_moderation_control',
     'field_date',

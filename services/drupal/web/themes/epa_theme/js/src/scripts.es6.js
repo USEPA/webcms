@@ -9,6 +9,8 @@ import navigation from './modules/navigation';
 import banner from 'uswds/src/js/components/banner.js';
 import tablesort from './modules/tablesort';
 import backToTop from './modules/_back-to-top.es6';
+import setScrollbarProperty from './modules/scrollbar-property.es6';
+import 'svgxuse';
 
 (function() {
   'use strict';
@@ -36,5 +38,6 @@ import backToTop from './modules/_back-to-top.es6';
     navigation(); // If used with the USWDS accordion component, the navigation must run after it.
     tablesort();
     backToTop();
+    setScrollbarProperty();
   });
 })();

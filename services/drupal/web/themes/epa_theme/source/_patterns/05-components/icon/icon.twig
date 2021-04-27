@@ -29,7 +29,8 @@
    ] %}
   {% for icon in icons %}
     <p>
-      <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} aria-label="{{ label }}"{% endif %}>
+      <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} role="img"{% endif %}>
+        {% if label %}<title>{{ label }}</title>{% endif %}
         <use xlink:href="{{ epa_theme_image_path }}sprite.artifact.svg#{{ icon }}"></use>
       </svg>
       {{ icon }}
@@ -37,7 +38,8 @@
   {% endfor %}
 {%- else -%}
   {% spaceless %}
-    <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} aria-label="{{ label }}"{% endif %}>
+    <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} role="img"{% endif %}>
+      {% if label %}<title>{{ label }}</title>{% endif %}
       <use xlink:href="{{ epa_theme_image_path }}sprite.artifact.svg#{{ icon_name }}"></use>
     </svg>
   {% endspaceless %}

@@ -5,10 +5,12 @@ namespace Drupal\epa_workflow;
 use DateTime;
 use DateTimeZone;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\scheduled_publish\Plugin\Field\FieldType\ScheduledPublish;
 use Drupal\scheduled_publish\Service\ScheduledPublishCron;
 
@@ -54,6 +56,8 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    */
   private $dateTime;
 
+
+
   /**
    * The constructor.
    *
@@ -68,12 +72,14 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @param \Drupal\Component\Datetime\TimeInterface $date_time
    *   The datetime.
    */
-  public function __construct(ScheduledPublishCron $scheduled_publish_cron, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, TimeInterface $date_time) {
+  public function __construct(ScheduledPublishCron $scheduled_publish_cron, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, TimeInterface $date_time, ModerationInformationInterface $moderation_info, LoggerChannelFactoryInterface $logger) {
     $this->scheduledPublishCron = $scheduled_publish_cron;
     $this->entityTypeBundleInfo = $entity_type_bundle_info;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->dateTime = $date_time;
+    $this->moderationInfo = $moderation_info;
+    $this->logger = $logger;
   }
 
   /**
@@ -188,7 +194,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    */
   private function getTimestampFromIso8601(string $dateIso8601): int {
     $datetime = new DateTime($dateIso8601, new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
-    $datetime->setTimezone(new \DateTimeZone(drupal_get_user_timezone()));
+    $datetime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
     return $datetime->getTimestamp();
   }

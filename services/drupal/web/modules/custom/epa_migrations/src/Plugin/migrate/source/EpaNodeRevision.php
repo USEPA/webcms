@@ -29,6 +29,11 @@ class EpaNodeRevision extends NodeRevision {
 
     $query->leftJoin('panelizer_entity', 'pe', 'nr.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
     $query->leftJoin('panels_display', 'pd', 'pe.did = pd.did');
+    $query->innerJoin('node_revision_epa_states', 'nres', 'nres.vid = nr.vid');
+
+    $query->addField('nres','state');
+    $query->addField('pe', 'did');
+    $query->addField('pd', 'layout');
 
     // Only include records where one of the following is true:
     // * There's no layout record (no panelizer override)
@@ -57,15 +62,7 @@ class EpaNodeRevision extends NodeRevision {
       return FALSE;
     }
 
-    // Get the revision moderation state and timestamp.
-    $state_data = $this->select('node_revision_epa_states', 'nres')
-      ->fields('nres', ['state'])
-      ->condition('nres.vid', $row->getSourceProperty('vid'))
-      ->execute()
-      ->fetchAll();
-
-    if ($state_data) {
-      $state_data = array_shift($state_data);
+    if ($state = $row->getSourceProperty('state')) {
       $state_map = [
         'unpublished' => 'unpublished',
         'draft' => 'draft',
@@ -77,43 +74,12 @@ class EpaNodeRevision extends NodeRevision {
         'queued_for_archive' => 'unpublished',
       ];
 
-      $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
+      $row->setSourceProperty('nres_state', $state_map[$state]);
     }
 
-    // To prepare rows for import into fields, we're going to:
-    // - Skip nodes that use panelizer and have a layout other than onecol_page
-    //   or twocol_page.
-    // - Add a 'layout' source property to populate the 'field_layout'.
-    // - Add source properties containing query results for 'main_col' and
-    //   'sidebar' panes.
-    //
-    // First, initialize the 'layout' source property as NULL so we can properly
-    // process nodes that do not have a record in the 'panelizer_entith' table.
-    $row->setSourceProperty('layout', NULL);
-
-    // Get the Display ID for the current revision.
-    $did = $this->select('panelizer_entity', 'pe')
-      ->fields('pe', ['did'])
-      ->condition('pe.revision_id', $row->getSourceProperty('vid'))
-      ->condition('pe.entity_id', $row->getSourceProperty('nid'))
-      ->condition('pe.entity_type', 'node')
-      ->execute()
-      ->fetchField();
-
-    // Get the node type from configuration.
-    $type = $row->getSourceProperty('type');
+    $did = $row->getSourceProperty('did');
 
     if ($did) {
-      // Get the Panelizer layout for this display.
-      $layout = $this->select('panels_display', 'pd')
-        ->fields('pd', ['layout'])
-        ->condition('pd.did', $did)
-        ->execute()
-        ->fetchField();
-
-      // Update the 'layout' property to its actual value.
-      $row->setSourceProperty('layout', $layout);
-
       // Fetch the main_col panes and add the result as a source property.
       $main_col_panes = $this->fetchPanes('main_col', $did);
       $row->setSourceProperty('main_col_panes', $main_col_panes);
@@ -121,6 +87,11 @@ class EpaNodeRevision extends NodeRevision {
       // Fetch the sidebar panes and add the result as a source property.
       $sidebar_panes = $this->fetchPanes('sidebar', $did);
       $row->setSourceProperty('sidebar_panes', $sidebar_panes);
+    }
+    else {
+      // Return the body content as 'main_col_panes' so it can be converted to
+      // a paragraph.
+      $row->setSourceProperty('main_col_panes', $row->getSourceProperty('body'));
     }
 
     return parent::prepareRow($row);
@@ -142,6 +113,7 @@ class EpaNodeRevision extends NodeRevision {
       ->fields('pp')
       ->condition('pp.did', $did)
       ->condition('pp.panel', $panel)
+      ->orderBy('pp.position')
       ->execute()
       ->fetchAll();
   }

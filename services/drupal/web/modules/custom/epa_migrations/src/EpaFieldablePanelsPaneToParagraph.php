@@ -64,21 +64,23 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           // get the vid for this fpid from the current revision table to ensure
           // we're getting data for the current version of the reusable pane.
           $fpid = $id;
-          $vid = array_pop($this->d7Connection->select('fieldable_panels_panes', 'fpp')
+          $vid = $this->d7Connection->select('fieldable_panels_panes', 'fpp')
             ->fields('fpp', ['vid'])
             ->condition('fpp.fpid', $id)
             ->execute()
-            ->fetchCol());
+            ->fetchCol();
+          $vid = array_pop($vid);
           break;
 
         case 'vid':
           // If we are working with a 'vid' then the pane is not reusable. Let's
           // get the fpid for this vid from the revision table.
-          $fpid = array_pop($this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
+          $fpid = $this->d7Connection->select('fieldable_panels_panes_revision', 'fppr')
             ->fields('fppr', ['fpid'])
             ->condition('fppr.vid', $id)
             ->execute()
-            ->fetchCol());
+            ->fetchCol();
+          $fpid = array_pop($fpid);
           $vid = $id;
           break;
       }
@@ -138,7 +140,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
             $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']);
 
             // Perform text processing to update/remove inline code.
-            $body_field['value'] = $this->processText($body_field['value']);
+            $body_field['value'] = $this->processText($body_field['value'], 'box');
 
             $paragraph = $this->addBoxWrapper(
               [
@@ -161,12 +163,13 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']) : FALSE;
 
           // Perform text processing to update/remove inline code.
-          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
+          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value'], 'box') : FALSE;
 
           $links_query = $this->d7Connection->select('field_revision_field_epa_link_list_links', 'fpp_links')
             ->condition('fpp_links.revision_id', $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_url', 'link');
           $links_query->addField('fpp_links', 'field_epa_link_list_links_title', 'title');
+          $links_query->orderBy('fpp_links.delta');
 
           $links = $links_query->execute()->fetchAll();
 
@@ -191,11 +194,12 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
           $body_field['value'] ? $body_field['value'] = $this->transformWysiwyg($body_field['value'], $this->entityTypeManager, $record['is_skinny_pane']) : FALSE;
 
           // Perform text processing to update/remove inline code.
-          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value']) : FALSE;
+          $body_field['value'] ? $body_field['value'] = $this->processText($body_field['value'], 'box') : FALSE;
 
-          $links_query = $this->d7Connection->select('field_data_field_epa_node_list_ref', 'fpp_links')
+          $links_query = $this->d7Connection->select('field_revision_field_epa_node_list_ref', 'fpp_links')
             ->condition("fpp_links.revision_id", $vid, '=');
           $links_query->addField('fpp_links', 'field_epa_node_list_ref_target_id', 'entity');
+          $links_query->orderBy('fpp_links.delta');
 
           $links = $links_query->execute()->fetchAll();
 

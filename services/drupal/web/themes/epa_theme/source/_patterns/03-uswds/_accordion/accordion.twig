@@ -1,0 +1,22 @@
+{% set classes = [
+  'usa-accordion',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set accordion_id = 'accordion'|unique_id %}
+
+<div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
+  {% if pattern_lab %}
+    {% for item in accordion %}
+      {% include '@uswds/_accordion/_accordion-content.twig' with {
+        'accordion_id': accordion_id,
+        'content_id': loop.index,
+        'title': item.title,
+        'is_expanded': item.is_expanded,
+        'content': item.content,
+      } %}
+    {% endfor %}
+  {% else %}
+    {{ accordion_content }}
+  {% endif %}
+</div>

@@ -1,0 +1,48 @@
+{% set columns = 0 %}
+
+{% if content.first|render %}
+  {% set columns = columns + 1 %}
+{% endif %}
+
+{% if content.second|render %}
+  {% set columns = columns + 1 %}
+{% endif %}
+
+{% if content.third|render %}
+  {% set columns = columns + 1 %}
+{% endif %}
+
+{% if content.fourth|render %}
+  {% set columns = columns + 1 %}
+{% endif %}
+
+{% if columns > 1 %}
+  {%
+    set classes = [
+    'l-grid',
+    'l-grid--' ~ columns  ~ '-col'
+  ]
+  %}
+  <div{{ attributes.addClass(classes) }}>
+    {% if content.first|render %}
+      <div{{ region_attributes.first }}>{{ content.first }}</div>
+    {% endif %}
+
+    {% if content.second|render %}
+      <div{{ region_attributes.second }}>{{ content.second }}</div>
+    {% endif %}
+
+    {% if content.third|render %}
+      <div{{ region_attributes.third }}>{{ content.third }}</div>
+    {% endif %}
+
+    {% if content.fourth|render %}
+      <div{{ region_attributes.fourth }}>{{ content.fourth }}</div>
+    {% endif %}
+  </div>
+{% else %}
+  {{ content.first }}
+  {{ content.second }}
+  {{ content.third }}
+  {{ content.fourth }}
+{% endif %}

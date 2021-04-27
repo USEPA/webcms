@@ -5,9 +5,9 @@ dependencies:
   config:
     - field.field.media.remote_video.field_caption
     - field.field.media.remote_video.field_directory
-    - field.field.media.remote_video.field_keywords
     - field.field.media.remote_video.field_limit_file_accessibility
     - field.field.media.remote_video.field_media_oembed_video
+    - field.field.media.remote_video.field_media_tags
     - media.type.remote_video
   module:
     - media
@@ -29,12 +29,19 @@ content:
       max_width: 1020
       max_height: 0
     third_party_settings: {  }
+  field_media_tags:
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
 hidden:
   created: true
   entitygroupfield: true
   field_caption: true
   field_directory: true
-  field_keywords: true
   field_limit_file_accessibility: true
   langcode: true
   name: true

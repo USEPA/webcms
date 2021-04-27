@@ -25,7 +25,7 @@
 
 {% set sidebar %}
   <h2 class="h3">Filter By:</h2>
-  {% include '@uswds/accordion/accordion.twig' with {
+  {% include '@uswds/_accordion/accordion.twig' with {
     'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
     'is_multi_selectable': true,
     'accordion_id': 'facets',
@@ -136,6 +136,9 @@
   {% include '@components/pager/pager.twig' with {
     'heading': 'Pagination',
     'current': '6',
+  } %}
+  {% include '@components/rss-feed/rss-feed.twig' with {
+    'link_text': 'Subscribe to the RSS feed for this search',
   } %}
 {% endset %}
 

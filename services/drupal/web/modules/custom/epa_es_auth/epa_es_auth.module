@@ -24,12 +24,7 @@ function epa_es_auth_elasticsearch_connector_load_library_options_alter(array &$
   if (getenv('WEBCMS_ENV_NAME') === 'local') {
     return;
   }
-
-  fwrite(
-    fopen('php://stderr', 'w'),
-    "epa_es_auth_elasticsearch_connector_load_library_options_alter() fired"
-  );
-
+  
   $provider = CredentialProvider::defaultProvider();
   $aws_region = getenv('WEBCMS_S3_REGION');
 

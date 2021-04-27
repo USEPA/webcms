@@ -6,7 +6,7 @@
  * @param $vars
  */
 function epa_theme_preprocess_menu(&$vars) {
-  if (preg_match('/^group-[0-9]+-menu$/', $vars['menu_name'])) {
+  if ($vars['theme_hook_original'] === 'menu__group_menu') {
     $vars['attributes']['class'][] = 'menu--sidenav';
   }
 }

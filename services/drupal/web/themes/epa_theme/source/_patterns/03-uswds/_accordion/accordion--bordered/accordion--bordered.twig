@@ -1,0 +1,10 @@
+{% set classes = [
+  'usa-accordion--bordered',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@uswds/_accordion/accordion.twig' with {
+  'modifier_classes': classes,
+  'is_multi_selectable': is_multi_selectable,
+  'accordion': accordion,
+} %}

@@ -27,8 +27,7 @@ dependencies:
     - node.type.faq
   module:
     - datetime
-    - linked_field
-    - text
+    - smart_trim
     - user
 id: node.faq.teaser
 targetEntityType: node
@@ -37,10 +36,21 @@ mode: teaser
 content:
   body:
     label: hidden
-    type: text_summary_or_trimmed
+    type: smart_trim
     weight: 2
     settings:
       trim_length: 300
+      trim_type: chars
+      trim_suffix: ''
+      wrap_class: trimmed
+      more_text: More
+      more_class: more-link
+      summary_handler: full
+      trim_options:
+        text: true
+        trim_zero: false
+      wrap_output: false
+      more_link: false
     third_party_settings: {  }
     region: content
   field_last_published:
@@ -58,13 +68,7 @@ content:
     region: content
     label: hidden
     settings: {  }
-    third_party_settings:
-      linked_field:
-        linked: '1'
-        type: custom
-        destination: '[node:url]'
-        advanced: {  }
-        token: ''
+    third_party_settings: {  }
 hidden:
   content_moderation_control: true
   entitygroupfield: true
