@@ -906,20 +906,17 @@ update:dev:en:
   stage: update:en
   only: [ci-work]
 
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
-
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
+    WEBCMS_LANG: en
 
   # Note that while we want to prevent overlapping Drush runs, we don't also include an
   # environment here because, like the Docker image builds, there are no inputs outside
   # of the provided $WEBCMS_* variables.
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
-    name: site/stage-$WEBCMS_LANG
+    name: site/dev-$WEBCMS_LANG
 
 update:dev:es:
   extends: .update
@@ -929,10 +926,11 @@ update:dev:es:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
+    WEBCMS_LANG: es
 
   # Note that while we want to prevent overlapping Drush runs, we don't also include an
   # environment here because, like the Docker image builds, there are no inputs outside
   # of the provided $WEBCMS_* variables.
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
-    name: site/stage-$WEBCMS_LANG
+    name: site/dev-$WEBCMS_LANG
