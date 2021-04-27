@@ -76,6 +76,12 @@ variable "drupal_state" {
   }
 }
 
+variable "drupal_csrf_origin_whitelist" {
+  description = "A list of domains considered trustworthy by Drupal's Security Kit module. Each should be of the form PROTOCOL://DOMAIN[:PORT], such as http://example.com or https://example.net:123. The site's own domain is already part of this list."
+  type        = list(string)
+  default     = []
+}
+
 variable "drupal_use_s3_domain" {
   description = "Determines whether S3 assets will be served from the same domain as the main site. Set to false to serve directly from S3 domain."
   type        = bool
