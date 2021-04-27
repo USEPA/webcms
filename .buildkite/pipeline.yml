@@ -33,7 +33,7 @@ steps:
 
   # Also on the main branch, deploy to the Spanish-language test environment
   - label: ":pipeline: Español"
-    if: build.branch == "migration" && build.pull_request.id == null
+    if: build.branch == "main" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
@@ -41,7 +41,7 @@ steps:
       WEBCMS_WORKSPACE: espanol
 
   - label: ":pipeline: QA"
-    if: build.branch == "migration" && build.pull_request.id == null
+    if: build.branch == "main" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
