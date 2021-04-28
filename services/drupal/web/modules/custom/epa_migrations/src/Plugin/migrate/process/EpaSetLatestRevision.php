@@ -216,15 +216,4 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     return $heaviest_revision;
   }
 
-  /**
-   * Turn on 'generate automatic URL alias.
-   *
-   * @param \Drupal\node\Entity\Node $node
-   *   The node entity.
-   */
-  private function pathautoOn(Node $node) {
-
-
-  }
-
 }
