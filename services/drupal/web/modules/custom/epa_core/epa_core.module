@@ -265,6 +265,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
             $contact_form = $group->field_contact_us_form->target_id;
+            $bubbleable_metadata->addCacheableDependency($group);
             $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
             $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
               ->toString() : $original;
@@ -279,6 +280,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $groups = \Drupal::service('epa_web_areas.web_areas_helper')
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
+            $bubbleable_metadata->addCacheableDependency($group);
             $contact_form = $group->field_contact_us_form->target_id;
             $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
             if ($url) {
@@ -292,6 +294,9 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
         $bubbleable_metadata->addCacheContexts(['url']);
+        if (isset($node)) {
+          $bubbleable_metadata->addCacheableDependency($node);
+        }
         if (isset($node) && !$node->field_last_published->isEmpty()) {
           $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
