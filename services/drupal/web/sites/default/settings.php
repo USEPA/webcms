@@ -842,6 +842,10 @@ switch ($env_lang) {
     break;
 }
 
+if (in_array($env_name, ['local'])) {
+  $config['config_split.config_split.development']['status'] = TRUE;
+}
+
 // Only activate Memcache if we're in the 'run' or 'migration' ENV_STATE. We need to do this because
 // setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
