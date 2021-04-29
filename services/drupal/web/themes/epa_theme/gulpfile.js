@@ -68,7 +68,10 @@ const buildConfig = async () => {
 exports.buildConfig = buildConfig;
 
 const lintStyles = () => {
-  return src('**/!(*.artifact).scss', { cwd: './source', since: lastRun(lintStyles) }).pipe(
+  return src('**/!(*.artifact).scss', {
+    cwd: './source',
+    since: lastRun(lintStyles),
+  }).pipe(
     stylelint({
       configFile: '.stylelintrc.yml',
       failAfterError: true,
@@ -77,7 +80,7 @@ const lintStyles = () => {
   );
 };
 
-const compileStyles = () => {
+const buildSass = mode => {
   return src('*.scss', { cwd: './source' })
     .pipe(sourcemaps.init())
     .pipe(
@@ -89,6 +92,7 @@ const compileStyles = () => {
         ],
         precision: 10,
         importer: sassGlobImporter(),
+        outputStyle: mode === 'production' ? 'compressed' : 'expanded',
       })
     )
     .pipe(
@@ -105,14 +109,16 @@ const compileStyles = () => {
 
 const createSprite = () => {
   return src('**/*.svg', { cwd: 'images/_sprite-source-files/' })
-    .pipe(svgSprite({
-      mode: {
-        symbol: {
-          dest: '',
-          sprite: 'sprite.artifact.svg'
-        }
-      }
-    }))
+    .pipe(
+      svgSprite({
+        mode: {
+          symbol: {
+            dest: '',
+            sprite: 'sprite.artifact.svg',
+          },
+        },
+      })
+    )
     .pipe(dest('images'));
 };
 
@@ -140,6 +146,11 @@ const bundleScripts = (exports.gessoBundleScripts = () =>
 
 const bundleScriptsDev = () => webpackBundleScripts('development');
 
+const compileStyles = () => buildSass('production');
+exports.buildStyles = series(lintStyles, compileStyles);
+
+const compileStylesDev = () => buildSass('development');
+
 const watchFiles = () => {
   watch(
     [
@@ -147,7 +158,7 @@ const watchFiles = () => {
       '!source/_patterns/00-config/_config.artifact.design-tokens.scss',
     ],
     { usePolling: true, interval: 1500 },
-    series(lintStyles, buildStyles)
+    series(lintStyles, compileStylesDev)
   );
   watch(
     ['images/_sprite-source-files/*.svg'],
@@ -159,7 +170,10 @@ const watchFiles = () => {
     { usePolling: true, interval: 1500 },
     series(
       buildConfig,
-      parallel(series(lintStyles, buildStyles), series(lintPatterns, buildPatternLab))
+      parallel(
+        series(lintStyles, compileStylesDev),
+        series(lintPatterns, buildPatternLab)
+      )
     )
   );
   watch(
@@ -175,25 +189,29 @@ const watchFiles = () => {
     { usePolling: true, interval: 1500 },
     bundleScriptsDev
   );
-  watch(
-    [
-      'source/**/*.md',
-    ],
-    { usePolling: true, interval: 1500 },
-    lintPatterns
-  )
+  watch(['source/**/*.md'], { usePolling: true, interval: 1500 }, lintPatterns);
 };
 
-const buildStyles = (exports.buildStyles = series(lintStyles, compileStyles));
-const buildPatterns = (exports.buildPatterns) = series(lintPatterns, buildPatternLab);
+const buildPatterns = (exports.buildPatterns = series(
+  lintPatterns,
+  buildPatternLab
+));
 const buildImages = (exports.buildImages = createSprite);
 
-const build = (isProduction = true ) =>  {
+const build = (isProduction = true) => {
   const scriptTask = isProduction ? bundleScripts : bundleScriptsDev;
+  const stylesTask = isProduction ? compileStyles : compileStylesDev;
   task('bundleScripts', scriptTask);
+  task('compileStyles', stylesTask);
   return series(
     buildConfig,
-    parallel(task('bundleScripts'), buildImages, buildStyles, buildPatterns));
+    parallel(
+      task('bundleScripts'),
+      buildImages,
+      task('compileStyles'),
+      buildPatterns
+    )
+  );
 };
 
 exports.build = build(true);
