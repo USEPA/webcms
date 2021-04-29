@@ -2,16 +2,7 @@
 // Styles for a pull quote.
 
 .pull-quote {
-  background-color: gesso-grayscale(white);
-  border-left: rem(units(1)) solid gesso-brand(aqua, base);
-  clear: both;
-  margin-bottom: rem(units(3));
-  padding: rem(units($theme-alert-padding-x)) 0
-    rem(units($theme-alert-padding-x)) rem(units($theme-alert-padding-x));
-
-  > :last-child {
-    margin-bottom: 0;
-  }
+  @extend %pull-quote;
 
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
@@ -23,5 +14,5 @@
 }
 
 .pull-quote__cite {
-  text-align: left;
+  @extend %pull-quote__cite;
 }
