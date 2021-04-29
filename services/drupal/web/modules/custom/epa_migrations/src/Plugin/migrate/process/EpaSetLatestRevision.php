@@ -11,8 +11,6 @@ use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Drupal\node\Entity\Node;
-use Drupal\pathauto\PathautoState;
-use Drupal\redirect\Exception\RedirectLoopException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -181,11 +179,10 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
       }
     }
 
-    // Now that we've set the correct revisions, let's refresh our node
-    // entity and turn on pathauto.
-    $node = $node_storage->load($nid);
-    $this->pathautoOn($node);
-
+    // Now that we've set the correct revisions, let's turn on pathauto and
+    // reset the cache for this node.
+    \Drupal::keyValue('pathauto_state.node')->set($nid, 1);
+    $node_storage->resetCache([$nid]);
     return TRUE;
   }
 
@@ -217,24 +214,6 @@ class EpaSetLatestRevision extends ProcessPluginBase implements ContainerFactory
     }
 
     return $heaviest_revision;
-  }
-
-  /**
-   * Turn on 'generate automatic URL alias.
-   *
-   * @param \Drupal\node\Entity\Node $node
-   *   The node entity.
-   */
-  private function pathautoOn(Node $node) {
-    $node->set('path', ['pathauto' => PathautoState::CREATE]);
-
-    try {
-      $node->save();
-    }
-    catch (RedirectLoopException $e) {
-      $this->logger->notice('There was a problem enabling pathauto for nid: %nid. Caught RedirectLoopException: %message', ['%nid' => $node->id(), '%message' => $e->getMessage()]);
-    }
-
   }
 
 }
