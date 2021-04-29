@@ -842,6 +842,10 @@ switch ($env_lang) {
     break;
 }
 
+if (in_array($env_name, ['local'])) {
+  $config['config_split.config_split.development']['status'] = TRUE;
+}
+
 // Only activate Memcache if we're in the 'run' or 'migration' ENV_STATE. We need to do this because
 // setting the cache backend before the Memcache module is installed, Drupal will throw an
 // exception.
@@ -891,6 +895,12 @@ $config['samlauth.authentication']['idp_single_log_out_service'] = getenv('WEBCM
 $config['samlauth.authentication']['idp_x509_certificate'] = getenv('WEBCMS_SAML_IDP_CERT');
 $settings['f1_sso_enabled'] = (bool)getenv('WEBCMS_SAML_FORCE_SAML_LOGIN');
 
+if ($settings['f1_sso_enabled']) {
+  // If we're forcing folks to log in via SSO, then no local roles should be
+  // allowed to log in the normal way.
+  $config['samlauth.authentication']['drupal_login_roles'] = ['authenticated' => '0'];
+}
+
 $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
@@ -908,10 +918,10 @@ $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
 // Ensure we force the site to use the "include" method of shielding pages
 $config['shield.settings']['method'] = 1;
 
-if (in_array($env_name, ['local','dev','qa'])) {
-  $class_loader->addPsr4('Drupal\\webprofiler\\', [ __DIR__ . '/../../modules/contrib/devel/webprofiler/src']);
-  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
-}
+//if (in_array($env_name, ['local','dev','qa'])) {
+//  $class_loader->addPsr4('Drupal\\webprofiler\\', [ __DIR__ . '/../../modules/contrib/devel/webprofiler/src']);
+//  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
+//}
 
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
