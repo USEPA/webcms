@@ -891,6 +891,12 @@ $config['samlauth.authentication']['idp_single_log_out_service'] = getenv('WEBCM
 $config['samlauth.authentication']['idp_x509_certificate'] = getenv('WEBCMS_SAML_IDP_CERT');
 $settings['f1_sso_enabled'] = (bool)getenv('WEBCMS_SAML_FORCE_SAML_LOGIN');
 
+if ($settings['f1_sso_enabled']) {
+  // If we're forcing folks to log in via SSO, then no local roles should be
+  // allowed to log in the normal way.
+  $config['samlauth.authentication']['drupal_login_roles'] = ['authenticated' => '0'];
+}
+
 $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
