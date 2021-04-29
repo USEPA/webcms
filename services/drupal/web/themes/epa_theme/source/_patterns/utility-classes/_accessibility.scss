@@ -1,11 +1,13 @@
 // @file
 // Accessibility utility classes
 
+.element-invisible, // Drupal 7 class
 .visually-hidden,
 .u-visually-hidden,
 .usa-sr-only {
   @include visually-hidden-important;
 
+  &.element-focusable, // Drupal 7 class
   &.focusable,
   &.u-focusable {
     &:focus,
@@ -15,6 +17,7 @@
   }
 }
 
+.element-hidden, // Drupal 7 class
 .hidden,
 .u-hidden {
   @include hidden-important;
