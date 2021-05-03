@@ -1,17 +1,20 @@
-{% if content.main|render and content.sidebar|render %}
+{% set content_main = content.main|render %}
+{% set content_sidebar = content.sidebar|render %}
+
+{% if content_main and content_sidebar %}
   {% set classes = ['l-sidebar'] %}
   {% set main_classes = ['l-sidebar__main'] %}
   {% set sidebar_classes = ['l-sidebar__sidebar'] %}
 {% endif %}
 <div{{ attributes.addClass(classes) }}>
-  {% if content.main|render %}
+  {% if content_main %}
     <div{{ region_attributes.main.addClass(main_classes) }}>
-      {{ content.main }}
+      {{ content_main }}
     </div>
   {% endif %}
-  {% if content.sidebar|render %}
+  {% if content_sidebar %}
     <div{{ region_attributes.sidebar.addClass(sidebar_classes) }}>
-      {{ content.sidebar }}
+      {{ content_sidebar }}
     </div>
   {% endif %}
 </div>

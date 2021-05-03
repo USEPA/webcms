@@ -1,62 +1,72 @@
+{% set content_a1 = content.a1|render %}
+{% set content_a2 = content.a2|render %}
+{% set content_b1 = content.b1|render %}
+{% set content_b2 = content.b2|render %}
+{% set content_c1 = content.c1|render %}
+{% set content_c2 = content.c2|render %}
+{% set content_main = content.main|render %}
+{% set content_sidebar = content.sidebar|render %}
+{% set content_bottom = content.bottom|render %}
+
 {% set row_a %}
-  {% if content.a1|render and content.a2|render %}
+  {% if content_a1 and content_a2 %}
     <div class="l-grid l-grid--2-col">
-      <div{{ region_attributes.a1 }}>{{ content.a1 }}</div>
-      <div{{ region_attributes.a2 }}>{{ content.a2 }}</div>
+      <div{{ region_attributes.a1 }}>{{ content_a1 }}</div>
+      <div{{ region_attributes.a2 }}>{{ content_a2 }}</div>
     </div>
   {% else %}
-    {{ content.a1 }}
-    {{ content.a2 }}
+    {{ content_a1 }}
+    {{ content_a2 }}
   {% endif %}
 {% endset %}
 
 {% set row_b %}
-  {% if content.b1|render and content.b2|render %}
+  {% if content_b1 and content_b2 %}
     <div class="l-grid l-grid--2-col">
-      <div{{ region_attributes.b1 }}>{{ content.b1 }}</div>
-      <div{{ region_attributes.b2 }}>{{ content.b2 }}</div>
+      <div{{ region_attributes.b1 }}>{{ content_b1 }}</div>
+      <div{{ region_attributes.b2 }}>{{ content_b2 }}</div>
     </div>
   {% else %}
-    {{ content.b1 }}
-    {{ content.b2 }}
+    {{ content_b1 }}
+    {{ content_b2 }}
   {% endif %}
 {% endset %}
 
 {% set row_c %}
-  {% if content.c1|render and content.a2|render %}
+  {% if content_c1 and content_c2 %}
     <div class="l-grid l-grid--2-col">
-      <div{{ region_attributes.c1 }}>{{ content.c1 }}</div>
-      <div{{ region_attributes.c2 }}>{{ content.c2 }}</div>
+      <div{{ region_attributes.c1 }}>{{ content_c1 }}</div>
+      <div{{ region_attributes.c2 }}>{{ content_c2 }}</div>
     </div>
   {% else %}
-    {{ content.c1 }}
-    {{ content.c2 }}
+    {{ content_c1 }}
+    {{ content_c2 }}
   {% endif %}
 {% endset %}
 
 {% set main_content %}
-  {% if content.main|render %}
-    <div{{ region_attributes.main }}>{{ content.main }}</div>
+  {% if content_main %}
+    <div{{ region_attributes.main }}>{{ content_main }}</div>
   {% endif %}
   {{ row_a }}
   {{ row_b }}
   {{ row_c }}
-  {% if content.bottom|render %}
-    <div{{ region_attributes.bottom }}>{{ content.bottom }}</div>
+  {% if content_bottom %}
+    <div{{ region_attributes.bottom }}>{{ content_bottom }}</div>
   {% endif %}
 {% endset %}
 
-{% if main_content|trim and content.sidebar|render %}
+{% if main_content|trim and content_sidebar %}
   {% set sidebar_classes = ['l-sidebar__sidebar'] %}
   <div class="l-sidebar">
     <div class="l-sidebar__main">
       {{ main_content }}
     </div>
     <div{{ region_attributes.sidebar.addClass(sidebar_classes) }}>
-      {{ content.sidebar }}
+      {{ content_sidebar }}
     </div>
   </div>
 {% else %}
   {{ main_content }}
-  {{ content.sidebar }}
+  {{ content_sidebar }}
 {% endif %}
