@@ -906,9 +906,6 @@ $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED')
 
 $config['webform.settings']['settings']['default_form_exception_message'] = '';
 
-
-$settings['cache']['bins']['data'] = 'cache.backend.php';
-
 $settings['config_sync_directory'] = '../config/sync';
 
 // Set all managed files to be marked as "temporary" and therefore subject to
