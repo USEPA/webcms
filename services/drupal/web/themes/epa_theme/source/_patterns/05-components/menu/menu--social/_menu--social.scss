@@ -7,10 +7,18 @@ $social-menu-gap: rem(gesso-spacing(1));
 .menu--social {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   list-style-type: none;
-  max-width: 3 * ($social-menu-icon-size + $social-menu-gap);
   padding: 0;
+
+  @include breakpoint($bp-footer-columns) {
+    justify-content: center;
+    max-width: 3 * ($social-menu-icon-size + $social-menu-gap);
+  }
+
+  @include breakpoint(1040px) {
+    justify-content: flex-start;
+    max-width: 100%;
+  }
 
   .menu__item {
     margin: 0 $social-menu-gap $social-menu-gap 0;
