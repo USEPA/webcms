@@ -32,5 +32,5 @@ while true; do
   echo "Input metrics: $input"
   echo "Output metrics: $metrics"
 
-  aws put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
+  aws cloudwatch put-metric-data --namespace WebCMS/FPM --metric-data "$metrics"
 done
