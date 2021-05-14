@@ -71,7 +71,7 @@ class AddDefinitionsController extends ControllerBase {
     }
 
     $url = Url::fromUri(EPAAddDefinitions::SERVICE_ENDPOINT, ['query' => ['callback' => 'CKEditorAddDefinitions.dictionaryCallback']]);
-    $post_data['form_params'] = ['text' => $post];
+    $post_data['body'] = UrlHelper::buildQuery(['text' => $post]);
 
     try {
       $request = $this->httpClient->post($url->toString(), $post_data);

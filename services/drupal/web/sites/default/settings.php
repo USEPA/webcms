@@ -828,9 +828,9 @@ $settings['s3fs.use_s3_for_private'] = TRUE;
 
 $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
-$env_name = getenv('WEBCMS_ENV_NAME');
+$env_name = getenv('WEBCMS_SITE');
 $env_state = getenv('WEBCMS_ENV_STATE');
-$env_lang = getenv('WEBCMS_ENV_LANG');
+$env_lang = getenv('WEBCMS_LANG');
 
 if (empty($env_lang)) {
   $env_lang = 'en';

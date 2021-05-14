@@ -21,10 +21,10 @@ use Drupal\elasticsearch_connector\Entity\Cluster;
 function epa_es_auth_elasticsearch_connector_load_library_options_alter(array &$options, Cluster $cluster) {
   // Only sign requests if we're not in a local environment: this functionality is only present
   // in the AWS implementation of Elasticsearch.
-  if (getenv('WEBCMS_ENV_NAME') === 'local') {
+  if (getenv('WEBCMS_SITE') === 'local') {
     return;
   }
-  
+
   $provider = CredentialProvider::defaultProvider();
   $aws_region = getenv('WEBCMS_S3_REGION');
 
