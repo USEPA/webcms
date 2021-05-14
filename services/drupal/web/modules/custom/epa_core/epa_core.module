@@ -453,7 +453,7 @@ function _epa_core_augment_datetime_description(&$field_description) {
  * Implements hook_entity_bundle_field_info_alter().
  */
 function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
-  $env_lang = getenv('WEBCMS_ENV_LANG');
+  $env_lang = getenv('WEBCMS_LANG');
   if (isset($env_lang) && $env_lang === 'es' && $entity_type->id() == 'node' && !empty($fields['field_language'])) {
     $fields['field_language']->setDefaultValue('es');
   }
