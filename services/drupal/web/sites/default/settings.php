@@ -865,6 +865,9 @@ switch ($env_state) {
       $settings['memcache']['options'][Memcached::OPT_CLIENT_MODE] = Memcached::DYNAMIC_CLIENT_MODE;
     }
 
+    // Allow sharing of memcache server by multiple sites within a hosting environment.
+    $settings['memcache']['key_prefix'] = $env_name . '-' . $env_lang;
+
     $settings['cache']['default'] = 'cache.backend.memcache';
     break;
 }
