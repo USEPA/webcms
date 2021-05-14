@@ -24,7 +24,7 @@ Note that if PHP-FPM is overloaded, it's possible that the `curl` command will t
 The entrypoint script requires two environment variables. It will deliberately crash on startup if they are not present:
 
 1. `$AWS_REGION`: Used to tell the AWS CLI which region the metrics are being published in.
-2. `$WEBCMS_ENV_NAME`: The name of this deployment, such as `dev`
+2. `$WEBCMS_SITE`: The name of this deployment, such as `dev`
 
 ## Metrics Structure
 

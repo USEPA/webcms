@@ -7,8 +7,8 @@ if test -z "$AWS_REGION"; then
   exit 1
 fi
 
-if test -z "$WEBCMS_ENV_NAME"; then
-  echo "Required environment variable WEBCMS_ENV_NAME is not set." >&2
+if test -z "$WEBCMS_SITE"; then
+  echo "Required environment variable WEBCMS_SITE is not set." >&2
   exit 1
 fi
 

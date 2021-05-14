@@ -28,6 +28,6 @@
   Value: $input[.key],
   Timestamp: now | floor,
   Dimensions: [
-    { Name: "Environment", Value: $ENV.WEBCMS_ENV_NAME }
+    { Name: "Environment", Value: $ENV.WEBCMS_SITE }
   ],
 })

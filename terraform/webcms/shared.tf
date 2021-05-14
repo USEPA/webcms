@@ -184,8 +184,8 @@ locals {
     { name = "WEBCMS_SITE_URL", value = "https://${var.drupal_hostname}" },
     { name = "WEBCMS_SITE_HOSTNAME", value = var.drupal_hostname },
     { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
-    { name = "WEBCMS_ENV_NAME", value = var.site },
-    { name = "WEBCMS_ENV_LANG", value = var.lang },
+    { name = "WEBCMS_SITE", value = var.site },
+    { name = "WEBCMS_LANG", value = var.lang },
     { name = "WEBCMS_S3_USES_DOMAIN", value = var.drupal_use_s3_domain ? "1" : "0" },
     { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = join(",", var.drupal_csrf_origin_whitelist) },
 

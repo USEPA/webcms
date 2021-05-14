@@ -159,7 +159,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       environment = [
         { name = "AWS_REGION", value = var.aws_region },
-        { name = "WEBCMS_ENV_NAME", value = "${var.site}-${var.lang}" },
+        { name = "WEBCMS_SITE", value = "${var.site}-${var.lang}" },
       ]
 
       logConfiguration = {
