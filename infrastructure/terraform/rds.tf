@@ -20,10 +20,10 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 1
   }
 
-  # Bump the max allowed packet to 64MB (default is 1-4MB, depending on server version).
+  # Bump the max allowed packet to 128MB (default is 1-4MB, depending on server version).
   parameter {
     name  = "max_allowed_packet"
-    value = 64 * (1024 * 1024)
+    value = 128 * (1024 * 1024)
   }
 
   # Slow query logging
