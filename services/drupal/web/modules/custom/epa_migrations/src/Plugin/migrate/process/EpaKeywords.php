@@ -82,79 +82,68 @@ class EpaKeywords extends ProcessPluginBase implements ContainerFactoryPluginInt
     $return_ids = [];
 
     $nid = $value;
+    $vids = [1, 3, 7, 9, 13, 15, 19, 21, 25, 27, 29, 31];
+    $env_lang = getenv('WEBCMS_LANG');
+
+    // Vocabs are a bit different on the spanish site.
+    if ($env_lang == 'es') {
+      $vids = [1, 3, 7, 9, 13, 15, 21, 23, 27, 29, 31, 33];
+    }
 
     // Get all the term ids assigned to this node in D7.
-    $tids = $this->d7Connection->select('taxonomy_index', 'ti')
-      ->fields('ti', ['tid'])
+    $query = $this->d7Connection->select('taxonomy_index', 'ti')
+      ->fields('ti', ['tid']);
+    $query->join('taxonomy_term_data', 'td', 'td.tid = ti.tid');
+    $query->fields('td', ['vid','name'])
       ->condition('ti.nid', $nid)
-      ->execute()
-      ->fetchCol();
+      ->condition('td.vid', $vids,'IN');
 
-    if ($tids) {
-      $vids_to_migrate = [1, 3, 7, 9, 13, 15, 19, 21, 25, 27, 29, 31];
-      // Get vids and names for all the terms assigned to this node.
-      $all_term_data = $this->d7Connection->select('taxonomy_term_data', 'ttd')
-        ->fields('ttd', ['tid', 'vid', 'name'])
-        ->condition('ttd.tid', $tids, 'IN')
-        ->execute()
-        ->fetchAll();
+    $terms = $query->execute()
+      ->fetchAll();
 
-      $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $term_storage = $this->entityTypeManager->getStorage('taxonomy_term');
 
-      foreach ($tids as $tid) {
-        // Find the object for this term.
-        $term_data = array_filter($all_term_data, function ($term_object) use ($tid) {
-          return $term_object->tid === $tid;
-        });
+    foreach ($terms as $term_data) {
+      // Check if this term has already been migrated.
+      $existing_term = $term_storage->load($term_data->tid);
 
-        $term_data = array_pop($term_data);
+      if ($existing_term) {
+        // Add this term id to our return array and we're done.
+        $return_ids[] = $term_data->tid;
+      }
+      else {
+        // Build the hierarchy for this term.
+        $ancestors = $this->getTidAncestors($term_data->tid);
 
-        // Ensure the this term is a member of the vids to consolidate.
-        if (in_array($term_data->vid, $vids_to_migrate)) {
+        // Get the names of the ancestors so we can build a term.
+        if (count($ancestors) > 0) {
+          $ancestor_queried_names = $this->d7Connection->select('taxonomy_term_data', 'ttd')
+            ->fields('ttd', ['tid', 'name'])
+            ->condition('ttd.tid', $ancestors, "IN")
+            ->execute()
+            ->fetchAllAssoc('tid');
 
-          // Check if this term has already been migrated.
-          $existing_term = $term_storage->load($tid);
+          $ordered_names = array_map(function ($ancestor_tid) use ($ancestor_queried_names) {
+            return $ancestor_queried_names[$ancestor_tid]->name;
+          }, $ancestors);
 
-          if ($existing_term) {
-            // Add this term id to our return array and we're done.
-            $return_ids[] = $tid;
-          }
-          else {
-            // Build the hierarchy for this term.
-            $ancestors = $this->getTidAncestors($tid);
-
-            // Get the names of the ancestors so we can build a term.
-            if (count($ancestors) > 0) {
-              $ancestor_queried_names = $this->d7Connection->select('taxonomy_term_data', 'ttd')
-                ->fields('ttd', ['tid', 'name'])
-                ->condition('ttd.tid', $ancestors, "IN")
-                ->execute()
-                ->fetchAllAssoc('tid');
-
-              $ordered_names = array_map(function ($ancestor_tid) use ($ancestor_queried_names) {
-                return $ancestor_queried_names[$ancestor_tid]->name;
-              }, $ancestors);
-
-              $compound_name = implode(" > ", $ordered_names);
-              $compound_name .= " > {$term_data->name}";
-            }
-            else {
-              $compound_name = $term_data->name;
-            }
-
-            // Create a new term in the keywords vocabulary and add the id to
-            // the list of ids we'll return.
-            $new_term = $term_storage->create([
-              'tid' => $tid,
-              'vid' => 'keywords',
-              'name' => $compound_name,
-            ]);
-
-            $new_term->save();
-
-            $return_ids[] = $new_term->id();
-          }
+          $compound_name = implode(" > ", $ordered_names);
+          $compound_name .= " > {$term_data->name}";
         }
+        else {
+          $compound_name = $term_data->name;
+        }
+        // Create a new term in the keywords vocabulary and add the id to
+        // the list of ids we'll return.
+        $new_term = $term_storage->create([
+          'tid' => $term_data->tid,
+          'vid' => 'keywords',
+          'name' => $compound_name,
+        ]);
+
+        $new_term->save();
+
+        $return_ids[] = $new_term->id();
       }
     }
 
