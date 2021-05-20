@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: 5dvv4pCTK6eMLgYU-eiSzYY4Sf4WcwaVDDA5kz2I4Hk
+  default_config_hash: eBMMOWV7COSw1OtuQyn4u59BQnib03fT9RqBa-RxhNI
 id: upgrade_d7_node_document_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -81,6 +81,17 @@ process:
     -
       plugin: get
       source: comment
+  field_paragraphs:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: body_pane
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_paragraphs
+    -
+      plugin: multiple_values
   layout_builder__layout:
     -
       plugin: skip_on_empty

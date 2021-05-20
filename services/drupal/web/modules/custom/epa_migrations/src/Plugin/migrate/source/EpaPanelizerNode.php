@@ -105,7 +105,20 @@ class EpaPanelizerNode extends Node {
     $did = $row->getSourceProperty('did');
 
     if ($did) {
+      // Fetch the node_content pane for the body field.
+      $body_pane = $this->select('panels_pane', 'pp')
+        ->fields('pp')
+        ->condition('pp.did', $did)
+        ->condition('pp.type', 'node_content')
+        ->orderBy('pp.position')
+        ->orderBy('pp.panel')
+        ->execute()
+        ->fetchAll();
+      $row->setSourceProperty('body_pane', $body_pane);
+
       // Fetch the panes and add the result as a source property.
+      // Include the node_content pane (body field) in the panes so we can
+      // correctly place it.
       $panes = $this->select('panels_pane', 'pp')
         ->fields('pp')
         ->condition('pp.did', $did)
