@@ -1,0 +1,227 @@
+diff --git a/akamai.services.yml b/akamai.services.yml
+index b2eb604..dc70131 100644
+--- a/akamai.services.yml
++++ b/akamai.services.yml
+@@ -24,11 +24,6 @@ services:
+     class: Drupal\akamai\EventSubscriber\ConfigSubscriber
+     tags:
+       - { name: event_subscriber }
+-  akamai.cacheable_response_subscriber:
+-    class: Drupal\akamai\EventSubscriber\CacheableResponseSubscriber
+-    arguments: ['@config.factory', '@akamai.helper.cachetagformatter', '@event_dispatcher']
+-    tags:
+-      - { name: event_subscriber }
+   akamai.helper.cachetagformatter:
+     class: Drupal\akamai\Helper\CacheTagFormatter
+   akamai.helper.edgescape:
+diff --git a/src/EventSubscriber/CacheableResponseSubscriber.php b/src/EventSubscriber/CacheableResponseSubscriber.php
+deleted file mode 100644
+index 4e81790..0000000
+--- a/src/EventSubscriber/CacheableResponseSubscriber.php
++++ /dev/null
+@@ -1,104 +0,0 @@
+-<?php
+-
+-namespace Drupal\akamai\EventSubscriber;
+-
+-use Drupal\akamai\Event\AkamaiHeaderEvents;
+-use Symfony\Component\HttpKernel\KernelEvents;
+-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+-use Drupal\Core\Cache\CacheableResponseInterface;
+-use Drupal\Core\Config\ConfigFactoryInterface;
+-use Drupal\akamai\Helper\CacheTagFormatter;
+-
+-/**
+- * Add cache tags headers on cacheable responses, for external caching systems.
+- */
+-class CacheableResponseSubscriber implements EventSubscriberInterface {
+-
+-  /**
+-   * The config factory.
+-   *
+-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+-   */
+-  protected $configFactory;
+-
+-  /**
+-   * Cache tag formatter.
+-   *
+-   * @var \Drupal\akamai\Helper\CacheTagFormatter
+-   */
+-  protected $tagFormatter;
+-
+-  /**
+-   * The event dispatcher.
+-   *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+-   */
+-  protected $eventDispatcher;
+-
+-  /**
+-   * Constructs a new CacheableResponseSubscriber.
+-   *
+-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+-   *   The configuration factory.
+-   * @param \Drupal\akamai\Helper\CacheTagFormatter $formatter
+-   *   The cache tag formatter.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+-   *   The event dispatcher.
+-   */
+-  public function __construct(ConfigFactoryInterface $config_factory, CacheTagFormatter $formatter, EventDispatcherInterface $event_dispatcher) {
+-    $this->configFactory = $config_factory;
+-    $this->tagFormatter = $formatter;
+-    $this->eventDispatcher = $event_dispatcher;
+-  }
+-
+-  /**
+-   * {@inheritdoc}
+-   */
+-  public static function getSubscribedEvents() {
+-    $events[KernelEvents::RESPONSE][] = ['onRespond'];
+-    return $events;
+-  }
+-
+-  /**
+-   * Add cache tags header on cacheable responses.
+-   *
+-   * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
+-   *   The event to process.
+-   */
+-  public function onRespond(FilterResponseEvent $event) {
+-    if (!$event->isMasterRequest()) {
+-      return;
+-    }
+-
+-    $response = $event->getResponse();
+-    $config = $this->configFactory->get('akamai.settings');
+-    $header = $config->get('edge_cache_tag_header');
+-
+-    // Send headers if response is cacheable and the setting is enabled.
+-    if ($header && $response instanceof CacheableResponseInterface) {
+-      $tags = $response->getCacheableMetadata()->getCacheTags();
+-      $blacklist = $config->get('edge_cache_tag_header_blacklist');
+-      $blacklist = is_array($blacklist) ? $blacklist : [];
+-      $tags = array_filter($tags, function ($tag) use ($blacklist) {
+-        foreach ($blacklist as $prefix) {
+-          if (strpos($tag, $prefix) !== FALSE) {
+-            return FALSE;
+-          }
+-        }
+-        return TRUE;
+-      });
+-
+-      // Instantiate our event.
+-      $event = new AkamaiHeaderEvents($tags);
+-      $this->eventDispatcher->dispatch(AkamaiHeaderEvents::HEADER_CREATION, $event);
+-      $tags = $event->data;
+-      foreach ($tags as &$tag) {
+-        $tag = $this->tagFormatter->format($tag);
+-      }
+-      $response->headers->set('Edge-Cache-Tag', implode(',', $tags));
+-    }
+-  }
+-
+-}
+diff --git a/src/Plugin/Purge/Purger/AkamaiTagPurger.php b/src/Plugin/Purge/Purger/AkamaiTagPurger.php
+index 91395ca..8810790 100644
+--- a/src/Plugin/Purge/Purger/AkamaiTagPurger.php
++++ b/src/Plugin/Purge/Purger/AkamaiTagPurger.php
+@@ -119,7 +119,7 @@ class AkamaiTagPurger extends PurgerBase {
+     $formatter = \Drupal::service('akamai.helper.cachetagformatter');
+     foreach ($invalidations as $invalidation) {
+       $invalidation->setState(InvalidationInterface::PROCESSING);
+-      $tag = $formatter->format($invalidation->getExpression());
++      $tag = $formatter->format($invalidation);
+       if (mb_strlen($tag) > 128) {
+         $this->logger->warning('Cache Tag %tag has exceeded the Akamai 128 character tag maximum length.', ['%tag' => $tag]);
+       }
+diff --git a/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php b/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php
+new file mode 100644
+index 0000000..25bdcef
+--- /dev/null
++++ b/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php
+@@ -0,0 +1,82 @@
++<?php
++
++namespace Drupal\akamai\Plugin\Purge\TagsHeader;
++
++use Drupal\akamai\Event\AkamaiHeaderEvents;
++use Drupal\purge\Plugin\Purge\TagsHeader\TagsHeaderBase;
++use Drupal\purge\Plugin\Purge\TagsHeader\TagsHeaderInterface;
++use Symfony\Component\DependencyInjection\ContainerInterface;
++
++/**
++ * Akamai Edge-Cache-Tag headers.
++ *
++ * @PurgeTagsHeader(
++ *   id = "akamai_edge_cache_tags_header",
++ *   header_name = "Edge-Cache-Tag",
++ * )
++ */
++class AkamaiEdgeCacheTagsHeader extends TagsHeaderBase implements TagsHeaderInterface {
++
++  /**
++   * The configuration factory.
++   *
++   * @var \Drupal\Core\Config\ConfigFactoryInterface
++   */
++  protected $configFactory;
++
++  /**
++   * The tag formatter.
++   *
++   * @var \Drupal\akamai\Helper\CacheTagFormatter
++   */
++  protected $formatter;
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
++    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
++
++    $instance->configFactory = $container->get('config.factory');
++    $instance->formatter = $container->get('akamai.helper.cachetagformatter');
++
++    return $instance;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getValue(array $tags) {
++    $blacklist = $this->configFactory->get('akamai.settings')->get('edge_cache_tag_header_blacklist');
++    $blacklist = is_array($blacklist) ? $blacklist : [];
++    $tags = array_filter($tags, function ($tag) use ($blacklist) {
++      foreach ($blacklist as $prefix) {
++        if (strpos($tag, $prefix) !== FALSE) {
++          return FALSE;
++        }
++      }
++      return TRUE;
++    });
++
++    // Instantiate our event.
++    $event = new AkamaiHeaderEvents($tags);
++    $this->eventDispatcher->dispatch(AkamaiHeaderEvents::HEADER_CREATION, $event);
++    $tags = $event->data;
++
++    // Call parent to get any formatting added by base class. This really only
++    // matters for those using this patch:
++    // https://www.drupal.org/project/purge/issues/2952277
++    $tags = explode(' ', parent::getValue($tags));
++
++    $tags = array_map([$this->formatter, 'format'], $tags);
++    return implode(' ', $tags);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function isEnabled() {
++    $header = $this->configFactory->get('akamai.settings')->get('edge_cache_tag_header');
++    return (bool) $header;
++  }
++}
