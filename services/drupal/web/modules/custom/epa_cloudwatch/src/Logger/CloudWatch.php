@@ -4,6 +4,7 @@ namespace Drupal\epa_cloudwatch\Logger;
 
 use Aws\CloudWatchLogs\CloudWatchLogsClient;
 use Aws\CloudWatchLogs\Exception\CloudWatchLogsException;
+use Aws\Credentials\Credentials;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\Core\Logger\RfcLoggerTrait;
@@ -83,19 +84,29 @@ class CloudWatch implements LoggerInterface {
       return $this->client;
     }
 
-    //
+    // Load required arguments from configuration.
     $region = $this->config->get('region');
     if (empty($region)) {
       throw new ConfigurationRequiredException('region');
     }
-
     $args = ['region' => $region];
 
-    // If we are overriding the AWS endpoint (for example, testing with Localstack),
-    // then add that arg in.
+    $version = $this->config->get('version');
+    if (empty($version)) {
+      throw new ConfigurationRequiredException('version');
+    }
+    $args['version'] = $version;
+
+    // Provide local overrides for arguments that would normally be loaded from
+    // the environment.
     $endpoint = $this->config->get('endpoint');
     if (!empty($endpoint)) {
       $args['endpoint'] = $endpoint;
+    }
+
+    $credentials = $this->config->get('credentials');
+    if (!empty($credentials)) {
+      $args['credentials'] = new Credentials($credentials['user'], $credentials['password']);
     }
 
     $this->client = new CloudWatchLogsClient($args);
@@ -297,9 +308,43 @@ class CloudWatch implements LoggerInterface {
       // will inform us that it already exists. We ignore that error, but re-throw all
       // others - this gives us safe logic for lazy log stream creation while not
       // shadowing other problems (such as bad IAM permissions).
-      if ($e->getAwsErrorCode() === 'ResourceAlreadyExistsException') {
+      if ($e->getAwsErrorCode() !== 'ResourceAlreadyExistsException') {
+        throw $e;
+      }
+
+      // If the log group does not exist, we will get a resource not found
+      // exception. We will create the log group, then create the log stream.
+      // This scenario is only likely to occur when running with localstack in a
+      // local development environment.
+      if ($e->getAwsErrorCode() === 'ResourceNotFoundException') {
+        $this->createLogGroup();
+        $this->createLogStream();
+      }
+    }
+  }
+
+  /**
+   * Creates a log group for CloudWatch Logs.
+   */
+  protected function createLogGroup() {
+    $client = $this->getClient();
+    $logGroup = $this->getLogGroup();
+
+    try {
+      $client->createLogGroup([
+        'logGroupName' => $logGroup,
+      ]);
+    }
+    catch (CloudWatchLogsException $e) {
+      // If we were not the only request attempting to request this log stream,
+      // then AWS will inform us that it already exists. We ignore that error,
+      // but re-throw all others - this gives us safe logic for lazy log stream
+      // creation while not shadowing other problems (such as bad IAM
+      // permissions).
+      if ($e->getAwsErrorCode() !== 'ResourceAlreadyExistsException') {
         throw $e;
       }
     }
   }
+
 }
