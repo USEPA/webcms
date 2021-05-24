@@ -139,10 +139,10 @@ index 91395ca..8810790 100644
        }
 diff --git a/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php b/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php
 new file mode 100644
-index 0000000..25bdcef
+index 0000000..0aa59ae
 --- /dev/null
 +++ b/src/Plugin/Purge/TagsHeader/AkamaiEdgeCacheTagsHeader.php
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,90 @@
 +<?php
 +
 +namespace Drupal\akamai\Plugin\Purge\TagsHeader;
@@ -177,6 +177,13 @@ index 0000000..25bdcef
 +  protected $formatter;
 +
 +  /**
++   * The event dispatcher.
++   *
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   */
++  protected $eventDispatcher;
++
++  /**
 +   * {@inheritdoc}
 +   */
 +  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -184,6 +191,7 @@ index 0000000..25bdcef
 +
 +    $instance->configFactory = $container->get('config.factory');
 +    $instance->formatter = $container->get('akamai.helper.cachetagformatter');
++    $instance->eventDispatcher = $container->get('event_dispatcher');
 +
 +    return $instance;
 +  }
