@@ -50,11 +50,11 @@ $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml'
 
 ini_set('max_execution_time', 0);
 
-// Use a stub region
-$settings['epa_cloudwatch.region'] = 'us-east-1';
-
-// Redirect logging to Localstack (see https://github.com/localstack/localstack)
-$settings['epa_cloudwatch.endpoint'] = 'http://localstack:4566';
-
-$settings['epa_cloudwatch.log_group'] = '/webcms/drupal';
-$settings['epa_cloudwatch.log_stream'] = 'webcms';
+// Provide override configuration for epa_cloudwatch to redirect
+// logging to Localstack (see https://github.com/localstack/localstack)
+$config['epa_cloudwatch']['endpoint'] = 'http://localstack:4566';
+$config['epa_cloudwatch']['credentials'] = [
+  'user' => 'foo',
+  'password' => 'bar',
+];
+$config['epa_cloudwatch']['log_stream'] = 'app-drupal';
