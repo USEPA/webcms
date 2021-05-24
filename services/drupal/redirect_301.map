@@ -1,6 +1,9 @@
 map $request_uri $new_uri_301 {
-    # entries of form:
-    #/old-url /new-url;
+    # NOTE: These redirects will affect AWS environments, including production.
+    # For local testing edit services/nginx/redirect_301.map instead
+
+     # entries of form:
+     #/old-url /new-url;
 
     ~*\/(?i)climatechange(\/|$).* /climate-change;
     ~*\/(?i)statelocalclimate(\/|$).* /statelocalenergy;
@@ -310,5 +313,5 @@ map $request_uri $new_uri_301 {
     ~*\/wqsrepository(\/|$).* /wqs-tech/state-specific-water-quality-standards-effective-under-clean-water-act-cwa;
     ~*\/wtc(\/|$).* https://archive.epa.gov/wtc/web/html/;
     ~*\/wtc(\/|$).* https://archive.epa.gov/wtc/web/html/;
-    
+
 }
