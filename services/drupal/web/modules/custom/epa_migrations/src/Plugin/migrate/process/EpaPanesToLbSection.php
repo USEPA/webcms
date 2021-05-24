@@ -199,10 +199,8 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
               }
 
               $pane['is_skinny_pane'] = $num_columns >= 3;
-              $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
-
-              if ($paragraphs) {
-                $component = $this->buildSectionComponent($paragraphs, $region);
+              $component = $this->buildSectionComponent($pane, $row, $migrate_executable, $region);
+              if ($component) {
                 $section->appendComponent($component);
               }
             }
@@ -245,10 +243,8 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
           $region = $regions_by_panel_name[$pane['panel']];
 
           $pane['is_skinny_pane'] = !in_array($region, ['main', 'bottom']);
-          $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
-
-          if ($paragraphs) {
-            $component = $this->buildSectionComponent($paragraphs, $region);
+          $component = $this->buildSectionComponent($pane, $row, $migrate_executable, $region);
+          if ($component) {
             $section->appendComponent($component);
           }
         }
@@ -279,10 +275,8 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
           $region = $regions_by_panel_name[$pane['panel']];
 
           $pane['is_skinny_pane'] = $region == 'sidebar';
-          $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
-
-          if ($paragraphs) {
-            $component = $this->buildSectionComponent($paragraphs, $region);
+          $component = $this->buildSectionComponent($pane, $row, $migrate_executable, $region);
+          if ($component) {
             $section->appendComponent($component);
           }
         }
@@ -293,36 +287,81 @@ class EpaPanesToLbSection extends ProcessPluginBase implements ContainerFactoryP
   }
 
   /**
-   * Given an array of paragraphs, build a Section Component.
+   * Given a pane, build a Section Component.
    *
-   * @param array $paragraphs
-   *   The paragraphs to assign this component.
+   * @param array $pane
+   *   The pane data.
+   * @param \Drupal\migrate\Row $row
+   *   The migration row data.
+   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   *   The migration executable.
    * @param string $region
    *   The region where the Section Component should be placed.
    *
    * @return \Drupal\layout_builder\SectionComponent
    *   The Section Component with an inline content block.
    */
-  private function buildSectionComponent(array $paragraphs, string $region) {
-    // Build a  Block entity.
-    $block = $this->entityTypeManager->getStorage('block_content')
-      ->create([
-        'info' => 'Paragraph Block',
-        'type' => 'paragraph',
-        'reusable' => 0,
-        'field_paragraphs' => $paragraphs,
-      ]
-    );
+  private function buildSectionComponent(array $pane, Row $row, MigrateExecutableInterface $migrate_executable, string $region) {
+    if ($pane['type'] == 'node_content') {
+      // Create a field_block:node:page:field_paragraphs component.
+      $component = new SectionComponent($this->uuid->generate(), $region, [
+        'id' => 'field_block:node:page:field_paragraphs',
+        'label' => 'Body',
+        'provider' => 'layout_builder',
+        'label_display' => 0,
+        'formatter' => [
+          'label' => 'hidden',
+          'type' => 'entity_reference_revisions_entity_view',
+          'settings' => [
+            'view_mode' => 'default',
+          ],
+          'third_party_settings' => [
+            'linked_field' => [
+              'linked' => 0,
+              'type' => 'field',
+              'destination' => [
+                'field' => '',
+                'custom' => '',
+              ],
+              'advanced' => [
+                'title' => '',
+                'target' => '',
+                'class' => '',
+                'rel' => '',
+                'text' => '',
+              ],
+              'token' => '',
+            ],
+          ],
+        ],
+        'context_mapping' => [
+          'entity' => 'layout_builder.entity',
+          'view_mode' => 'view_mode',
+        ],
+      ]);
 
-    // Create Block embedded in a Section Component. Passing a serialized
-    // Block entity is the key to making this work.
-    $component = new SectionComponent($this->uuid->generate(), $region, [
-      'id' => 'inline_block:paragraph',
-      'label' => 'Paragraph Block',
-      'label_display' => FALSE,
-      'block_serialized' => serialize($block),
-      'context_mapping' => [],
-    ]);
+    }
+    else {
+      $paragraphs = $this->transformParagraphs($pane, $row, $migrate_executable);
+      // Create a paragraph block.
+      $block = $this->entityTypeManager->getStorage('block_content')
+        ->create([
+          'info' => 'Paragraph Block',
+          'type' => 'paragraph',
+          'reusable' => 0,
+          'field_paragraphs' => $paragraphs,
+        ]);
+
+      // Create Block embedded in a Section Component. Passing a serialized
+      // Block entity is the key to making this work.
+      $component = new SectionComponent($this->uuid->generate(), $region, [
+        'id' => 'inline_block:paragraph',
+        'label' => 'Paragraph Block',
+        'label_display' => FALSE,
+        'block_serialized' => serialize($block),
+        'context_mapping' => [],
+      ]);
+    }
 
     return $component;
   }

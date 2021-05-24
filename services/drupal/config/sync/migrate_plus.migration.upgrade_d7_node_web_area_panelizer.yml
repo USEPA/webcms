@@ -3,7 +3,7 @@ langcode: en
 status: true
 dependencies: {  }
 _core:
-  default_config_hash: XFCkd9p3vpQ2xGsoas3bszN1dVwHue_5J84OB-LRM4I
+  default_config_hash: rqnYW9_RkYC8_a5DWK0PmHMBQU1BfcNsbkR2sM2wIug
 id: upgrade_d7_node_web_area_panelizer
 class: Drupal\migrate\Plugin\Migration
 field_plugin_method: null
@@ -20,6 +20,22 @@ source:
     name: nid
     alias: 'n'
 process:
+  field_paragraphs:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: body_pane
+    -
+      plugin: single_value
+    -
+      plugin: epa_panes_to_paragraphs
+    -
+      plugin: multiple_values
+    -
+      plugin: sub_process
+      process:
+        target_id: target_id
+        target_revision_id: target_revision_id
   layout_builder__layout:
     -
       plugin: skip_on_empty

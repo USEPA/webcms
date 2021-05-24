@@ -91,11 +91,22 @@ TEMPLATE;
           // <drupal-media> element in a link to the original image.
           $link_to_original = $tag_info['fields']['field_original_image_link[und]'] ?? '';
           if (!empty($link_to_original) && $link_to_original == 1 && $media_entity && $media_entity->bundle->entity->label() == 'Image') {
-            $original_image_url = $media_entity->field_media_image->entity->createFileUrl();
-            $link_element = $doc->createElement('a');
-            $link_element->setAttribute('href', $original_image_url);
-            $link_element->appendChild($el);
-            $doc->appendChild($link_element);
+            $original_image_url = $media_entity->field_media_image->entity->getFileUri();
+            if (str_starts_with($original_image_url, 'public://')) {
+              // Since we have to hard-code a link here, and we are inconsistent
+              // in various environments as to what domain files are hosted on,
+              // we need to reference /sites/default/files/* which
+              // EpaMediaS3fsSubscriber will then ensure will get redirected to
+              // the right location if the file doesn't actually exist there.
+              $original_image_url = substr_replace($original_image_url, '/sites/default/files/', 0, 9);
+              $link_element = $doc->createElement('a');
+              $link_element->setAttribute('href', $original_image_url);
+              $link_element->appendChild($el);
+              $doc->appendChild($link_element);
+            }
+            else {
+              $doc->appendChild($el);
+            }
           }
           else {
             $doc->appendChild($el);
