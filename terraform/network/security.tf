@@ -199,7 +199,7 @@ resource "aws_security_group_rule" "public_traefik_https_ingress" {
 
 #region Drupal
 
-# Allow traffic on port 80 from Traefik to Drupal
+# Allow traffic on port 443 from Traefik to Drupal
 resource "aws_security_group_rule" "drupal_traefik_ingress" {
   description = "Allows Drupal to receive traffic from Traefik"
 
@@ -207,8 +207,8 @@ resource "aws_security_group_rule" "drupal_traefik_ingress" {
 
   type      = "ingress"
   protocol  = "tcp"
-  from_port = 80
-  to_port   = 80
+  from_port = 443
+  to_port   = 443
 
   source_security_group_id = aws_security_group.traefik.id
 }
@@ -220,8 +220,8 @@ resource "aws_security_group_rule" "traefik_drupal_egress" {
 
   type      = "egress"
   protocol  = "tcp"
-  from_port = 80
-  to_port   = 80
+  from_port = 443
+  to_port   = 443
 
   source_security_group_id = aws_security_group.drupal.id
 }
