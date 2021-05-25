@@ -84,21 +84,18 @@ class CloudWatch implements LoggerInterface {
       return $this->client;
     }
 
-    // Load required arguments from configuration.
-    $region = $this->config->get('region');
+    // Load the region from an environment variable.
+    $region = getenv('WEBCMS_S3_REGION');
     if (empty($region)) {
       throw new ConfigurationRequiredException('region');
     }
     $args = ['region' => $region];
 
-    $version = $this->config->get('version');
-    if (empty($version)) {
-      throw new ConfigurationRequiredException('version');
-    }
-    $args['version'] = $version;
+    // Set the cloudwatch logs api version.
+    $args['version'] = '2014-03-28';
 
     // Provide local overrides for arguments that would normally be loaded from
-    // the environment.
+    // the AWS environment.
     $endpoint = $this->config->get('endpoint');
     if (!empty($endpoint)) {
       $args['endpoint'] = $endpoint;
@@ -220,7 +217,7 @@ class CloudWatch implements LoggerInterface {
     }
 
     // As with the AWS region, raise an error if we don't have a log group.
-    $logGroup = $this->config->get('log_group');
+    $logGroup = getenv('WEBCMS_LOG_GROUP');
     if (empty($logGroup)) {
       throw new ConfigurationRequiredException('log_group');
     }
@@ -305,7 +302,7 @@ class CloudWatch implements LoggerInterface {
       ]);
     }
     catch (CloudWatchLogsException $e) {
-      switch ($e->getAwsErrorCode) {
+      switch ($e->getAwsErrorCode()) {
         // If the log group does not exist, we will get a resource not found
         // exception. We will create the log group, then create the log stream.
         // This scenario is only likely to occur when running with localstack in

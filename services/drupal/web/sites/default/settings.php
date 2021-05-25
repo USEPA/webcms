@@ -915,11 +915,6 @@ $config['file.settings']['make_unused_managed_files_temporary'] = TRUE;
 // Ensure we force the site to use the "include" method of shielding pages
 $config['shield.settings']['method'] = 1;
 
-// Set the required configuration for epa_cloudwatch.
-$config['epa_cloudwatch']['region'] = 'us-east-1';
-$config['epa_cloudwatch']['version'] = '2014-03-28';
-$config['epa_cloudwatch']['log_group'] = '/webcms/drupal';
-
 //if (in_array($env_name, ['local','dev','qa'])) {
 //  $class_loader->addPsr4('Drupal\\webprofiler\\', [ __DIR__ . '/../../modules/contrib/devel/webprofiler/src']);
 //  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
