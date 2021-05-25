@@ -178,7 +178,7 @@ class CloudWatch implements LoggerInterface {
     }
 
     // Use the Docker container ID as the stream name, same as the ECS logs agent.
-    $metadata = json_decode($json, FALSE, 0, JSON_THROW_ON_ERROR);
+    $metadata = json_decode($json, FALSE, 512, JSON_THROW_ON_ERROR);
 
     $this->logStream = $metadata->DockerId;
     return TRUE;
