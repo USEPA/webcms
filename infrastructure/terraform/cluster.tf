@@ -240,7 +240,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
 
       environment = [
         {
-          name  = "WEBCMS_ENV_NAME"
+          name  = "WEBCMS_SITE"
           value = var.site-env-name
         },
 
@@ -345,7 +345,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
               Value: $input[.key],
               Timestamp: now | floor,
               Dimensions: [
-                { Name: "Environment", Value: "\($ENV.WEBCMS_ENV_NAME)" }
+                { Name: "Environment", Value: "\($ENV.WEBCMS_SITE)" }
               ]
             })
           SCRIPT

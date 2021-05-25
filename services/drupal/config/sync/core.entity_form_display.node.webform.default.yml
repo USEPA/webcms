@@ -31,7 +31,6 @@ third_party_settings:
         - field_description
         - field_type
         - field_geographic_locations
-        - field_is_searchable_collection
       parent_name: group_additional_fields
       weight: 9
       format_type: tab
@@ -140,13 +139,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
-  field_is_searchable_collection:
-    weight: 16
-    settings:
-      display_label: true
-    third_party_settings: {  }
-    type: boolean_checkbox
-    region: content
   field_language:
     weight: 45
     settings: {  }
@@ -254,10 +246,12 @@ content:
     weight: 4
     settings:
       default_data: true
+      webforms: {  }
     third_party_settings: {  }
     type: webform_entity_reference_select
     region: content
 hidden:
+  field_is_searchable_collection: true
   field_last_published: true
   field_review_deadline: true
   path: true

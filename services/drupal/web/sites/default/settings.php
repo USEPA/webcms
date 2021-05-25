@@ -828,9 +828,9 @@ $settings['s3fs.use_s3_for_private'] = TRUE;
 
 $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
-$env_name = getenv('WEBCMS_ENV_NAME');
+$env_name = getenv('WEBCMS_SITE');
 $env_state = getenv('WEBCMS_ENV_STATE');
-$env_lang = getenv('WEBCMS_ENV_LANG');
+$env_lang = getenv('WEBCMS_LANG');
 
 if (empty($env_lang)) {
   $env_lang = 'en';
@@ -905,9 +905,6 @@ $config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
 $config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
 $config['webform.settings']['settings']['default_form_exception_message'] = '';
-
-
-$settings['cache']['bins']['data'] = 'cache.backend.php';
 
 $settings['config_sync_directory'] = '../config/sync';
 

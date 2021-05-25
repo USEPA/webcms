@@ -1,4 +1,7 @@
 map $request_uri $new_uri_302 {
+    # NOTE: These redirects will affect AWS environments, including production.
+    # For local testing edit services/nginx/redirect_302.map instead
+
     # entries of form:
     #/old-url /new-url;
     /test-302 http://www.google.com;
