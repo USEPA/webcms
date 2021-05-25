@@ -303,22 +303,28 @@ class CloudWatch implements LoggerInterface {
         'logGroupName' => $logGroup,
         'logStreamName' => $logStream,
       ]);
-    } catch (CloudWatchLogsException $e) {
-      // If we were not the only request attempting to request this log stream, then AWS
-      // will inform us that it already exists. We ignore that error, but re-throw all
-      // others - this gives us safe logic for lazy log stream creation while not
-      // shadowing other problems (such as bad IAM permissions).
-      if ($e->getAwsErrorCode() !== 'ResourceAlreadyExistsException') {
-        throw $e;
-      }
+    }
+    catch (CloudWatchLogsException $e) {
+      switch ($e->getAwsErrorCode) {
+        // If the log group does not exist, we will get a resource not found
+        // exception. We will create the log group, then create the log stream.
+        // This scenario is only likely to occur when running with localstack in
+        // a local development environment.
+        case 'ResourceNotFoundException':
+          $this->createLogGroup();
+          $this->createLogStream();
+          break;
 
-      // If the log group does not exist, we will get a resource not found
-      // exception. We will create the log group, then create the log stream.
-      // This scenario is only likely to occur when running with localstack in a
-      // local development environment.
-      if ($e->getAwsErrorCode() === 'ResourceNotFoundException') {
-        $this->createLogGroup();
-        $this->createLogStream();
+        // If we were not the only request attempting to request this log
+        // stream, then AWS will inform us that it already exists. We ignore
+        // that error, but re-throw all others - this gives us safe logic for
+        // lazy log stream creation while not shadowing other problems (such as
+        // bad IAM permissions).
+        case 'ResourceAlreadyExistsException':
+          break;
+
+        default:
+          throw $e;
       }
     }
   }
