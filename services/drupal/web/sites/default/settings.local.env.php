@@ -54,7 +54,7 @@ ini_set('max_execution_time', 0);
 // logging to Localstack (see https://github.com/localstack/localstack)
 $config['epa_cloudwatch']['endpoint'] = 'http://localstack:4566';
 $config['epa_cloudwatch']['credentials'] = [
-  'user' => 'foo',
-  'password' => 'bar',
+  'access_key' => 'foo',
+  'secret_key' => 'bar',
 ];
 $config['epa_cloudwatch']['log_stream'] = 'app-drupal';

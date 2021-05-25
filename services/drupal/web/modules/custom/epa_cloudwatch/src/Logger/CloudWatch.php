@@ -106,7 +106,7 @@ class CloudWatch implements LoggerInterface {
 
     $credentials = $this->config->get('credentials');
     if (!empty($credentials)) {
-      $args['credentials'] = new Credentials($credentials['user'], $credentials['password']);
+      $args['credentials'] = new Credentials($credentials['access_key'], $credentials['secret_key']);
     }
 
     $this->client = new CloudWatchLogsClient($args);
@@ -336,9 +336,9 @@ class CloudWatch implements LoggerInterface {
       ]);
     }
     catch (CloudWatchLogsException $e) {
-      // If we were not the only request attempting to request this log stream,
+      // If we were not the only request attempting to create this log group,
       // then AWS will inform us that it already exists. We ignore that error,
-      // but re-throw all others - this gives us safe logic for lazy log stream
+      // but re-throw all others - this gives us safe logic for lazy log group
       // creation while not shadowing other problems (such as bad IAM
       // permissions).
       if ($e->getAwsErrorCode() !== 'ResourceAlreadyExistsException') {
