@@ -9,8 +9,8 @@
 {% if title is not empty -%}
   <label{{ attributes.addClass(classes) }}>
     {{ title }}
-    {% if not required and title_display != 'after' -%}
-      <span class="usa-hint">({{ 'optional'|t }})</span>
+    {% if required and title_display != 'after' -%}
+      <abbr class="usa-hint usa-hint--required" title="{{ 'required'|t }}">*</abbr>
     {%- endif %}
   </label>
 {%- endif %}
