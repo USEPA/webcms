@@ -296,6 +296,34 @@ resource "aws_iam_role_policy_attachment" "drupal_put_metrics" {
   policy_arn = aws_iam_policy.put_metrics.arn
 }
 
+# Grant the Drupal container permissions to Cloudwatch to create a log stream
+# and publish log events.
+data "aws_iam_policy_document" "put_logs" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "allowPublishingLogEvents"
+    effect    = "Allow"
+    actions   = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvent"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "put_logs" {
+  name        = "${local.role-prefix}LogsPublish"
+  description = "Permits publishing CloudWatch log events"
+
+  policy = data.aws_iam_policy_document.put_logs.json
+}
+
+resource "aws_iam_role_policy_attachment" "drupal_put_logs" {
+  role       = aws_iam_role.drupal_container_role.name
+  policy_arn = aws_iam_policy.put_logs.arn
+}
+
 # This is a policy for read/write access to the cluster's data, but not for
 # cluster management.
 data "aws_iam_policy_document" "es_access" {
