@@ -306,7 +306,7 @@ data "aws_iam_policy_document" "put_logs" {
     effect    = "Allow"
     actions   = [
       "logs:CreateLogStream",
-      "logs:PutLogEvent"
+      "logs:PutLogEvents"
     ]
     resources = ["*"]
   }
