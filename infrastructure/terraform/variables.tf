@@ -39,6 +39,11 @@ variable "site-csrf-origin-whitelist" {
   default     = "https://wamssostg.epa.gov, https://a11y_page_service.siteimprove.com:8079"
 }
 
+variable "site-log-group" {
+  description = "Name of the log group for this environment"
+  type        = string
+}
+
 # Akamai variables
 variable "akamai-enabled" {
   description = "Set to TRUE if this site is being served via Akamai; otherwise FALSE."
