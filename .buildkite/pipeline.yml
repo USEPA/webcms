@@ -4,7 +4,7 @@
 
 steps:
   - label: ":pipeline: Feature"
-    if: build.branch != "main" && build.branch != "integration" && build.branch != "migration"
+    if: build.branch != "main" && build.branch != "integration" && build.branch != "migration" && build.branch != "release"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
@@ -13,9 +13,9 @@ steps:
       WEBCMS_ENVIRONMENT: stage
       WEBCMS_WORKSPACE: stage
 
-  # Upload the deploy pipeline from integration to the dev environment, disregarding PRs
+  # Upload the deploy pipeline from release to the dev environment, disregarding PRs
   - label: ":pipeline: Dev"
-    if: build.branch == "integration" && build.pull_request.id == null
+    if: build.branch == "release" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
