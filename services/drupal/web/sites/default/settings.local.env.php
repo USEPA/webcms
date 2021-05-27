@@ -49,3 +49,12 @@ if (defined('Memcached::OPT_CLIENT_MODE')) {
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
 
 ini_set('max_execution_time', 0);
+
+// Provide override configuration for epa_cloudwatch to redirect
+// logging to Localstack (see https://github.com/localstack/localstack)
+$config['epa_cloudwatch']['endpoint'] = 'http://localstack:4566';
+$config['epa_cloudwatch']['credentials'] = [
+  'access_key' => 'foo',
+  'secret_key' => 'bar',
+];
+$config['epa_cloudwatch']['log_stream'] = 'app-drupal';

@@ -1,0 +1,6 @@
+services:
+  logger.epa_cloudwatch:
+    class: Drupal\epa_cloudwatch\Logger\CloudWatch
+    arguments: ['@config.factory', '@logger.log_message_parser']
+    tags:
+      - { name: logger }

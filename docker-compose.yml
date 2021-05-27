@@ -148,6 +148,16 @@ services:
         source: es-data
         target: /usr/share/elasticsearch/data
 
+  localstack:
+    image: localstack/localstack:0.12.10
+    ports:
+      - 4566:4566
+    environment:
+      LOCALSTACK_SERVICES: logs
+      LOCALSTACK_START_WEB: '0'
+      AWS_ACCESS_KEY_ID: foobar
+      AWS_SECRET_ACCESS_KEY: foobar
+
 # Persistent storage volumes. Volumes allow for data to survive container shutdown.
 volumes:
   es-data: null
