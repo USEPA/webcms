@@ -216,6 +216,17 @@ resource "aws_ssm_parameter" "fpm_metrics_log_group" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "drupal_log_group" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drupal"
+  type  = "String"
+  value = aws_cloudwatch_log_group.drupal[each.key].name
+
+  tags = var.tags
+}
+
+
 #endregion
 
 #region Secrets Manager ARNs

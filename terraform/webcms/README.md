@@ -193,6 +193,7 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
   - `/webcms/${var.environment}/log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
   - `/webcms/${var.environment}/log-groups/drush`: The name of the log group for Drush runs.
+  - `/webcms/${var.environment}/log-groups/drupal`: The name of the log group for Drupal application logs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
   - `/webcms/${var.environment}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
   - `/webcms/${var.environment}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.

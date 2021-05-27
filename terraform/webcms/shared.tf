@@ -118,6 +118,10 @@ data "aws_ssm_parameter" "fpm_metrics_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/fpm-metrics"
 }
 
+data "aws_ssm_parameter" "drupal_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/drupal"
+}
+
 #endregion
 
 #region Secrets Manager ARNs
