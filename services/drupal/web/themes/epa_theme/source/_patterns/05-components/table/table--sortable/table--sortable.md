@@ -1,8 +1,10 @@
 ---
 el: .usa-table--sortable
-title: Sortable Table
-state: complete
+title: Sortable Table [DEPRECATED]
+state: deprecated
 ---
+**This component is deprecated and used only for migrated and already-existing
+content. New sortable tables should use the USWDS sortable table.**
 
 __Variables:__
 * modifier_classes: [string] Optional additional CSS classes.
