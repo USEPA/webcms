@@ -188,11 +188,11 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/drupal/s3-bucket`: The name of the S3 bucket to store uploaded content.
   - `/webcms/${var.environment}/drupal/s3-domain`: The full regional domain of the S3 bucket (e.g., `<bucket>.us-east-2.s3.amazonaws.com`).
 - Log group identifiers are also read from Parameter Store:
-  - `/webcms/${var.environment}/drupal/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
-  - `/webcms/${var.environment}/drupal/nginx`: The name of the log group for Drupal's nginx container.
-  - `/webcms/${var.environment}/drupal/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
-  - `/webcms/${var.environment}/drupal/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
-  - `/webcms/${var.environment}/drupal/drush`: The name of the log group for Drush runs.
+  - `/webcms/${var.environment}/log-groups/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
+  - `/webcms/${var.environment}/log-groups/nginx`: The name of the log group for Drupal's nginx container.
+  - `/webcms/${var.environment}/log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
+  - `/webcms/${var.environment}/log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
+  - `/webcms/${var.environment}/log-groups/drush`: The name of the log group for Drush runs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
   - `/webcms/${var.environment}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
   - `/webcms/${var.environment}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
