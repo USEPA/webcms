@@ -192,6 +192,7 @@ locals {
     { name = "WEBCMS_LANG", value = var.lang },
     { name = "WEBCMS_S3_USES_DOMAIN", value = var.drupal_use_s3_domain ? "1" : "0" },
     { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = join(",", var.drupal_csrf_origin_whitelist) },
+    { name = "WEBCMS_LOG_GROUP", value = data.aws_ssm_parameter.drupal_log_group.value },
 
     # Akamai
     { name = "WEBCMS_AKAMAI_ENABLED", value = var.akamai_enabled ? "1" : "0" },
