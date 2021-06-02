@@ -1,0 +1,15 @@
+diff --git a/core/modules/media/src/Controller/MediaFilterController.php b/core/modules/media/src/Controller/MediaFilterController.php
+index 4b9ea6bfef..a4cb00126b 100644
+--- a/core/modules/media/src/Controller/MediaFilterController.php
++++ b/core/modules/media/src/Controller/MediaFilterController.php
+@@ -93,6 +93,10 @@ class MediaFilterController implements ContainerInjectionInterface {
+    * @see \Drupal\editor\EditorController::getUntransformedText
+    */
+   public function preview(Request $request, FilterFormatInterface $filter_format) {
++    if (!$request->isXmlHttpRequest()) {
++      throw new NotFoundHttpException();
++    }
++
+     $text = $request->query->get('text');
+     $uuid = $request->query->get('uuid');
+     if ($text == '' || $uuid == '') {
