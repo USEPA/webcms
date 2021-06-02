@@ -5,19 +5,35 @@
   /* stylelint-disable-next-line */
   html.js & thead th {
     @include svg-background(sort);
-    background-position: 0.25rem 50%;
+    background-position: right 0.25rem top 50%;
     background-repeat: no-repeat;
-    background-size: 0.5rem;
+    background-size: 1.5rem;
     cursor: pointer;
+    padding-right: 2.5rem;
+
+    // stylelint-disable-next-line selector-max-compound-selectors
+    &:hover {
+      @include svg-background(sort-black);
+    }
 
     /* stylelint-disable-next-line */
     &[aria-sort='ascending'] {
       @include svg-background(sort-up);
+
+      // stylelint-disable-next-line selector-max-compound-selectors
+      &:hover {
+        @include svg-background(sort-up-black);
+      }
     }
 
     /* stylelint-disable-next-line */
     &[aria-sort='descending'] {
       @include svg-background(sort-down);
+
+      // stylelint-disable-next-line selector-max-compound-selectors
+      &:hover {
+        @include svg-background(sort-down-black);
+      }
     }
   }
 }
