@@ -1,6 +1,6 @@
 ---
-el: .sitewide-alert
-title: Sitewide Alert
+el: .usa-site-alert--emergency
+title: Emergency Site Alert
 state: complete
 ---
 
