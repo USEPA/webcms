@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "uploads" {
 resource "aws_s3_bucket_policy" "uploads_policy" {
   bucket = aws_s3_bucket.uploads.bucket
 
-  # This policy allows anonymous reads to the /public/ prefix of the uploads bucket, which
+  # This policy allows anonymous reads to the /files/ prefix of the uploads bucket, which
   # we need in order to satisfy s3fs - it only uses one bucket for both public and private
   # files.
   policy = jsonencode({
@@ -20,7 +20,7 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
         Effect    = "Allow"
         Principal = "*"
         Action    = ["s3:GetObject"]
-        Resource  = ["arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/public/*"]
+        Resource  = ["arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/files/*"]
       }
     ]
   })
