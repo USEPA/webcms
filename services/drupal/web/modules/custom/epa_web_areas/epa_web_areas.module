@@ -310,6 +310,9 @@ function epa_web_areas_menu_local_actions_alter(&$local_actions) {
 
 // Provides dynamic titles for some of our Group-related Page Manager pages
 function epa_web_areas_get_title($group, $page_manager_page_variant = null, $page_manager_page = null) {
+  if (is_string($page_manager_page)) {
+    return 'Page Not Found';
+  }
   switch ($page_manager_page->id()) {
     case 'group_details':
       return t('Details for %group', ['%group' => $group->label()]);
