@@ -124,7 +124,7 @@ resource "aws_appautoscaling_target" "traefik" {
 }
 
 resource "aws_appautoscaling_policy" "traefik" {
-  name = "webcms-${var.environment}-traefik-cpu"
+  name        = "webcms-${var.environment}-traefik-cpu"
   policy_type = "TargetTrackingScaling"
 
   resource_id        = aws_appautoscaling_target.traefik.id
