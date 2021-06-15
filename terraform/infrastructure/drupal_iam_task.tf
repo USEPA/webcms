@@ -114,3 +114,33 @@ resource "aws_iam_role_policy_attachment" "drupal_publish_metrics" {
   role       = aws_iam_role.drupal_task[each.key].name
   policy_arn = aws_iam_policy.drupal_publish_metrics.arn
 }
+
+# Grant the Drupal container permissions to Cloudwatch to create a log stream
+# and publish log events.
+data "aws_iam_policy_document" "drupal_put_logs" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "allowPublishingLogEvents"
+    effect    = "Allow"
+    actions   = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "drupal_put_logs" {
+  name        = "${var.iam_prefix}-${var.environment}-LogsPublish"
+  description = "Permits publishing CloudWatch log events"
+
+  policy = data.aws_iam_policy_document.drupal_put_logs.json
+}
+
+resource "aws_iam_role_policy_attachment" "drupal_put_logs" {
+  for_each = local.sites
+
+  role       = aws_iam_role.drupal_task[each.key].name
+  policy_arn = aws_iam_policy.drupal_put_logs.arn
+}

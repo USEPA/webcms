@@ -25,6 +25,15 @@ resource "aws_cloudwatch_log_group" "drush" {
   tags = var.tags
 }
 
+# Log group for Drupal logs, emitted by the epa_cloudwatch module
+resource "aws_cloudwatch_log_group" "drupal" {
+  for_each = local.sites
+
+  name = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/app-drupal"
+
+  tags = var.tags
+}
+
 # Log group for the CloudWatch agent
 resource "aws_cloudwatch_log_group" "agent" {
   for_each = local.sites
