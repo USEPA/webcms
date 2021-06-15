@@ -111,3 +111,34 @@ resource "aws_ecs_service" "traefik" {
 
   tags = var.tags
 }
+
+# Scale Traefik out based on CPU utilization. We've chosen a low 30% CPU target because
+# Traefik is a router/load balance, making utilization a less than ideal proxy metric for
+# what we're really interested in (number of connections being processed).
+resource "aws_appautoscaling_target" "traefik" {
+  min_capacity       = var.traefik_min_capacity
+  max_capacity       = var.traefik_max_capacity
+  resource_id        = "service/${aws_ecs_cluster.cluster.name}/${aws_ecs_service.traefik.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "traefik" {
+  name = "webcms-${var.environment}-traefik-cpu"
+  policy_type = "TargetTrackingScaling"
+
+  resource_id        = aws_appautoscaling_target.traefik.id
+  scalable_dimension = aws_appautoscaling_target.traefik.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.traefik.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 30
+
+    scale_in_cooldown  = 5 * 60
+    scale_out_cooldown = 60
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
