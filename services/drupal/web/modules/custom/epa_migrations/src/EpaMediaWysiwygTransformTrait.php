@@ -41,7 +41,14 @@ trait EpaMediaWysiwygTransformTrait {
 
     $inline_embed_replacement_template = <<<'TEMPLATE'
 <drupal-inline-media
-  data-align="center"
+  data-entity-type="media"
+  data-view-mode="link_with_metadata"
+  data-entity-uuid="%s"></drupal-inline-media>
+TEMPLATE;
+
+    // We migrate documents with the description displayed by default.
+    $inline_embed_pdf_replacement_template = <<<'TEMPLATE'
+<drupal-inline-media
   data-entity-type="media"
   data-view-mode="link_with_description"
   data-entity-uuid="%s"></drupal-inline-media>
@@ -50,7 +57,7 @@ TEMPLATE;
     // Fix these malformed JSON strings
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
-    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
+    $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $inline_embed_pdf_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
       $decoder = new JsonDecode(TRUE);
 
       try {
@@ -61,10 +68,17 @@ TEMPLATE;
         $media_entity_uuid = $media_entity ? $media_entity->uuid() : 0;
 
         // Return an inline media embed.
-        if ($tag_info['view_mode'] === 'media_link') {
-          return sprintf($inline_embed_replacement_template,
-            $media_entity_uuid
-          );
+        if ($media_entity && $tag_info['view_mode'] === 'media_link') {
+          if ($media_entity->bundle() === 'document') {
+            return sprintf($inline_embed_pdf_replacement_template,
+              $media_entity_uuid
+            );
+          }
+          else {
+            return sprintf($inline_embed_replacement_template,
+              $media_entity_uuid
+            );
+          }
         }
         // Return a full media embed.
         else {

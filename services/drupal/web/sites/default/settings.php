@@ -820,7 +820,7 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 // port, so then we have to rely on the patch we wrote here: https://www.drupal.org/node/3203137
 if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
   $config['s3fs.settings']['use_cname'] = TRUE;
-  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default/files';
+  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default';
 }
 
 $settings['s3fs.use_s3_for_public'] = TRUE;
