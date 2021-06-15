@@ -37,7 +37,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * # or this
  * <drupal-inline-media
- * data-align="center"
  * data-entity-type="media"
  * data-view-mode="link_with_description"
  * data-entity-uuid="1234"></drupal-inline-media>
