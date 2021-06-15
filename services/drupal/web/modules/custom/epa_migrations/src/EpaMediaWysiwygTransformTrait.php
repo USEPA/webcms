@@ -68,7 +68,7 @@ TEMPLATE;
         $media_entity_uuid = $media_entity ? $media_entity->uuid() : 0;
 
         // Return an inline media embed.
-        if ($tag_info['view_mode'] === 'media_link') {
+        if ($media_entity && $tag_info['view_mode'] === 'media_link') {
           if ($media_entity->bundle() === 'document') {
             return sprintf($inline_embed_pdf_replacement_template,
               $media_entity_uuid
