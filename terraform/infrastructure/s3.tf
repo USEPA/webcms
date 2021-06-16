@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "uploads" {
   tags = var.tags
 }
 
-# This policy allows anonymous reads to the /public/ prefix of the uploads bucket, which
+# This policy allows anonymous reads to the /files/ prefix of the uploads bucket, which
 # we need in order to satisfy s3fs - it only uses one bucket for both public and private
 # files.
 data "aws_iam_policy_document" "uploads_policy" {
@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "uploads_policy" {
     sid       = "AddPerm"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.uploads[each.key].arn}/public/*"]
+    resources = ["${aws_s3_bucket.uploads[each.key].arn}/files/*"]
 
     principals {
       type        = "*"
