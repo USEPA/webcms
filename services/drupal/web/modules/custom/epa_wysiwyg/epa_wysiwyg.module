@@ -5,6 +5,7 @@
  * Contains epa_wysiwyg.module.
  */
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -92,4 +93,69 @@ function template_preprocess_epa_file_link(&$variables) {
   $variables['file_size'] = format_size($file->getSize());
   $variables['url'] = Url::fromUri($url, $options);
   $variables['link'] = Link::fromTextAndUrl($variables['link_text'], $variables['url'])->toRenderable();
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Alter only the form with ID 'editor_link_dialog'.
+  if ($form_id !== 'editor_link_dialog') {
+    return;
+  }
+
+  // Attach our custom javascript library.
+  $form['#attached']['library'][] = 'epa_wysiwyg/epa-wysiwyg-linkit';
+
+  // Provide a fieldset for switching the profile.
+  $form['attributes']['select-profile'] = [
+    '#title' => t('Filter search results'),
+    '#type' => 'radios',
+    '#options' => [
+      'web_area_content' => t('Your internal links'),
+      'default' => t('No filter: all WebCMS content'),
+    ],
+    'web_area_content' => [
+      '#description' => t('Search within your web areas only.'),
+    ],
+    'default' => [
+      '#description' => t('Search within your web areas and www.epa.gov'),
+    ],
+    '#weight' => -20,
+    '#default_value' => 'default',
+  ];
+
+  // Add states to disable and hide the default linkit input unless the default
+  // profile is selected.
+  $form['attributes']['href'] = array_merge($form['attributes']['href'], [
+    '#states' => [
+      'visible' => [
+        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
+      ],
+      'disabled' => [
+        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
+      ]
+    ]
+  ]);
+
+  // Provide a second linkit input that uses the web_area_content linkit profile
+  // and is disabled and hidden unless the web_area_content profile is selected.
+  $form['attributes']['href_web_area_content'] = array_merge($form['attributes']['href'], [
+    '#type' => 'linkit',
+    '#description' => t('Start typing to find content.'),
+    '#autocomplete_route_name' => 'linkit.autocomplete',
+    '#autocomplete_route_parameters' => [
+      'linkit_profile_id' => 'web_area_content',
+    ],
+    "#weight" => -10,
+    '#default_value' => isset($input['href']) ? $input['href'] : '',
+    '#states' => [
+      'visible' => [
+        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
+      ],
+      'disabled' => [
+        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
+      ]
+    ]
+  ]);
 }
