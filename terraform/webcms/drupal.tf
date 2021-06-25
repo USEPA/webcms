@@ -83,6 +83,7 @@ resource "aws_ecs_task_definition" "drupal_task" {
       environment = [
         # See nginx.conf in services/drupal for why this is needed.
         { name = "WEBCMS_DOMAIN", value = var.drupal_hostname },
+        { name = "WEBCMS_SITE", value = var.site },
 
         # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
         # the region and bucket name because in us-east-1, the domain isn't easy to
