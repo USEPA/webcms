@@ -87,13 +87,6 @@ class EpaMultivalueField extends DrupalSqlBase {
    * @see SqlBase::initializeIterator
    */
   protected function initializeIterator() {
-    if (date('Y-m-d') > '2021-06-01') {
-      // This code should not be reused without first syncing in changes from its ancestor
-      // method SqlBase::initializeIterator.
-      throw new MigrateException("Code should be synced with SqlBase::initializeIterator as it"
-        . " may be out of sync."
-      );
-    }
 
     // Initialize the batch size.
     if ($this->batchSize == 0 && isset($this->configuration['batch_size'])) {
