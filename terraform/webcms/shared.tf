@@ -243,7 +243,7 @@ locals {
       # the second is a rollup name for the WebCMS env/site, which enables a view of the
       # entire deployment across languages. This helps answer questions about how an
       # entire codebase is performing in aggregate.
-      name = "WEBCMS_NEW_RELIC_APPNAME"
+      name  = "WEBCMS_NEW_RELIC_APPNAME"
       value = join(";", ["WebCMS ${var.environment}/${var.site}/${var.lang}", "WebCMS ${var.environment}/${var.site}"])
     },
   ]

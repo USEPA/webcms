@@ -277,7 +277,7 @@ resource "aws_ssm_parameter" "newrelic_license" {
   type  = "String"
   value = aws_secretsmanager_secret.newrelic_license[each.value.site].arn
 
-  tags  = var.tags
+  tags = var.tags
 }
 
 resource "aws_ssm_parameter" "hash_salt" {

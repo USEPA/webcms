@@ -44,7 +44,7 @@ resource "aws_ecs_task_definition" "drush_task" {
 
     # Attach the New Relic PHP daemon
     {
-      name = "newrelic"
+      name  = "newrelic"
       image = "${data.aws_ssm_parameter.ecr_newrelic.value}:latest"
 
       logConfiguration = {
