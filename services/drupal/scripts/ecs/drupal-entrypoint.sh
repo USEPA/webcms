@@ -4,8 +4,8 @@ set -eu
 
 newrelic_ini_path="$(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini"
 
-# If we have a license key and application name in this environment, configure New Relic.
-if test -n "${WEBCMS_NEW_RELIC_LICENSE:-}" && test -n "${WEBCMS_NEW_RELIC_APPNAME}"; then
+# If we have a non-default license key in this environment, configure New Relic.
+if test -n "${WEBCMS_NEW_RELIC_LICENSE:-}" && test "${WEBCMS_NEW_RELIC_LICENSE}" != .; then
   sed -i \
     -e "s/REPLACE_WITH_REAL_KEY/${WEBCMS_NEW_RELIC_LICENSE}/" \
     -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"${WEBCMS_NEW_RELIC_APPNAME}\"" \
