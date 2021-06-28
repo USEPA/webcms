@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -eu
+
+newrelic_ini_path="$(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini"
+
+# If we have a license key and application name in this environment, configure New Relic.
+if test -n "${WEBCMS_NEW_RELIC_LICENSE:-}" && test -n "${WEBCMS_NEW_RELIC_APPNAME}"; then
+  sed -i \
+    -e "s/REPLACE_WITH_REAL_KEY/${WEBCMS_NEW_RELIC_LICENSE}/" \
+    -e "s/newrelic.appname[[:space:]]=[[:space:]].*/newrelic.appname=\"${WEBCMS_NEW_RELIC_APPNAME}\"" \
+    "$newrelic_ini_path"
+else
+  # Otherwise, disable the extension.
+  echo 'newrelic.enabled=false' >> "$newrelic_ini_path"
+fi
+
+{
+  echo 'newrelic.distributed_tracing_enabled=true'
+  echo 'newrelic.daemon_address="newrelic-php-daemon:31339"'
+  echo 'newrelic.daemon.app_connect_timeout=15s'
+  echo 'newrelic.daemon.start_timeout=5s'
+} >> "$newrelic_ini_path"
+
+# Forward to the original image entrypoint
+exec docker-php-entrypoint "$@"

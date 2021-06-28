@@ -391,6 +391,22 @@ copy:traefik:dev:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
 
+# Mirror the New Relic PHP daemon
+copy:newrelic:dev:
+  extends: .kaniko
+  stage: copy
+  only: [ci-work]
+
+  script:
+    - mkdir -p /workspace
+    - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
+    - /kaniko/executor
+      --context=/workspace
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+
 #endregion
 
 
@@ -548,13 +564,13 @@ deploy:dev:validate:en:
   only:
     refs:
       - ci-work
-  
+
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-    
+
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
