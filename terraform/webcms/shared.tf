@@ -142,7 +142,7 @@ data "aws_ssm_parameter" "db_d7_credentials" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials"
 }
 
-data "aws_ssm_paramter" "newrelic_license" {
+data "aws_ssm_parameter" "newrelic_license" {
   name = "/webcms/${var.environment}/${var.site}/${var.key}/secrets/newrelic-license"
 }
 
