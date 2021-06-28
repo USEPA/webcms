@@ -145,7 +145,9 @@ resource "aws_secretsmanager_secret" "newrelic_license" {
 # default. This value is ignored by Terraform when changed, but we need it to exist or
 # else ECS will fail to deploy it.
 resource "aws_secretsmanager_secret_version" "newrelic_license" {
-  secret_id = aws_secretsmanager_secret.newrelic_license.id
+  for_each = toset(var.sites)
+
+  secret_id = aws_secretsmanager_secret.newrelic_license[each.key].id
 
   secret_string = ""
 
