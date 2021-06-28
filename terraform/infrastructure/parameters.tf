@@ -162,6 +162,16 @@ resource "aws_ssm_parameter" "ecr_cloudwatch" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "ecr_newrelic" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/newrelic-daemon"
+  type  = "String"
+  value = aws_ecr_repository.newrelic_daemon_mirror.repository_url
+
+  tags = var.tags
+}
+
 #endregion
 
 #region Log groups
@@ -206,6 +216,16 @@ resource "aws_ssm_parameter" "agent_log_group" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "newrelic_log_group" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/newrelic-daemon"
+  type  = "String"
+  value = aws_cloudwatch_log_group.newrelic[each.key].name
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "fpm_metrics_log_group" {
   for_each = local.sites
 
@@ -225,7 +245,6 @@ resource "aws_ssm_parameter" "drupal_log_group" {
 
   tags = var.tags
 }
-
 
 #endregion
 
@@ -249,6 +268,16 @@ resource "aws_ssm_parameter" "db_d7_credentials" {
   value = aws_secretsmanager_secret.db_d7_credentials[each.key].arn
 
   tags = var.tags
+}
+
+resource "aws_ssm_parameter" "newrelic_license" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.key}/secrets/newrelic-license"
+  type  = "String"
+  value = aws_secretsmanager_secret.newrelic_license[each.value.site].arn
+
+  tags  = var.tags
 }
 
 resource "aws_ssm_parameter" "hash_salt" {

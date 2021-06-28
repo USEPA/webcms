@@ -94,6 +94,10 @@ data "aws_ssm_parameter" "ecr_cloudwatch" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/cloudwatch"
 }
 
+data "aws_ssm_parameter" "ecr_newrelic" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/newrelic-daemon"
+}
+
 #endregion
 
 #region Log groups
@@ -114,6 +118,10 @@ data "aws_ssm_parameter" "agent_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/cloudwatch-agent"
 }
 
+data "aws_ssm_parameter" "newrelic_log_group" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/newrelic-daemon"
+}
+
 data "aws_ssm_parameter" "fpm_metrics_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/fpm-metrics"
 }
@@ -132,6 +140,10 @@ data "aws_ssm_parameter" "db_d8_credentials" {
 
 data "aws_ssm_parameter" "db_d7_credentials" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials"
+}
+
+data "aws_ssm_paramter" "newrelic_license" {
+  name = "/webcms/${var.environment}/${var.site}/${var.key}/secrets/newrelic-license"
 }
 
 data "aws_ssm_parameter" "hash_salt" {
@@ -176,6 +188,7 @@ locals {
     { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_access_token.value },
     { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_client_token.value },
     { name = "WEBCMS_AKAMAI_CLIENT_SECRET", valueFrom = data.aws_ssm_parameter.akamai_client_secret.value },
+    { name = "WEBCMS_NEW_RELIC_LICENSE", valueFrom = data.aws_ssm_parameter.newrelic_license.value },
   ]
 
   #endregion
@@ -223,6 +236,16 @@ locals {
     { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml_idp_slo_url },
     { name = "WEBCMS_SAML_IDP_CERT", value = var.saml_idp_cert },
     { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml_force_saml_login ? "1" : "0" },
+
+    # New Relic
+    {
+      # Construct two application names: the first is the "full" name (env/site/lang), and
+      # the second is a rollup name for the WebCMS env/site, which enables a view of the
+      # entire deployment across languages. This helps answer questions about how an
+      # entire codebase is performing in aggregate.
+      name = "WEBCMS_NEW_RELIC_APPNAME"
+      value = join(";", ["WebCMS ${var.environment}/${var.site}/${var.lang}", "WebCMS ${var.environment}/${var.site}"])
+    },
   ]
 
   #endregion

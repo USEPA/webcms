@@ -50,6 +50,16 @@ FROM forumone/drupal8:7.3-xdebug AS dev
 
 # Development-only dependencies/config here
 
+# Download and install New Relic, but don't enable it. This allows us to use the extension
+# functions in our own code.
+ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
+RUN set -ex \
+  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
+  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
+  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
+  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
+  && echo newrelic.enabled=false >> $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
   /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
@@ -123,6 +133,16 @@ FROM forumone/drupal8:7.3 AS base
 
 # This is the base production layer. We use it here in order to make it easier to ensure
 # that both the dev and base targets are in sync with each other.
+
+# Download and install the New Relic APM extension. Note that, unlike in the docs, we do
+# not configure the extension here. That must happen at runtime since the license keys
+# and application names are environment-dependent.
+ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
+RUN set -ex \
+  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
+  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
+  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
+  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
 
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
@@ -218,6 +238,12 @@ COPY web web
 COPY config config
 COPY drush drush
 
+# Add the entrypoint logic to configure the New Relic extension
+COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
+RUN chmod +x /webcms-entrypoint
+
+ENTRYPOINT ["/webcms-entrypoint"]
+
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
@@ -234,6 +260,14 @@ COPY default.conf /etc/nginx/templates/default.conf.template
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
 FROM forumone/drupal8-cli:7.3 AS drush
+
+# Download and install New Relic
+ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
+RUN set -ex \
+  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
+  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
+  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
+  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
 
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
@@ -260,3 +294,9 @@ COPY --from=drupal /var/www/html /var/www/html
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate
+
+# Add the entrypoint logic to configure the New Relic extension
+COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
+RUN chmod +x /webcms-entrypoint
+
+ENTRYPOINT ["/webcms-entrypoint"]

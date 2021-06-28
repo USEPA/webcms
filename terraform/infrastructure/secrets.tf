@@ -125,3 +125,33 @@ resource "aws_secretsmanager_secret" "akamai_client_secret" {
 }
 
 #endregion
+
+#region New Relic
+
+# Unlike the other secrets, we assume the New Relic license key is differentiated only by
+# site, not by site+lang.
+resource "aws_secretsmanager_secret" "newrelic_license" {
+  for_each = toset(var.sites)
+
+  name        = "/webcms/${var.environment}/${each.value}/newrelic-license"
+  description = "New Relic license key"
+
+  recovery_window_in_days = 0
+
+  tags = var.tags
+}
+
+# In order to avoid breaking existing deployments, we create an empty license key by
+# default. This value is ignored by Terraform when changed, but we need it to exist or
+# else ECS will fail to deploy it.
+resource "aws_secretsmanager_secret_version" "newrelic_license" {
+  secret_id = aws_secretsmanager_secret.newrelic_license.id
+
+  secret_string = ""
+
+  lifecycle {
+    ignore_changes = [secret_string, version_stages]
+  }
+}
+
+#endregion
