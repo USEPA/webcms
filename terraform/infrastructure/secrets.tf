@@ -149,7 +149,7 @@ resource "aws_secretsmanager_secret_version" "newrelic_license" {
 
   secret_id = aws_secretsmanager_secret.newrelic_license[each.value].id
 
-  secret_string = ""
+  secret_string = "."
 
   lifecycle {
     ignore_changes = [secret_string, version_stages]
