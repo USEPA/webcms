@@ -273,7 +273,7 @@ resource "aws_ssm_parameter" "db_d7_credentials" {
 resource "aws_ssm_parameter" "newrelic_license" {
   for_each = local.sites
 
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.key}/secrets/newrelic-license"
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/newrelic-license"
   type  = "String"
   value = aws_secretsmanager_secret.newrelic_license[each.value.site].arn
 

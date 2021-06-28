@@ -147,7 +147,7 @@ resource "aws_secretsmanager_secret" "newrelic_license" {
 resource "aws_secretsmanager_secret_version" "newrelic_license" {
   for_each = toset(var.sites)
 
-  secret_id = aws_secretsmanager_secret.newrelic_license[each.key].id
+  secret_id = aws_secretsmanager_secret.newrelic_license[each.value].id
 
   secret_string = ""
 

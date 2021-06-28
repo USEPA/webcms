@@ -143,7 +143,7 @@ data "aws_ssm_parameter" "db_d7_credentials" {
 }
 
 data "aws_ssm_parameter" "newrelic_license" {
-  name = "/webcms/${var.environment}/${var.site}/${var.key}/secrets/newrelic-license"
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license"
 }
 
 data "aws_ssm_parameter" "hash_salt" {
