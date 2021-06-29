@@ -36,6 +36,7 @@ data "aws_iam_policy_document" "drupal_secrets_access" {
       aws_secretsmanager_secret.akamai_access_token[each.key].arn,
       aws_secretsmanager_secret.akamai_client_token[each.key].arn,
       aws_secretsmanager_secret.akamai_client_secret[each.key].arn,
+      aws_secretsmanager_secret.newrelic_license[each.value.site].arn,
     ]
   }
 }
