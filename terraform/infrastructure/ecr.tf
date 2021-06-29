@@ -63,7 +63,7 @@ resource "aws_ecr_repository" "traefik_mirror" {
 
 # This mirrors docker.io/newrelic/php-daemon
 resource "aws_ecr_repository" "newrelic_daemon_mirror" {
-  name = "webmcs-${var.environment}-newrelic-daemon"
+  name = "webcms-${var.environment}-newrelic-daemon"
 
   tags = var.tags
 }
