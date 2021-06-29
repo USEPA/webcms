@@ -243,6 +243,7 @@ COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
 RUN chmod +x /webcms-entrypoint
 
 ENTRYPOINT ["/webcms-entrypoint"]
+CMD [ "php-fpm" ]
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
