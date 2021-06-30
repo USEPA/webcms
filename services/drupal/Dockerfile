@@ -226,10 +226,8 @@ FROM nginx:mainline-alpine AS nginx
 COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the nginx configuration and the startup script
-COPY default.conf status.conf *.map /etc/nginx/conf.d/
-COPY scripts/ecs/nginx-entrypoint.sh /entrypoint.sh
-
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+COPY status.conf *.map /etc/nginx/conf.d/
+COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
