@@ -21,7 +21,7 @@ fi
 
 {
   echo 'newrelic.distributed_tracing_enabled=true'
-  echo 'newrelic.daemon.address="newrelic-php-daemon:31339"'
+  echo 'newrelic.daemon.address="localhost:31339"'
   echo 'newrelic.daemon.app_connect_timeout=15s'
   echo 'newrelic.daemon.start_timeout=5s'
 } >> "$newrelic_ini_path"
