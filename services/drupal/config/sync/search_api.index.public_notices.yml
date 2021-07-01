@@ -3,23 +3,23 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.node.body
     - field.storage.node.field_comments_due_date
     - field.storage.node.field_computed_comments_due_date
     - field.storage.node.field_description
     - field.storage.node.field_geographic_locations
+    - field.storage.node.field_hublinks
     - field.storage.node.field_locations_of_prop_actions
     - field.storage.paragraph.field_location_proposed_other
-    - field.storage.paragraph.field_state_or_territory
     - field.storage.node.field_notice_sort_date
-    - field.storage.node.field_hublinks
     - field.storage.node.field_programs_or_statutes
     - field.storage.node.field_type_of_proposed_action
-    - field.storage.node.body
+    - field.storage.paragraph.field_state_or_territory
     - search_api.server.localhost
   module:
-    - node
     - paragraphs
     - taxonomy
+    - node
     - search_api
 id: public_notices
 name: 'Public Notices'
@@ -221,6 +221,7 @@ processor_settings:
     weights:
       preprocess_index: -47
       preprocess_query: -44
+    ignored: ._-
   transliteration:
     all_fields: false
     fields:
@@ -232,6 +233,6 @@ tracker_settings:
   default:
     indexing_order: fifo
 options:
-  index_directly: true
+  index_directly: false
   cron_limit: 50
 server: localhost
