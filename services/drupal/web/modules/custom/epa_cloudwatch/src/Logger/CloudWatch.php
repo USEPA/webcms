@@ -30,6 +30,34 @@ class CloudWatch implements LoggerInterface {
   use RfcLoggerTrait;
 
   /**
+   * The maximum number of bytes in a single PutLogEvents payload.
+   *
+   * Per the AWS docs:
+   *
+   * > The maximum batch size is 1,048,576 bytes. This size is calculated as the sum of
+   * > all event messages in UTF-8, plus 26 bytes for each log event.
+   */
+  const MAX_BATCH_SIZE = 1048576;
+
+  /**
+   * The maximum time (in seconds) a PutLogEvents payload can span.
+   *
+   * Per the AWS docs:
+   *
+   * > A batch of log events in a single request cannot span more than 24 hours.
+   * > Otherwise, the operation fails.
+   */
+  const MAX_BATCH_DURATION = 24 * 60 * 60;
+
+  /**
+   * Buffer of log events. This buffer is unspooled only at the termination of a request
+   * (or console exit, in the case of Drush).
+   *
+   * @var array
+   */
+  protected static $log_events = [];
+
+  /**
    * @var \Drupal\Core\Logger\LogMessageParserInterface
    */
   protected $parser;
@@ -38,11 +66,6 @@ class CloudWatch implements LoggerInterface {
    * @var \Drupal\Core\Config\ImmutableConfig
    */
   protected $config;
-
-  /**
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
 
   /**
    * @var \Aws\CloudWatchLogs\CloudWatchLogsClient
@@ -74,12 +97,14 @@ class CloudWatch implements LoggerInterface {
   public function __construct(ConfigFactoryInterface $config_factory, LogMessageParserInterface $parser) {
     $this->config = $config_factory->get('epa_cloudwatch');
     $this->parser = $parser;
+
+    $this->createClient();
   }
 
   /**
-   * Lazily instantiates a CloudWatchLogsClient object.
+   * Instantiates a CloudWatchLogsClient object.
    */
-  protected function getClient() {
+  protected function createClient() {
     if (isset($this->client)) {
       return $this->client;
     }
@@ -118,12 +143,9 @@ class CloudWatch implements LoggerInterface {
     // remove any backtraces.
     unset($context['backtrace']);
 
-    // Convert the message timestamp from seconds to milliseconds as required by AWS.
-    $timestamp = $context['timestamp'] * 1000;
-
     // Create a JSON message object. The values here are based on what the dblog module
     // records.
-    $payload = json_encode([
+    $payload = [
       'uid' => $context['uid'],
       'type' => mb_substr($context['channel'], 0, 64),
       'message' => $message,
@@ -134,9 +156,11 @@ class CloudWatch implements LoggerInterface {
       'referer' => $context['referer'],
       'hostname' => mb_substr($context['ip'], 0, 128),
       'timestamp' => $context['timestamp'],
-    ]);
+    ];
 
-    $this->putLogMessage($payload, $timestamp);
+    // Buffer the log event, but don't actually send. Instead, we wait until the end of
+    // the request, when the event subscriber calls flushLogEvents().
+    self::$log_events[] = $payload;
   }
 
   /**
@@ -227,28 +251,86 @@ class CloudWatch implements LoggerInterface {
   }
 
   /**
+   * Empties the internal buffer of log events and sends them all to CloudWatch Logs.
+   */
+  public function flushLogEvents() {
+    $all_events = self::$log_events;
+    if (empty($all_events)) {
+      return;
+    }
+
+    // The current batch of log events to send to CloudWatch
+    $log_events = [];
+
+    // Count the size (in bytes) of this batch of events.
+    $batch_size = 0;
+
+    // Calculate the start time (in seconds) of this batch of events.
+    $batch_start = $all_events[0]['timestamp'];
+
+    foreach ($all_events as $event) {
+      // Get the timestamp (in seconds) of the event
+      $event_time = $event['timestamp'];
+
+      // Encode the event as a JSON string and calculate the size
+      $message = json_encode($event);
+      $event_size = strlen($message) + 26;
+
+      // This is the structure expected by the PutLogEvents API call. We have to convert
+      // from the seconds-based timestamp to AWS' milliseconds-based timestamp, hence
+      // the arithmetic.
+      $log_event = [
+        'message' => $message,
+        'timestamp' => $event_time * 1000,
+      ];
+
+      // Compute the dimensions (byte size and overall timespan) of the events.
+      $total_size = $batch_size + $event_size;
+      $total_time = $event_time - $batch_start;
+
+      if ($total_size > self::MAX_BATCH_SIZE || $total_time > self::MAX_BATCH_DURATION) {
+        // If the new dimensions would exceed CloudWatch's limits, send the current batch
+        // of log events and reset the list to the next message.
+        $this->putLogEvents($log_events);
+
+        $log_events = [$log_event];
+        $batch_size = $event_size;
+        $batch_start = $event_time;
+      } else {
+        // Otherwise, continue accumulating log events. $batch_size is incremented but
+        // not $batch_start, since that holds the earliest (not latest) timestamp.
+        $log_events[] = $log_event;
+        $batch_size = $total_size;
+      }
+    }
+
+    // If we have leftover events from our loop, send them here.
+    if (!empty($log_events)) {
+      $this->putLogEvents($log_events);
+    }
+
+    // Reset the shared log events buffer.
+    self::$log_events = [];
+  }
+
+  /**
    * Send a log message to CloudWatch. This method will lazily create the log stream it
    * should send to as well as attempt to recover from sequence token issues with the log
    * stream.
    *
-   * @param string $message A log message
-   * @param int $timestamp The timestamp of the message
+   * @param array $log_events A batch of log events
    * @param int $tries The number of retry attempts remaining
    */
-  protected function putLogMessage($message, $timestamp, $tries = 3) {
+  protected function putLogEvents(array $log_events, $tries = 3) {
     if ($tries <= 0) {
       throw new RetryExceededException('Failed to retry sending logs after 3 attempts');
     }
-
-    $client = $this->getClient();
 
     $logGroup = $this->getLogGroup();
     $logStream = $this->getLogStream();
 
     $args = [
-      'logEvents' => [
-        [ 'message' => $message, 'timestamp' => $timestamp ],
-      ],
+      'logEvents' => $log_events,
       'logGroupName' => $logGroup,
       'logStreamName' => $logStream,
     ];
@@ -260,7 +342,7 @@ class CloudWatch implements LoggerInterface {
     }
 
     try {
-      $result = $client->putLogEvents($args);
+      $result = $this->client->putLogEvents($args);
     } catch (CloudWatchLogsException $e) {
       switch ($e->getAwsErrorCode()) {
         // If AWS rejected our sequence token (either because we didn't have one and
@@ -268,14 +350,14 @@ class CloudWatch implements LoggerInterface {
         // the expected token from the exception and try again.
         case 'InvalidSequenceTokenException':
           $this->sequenceToken = $e->get('expectedSequenceToken');
-          return $this->putLogMessage($message, $timestamp, $tries - 1);
+          return $this->putLogEvents($log_events, $tries - 1);
 
         // Exceptions here are thrown if the log group or log stream don't exist. We
         // currently assume the log group will have already been created, so we simply
         // attempt to create a new log stream and try again.
         case 'ResourceNotFoundException':
           $this->createLogStream();
-          return $this->putLogMessage($message, $timestamp, $tries - 1);
+          return $this->putLogEvents($log_events, $tries - 1);
 
         // Re-throw any other exceptions we encounter.
         default:
@@ -291,12 +373,11 @@ class CloudWatch implements LoggerInterface {
    * Creates a log stream for CloudWatch Logs.
    */
   protected function createLogStream() {
-    $client = $this->getClient();
     $logGroup = $this->getLogGroup();
     $logStream = $this->getLogStream();
 
     try {
-      $client->createLogStream([
+      $this->client->createLogStream([
         'logGroupName' => $logGroup,
         'logStreamName' => $logStream,
       ]);
@@ -330,11 +411,10 @@ class CloudWatch implements LoggerInterface {
    * Creates a log group for CloudWatch Logs.
    */
   protected function createLogGroup() {
-    $client = $this->getClient();
     $logGroup = $this->getLogGroup();
 
     try {
-      $client->createLogGroup([
+      $this->client->createLogGroup([
         'logGroupName' => $logGroup,
       ]);
     }
