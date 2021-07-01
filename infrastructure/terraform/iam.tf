@@ -302,12 +302,14 @@ data "aws_iam_policy_document" "put_logs" {
   version = "2012-10-17"
 
   statement {
-    sid       = "allowPublishingLogEvents"
-    effect    = "Allow"
-    actions   = [
+    sid    = "allowPublishingLogEvents"
+    effect = "Allow"
+
+    actions = [
       "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
+
     resources = ["*"]
   }
 }
