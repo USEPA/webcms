@@ -3,8 +3,6 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_paragraphs
-    - field.storage.paragraph.field_body
     - field.storage.node.field_description
     - field.storage.node.field_geographic_locations
     - field.storage.node.field_hublinks
@@ -13,8 +11,8 @@ dependencies:
     - field.storage.node.field_secondary_headline
     - field.storage.node.field_subjects
     - search_api.server.localhost
+    - core.entity_view_mode.node.search_index
   module:
-    - paragraphs
     - node
     - search_api
 id: news_releases
@@ -22,17 +20,6 @@ name: 'News Releases'
 description: ''
 read_only: false
 field_settings:
-  field_body:
-    label: 'Body » Paragraph » Body'
-    datasource_id: 'entity:node'
-    property_path: 'field_paragraphs:entity:field_body'
-    type: text
-    dependencies:
-      config:
-        - field.storage.node.field_paragraphs
-        - field.storage.paragraph.field_body
-      module:
-        - paragraphs
   field_description:
     label: Description
     datasource_id: 'entity:node'
@@ -91,6 +78,16 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_subjects
+  rendered_item:
+    label: 'Rendered HTML output'
+    property_path: rendered_item
+    type: text
+    configuration:
+      roles:
+        anonymous: anonymous
+      view_mode:
+        'entity:node':
+          news_release: search_index
   status:
     label: Published
     datasource_id: 'entity:node'
@@ -163,6 +160,7 @@ processor_settings:
     weights:
       preprocess_index: -47
       preprocess_query: -44
+    ignored: ._-
   transliteration:
     all_fields: false
     fields:
@@ -174,6 +172,6 @@ tracker_settings:
   default:
     indexing_order: fifo
 options:
-  index_directly: true
+  index_directly: false
   cron_limit: 50
 server: localhost

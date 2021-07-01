@@ -1,0 +1,81 @@
+uuid: 423d381e-a2c1-433c-8819-ddd74cb92065
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.news_release.field_channel
+    - field.field.node.news_release.field_description
+    - field.field.node.news_release.field_env_laws_regs_and_treaties
+    - field.field.node.news_release.field_expiration_date
+    - field.field.node.news_release.field_geographic_locations
+    - field.field.node.news_release.field_hublinks
+    - field.field.node.news_release.field_is_searchable_collection
+    - field.field.node.news_release.field_keywords
+    - field.field.node.news_release.field_language
+    - field.field.node.news_release.field_last_published
+    - field.field.node.news_release.field_machine_name
+    - field.field.node.news_release.field_paragraphs
+    - field.field.node.news_release.field_press_office
+    - field.field.node.news_release.field_press_officers
+    - field.field.node.news_release.field_publish_date
+    - field.field.node.news_release.field_release
+    - field.field.node.news_release.field_review_deadline
+    - field.field.node.news_release.field_scheduled_transition
+    - field.field.node.news_release.field_secondary_headline
+    - field.field.node.news_release.field_subjects
+    - field.field.node.news_release.field_type
+    - node.type.news_release
+  module:
+    - entity_reference_revisions
+    - layout_builder
+    - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.news_release.search_index
+targetEntityType: node
+bundle: news_release
+mode: search_index
+content:
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_paragraphs:
+    weight: 0
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+hidden:
+  content_moderation_control: true
+  entitygroupfield: true
+  field_channel: true
+  field_description: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_press_office: true
+  field_press_officers: true
+  field_publish_date: true
+  field_release: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_secondary_headline: true
+  field_subjects: true
+  field_type: true
+  langcode: true
+  links: true
+  search_api_excerpt: true
