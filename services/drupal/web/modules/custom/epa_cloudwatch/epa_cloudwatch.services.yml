@@ -4,3 +4,9 @@ services:
     arguments: ['@config.factory', '@logger.log_message_parser']
     tags:
       - { name: logger }
+
+  epa_cloudwatch.event_subscriber:
+    class: Drupal\epa_cloudwatch\EventSubscriber\LogFlushSubscriber
+    arguments: ['@logger.epa_cloudwatch']
+    tags:
+      - name: event_subscriber
