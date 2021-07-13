@@ -1,8 +1,9 @@
 ---
 el: .details
 title: Details
-state: inprogress
+state: inreview
 ---
+Intended for use in a form component
 
 __Variables:__
 * is_open: [boolean] True/False identifying component as a button element.
