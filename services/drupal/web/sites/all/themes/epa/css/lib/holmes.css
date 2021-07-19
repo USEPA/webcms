@@ -1,0 +1,266 @@
+/**
+ * @file
+ * Holmes is stand-alone diagnostic CSS stylesheet that will highlight
+ * potentially invalid or erroneous HTML markup.
+ * http://github.com/redroot/holmes/
+ * Licensed under GPL license
+ */
+
+a:not([href]),
+a[href=""] {
+  outline: 2px solid #e31c3d;
+}
+
+a[href="#"],
+a[href^="javascript"] {
+  outline: 2px solid #fdb81e;
+}
+
+img:not([alt]),
+img[alt=""] {
+  outline: 2px solid #e31c3d;
+}
+
+label:not([for]),
+label[for=""],
+input:not([name]),
+input[name=""],
+select:not([name]),
+select[name=""],
+textarea:not([name]),
+textarea[name=""],
+abbr:not([title]),
+abbr[title=""],
+table:not([summary]),
+table[summary=""] {
+  outline: 2px solid #e31c3d;
+}
+
+[style] {
+  outline: 2px solid #fdb81e;
+}
+
+applet,
+acronym,
+center,
+dir,
+font,
+strike,
+u,
+big,
+tt,
+marquee,
+plaintext,
+xmp {
+  border: 2px solid #aeb0b5;
+}
+
+body[bgproperties],
+body[topmargin],
+body[rightmargin],
+body[bottommargin],
+body[leftmargin] {
+  outline: 2px solid #aeb0b5;
+}
+
+*[bordercolor],
+*[bordercolordark],
+*[bordercolorlight],
+table[frame] {
+  border: 2px solid #aeb0b5;
+}
+
+div:empty,
+span:empty,
+li:empty,
+p:empty,
+td:empty,
+th:empty {
+  border: 2px solid #fdb81e;
+}
+
+a[href="#"]:hover::after,
+a[href^="javascript"]:hover::after,
+div:empty:hover::after,
+span:empty:hover::after,
+li:empty:hover::after,
+p:empty:hover::after,
+td:empty:hover::after,
+th:empty:hover::after,
+[style]:hover::after {
+  background: #fdb81e;
+  border-radius: 0.5em;
+  color: #212121;
+  display: block;
+  left: 0;
+  margin: 1em;
+  padding: 1em;
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+}
+
+a:not([href]):hover::after,
+a[href=""]:hover::after,
+img:not([alt]):hover::after,
+img[alt=""]:hover::after,
+label:not([for]):hover::after,
+label[for=""]:hover::after,
+input:not([name]):hover::after,
+input[name=""]:hover::after,
+select:not([name]):hover::after,
+select[name=""]:hover::after,
+textarea:not([name]):hover::after,
+textarea[name=""]:hover::after,
+abbr:not([title]):hover::after,
+abbr[title=""]:hover::after,
+table:not([summary]):hover::after,
+table[summary=""]:hover::after {
+  background: #e31c3d;
+  border-radius: 0.5em;
+  color: #212121;
+  display: block;
+  left: 0;
+  margin: 1em;
+  padding: 1em;
+  position: fixed;
+  text-decoration: none;
+  top: 0;
+  z-index: 9999;
+}
+
+applet:hover::after,
+acronym:hover::after,
+center:hover::after,
+dir:hover::after,
+font:hover::after,
+strike:hover::after,
+big:hover::after,
+tt:hover::after,
+marquee:hover::after,
+plaintext:hover::after,
+xmp:hover::after,
+*[bordercolor]:hover::after,
+*[bordercolordark]:hover::after,
+*[bordercolorlight]:hover::after,
+table[frame]:hover::after {
+  background: #aeb0b5;
+  border-radius: 0.5em;
+  color: #212121;
+  display: block;
+  left: 0;
+  margin: 1em;
+  padding: 1em;
+  position: fixed;
+  top: 0;
+  z-index: 9999;
+}
+
+body[bgproperties]:hover::after,
+body[topmargin]:hover::after,
+body[rightmargin]:hover::after,
+body[bottommargin]:hover::after,
+body[leftmargin]:hover::after {
+  background: #aeb0b5;
+  border-radius: 0.5em;
+  bottom: 0px;
+  color: #212121;
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  position: fixed; /* Bottom right due to whole body coverage */
+  right: 0px;
+  z-index: 9999;
+}
+
+td:empty:hover::after,
+th:empty:hover::after {
+  top: 4em;
+}
+
+a:not([href]):hover::after,
+a[href=""]:hover::after {
+  content: 'Missing href attribute';
+}
+
+a[href="#"]:hover::after {
+  content: "href='#'";
+}
+
+a[href^="javascript"]:hover::after {
+  content: 'Link href has javascript';
+}
+
+img:not([alt]):hover::after,
+img[alt=""]:hover::after {
+  content: 'Missing alt attribute';
+}
+
+label:not([for]):hover::after,
+label[for=""]:hover::after {
+  content: 'Missing for attribute';
+}
+
+input:not([name]):hover::after,
+input[name=""]:hover::after,
+select:not([name]):hover::after,
+select[name=""]:hover::after,
+textarea:not([name]):hover::after,
+textarea[name=""]:hover::after {
+  content: 'Missing name attribute';
+}
+
+abbr:not([title]):hover::after,
+abbr[title=""]:hover::after {
+  content: 'Missing title attribute';
+}
+
+table:not([summary]):hover::after,
+table[summary=""]:hover::after {
+  content: 'Missing summary attribute';
+}
+
+[style]:hover::after {
+  content: 'Element has inline styles';
+}
+
+applet:hover::after,
+acronym:hover::after,
+center:hover::after,
+dir:hover::after,
+font:hover::after,
+strike:hover::after,
+big:hover::after,
+tt:hover::after,
+marquee:hover::after,
+plaintext:hover::after,
+xmp:hover::after {
+  content: 'Deprecated or Non-W3C element';
+}
+
+body[bgproperties]:hover::after {
+  content: 'Deprecated or Non-W3C body attribute bgproperties';
+}
+
+body[topmargin]:hover::after,
+body[rightmargin]:hover::after,
+body[bottommargin]:hover::after,
+body[leftmargin]:hover::after {
+  content: 'Deprecated or Non-W3C body attribute *margin';
+}
+
+*[bordercolor]:hover::after,
+*[bordercolordark]:hover::after,
+*[bordercolorlight]:hover::after,
+table[frame]:hover::after {
+  content: 'Deprecated or Non-W3C body attribute bordercolor';
+}
+
+div:empty:hover::after,
+span:empty:hover::after,
+li:empty:hover::after,
+p:empty:hover::after,
+td:empty:hover::after,
+th:empty:hover::after {
+  content: 'Empty element!';
+}
