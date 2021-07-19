@@ -1,0 +1,375 @@
+/**
+ * @file
+ * Layout styles.
+ */
+
+.main-content,
+.main-footer > .main-footer__inner,
+.main-nav > .nav__inner,
+.masthead,
+.secondary-nav {
+  margin: 0 auto;
+  max-width: 35em;
+  padding: 0 1em;
+  position: relative;
+}
+@media screen and (min-width: 35em), print and (min-width: 35em) {
+  .main-nav > .nav__inner,
+  .masthead,
+  .secondary-nav,
+  .main-content,
+  .main-footer > .main-footer__inner {
+    max-width: 60em;
+  }
+  .wide-template .region-alert > .block-alert,
+  .wide-template .masthead,
+  .wide-template .nav,
+  .wide-template .main-content,
+  .wide-template .main-footer > .main-footer__inner {
+    max-width: 100%;
+  }
+}
+
+.site-logo {
+  display: none; /* Hide logo until printing. */
+}
+
+.in-maintenance > .main-content {
+  padding-bottom: 1em;
+}
+
+/** Regions *******************************************************************/
+@media screen and (min-width: 30em) {
+  .one-sidebar .main-column {
+    float: right; /* LTR */
+    padding-left: 1.3em; /* LTR */
+    width: 75%;
+  }
+  .main-content .region-sidebar {
+    clear: left;
+    height: 100%;
+    padding-right: 1.3em;
+    width: 25%;
+  }
+}
+
+/** Main Nav ******************************************************************/
+.main-nav > .menu > .menu-item {
+  display: block;
+  float: left; /* LTR */
+}
+.main-nav > .menu > .menu-item > .menu-link {
+  display: block;
+  white-space: nowrap;
+}
+
+/** Grid ******************************************************************/
+.row {
+  margin: 0 -1em;
+}
+.region-footer .row {
+  margin: 0 -1.6em;
+}
+.col {
+  padding: 0 1em;
+}
+.region-footer .col {
+  padding: 0 1.6em;
+}
+
+@media screen and (min-width: 25em) {
+  .cols-6 > .col {
+    float: left;
+    width: 50%;
+  }
+  .cols-6 > .col:nth-of-type(2n+1) {
+    clear: left;
+  }
+}
+@media screen and (min-width: 30em) {
+  .cols-5 > .col {
+    float: left;
+    width: 50%;
+  }
+  .cols-5 > .col:first-child {
+    width: 100%;
+  }
+  .cols-5 > .col:nth-of-type(5n+4) {
+    clear: left;
+  }
+}
+@media screen and (min-width: 35em),print and (min-width: 35em) {
+  .cols-4 > .col {
+    float: left;
+    width: 50%;
+  }
+  .cols-4 > .col:nth-of-type(2n+1) {
+    clear: left;
+  }
+  .cols-6 > .col {
+    width: 33.33334%;
+  }
+  .cols-6 > .col:nth-of-type(2n+1) {
+    clear: none;
+  }
+  .cols-6 > .col:nth-of-type(3n+1) {
+    clear: left;
+  }
+}
+@media screen and (min-width: 40em),print and (min-width: 40em) {
+  .cols-3 > .col {
+    float: left;
+    width: 50%;
+  }
+  .cols-3 > .col:first-child {
+    width: 100%;
+  }
+  .cols-5.row > .col {
+    width: 33.33334%;
+  }
+  .cols-5 > .col:nth-of-type(5n+1),
+  .cols-5 > .col:nth-of-type(5n+2) {
+    width: 50%;
+  }
+  .cols-5 > .col:nth-of-type(5n+3) {
+    clear: left;
+  }
+  .cols-5 > .col:nth-of-type(5n+4) {
+    clear: none;
+  }
+}
+@media screen and (min-width: 45em),print and (min-width: 45em) {
+  .row > .col {
+    float: left;
+  }
+  .cols-1.row > .col {
+    float: none;
+    width: 100%;
+  }
+  .cols-2 > .col {
+    width: 50%;
+  }
+  .cols-3.row > .col {
+    width: 33.33334%;
+  }
+  .cols-4 > .col {
+    width: 25%;
+  }
+  .cols-4 > .col:nth-of-type(2n+1) {
+    clear: none;
+  }
+  .cols-5.row > .col {
+    width: 20%;
+  }
+  .cols-6 > .col {
+    width: 16.66667%;
+  }
+  .cols-5 > .col:nth-of-type(5n+3),
+  .cols-6 > .col:nth-of-type(3n+1) {
+    clear: none;
+  }
+}
+
+@media screen and (min-width: 45em), print and (min-width: 45em) {
+  .row > .size-1of1.col {
+    width: 100%;
+  }
+  .row > .size-1of2.col {
+    width: 50%;
+  }
+  .row > .size-1of3.col {
+    width: 33.33334%;
+  }
+  .row > .size-2of3.col {
+    width: 66.66667%;
+  }
+  .row > .size-1of4.col {
+    width: 25%;
+  }
+  .row > .size-3of4.col {
+    width: 75%;
+  }
+  .row > .size-1of5.col {
+    width: 20%;
+  }
+  .row > .size-2of5.col {
+    width: 40%;
+  }
+  .row > .size-3of5.col {
+    width: 60%;
+  }
+  .row > .size-4of5.col {
+    width: 80%;
+  }
+  .row > .size-1of6.col {
+    width: 16.66667%;
+  }
+  .row > .size-5of6.col {
+    width: 83.33334%;
+  }
+}
+
+@media screen and (min-width: 35em) {
+  aside.col {
+    padding: 0;
+  }
+  aside.col > .panel-pane {
+    float: left;
+    padding: 0 1em;
+    width: 50%;
+  }
+  aside.col > .panel-pane:nth-of-type(2n+1) {
+    clear: left;
+  }
+}
+@media screen and (min-width: 45em),print and (min-width: 45em) {
+  aside.col {
+    padding: 0 1em;
+  }
+  aside.col > .panel-pane {
+    float: none;
+    padding: 0;
+    width: 100%;
+  }
+}
+
+/** Floated Images ************************************************************/
+@media screen and (min-width: 30em) {
+  .left.image,
+  .cols-5 > .col:first-child .left.image {
+    float: left;
+    margin-right: 1em;
+    max-width: 50%;
+  }
+  .right.image,
+  .cols-5 > .col:first-child .right.image {
+    float: right;
+    margin-left: 1em;
+    max-width: 50%;
+  }
+  .cols-5 .left.image,
+  .cols-5 .right.image,
+  .cols-6 .left.image,
+  .cols-6 .right.image,
+  aside.col .left.image,
+  aside.col .right.image {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+@media screen and (min-width: 35em),print and (min-width: 35em) {
+  .cols-4 .left.image,
+  .cols-4 .right.image {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+@media screen and (min-width: 40em),print and (min-width: 40em) {
+  .cols-3 .left.image,
+  .cols-3 .right.image,
+  .cols-5 > .col:first-child .left.image,
+  .cols-5 > .col:first-child .right.image {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+  .cols-3 > .col:first-child .left.image {
+    float: left;
+    margin-right: 1em;
+    max-width: 50%;
+  }
+  .cols-3 > .col:first-child .right.image {
+    float: right;
+    margin-left: 1em;
+    max-width: 50%;
+  }
+}
+@media screen and (min-width: 45em),print and (min-width: 45em) {
+  .cols-3 > .col:first-child .left.image,
+  .cols-3 > .col:first-child .right.image {
+    float: none;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+  }
+}
+
+
+/** Print Layout **************************************************************/
+@media print {
+  nav,
+  .epa-search,
+  .breadcrumb,
+  .breadcrumb-title,
+  .block-epa-core-gsa-epa-search,
+  .block-menu,
+  .block-menu-block,
+  .block-search,
+  .block-user,
+  .col__title,
+  .comment-form,
+  .govdelivery-form,
+  .links,
+  .menu,
+  .microsite-aside,
+  .microsite-name,
+  .mobile-nav,
+  .no-print,
+  .node-links,
+  .region-preface,
+  .site-name-and-slogan,
+  .social-menu,
+  .submitted .permalink,
+  .pagetop,
+  .tasks,
+  #block-epa-accessibility-quail-results,
+  #block-epa-workflow-revision-info-block,
+  #block-comment-recent,
+  #block-forum-active,
+  #block-forum-new,
+  #block-node-recent,
+  #block-node-syndicate,
+  footer .pipeline,
+  #show-admin-info-wrapper,
+  .social-menu-wrapper,
+  .social-menu-title,
+  .social-menu-more,
+  .web-area-footer,
+  #block-pane-epa-web-area-footer {
+    display: none !important;
+  }
+
+  .masthead,
+  .main-content,
+  .main-nav,
+  .secondary-nav,
+  .main-footer {
+    width: 100%;
+  }
+
+  .site-logo {
+    display: block;
+    margin-bottom: 1em;
+  }
+
+  .microsite-name,
+  .page-title {
+    margin-top: -10px;
+    padding: 0;
+  }
+
+  .main-footer .region-footer {
+    background: transparent;
+    min-height: auto;
+    padding-top: 0;
+  }
+
+  .block-pane-epa-global-footer .row > .col {
+    width: 100%;
+  }
+}
