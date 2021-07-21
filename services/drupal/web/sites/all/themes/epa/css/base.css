@@ -1,0 +1,249 @@
+/**
+ * @file
+ * Base style sheet includes resets and helper classes.
+ *
+ * Inspiration: http://necolas.github.com/normalize.css
+ */
+
+/** Resets and Normalization **************************************************/
+* {
+  box-sizing: border-box;
+  *behavior: url(/sites/all/themes/epa/inc/boxsizing.htc);
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+
+audio,
+canvas,
+progress,
+video {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+[hidden],
+template {
+  display: none;
+}
+
+html {
+  overflow-y: scroll;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body,
+dl,
+figure,
+form {
+  margin: 0;
+}
+
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+}
+
+ins {
+  text-decoration: none;
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+a {
+  background-color: transparent;
+}
+a:hover,
+a:active {
+  outline: 0;
+}
+
+b,
+strong {
+  font-weight: bold;
+}
+
+dfn {
+  font-style: italic;
+}
+
+pre {
+  white-space: pre;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+q {
+  quotes: none;
+}
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  margin: 0;
+  max-width: 100%;
+  vertical-align: baseline; /* IE7 */
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+button,
+input {
+  line-height: normal;
+}
+button,
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+button[disabled],
+input[disabled] {
+  cursor: default;
+}
+input[type='search'] {
+  -webkit-appearance: textfield;
+}
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+button {
+  width: auto;
+  overflow: visible;
+}
+
+textarea {
+  overflow: auto;
+  vertical-align: top;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+th,
+td {
+  padding: 0;
+  text-align: left; /* LTR */
+  vertical-align: middle;
+}
+
+img,
+input,
+textarea,
+video {
+  height: auto;
+  max-width: 100%;
+}
+embed,
+iframe,
+object {
+  border: 0;
+  max-width: 100%;
+}
+
+/** Helper Classes ************************************************************/
+.nowrap {
+  white-space: nowrap;
+}
+
+.clear-both {
+  clear: both;
+}
+.clear-left {
+  clear: left;
+}
+.clear-right {
+  clear: right;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.element-hidden {
+  display: none;
+}
+.element-invisible {
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute !important;
+}
+.element-invisible.element-focusable:active,
+.element-invisible.element-focusable:focus {
+  clip: auto;
+  position: static !important;
+}
+
+.container-inline div,
+.container-inline label {
+  display: inline-block;
+}
+
+.clearfix:after,
+.menu:after,
+.pane-content:after,
+.pipeline:after,
+.tabs:after,
+.slat:after,
+.row:after,
+.col:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.nocallout {
+  -webkit-touch-callout: none;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
