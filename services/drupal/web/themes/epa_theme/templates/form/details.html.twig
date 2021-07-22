@@ -15,7 +15,7 @@
   */
 #}
 
-{% set details_content %}
+{% set detail_content %}
   {% if errors %}
   <div>
     {{ errors }}
@@ -25,10 +25,16 @@
   {{ value }}
 {% endset %}
 
-{% include '@components/details/details.twig' with {
-  'attributes': attributes,
-  'required': required,
-  'details_summary': title is not empty ? title : 'Details'|t,
-  'details_description': description,
-  'details_content': details_content
+{% set details_content %}
+  {% include '@uswds/_accordion/_accordion-content.twig' with {
+    'content': detail_content,
+    'content_id': '0',
+    'title': title is not empty ? title : 'Details'|t,
+    'accordion_id': element['#webform_key'],
+  } %}
+{% endset %}
+
+{% include '@uswds/_accordion/accordion.twig' with {
+  'accordion_content': details_content,
+  'modifier_classes': 'form-item',
 } %}
