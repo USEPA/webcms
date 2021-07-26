@@ -53,7 +53,12 @@ resource "aws_rds_cluster_parameter_group" "params" {
     apply_method = "pending-reboot"
   }
 
-  tags = var.tags
+  tags = merge(
+    var.tags,
+    {
+      cpm backup="EPAWEB-Prod"
+    },
+  )
 }
 
 resource "random_password" "rds_root_password" {
