@@ -116,4 +116,11 @@ resource "aws_rds_cluster_instance" "db_instance" {
 
   cluster_identifier   = aws_rds_cluster.db.cluster_identifier
   db_subnet_group_name = aws_rds_cluster.db.db_subnet_group_name
+  
+  tags = merge(
+    var.tags,
+    {
+      "cpm backup": "EPAWEB-Prod"
+    },
+  )
 }
