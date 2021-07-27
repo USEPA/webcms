@@ -1,0 +1,7 @@
+<?php
+/**
+ * Update the mimetype of existing uploaded json files.
+ */
+function epa_media_update_9000() {
+  \Drupal::database()->query("UPDATE {file_managed} SET filemime = 'application/json' WHERE filename LIKE '%.json' AND filemime = 'application/octet-stream';");
+}
