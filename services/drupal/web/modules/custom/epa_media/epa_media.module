@@ -132,3 +132,13 @@ function epa_media_preprocess_media_oembed_iframe(&$variables)
     $variables['media'] = IFrameMarkup::create(str_replace('youtube.com/', 'youtube-nocookie.com/', $variables['media']));
   }
 }
+
+
+/**
+ * Implements hook_file_mimetype_mapping_alter().
+ */
+function epa_media_file_mimetype_mapping_alter(&$mapping) {
+  // Assign applicatin/json mimetype to JSON files.
+  $mapping['mimetypes']['application_json'] = 'application/json';
+  $mapping['extensions']['json'] = 'application_json';
+}
