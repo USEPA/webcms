@@ -23,6 +23,11 @@ class PublicAlertsBlock extends BlockBase {
 
     $build['#theme'][] = 'epa_alerts';
     $build['#alertContext'] = 'public';
+
+    // Must manually add this since we're not directly rendering the view so the
+    // views_ajax_get module doesn't get an opportunity to attach it dynamically.
+    $build['#attached']['drupalSettings']['viewsAjaxGet']['public_alerts'] = 'public_alerts';
+
     $build['#attached']['library'][] = 'epa_alerts/epaAlerts';
     $build['#attached']['drupalSettings']['epaAlerts']['context'] = 'public';
 
