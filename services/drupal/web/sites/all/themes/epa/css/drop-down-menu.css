@@ -1,0 +1,84 @@
+/**
+ * @file
+ * Styles for the drop-down menu.
+ */
+
+/** Functional Styles *********************************************************/
+.main-nav > .nav__inner > .menu .menu {
+  position: absolute;
+  z-index: 4;
+}
+
+.main-nav > .nav__inner > .menu .menu .menu-link {
+  clip: rect(1px, 1px, 1px, 1px);
+  opacity: 0;
+  position: absolute !important;
+}
+
+html.no-js .main-nav .menu-item:hover > .menu > .menu-item > .menu-link, /** add > .nav__inner below **/
+.main-nav .menu-link:focus + .menu > .menu-item > .menu-link,
+.main-nav .show-menu .menu > .menu-item > .menu-link,
+.main-nav > .nav__inner > .menu .menu .menu-link:focus {
+  clip: auto;
+  opacity: 1;
+  position: static !important;
+}
+
+/** Design Styles *************************************************************/
+.main-nav > .nav__inner > .menu .menu {
+  background: #f1f1f1;
+  display: ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  max-width: 19.7647em;
+}
+.main-nav > .nav__inner > .menu .menu .menu-item {
+  display: grid;
+}
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(1):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(1):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(2):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(2):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(3):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(3):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(4):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(4):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(5):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(5):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(6):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(6):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(7):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(7):first-child ~ li,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(8):first-child,
+.main-nav > .nav__inner > .menu .menu .menu-item:nth-last-child(8):first-child ~ li {
+  -ms-grid-column: 1;
+  -ms-grid-column-span: 2;
+  grid-column: 1 / span 2;
+}
+.main-nav > .nav__inner > .menu .menu .menu-link {
+  align-items: center;
+  background: #f1f1f1;
+  border: solid #f1f1f1;
+  border-width: 0 5px;
+  color: #205493;
+  display: flex;
+  font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.1;
+  padding: 0.7143em 1.5714em;
+  text-decoration: none;
+  width: 12em;
+}
+.main-nav > .nav__inner > .menu .menu a.active,
+.main-nav > .nav__inner > .menu .menu a.menu-link:focus,
+.main-nav > .nav__inner > .menu .menu a.menu-link:hover,
+.main-nav > .nav__inner > .menu .menu a.menu-link:active {
+  background: #d6d7d9;
+  border-color: #205493;
+  outline: 0;
+}
+.main-nav > .nav__inner > .menu .menu a.active {
+  font-weight: 700;
+}

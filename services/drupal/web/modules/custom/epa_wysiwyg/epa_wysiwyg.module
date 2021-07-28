@@ -99,11 +99,6 @@ function template_preprocess_epa_file_link(&$variables) {
  * Implements hook_form_FORM_ID_alter().
  */
 function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Alter only the form with ID 'editor_link_dialog'.
-  if ($form_id !== 'editor_link_dialog') {
-    return;
-  }
-
   // Attach our custom javascript library.
   $form['#attached']['library'][] = 'epa_wysiwyg/epa-wysiwyg-linkit';
 
@@ -127,15 +122,23 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
 
   // Add states to disable and hide the default linkit input unless the default
   // profile is selected.
-  $form['attributes']['href'] = array_merge($form['attributes']['href'], [
+  $form['attributes']['href_default'] = array_merge($form['attributes']['href'], [
+    '#type' => 'linkit',
+    '#description' => t('Start typing to find content.'),
+    '#autocomplete_route_name' => 'linkit.autocomplete',
+    '#autocomplete_route_parameters' => [
+      'linkit_profile_id' => 'default',
+    ],
+    "#weight" => -10,
+    '#default_value' => isset($input['href']) ? $input['href'] : '',
     '#states' => [
       'visible' => [
         ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
       ],
       'disabled' => [
         ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
-      ]
-    ]
+      ],
+    ],
   ]);
 
   // Provide a second linkit input that uses the web_area_content linkit profile
@@ -155,7 +158,44 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
       ],
       'disabled' => [
         ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
-      ]
-    ]
+      ],
+    ],
   ]);
+
+  $form['attributes']['href'] = array_merge($form['attributes']['href'], [
+    '#states' => [
+      'disabled' => [
+        ':input[name="attributes[select-profile]"]' => [
+          ['value' => 'web_area_content'],
+          'or',
+          ['value' => 'default']
+        ],
+      ],
+      'invisible' => [
+        ':input[name="attributes[select-profile]"]' => [
+          ['value' => 'web_area_content'],
+          'or',
+          ['value' => 'default']
+        ],
+      ],
+    ],
+  ]);
+
+  array_unshift($form['#validate'], '_epa_wysiwyg_populate_href');
+}
+
+// Populate the 'href' attribute with the value of href_default or
+// href_web_area_content so linkit uses the selected url.
+function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state) {
+  $href_profile_fields = [
+    'href_default',
+    'href_web_area_content',
+  ];
+
+  foreach ($href_profile_fields as $field_name) {
+    $value = $form_state->getValue(['attributes', $field_name]);
+    if (!empty($value)) {
+      $form_state->setValue(['attributes', 'href'], $value);
+    }
+  }
 }
