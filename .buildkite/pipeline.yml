@@ -41,7 +41,7 @@ steps:
       WEBCMS_WORKSPACE: espanol
 
   - label: ":pipeline: QA"
-    if: build.branch == "main" && build.pull_request.id == null
+    if: build.branch == "integration" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/deploy.yml
     env:
