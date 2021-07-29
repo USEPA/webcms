@@ -17,10 +17,9 @@
 
 {% set detail_content %}
   {% if errors %}
-  <div>
-    {{ errors }}
-  </div>
+    <div>{{ errors }}</div>
   {% endif %}
+
   {{ children }}
   {{ value }}
 {% endset %}
@@ -36,5 +35,5 @@
 
 {% include '@uswds/_accordion/accordion.twig' with {
   'accordion_content': details_content,
-  'modifier_classes': 'form-item',
+  'modifier_classes': 'usa-accordion--bordered form-item',
 } %}
