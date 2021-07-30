@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "replication" {
 resource "aws_s3_bucket" "uploads-replication" {
   for_each = local.sites
 
-  provider = "aws.us-west"
+  provider = aws.us-west
   name="${aws_s3_bucket.uploads[each.key].name}-r"
 
   versioning {
