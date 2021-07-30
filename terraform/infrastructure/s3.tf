@@ -79,7 +79,7 @@ resource "aws_s3_bucket" "uploads-replication" {
   for_each = local.sites
 
   provider = aws.us-west
-  name="${aws_s3_bucket.uploads[each.key].name}-r"
+  bucket="${aws_s3_bucket.uploads[each.key].name}-r"
 
   versioning {
     enabled = true
