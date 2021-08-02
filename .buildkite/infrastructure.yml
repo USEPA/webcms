@@ -28,11 +28,6 @@ steps:
   # Copy images from the Docker Hub into the AWS perimeter
   - label: ":docker: Mirror Images"
     command:
-      # Traefik (used for routing behind the NLB)
-      - docker pull traefik:2.4
-      - docker tag traefik:2.4 ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:2.4
-      - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:2.4
-
       # AWS CloudWatch agent (used to send statsd metrics)
       - docker pull amazon/cloudwatch-agent
       - docker tag amazon/cloudwatch-agent ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch

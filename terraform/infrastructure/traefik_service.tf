@@ -33,6 +33,9 @@ resource "aws_ecs_task_definition" "traefik" {
         # Don't expose services/tasks by default
         "--providers.ecs.exposedByDefault=false",
 
+        # Enable failover service
+        "--providers.file.filename=/etc/traefik/dynamic.yaml",
+
         # Listen for HTTP traffic on port 80
         "--entryPoints.web.address=:80",
 
@@ -81,6 +84,7 @@ resource "aws_ecs_service" "traefik" {
   desired_count = 2
 
   enable_ecs_managed_tags = true
+  force_new_deployment    = true
   propagate_tags          = "SERVICE"
 
   # HTTP (port 80) configuration
