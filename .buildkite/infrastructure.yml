@@ -28,6 +28,10 @@ steps:
   # Copy images from the Docker Hub into the AWS perimeter
   - label: ":docker: Mirror Images"
     command:
+      # Traefik (customized for failover)
+      - docker build services/traefik -t ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:latest
+      - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-traefik:latest
+
       # AWS CloudWatch agent (used to send statsd metrics)
       - docker pull amazon/cloudwatch-agent
       - docker tag amazon/cloudwatch-agent ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch

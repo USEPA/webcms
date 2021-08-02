@@ -1,7 +1,3 @@
-locals {
-  traefik_version = "2.4"
-}
-
 resource "aws_ecs_task_definition" "traefik" {
   family = "webcms-${var.environment}-traefik"
 
@@ -17,7 +13,7 @@ resource "aws_ecs_task_definition" "traefik" {
   container_definitions = jsonencode([
     {
       name      = "traefik"
-      image     = "${aws_ecr_repository.traefik_mirror.repository_url}:${local.traefik_version}"
+      image     = "${aws_ecr_repository.traefik_mirror.repository_url}:latest"
       essential = true
 
       entryPoint = ["traefik"]
