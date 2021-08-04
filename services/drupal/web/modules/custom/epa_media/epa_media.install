@@ -12,29 +12,21 @@ function epa_media_update_9000() {
 function epa_media_update_9001(&$sandbox) {
   $database = \Drupal::database();
 
-  if (!isset($sandbox['total'])) {
-    // Find all "Document" media entities that have a .json or .xml file.
-    $media_ids = $database
-      ->query("SELECT m.entity_id
+  // Find all "Document" media entities that have a .json or .xml file.
+  $media_ids = $database
+    ->query("SELECT m.entity_id
         FROM media__field_media_file AS m
         INNER JOIN file_managed AS fm ON m.field_media_file_target_id = fm.fid
         WHERE fm.filename like '%.json' OR fm.filename like '%.xml'
         AND m.bundle = 'document';")
-      ->fetchCol('entity_id');
+    ->fetchCol('entity_id');
 
-    $sandbox['total'] = count($media_ids);
-    $sandbox['current'] = 0;
-    $sandbox['offset'] = 0;
-  }
+  $sandbox['total'] = count($media_ids);
 
   // Do not continue if no media items are found.
   if (empty($sandbox['total'])) {
-    $sandbox['#finished'] = 1;
     return t('No Media entities to be processed.');
   }
-
-  // Arbitrary limit to process 50 at a time.
-  $ids = array_slice($media_ids, $sandbox['offset'], 50);
 
   // Update base tables with those media_ids
   $database
@@ -47,43 +39,43 @@ function epa_media_update_9001(&$sandbox) {
           mfd.bundle = 'other',
           mr.bundle = 'other',
           mfr.bundle = 'other'
-      WHERE m.mid IN (:ids[])", [':ids[]' => $ids]);
+      WHERE m.mid IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Copy values from media__field_media_file to table used by 'Other' bundle.
   $database
     ->query("INSERT INTO {media__field_media_file_1}
       SELECT f.*
       FROM {media__field_media_file} AS f
-      WHERE f.entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE f.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Do the same thing for revision fields.
   $database
     ->query("INSERT INTO {media_revision__field_media_file_1}
       SELECT f.*
       FROM {media_revision__field_media_file} AS f
-      WHERE f.entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE f.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Bundle gets copied over need to update the bundle the bundle as well.
   $database
     ->query("UPDATE {media__field_media_file_1}
       SET bundle = 'other'
-      WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // ... and do the the same for revision fields.
   $database
     ->query("UPDATE {media_revision__field_media_file_1}
       SET bundle = 'other'
-      WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Now delete values from media__field_media_file.
   $database
     ->query("DELETE FROM {media__field_media_file}
-      WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // ...and delete from revision table.
   $database
     ->query("DELETE FROM {media_revision__field_media_file}
-      WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Update fields being used by Other bundle (file accessibility and tags).
   $database
@@ -95,36 +87,32 @@ function epa_media_update_9001(&$sandbox) {
         mra.bundle = 'other',
         mt.bundle = 'other',
         mrt.bundle = 'other'
-    WHERE ma.entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE ma.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   // Now cleanup all fields not used by Other bundle.
   $database
     ->query("DELETE FROM {media__field_description}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   $database
     ->query("DELETE FROM {media_revision__field_description}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   $database
     ->query("DELETE FROM {media__field_publication_date}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   $database
     ->query("DELETE FROM {media_revision__field_publication_date}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   $database
     ->query("DELETE FROM {media__field_publication_number}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
   $database
     ->query("DELETE FROM {media_revision__field_publication_number}
-    WHERE entity_id IN (:ids[])", [':ids[]' => $ids]);
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
 
-  $sandbox['current'] += count($ids);
-  $sandbox['offset'] += 50;
-
-  $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
-  return t('Updated :n media entities be "Other" bundle.', [':n' => $sandbox['current']]);
+  return t('Updated :n media entities be "Other" bundle.', [':n' => $sandbox['total']]);
 }
