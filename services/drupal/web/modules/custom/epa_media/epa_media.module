@@ -58,7 +58,7 @@ function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterfa
 
   if ($fid = $media->getSource()->getSourceFieldValue($media)){
 
-    // Remote videos don't have a File. Need to handle differently.
+    // Remote videos don't have a File. Source field value is URL to remote video itself.
     if ($media->bundle() == 'remote_video') {
       $form['file_url'] = [
         '#markup' => t('<p><strong>Remote Video URL:</strong> %remote_url</p>', ['%remote_url' => $fid])
