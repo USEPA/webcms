@@ -164,13 +164,6 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
 
   $form['attributes']['href'] = array_merge($form['attributes']['href'], [
     '#states' => [
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => [
-          ['value' => 'web_area_content'],
-          'or',
-          ['value' => 'default']
-        ],
-      ],
       'invisible' => [
         ':input[name="attributes[select-profile]"]' => [
           ['value' => 'web_area_content'],
