@@ -164,13 +164,6 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
 
   $form['attributes']['href'] = array_merge($form['attributes']['href'], [
     '#states' => [
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => [
-          ['value' => 'web_area_content'],
-          'or',
-          ['value' => 'default']
-        ],
-      ],
       'invisible' => [
         ':input[name="attributes[select-profile]"]' => [
           ['value' => 'web_area_content'],
@@ -184,18 +177,31 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
   array_unshift($form['#validate'], '_epa_wysiwyg_populate_href');
 }
 
-// Populate the 'href' attribute with the value of href_default or
-// href_web_area_content so linkit uses the selected url.
+// Custom logic to accommodate the additional href_default and
+// href_web_area_content attributes.
 function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state) {
   $href_profile_fields = [
     'href_default',
     'href_web_area_content',
   ];
 
+  $href_value = $form_state->getValue(['attributes', 'href']);
+
   foreach ($href_profile_fields as $field_name) {
-    $value = $form_state->getValue(['attributes', $field_name]);
-    if (!empty($value)) {
-      $form_state->setValue(['attributes', 'href'], $value);
+    // The href attribute is reset to empty when the form is initialized. If the
+    // attribute has a value when the form is submitted, then another module
+    // (i.e. anchor) updated it. Let's set our linkit profile inputs to match.
+    if (!empty($href_value)) {
+      $form_state->setValue(['attributes', $field_name], $href_value);
     }
+    // The href attribute is empty so we want to populate it with the value from
+    // the linkit profile attribute that has a value.
+    else {
+      $value = $form_state->getValue(['attributes', $field_name]);
+      if (!empty($value)) {
+        $form_state->setValue(['attributes', 'href'], $value);
+      }
+    }
+
   }
 }
