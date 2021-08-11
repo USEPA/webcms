@@ -1,0 +1,69 @@
+uuid: af9929ff-c68c-4cf7-8a5b-fbeecd20bfda
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.news_releases
+    - views.view.search_news_releases
+  module:
+    - facets_pretty_paths
+    - search_api
+third_party_settings:
+  facets_pretty_paths:
+    coder: default_coder
+id: news_releases_language
+name: Language
+url_alias: news_releases_language
+weight: 0
+min_count: 1
+show_only_one_result: false
+field_identifier: field_language
+facet_source_id: 'search_api:views_page__search_news_releases__page_1'
+widget:
+  type: links
+  config:
+    show_numbers: true
+    soft_limit: 10
+    soft_limit_settings:
+      show_less_label: 'Show less'
+      show_more_label: 'Show more'
+    show_reset_link: false
+    reset_text: 'Show all'
+    hide_reset_when_no_selection: false
+query_operator: or
+use_hierarchy: false
+keep_hierarchy_parents_active: false
+expand_hierarchy: false
+enable_parent_when_child_gets_disabled: true
+hard_limit: 0
+exclude: false
+only_visible_when_facet_source_is_visible: false
+processor_configs:
+  active_widget_order:
+    processor_id: active_widget_order
+    weights:
+      sort: 20
+    settings:
+      sort: ASC
+  display_value_widget_order:
+    processor_id: display_value_widget_order
+    weights:
+      sort: 40
+    settings:
+      sort: ASC
+  list_item:
+    processor_id: list_item
+    weights:
+      build: 5
+    settings: {  }
+  url_processor_handler:
+    processor_id: url_processor_handler
+    weights:
+      pre_query: 50
+      build: 15
+    settings: {  }
+empty_behavior:
+  behavior: text
+  text_format: plain_text
+  text: 'This is empty'
+show_title: false

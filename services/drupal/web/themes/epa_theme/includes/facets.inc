@@ -45,6 +45,7 @@ function epa_theme_preprocess_facets_summary_item_list(&$vars) {
       case 'news_releases_press_office':
       case 'news_releases_subjects':
       case 'news_releases_year':
+      case 'news_releases_language':
         $vars['reset_url'] = '/newsreleases/search';
         break;
 
