@@ -374,7 +374,7 @@ copy:cloudwatch:dev:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
 
-# Build custom Traefik image based off the 2.4 tag. Keep the 2.4 tag(Keep this in sync Traefik version mentions found
+# Build custom Traefik image based off the 2.4 tag. Use latest tag(Keep this as "latest" Traefik tag mentions found
 # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
 build:traefik:dev:
   extends: .kaniko
@@ -385,7 +385,7 @@ build:traefik:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/traefik
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
