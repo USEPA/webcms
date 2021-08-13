@@ -376,7 +376,7 @@ copy:cloudwatch:dev:
 
 # Build custom Traefik image based off the 2.4 tag. Keep the 2.4 tag(Keep this in sync Traefik version mentions found
 # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
-copy:traefik:dev:
+build:traefik:dev:
   extends: .kaniko
   stage: build
   only: [ci-work]
