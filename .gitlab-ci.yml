@@ -3,9 +3,11 @@
 # jobs pertain to the branch being built and dispatches those. (The exception to this is
 # the Drush logic, which is encapsulated by a Node.js script in the ci/ directory.)
 
-stages:
+stages:  
   # Applications of the infrastructure Terraform module. This has to occur first because,
   # without it, Docker builds could attempt to push to empty ECR repositories.
+  # First step is to build the traefik module as the traefik service is created and updated in the infrastructure module
+  - infrastructure_preprod_build
   - infrastructure_preprod_init
   - infrastructure_preprod_validate
   - infrastructure_preprod_plan
@@ -378,7 +380,7 @@ copy:cloudwatch:dev:
 # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
 build:traefik:dev:
   extends: .kaniko
-  stage: build
+  stage: infrastructure_preprod_build
   only: [ci-work]
 
   script:
