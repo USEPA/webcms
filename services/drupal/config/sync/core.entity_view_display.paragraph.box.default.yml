@@ -9,6 +9,7 @@ dependencies:
     - field.field.paragraph.box.field_paragraphs
     - field.field.paragraph.box.field_style
     - field.field.paragraph.box.field_title
+    - field.field.paragraph.box.field_title_heading
     - paragraphs.paragraphs_type.box
     - responsive_image.styles.responsive_box_image
   module:
@@ -22,7 +23,7 @@ bundle: box
 mode: default
 content:
   field_header_link:
-    weight: 2
+    weight: 3
     label: hidden
     settings:
       trim_length: null
@@ -35,7 +36,7 @@ content:
     region: content
   field_image:
     type: responsive_image
-    weight: 1
+    weight: 2
     region: content
     label: hidden
     settings:
@@ -43,7 +44,7 @@ content:
       image_link: ''
     third_party_settings: {  }
   field_link:
-    weight: 5
+    weight: 6
     label: hidden
     settings:
       trim_length: 80
@@ -56,7 +57,7 @@ content:
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 3
+    weight: 4
     label: hidden
     settings:
       view_mode: default
@@ -64,7 +65,7 @@ content:
     third_party_settings: {  }
     region: content
   field_style:
-    weight: 4
+    weight: 5
     label: hidden
     settings: {  }
     third_party_settings: {  }
@@ -77,6 +78,13 @@ content:
       link_to_entity: false
     third_party_settings: {  }
     type: string
+    region: content
+  field_title_heading:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_key
     region: content
 hidden:
   search_api_excerpt: true
