@@ -1,0 +1,14 @@
+{% set classes = [
+  'usa-site-alert',
+  not heading ? 'usa-site-alert--no-heading',
+  modifier_classes ? modifier_classes
+]|join(' ')|trim %}
+
+<section class="{{ classes }}" aria-label="{{ label }}">
+  <div class="usa-alert">
+    <div class="usa-alert__body">
+      {% if heading %}<h3 class="usa-alert__heading">{{ heading }}</h3>{% endif %}
+      <div class="usa-alert__text">{{ content }}</div>
+    </div>
+  </div>
+</section>
