@@ -1,0 +1,118 @@
+<?php
+/**
+ * Update the mimetype of existing uploaded json files.
+ */
+function epa_media_update_9000() {
+  \Drupal::database()->query("UPDATE {file_managed} SET filemime = 'application/json' WHERE filename LIKE '%.json' AND filemime = 'application/octet-stream';");
+}
+
+/**
+ * Move all json and xml "Document" media entities to be "Other" media bundle
+ */
+function epa_media_update_9001(&$sandbox) {
+  $database = \Drupal::database();
+
+  // Find all "Document" media entities that have a .json or .xml file.
+  $media_ids = $database
+    ->query("SELECT m.entity_id
+        FROM media__field_media_file AS m
+        INNER JOIN file_managed AS fm ON m.field_media_file_target_id = fm.fid
+        WHERE fm.filename like '%.json' OR fm.filename like '%.xml'
+        AND m.bundle = 'document';")
+    ->fetchCol('entity_id');
+
+  $sandbox['total'] = count($media_ids);
+
+  // Do not continue if no media items are found.
+  if (empty($sandbox['total'])) {
+    return t('No Media entities to be processed.');
+  }
+
+  // Update base tables with those media_ids
+  $database
+    ->query("UPDATE {media} AS m
+      INNER JOIN {media_field_data} AS mfd ON m.mid = mfd.mid
+      INNER JOIN {media_revision} AS mr ON m.mid = mr.mid
+      INNER JOIN {media_field_revision} AS mfr ON m.mid = mfr.mid
+      SET
+          m.bundle = 'other',
+          mfd.bundle = 'other',
+          mr.bundle = 'other',
+          mfr.bundle = 'other'
+      WHERE m.mid IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Copy values from media__field_media_file to table used by 'Other' bundle.
+  $database
+    ->query("INSERT INTO {media__field_media_file_1}
+      SELECT f.*
+      FROM {media__field_media_file} AS f
+      WHERE f.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Do the same thing for revision fields.
+  $database
+    ->query("INSERT INTO {media_revision__field_media_file_1}
+      SELECT f.*
+      FROM {media_revision__field_media_file} AS f
+      WHERE f.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Bundle gets copied over need to update the bundle the bundle as well.
+  $database
+    ->query("UPDATE {media__field_media_file_1}
+      SET bundle = 'other'
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // ... and do the the same for revision fields.
+  $database
+    ->query("UPDATE {media_revision__field_media_file_1}
+      SET bundle = 'other'
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Now delete values from media__field_media_file.
+  $database
+    ->query("DELETE FROM {media__field_media_file}
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // ...and delete from revision table.
+  $database
+    ->query("DELETE FROM {media_revision__field_media_file}
+      WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Update fields being used by Other bundle (file accessibility and tags).
+  $database
+    ->query("UPDATE {media__field_limit_file_accessibility} AS ma
+    INNER JOIN {media_revision__field_limit_file_accessibility} AS mra ON ma.entity_id = mra.entity_id
+    INNER JOIN {media__field_media_tags} AS mt ON ma.entity_id = mt.entity_id
+    INNER JOIN {media_revision__field_media_tags} AS mrt ON ma.entity_id = mrt.entity_id
+    SET ma.bundle = 'other',
+        mra.bundle = 'other',
+        mt.bundle = 'other',
+        mrt.bundle = 'other'
+    WHERE ma.entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  // Now cleanup all fields not used by Other bundle.
+  $database
+    ->query("DELETE FROM {media__field_description}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  $database
+    ->query("DELETE FROM {media_revision__field_description}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  $database
+    ->query("DELETE FROM {media__field_publication_date}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  $database
+    ->query("DELETE FROM {media_revision__field_publication_date}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  $database
+    ->query("DELETE FROM {media__field_publication_number}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  $database
+    ->query("DELETE FROM {media_revision__field_publication_number}
+    WHERE entity_id IN (:ids[])", [':ids[]' => $media_ids]);
+
+  return t('Updated :n media entities be "Other" bundle.', [':n' => $sandbox['total']]);
+}
