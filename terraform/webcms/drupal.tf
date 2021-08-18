@@ -274,8 +274,7 @@ resource "aws_appautoscaling_scheduled_action" "business_hours" {
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
   resource_id        = aws_appautoscaling_target.drupal.resource_id
   scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
-  timezone           = "US/Eastern"
-  schedule           = "cron(45 16 * * 1-5)"
+  schedule           = "cron(45 20 * * 1-5)"
 
   scalable_target_action {
     min_capacity = 20
@@ -287,8 +286,7 @@ resource "aws_appautoscaling_scheduled_action" "after_hours" {
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
   resource_id        = aws_appautoscaling_target.drupal.resource_id
   scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
-  timezone           = "US/Eastern"
-  schedule           = "cron(45 18 * * 1-5)"
+  schedule           = "cron(45 22 * * 1-5)"
 
   scalable_target_action {
     min_capacity = var.drupal_min_capacity
