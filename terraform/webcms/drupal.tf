@@ -277,8 +277,8 @@ resource "aws_appautoscaling_scheduled_action" "business_hours" {
   schedule           = "cron(45 20 * * 1-5)"
 
   scalable_target_action {
-    var.target_min = 20
-    min_capacity = var.target_min > var.drupal_max_capacity ? var.drupal_max_capacity : var.drupal_min_capacity
+    target_min = 20
+    min_capacity = target_min > var.drupal_max_capacity ? var.drupal_max_capacity : var.drupal_min_capacity
   }
 }
 
