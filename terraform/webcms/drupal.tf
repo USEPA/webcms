@@ -269,7 +269,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
   }
 }
 
-resource "aws_appautoscaling_scheduled_action" "ecs" {
+resource "aws_appautoscaling_scheduled_action" "business_hours" {
   name               = "increased_min"
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
   resource_id        = aws_appautoscaling_target.drupal.resource_id
@@ -282,7 +282,7 @@ resource "aws_appautoscaling_scheduled_action" "ecs" {
   }
 }
 
-resource "aws_appautoscaling_scheduled_action" "ecs" {
+resource "aws_appautoscaling_scheduled_action" "after_hours" {
   name               = "increased_min"
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
   resource_id        = aws_appautoscaling_target.drupal.resource_id
