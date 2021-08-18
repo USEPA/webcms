@@ -5,13 +5,11 @@ dependencies:
   config:
     - field.storage.node.field_press_office
     - field.storage.node.field_release
-    - field.storage.paragraph.field_body
     - search_api.index.news_releases
   module:
     - datetime
     - epa_rss
     - search_api
-    - text
     - user
     - views_autocomplete_filters
 id: search_news_releases
@@ -715,11 +713,9 @@ display:
         fields: false
         title: false
         sitename_title: false
-        cache: false
+        cache: true
       title: 'EPA News Releases'
       sitename_title: false
-      cache:
-        type: none
       style:
         type: epa_faceted_rss
         options:
@@ -741,7 +737,6 @@ display:
       tags:
         - 'config:field.storage.node.field_press_office'
         - 'config:field.storage.node.field_release'
-        - 'config:field.storage.paragraph.field_body'
         - 'config:search_api.index.news_releases'
   page_1:
     display_plugin: page
