@@ -300,5 +300,8 @@ resource "aws_appautoscaling_scheduled_action" "after_hours" {
     min_capacity = var.drupal_min_capacity
     max_capacity = var.drupal_max_capacity
   }
+  
+  depends_on = ["aws_appautoscaling_scheduled_action.business_hours"]
+  
 }
 
