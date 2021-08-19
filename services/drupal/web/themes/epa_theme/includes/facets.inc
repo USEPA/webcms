@@ -18,6 +18,11 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
     if (!empty($vars['facet']->getActiveItems())) {
       $vars['facet_is_expanded'] = TRUE;
     }
+
+    // Specifically expand the language facet by default.
+    if ($vars['facet']->id() == 'news_releases_language') {
+      $vars['facet_is_expanded'] = TRUE;
+    }
   }
 
   // Add class to facet links.
