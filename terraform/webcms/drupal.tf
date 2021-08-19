@@ -274,11 +274,12 @@ resource "aws_appautoscaling_scheduled_action" "business_hours" {
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
   resource_id        = aws_appautoscaling_target.drupal.resource_id
   scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
-  schedule           = "cron(45 20 * * 1-5)"
+  schedule           = "cron(45 2 * * 1-5)"
 
   scalable_target_action {
-    target_min = 20
-    min_capacity = target_min > var.drupal_max_capacity ? var.drupal_max_capacity : var.drupal_min_capacity
+    #If the integer setting for the business_hours minimum capacity is higher than the maximum capacity
+    #then ignore the change and keep the environment variable defined minimum capacity
+    min_capacity = 20 <= var.drupal_max_capacity ? 20 : var.drupal_min_capacity
   }
 }
 
