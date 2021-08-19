@@ -269,6 +269,11 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
   }
 }
 
+#Declare the business hours minimum tasks
+locals {
+  business_hours_min_tasks = 20
+}
+
 resource "aws_appautoscaling_scheduled_action" "business_hours" {
   name               = "increased_min"
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
@@ -277,9 +282,9 @@ resource "aws_appautoscaling_scheduled_action" "business_hours" {
   schedule           = "cron(45 2 * * 1-5)"
 
   scalable_target_action {
-    #If the integer setting for the business_hours minimum capacity is higher than the maximum capacity
+    #If the setting for the business_hours minimum capacity is higher than the maximum capacity
     #then ignore the change and keep the environment variable defined minimum capacity
-    min_capacity = 20 <= var.drupal_max_capacity ? 20 : var.drupal_min_capacity
+    min_capacity = local.business_hours_min_tasks <= var.drupal_max_capacity ? local.business_hours_min_tasks : var.drupal_min_capacity
   }
 }
 
