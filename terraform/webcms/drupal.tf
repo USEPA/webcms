@@ -284,7 +284,7 @@ resource "aws_appautoscaling_scheduled_action" "business_hours" {
   scalable_target_action {
     #If the setting for the business_hours minimum capacity is higher than the maximum capacity
     #then ignore the change and keep the environment variable defined minimum capacity
-    min_capacity = (local.business_hours_min_tasks <= var.drupal_max_capacity ? local.business_hours_min_tasks : var.drupal_min_capacity)
+    min_capacity = (local.business_hours_min_tasks <= var.drupal_max_capacity && aws_ecs_service.drupal.name == "webcms-preproduction-dev-en-drupal" ? local.business_hours_min_tasks : var.drupal_min_capacity)
     max_capacity = var.drupal_max_capacity
   }
 }
