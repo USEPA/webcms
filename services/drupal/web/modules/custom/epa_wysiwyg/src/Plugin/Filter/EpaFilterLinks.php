@@ -118,7 +118,7 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
               // - the linked entity (whose URL and title may change)
               ->addCacheableDependency($entity);
           }
-          }
+        }
       } catch (\Exception $e) {
         watchdog_exception('epa_filter_links', $e);
       }
