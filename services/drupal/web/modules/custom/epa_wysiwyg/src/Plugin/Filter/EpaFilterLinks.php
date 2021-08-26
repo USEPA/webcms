@@ -3,6 +3,7 @@
 namespace Drupal\epa_wysiwyg\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
@@ -32,6 +33,13 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
   protected $entityTypeManager;
 
   /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
    * Constructs a EpaFilterLinks Filter.
    *
    * @param array $configuration
@@ -43,10 +51,11 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
    * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
    *   The entity repository service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
+    $this->entityRepository = $entity_repository;
   }
 
   /**
@@ -57,7 +66,8 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
     );
   }
 
@@ -96,7 +106,10 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
             $entity = $this->entityTypeManager
               ->getStorage('node')
               ->load($nid);
+
             if ($entity) {
+              $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
+
               $url = $entity->toUrl()->toString(TRUE);
               $element->setAttribute('href', $url->getGeneratedUrl());
               $result
