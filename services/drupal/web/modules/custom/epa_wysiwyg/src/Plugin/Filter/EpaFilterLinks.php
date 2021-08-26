@@ -108,7 +108,7 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
           $nid = $path_array[2];
           // If $path_array contains more than 3 elements we're going to a route
           // other than a node view (/node/[nid]).
-          if ($nid && count($path_array) > 3) {
+          if ($nid && count($path_array) == 3) {
             $entity = $this->entityTypeManager
               ->getStorage('node')
               ->load($nid);
