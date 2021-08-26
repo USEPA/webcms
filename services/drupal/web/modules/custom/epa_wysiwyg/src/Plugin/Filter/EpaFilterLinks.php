@@ -6,11 +6,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Url;
-use Drupal\filter\Annotation\Filter;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
-use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -99,37 +96,29 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
 
         // @todo: improve this to support any type of entity. Will require
         // more intelligently loading routes.
-        if (strpos($href, '/node/') === 0) {
-          // We have a node path. Attempt to parse_url() then load the node.
-          $href_url = parse_url($href);
-          $path = $href_url['path'];
-          $path_array = explode('/', $path);
-          // Path is "/node/[nid]" then after exploding the nid will be the 2 index.
-          $nid = $path_array[2];
-          // If $path_array contains more than 3 elements we're going to a route
-          // other than a node view (/node/[nid]).
-          if ($nid && count($path_array) == 3) {
-            $entity = $this->entityTypeManager
-              ->getStorage('node')
-              ->load($nid);
+        if (preg_match('/node\/(\d+(?=(#.*)|(\?.*)|$))/', $href, $matches)) {
 
-            if ($entity) {
-              $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
+          $entity = $this->entityTypeManager
+            ->getStorage('node')
+            ->load($matches[1]);
 
-              $anchor = empty($href_url["fragment"]) ? '' : '#' . $href_url["fragment"];
-              $query = empty($href_url["query"]) ? '' : '?' . $href_url["query"];
+          if ($entity) {
+            $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
 
-              $url = $entity->toUrl()->toString(TRUE);
-              $element->setAttribute('href', $url->getGeneratedUrl() . $query . $anchor);
-              $result
-                // - the generated URL (which has undergone path & route
-                // processing)
-                ->addCacheableDependency($url)
-                // - the linked entity (whose URL and title may change)
-                ->addCacheableDependency($entity);
-            }
+            $href_url = parse_url($href);
+            $anchor = empty($href_url["fragment"]) ? '' : '#' . $href_url["fragment"];
+            $query = empty($href_url["query"]) ? '' : '?' . $href_url["query"];
+
+            $url = $entity->toUrl()->toString(TRUE);
+            $element->setAttribute('href', $url->getGeneratedUrl() . $query . $anchor);
+            $result
+              // - the generated URL (which has undergone path & route
+              // processing)
+              ->addCacheableDependency($url)
+              // - the linked entity (whose URL and title may change)
+              ->addCacheableDependency($entity);
           }
-        }
+          }
       } catch (\Exception $e) {
         watchdog_exception('epa_filter_links', $e);
       }
