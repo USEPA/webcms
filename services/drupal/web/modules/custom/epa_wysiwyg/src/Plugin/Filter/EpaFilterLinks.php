@@ -100,8 +100,10 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
         // @todo: improve this to support any type of entity. Will require
         // more intelligently loading routes.
         if (strpos($href, '/node/') === 0) {
-          // We have a node path. Attempt to load the node.
-          $nid = explode('node/', $href)[1];
+          // We have a node path. Attempt to parse_url() then load the node.
+          $href_url = parse_url($href);
+          $path = $href_url['path'];
+          $nid = explode('node/', $path)[1];
           if ($nid) {
             $entity = $this->entityTypeManager
               ->getStorage('node')
@@ -110,8 +112,11 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
             if ($entity) {
               $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
 
+              $anchor = empty($href_url["fragment"]) ? '' : '#' . $href_url["fragment"];
+              $query = empty($href_url["query"]) ? '' : '?' . $href_url["query"];
+
               $url = $entity->toUrl()->toString(TRUE);
-              $element->setAttribute('href', $url->getGeneratedUrl());
+              $element->setAttribute('href', $url->getGeneratedUrl() . $query . $anchor);
               $result
                 // - the generated URL (which has undergone path & route
                 // processing)
