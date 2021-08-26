@@ -77,7 +77,6 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
    * @see \Drupal\filter\FilterProcessResult
    */
   public function process($text, $langcode) {
-    $start = microtime(TRUE);
     $result = new FilterProcessResult($text);
 
     $dom = Html::load($text);
@@ -115,8 +114,6 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
     }
 
     $result->setProcessedText(Html::serialize($dom));
-    $stop = microtime(TRUE);
-    echo "elapsed time: " . ($stop - $start);
     return $result;
   }
 
