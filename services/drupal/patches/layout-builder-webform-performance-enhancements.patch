@@ -1,0 +1,30 @@
+diff --git a/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php b/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
+index 8de394c349..7f26a289aa 100644
+--- a/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
++++ b/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
+@@ -89,6 +89,10 @@ public static function create(ContainerInterface $container, $base_plugin_id) {
+   public function getDerivativeDefinitions($base_plugin_definition) {
+     $entity_type_labels = $this->entityTypeRepository->getEntityTypeLabels();
+     foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
++      // Don't process webform_submission entities.
++      if ($entity_type_id == 'webform_submission') {
++        continue;
++      }
+       // Only process fieldable entity types.
+       if (!$entity_type->entityClassImplements(FieldableEntityInterface::class)) {
+         continue;
+diff --git a/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php b/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
+index a2a94a024d..d7454b618a 100644
+--- a/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
++++ b/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
+@@ -90,6 +90,10 @@ public static function create(ContainerInterface $container, $base_plugin_id) {
+   public function getDerivativeDefinitions($base_plugin_definition) {
+     $entity_type_labels = $this->entityTypeRepository->getEntityTypeLabels();
+     foreach ($this->entityFieldManager->getFieldMap() as $entity_type_id => $entity_field_map) {
++      // Don't process webform_submission entities.
++      if ($entity_type_id == 'webform_submission') {
++        continue;
++      }
+       foreach ($entity_field_map as $field_name => $field_info) {
+         // Skip fields without any formatters.
+         $options = $this->formatterManager->getOptions($field_info['type']);
