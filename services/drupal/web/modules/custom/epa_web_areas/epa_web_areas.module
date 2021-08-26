@@ -146,7 +146,7 @@ function epa_web_areas_field_widget_form_alter($element, FormStateInterface $for
     // given the entity is added via the group
     // e.g. group/{group_id}/{entity}/add.
     $entity = $form_state->getformObject()->getEntity();
-    if ($entity->id()) {
+    if ($entity->id() && $entity instanceOf ContentEntityInterface) {
       $group_contents = GroupContent::loadByEntity($entity);
       foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
