@@ -8,7 +8,6 @@ map $request_uri $new_uri_301 {
     ~*^\/5yr(\/|$).* https://semspub.epa.gov/src/search;
     ~*^\/about(\/|$).* /aboutepa;
     ~*^\/adi(\/|$).* https://cfpub.epa.gov/adi;
-    ~*^\/advisorycouncilcaa(\/|$).* https://yosemite.epa.gov/sab/sabpeople.nsf/WebCommittees/COUNCIL;
     ~*^\/aieo(\/|$).* /tribal;
     ~*^\/air(\/|$).* /environmental-topics/air-topics;
     ~*^\/aircompare(\/|$).* https://www3.epa.gov/aircompare/$1;
@@ -31,7 +30,6 @@ map $request_uri $new_uri_301 {
     ~*^\/cancerguidelines(\/|$).* /risk/guidelines-carcinogen-risk-assessment;
     ~*^\/carbon-footprint-calculator(\/|$).* https://www3.epa.gov/carbon-footprint-calculator/$1;
     ~*^\/carlabel(\/|$).* /fuel-economy;
-    ~*^\/casac(\/|$).* https://yosemite.epa.gov/sab/sabpeople.nsf/WebCommittees/CASAC;
     ~*^\/cdr(\/|$).* /chemical-data-reporting;
     ~*^\/ceampubl\/learn2model(\/|$).* https://www3.epa.gov/ceampubl/learn2model/$1;
     ~*^\/ceppo(\/|$).* /oil-spills-prevention-and-preparedness-regulations;
@@ -86,7 +84,8 @@ map $request_uri $new_uri_301 {
     ~*^\/endocrine-disuptors(\/|$).* /endocrine-disruption/$1;
     ~*^\/energy-independence(\/|$).* /stationary-sources-air-pollution;
     ~*^\/enviro\/html\/fii(\/|$).* /frs;
-    ~*^\/epafiles(\/|$).* https://www3.epa.gov/epafiles/$1;
+    ~*^\/epafiles(\/|$)(.*) https://www3.epa.gov/epafiles/$1;
+    ~*^\/epafiles\/(.*) https://www3.epa.gov/epafiles/$1;
     ~*^\/epeat(\/|$).* /greenerproducts;
     ~*^\/epp(\/|$).* /greenerproducts;
     ~*^\/erasc(\/|$).* https://cfpub.epa.gov/ncea/erasc/recordisplay.cfm?deid=154348;
@@ -248,7 +247,6 @@ map $request_uri $new_uri_301 {
     ~*^\/rsig(\/|$).* /hesc/remote-sensing-information-gateway;
     ~*^\/rtp(\/|$).* /aboutepa/about-epas-campus-research-triangle-park-rtp-north-carolina;
     ~*^\/rtpspeakers(\/|$).* /rtp-speakers-bureau;
-    ~*^\/sab(\/|$).* https://yosemite.epa.gov/sab/sabpeople.nsf/WebCommittees/BOARD;
     ~*^\/sabstaff(\/|$).* https://yosemite.epa.gov/sab/sabproduct.nsf/Web/index?OpenDocument;
     ~*^\/safewater_keep(\/|$).* /ground-water-and-drinking-water;
     ~*^\/safewater\/kids(\/|$).* https://www3.epa.gov/safewater/kids/$1;

@@ -220,6 +220,10 @@ function epa_core_token_info() {
     'description' => t('The current entity\'s latest updated date.'),
     'type' => 'date'
   ];
+  $view_argument_1 = [
+    'name' => 'The first argument of the view'
+  ];
+
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
@@ -230,6 +234,9 @@ function epa_core_token_info() {
     'current-page' => [
       'contact-us-link' => $contact_us_link,
       'footer-last-updated' => $footer_last_updated,
+    ],
+    'view' => [
+      'argument-1' => $view_argument_1,
     ]
   ];
   return $tokens;
@@ -302,6 +309,15 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         else {
           $replacements[$original] = '';
+        }
+        break;
+      case 'argument-1':
+        if ($type == 'view' && !empty($data['view'])) {
+          $view = $data['view'];
+          $args = $view->args;
+          if (!empty($args)) {
+            $replacements[$original] = $args[0];
+          }
         }
         break;
     }
