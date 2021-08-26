@@ -3,12 +3,14 @@
 namespace Drupal\epa_wysiwyg\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\filter\Annotation\Filter;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Drupal\node\Entity\Node;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class EpaFilterLinks
@@ -20,7 +22,45 @@ use Drupal\node\Entity\Node;
  * )
  * @package Drupal\epa_wysiwyg\Plugin\Filter
  */
-class EpaFilterLinks extends FilterBase {
+class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs a EpaFilterLinks Filter.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   *   The entity repository service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager')
+    );
+  }
+
 
   /**
    * Performs the filter processing.
@@ -37,6 +77,7 @@ class EpaFilterLinks extends FilterBase {
    * @see \Drupal\filter\FilterProcessResult
    */
   public function process($text, $langcode) {
+    $start = microtime(TRUE);
     $result = new FilterProcessResult($text);
 
     $dom = Html::load($text);
@@ -50,17 +91,22 @@ class EpaFilterLinks extends FilterBase {
         // @todo: improve this to support any type of entity. Will require
         // more intelligently loading routes.
         if (strpos($href, '/node/') === 0) {
-          $url = Url::fromUri("internal:". $href);
-          if ($url->isRouted() && $url->getRouteName() == 'entity.node.canonical' && $parameters = $url->getRouteParameters()) {
-              $element->setAttribute('href', $url->toString());
-              $entity = Node::load($parameters['node']);
-              // The processed text now depends on:
+          // We have a node path. Attempt to load the node.
+          $nid = explode('node/', $href)[1];
+          if ($nid) {
+            $entity = $this->entityTypeManager
+              ->getStorage('node')
+              ->load($nid);
+            if ($entity) {
+              $url = $entity->toUrl()->toString(TRUE);
+              $element->setAttribute('href', $url->getGeneratedUrl());
               $result
                 // - the generated URL (which has undergone path & route
                 // processing)
                 ->addCacheableDependency($url)
                 // - the linked entity (whose URL and title may change)
                 ->addCacheableDependency($entity);
+            }
           }
         }
       } catch (\Exception $e) {
@@ -69,6 +115,8 @@ class EpaFilterLinks extends FilterBase {
     }
 
     $result->setProcessedText(Html::serialize($dom));
+    $stop = microtime(TRUE);
+    echo "elapsed time: " . ($stop - $start);
     return $result;
   }
 
