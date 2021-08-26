@@ -35,6 +35,10 @@ stages:
   # Drush
   - update:en
   - update:es
+  
+  # Create Release
+  - artifacts
+  - release
 
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
@@ -951,3 +955,43 @@ update:dev:es:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+
+###################
+# Create Releases #
+###################
+
+# Create artifacts of ci, terraform/database, terraform/infrastructure, and terraform/webcms directories
+# Only run if CI_COMMIT_TAG is defined
+Artifacts:
+  image: alpine
+  stage: artifacts
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  shell:
+    - echo "Creating artifacts"
+  artifacts:
+    paths:
+      - ./ci
+      - ./terraform/database
+      - ./terraform/infrastructure
+      - ./terraform/webcms
+
+# Create release using artifacts from "Artifacts" job, tagged with CI_COMMIT_TAG
+# Only run if CI_COMMIT_TAG is defined
+Create Release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: "Artifacts"
+      artifacts: true
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  script:
+    - echo "running release job for $CI_COMMIT_TAG"
+  release:
+    description: "Release for $CI_COMMIT_TAG"
+    tag_name: "$CI_COMMIT_TAG"
