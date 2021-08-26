@@ -103,8 +103,12 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
           // We have a node path. Attempt to parse_url() then load the node.
           $href_url = parse_url($href);
           $path = $href_url['path'];
-          $nid = explode('node/', $path)[1];
-          if ($nid) {
+          $path_array = explode('/', $path);
+          // Path is "/node/[nid]" then after exploding the nid will be the 2 index.
+          $nid = $path_array[2];
+          // If $path_array contains more than 3 elements we're going to a route
+          // other than a node view (/node/[nid]).
+          if ($nid && count($path_array) > 3) {
             $entity = $this->entityTypeManager
               ->getStorage('node')
               ->load($nid);
