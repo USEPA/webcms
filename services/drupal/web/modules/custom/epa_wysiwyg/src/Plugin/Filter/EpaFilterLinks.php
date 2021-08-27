@@ -96,7 +96,7 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
 
         // @todo: improve this to support any type of entity. Will require
         // more intelligently loading routes.
-        if (preg_match('/node\/(\d+(?=(#.*)|(\?.*)|$))/', $href, $matches)) {
+        if (preg_match('/^\/node\/(\d+(?=(#.*)|(\?.*)|$))/', $href, $matches)) {
 
           $entity = $this->entityTypeManager
             ->getStorage('node')
