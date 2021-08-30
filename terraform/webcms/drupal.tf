@@ -258,7 +258,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value = 60
+    target_value = 40
 
     scale_in_cooldown  = 5 * 60
     scale_out_cooldown = 60
@@ -271,7 +271,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
 
 #Declare the business hours minimum tasks
 locals {
-  business_hours_min_tasks = 20
+  business_hours_min_tasks = 25
 }
 
 resource "aws_appautoscaling_scheduled_action" "business_hours" {
