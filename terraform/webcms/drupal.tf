@@ -271,7 +271,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
 
 #Declare the business hours minimum tasks
 locals {
-  business_hours_min_tasks = 25
+  business_hours_min_tasks = 20
 }
 
 resource "aws_appautoscaling_scheduled_action" "business_hours" {
