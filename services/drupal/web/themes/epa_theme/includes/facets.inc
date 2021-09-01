@@ -18,6 +18,11 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
     if (!empty($vars['facet']->getActiveItems())) {
       $vars['facet_is_expanded'] = TRUE;
     }
+
+    // Specifically expand the language facet by default.
+    if ($vars['facet']->id() == 'news_releases_language') {
+      $vars['facet_is_expanded'] = TRUE;
+    }
   }
 
   // Add class to facet links.
@@ -45,6 +50,7 @@ function epa_theme_preprocess_facets_summary_item_list(&$vars) {
       case 'news_releases_press_office':
       case 'news_releases_subjects':
       case 'news_releases_year':
+      case 'news_releases_language':
         $vars['reset_url'] = '/newsreleases/search';
         break;
 
