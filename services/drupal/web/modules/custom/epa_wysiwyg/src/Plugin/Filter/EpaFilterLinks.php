@@ -3,12 +3,12 @@
 namespace Drupal\epa_wysiwyg\Plugin\Filter;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\StreamWrapper\StreamWrapperManager;
-use Drupal\Core\Url;
-use Drupal\filter\Annotation\Filter;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
-use Drupal\node\Entity\Node;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class EpaFilterLinks
@@ -20,7 +20,54 @@ use Drupal\node\Entity\Node;
  * )
  * @package Drupal\epa_wysiwyg\Plugin\Filter
  */
-class EpaFilterLinks extends FilterBase {
+class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManager
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The entity repository.
+   *
+   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   */
+  protected $entityRepository;
+
+  /**
+   * Constructs a EpaFilterLinks Filter.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entity_type_manager
+   *   The entity repository service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->entityTypeManager = $entity_type_manager;
+    $this->entityRepository = $entity_repository;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('entity.repository')
+    );
+  }
+
 
   /**
    * Performs the filter processing.
@@ -49,18 +96,27 @@ class EpaFilterLinks extends FilterBase {
 
         // @todo: improve this to support any type of entity. Will require
         // more intelligently loading routes.
-        if (strpos($href, '/node/') === 0) {
-          $url = Url::fromUri("internal:". $href);
-          if ($url->isRouted() && $url->getRouteName() == 'entity.node.canonical' && $parameters = $url->getRouteParameters()) {
-              $element->setAttribute('href', $url->toString());
-              $entity = Node::load($parameters['node']);
-              // The processed text now depends on:
-              $result
-                // - the generated URL (which has undergone path & route
-                // processing)
-                ->addCacheableDependency($url)
-                // - the linked entity (whose URL and title may change)
-                ->addCacheableDependency($entity);
+        if (preg_match('/^\/node\/(\d+(?=(#.*)|(\?.*)|$))/', $href, $matches)) {
+
+          $entity = $this->entityTypeManager
+            ->getStorage('node')
+            ->load($matches[1]);
+
+          if ($entity) {
+            $entity = $this->entityRepository->getTranslationFromContext($entity, $langcode);
+
+            $href_url = parse_url($href);
+            $anchor = empty($href_url["fragment"]) ? '' : '#' . $href_url["fragment"];
+            $query = empty($href_url["query"]) ? '' : '?' . $href_url["query"];
+
+            $url = $entity->toUrl()->toString(TRUE);
+            $element->setAttribute('href', $url->getGeneratedUrl() . $query . $anchor);
+            $result
+              // - the generated URL (which has undergone path & route
+              // processing)
+              ->addCacheableDependency($url)
+              // - the linked entity (whose URL and title may change)
+              ->addCacheableDependency($entity);
           }
         }
       } catch (\Exception $e) {
