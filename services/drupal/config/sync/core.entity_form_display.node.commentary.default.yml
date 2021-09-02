@@ -35,7 +35,7 @@ third_party_settings:
         - group_page_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 7
+      weight: 8
       format_type: tabs
       region: content
       format_settings:
@@ -81,7 +81,7 @@ third_party_settings:
         - field_publish_date
         - field_machine_name
       parent_name: group_additional_fields
-      weight: 23
+      weight: 22
       format_type: tab
       region: content
       format_settings:
@@ -91,6 +91,47 @@ third_party_settings:
         formatter: closed
         required_fields: true
       label: 'Other Metadata'
+    group_authors:
+      children:
+        - field_authors
+      parent_name: group_tabs
+      weight: 21
+      format_type: tab
+      region: content
+      format_settings:
+        id: ''
+        classes: ''
+        description: ''
+        formatter: closed
+        required_fields: true
+      label: Authors
+    group_tabs:
+      children:
+        - group_content
+        - group_authors
+      parent_name: ''
+      weight: 6
+      format_type: tabs
+      region: content
+      format_settings:
+        id: ''
+        classes: ''
+        direction: horizontal
+      label: Tabs
+    group_content:
+      children:
+        - field_paragraphs
+      parent_name: group_tabs
+      weight: 20
+      format_type: tab
+      region: content
+      format_settings:
+        id: ''
+        classes: ''
+        description: ''
+        formatter: open
+        required_fields: true
+      label: Content
 id: node.commentary.default
 targetEntityType: node
 bundle: commentary
@@ -98,7 +139,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 9
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -114,18 +155,19 @@ content:
     third_party_settings: {  }
   field_authors:
     type: paragraphs
-    weight: 6
+    weight: 3
     settings:
       title: Paragraph
       title_plural: Paragraphs
-      edit_mode: open
-      add_mode: dropdown
-      form_display_mode: default
-      default_paragraph_type: ''
+      edit_mode: closed
       closed_mode: summary
       autocollapse: none
       closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: author
       features:
+        add_above: '0'
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
     third_party_settings: {  }
@@ -137,14 +179,10 @@ content:
     type: options_buttons
     region: content
   field_commentary_subjects:
-    weight: 3
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
+    weight: 4
+    settings: {  }
     third_party_settings: {  }
-    type: entity_reference_autocomplete_tags
+    type: options_select
     region: content
   field_description:
     weight: 14
@@ -241,14 +279,14 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 4
+    weight: 3
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 13
+    weight: 14
     settings: {  }
     region: content
     third_party_settings: {  }
@@ -256,21 +294,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 10
+    weight: 11
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 12
+    weight: 13
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 11
+    weight: 12
     region: content
     third_party_settings: {  }
   title:
@@ -283,7 +321,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 8
+    weight: 9
     settings:
       match_operator: CONTAINS
       size: 60
@@ -292,7 +330,7 @@ content:
     region: content
     third_party_settings: {  }
   url_redirects:
-    weight: 14
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
