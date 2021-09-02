@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.commentary.field_authors
     - field.field.node.commentary.field_channel
     - field.field.node.commentary.field_commentary_subjects
     - field.field.node.commentary.field_description
@@ -27,6 +28,15 @@ targetEntityType: node
 bundle: commentary
 mode: default
 content:
+  field_authors:
+    type: entity_reference_revisions_entity_view
+    weight: 116
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
   field_channel:
     weight: 109
     label: above
