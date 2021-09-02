@@ -106,6 +106,12 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
         $form['submission_behaviors']['form_disable_remote_addr']['#access'] = FALSE;
       }
       break;
+
+    case 'webform_ui_element_form':
+      if (isset($form['properties']['form']['display_container']['description_display']['#options']['tooltip'])) {
+        unset($form['properties']['form']['display_container']['description_display']['#options']['tooltip']);
+      }
+
   }
 }
 
