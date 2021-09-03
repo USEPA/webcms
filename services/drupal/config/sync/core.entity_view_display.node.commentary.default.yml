@@ -10,6 +10,7 @@ dependencies:
     - field.field.node.commentary.field_env_laws_regs_and_treaties
     - field.field.node.commentary.field_keywords
     - field.field.node.commentary.field_language
+    - field.field.node.commentary.field_last_published
     - field.field.node.commentary.field_machine_name
     - field.field.node.commentary.field_media_image
     - field.field.node.commentary.field_page_head
@@ -28,6 +29,11 @@ targetEntityType: node
 bundle: commentary
 mode: default
 content:
+  content_moderation_control:
+    weight: -20
+    settings: {  }
+    third_party_settings: {  }
+    region: content
   field_authors:
     type: entity_reference_revisions_entity_view
     weight: 116
@@ -82,6 +88,15 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: list_default
+    region: content
+  field_last_published:
+    weight: 117
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
     region: content
   field_machine_name:
     weight: 112
