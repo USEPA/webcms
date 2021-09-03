@@ -10,6 +10,7 @@ dependencies:
     - field.field.node.commentary.field_env_laws_regs_and_treaties
     - field.field.node.commentary.field_keywords
     - field.field.node.commentary.field_language
+    - field.field.node.commentary.field_last_published
     - field.field.node.commentary.field_machine_name
     - field.field.node.commentary.field_media_image
     - field.field.node.commentary.field_page_head
@@ -35,7 +36,7 @@ third_party_settings:
         - group_page_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 8
+      weight: 6
       format_type: tabs
       region: content
       format_settings:
@@ -110,7 +111,7 @@ third_party_settings:
         - group_content
         - group_authors
       parent_name: ''
-      weight: 6
+      weight: 5
       format_type: tabs
       region: content
       format_settings:
@@ -139,7 +140,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 10
+    weight: 8
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -286,7 +287,7 @@ content:
     third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 14
+    weight: 12
     settings: {  }
     region: content
     third_party_settings: {  }
@@ -294,21 +295,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 11
+    weight: 9
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 13
+    weight: 11
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 12
+    weight: 10
     region: content
     third_party_settings: {  }
   title:
@@ -321,7 +322,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 9
+    weight: 7
     settings:
       match_operator: CONTAINS
       size: 60
@@ -330,10 +331,11 @@ content:
     region: content
     third_party_settings: {  }
   url_redirects:
-    weight: 15
+    weight: 13
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
+  field_last_published: true
   field_review_deadline: true
   path: true
