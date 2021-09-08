@@ -10,8 +10,8 @@ import Drupal from 'drupal';
       externalLinks.forEach(function(el) {
         if (el.hasAttribute('href')) {
           el.insertAdjacentHTML(
-            'afterend',
-            ` <span class="usa-tag">${Drupal.t('Exit')}</span>`
+            'beforeend',
+            `<span class="usa-tag external-link__tag">${Drupal.t('Exit')}</span>`
           );
         }
       });
