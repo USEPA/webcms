@@ -1,4 +1,6 @@
 <?php
+
+use Drupal\redirect\Entity\Redirect;
 use Drupal\taxonomy\Entity\Term;
 
 /**
@@ -26,6 +28,27 @@ function epa_core_update_8002() {
   \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
 }
 
+/**
+ * Remove redundant redirects.
+ */
+function epa_core_update_9000() {
+  // Finds all redirects that exactly match an existing alias.
+  $rows = \Drupal::database()->query('SELECT rid, alias
+FROM {path_alias} p
+LEFT JOIN {redirect} r
+    ON CONCAT(\'internal:\', p.path) = r.redirect_redirect__uri
+WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
+
+  $redirects = Redirect::loadMultiple(array_keys($rows));
+
+  foreach ($redirects as $redirect) {
+    // Double-check that there's no query string on the source of this redirect
+    // by comparing it to the alias.
+    if($rows[$redirect->id()] == $redirect->getSourcePathWithQuery()) {
+      $redirect->delete();
+    }
+  }
+}
 /**
  * Create the new News Release term with 730 day review cycle.
  */
