@@ -518,7 +518,9 @@ display:
           entity_type: media
           entity_field: uid
           plugin_id: standard
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
       use_ajax: true
       css_class: 'media-library-view js-media-library-view'
       arguments: {  }
@@ -526,7 +528,7 @@ display:
         operator: AND
         groups:
           1: AND
-      group_by: true
+      group_by: false
     cache_metadata:
       max-age: 0
       contexts:
@@ -555,6 +557,7 @@ display:
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
+        - 'config:core.entity_view_display.media.other.link_with_description'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
@@ -1128,6 +1131,7 @@ display:
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
+        - 'config:core.entity_view_display.media.other.link_with_description'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
@@ -1651,6 +1655,7 @@ display:
         - 'config:core.entity_view_display.media.image.small'
         - 'config:core.entity_view_display.media.image.thumbnail'
         - 'config:core.entity_view_display.media.other.default'
+        - 'config:core.entity_view_display.media.other.link_with_description'
         - 'config:core.entity_view_display.media.other.link_with_metadata'
         - 'config:core.entity_view_display.media.other.media_library'
         - 'config:core.entity_view_display.media.remote_video.default'
