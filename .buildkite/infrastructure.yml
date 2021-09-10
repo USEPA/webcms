@@ -15,9 +15,8 @@ steps:
   # This step has to wait for the VPC due to the dependency on networking component IDs
   # (subnets, security groups, and the VPC itself).
   - label: ":pipeline: :terraform: infrastructure"
-    if: build.branch == "main" && build.pull_request.id == null
-
     command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
     env:
       WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
       WEBCMS_TF_MODULE: infrastructure

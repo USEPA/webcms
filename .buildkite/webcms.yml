@@ -11,6 +11,12 @@
 #    images to deploy and thus wouldn't be able to continue safely.
 # 3. We use the terraform.apply.yml template to
 
+env:
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+  WEBCMS_SITE: ${WEBCMS_SITE}
+  WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG}
+
 steps:
   - label: ":docker: Build images"
     command: bash .buildkite/build-images.sh
@@ -36,7 +42,6 @@ steps:
     env:
       WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/en
       WEBCMS_TF_MODULE: webcms
-      WEBCMS_SITE: ${WEBCMS_SITE}
       WEBCMS_LANG: en
 
   - label: ":terraform: WebCMS (${WEBCMS_SITE}-es)"
@@ -45,25 +50,58 @@ steps:
     env:
       WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/es
       WEBCMS_TF_MODULE: webcms
-      WEBCMS_SITE: ${WEBCMS_SITE}
       WEBCMS_LANG: es
 
   - wait: ~
 
   - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
-    depends_on:
-      - terraform-${WEBCMS_SITE}-en
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
 
-    command: bash .buildkite/run-drush.sh
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG
+            - WEBCMS_IMAGE_TAG
+
     env:
-      WEBCMS_SITE: ${WEBCMS_SITE}
       WEBCMS_LANG: en
 
   - label: ":ecs: Drush (${WEBCMS_SITE}-es)"
-    depends_on:
-      - terraform-${WEBCMS_SITE}-es
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
 
-    command: bash .buildkite/run-drush.sh
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG
+            - WEBCMS_IMAGE_TAG
+
     env:
-      WEBCMS_SITE: ${WEBCMS_SITE}
-      WEBCMS_LANG: en
+      WEBCMS_LANG: es
