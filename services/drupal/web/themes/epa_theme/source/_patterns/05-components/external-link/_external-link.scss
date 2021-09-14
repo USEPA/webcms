@@ -1,7 +1,7 @@
 // @file
 // Styles for an External Link.
 
-.external-link {
+%external-link {
   &::after {
     @include svg-background(external-link--blue-base);
     background-repeat: no-repeat;
@@ -22,11 +22,21 @@
   }
 }
 
-a#{$external-urls} {
-  @extend .external-link;
+/* stylelint-disable-next-line selector-no-qualifying-type */
+html.no-js {
+  a#{$external-urls},
+  .external-link {
+    @extend %external-link;
+  }
 }
 
 // Hide external link icon for anchors without an href attribute.
 a:not([href])::after {
   display: none !important;
+}
+
+.external-link__tag {
+  display: inline-block;
+  margin-left: 0.25em;
+  text-decoration: none;
 }
