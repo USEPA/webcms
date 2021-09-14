@@ -11,7 +11,9 @@ import Drupal from 'drupal';
         if (el.hasAttribute('href')) {
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="usa-tag external-link__tag">${Drupal.t('Exit')}</span>`
+            `<span class="usa-tag external-link__tag">${Drupal.t(
+              'Exit'
+            )}</span>`
           );
         }
       });
