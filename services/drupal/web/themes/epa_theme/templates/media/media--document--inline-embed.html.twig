@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Theme override to display a media item.
+ *
+ * Available variables:
+ * - name: Name of the media.
+ * - content: Media content.
+ *
+ * @see template_preprocess_media()
+ *
+ * @ingroup themeable
+ */
+#}
+
+{{ title_suffix.contextual_links }}
+
+{% include '@components/document/document.twig' with {
+  'file': content.field_media_file,
+  'date': content.field_publication_date|field_value ? content.field_publication_date|field_value : false,
+  'publication_number': content.field_publication_number|field_value ? content.field_publication_number|field_value : false,
+  'description': content.field_description|field_value
+} %}
