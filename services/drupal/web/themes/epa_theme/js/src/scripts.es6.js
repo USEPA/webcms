@@ -36,6 +36,7 @@ import 'svgxuse';
   });
 
   domready(() => {
+    document.documentElement.classList.remove('no-js');
     accordion.on(document.body);
     banner.on(document.body);
     navigation(); // If used with the USWDS accordion component, the navigation must run after it.
