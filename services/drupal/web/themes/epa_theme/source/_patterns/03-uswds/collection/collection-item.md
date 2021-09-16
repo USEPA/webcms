@@ -19,5 +19,5 @@ __Variables:__
 * more_info: [array] List of more information. Each item is an object containing:
   * text: [string] Title of the item.
 * tags: [array] List of tags. Each item is an object containing:
-  * type: [string] Type of the item.
   * title: [string] Title of the item.
+  * type: [string] Type of the tag (e.g., new).

@@ -30,7 +30,7 @@
     {% if tags %}
       <ul class="usa-collection__meta" aria-label="{{ 'Topics'|t }}">
         {% for tag in tags %}
-          <li class="usa-collection__meta-item usa-tag">{{ tag.title }}</li>
+          <li class="usa-collection__meta-item usa-tag{% if tag.type %} usa-tag--{{ tag.type }}{% endif %}">{{ tag.title }}</li>
         {% endfor %}
       </ul>
     {% endif %}
