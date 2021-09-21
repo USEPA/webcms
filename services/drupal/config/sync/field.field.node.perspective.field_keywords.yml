@@ -1,24 +1,24 @@
-uuid: c6ba517f-8a60-4343-97a7-1a8033b44c51
+uuid: 99c61acb-f649-4c09-938f-25b6968acccf
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_channel
-    - node.type.commentary
-    - taxonomy.vocabulary.channels
+    - field.storage.node.field_keywords
+    - node.type.perspective
+    - taxonomy.vocabulary.keywords
   module:
     - custom_add_another
 third_party_settings:
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
-id: node.commentary.field_channel
-field_name: field_channel
+id: node.perspective.field_keywords
+field_name: field_keywords
 entity_type: node
-bundle: commentary
-label: Channel
-description: 'Use <a href="https://www.epa.gov/webguide/metadata-web-area-homepages#channel" class="external" target="_blank">this guide</a> for choosing the right channel.'
-required: true
+bundle: perspective
+label: Keywords
+description: ''
+required: false
 translatable: true
 default_value: {  }
 default_value_callback: ''
@@ -26,7 +26,7 @@ settings:
   handler: 'default:taxonomy_term'
   handler_settings:
     target_bundles:
-      channels: channels
+      keywords: keywords
     sort:
       field: name
       direction: asc
