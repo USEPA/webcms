@@ -33,7 +33,8 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       return $usual_result;
     }
 
-    $permissions_to_override = [
+    // @TODO: If we have to do an additional node type look to refactor this into a single field.
+    $news_release_permissions = [
       'create group_node:news_release entity',
       'update any group_node:news_release entity',
       'delete any group_node:news_release entity',
@@ -42,9 +43,23 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       'update own group_node:news_release entity',
     ];
 
-    if (in_array($permission, $permissions_to_override) &&
+    if (in_array($permission, $news_release_permissions) &&
       $group->hasField('field_allow_news_releases')) {
       return $group->field_allow_news_releases->value;
+    }
+
+    $commentary_permissions = [
+      'create group_node:commentary entity',
+      'update any group_node:commentary entity',
+      'delete any group_node:commentary entity',
+      'delete own group_node:commentary entity',
+      'update any group_node:commentary entity',
+      'update own group_node:commentary entity',
+    ];
+
+    if (in_array($permission, $commentary_permissions) &&
+      $group->hasField('field_allow_perspectives')) {
+      return $group->field_allow_perspectives->value;
     }
     return $usual_result;
   }
