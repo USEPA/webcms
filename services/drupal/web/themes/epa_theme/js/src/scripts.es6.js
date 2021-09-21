@@ -7,7 +7,10 @@ import domready from 'domready';
 import accordion from 'uswds/src/js/components/accordion.js';
 import navigation from './modules/navigation';
 import banner from 'uswds/src/js/components/banner.js';
+// DEPRECATED table sort method.
 import tablesort from './modules/tablesort';
+// USWDS JS sortable tables. Replaces tablesort going forward.
+import table from 'uswds/src/js/components/table';
 import backToTop from './modules/_back-to-top.es6';
 import setScrollbarProperty from './modules/scrollbar-property.es6';
 import 'svgxuse';
@@ -33,10 +36,12 @@ import 'svgxuse';
   });
 
   domready(() => {
+    document.documentElement.classList.remove('no-js');
     accordion.on(document.body);
     banner.on(document.body);
     navigation(); // If used with the USWDS accordion component, the navigation must run after it.
     tablesort();
+    table.on(document.body);
     backToTop();
     setScrollbarProperty();
   });
