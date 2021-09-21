@@ -58,8 +58,8 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
     ];
 
     if (in_array($permission, $commentary_permissions) &&
-      $group->hasField('field_allow_commentaries')) {
-      return $group->field_allow_commentaries->value;
+      $group->hasField('field_allow_perspectives')) {
+      return $group->field_allow_perspectives->value;
     }
     return $usual_result;
   }
