@@ -1,0 +1,21 @@
+<span class="document">
+  {% if pattern_lab %}
+    {% include '@components/file/file.twig' with {
+      file: {
+        icon: 'file',
+        name: 'File name',
+        extension: 'pdf',
+      },
+    } %}
+  {% else %}
+    {{ file }}
+  {% endif %}
+  <span class="document__meta">
+    {% if date or publication_number %}
+      ({{ date }}{% if date and publication_number %}, {% endif %}{{ publication_number }})
+    {% endif %}
+    {% if description %}
+      <br />{{ description }}
+    {% endif %}
+  </span>
+</span>

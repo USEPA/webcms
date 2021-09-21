@@ -1,8 +1,13 @@
+{% if pattern_lab %}
+  {% set icon %}{{ file.icon }}{% endset %}
+  {% set link_text %}{{ file.name }} ({{ file.extension }}){% endset %}
+{% endif %}
+
 <a href="{{ url }}" class="file">
   {%- include '@components/icon/icon.twig' with {
     'modifier_classes': 'icon--file is-spaced-after',
     'is_hidden': true,
     'icon_name': icon,
   } -%}
-  {{ link_text }}
+  {{- link_text -}}
 </a>

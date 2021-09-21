@@ -1,0 +1,12 @@
+{% set classes = [
+  'usa-site-alert--info',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/site-alert/site-alert.twig' with {
+  'modifier_classes': classes,
+  'show_close': show_close,
+  'hash': hash,
+  'label': 'Information'|t,
+  'content': content,
+} %}
