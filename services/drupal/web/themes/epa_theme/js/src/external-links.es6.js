@@ -9,11 +9,10 @@ import Drupal from 'drupal';
       );
       externalLinks.forEach(function(el) {
         if (el.hasAttribute('href')) {
+          const translated = Drupal.t('Exit');
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="usa-tag external-link__tag">${Drupal.t(
-              'Exit'
-            )}</span>`
+            `<span class="usa-tag external-link__tag">${translated}</span>`
           );
         }
       });
