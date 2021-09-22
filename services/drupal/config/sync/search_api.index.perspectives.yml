@@ -1,0 +1,162 @@
+uuid: f8691f28-695c-4a2e-8448-dce82c3e5eb7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors
+    - field.storage.paragraph.field_author
+    - field.storage.node.field_description
+    - field.storage.node.field_language
+    - field.storage.node.field_perspective_subjects
+    - field.storage.node.field_publish_date
+    - search_api.server.localhost
+    - core.entity_view_mode.node.search_index
+  module:
+    - paragraphs
+    - node
+    - search_api
+id: perspectives
+name: Perspectives
+description: ''
+read_only: false
+field_settings:
+  field_author:
+    label: 'Field Authors » Paragraph » Author Term'
+    datasource_id: 'entity:node'
+    property_path: 'field_authors:entity:field_author'
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_authors
+        - field.storage.paragraph.field_author
+      module:
+        - paragraphs
+  field_description:
+    label: Description
+    datasource_id: 'entity:node'
+    property_path: field_description
+    type: text
+    boost: 0.2
+    dependencies:
+      config:
+        - field.storage.node.field_description
+  field_language:
+    label: Language
+    datasource_id: 'entity:node'
+    property_path: field_language
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_language
+  field_perspective_subjects:
+    label: Subjects
+    datasource_id: 'entity:node'
+    property_path: field_perspective_subjects
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_perspective_subjects
+  field_publish_date:
+    label: 'Publish Date'
+    datasource_id: 'entity:node'
+    property_path: field_publish_date
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_publish_date
+  rendered_item:
+    label: 'Rendered HTML output'
+    property_path: rendered_item
+    type: text
+    configuration:
+      roles:
+        anonymous: anonymous
+      view_mode:
+        'entity:node':
+          perspective: search_index
+  status:
+    label: Published
+    datasource_id: 'entity:node'
+    property_path: status
+    type: boolean
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 5
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - perspective
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_status: {  }
+  hierarchy:
+    fields:
+      field_author: taxonomy_term-parent
+      field_perspective_subjects: taxonomy_term-parent
+    weights:
+      preprocess_index: -47
+  html_filter:
+    all_fields: false
+    fields:
+      - title
+    title: false
+    alt: true
+    tags:
+      b: 2
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+    weights:
+      preprocess_index: -50
+      preprocess_query: -47
+  language_with_fallback: {  }
+  rendered_item: {  }
+  tokenizer:
+    all_fields: false
+    fields:
+      - title
+    ignored: ._-
+    spaces: '[^[:alnum:]]'
+    overlap_cjk: 1
+    minimum_word_size: '3'
+    weights:
+      preprocess_index: -48
+      preprocess_query: -44
+  transliteration:
+    all_fields: false
+    fields:
+      - title
+    weights:
+      preprocess_index: -49
+      preprocess_query: -46
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: true
+  cron_limit: 50
+server: localhost
