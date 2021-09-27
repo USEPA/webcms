@@ -5,7 +5,6 @@ dependencies:
   config:
     - field.field.node.perspective.field_authors
     - field.field.node.perspective.field_channel
-    - field.field.node.perspective.field_perspective_subjects
     - field.field.node.perspective.field_description
     - field.field.node.perspective.field_env_laws_regs_and_treaties
     - field.field.node.perspective.field_keywords
@@ -15,7 +14,9 @@ dependencies:
     - field.field.node.perspective.field_media_image
     - field.field.node.perspective.field_page_head
     - field.field.node.perspective.field_paragraphs
+    - field.field.node.perspective.field_perspective_subjects
     - field.field.node.perspective.field_publish_date
+    - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
     - field.field.node.perspective.field_type
     - node.type.perspective
@@ -29,14 +30,9 @@ targetEntityType: node
 bundle: perspective
 mode: default
 content:
-  content_moderation_control:
-    weight: -20
-    settings: {  }
-    third_party_settings: {  }
-    region: content
   field_authors:
     type: entity_reference_revisions_entity_view
-    weight: 116
+    weight: 14
     label: above
     settings:
       view_mode: default
@@ -44,7 +40,7 @@ content:
     third_party_settings: {  }
     region: content
   field_channel:
-    weight: 109
+    weight: 7
     label: above
     settings:
       link: true
@@ -52,14 +48,14 @@ content:
     type: entity_reference_label
     region: content
   field_description:
-    weight: 106
+    weight: 4
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 110
+    weight: 8
     label: above
     settings:
       link: true
@@ -67,7 +63,7 @@ content:
     type: entity_reference_label
     region: content
   field_keywords:
-    weight: 107
+    weight: 5
     label: above
     settings:
       link: true
@@ -75,14 +71,14 @@ content:
     type: entity_reference_label
     region: content
   field_language:
-    weight: 105
+    weight: 3
     label: above
     settings: {  }
     third_party_settings: {  }
     type: list_default
     region: content
   field_last_published:
-    weight: 117
+    weight: 15
     label: above
     settings:
       format_type: medium
@@ -91,7 +87,7 @@ content:
     type: datetime_default
     region: content
   field_machine_name:
-    weight: 112
+    weight: 10
     label: above
     settings:
       link_to_entity: false
@@ -100,7 +96,7 @@ content:
     region: content
   field_media_image:
     type: entity_reference_entity_view
-    weight: 115
+    weight: 13
     label: above
     settings:
       view_mode: default
@@ -108,14 +104,14 @@ content:
     third_party_settings: {  }
     region: content
   field_page_head:
-    weight: 111
+    weight: 9
     label: above
     settings: {  }
     third_party_settings: {  }
     type: basic_string
     region: content
   field_paragraphs:
-    weight: 103
+    weight: 2
     label: above
     settings:
       view_mode: default
@@ -124,7 +120,7 @@ content:
     type: entity_reference_revisions_entity_view
     region: content
   field_perspective_subjects:
-    weight: 114
+    weight: 12
     label: above
     settings:
       link: true
@@ -132,7 +128,16 @@ content:
     type: entity_reference_label
     region: content
   field_publish_date:
-    weight: 102
+    weight: 1
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: datetime_default
+    region: content
+  field_release:
+    weight: 16
     label: above
     settings:
       format_type: medium
@@ -141,7 +146,7 @@ content:
     type: datetime_default
     region: content
   field_review_deadline:
-    weight: 113
+    weight: 11
     label: above
     settings:
       format_type: medium
@@ -150,7 +155,7 @@ content:
     type: datetime_default
     region: content
   field_type:
-    weight: 108
+    weight: 6
     label: above
     settings:
       link: true
@@ -158,11 +163,12 @@ content:
     type: entity_reference_label
     region: content
   links:
-    weight: 100
+    weight: 0
+    region: content
     settings: {  }
     third_party_settings: {  }
-    region: content
 hidden:
+  content_moderation_control: true
   entitygroupfield: true
   langcode: true
   search_api_excerpt: true

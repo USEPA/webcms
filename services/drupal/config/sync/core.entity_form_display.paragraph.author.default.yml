@@ -11,6 +11,7 @@ dependencies:
     - paragraphs.paragraphs_type.author
   module:
     - inline_entity_form
+    - maxlength
     - shs
     - text
 id: paragraph.author.default
@@ -69,7 +70,10 @@ content:
     settings:
       size: 60
       placeholder: ''
-    third_party_settings: {  }
+    third_party_settings:
+      maxlength:
+        maxlength_js: 240
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
     type: string_textfield
     region: content
 hidden:
