@@ -2,19 +2,20 @@ uuid: f8691f28-695c-4a2e-8448-dce82c3e5eb7
 langcode: en
 status: true
 dependencies:
+  module:
+    - node
+    - paragraphs
+    - search_api
   config:
+    - field.storage.node.field_description
     - field.storage.node.field_authors
     - field.storage.paragraph.field_author
-    - field.storage.node.field_description
     - field.storage.node.field_language
-    - field.storage.node.field_perspective_subjects
     - field.storage.node.field_publish_date
+    - field.storage.node.field_release
+    - field.storage.node.field_perspective_subjects
     - search_api.server.localhost
     - core.entity_view_mode.node.search_index
-  module:
-    - paragraphs
-    - node
-    - search_api
 id: perspectives
 name: Perspectives
 description: ''
@@ -64,6 +65,14 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_publish_date
+  field_release:
+    label: 'Release Date'
+    datasource_id: 'entity:node'
+    property_path: field_release
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_release
   rendered_item:
     label: 'Rendered HTML output'
     property_path: rendered_item
