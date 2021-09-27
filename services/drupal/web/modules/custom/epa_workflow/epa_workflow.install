@@ -58,3 +58,73 @@ function epa_workflow_uninstall() {
   }
 
 }
+
+/**
+ * Sets all nodes with broken type reference to “Overviews and Fact Sheets”.
+ */
+function epa_workflow_update_9001(&$sandbox) {
+  $results = \Drupal::database()
+    ->query(
+      "SELECT entity_id
+             FROM node__field_type
+             WHERE field_type_target_id NOT IN (
+                SELECT tid from taxonomy_term_data where vid = 'type'
+             );")
+    ->fetchCol('entity_id');
+
+  if (count($results)) {
+    /** @var \Drupal\node\NodeInterface[] $nodes */
+    $nodes = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadMultiple($results);
+
+    foreach ($nodes as $node) {
+      $node->set('field_type', ['target_id' => 9]);
+      $node->save();
+    }
+  }
+}
+
+/**
+ * Update all nodes without field_review_deadline value to have value and a scheduled transition
+ */
+function epa_workflow_update_9002(&$sandbox) {
+  // Set the review deadline value to a year from now
+  $now = \Drupal\Core\Datetime\DrupalDateTime::createFromTimestamp(time());
+  $now->sub(new DateInterval('P1Y'));
+  $formatted = $now->format('Y-m-d\TH:i:s');
+
+  if (!isset($sandbox['total'])) {
+    // Query all published nodes that do not have a field_review_deadline value set.
+    $result = \Drupal::entityQuery('node')
+      ->condition('status', 1)
+      ->notExists('field_review_deadline')
+      ->execute();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+  }
+
+  $batch_size = 25;
+
+  $nids = \Drupal::entityQuery('node')
+    ->condition('status', 1)
+    ->notExists('field_review_deadline')
+    ->range($sandbox['current'], $sandbox['current'] + $batch_size)
+    ->execute();
+
+  /** @var \Drupal\node\NodeInterface[] $nodes */
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadMultiple($nids);
+
+  foreach ($nodes as $node) {
+    $node->set('field_review_deadline', $formatted);
+    $node->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::messenger()->addStatus($sandbox['current'] . ' nodes processed.');
+
+  $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+}
