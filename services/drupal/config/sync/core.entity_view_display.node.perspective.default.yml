@@ -14,10 +14,11 @@ dependencies:
     - field.field.node.perspective.field_media_image
     - field.field.node.perspective.field_page_head
     - field.field.node.perspective.field_paragraphs
-    - field.field.node.perspective.field_perspective_subjects
     - field.field.node.perspective.field_publish_date
+    - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
     - node.type.perspective
   module:
@@ -119,14 +120,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_perspective_subjects:
-    weight: 12
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_publish_date:
     weight: 1
     label: above
@@ -135,6 +128,14 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_publisher:
+    weight: 18
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
     region: content
   field_release:
     weight: 16
@@ -153,6 +154,14 @@ content:
       timezone_override: ''
     third_party_settings: {  }
     type: datetime_default
+    region: content
+  field_subjects:
+    weight: 17
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
     region: content
   field_type:
     weight: 6
