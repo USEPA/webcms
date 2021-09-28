@@ -16,11 +16,13 @@ export default function(threshold = 200, smoothScroll = true) {
           backToTop.getAttribute('aria-hidden') === 'true'
         ) {
           backToTop.setAttribute('aria-hidden', 'false');
+          backToTop.removeAttribute('disabled');
         } else if (
           window.pageYOffset < threshold &&
           backToTop.getAttribute('aria-hidden', 'false')
         ) {
           backToTop.setAttribute('aria-hidden', 'true');
+          backToTop.setAttribute('disabled', 'disabled');
         }
       };
       let stillScrolling = false;
