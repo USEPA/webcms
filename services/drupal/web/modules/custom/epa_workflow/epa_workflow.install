@@ -86,17 +86,18 @@ function epa_workflow_update_9001(&$sandbox) {
 }
 
 /**
- * Update all nodes without field_review_deadline value to have value and a scheduled transition
+ * Update all nodes without field_review_deadline value to have value 1 year from now and a scheduled transition.
  */
 function epa_workflow_update_9002(&$sandbox) {
   // Set the review deadline value to a year from now
   $now = \Drupal\Core\Datetime\DrupalDateTime::createFromTimestamp(time());
-  $now->sub(new DateInterval('P1Y'));
+  $now->add(new DateInterval('P1Y'));
   $formatted = $now->format('Y-m-d\TH:i:s');
 
   if (!isset($sandbox['total'])) {
     // Query all published nodes that do not have a field_review_deadline value set.
     $result = \Drupal::entityQuery('node')
+      ->accessCheck(FALSE)
       ->condition('status', 1)
       ->notExists('field_review_deadline')
       ->execute();
@@ -110,8 +111,13 @@ function epa_workflow_update_9002(&$sandbox) {
   $nids = \Drupal::entityQuery('node')
     ->condition('status', 1)
     ->notExists('field_review_deadline')
-    ->range($sandbox['current'], $sandbox['current'] + $batch_size)
+    ->range($sandbox['current'], $batch_size)
     ->execute();
+
+  if (empty($nids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
 
   /** @var \Drupal\node\NodeInterface[] $nodes */
   $nodes = \Drupal::entityTypeManager()
@@ -124,7 +130,130 @@ function epa_workflow_update_9002(&$sandbox) {
     $sandbox['current']++;
   }
 
-  \Drupal::messenger()->addStatus($sandbox['current'] . ' nodes processed.');
+  \Drupal::messenger()->addStatus($sandbox['current'] . ' nodes without review deadline processed.');
 
-  $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Update all published nodes missing a transition date with a review deadline
+ * less than 3 weeks away or in the past.
+ */
+function epa_workflow_update_9003(&$sandbox) {
+  // Create dates for 1 year in the future and 3 weeks in the future from now.
+  $now = \Drupal\Core\Datetime\DrupalDateTime::createFromTimestamp(time());
+  $one_year = $three_weeks = $now;
+
+  $one_year->add(new DateInterval('P1Y'));
+  $formatted_one_year = $one_year->format('Y-m-d\TH:i:s');
+
+  $three_weeks->add(new DateInterval('P3W'));
+  $formatted_three_weeks = $three_weeks->format('Y-m-d\TH:i:s');
+
+  if (!isset($sandbox['total'])) {
+    // Query all published nodes that don't have a scheduled transition date, but
+    // do have a review deadline
+    $result = \Drupal::entityQuery('node')
+      ->condition('status', 1)
+      ->condition('field_review_deadline', $formatted_three_weeks, '<=')
+      ->notExists('field_scheduled_transition')
+      ->execute();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+  }
+
+  $batch_size = 25;
+
+  $nids = \Drupal::entityQuery('node')
+    ->condition('status', 1)
+    ->condition('field_review_deadline', $formatted_three_weeks, '<=')
+    ->notExists('field_scheduled_transition')
+    ->range($sandbox['current'], $batch_size)
+    ->execute();
+
+  if (empty($nids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface[] $nodes */
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadMultiple($nids);
+
+  foreach ($nodes as $node) {
+    $node->set('field_review_deadline', $formatted_one_year);
+    $node->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::messenger()->addStatus($sandbox['current'] . ' nodes with missing scheduled transition processed.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Update all published nodes missing a transition date with a review deadline
+ * more 3 weeks away.
+ */
+function epa_workflow_update_9004(&$sandbox) {
+  $now = \Drupal\Core\Datetime\DrupalDateTime::createFromTimestamp(time());
+  $three_weeks = $now->add(new DateInterval('P3W'));
+  $formatted_three_weeks = $three_weeks->format('Y-m-d\TH:i:s');
+
+  if (!isset($sandbox['total'])) {
+    // Query all published nodes that don't have a scheduled transition date, but
+    // do have a review deadline
+    $result = \Drupal::entityQuery('node')
+      ->condition('status', 1)
+      ->condition('field_review_deadline', $formatted_three_weeks, '>=')
+      ->notExists('field_scheduled_transition')
+      ->execute();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+  }
+
+  $batch_size = 25;
+
+  $nids = \Drupal::entityQuery('node')
+    ->condition('status', 1)
+    ->condition('field_review_deadline', $formatted_three_weeks, '>=')
+    ->notExists('field_scheduled_transition')
+    ->range($sandbox['current'], $batch_size)
+    ->execute();
+
+  if (empty($nids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface[] $nodes */
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadMultiple($nids);
+
+  foreach ($nodes as $node) {
+    // Nothing needs to change on the node, but triggering a save will create a
+    // scheduled transition date 3 weeks prior via the EPAPublished service.
+    $node->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::messenger()->addStatus($sandbox['current'] . ' nodes with missing scheduled transition processed.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
 }
