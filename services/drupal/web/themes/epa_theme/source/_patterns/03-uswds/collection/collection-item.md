@@ -15,6 +15,7 @@ __Variables:__
 * image_alt: [string] Al attribute for collection image.
 * url: [string] URL of collection item.
 * heading: [string] Heading of collection item.
+* subtitle: [string] Subtitle of collection item.
 * description: [string] Description of collection item.
 * more_info: [array] List of more information. Each item is an object containing:
   * text: [string] Title of the item.
