@@ -11,7 +11,7 @@
 
 {% set summary_box_id = 'summary-box'|unique_id %}
 
-<div class="{{ classes }}" role="region"{% if heading %}aria-labelledby="{{ summary_box_id }}"{% endif %}>
+<div class="{{ classes }}" role="region"{% if id %} id="{{ id }}"{% endif %}{% if heading %}aria-labelledby="{{ summary_box_id }}"{% endif %}>
   <div class="{{ body_classes }}">
     {% if image %}
       {% set image_classes = [
