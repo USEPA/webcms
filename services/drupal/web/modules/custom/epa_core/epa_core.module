@@ -521,3 +521,22 @@ function epa_core_preprocess_form_element(array &$variables) {
     $variables['description_display'] = 'before';
   }
 }
+
+use Drupal\Core\Template\Attribute;
+
+/**
+ * Prepares variables for views-style-epa-core-uswds-collection.html.twig template.
+ */
+function template_preprocess_views_style_epa_core_uswds_collection(&$variables) {
+
+  $view = $variables['view'];
+
+  $variables['attributes']['class'] = ['usa-collection'];
+
+  foreach ($variables['rows'] as $id => $row) {
+    $variables['rows'][$id] = [];
+    $variables['rows'][$id]['content'] = $row;
+    $variables['rows'][$id]['attributes'] = new Attribute();
+    $variables['rows'][$id]['attributes']->addClass('usa-collection__item');
+  }
+}
