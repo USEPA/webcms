@@ -5,7 +5,10 @@
  */
 #}
 
-{% set more_info = [{'text': content.field_last_published }] %}
+{% set more_info = [{
+  'text': content.field_last_published|field_value,
+  'label': content.field_last_published|field_label
+}] %}
 
 {% include '@uswds/collection/_collection-item.twig' with {
   'url': url,

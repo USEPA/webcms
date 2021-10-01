@@ -12,6 +12,7 @@ dependencies:
     - taxonomy.vocabulary.type
   module:
     - datetime
+    - epa_core
     - node
     - taxonomy
     - user
@@ -775,6 +776,18 @@ display:
         views_ajax_get:
           ajax_get: false
       display_description: ''
+      style:
+        type: epa_core_uswds_collection
+        options:
+          uses_fields: false
+      defaults:
+        style: false
+        row: false
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: link
     cache_metadata:
       max-age: -1
       contexts:
