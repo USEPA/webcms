@@ -10,11 +10,16 @@
   {{ content.field_geographic_locations }}
 {% endset %}
 
-{% include '@components/teaser/teaser.twig' with {
+{% set more_info = [
+  {'text': content.field_computed_comments_due_date},
+  {'text': content.field_geographic_locations}
+] %}
+
+{% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
-  'title': label,
+  'heading': label,
   'subtitle': content.field_secondary_headline,
-  'metadata': metadata,
-  'summary': content.field_description,
+  'more_info': more_info,
+  'description': content.field_description,
 } %}
 {% set catch_cache = content|render %}

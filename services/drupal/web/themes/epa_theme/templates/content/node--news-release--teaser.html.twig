@@ -4,12 +4,15 @@
  * Theme override to display a teaser node.
  */
 #}
+{% set more_info = [
+  {'text': content.field_release}
+] %}
 
-{% include '@components/teaser/teaser.twig' with {
+{% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
-  'title': label,
+  'heading': label,
   'subtitle': content.field_secondary_headline,
-  'metadata': content.field_release,
-  'summary': content.field_description,
+  'more_info': more_info,
+  'description': content.field_description,
 } %}
 {% set catch_cache = content|render %}
