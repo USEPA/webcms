@@ -5,14 +5,15 @@
  */
 #}
 
-{% set metadata %}
-  {{ content.field_computed_comments_due_date }}
-  {{ content.field_geographic_locations }}
-{% endset %}
-
 {% set more_info = [
-  {'text': content.field_computed_comments_due_date},
-  {'text': content.field_geographic_locations}
+  {
+    'text': content.field_computed_comments_due_date|field_value,
+    'label': content.field_computed_comments_due_date|field_label
+  },
+  {
+    'text': content.field_geographic_locations|field_value,
+    'label': content.field_geographic_locations|field_label
+  }
 ] %}
 
 {% include '@uswds/collection/_collection-item.twig' with {
