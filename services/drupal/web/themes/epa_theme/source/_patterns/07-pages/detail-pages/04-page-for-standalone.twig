@@ -1,6 +1,6 @@
 {% set header_info %}
   {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Standalone',
+    'text': 'ECHO',
   } %}
 {% endset %}
 
@@ -12,13 +12,32 @@
 {% endset %}
 
 {% set content %}
+  {% include '@components/box/box--multipurpose/box--multipurpose.twig' with {
+    'modifier_classes': 'u-align-right',
+    'title': {
+      'tag': 'div',
+      'text': '',
+      'icon': '',
+    },
+    'img': {
+      'small': {
+         'src': 'https://www.epa.gov/sites/production/files/styles/block_header/public/2013-06/doyouknowyourhistory.jpg',
+         'alt': 'Do you know your EPA history?',
+         'width': '320',
+      },
+     'medium': {
+         'src': 'https://www.epa.gov/sites/production/files/styles/block_header/public/2013-06/doyouknowyourhistory.jpg',
+      },
+   },
+    'content': '<p>We celebrate EPA’s “birthday” every December 2. What actually happened on December 2, 1970?</p>',
+  } only %}
   {% include '@components/box/box--related-info/box--related-info.twig' with {
     'modifier_classes': 'u-align-right u-clear-right',
     'title': {
-      'tag': 'h2',
+      'tag': 'div',
       'text': 'Related Information',
     },
-    'content': '<p><a href="#">Applications Other than www</a></p>',
+    'content': '<p><a href="#">History of Earth Day</a></p>',
   } only %}
   <h2>Web Standard: Public Applications</h2>
   <p>According to the <a href="https://digital.gov/resources/21st-century-integrated-digital-experience-act/">21st Century Integrated Digital Experience Act (IDEA)</a>, agencies must adopt the standards developed by GSA/TTS for all web sites and applications – both internal and external. Those <a href="https://designsystem.digital.gov">standards are the US Web Design System (USWDS)</a>.</p>
