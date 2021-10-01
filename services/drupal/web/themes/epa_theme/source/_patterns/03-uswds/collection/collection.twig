@@ -5,18 +5,21 @@
 
 <ul class="{{ classes }}">
   {% for item in collection %}
-    {% include "@uswds/collection/_collection-item.twig" with {
-      url: item.url,
-      show_calendar: item.show_calendar,
-      datetime: item.datetime,
-      month: item.month,
-      day: item.day,
-      image_src: item.image_src,
-      image_alt: item.image_alt,
-      heading: item.heading,
-      description: item.description,
-      more_info: item.more_info,
-      tags: item.tags,
-    } only %}
+    <li class="usa-collection__item">
+      {% include "@uswds/collection/_collection-item.twig" with {
+        url: item.url,
+        show_calendar: item.show_calendar,
+        datetime: item.datetime,
+        month: item.month,
+        day: item.day,
+        image_src: item.image_src,
+        image_alt: item.image_alt,
+        heading: item.heading,
+        subtitle: item.subtitle,
+        description: item.description,
+        more_info: item.more_info,
+        tags: item.tags,
+      } only %}
+    </li>
   {% endfor %}
 </ul>

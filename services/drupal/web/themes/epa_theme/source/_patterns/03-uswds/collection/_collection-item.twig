@@ -1,38 +1,40 @@
-<li class="usa-collection__item">
-  {% if show_calendar %}
-    <div class="usa-collection__calendar-date" href="{{ url }}">
-      <time{% if datetime %} datetime="{{ datetime }}"{% endif %}>
-        <span class="usa-collection__calendar-date-month">{{ month }}</span>
-        <span class="usa-collection__calendar-date-day">{{ day }}</span>
-      </time>
-    </div>
-  {% elseif image_src %}
-    <img class="usa-collection__img" src="{{ image_src }}" alt="{{ image_alt }}">
+{% if show_calendar %}
+  <div class="usa-collection__calendar-date" href="{{ url }}">
+    <time{% if datetime %} datetime="{{ datetime }}"{% endif %}>
+      <span class="usa-collection__calendar-date-month">{{ month }}</span>
+      <span class="usa-collection__calendar-date-day">{{ day }}</span>
+    </time>
+  </div>
+{% elseif image_src %}
+  <img class="usa-collection__img" src="{{ image_src }}" alt="{{ image_alt }}">
+{% endif %}
+
+<div class="usa-collection__body">
+  <h3 class="usa-collection__heading">
+    <a class="usa-link" href="{{ url }}">{{ heading }}</a>
+  </h3>
+
+  {% if subtitle %}
+    <p class="usa-collection__description"><strong>{{ subtitle }}</strong></p>
   {% endif %}
 
-  <div class="usa-collection__body">
-    <h3 class="usa-collection__heading">
-      <a class="usa-link" href="{{ url }}">{{ heading }}</a>
-    </h3>
+  {% if description %}
+    <p class="usa-collection__description">{{ description }}</p>
+  {% endif %}
 
-    {% if description %}
-      <p class="usa-collection__description">{{ description }}</p>
-    {% endif %}
+  {% if more_info %}
+    <ul class="usa-collection__meta" aria-label="{{ 'More information'|t }}">
+      {% for info in more_info %}
+        <li class="usa-collection__meta-item">{{ info.text }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-    {% if more_info %}
-      <ul class="usa-collection__meta" aria-label="{{ 'More information'|t }}">
-        {% for info in more_info %}
-          <li class="usa-collection__meta-item">{{ info.text }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-
-    {% if tags %}
-      <ul class="usa-collection__meta" aria-label="{{ 'Topics'|t }}">
-        {% for tag in tags %}
-          <li class="usa-collection__meta-item usa-tag{% if tag.type %} usa-tag--{{ tag.type }}{% endif %}">{{ tag.title }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+  {% if tags %}
+    <ul class="usa-collection__meta" aria-label="{{ 'Topics'|t }}">
+      {% for tag in tags %}
+        <li class="usa-collection__meta-item usa-tag{% if tag.type %} usa-tag--{{ tag.type }}{% endif %}">{{ tag.title }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
   </div>
-</li>

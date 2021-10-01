@@ -5,10 +5,12 @@
  */
 #}
 
-{% include '@components/teaser/teaser.twig' with {
+{% set more_info = [{'text': content.field_last_published }] %}
+
+{% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
-  'title': content.field_question,
+  'heading': content.field_question,
   'subtitle': content.field_secondary_headline,
-  'metadata': content.field_last_published,
-  'summary': content.body,
+  'more_info': more_info,
+  'description': content.body,
 } %}
