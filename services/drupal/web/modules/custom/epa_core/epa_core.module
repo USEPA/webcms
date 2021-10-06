@@ -484,8 +484,6 @@ function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\E
 
 /**
  * Provides default values for our type fields across a couple content types.
- *
- * TODO: Validate we still need this. Can't find where this is being used currently
  */
 function epa_core_default_value_field_type(ContentEntityInterface $entity, FieldDefinitionInterface $definition) {
   if ($entity->getEntityTypeId() === 'node') {
@@ -495,6 +493,9 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
         break;
       case 'news_release':
         $term_name = "news release";
+        break;
+      case 'perspective':
+        $term_name = "speeches, testimony and transcripts";
         break;
     }
     if (!empty($term_name)) {

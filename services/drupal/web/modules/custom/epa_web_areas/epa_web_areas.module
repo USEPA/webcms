@@ -61,6 +61,10 @@ function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInte
   if (isset($form['field_allow_news_releases'])) {
     $form['field_allow_news_releases']['#access'] = $account->hasPermission('permit news releases');
   }
+
+  if (isset($form['field_allow_perspectives'])) {
+    $form['field_allow_perspectives']['#access'] = $account->hasPermission('permit perspectives');
+  }
 }
 
 /**
