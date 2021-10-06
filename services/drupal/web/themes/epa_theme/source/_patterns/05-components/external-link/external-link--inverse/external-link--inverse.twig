@@ -3,8 +3,12 @@
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
+{% if is_dark_bg %}<div class="usa-dark-background">{% endif %}
+
 {% include '@components/external-link/external-link.twig' with {
   'modifier_classes': classes,
   'url': url,
   'text': text,
 } %}
+
+{% if is_dark_bg %}</div>{% endif %}
