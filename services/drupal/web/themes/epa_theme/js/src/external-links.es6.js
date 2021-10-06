@@ -10,7 +10,7 @@ import Drupal from 'drupal';
       const translate = {
         en: ['Exit', 'Exit EPA website'],
         es: ['Salir', 'Salir del sitio web de la EPA'],
-        ar: ['الخروج من موقع وكالة حماية البيئة', 'خروج'],
+        ar: ['خروج', 'الخروج من موقع وكالة حماية البيئة'],
         zh_CN: ['退出', '退出环保署网页'],
         zh_TW: ['退出', '退出環保署網頁'],
         fr: ['Exit', 'Exit EPA Website'],
