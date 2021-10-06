@@ -1,7 +1,7 @@
 ---
 el: .usa-collection__item
 title: Collection Item
-state: inreview
+state: complete
 ---
 See
 [https://designsystem.digital.gov/components/collection/]().
