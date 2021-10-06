@@ -49,12 +49,12 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
     }
 
     $commentary_permissions = [
-      'create group_node:commentary entity',
-      'update any group_node:commentary entity',
-      'delete any group_node:commentary entity',
-      'delete own group_node:commentary entity',
-      'update any group_node:commentary entity',
-      'update own group_node:commentary entity',
+      'create group_node:perspective entity',
+      'update any group_node:perspective entity',
+      'delete any group_node:perspective entity',
+      'delete own group_node:perspective entity',
+      'update any group_node:perspective entity',
+      'update own group_node:perspective entity',
     ];
 
     if (in_array($permission, $commentary_permissions) &&
