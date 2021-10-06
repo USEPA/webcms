@@ -5,16 +5,25 @@
  */
 #}
 
-{% set more_info = [
-  {
-    'text': content.field_computed_comments_due_date|field_value,
-    'label': content.field_computed_comments_due_date|field_label
-  },
-  {
-    'text': content.field_geographic_locations|field_value,
-    'label': content.field_geographic_locations|field_label
-  }
-] %}
+{% set more_info = [] %}
+
+{% if content.field_computed_comments_due_date|field_value %}
+  {% set more_info = more_info|merge([
+    {
+      'text': content.field_computed_comments_due_date|field_value,
+      'label': content.field_computed_comments_due_date|field_label
+    }
+  ]) %}
+{% endif %}
+
+{% if content.field_geographic_locations|field_value %}
+  {% set more_info = more_info|merge([
+    {
+      'text': content.field_geographic_locations|field_value,
+      'label': content.field_geographic_locations|field_label
+    }
+  ]) %}
+{% endif %}
 
 {% include '@uswds/collection/_collection-item.twig' with {
   'url': url,

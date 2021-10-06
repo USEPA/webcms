@@ -4,10 +4,17 @@
  * Theme override to display a teaser node.
  */
 #}
-{% set more_info = [{
-  'text': content.field_date|field_value,
-  'label': content.field_date|field_label
-}] %}
+
+{% set more_info = [] %}
+
+{% if content.field_date|field_value %}
+  {% set more_info = more_info|merge([
+    {
+      'text': content.field_date|field_value,
+      'label': content.field_date|field_label
+    }
+  ]) %}
+{% endif %}
 
 {% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
