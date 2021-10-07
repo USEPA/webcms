@@ -60,7 +60,7 @@ class ViewsReferenceViewMode extends PluginBase implements ViewsReferenceSetting
    */
   public function alterFormField(array &$form_field) {
     // List of view modes that we actually want selectable by our users
-    $view_mode_whitelist = ['teaser'=>'Teaser', 'list'=> 'List'];
+    $view_mode_whitelist = ['teaser'=>'Teaser', 'list'=>'List'];
 
     $view = $this->viewsUtility->loadView($this->configuration['view_name'],
       $this->configuration['display_id']);
@@ -83,7 +83,7 @@ class ViewsReferenceViewMode extends PluginBase implements ViewsReferenceSetting
   public function alterView(ViewExecutable $view, $value) {
     $row_plugin = $view->display_handler->getPlugin('row');
     if ($row_plugin->options['view_mode']) {
-      $row_plugin->options['view_mode'] = $value;
+      $row_plugin->options['view_mode'] = $value === 'link' ? 'list' : $value;
     }
   }
 
