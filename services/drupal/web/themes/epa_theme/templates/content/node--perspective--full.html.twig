@@ -1,0 +1,131 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Perspectives'|t,
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set messages %}
+  {{ drupal_block('system_messages_block', wrapper=false) }}
+{% endset %}
+
+{% set local_tasks %}
+  {{ drupal_block('local_tasks_block', wrapper=false) }}
+  {{ drupal_block('local_actions_block', wrapper=false) }}
+  {{ content.epa_content_moderation_control }}
+{% endset %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set has_footer = false %}
+
+{% if footer|render|striptags|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
+{% set author_meta %}
+  {% for author in content.field_authors|field_value %}
+    {% set author_entity = author['#paragraph'] %}
+    <p>
+      <strong><a href="#author-{{ loop.index }}">{{ author_entity.field_author.entity.label }}</a></strong>
+      {% if author_entity.field_position.0.value %}<br>{{ author_entity.field_position.0.value }}{% endif %}
+      {% if author_entity.field_office.0.value %}<br>{{ author_entity.field_office.0.value }}{% endif %}
+    </p>
+  {% endfor %}
+{% endset %}
+
+{% set about_authors %}
+  {% for author in content.field_authors|field_value %}
+    {% set author_entity = author['#paragraph'] %}
+    {% set tid = author_entity.field_author.target_id %}
+
+    {% set author_content %}
+      <p>
+        <strong><a href="/perspectives/search/?author={{ tid }}">{{ author_entity.field_author.entity.label }}</a></strong>
+        {% if author_entity.field_position.0.value or author_entity.field_office.0.value %}<br>{% endif %}
+        {{ author_entity.field_position.0.value }}{% if author_entity.field_position.0.value and author_entity.field_office.0.value %}, {% endif %}{{ author_entity.field_office.0.value }}
+      </p>
+      <p>{{ author_entity.field_biography.0.value }}</p>
+    {% endset %}
+
+    {% include '@components/summary-box/summary-box--image-right/summary-box--image-right.twig' with {
+      'id': 'author-'~loop.index,
+      'modifier_classes': 'margin-y-4 u-clear-both',
+      'image': drupal_field('field_image', 'taxonomy_term', tid),
+      'heading': 'About the Author',
+      'heading_element': 'h2',
+      'content': author_content,
+    } only %}
+  {% endfor %}
+{% endset %}
+
+{% set body %}
+  {{ content.field_last_published }}
+  {{ author_meta }}
+  {{ content.field_paragraphs }}
+  {{ about_authors }}
+{% endset %}
+
+
+{% if display_sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'messages': messages,
+    'tasks': local_tasks,
+    'body': body,
+    'footer': footer,
+  } %}
+{% endif %}
