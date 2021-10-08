@@ -2,14 +2,10 @@ uuid: f8691f28-695c-4a2e-8448-dce82c3e5eb7
 langcode: en
 status: true
 dependencies:
-  module:
-    - node
-    - paragraphs
-    - search_api
   config:
-    - field.storage.node.field_description
     - field.storage.node.field_authors
     - field.storage.paragraph.field_author
+    - field.storage.node.field_description
     - field.storage.node.field_language
     - field.storage.node.field_publish_date
     - field.storage.node.field_publisher
@@ -17,6 +13,10 @@ dependencies:
     - field.storage.node.field_subjects
     - search_api.server.localhost
     - core.entity_view_mode.node.search_index
+  module:
+    - paragraphs
+    - node
+    - search_api
 id: perspectives
 name: Perspectives
 description: ''
@@ -133,7 +133,8 @@ processor_settings:
   hierarchy:
     fields:
       field_author: taxonomy_term-parent
-      field_perspective_subjects: taxonomy_term-parent
+      field_publisher: taxonomy_term-parent
+      field_subjects: taxonomy_term-parent
     weights:
       preprocess_index: -47
   html_filter:
