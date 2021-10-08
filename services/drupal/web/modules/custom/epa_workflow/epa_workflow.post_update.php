@@ -173,7 +173,7 @@ function epa_workflow_post_update_0004_fix_nodes_missing_transition_date(&$sandb
     // Query all published nodes that don't have a scheduled transition date, but
     // do have a review deadline
     $result = \Drupal::entityQuery('node')
-      - >condition('status', 1)
+      ->condition('status', 1)
       ->notExists('field_scheduled_transition')
       ->execute();
 
