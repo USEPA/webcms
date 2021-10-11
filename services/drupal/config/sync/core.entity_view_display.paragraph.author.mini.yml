@@ -1,0 +1,58 @@
+uuid: c24ba7a9-762c-4100-84d3-4aefa78a2176
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.paragraph.mini
+    - field.field.paragraph.author.field_author
+    - field.field.paragraph.author.field_biography
+    - field.field.paragraph.author.field_geographic_locations
+    - field.field.paragraph.author.field_office
+    - field.field.paragraph.author.field_position
+    - paragraphs.paragraphs_type.author
+  module:
+    - layout_builder
+    - linked_field
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: paragraph.author.mini
+targetEntityType: paragraph
+bundle: author
+mode: mini
+content:
+  field_author:
+    weight: 0
+    label: hidden
+    settings:
+      link: false
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: 'internal:/node/[paragraph:parent_id]#author-[paragraph:field_author:target_id]'
+        advanced: {  }
+        token: ''
+    type: entity_reference_label
+    region: content
+  field_office:
+    weight: 2
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_position:
+    weight: 1
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+hidden:
+  field_biography: true
+  field_geographic_locations: true
+  search_api_excerpt: true

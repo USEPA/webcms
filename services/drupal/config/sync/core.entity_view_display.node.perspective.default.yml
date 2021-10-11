@@ -21,11 +21,194 @@ dependencies:
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
     - node.type.perspective
+  content:
+    - 'block_content:custom_html:e1a44562-a863-4467-8e91-02a8c24894fa'
   module:
+    - block_content
     - datetime
     - entity_reference_revisions
+    - layout_builder
+    - layout_builder_restrictions
+    - layout_discovery
     - options
     - user
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          3c0e9f36-d2dd-42ff-bdf9-1b70d29f51e3:
+            uuid: 3c0e9f36-d2dd-42ff-bdf9-1b70d29f51e3
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:node:perspective:field_paragraphs'
+              formatter:
+                label: above
+                settings:
+                  view_mode: default
+                  link: ''
+                third_party_settings: {  }
+                type: entity_reference_revisions_entity_view
+            additional: {  }
+            weight: 7
+          3445bc50-e66b-477d-af7e-6f9bb2017cc8:
+            uuid: 3445bc50-e66b-477d-af7e-6f9bb2017cc8
+            region: content
+            configuration:
+              id: 'field_block:node:perspective:field_authors'
+              label: Authors
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: entity_reference_revisions_entity_view
+                settings:
+                  view_mode: mini
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 6
+          fa939fbf-0f5f-4c4d-b7f0-3e97678ea976:
+            uuid: fa939fbf-0f5f-4c4d-b7f0-3e97678ea976
+            region: content
+            configuration:
+              id: 'field_block:node:perspective:field_release'
+              label: 'Release Date'
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: datetime_default
+                settings:
+                  timezone_override: ''
+                  format_type: medium_no_time
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 2
+          8fb43927-332e-41d2-9824-fd6f4ef7b8d2:
+            uuid: 8fb43927-332e-41d2-9824-fd6f4ef7b8d2
+            region: content
+            configuration:
+              id: 'field_block:node:perspective:field_authors'
+              label: 'Author bios'
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: entity_reference_revisions_entity_view
+                settings:
+                  view_mode: default
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 8
+          17c4813a-a191-4100-ac3a-bee814754f9f:
+            uuid: 17c4813a-a191-4100-ac3a-bee814754f9f
+            region: content
+            configuration:
+              id: 'block_content:e1a44562-a863-4467-8e91-02a8c24894fa'
+              label: 'Perspectives: Editor’s Note'
+              provider: block_content
+              label_display: '0'
+              status: true
+              info: ''
+              view_mode: full
+              context_mapping: {  }
+            additional: {  }
+            weight: 9
+          fd1dcbe7-5e00-4baa-beb4-4413d0187598:
+            uuid: fd1dcbe7-5e00-4baa-beb4-4413d0187598
+            region: content
+            configuration:
+              id: 'field_block:node:perspective:field_subjects'
+              label: 'Related Information'
+              provider: layout_builder
+              label_display: visible
+              formatter:
+                label: hidden
+                type: tokenized_field_formatter
+                settings:
+                  token_string: '<a href="/perspectives/search/perspectives_subjects/[term:tid]">Learn more about [term:name]</a>'
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 5
+        third_party_settings: {  }
+  layout_builder_restrictions:
+    allowed_block_categories: {  }
+    entity_view_mode_restriction:
+      whitelisted_blocks: {  }
+      blacklisted_blocks: {  }
+      allowed_layouts: {  }
 id: node.perspective.default
 targetEntityType: node
 bundle: perspective
