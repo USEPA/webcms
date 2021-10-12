@@ -1,25 +1,23 @@
-uuid: 2bb0ed70-ff67-4770-bf7d-385efdd69cca
+uuid: b9f849a8-10ff-4275-8bc5-ae9f9d722359
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.cards.field_cards
-    - field.field.paragraph.cards.field_title
-    - paragraphs.paragraphs_type.cards
+    - field.field.paragraph.card_group.field_cards
+    - paragraphs.paragraphs_type.card_group
   module:
     - paragraphs
-id: paragraph.cards.default
+id: paragraph.card_group.default
 targetEntityType: paragraph
-bundle: cards
+bundle: card_group
 mode: default
 content:
   field_cards:
-    type: paragraphs
-    weight: 1
+    weight: 0
     settings:
       title: Card
       title_plural: Cards
-      edit_mode: open
+      edit_mode: closed
       closed_mode: summary
       autocollapse: none
       closed_mode_threshold: 0
@@ -31,14 +29,7 @@ content:
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
     third_party_settings: {  }
-    region: content
-  field_title:
-    weight: 0
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-    type: string_textfield
+    type: paragraphs
     region: content
 hidden:
   created: true

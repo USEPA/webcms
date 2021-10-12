@@ -1,26 +1,26 @@
-uuid: eb983ece-fc42-408c-a39f-1fc45a1f2474
+uuid: 87504238-0399-4bea-bf9c-d33e2d148081
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.paragraph.field_cards
     - paragraphs.paragraphs_type.card
-    - paragraphs.paragraphs_type.cards
+    - paragraphs.paragraphs_type.card_group
   module:
     - custom_add_another
     - entity_reference_revisions
 third_party_settings:
   custom_add_another:
-    custom_add_another: 'add another Card'
-    custom_remove: 'remove Card'
-id: paragraph.cards.field_cards
+    custom_add_another: ''
+    custom_remove: ''
+id: paragraph.card_group.field_cards
 field_name: field_cards
 entity_type: paragraph
-bundle: cards
+bundle: card_group
 label: Cards
 description: ''
 required: true
-translatable: false
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
@@ -31,60 +31,63 @@ settings:
       card: card
     target_bundles_drag_drop:
       applicants_or_respondents:
-        weight: 20
-        enabled: false
-      banner:
         weight: 21
         enabled: false
-      banner_slide:
+      banner:
         weight: 22
         enabled: false
-      box:
+      banner_slide:
         weight: 23
+        enabled: false
+      box:
+        weight: 24
         enabled: false
       card:
         enabled: true
-        weight: 24
-      cards:
         weight: 25
-        enabled: false
-      cfr:
-        weight: 26
-        enabled: false
-      docket:
+      card_group:
         weight: 27
         enabled: false
-      dynamic_list:
+      cards:
+        weight: 26
+        enabled: false
+      cfr:
         weight: 28
         enabled: false
-      frc:
+      docket:
         weight: 29
         enabled: false
-      from_library:
+      dynamic_list:
         weight: 30
         enabled: false
-      header:
+      frc:
         weight: 31
         enabled: false
-      html:
+      from_library:
         weight: 32
         enabled: false
-      legal_authorities:
+      header:
         weight: 33
         enabled: false
-      link_list:
+      html:
         weight: 34
         enabled: false
-      locations_of_prop_actions:
+      legal_authorities:
         weight: 35
         enabled: false
-      press_officers:
+      link_list:
         weight: 36
         enabled: false
-      slide:
+      locations_of_prop_actions:
         weight: 37
         enabled: false
-      slideshow:
+      press_officers:
         weight: 38
+        enabled: false
+      slide:
+        weight: 39
+        enabled: false
+      slideshow:
+        weight: 40
         enabled: false
 field_type: entity_reference_revisions
