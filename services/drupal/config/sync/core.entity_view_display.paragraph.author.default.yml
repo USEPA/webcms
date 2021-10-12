@@ -10,7 +10,122 @@ dependencies:
     - field.field.paragraph.author.field_position
     - paragraphs.paragraphs_type.author
   module:
+    - layout_builder
+    - layout_discovery
+    - linked_field
     - text
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: true
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings:
+          label: ''
+        components:
+          27e8f98e-696b-4c85-abda-234b9095995e:
+            uuid: 27e8f98e-696b-4c85-abda-234b9095995e
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:paragraph:author:field_author'
+              formatter:
+                label: hidden
+                settings:
+                  link: false
+                third_party_settings:
+                  linked_field:
+                    linked: '1'
+                    type: custom
+                    destination: 'internal:/perspectives/search/perspectives_author/[paragraph:field_author:target_id]'
+                    advanced: {  }
+                    token: ''
+                type: entity_reference_label
+            additional: {  }
+            weight: 0
+          e099c79c-1131-48f8-97f0-091fc342860c:
+            uuid: e099c79c-1131-48f8-97f0-091fc342860c
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:paragraph:author:field_office'
+              formatter:
+                label: hidden
+                settings:
+                  link_to_entity: false
+                third_party_settings: {  }
+                type: string
+            additional: {  }
+            weight: 3
+          4cb3b38c-882c-4e3c-a8af-c0f314b77730:
+            uuid: 4cb3b38c-882c-4e3c-a8af-c0f314b77730
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:paragraph:author:field_biography'
+              formatter:
+                label: hidden
+                settings: {  }
+                third_party_settings: {  }
+                type: text_default
+            additional: {  }
+            weight: 4
+          67d8ac57-8169-414e-91c8-49b600b9543d:
+            uuid: 67d8ac57-8169-414e-91c8-49b600b9543d
+            region: content
+            configuration:
+              id: 'field_block:paragraph:author:field_author'
+              label: 'Author image'
+              provider: layout_builder
+              label_display: '0'
+              formatter:
+                label: hidden
+                type: entity_reference_entity_view
+                settings:
+                  view_mode: default
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+            additional: {  }
+            weight: 1
+          86b844fd-f649-4faa-a589-080e314e4976:
+            uuid: 86b844fd-f649-4faa-a589-080e314e4976
+            region: content
+            configuration:
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              id: 'field_block:paragraph:author:field_position'
+              formatter:
+                label: hidden
+                settings:
+                  link_to_entity: false
+                third_party_settings: {  }
+                type: string
+            additional: {  }
+            weight: 2
+        third_party_settings: {  }
 id: paragraph.author.default
 targetEntityType: paragraph
 bundle: author
@@ -18,30 +133,28 @@ mode: default
 content:
   field_author:
     weight: 0
-    label: above
+    label: hidden
     settings:
-      link: true
-    third_party_settings: {  }
+      link: false
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: 'internal:/perspectives/search/perspectives_author/[paragraph:field_author:target_id]'
+        advanced: {  }
+        token: ''
     type: entity_reference_label
     region: content
   field_biography:
-    weight: 4
-    label: above
+    weight: 3
+    label: hidden
     settings: {  }
     third_party_settings: {  }
     type: text_default
     region: content
-  field_geographic_locations:
-    weight: 3
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
-    region: content
   field_office:
     weight: 1
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
@@ -49,11 +162,12 @@ content:
     region: content
   field_position:
     weight: 2
-    label: above
+    label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
     type: string
     region: content
 hidden:
+  field_geographic_locations: true
   search_api_excerpt: true
