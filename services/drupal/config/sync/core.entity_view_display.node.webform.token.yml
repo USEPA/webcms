@@ -5,6 +5,7 @@ dependencies:
   config:
     - core.entity_view_mode.node.token
     - field.field.node.webform.field_description
+    - field.field.node.webform.field_expiration_date
     - field.field.node.webform.field_geographic_locations
     - field.field.node.webform.field_hublinks
     - field.field.node.webform.field_is_searchable_collection
@@ -13,7 +14,9 @@ dependencies:
     - field.field.node.webform.field_machine_name
     - field.field.node.webform.field_page_head
     - field.field.node.webform.field_paragraphs
+    - field.field.node.webform.field_publish_date
     - field.field.node.webform.field_review_deadline
+    - field.field.node.webform.field_scheduled_transition
     - field.field.node.webform.field_type
     - field.field.node.webform.webform
     - node.type.webform
@@ -24,6 +27,7 @@ dependencies:
     - epa_web_areas
     - layout_builder
     - options
+    - scheduled_publish
     - user
     - webform
 third_party_settings:
@@ -49,6 +53,15 @@ content:
     region: content
     label: above
     settings: {  }
+    third_party_settings: {  }
+  field_expiration_date:
+    type: datetime_default
+    weight: 14
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
     third_party_settings: {  }
   field_geographic_locations:
     type: entity_reference_label
@@ -115,6 +128,15 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
+  field_publish_date:
+    type: datetime_default
+    weight: 15
+    region: content
+    label: above
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
   field_review_deadline:
     type: datetime_default
     weight: 12
@@ -123,6 +145,15 @@ content:
     settings:
       format_type: medium
       timezone_override: ''
+    third_party_settings: {  }
+  field_scheduled_transition:
+    type: scheduled_publish_generic_formatter
+    weight: 16
+    region: content
+    label: above
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
     third_party_settings: {  }
   field_type:
     type: entity_reference_label
@@ -151,6 +182,5 @@ content:
     region: content
 hidden:
   content_moderation_control: true
-  entitygroupfield: true
   links: true
   search_api_excerpt: true
