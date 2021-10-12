@@ -5,6 +5,14 @@ dependencies:
   config:
     - field.storage.node.field_paragraphs
     - node.type.event
+    - paragraphs.paragraphs_type.box
+    - paragraphs.paragraphs_type.cards
+    - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.from_library
+    - paragraphs.paragraphs_type.header
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
+    - paragraphs.paragraphs_type.slideshow
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -34,6 +42,7 @@ settings:
       dynamic_list: dynamic_list
       slideshow: slideshow
       from_library: from_library
+      cards: cards
     target_bundles_drag_drop:
       applicants_or_respondents:
         weight: -26
@@ -47,6 +56,12 @@ settings:
       box:
         enabled: true
         weight: -31
+      card:
+        weight: 24
+        enabled: false
+      cards:
+        enabled: true
+        weight: 25
       cfr:
         weight: -25
         enabled: false
@@ -79,6 +94,9 @@ settings:
         enabled: false
       press_officers:
         weight: -18
+        enabled: false
+      slide:
+        weight: 37
         enabled: false
       slideshow:
         enabled: true
