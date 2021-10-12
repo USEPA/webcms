@@ -1,0 +1,59 @@
+uuid: 333786b2-2589-47ea-a029-00e520cc8e00
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.author.field_author
+    - field.field.paragraph.author.field_biography
+    - field.field.paragraph.author.field_geographic_locations
+    - field.field.paragraph.author.field_office
+    - field.field.paragraph.author.field_position
+    - paragraphs.paragraphs_type.author
+  module:
+    - text
+id: paragraph.author.default
+targetEntityType: paragraph
+bundle: author
+mode: default
+content:
+  field_author:
+    weight: 0
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_biography:
+    weight: 4
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: text_default
+    region: content
+  field_geographic_locations:
+    weight: 3
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  field_office:
+    weight: 1
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_position:
+    weight: 2
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+hidden:
+  search_api_excerpt: true
