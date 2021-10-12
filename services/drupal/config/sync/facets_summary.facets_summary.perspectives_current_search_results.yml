@@ -1,0 +1,27 @@
+uuid: 6ddce550-953f-482d-8069-ba0780d15386
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.perspectives
+    - views.view.search_perspectives
+  module:
+    - search_api
+id: perspectives_current_search_results
+name: 'Current search results'
+facets: {  }
+facet_source_id: 'search_api:views_page__search_perspectives__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '45'
+    settings: {  }
+  show_text_when_empty:
+    processor_id: show_text_when_empty
+    weights:
+      build: '10'
+    settings:
+      text:
+        value: 'No results found.'
+        format: plain_text
