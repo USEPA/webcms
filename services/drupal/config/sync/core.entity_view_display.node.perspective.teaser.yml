@@ -23,40 +23,63 @@ dependencies:
     - field.field.node.perspective.field_type
     - node.type.perspective
   module:
+    - datetime
+    - token_formatters
     - user
 id: node.perspective.teaser
 targetEntityType: node
 bundle: perspective
 mode: teaser
 content:
-  content_moderation_control:
-    weight: -20
+  field_authors:
+    type: tokenized_field_formatter
+    weight: 1
+    region: content
+    label: hidden
+    settings:
+      token_string: '[paragraph:field_author:entity:name]'
+    third_party_settings: {  }
+  field_description:
+    type: basic_string
+    weight: 3
+    region: content
+    label: hidden
     settings: {  }
     third_party_settings: {  }
+  field_media_image:
+    type: entity_reference_entity_view
+    weight: 0
     region: content
-  links:
-    weight: 100
-    settings: {  }
+    label: hidden
+    settings:
+      view_mode: default
+      link: false
     third_party_settings: {  }
+  field_publish_date:
+    type: datetime_default
+    weight: 2
     region: content
+    label: hidden
+    settings:
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
 hidden:
+  content_moderation_control: true
   entitygroupfield: true
-  field_authors: true
   field_channel: true
-  field_description: true
   field_env_laws_regs_and_treaties: true
   field_keywords: true
   field_language: true
   field_last_published: true
   field_machine_name: true
-  field_media_image: true
   field_page_head: true
   field_paragraphs: true
-  field_publish_date: true
   field_publisher: true
   field_release: true
   field_review_deadline: true
   field_subjects: true
   field_type: true
   langcode: true
+  links: true
   search_api_excerpt: true

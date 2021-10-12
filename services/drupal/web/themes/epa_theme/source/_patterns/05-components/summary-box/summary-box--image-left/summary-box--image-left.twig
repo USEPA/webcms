@@ -1,0 +1,13 @@
+{% set image_classes = [
+  'u-align-left',
+  image_modifier_classes ? image_modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@uswds/summary-box/summary-box.twig' with {
+  'modifier_classes': modifier_classes,
+  'image': image,
+  'image_modifier_classes': image_classes,
+  'heading': heading,
+  'heading_element': heading_element,
+  'content': content,
+} %}
