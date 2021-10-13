@@ -22,5 +22,13 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
     if (!empty($variables['elements']['#id'])) {
       $suggestions[] = 'block__' . $variables['elements']['#id'];
     }
+
+    /** @var \Drupal\fixed_block_content\FixedToContentMappingHandlerInterface $mapping_handler */
+    $mapping_handler = \Drupal::entityTypeManager()->getHandler('fixed_block_content', 'mapping_handler');
+
+    // Search the fixed block of the edited custom block.
+    if ($fixed_block = $mapping_handler->getFixedBlock($content['#block_content'])) {
+      $suggestions[] = 'block__fixed__'. $fixed_block->id();
+    }
   }
 }
