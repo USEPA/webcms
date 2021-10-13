@@ -5,7 +5,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.externalLinks = {
     attach(context, settings) {
       const externalLinks = context.querySelectorAll(
-        "a:not([href=''], [href*='.gov'], [href*='.mil'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com'], [href*='webcms-uploads-qa.s3.amazonaws.com'], [href*='localhost:8080'])"
+        "a:not([href=''], [href*='.gov'], [href*='.mil'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com'], [href*='webcms-uploads-qa.s3.amazonaws.com'])"
       );
       const translate = {
         en: ['Exit', 'Exit EPA website'],
