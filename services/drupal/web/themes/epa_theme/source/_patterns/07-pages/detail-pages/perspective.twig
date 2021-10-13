@@ -1,0 +1,65 @@
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Perspectives',
+  } %}
+{% endset %}
+
+{% set author_content %}
+  <p><strong><a href="/themes/epa_theme/pattern-lab/patterns/07-pages-listing-pages-perspectives/07-pages-listing-pages-perspectives.rendered.html">Alexandra Dapolito Dunn</a></strong><br>Assistant Administrator<br>Office of Chemical Safety and Pollution Prevention</p>
+  <p>Alexandra Dapolito Dunn is the Assistant Administrator for the Office of Chemical Safety and Pollution Prevention. Prior to that she served as the Regional Administrator for EPA Region 1, and her responsibilities included overseeing the states of Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont and ten tribal nations.</p>
+{% endset %}
+
+{% set editor_note %}
+  <p><strong>Editor’s Note: </strong>The views expressed here are intended to explain EPA policy. They do not change anyone’s rights or obligations. You may share this post. However, please do not change the title or the content, or remove EPA’s identity as the author. If you do make substantive changes, please do not attribute the edited title or content to EPA or the author.</p>
+  <p>EPA’s official web site is <a href="https://www.epa.gov/">www.epa.gov</a>. Some links on this page may redirect users from the EPA website to specific content on a non-EPA, third-party site. In doing so, EPA is directing you only to the specific content referenced at the time of publication, not to any other content that may appear on the same webpage or elsewhere on the third-party site, or be added at a later date.</p>
+  <p>EPA is providing this link for informational purposes only. EPA cannot attest to the accuracy of non-EPA information provided by any third-party sites or any other linked site. EPA does not endorse any non-government websites, companies, internet applications or any policies or information expressed therein.</p>
+{% endset %}
+
+{% set content %}
+  <p>March 12, 2020</p>
+  {% include '@components/box/box--related-info/box--related-info.twig' with {
+    'modifier_classes': 'u-align-right',
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Information',
+    },
+    'content': '<ul><li><a href="#">Read more EPA Perspectives</a></li><li><a href="#">Learn more about [subject]</a></li><li><a href="#">Learn more about [subject]</a></li></ul>',
+  } only %}
+  <p><strong><a href="#author-1">Alexandra Dapolito Dunn</a></strong><br>Assistant Administrator<br>Office of Chemical Safety and Pollution Prevention</p>
+  <p>On this day in 1990, a new era was ushered in for EPA and the nation when the Pollution Prevention (P2) Act was signed into law. The act gave the agency new tools to join with states, tribes, and communities to prevent pollution <em>before</em> it happens. It also marked a shift in the paradigm of environmental protection which had been mostly focused on end-of-pipe pollution control and clean-up strategies.</p>
+  <p>Equally important, the P2 act strengthened EPA’s role as an ally of American businesses, helping them save billions of dollars and improve operations. As EPA Administrator Andrew Wheeler has said, “It’s far better to prevent pollution from occurring than to go in after the fact and clean it up.”</p>
+  <p>The P2 Act greatly expanded the opportunities for “source reduction” to reduce or prevent pollution at the source through cost-effective changes in production, operation, and raw materials use. These changes can reduce the amount of pollution entering a waste stream or the environment prior to recycling, treatment or disposal, and can offer industry substantial savings in reduced raw material, pollution control, pollution clean-up and liability costs.</p>
+  <p>One of EPA’s first pollution prevention successes was with its 33/50 Program, a voluntary program under which companies committed to reduce their releases of 17 top priority chemicals 33 percent by 1992 and by 50 percent by 1995. Subsequent EPA programs built on the 33/50 and P2 model and are still working to reduce pollution across the country today including EPA’s <a href="https://www.epa.gov/watersense">WaterSense</a>, <a href="https://www.epa.gov/saferchoice">Safer Choice</a>, <a href="https://www.epa.gov/greenerproducts">Environmentally Preferable Purchasing</a>, <a href="https://www.epa.gov/greenchemistry">Green Chemistry</a>, and our <a href="https://www.epa.gov/smartway">SmartWay Transport Partnership Program</a>. President Trump acknowledged the effectiveness of these and other EPA programs in a 2018 <a href="https://www.whitehouse.gov/presidential-actions/executive-order-regarding-efficient-federal-operations/">Executive Order</a> that directed federal agencies to use EPA’s P2 resources to meet their statutory sustainable purchasing requirements.</p>
+  <p>The P2 Act also serves as an authority for collecting information from reporting facilities through the <a href="https://www.epa.gov/toxics-release-inventory-tri-program/pollution-prevention-p2-and-tri">Toxics Release Inventory</a> (TRI) about their management of certain toxic chemicals, including source reduction approaches. Since this reporting began in 1991, we have learned that over 24,000 unique facilities have taken more than 450,000 actions to prevent pollution and reduce the amount of toxic chemicals entering the environment, such as spill and leak prevention measures, using safer chemicals, modifying industrial processes, and updating operating procedures.</p>
+  <p>Perhaps the most impactful and collaborative program to grow out of the P2 Act is EPA’s P2 Grants Program. Since 1990, EPA has awarded more than 1,200 grants to state, tribal, non-profit, and university partners to work directly with U.S. businesses to develop and implement source reduction techniques. With the assistance from P2 grants, businesses have been able to save over $1.5 billion since 2011 while also reducing the use of hazardous materials by over 570 million pounds.</p>
+  <p>As we celebrate the 30<sup>th</sup> anniversary of the Pollution Prevention Act today, I would like to thank all our state and local pollution prevention partners, as well as all the businesses that have joined with us to score a true win-win for the American people.</p>
+
+  {% include '@components/summary-box/summary-box--image-right/summary-box--image-right.twig' with {
+    'id': 'author-1',
+    'modifier_classes': 'margin-y-4 u-clear-both',
+    'image': '<img src="https://s3-us-gov-west-1.amazonaws.com/cg-c877c3f0-e413-40cd-a59c-ad2d6b211d1b/uploads/sites/4/2019/04/alexdunn.png" alt="Alexandra Dapolito Dunn, Assistant Administrator of U.S. EPA Office of Chemical Safety and Pollution Prevention" width="192" height="288">',
+    'heading': 'About the Author',
+    'heading_element': 'h2',
+    'content': author_content,
+  } only %}
+
+  {% include '@components/box/box--special/box--special.twig' with {
+    'modifier_classes': 'margin-y-4 font-sans-3xs',
+    'content': editor_note,
+  } only %}
+{% endset %}
+
+{% set page_content %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'title': page_title,
+    'messages': page_messages,
+    'tasks': page_tasks,
+    'intro': intro,
+    'body': content,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content
+} %}
