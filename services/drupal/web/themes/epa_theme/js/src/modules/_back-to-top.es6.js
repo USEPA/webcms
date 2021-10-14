@@ -10,19 +10,20 @@ export default function(threshold = 200, smoothScroll = true) {
   if (backToTop) {
     if (!isNaN(threshold)) {
       backToTop.setAttribute('aria-hidden', 'true');
+      backToTop.setAttribute('tabIndex', '-1');
       const scrollHandler = () => {
         if (
-          window.pageYOffset >= threshold &&
+          window.scrollY >= threshold &&
           backToTop.getAttribute('aria-hidden') === 'true'
         ) {
           backToTop.setAttribute('aria-hidden', 'false');
-          backToTop.removeAttribute('disabled');
+          backToTop.removeAttribute('tabIndex');
         } else if (
-          window.pageYOffset < threshold &&
+          window.scrollY < threshold &&
           backToTop.getAttribute('aria-hidden', 'false')
         ) {
           backToTop.setAttribute('aria-hidden', 'true');
-          backToTop.setAttribute('disabled', 'disabled');
+          backToTop.setAttribute('tabIndex', '-1');
         }
       };
       let stillScrolling = false;
