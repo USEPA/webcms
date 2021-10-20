@@ -1,0 +1,28 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function epa_menus_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Creates a copy of the Save button and places it promptly in the revision info section of the form.
+  if (isset($form['actions']['submit'])) {
+    $submit_copy = $form['actions']['submit'];
+    $submit_copy['#group'] = 'revision_information';
+    $submit_copy['#weight'] = 100;
+    $form['revision_information']['submit_copy'] = $submit_copy;
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_menus_module_implements_alter(&$implementations, $hook) {
+  // Make sure our hook_node_form_alter runs last.
+  if ($hook === 'form_alter') {
+    $self = $implementations['epa_menus'];
+    unset($implementations['epa_menus']);
+    $implementations['epa_menus'] = $self;
+  }
+}
