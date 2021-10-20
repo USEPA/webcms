@@ -1,0 +1,27 @@
+{% set classes = [
+  'usa-card',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set card_layout = card_layout ? card_layout : 'tablet:grid-col-4' %}
+
+<li class="{{ card_layout }} {{ classes }}">
+  <div class="usa-card__container">
+    <header class="usa-card__header">
+      <h2 class="usa-card__heading">{{ card_title }}</h2>
+    </header>
+    {% if card_media %}
+    <div class="usa-card__media {{ media_classes }}">
+      <div class="usa-card__img">
+        {{ card_media }}
+      </div>
+    </div>
+    {% endif %}
+    <div class="usa-card__body">
+      {{ card_content }}
+    </div>
+    <div class="usa-card__footer">
+      <button class="usa-button">Visit Florida Keys</button>
+    </div>
+  </div>
+</li>
