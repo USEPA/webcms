@@ -4,9 +4,3 @@ services:
     tags:
       - { name: event_subscriber }
     arguments: ['@http_kernel', '@logger.channel.php', '@redirect.destination', '@router.no_access_checks']
-  epa_media.media_library.ui_builder:
-    class: Drupal\epa_media\EpaMediaLibraryUiBuilder
-    decorates: media_library.ui_builder
-    decoration_priority: 5
-    public: false
-    arguments: [ '@entity_type.manager', '@request_stack', '@views.executable', '@form_builder', '@media_library.opener_resolver' ]
