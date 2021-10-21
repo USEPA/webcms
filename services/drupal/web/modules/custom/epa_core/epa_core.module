@@ -55,6 +55,14 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
  * - Hide type field on news releasees
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Creates a copy of the Save button and places it promptly in the revision info section of the form.
+  if (isset($form['actions']['submit'])) {
+    $submit_copy = $form['actions']['submit'];
+    $submit_copy['#group'] = 'revision_information';
+    $submit_copy['#weight'] = 100;
+    $form['revision_information']['submit_copy'] = $submit_copy;
+  }
+
   switch ($form_id) {
     case 'node_news_release_form':
     case 'node_news_release_edit_form':
@@ -514,3 +522,15 @@ function epa_core_preprocess_form_element(array &$variables) {
     $variables['description_display'] = 'before';
   }
 }
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_core_module_implements_alter(&$implementations, $hook) {
+  // Prevent group_content_menu module's form alter from happening.
+  // This prevents the menu settings from being displayed
+  if ($hook === 'form_alter' && isset($implementations['group_content_menu'])) {
+    unset($implementations['group_content_menu']);
+  }
+}
+
