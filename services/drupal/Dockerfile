@@ -1,4 +1,4 @@
-FROM forumone/drupal8:7.3 AS memcached-ext
+FROM forumone/drupal8:7.4 AS memcached-ext
 
 # This build stage builds and installs the AWS Elasticache client for Memcached. It's a
 # manual clone & build process for two reasons:
@@ -46,14 +46,14 @@ RUN set -ex \
 # available in the PHP extensions directory. It will be copied into the dev, base, and
 # drush build stages.
 
-FROM forumone/drupal8:7.3-xdebug AS dev
+FROM forumone/drupal8:7.4-xdebug AS dev
 
 # Development-only dependencies/config here
 
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
@@ -119,15 +119,15 @@ RUN set -ex \
     echo 'access.format="[%T] %R %m %r %{REQUEST_URI}e mem(bytes): %M cpu%%: %{total}C dur(secs): %d"'; \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
-FROM forumone/drupal8:7.3 AS base
+FROM forumone/drupal8:7.4 AS base
 
 # This is the base production layer. We use it here in order to make it easier to ensure
 # that both the dev and base targets are in sync with each other.
 
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
@@ -178,7 +178,7 @@ RUN composer install \
   --optimize-autoloader
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:php7.3-node12 AS gesso
+FROM forumone/gesso:php7.4-node12 AS gesso
 
 WORKDIR /app
 
@@ -231,12 +231,12 @@ COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM forumone/drupal8-cli:7.3 AS drush
+FROM forumone/drupal8-cli:7.4 AS drush
 
 # Copy and enable the AWS Elasticache memcached extension
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20180731/
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
 RUN docker-php-ext-enable memcached
 
 # APK packages needed by this image
