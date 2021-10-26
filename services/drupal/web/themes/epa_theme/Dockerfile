@@ -1,4 +1,4 @@
-FROM forumone/gesso:php7.4-node12
+FROM forumone/gesso:4-node-v12-php-7.4
 
 COPY package*.json ./
 RUN if test -e package-lock.json; then npm ci; else npm i; fi
