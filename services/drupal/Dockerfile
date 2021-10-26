@@ -178,7 +178,7 @@ RUN composer install \
   --optimize-autoloader
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:php7.4-node12 AS gesso
+FROM forumone/gesso:4-node-v12-php-7.4 AS gesso
 
 WORKDIR /app
 
