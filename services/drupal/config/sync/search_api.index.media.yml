@@ -1,0 +1,167 @@
+uuid: 5ceb35b8-6608-4e0b-9a23-9aa593338c96
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_media_audio_file
+    - field.storage.media.field_description
+    - field.storage.media.field_media_file
+    - field.storage.media.field_media_file_1
+    - field.storage.media.field_media_image
+    - field.storage.media.field_publication_number
+    - field.storage.media.field_media_tags
+    - search_api.server.localhost
+  module:
+    - file
+    - media
+    - user
+    - entitygroupfield
+    - group
+    - search_api
+id: media
+name: Media
+description: ''
+read_only: false
+field_settings:
+  author_name:
+    label: 'Authored by » User » Name'
+    datasource_id: 'entity:media'
+    property_path: 'uid:entity:name'
+    type: string
+    dependencies:
+      module:
+        - media
+        - user
+  bundle:
+    label: 'Media type'
+    datasource_id: 'entity:media'
+    property_path: bundle
+    type: string
+    dependencies:
+      module:
+        - media
+  changed:
+    label: Changed
+    datasource_id: 'entity:media'
+    property_path: changed
+    type: date
+    dependencies:
+      module:
+        - media
+  created:
+    label: 'Authored on'
+    datasource_id: 'entity:media'
+    property_path: created
+    type: date
+    dependencies:
+      module:
+        - media
+  field_description:
+    label: Description
+    datasource_id: 'entity:media'
+    property_path: field_description
+    type: text
+    dependencies:
+      config:
+        - field.storage.media.field_description
+  field_media_tags:
+    label: Tags
+    datasource_id: 'entity:media'
+    property_path: field_media_tags
+    type: integer
+    dependencies:
+      config:
+        - field.storage.media.field_media_tags
+  field_publication_number:
+    label: 'Publication Number'
+    datasource_id: 'entity:media'
+    property_path: field_publication_number
+    type: string
+    dependencies:
+      config:
+        - field.storage.media.field_publication_number
+  filename:
+    label: 'Audio file » File » Filename'
+    datasource_id: 'entity:media'
+    property_path: 'field_media_audio_file:entity:filename'
+    type: text
+    dependencies:
+      config:
+        - field.storage.media.field_media_audio_file
+      module:
+        - file
+  filename_1:
+    label: 'File » File » Filename'
+    datasource_id: 'entity:media'
+    property_path: 'field_media_file:entity:filename'
+    type: text
+    dependencies:
+      config:
+        - field.storage.media.field_media_file
+      module:
+        - file
+  filename_2:
+    label: 'File » File » Filename'
+    datasource_id: 'entity:media'
+    property_path: 'field_media_file_1:entity:filename'
+    type: text
+    dependencies:
+      config:
+        - field.storage.media.field_media_file_1
+      module:
+        - file
+  filename_3:
+    label: 'Image » File » Filename'
+    datasource_id: 'entity:media'
+    property_path: 'field_media_image:entity:filename'
+    type: text
+    dependencies:
+      config:
+        - field.storage.media.field_media_image
+      module:
+        - file
+  gid:
+    label: 'Groups » Group content » Parent group'
+    datasource_id: 'entity:media'
+    property_path: 'entitygroupfield:entity:gid'
+    type: integer
+    dependencies:
+      module:
+        - entitygroupfield
+        - group
+  name:
+    label: Name
+    datasource_id: 'entity:media'
+    property_path: name
+    type: text
+    dependencies:
+      module:
+        - media
+  uid:
+    label: 'Authored by'
+    datasource_id: 'entity:media'
+    property_path: uid
+    type: integer
+    dependencies:
+      module:
+        - media
+datasource_settings:
+  'entity:media':
+    bundles:
+      default: true
+      selected: {  }
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  language_with_fallback: {  }
+  rendered_item: {  }
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  index_directly: true
+  cron_limit: 50
+server: localhost

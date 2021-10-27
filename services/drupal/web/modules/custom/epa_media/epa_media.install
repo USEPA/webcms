@@ -116,3 +116,10 @@ function epa_media_update_9001(&$sandbox) {
 
   return t('Updated :n media entities be "Other" bundle.', [':n' => $sandbox['total']]);
 }
+
+/**
+ * Replace core media_library with our custom one built on Search API.
+ */
+function epa_media_update_9200() {
+  \Drupal::service('config.factory')->getEditable('views.view.media_library')->delete();
+}
