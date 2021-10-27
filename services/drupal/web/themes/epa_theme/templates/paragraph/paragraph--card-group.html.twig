@@ -25,12 +25,6 @@
  */
 #}
 
-{#{% embed '@layouts/grid/grid.twig' with {#}
-{#  'num_of_cols': 3,#}
-{#} %}#}
-{#  {% block content %}#}
-{#    {{ content.field_cards }}#}
-{#  {% endblock %}#}
-{#{% endembed %}#}
-
-{{ content }}
+{% include '@uswds/card-group/card-group.twig' with {
+  'cards': content.field_cards,
+} %}
