@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.perspective.field_channel
     - field.field.node.perspective.field_description
     - field.field.node.perspective.field_env_laws_regs_and_treaties
+    - field.field.node.perspective.field_geographic_locations
     - field.field.node.perspective.field_keywords
     - field.field.node.perspective.field_language
     - field.field.node.perspective.field_last_published
@@ -39,7 +40,7 @@ third_party_settings:
         - group_page_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 10
+      weight: 9
       format_type: tabs
       region: content
       format_settings:
@@ -52,6 +53,7 @@ third_party_settings:
         - field_description
         - field_keywords
         - field_channel
+        - field_geographic_locations
         - field_env_laws_regs_and_treaties
       parent_name: group_additional_fields
       weight: 20
@@ -98,7 +100,7 @@ third_party_settings:
       children:
         - field_authors
       parent_name: ''
-      weight: 8
+      weight: 7
       format_type: details
       region: content
       format_settings:
@@ -115,7 +117,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 12
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -149,7 +151,7 @@ content:
     third_party_settings: {  }
     region: content
   field_channel:
-    weight: 17
+    weight: 16
     settings: {  }
     third_party_settings: {  }
     type: options_buttons
@@ -168,7 +170,17 @@ content:
     type: string_textarea
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 19
+    weight: 18
+    settings:
+      display_node_count: false
+      create_new_items: false
+      create_new_levels: false
+      force_deepest: false
+    third_party_settings: {  }
+    type: options_shs
+    region: content
+  field_geographic_locations:
+    weight: 17
     settings:
       display_node_count: false
       create_new_items: false
@@ -203,7 +215,7 @@ content:
     region: content
   field_media_image:
     type: media_library_widget
-    weight: 2
+    weight: 8
     settings:
       media_types: {  }
     third_party_settings: {  }
@@ -217,7 +229,7 @@ content:
     type: string_textarea
     region: content
   field_paragraphs:
-    weight: 5
+    weight: 4
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -242,7 +254,7 @@ content:
     type: datetime_default
     region: content
   field_publisher:
-    weight: 7
+    weight: 6
     settings:
       force_deepest: false
       parent: '0'
@@ -254,13 +266,13 @@ content:
     type: cshs
     region: content
   field_release:
-    weight: 4
+    weight: 3
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
     region: content
   field_subjects:
-    weight: 6
+    weight: 5
     settings:
       display_node_count: false
       create_new_items: false
@@ -271,14 +283,14 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 3
+    weight: 2
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 16
+    weight: 15
     settings: {  }
     region: content
     third_party_settings: {  }
@@ -286,21 +298,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 13
+    weight: 12
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 14
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 14
+    weight: 13
     region: content
     third_party_settings: {  }
   title:
@@ -313,7 +325,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 11
+    weight: 10
     settings:
       match_operator: CONTAINS
       size: 60
@@ -322,7 +334,7 @@ content:
     region: content
     third_party_settings: {  }
   url_redirects:
-    weight: 17
+    weight: 16
     region: content
     settings: {  }
     third_party_settings: {  }
