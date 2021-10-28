@@ -23,6 +23,17 @@ name: Media
 description: ''
 read_only: false
 field_settings:
+  aggregated_filenames:
+    label: 'Aggregated filenames'
+    property_path: aggregated_field
+    type: text
+    configuration:
+      type: concat
+      fields:
+        - 'entity:media/field_media_audio_file:entity:filename'
+        - 'entity:media/field_media_file:entity:filename'
+        - 'entity:media/field_media_file_1:entity:filename'
+        - 'entity:media/field_media_image:entity:filename'
   author_name:
     label: 'Authored by » User » Name'
     datasource_id: 'entity:media'
