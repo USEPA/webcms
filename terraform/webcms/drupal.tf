@@ -228,6 +228,13 @@ resource "aws_ecs_service" "drupal" {
     security_groups = [data.aws_ssm_parameter.drupal_security_group.value]
   }
 
+  # Identify this service with the load balancer's target group.
+  load_balancer {
+    target_group_arn = aws_lb_target_group.drupal.arn
+    container_name   = "nginx"
+    container_port   = 443
+  }
+
   # Ignore changes to the desired_count attribute - we assume that the application
   # autoscaling rules will take over after deployment.
   lifecycle {

@@ -68,6 +68,16 @@ resource "aws_ssm_parameter" "cron_event_role" {
 
 #region Drupal-specific
 
+resource "aws_ssm_parameter" "drupal_listener" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/listener"
+  type  = "String"
+  value = aws_lb_listener.alb_https.arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "drupal_iam_task" {
   for_each = local.sites
 

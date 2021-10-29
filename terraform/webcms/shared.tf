@@ -54,6 +54,10 @@ data "aws_ssm_parameter" "cron_event_role" {
 
 #region Drupal-specific
 
+data "aws_ssm_parameter" "drupal_listener" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/listener"
+}
+
 data "aws_ssm_parameter" "drupal_iam_task" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-task"
 }
