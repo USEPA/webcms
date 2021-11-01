@@ -105,13 +105,6 @@ class EPAPublished extends EPAModeration {
           $node->field_type = $term->id();
         }
       }
-      if ($node->bundle() == 'commentary') {
-        $term = taxonomy_term_load_multiple_by_name('speeches, testimony and transcripts', 'type');
-        if (!empty($term)) {
-          $term = reset($term);
-          $node->field_type = $term->id();
-        }
-      }
     }
   }
 

@@ -9,7 +9,31 @@ dependencies:
     - search_api
 id: perspectives_current_search_results
 name: 'Current search results'
-facets: {  }
+facets:
+  perspectives_author:
+    checked: true
+    label: Author
+    separator: ', '
+    weight: 0
+    show_count: false
+  perspectives_publisher:
+    checked: true
+    label: Publisher
+    separator: ', '
+    weight: 0
+    show_count: false
+  perspectives_subjects:
+    checked: true
+    label: Subject
+    separator: ', '
+    weight: 0
+    show_count: false
+  perspectives_year:
+    checked: true
+    label: Year
+    separator: ', '
+    weight: 0
+    show_count: false
 facet_source_id: 'search_api:views_page__search_perspectives__page_1'
 processor_configs:
   hide_when_not_rendered:
@@ -17,11 +41,3 @@ processor_configs:
     weights:
       build: '45'
     settings: {  }
-  show_text_when_empty:
-    processor_id: show_text_when_empty
-    weights:
-      build: '10'
-    settings:
-      text:
-        value: 'No results found.'
-        format: plain_text
