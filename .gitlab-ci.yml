@@ -431,6 +431,8 @@ infrastructure:preproduction:init:
   stage: infrastructure_preprod_init
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
+      changes: 
+        - webcms/terraform/infrastructure/**/*
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -444,6 +446,8 @@ infrastructure:preproduction:validate:
   stage: infrastructure_preprod_validate
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
+      changes: 
+        - webcms/terraform/infrastructure/**/*
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -457,6 +461,8 @@ infrastructure:preproduction:plan:
   stage: infrastructure_preprod_plan
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
+      changes: 
+        - webcms/terraform/infrastructure/**/*
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -477,7 +483,8 @@ infrastructure:preproduction:apply:
   stage: infrastructure_preprod_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-
+      changes: 
+        - webcms/terraform/infrastructure/**/*
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
