@@ -23,6 +23,24 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function epa_core_theme($existing, $type, $theme, $path) {
+  return [
+    'hierarchical_term_facet_formatter' => [
+      'variables' => [
+        'terms' => [],
+        'wrapper' => '',
+        'separator' => ' » ',
+        'link' => FALSE,
+        'facet_source' => ''
+      ],
+      'file' => 'epa_core.theme.inc',
+    ],
+  ];
+}
+
+/**
  * Implements hook_menu_local_tasks_alter().
  *
  * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
