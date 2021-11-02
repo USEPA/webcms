@@ -40,11 +40,10 @@ function epa_theme_preprocess_node__news_release__full(&$variables) {
         );
         break;
       case 'fr':
-        // @TODO: Get from Mike.
-//        $link = Link::fromTextAndUrl(
-//          'اقرأ ھذه النشرة الإخباریة باللغة العربیة',
-//          $language_url
-//        );
+        $link = Link::fromTextAndUrl(
+          'Lisez les communiqués de presse de l\'EPA en français',
+          $language_url
+        );
         break;
       case 'ht':
         $link = Link::fromTextAndUrl(
@@ -53,11 +52,10 @@ function epa_theme_preprocess_node__news_release__full(&$variables) {
         );
         break;
       case 'it':
-        // @TODO: Get from Mike.
-//        $link = Link::fromTextAndUrl(
-//          'اقرأ ھذه النشرة الإخباریة باللغة العربیة',
-//          $language_url
-//        );
+        $link = Link::fromTextAndUrl(
+          'Leggi i comunicati stampa EPA in italiano',
+          $language_url
+        );
         break;
       case 'ko':
         $link = Link::fromTextAndUrl(
