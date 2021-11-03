@@ -282,10 +282,10 @@ build:drupal:
   stage: build
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
 
    # These correspond to the three production targets in services/drupal/Dockerfile. The
    # ordering here is important for builds with a limited pool of servers: by ensuring that
@@ -328,10 +328,10 @@ build:metrics:dev:
   stage: build
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
@@ -349,10 +349,10 @@ build:database:dev:
   stage: build
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
@@ -383,10 +383,10 @@ copy:cloudwatch:dev:
   stage: copy
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   script:
     - mkdir -p /workspace
     - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
@@ -404,10 +404,10 @@ build:traefik:dev:
   stage: infrastructure_preprod_build
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
@@ -423,10 +423,10 @@ copy:newrelic:dev:
   stage: copy
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   script:
     - mkdir -p /workspace
     - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
@@ -544,10 +544,10 @@ deploy:dev:init:en:
   stage: deploy:dev:init:en
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_LANG: en
     WEBCMS_ENVIRONMENT: preproduction
@@ -571,10 +571,10 @@ deploy:dev:init:es:
   stage: deploy:dev:init:es
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_LANG: es
     WEBCMS_ENVIRONMENT: preproduction
@@ -600,10 +600,10 @@ deploy:dev:validate:en:
   stage: deploy:dev:validate:en
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -621,10 +621,10 @@ deploy:dev:validate:es:
   stage: deploy:dev:validate:es
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -641,10 +641,10 @@ deploy:dev:plan-en:
   stage: deploy:dev:plan:en
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -675,10 +675,10 @@ deploy:dev:plan-es:
   stage: deploy:dev:plan:es
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -710,7 +710,7 @@ deploy:dev:plan-es:
 deploy:dev:apply-en:
   extends: .deploy
   stage: deploy:dev:apply:en
-
+  
   # Download the plan files from the previous step.
   dependencies: ["deploy:dev:plan-en"]
 
@@ -747,12 +747,12 @@ deploy:dev:apply-en:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: manual
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success
 
     - when: never
