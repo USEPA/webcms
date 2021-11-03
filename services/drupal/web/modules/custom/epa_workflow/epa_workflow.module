@@ -238,13 +238,13 @@ function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_stat
   if ($node instanceof NodeInterface && !$node->isNew()) {
 
     // Loading will always return the "Current revision".
-    /** @var \Drupal\node\NodeInterface $published */
-    $published = \Drupal::entityTypeManager()
+    /** @var \Drupal\node\NodeInterface $current */
+    $current = \Drupal::entityTypeManager()
       ->getStorage('node')
       ->load($node->id());
 
     // The revision ID of the "Current revision" will be lower (older) than the most recent revision.
-    if ($node->getRevisionId() > $published->getRevisionId()) {
+    if ($node->getRevisionId() !== $current->getRevisionId()) {
       $url = $node->toUrl('version-history')->toString();
       $markup = Markup::create("<strong>Note:</strong> The revision you are editing is not the currently published content. It may include edits that are not visible on the published page. Refer to the <a target='_blank' href='$url'>revision page</a> to see other revisions and revert if necessary.");
       \Drupal::messenger()->addWarning($markup);
