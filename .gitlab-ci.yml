@@ -964,10 +964,10 @@ update:dev:en:
   stage: update:en
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -985,10 +985,10 @@ update:dev:es:
   stage: update:es
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "live"'
       changes: 
-        - webcms/terraform/infrastructure/**/*
-      when: never
+        - webcms/terraform/webcms/**/*
+        - services/**/*
+      when: always
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
