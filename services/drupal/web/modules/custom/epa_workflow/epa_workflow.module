@@ -233,17 +233,18 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 /**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
-function epa_workflow_form_node_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-  /** @var \Drupal\node\NodeForm $node_form */
+function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $node = $form_state->getFormObject()->getEntity();
   if ($node instanceof NodeInterface && !$node->isNew()) {
-    // Loading a node from storage ALWAYS returns the published revision.
-    /** @var \Drupal\Node\NodeInterface $published */
+
+    // Loading will always return the "Current revision".
+    /** @var \Drupal\node\NodeInterface $published */
     $published = \Drupal::entityTypeManager()
       ->getStorage('node')
       ->load($node->id());
-    // Check if the currently published revision ID is not the current revision ID.
-    if ($published->getRevisionId() !== $node->getRevisionId()) {
+
+    // The revision ID of the "Current revision" will be lower (older) than the most recent revision.
+    if ($node->getRevisionId() > $published->getRevisionId()) {
       $url = $node->toUrl('version-history')->toString();
       $markup = Markup::create("<strong>Note:</strong> The revision you are editing is not the currently published content. It may include edits that are not visible on the published page. Refer to the <a target='_blank' href='$url'>revision page</a> to see other revisions and revert if necessary.");
       \Drupal::messenger()->addWarning($markup);
