@@ -242,9 +242,9 @@ display:
           plugin_id: views_bulk_operations_bulk_form
         nid:
           id: nid
-          table: node_field_data
+          table: node_field_revision
           field: nid
-          relationship: nid
+          relationship: none
           group_type: group
           admin_label: ''
           label: ID
@@ -438,9 +438,9 @@ display:
           plugin_id: field
         type:
           id: type
-          table: node_field_data
+          table: node_field_revision
           field: type
-          relationship: nid
+          relationship: none
           group_type: group
           admin_label: ''
           label: 'Content type'
@@ -748,45 +748,6 @@ display:
           entity_type: node
           plugin_id: entity_operations
       filters:
-        latest_translation_affected_revision:
-          id: latest_translation_affected_revision
-          table: node_revision
-          field: latest_translation_affected_revision
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-            operator_limit_selection: false
-            operator_list: {  }
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: node
-          plugin_id: latest_translation_affected_revision
         title:
           id: title
           table: node_field_revision
@@ -1029,6 +990,45 @@ display:
             group_items: {  }
           entity_type: node
           plugin_id: moderation_state_filter
+        latest_translation_affected_revision:
+          id: latest_translation_affected_revision
+          table: node_revision
+          field: latest_translation_affected_revision
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: ''
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: latest_translation_affected_revision
       sorts: {  }
       title: 'Latest Revisions'
       header: {  }
@@ -1052,7 +1052,7 @@ display:
           field: nid
           relationship: none
           group_type: group
-          admin_label: 'Get the actual content from a content revision.'
+          admin_label: Node
           required: false
           entity_type: node
           entity_field: nid
