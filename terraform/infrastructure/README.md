@@ -90,6 +90,7 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
   2. `/webcms/${var.environment}/security-groups/proxy`: The security group for the RDS proxy
   3. `/webcms/${var.environment}/security-groups/elasticsearch`: The security group for the Elasticsearch domain
   4. `/webcms/${var.environment}/security-groups/memcached`: The security group for the ElastiCache cluster
+  4. `/webcms/${var.environment}/security-groups/alb`: The security group for the ALB
   5. `/webcms/${var.environment}/security-groups/drupal`: The security group for the Drupal ECS tasks
   6. `/webcms/${var.environment}/security-groups/traefik`: The security group for the Traefik router
   7. `/webcms/${var.environment}/security-groups/terraform-database`: The security group for the database initialization task
@@ -100,7 +101,7 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
 
 The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 8 WebCMS. Most of the resources in this category are fairly straightforward:
 
-- A network load balancer ([load_balancer.tf](load_balancer.tf))
+- A pair of load balancers: an NLB and its [ALB target](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/application-load-balancer-target.html) ([load_balancer.tf](load_balancer.tf))
 - An Aurora cluster ([rds.tf](rds.tf))
 - An Elasticache cluster ([cache.tf](cache.tf))
 - An Elasticsearch domain ([search.tf](search.tf))
@@ -128,7 +129,7 @@ The simplest way to meet these requirements is to simply copy images from the Do
 
 ### Routing
 
-Since network load balancers do not perform request routing, we deploy [Traefik](https://traefik.io/) ([traefik_iam.tf](traefik_iam.tf), [traefik_service.tf](traefik_service.tf)). Traefik is able to [automatically discover configuration](https://doc.traefik.io/traefik/providers/ecs/) when running in ECS. This allows us to incrementally build up the routing configuration on a task-by-task basis, rather than having to define it up front. The router will monitor running containers across the services and balance load appropriately.
+We are in the process of migrating from Traefik to an ALB. In order to ease migration, both the legacy Traefik service and the new ALB are deployed by this module. The Traefik resources will be removed in a later update.
 
 ### Terraform Resources
 
@@ -167,15 +168,11 @@ There are a number of sensitive values that must be populated by an administrato
 
 ### Mirror Images
 
-The [ECR mirrors](#ecr-mirrors) need to be populated. There are two: [Traefik](https://hub.docker.com/_/traefik) and the [Amazon CloudWatch Agent](https://hub.docker.com/r/amazon/cloudwatch-agent).
+The [ECR mirrors](#ecr-mirrors) need to be populated in order to bring the [Amazon CloudWatch Agent](https://hub.docker.com/r/amazon/cloudwatch-agent) into the AWS perimeter.
 
-These steps should suffice to mirror the images from the Docker Hub to ECR. Remember to [authenticate with ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html#registry-auth-token) prior to running the `docker push` commands.
+These steps should suffice to mirror the image from the Docker Hub to ECR. Remember to [authenticate with ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html#registry-auth-token) prior to running the `docker push` commands.
 
 ```sh
-docker pull traefik:2.4
-docker tag traefik:2.4 <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-traefik:2.4
-docker push <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-traefik:2.4
-
 docker pull amazon/cloudwatch-agent:latest
 docker tag amazon/cloudwatch-agent:latest <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
 docker push <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
@@ -188,6 +185,8 @@ In order to capture updates to these images, these pull/push steps should be run
 - Initial deployments may fail due to a race condition with the load balancer and the Traefik service. Terraform will attempt to register the service with ECS before the listeners are fully ready.
 
   The race condition is transient; a second `terraform apply` will successfully deploy Traefik.
+
+- Similarly, this race condition can to the ALB target as well. Is is also transient and another apply will resolve the issue.
 
 - If you haven't created a Secrets Manager secret before in this region, the lookup of the KMS alias `alias/aws/secretsmanager` will fail. The solution is to create a throwaway secret and delete it immediately. The default KMS key will be created automatically, and the Terraform run will proceed.
 
