@@ -16,7 +16,7 @@ resource "aws_lb_target_group" "drupal" {
 
 # Route requests for the Drupal hostnames to the target group.
 resource "aws_lb_listener_rule" "drupal" {
-  listener_arn = data.aws_ssm_parameter.drupal_listener.value
+  listener_arn = data.aws_ssm_parameter.alb_listener.value
 
   action {
     type             = "forward"

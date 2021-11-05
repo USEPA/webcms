@@ -26,6 +26,14 @@ data "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #endregion
 
+#region ALB
+
+data "aws_ssm_parameter" "alb_listener" {
+  name = "/webcms/${var.environment}/alb/listener"
+}
+
+#endregion
+
 #region Service endpoints
 
 data "aws_ssm_parameter" "elasticache_endpoint" {
@@ -53,10 +61,6 @@ data "aws_ssm_parameter" "cron_event_role" {
 #endregion
 
 #region Drupal-specific
-
-data "aws_ssm_parameter" "drupal_listener" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/listener"
-}
 
 data "aws_ssm_parameter" "drupal_iam_task" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-task"
