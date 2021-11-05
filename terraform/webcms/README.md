@@ -26,6 +26,7 @@
 - [Resources](#resources)
   - [Drupal](#drupal)
   - [Drush](#drush)
+  - [Routing](#routing)
 - [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
   - [Build Images](#build-images)
@@ -182,27 +183,30 @@ As with the infrastructure and database modules, this module assumes that certai
 - We use the ECS cluster name and ARN:
   - `/webcms/${var.environment}/ecs/cluster-name`: The name (e.g., `webcms-preproduction`) of the ECS cluster in this environment.
   - `/webcms/${var.environment}/ecs/cluster-arn`: The full ARN of the ECS cluster in this environment.
-- For Drupal, we load some identifiers for IAM and S3:
-  - `/webcms/${var.environment}/drupal/iam-task`: The ECS task role for Drupal and Drush. This is the run-time IAM role used by the WebCMS and has access to, e.g., S3 and Elasticssearch.
-  - `/webcms/${var.environment}/drupal/iam-execution`: The ECS execution role for Drupal and Drush. This role is used internally by Fargate to launch tasks and thus has access to ECR and Secrets Manager.
-  - `/webcms/${var.environment}/drupal/s3-bucket`: The name of the S3 bucket to store uploaded content.
-  - `/webcms/${var.environment}/drupal/s3-domain`: The full regional domain of the S3 bucket (e.g., `<bucket>.us-east-2.s3.amazonaws.com`).
+- From the ALB we need some ARNs:
+  - `/webcms/${var.environment}/alb/listener`: The ARN of the ALB listener responsible for handling connections.
+- For Drupal, we load some identifiers for IAM, S3, and the ALB:
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-task`: The ECS task role for Drupal and Drush. This is the run-time IAM role used by the WebCMS and has access to, e.g., S3 and Elasticssearch.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-execution`: The ECS execution role for Drupal and Drush. This role is used internally by Fargate to launch tasks and thus has access to ECR and Secrets Manager.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/s3-bucket`: The name of the S3 bucket to store uploaded content.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/s3-domain`: The full regional domain of the S3 bucket (e.g., `<bucket>.us-east-2.s3.amazonaws.com`).
 - Log group identifiers are also read from Parameter Store:
-  - `/webcms/${var.environment}/log-groups/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
-  - `/webcms/${var.environment}/log-groups/nginx`: The name of the log group for Drupal's nginx container.
-  - `/webcms/${var.environment}/log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
-  - `/webcms/${var.environment}/log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
-  - `/webcms/${var.environment}/log-groups/drush`: The name of the log group for Drush runs.
-  - `/webcms/${var.environment}/log-groups/drupal`: The name of the log group for Drupal application logs.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/nginx`: The name of the log group for Drupal's nginx container.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drush`: The name of the log group for Drush runs.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drupal`: The name of the log group for Drupal application logs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
-  - `/webcms/${var.environment}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
-  - `/webcms/${var.environment}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
-  - `/webcms/${var.environment}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
-  - `/webcms/${var.environment}/secrets/mail-password`: The ARN of the SMTP password.
-  - `/webcms/${var.environment}/secrets/saml-sp-key`: The ARN of the private key for Drupal's SAML certificate.
-  - `/webcms/${var.environment}/secrets/akamai-access-token`: The ARN of the Akamai API access token.
-  - `/webcms/${var.environment}/secrets/akamai-client-token`: The ARN of the Akamai API client token.
-  - `/webcms/${var.environment}/secrets/akamai-client-secret`: The ARN of the Akamai API client secret.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license`: The ARN of the New Relic license key.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key`: The ARN of the private key for Drupal's SAML certificate.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-access-token`: The ARN of the Akamai API access token.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-token`: The ARN of the Akamai API client token.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-secret`: The ARN of the Akamai API client secret.
 
 ## Resources
 
@@ -215,6 +219,10 @@ An autoscaling policy is attached to the Drupal service that tracks 60% CPU util
 ### Drush
 
 This module creates a Drush task definition. The Drush task definition uses the same environment and secrets as Drupal, but instead of being run as an ECS service, the task is instead attached to the EventBridge cron schedule.
+
+### Routing
+
+This module creates an ALB target group and listener rule for Drupal.
 
 ## Module Outputs
 
