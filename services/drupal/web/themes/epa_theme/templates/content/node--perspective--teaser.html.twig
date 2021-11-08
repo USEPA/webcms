@@ -16,6 +16,22 @@
   ]) %}
 {% endif %}
 
+{% if content.field_authors|field_value %}
+  {% set authors_string = '' %}
+  {% for author in content.field_authors|field_value %}
+    {% if loop.index > 1 %}
+      {% set authors_string = authors_string ~ ', ' %}
+    {% endif %}
+    {% set authors_string = authors_string ~ author['#markup'] %}
+  {% endfor %}
+  {% set more_info = more_info|merge([
+    {
+      'text': authors_string,
+      'label': 'By'|t,
+    }
+  ]) %}
+{% endif %}
+
 {% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
   'heading': label,

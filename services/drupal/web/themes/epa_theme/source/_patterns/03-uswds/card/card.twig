@@ -1,9 +1,10 @@
 {% set classes = [
   'usa-card',
   modifier_classes ? modifier_classes,
+  card_layout ? card_layout : 'tablet:grid-col-4'
 ]|join(' ')|trim %}
 
-<div class="{{ classes }} {{ card_layout }}">
+<li class="{{ classes }}">
   <div class="usa-card__container">
     <header class="usa-card__header">
       <h2 class="usa-card__heading">{{ card_title }}</h2>
@@ -18,8 +19,10 @@
     <div class="usa-card__body">
       {{ card_content }}
     </div>
+    {% if card_url and card_button_text %}
     <div class="usa-card__footer">
       <a class="usa-button" href="{{ card_url }}">{{ card_button_text }}</a>
     </div>
+    {% endif %}
   </div>
-</div>
+</li>
