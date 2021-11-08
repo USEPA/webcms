@@ -1,28 +1,36 @@
 {% set classes = [
   'usa-card',
   modifier_classes ? modifier_classes,
-  card_layout ? card_layout : 'tablet:grid-col-4'
+  layout_classes ? layout_classes : 'tablet:grid-col-4'
+]|join(' ')|trim %}
+
+{% set media_classes = [
+  'usa-card__media',
+  media_modifier_classes ? media_modifier_classes,
 ]|join(' ')|trim %}
 
 <li class="{{ classes }}">
   <div class="usa-card__container">
     <header class="usa-card__header">
-      <h2 class="usa-card__heading">{{ card_title }}</h2>
+      <h2 class="usa-card__heading">{{ title }}</h2>
     </header>
-    {% if card_media %}
-    <div class="usa-card__media {{ media_classes }}">
-      <div class="usa-card__img">
-        {{ card_media }}
+
+    {% if media %}
+      <div class="{{ media_classes }}">
+        <div class="usa-card__img">
+          {{- media -}}
+        </div>
       </div>
-    </div>
     {% endif %}
+
     <div class="usa-card__body">
-      {{ card_content }}
+      {{ content }}
     </div>
-    {% if card_url and card_button_text %}
-    <div class="usa-card__footer">
-      <a class="usa-button" href="{{ card_url }}">{{ card_button_text }}</a>
-    </div>
+
+    {% if button_url and button_text %}
+      <div class="usa-card__footer">
+        <a class="usa-button" href="{{ button_url }}">{{ button_text }}</a>
+      </div>
     {% endif %}
   </div>
 </li>

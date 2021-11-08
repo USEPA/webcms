@@ -7,10 +7,10 @@ See [https://designsystem.digital.gov/components/card/](https://designsystem.dig
 
 __Variables:__
 * modifier_classes: [string] Modifier classes.
-* media_classes: [string] Modifier classes for the media element.
-* card_layout: [string] Classes to be added for layout purposes.
-* card_title: [string] Title of the card.
-* card_content: [string] Card main content.
-* card_media: [string] Markup for an image/media element.
-* card_url: [string] URL for the button element.
-* card_button_text: [string] Text for the button.
+* media_modifier_classes: [string] Modifier classes for the media element.
+* layout_classes: [string] Classes to be added for layout purposes.
+* title: [string] Title of the card.
+* content: [string] Card main content.
+* media: [string] Markup for an image/media element.
+* button_url: [string] URL for the button element.
+* button_text: [string] Text for the button.
