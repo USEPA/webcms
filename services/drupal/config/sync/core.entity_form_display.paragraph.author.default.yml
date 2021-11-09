@@ -1,0 +1,69 @@
+uuid: e2434699-7a5b-44be-9066-d732643ce9de
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.author.field_author
+    - field.field.paragraph.author.field_biography
+    - field.field.paragraph.author.field_office
+    - field.field.paragraph.author.field_position
+    - paragraphs.paragraphs_type.author
+  module:
+    - inline_entity_form
+    - maxlength
+    - text
+id: paragraph.author.default
+targetEntityType: paragraph
+bundle: author
+mode: default
+content:
+  field_author:
+    weight: 0
+    settings:
+      form_mode: default
+      override_labels: true
+      label_singular: Author
+      label_plural: Authors
+      allow_new: true
+      allow_existing: true
+      match_operator: CONTAINS
+      revision: false
+      collapsible: false
+      collapsed: false
+      allow_duplicate: false
+    third_party_settings: {  }
+    type: inline_entity_form_complex
+    region: content
+  field_biography:
+    weight: 4
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_office:
+    weight: 2
+    settings:
+      size: 120
+      placeholder: ''
+    third_party_settings:
+      maxlength:
+        maxlength_js: 240
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+    type: string_textfield
+    region: content
+  field_position:
+    weight: 1
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings:
+      maxlength:
+        maxlength_js: 240
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+    type: string_textfield
+    region: content
+hidden:
+  created: true
+  status: true

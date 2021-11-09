@@ -1,0 +1,70 @@
+uuid: 570ce4aa-85c8-41a1-a9f8-c0d7bd3ae7aa
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_wysiwyg
+    - media
+    - media_inline_embed
+    - pathologic
+    - token_filter
+name: 'Restricted HTML'
+format: restricted_html
+weight: 0
+filters:
+  epa_filter_empty_paragraphs:
+    id: epa_filter_empty_paragraphs
+    provider: epa_wysiwyg
+    status: true
+    weight: 0
+    settings: {  }
+  epa_filter_links:
+    id: epa_filter_links
+    provider: epa_wysiwyg
+    status: true
+    weight: 0
+    settings: {  }
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: true
+    weight: -10
+    settings:
+      allowed_html: '<p> <strong> <em> <a href hreflang> <ul> <li> <ol> <sup> <sub> <ins data-date>'
+      filter_html_help: true
+      filter_html_nofollow: false
+  media_embed:
+    id: media_embed
+    provider: media
+    status: false
+    weight: 100
+    settings:
+      default_view_mode: default
+      allowed_media_types: {  }
+      allowed_view_modes: {  }
+  media_inline_embed:
+    id: media_inline_embed
+    provider: media_inline_embed
+    status: false
+    weight: 100
+    settings:
+      default_view_mode: default
+      allowed_media_types: {  }
+      allowed_view_modes: {  }
+  filter_pathologic:
+    id: filter_pathologic
+    provider: pathologic
+    status: true
+    weight: 50
+    settings:
+      settings_source: global
+      local_settings:
+        protocol_style: full
+        local_paths: ''
+  token_filter:
+    id: token_filter
+    provider: token_filter
+    status: false
+    weight: 0
+    settings:
+      replace_empty: '0'
