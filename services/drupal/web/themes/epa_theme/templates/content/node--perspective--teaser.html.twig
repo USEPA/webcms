@@ -7,11 +7,30 @@
 
 {% set more_info = [] %}
 
-{% if content.field_last_published|field_value %}
+{% if content.field_release|field_value %}
   {% set more_info = more_info|merge([
     {
-      'text': content.field_last_published|field_value,
-      'label': content.field_last_published|field_label
+      'text': content.field_release|field_value,
+      'label': 'Date'|t,
+    }
+  ]) %}
+{% endif %}
+
+{% if content.field_authors|field_value %}
+  {% set authors_string = '' %}
+
+  {% for author in content.field_authors|field_value %}
+    {% if loop.index > 1 %}
+      {% set authors_string = authors_string ~ ', ' %}
+    {% endif %}
+
+    {% set authors_string = authors_string ~ author['#markup'] %}
+  {% endfor %}
+
+  {% set more_info = more_info|merge([
+    {
+      'text': authors_string,
+      'label': 'By'|t,
     }
   ]) %}
 {% endif %}
@@ -25,4 +44,5 @@
   'image_src': content.field_media_image|render ? content.field_media_image|field_target_entity.field_media_image.entity.fileuri|image_style('thumbnail') : false,
   'image_alt': content.field_media_image|field_target_entity.field_media_image.alt
 } %}
+
 {% set catch_cache = content|render %}
