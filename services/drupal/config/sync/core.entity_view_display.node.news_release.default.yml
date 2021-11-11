@@ -28,7 +28,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
-    - hierarchical_term_formatter
+    - epa_core
     - user
 id: node.news_release.default
 targetEntityType: node
@@ -54,12 +54,13 @@ content:
     label: inline
     settings:
       display: all
-      wrap: span
-      separator: ' > '
-      link: false
+      link: true
+      wrap: none
+      separator: ' | '
+      facet_source: news_releases_press_office
       reverse: false
     third_party_settings: {  }
-    type: hierarchical_term_formatter
+    type: epa_core_hierarchical_term_facet_formatter
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
