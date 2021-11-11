@@ -4,10 +4,18 @@
 ]|join(' ')|trim %}
 
 <div class="{{ classes }}">
-  <strong class="hublinks__title">{{ 'Related Topics'|t }}:</strong>
+  {% if title %}
+    <strong class="hublinks__title">{{ title }}:</strong>
+  {% endif %}
   <ul class="hublinks__list">
     {% for link in links -%}
-      <li class="hublinks__list-item"><a  class="hublinks__link" href="{{ link.url }}">{{ link.text }}</a></li>
+      <li class="hublinks__list-item">
+        {%- if link.url and link.text -%}
+          <a href="{{ link.url }}">{{ link.text }}</a>
+        {%- else -%}
+          {{ link }}
+        {%- endif -%}
+      </li>
     {%- endfor %}
   </ul>
 </div>

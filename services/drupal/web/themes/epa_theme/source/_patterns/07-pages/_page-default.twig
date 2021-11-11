@@ -19,16 +19,16 @@
 } %}
 
 {% if show_sitewide_alerts %}
-  {% include '@components/sitewide-alert/sitewide-alert--emergency/sitewide-alert--emergency.twig' with {
+  {% include '@components/site-alert/site-alert--emergency/site-alert--emergency.twig' with {
     'show_close': false,
     'content': '<p>This is an <strong>emergency</strong> alert.</p>',
   } %}
-  {% include '@components/sitewide-alert/sitewide-alert--warning/sitewide-alert--warning.twig' with {
+  {% include '@components/site-alert/site-alert.twig' with {
     'show_close': true,
     'hash': 'sample-alert-1',
     'content': '<p>This is a <strong>warning</strong> alert.</p>',
   } %}
-  {% include '@components/sitewide-alert/sitewide-alert--information/sitewide-alert--information.twig' with {
+  {% include '@components/site-alert/site-alert--information/site-alert--information.twig' with {
     'show_close': true,
     'hash': 'sample-alert-2',
     'content': '<p>We’ve made some changes to <a href="#">EPA.gov</a>. If the information you are looking for is not here, you may be able to find it on the <a href="https://archive.epa.gov/">EPA Web Archive</a> or the <a href="https://19january2017snapshot.epa.gov/">January 19, 2017 Web Snapshot</a>.</p>',
@@ -72,15 +72,14 @@
       {% include '@components/menu/menu--footer/menu--footer.twig' with {
         'menu_name': 'footer',
         'items': [
-          { 'title': 'Accessibility', 'url': '#' },
-          { 'title': 'EPA Administrator', 'url': '#' },
-          { 'title': 'Budget & Performance', 'url': '#' },
-          { 'title': 'Contracting', 'url': '#' },
-          { 'title': 'Grants', 'url': '#' },
-          { 'title': 'January 19, 2017 Web Snapshot', 'url': '#' },
-          { 'title': 'No FEAR Act Data', 'url': '#' },
-          { 'title': 'Privacy', 'url': '#' },
-          { 'title': 'Privacy and Security Notice', 'url': '#' }
+          { 'title': 'Accessibility', 'url': 'https://www.epa.gov/accessibility' },
+          { 'title': 'Budget & Performance', 'url': 'https://www.epa.gov/planandbudget' },
+          { 'title': 'Contracting', 'url': 'https://www.epa.gov/contracts' },
+          { 'title': 'EPA www Web Snapshots', 'url': 'https://www.epa.gov/home/wwwepagov-snapshots' },
+          { 'title': 'Grants', 'url': 'https://www.epa.gov/grants' },
+          { 'title': 'No FEAR Act Data', 'url': 'https://www.epa.gov/ocr/whistleblower-protections-epa-and-how-they-relate-non-disclosure-agreements-signed-epa-employees' },
+          { 'title': 'Privacy', 'url': 'https://www.epa.gov/privacy' },
+          { 'title': 'Privacy and Security Notice', 'url': 'https://www.epa.gov/privacy/privacy-and-security-notice' },
         ],
       } %}
     </div>
@@ -89,15 +88,15 @@
       {% include '@components/menu/menu--footer/menu--footer.twig' with {
         'menu_name': 'footer',
         'items': [
-          { 'title': 'Data.gov', 'url': '#' },
-          { 'title': 'Inspector General', 'url': '#' },
-          { 'title': 'Jobs', 'url': '#' },
-          { 'title': 'Newsroom', 'url': '#' },
-          { 'title': 'Open Government', 'url': '#' },
-          { 'title': 'Regulations.gov', 'url': '#' },
-          { 'title': 'Subscribe', 'url': '#' },
-          { 'title': 'USA.gov', 'url': '#' },
-          { 'title': 'White House', 'url': '#' }
+          { 'title': 'Data.gov', 'url': 'https://www.data.gov/' },
+          { 'title': 'Inspector General', 'url': 'https://www.epa.gov/office-inspector-general/about-epas-office-inspector-general' },
+          { 'title': 'Jobs', 'url': 'https://www.epa.gov/careers' },
+          { 'title': 'Newsroom', 'url': 'https://www.epa.gov/newsroom' },
+          { 'title': 'Open Government', 'url': 'https://www.epa.gov/data' },
+          { 'title': 'Regulations.gov', 'url': 'https://www.regulations.gov/' },
+          { 'title': 'Subscribe', 'url': 'https://www.epa.gov/newsroom/email-subscriptions-epa-news-releases' },
+          { 'title': 'USA.gov', 'url': 'https://www.usa.gov/' },
+          { 'title': 'White House', 'url': 'https://www.whitehouse.gov/' },
         ],
       } %}
     </div>
@@ -106,14 +105,18 @@
       {% include '@components/menu/menu--footer/menu--footer.twig' with {
         'menu_name': 'footer',
         'items': [
-          { 'title': 'Contact EPA', 'url': '#' },
-          { 'title': 'Hotlines', 'url': '#' },
-          { 'title': 'FOIA Requests', 'url': '#' }
+          { 'title': 'Contact EPA', 'url': 'https://www.epa.gov/aboutepa/forms/contact-epa' },
+          { 'title': 'EPA Disclaimers', 'url': 'https://www.epa.gov/web-policies-and-procedures/epa-disclaimers' },
+          { 'title': 'Hotlines', 'url': 'https://www.epa.gov/aboutepa/epa-hotlines' },
+          { 'title': 'FOIA Requests', 'url': 'https://www.epa.gov/foia' },
+          { 'title': 'Frequent Questions', 'url': 'https://www.epa.gov/aboutepa/frequent-questions-specific-epa-programstopics' },
         ],
       } %}
       <h2>Follow.</h2>
       {% include '@components/menu/menu--social/menu--social.twig' %}
-      <p class="footer__last-updated">Last updated on February 25, 2020</p>
+      <p class="footer__last-updated">Last updated on September 15, 2021</p>
     </div>
   {% endblock %}
 {% endembed %}
+
+{% include '@components/back-to-top/back-to-top.twig' %}

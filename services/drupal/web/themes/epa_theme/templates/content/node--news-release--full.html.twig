@@ -19,8 +19,14 @@
 {% endfor %}
 
 {% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'News Releases from ' ~ press_offices|join(', ')|striptags,
+  {% include '@components/hublinks/hublinks.twig' with {
+    'title': 'News Releases'|t,
+    'links': press_offices,
+  } %}
+
+  {% include '@components/hublinks/hublinks.twig' with {
+    'title': '',
+    'links': [more_link],
   } %}
 {% endset %}
 

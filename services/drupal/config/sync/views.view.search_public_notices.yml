@@ -8,6 +8,7 @@ dependencies:
     - search_api.index.public_notices
   module:
     - datetime
+    - epa_core
     - epa_rss
     - search_api
     - text
@@ -766,7 +767,21 @@ display:
       path: publicnotices/notices-search
       defaults:
         cache: true
+        style: false
+        row: false
+        filters: true
+        filter_groups: true
       exposed_block: true
+      style:
+        type: epa_core_uswds_collection
+        options:
+          uses_fields: false
+      row:
+        type: search_api
+        options:
+          view_modes:
+            'entity:node':
+              public_notice: teaser
     cache_metadata:
       max-age: -1
       contexts:

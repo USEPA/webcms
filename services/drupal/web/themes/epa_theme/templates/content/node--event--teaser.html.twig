@@ -5,10 +5,21 @@
  */
 #}
 
-{% include '@components/teaser/teaser.twig' with {
+{% set more_info = [] %}
+
+{% if content.field_date|field_value %}
+  {% set more_info = more_info|merge([
+    {
+      'text': content.field_date|field_value,
+      'label': content.field_date|field_label
+    }
+  ]) %}
+{% endif %}
+
+{% include '@uswds/collection/_collection-item.twig' with {
   'url': url,
-  'title': label,
+  'heading': label,
   'subtitle': content.field_secondary_headline,
-  'metadata': content.field_date,
-  'summary': content.field_description,
+  'more_info': more_info,
+  'description': content.field_description,
 } %}

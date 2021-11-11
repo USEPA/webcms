@@ -10,6 +10,7 @@ dependencies:
     - search_api.index.frequent_questions
   module:
     - datetime
+    - epa_core
     - epa_rss
     - search_api
     - text
@@ -74,10 +75,8 @@ display:
             offset_label: Offset
           quantity: 9
       style:
-        type: default
+        type: epa_core_uswds_collection
         options:
-          row_class: ''
-          default_row_class: false
           uses_fields: false
       row:
         type: search_api
@@ -714,6 +713,18 @@ display:
       exposed_block: true
       defaults:
         cache: true
+        style: false
+        row: false
+      style:
+        type: epa_core_uswds_collection
+        options:
+          uses_fields: false
+      row:
+        type: search_api
+        options:
+          view_modes:
+            'entity:node':
+              faq: teaser
     cache_metadata:
       max-age: -1
       contexts:
