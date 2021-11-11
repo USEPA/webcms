@@ -31,6 +31,7 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
     'dynamic_public_notice_list',
     'search_faqs',
     'search_news_releases',
+    'search_perspectives',
     'search_public_notices',
   ];
   if (isset($variables['element']['#name'])) {
