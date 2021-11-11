@@ -34,7 +34,7 @@ import Drupal from 'drupal';
           }
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="usa-tag external-link__tag" title="${translatedAccessible}"><span aria-hidden="true">${translated}</span><span class="u-visually-hidden">${translatedAccessible}</span></span>`
+            `<span class="usa-tag external-link__tag" title="${translatedAccessible}"><span aria-hidden="true">${translated}</span><span class="u-visually-hidden"> ${translatedAccessible}</span></span>`
           );
         }
       });
