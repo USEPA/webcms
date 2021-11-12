@@ -222,34 +222,44 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['current']['#value'] = NULL;
 
     $form['new_state']['#required'] = TRUE;
-  }
 
-  // Only show an "Edit" link to the user if we're on the "Latest version" route.
-  $current_route = \Drupal::routeMatch()->getRouteName();
-  if ($current_route == 'entity.node.latest_version' && $form_id == 'content_moderation_entity_moderation_form') {
+    // Only show an "Edit" link to the user if we're on the latest revision of the node.
     $storage = $form_state->getStorage();
     if (isset($storage['entity']) && $storage['entity'] instanceof NodeInterface) {
-      $link_options = [
-        'attributes' => [
-          'class' => [
-            'button'
+      $node = $storage['entity'];
+      if ($node->isLatestRevision()) {
+        $link_options = [
+          'attributes' => [
+            'class' => [
+              'button'
+            ],
           ],
-        ],
-      ];
+        ];
 
-      $edit_link = Link::fromTextAndUrl(
-        t('Edit'),
-        Url::fromRoute(
-          'entity.node.edit_form',
-          ['node' => $storage['entity']->id()],
-          $link_options
-        )
-      );
+        $edit_link = Link::fromTextAndUrl(
+          t('Edit'),
+          Url::fromRoute(
+            'entity.node.edit_form',
+            ['node' => $node->id()],
+            $link_options
+          )
+        );
 
-      $form['node_edit_link'] = $edit_link->toRenderable();
-      $form['node_edit_link']['#weight'] = -1;
+        $form['node_edit_link'] = $edit_link->toRenderable();
+      }
     }
   }
+
+
+//  $current_route = \Drupal::routeMatch()->getRouteName();
+//  if ($current_route == 'entity.node.latest_version' && $form_id == 'content_moderation_entity_moderation_form') {
+//    $storage = $form_state->getStorage();
+//    if (isset($storage['entity']) && $storage['entity'] instanceof NodeInterface) {
+//      $node = $storage['entity'];
+//      $node->isLatestRevision();
+//
+//    }
+//  }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
     _epa_workflow_add_compliance_checkboxes($form);
