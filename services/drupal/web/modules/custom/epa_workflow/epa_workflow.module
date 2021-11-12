@@ -250,17 +250,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     }
   }
 
-
-//  $current_route = \Drupal::routeMatch()->getRouteName();
-//  if ($current_route == 'entity.node.latest_version' && $form_id == 'content_moderation_entity_moderation_form') {
-//    $storage = $form_state->getStorage();
-//    if (isset($storage['entity']) && $storage['entity'] instanceof NodeInterface) {
-//      $node = $storage['entity'];
-//      $node->isLatestRevision();
-//
-//    }
-//  }
-
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
     _epa_workflow_add_compliance_checkboxes($form);
   }
