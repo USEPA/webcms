@@ -6,7 +6,7 @@
 <div class="{{ classes }}"{% if role %} role="{{ role }}"{% endif %}>
   <div class="usa-alert__body">
     {% if title -%}
-      <h3 class="usa-alert__heading">{{ title }}</h3>
+      <{{ title_element ?: 'h2' }} class="usa-alert__heading">{{ title }}</{{ title_element ?: 'h2' }}>
     {%- endif %}
     {{ content }}
   </div>
