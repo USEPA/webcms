@@ -1,4 +1,4 @@
-uuid: e6a39dcc-7ac9-452d-bbac-3cd4c49f7c4d
+uuid: b7564e82-59e1-4797-8d3d-2c48480592b3
 langcode: en
 status: true
 dependencies:
@@ -11,8 +11,8 @@ dependencies:
     - views_bulk_operations
 _core:
   default_config_hash: epCHwxXumnS0FQR7duKz2_r2nkW5CJxTracGsaPMuzE
-id: moderated_content
-label: 'Moderated content'
+id: bulk_operations
+label: 'Bulk Operations'
 module: views
 description: 'Find and moderate content.'
 tag: ''
@@ -1030,7 +1030,7 @@ display:
           entity_type: node
           plugin_id: latest_translation_affected_revision
       sorts: {  }
-      title: 'Latest Revisions'
+      title: 'Bulk Operations'
       header: {  }
       footer: {  }
       empty:
@@ -1095,11 +1095,6 @@ display:
         operator: AND
         groups:
           1: AND
-      use_more: true
-      use_more_always: true
-      use_more_text: 'Switch to Bulk Operations'
-      link_url: /admin/content/bulk
-      link_display: custom_url
     cache_metadata:
       max-age: 0
       contexts:
@@ -1114,23 +1109,23 @@ display:
   moderated_content:
     display_plugin: page
     id: moderated_content
-    display_title: 'Moderated content'
+    display_title: 'Bulk Operations'
     position: 1
     display_options:
       display_extenders:
         views_ajax_get:
           ajax_get: false
-      path: admin/content/node
+      path: admin/content/bulk
       display_description: ''
       menu:
-        type: 'default tab'
-        title: Content
+        type: none
+        title: 'Bulk Operations'
         description: ''
         expanded: false
-        parent: ''
+        parent: system.admin_content
         weight: -10
         context: '0'
-        menu_name: main
+        menu_name: admin
       tab_options:
         type: normal
         title: Content
