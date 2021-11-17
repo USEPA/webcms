@@ -27,6 +27,21 @@ function epa_core_update_8002() {
 }
 
 /**
+ * Remove circular redirects that were created during initial content migration.
+ */
+function epa_core_update_9001() {
+  $count = \Drupal::database()->query("DELETE r
+      FROM redirect AS r
+      WHERE r.rid IN (
+          SELECT r2.rid FROM (SELECT r1.rid
+          FROM redirect AS r1
+          LEFT JOIN path_alias AS pa
+              ON r1.redirect_source__path = SUBSTRING(pa.alias,2)
+          WHERE pa.path = SUBSTRING(r1.redirect_redirect__uri,10)) AS r2)", [], ['return' => \Drupal\Core\Database\Database::RETURN_AFFECTED]);
+  return t("Deleted %count circular redirects.", ['%count' => $count]);
+}
+
+/**
  * Create the new News Release term with 730 day review cycle.
  */
 function _epa_core_create_news_release_type_term() {
