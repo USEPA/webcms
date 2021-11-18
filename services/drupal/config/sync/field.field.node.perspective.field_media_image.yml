@@ -1,0 +1,35 @@
+uuid: f276e764-f1a6-4fdd-8ada-7fa14e407360
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_media_image
+    - media.type.image
+    - node.type.perspective
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: node.perspective.field_media_image
+field_name: field_media_image
+entity_type: node
+bundle: perspective
+label: 'Teaser Image'
+description: 'This image will only display on the perspectives search results page; it will not display on this perspective page.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

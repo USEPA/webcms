@@ -1,0 +1,24 @@
+{#
+/**
+ * @file
+ * Default twig file for Hierarchical Term Facet Formatter.
+ *
+ * Available variables:
+ * - terms: The processed taxonomy terms to display.
+ * - wrapper: The HTML tag that should wrap each of the terms.
+ * - separator: The text used to separate each of the terms.
+ *
+ * @see template_preprocess_hierarchical_term_facet_formatter()
+ *
+ * @ingroup themeable
+ */
+#}
+{% if wrapper == 'ol' or wrapper == 'ul' %}
+  <{{ wrapper }} class="terms-hierarchy">
+{% endif %}
+{% for term in terms -%}
+  {{ term }}{% if loop.last == false %}{{ separator }}{% endif %}
+{%- endfor %}
+{% if wrapper == 'ol' or wrapper == 'ul' %}
+  </{{ wrapper }}>
+{% endif %}

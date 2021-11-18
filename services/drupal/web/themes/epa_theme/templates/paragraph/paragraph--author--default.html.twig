@@ -1,0 +1,20 @@
+{% set tid = paragraph.field_author.target_id %}
+
+{% set author_content %}
+  <p>
+    <strong>{{ content.field_author }}</strong>
+    {% if content.field_position|render %}<br>{{ content.field_position|field_value }}{% endif %}
+    {% if content.field_office|render %}<br>{{ content.field_office|field_value }}{% endif %}
+  </p>
+  {{ content.field_biography }}
+{% endset %}
+
+{% include '@components/summary-box/summary-box--image-right/summary-box--image-right.twig' with {
+  'id': 'author-'~tid,
+  'modifier_classes': 'margin-y-4 u-clear-both',
+  'image': drupal_field('field_image', 'taxonomy_term', tid),
+  'heading': 'About the Author',
+  'heading_element': 'h2',
+  'content': author_content,
+} only %}
+

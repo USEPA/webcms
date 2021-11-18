@@ -2,6 +2,7 @@
 el: .views-view-unformatted
 title: Unformatted Views View
 state: complete
+hidden: true
 ---
 
 __Variables:__

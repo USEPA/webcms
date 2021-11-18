@@ -8,6 +8,7 @@ dependencies:
     - search_api.index.news_releases
   module:
     - datetime
+    - epa_core
     - epa_rss
     - search_api
     - user
@@ -751,6 +752,18 @@ display:
       exposed_block: true
       defaults:
         cache: true
+        style: false
+        row: false
+      style:
+        type: epa_core_uswds_collection
+        options:
+          uses_fields: false
+      row:
+        type: search_api
+        options:
+          view_modes:
+            'entity:node':
+              news_release: teaser
     cache_metadata:
       max-age: -1
       contexts:
