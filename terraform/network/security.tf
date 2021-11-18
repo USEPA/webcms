@@ -164,7 +164,7 @@ resource "aws_security_group_rule" "public_alb_http_ingress" {
 
   security_group_id = aws_security_group.alb.id
 
-  type      = "ingres"
+  type      = "ingress"
   protocol  = "tcp"
   from_port = 80
   to_port   = 80
