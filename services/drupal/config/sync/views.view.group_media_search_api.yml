@@ -84,6 +84,7 @@ display:
           description: ''
           columns:
             name: name
+            search_api_rendered_item: name
             aggregated_filenames: aggregated_filenames
             bundle: bundle
             uid_1: uid_1
@@ -94,6 +95,11 @@ display:
             name:
               sortable: true
               default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            search_api_rendered_item:
               align: ''
               separator: ''
               empty_column: false
@@ -153,8 +159,8 @@ display:
           label: Name
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '<a></a>'
             make_link: false
             path: ''
             absolute: false
@@ -213,6 +219,62 @@ display:
             multi_type: separator
             multi_separator: ', '
           plugin_id: search_api_field
+        search_api_rendered_item:
+          id: search_api_rendered_item
+          table: search_api_index_media
+          field: search_api_rendered_item
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          view_modes:
+            'entity:media':
+              audio: link_with_metadata
+              document: link_with_metadata
+              image: link_with_metadata
+              other: link_with_metadata
+              remote_video: link_with_metadata
+          plugin_id: search_api_rendered_item
         aggregated_filenames:
           id: aggregated_filenames
           table: search_api_index_media
