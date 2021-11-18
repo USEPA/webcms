@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a view template to display a list of rows.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the container.
+ * - rows: A list of rows.
+ *   - attributes: The row's HTML attributes.
+ *   - content: The row's contents.
+ * - title: The title of this group of rows. May be empty.
+ *
+ * @see template_preprocess_views_style_epa_core_uswds_collection()
+ */
+#}
+<ul{{ attributes }}>
+  {% for row in rows %}
+    <li{{ row.attributes.addClass(row_classes) }}>
+      {{ row.content }}
+    </li>
+  {% endfor %}
+</ul>

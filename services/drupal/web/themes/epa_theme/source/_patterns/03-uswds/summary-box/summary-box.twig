@@ -1,0 +1,37 @@
+{% set classes = [
+  'usa-summary-box',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set body_classes = [
+  'usa-summary-box__body',
+  has_constrain ? 'l-constrain',
+  constrain_modifier_classes ? constrain_modifier_classes,
+]|join(' ')|trim %}
+
+{% set summary_box_id = 'summary-box'|unique_id %}
+
+<div class="{{ classes }}" role="region"{% if id %} id="{{ id }}"{% endif %}{% if heading %}aria-labelledby="{{ summary_box_id }}"{% endif %}>
+  <div class="{{ body_classes }}">
+    {% if image %}
+      {% set image_classes = [
+        'margin-bottom-0',
+        image_modifier_classes ? image_modifier_classes,
+      ]|join(' ')|trim %}
+
+      {% include '@components/figure/figure.twig' with {
+        'modifier_classes': image_classes,
+        'caption': false,
+        'media': image,
+      } %}
+    {% endif %}
+
+    {% if heading %}
+      <{{ heading_element ?: 'h3' }} class="usa-summary-box__heading" id="{{ summary_box_id }}">{{ heading }}</{{ heading_element ?: 'h3' }}>
+    {% endif %}
+
+    <div class="usa-summary-box__text">
+      {{ content }}
+    </div>
+  </div>
+</div>

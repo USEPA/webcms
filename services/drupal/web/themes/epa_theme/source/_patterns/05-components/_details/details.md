@@ -2,6 +2,7 @@
 el: .details
 title: Details
 state: inreview
+hidden: true
 ---
 Intended for use in a form component
 

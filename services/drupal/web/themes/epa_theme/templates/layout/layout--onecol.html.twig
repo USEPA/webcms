@@ -8,23 +8,22 @@
  * - attributes: HTML attributes for the layout <div>.
  */
 #}
-
 {% if content %}
-  {% if attributes %}
+  {% if attributes is not empty %}
     <div{{ attributes }}>
   {% endif %}
 
-  {% if region_attributes.content %}
-      <div{{ region_attributes.content }}>
+  {% if region_attributes.content is not empty %}
+    <div{{ region_attributes.content }}>
   {% endif %}
 
   {{ content.content }}
 
-  {% if attributes %}
+  {% if region_attributes.content is not empty %}
     </div>
   {% endif %}
 
-  {% if region_attributes.content %}
+  {% if attributes is not empty %}
     </div>
   {% endif %}
 {% endif %}
