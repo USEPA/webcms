@@ -83,20 +83,22 @@ display:
           summary: ''
           description: ''
           columns:
-            search_api_media_library_select_form: search_api_media_library_select_form
             name: name
+            aggregated_filenames: aggregated_filenames
             bundle: bundle
             uid_1: uid_1
             changed: changed
             created: created
             search_api_operations: search_api_operations
           info:
-            search_api_media_library_select_form:
+            name:
+              sortable: true
+              default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
               responsive: ''
-            name:
+            aggregated_filenames:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -683,7 +685,7 @@ display:
           expose:
             operator_id: field_media_tags_op
             label: Tags
-            description: ''
+            description: 'You may filter by one or more tags.'
             use_operator: false
             operator: field_media_tags_op
             operator_limit_selection: false
@@ -691,7 +693,7 @@ display:
             identifier: field_media_tags
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
@@ -783,7 +785,7 @@ display:
           expose:
             operator_id: bundle_op
             label: Type
-            description: ''
+            description: 'Media type.'
             use_operator: false
             operator: bundle_op
             operator_limit_selection: false
@@ -878,7 +880,9 @@ display:
           break_phrase: false
           not: false
           plugin_id: search_api
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:

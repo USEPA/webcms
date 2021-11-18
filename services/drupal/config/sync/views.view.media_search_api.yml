@@ -83,16 +83,12 @@ display:
             search_api_bulk_form: search_api_bulk_form
             thumbnail: thumbnail
             name_1: name_1
+            aggregated_filenames: aggregated_filenames
             bundle: bundle
-            filename_2: filename_2
-            filename_1: filename_1
-            filename_3: filename_3
-            bundle_1: bundle_1
+            author_name: author_name
             changed: changed
             created_1: created_1
             search_api_operations: search_api_operations
-            uid: uid
-            author_name: author_name
           info:
             search_api_bulk_form:
               align: ''
@@ -111,6 +107,13 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
+            aggregated_filenames:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             bundle:
               sortable: true
               default_sort_order: asc
@@ -118,28 +121,7 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            filename_2:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            filename_1:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            filename_3:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            bundle_1:
+            author_name:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -161,20 +143,6 @@ display:
               empty_column: false
               responsive: ''
             search_api_operations:
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            uid:
-              sortable: true
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            author_name:
-              sortable: true
-              default_sort_order: asc
               align: ''
               separator: ''
               empty_column: false
@@ -870,7 +838,7 @@ display:
           expose:
             operator_id: field_media_tags_op
             label: Tags
-            description: ''
+            description: 'You may filter by one or more tags.'
             use_operator: false
             operator: field_media_tags_op
             operator_limit_selection: false
@@ -878,7 +846,7 @@ display:
             identifier: field_media_tags
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
@@ -970,7 +938,7 @@ display:
           expose:
             operator_id: bundle_op
             label: Type
-            description: ''
+            description: 'Media type.'
             use_operator: false
             operator: bundle_op
             operator_limit_selection: false
@@ -1020,7 +988,18 @@ display:
       title: 'Media Search'
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content: 'No content available.'
+          plugin_id: text_custom
       relationships: {  }
       arguments: {  }
       display_extenders:
