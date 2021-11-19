@@ -170,3 +170,10 @@ function epa_media_views_data() {
   ];
   return $data;
 }
+
+function epa_media_menu_local_actions_alter(&$local_actions) {
+  // We're using a non-standard view for the group media list, so we have to do
+  // this in order to get the add and relate media buttons at the top of the new view.
+  $local_actions['group_content.group_media_add_page']['appears_on'] = ['view.group_media_search_api.page_1'];
+  $local_actions['group_content.group_media_relate_page']['appears_on'] = ['view.group_media_search_api.page_1'];
+}

@@ -331,7 +331,7 @@ display:
           expose:
             operator_id: field_media_tags_op
             label: Tags
-            description: ''
+            description: 'You may filter by one or more tags.'
             use_operator: false
             operator: field_media_tags_op
             operator_limit_selection: false
@@ -339,7 +339,7 @@ display:
             identifier: field_media_tags
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
@@ -444,7 +444,18 @@ display:
           plugin_id: search_api
       header: {  }
       footer: {  }
-      empty: {  }
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          empty: true
+          tokenize: false
+          content: 'No content available.'
+          plugin_id: text_custom
       relationships: {  }
       arguments: {  }
       display_extenders: {  }
@@ -752,8 +763,8 @@ display:
           label: Name
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '<a></a>'
             make_link: false
             path: ''
             absolute: false
@@ -812,6 +823,115 @@ display:
             multi_type: separator
             multi_separator: ', '
           plugin_id: search_api_field
+        search_api_rendered_item:
+          id: search_api_rendered_item
+          table: search_api_index_media
+          field: search_api_rendered_item
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          view_modes:
+            'entity:media':
+              audio: link_with_metadata
+              document: link_with_metadata
+              image: link_with_metadata
+              other: link_with_metadata
+              remote_video: link_with_metadata
+          plugin_id: search_api_rendered_item
+        aggregated_filenames:
+          id: aggregated_filenames
+          table: search_api_index_media
+          field: aggregated_filenames
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: Filename
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          link_to_item: false
+          use_highlighting: false
+          multi_type: separator
+          multi_separator: ', '
+          plugin_id: search_api
         uid_1:
           id: uid_1
           table: search_api_index_media
@@ -975,6 +1095,8 @@ display:
             search_api_media_library_select_form: search_api_media_library_select_form
             thumbnail: thumbnail
             name_1: name_1
+            search_api_rendered_item: name_1
+            aggregated_filenames: aggregated_filenames
             uid_1: uid_1
             changed_1: changed_1
           info:
@@ -989,6 +1111,18 @@ display:
               empty_column: false
               responsive: ''
             name_1:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            search_api_rendered_item:
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            aggregated_filenames:
               sortable: true
               default_sort_order: asc
               align: ''
