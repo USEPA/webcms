@@ -1095,7 +1095,7 @@ display:
         operator: AND
         groups:
           1: AND
-      use_more: true
+      use_more: false
       use_more_always: true
       use_more_text: 'Switch to Bulk Operations'
       link_url: /admin/content/bulk
@@ -1647,6 +1647,8 @@ display:
       defaults:
         fields: false
         header: false
+        pager: false
+        title: false
       header:
         display_link:
           id: display_link
@@ -1659,6 +1661,25 @@ display:
           display_id: page_1
           label: 'Switch to Bulk Operations'
           plugin_id: display_link
+      pager:
+        type: mini
+        options:
+          items_per_page: 50
+          offset: 0
+          id: 0
+          total_pages: null
+          tags:
+            previous: '‹ Previous'
+            next: 'Next ›'
+          expose:
+            items_per_page: false
+            items_per_page_label: 'Items per page'
+            items_per_page_options: '5, 10, 25, 50'
+            items_per_page_options_all: false
+            items_per_page_options_all_label: '- All -'
+            offset: false
+            offset_label: Offset
+      title: 'Latest Revisions'
     cache_metadata:
       max-age: -1
       contexts:
