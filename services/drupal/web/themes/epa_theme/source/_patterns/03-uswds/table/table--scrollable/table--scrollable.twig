@@ -1,0 +1,13 @@
+{% set classes = [
+  'usa-table--scrollable',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include "@uswds/table/table.twig" with {
+  'modifier_classes': classes,
+  'caption': caption,
+  'header': header,
+  'footer': footer,
+  'rows': rows,
+  'scrollable': true,
+}%}
