@@ -1,0 +1,33 @@
+diff --git a/core/modules/media_library/src/MediaLibraryUiBuilder.php b/core/modules/media_library/src/MediaLibraryUiBuilder.php
+index 12f8e08a5ce80ef75d19cc25f56c696f09695211..e5dad168470813e2a3f20e82437070beaba23f53 100644
+--- a/core/modules/media_library/src/MediaLibraryUiBuilder.php
++++ b/core/modules/media_library/src/MediaLibraryUiBuilder.php
+@@ -319,9 +319,7 @@ protected function buildMediaTypeAddForm(MediaLibraryState $state) {
+    *   The render array for the media library view.
+    */
+   protected function buildMediaLibraryView(MediaLibraryState $state) {
+-    // @todo Make the view configurable in
+-    //   https://www.drupal.org/project/drupal/issues/2971209
+-    $view = $this->entityTypeManager->getStorage('view')->load('media_library');
++    $view = $this->entityTypeManager->getStorage('view')->load($this->getViewId($state));
+     $view_executable = $this->viewsExecutableFactory->get($view);
+     $display_id = $state->get('views_display_id', 'widget');
+ 
+@@ -346,4 +344,17 @@ protected function buildMediaLibraryView(MediaLibraryState $state) {
+     return $view_executable->buildRenderable($display_id, $args, FALSE);
+   }
+ 
++  /**
++   * Returns the ID of the media library view.
++   *
++   * @param \Drupal\media_library\MediaLibraryState $state
++   *   The current state of the media library, derived from the current request.
++   *
++   * @return string
++   *   The ID of the media library view.
++   */
++  protected function getViewId(MediaLibraryState $state): string {
++    return $state->get('view_id', 'media_library');
++  }
++
+ }
