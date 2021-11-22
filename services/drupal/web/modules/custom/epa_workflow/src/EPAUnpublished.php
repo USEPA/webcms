@@ -22,6 +22,7 @@ class EPAUnpublished extends EPAModeration {
 
     // Clear out the review deadline
     $this->setReviewDeadline(TRUE);
+    $this->clearScheduledTransitions();
   }
 
 }

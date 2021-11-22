@@ -173,12 +173,14 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
     if (empty($scheduledValue)) {
       return;
     }
-    $currentModerationState = $entity->get('moderation_state')
-      ->getValue()[0]['value'];
 
+    $datetime_utc = new DateTime('now', new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
     foreach ($scheduledValue as $key => $value) {
-      unset($scheduledValue[$key]);
-      $this->updateEntity($entity, $value['moderation_state'], $scheduledField, $scheduledValue);
+      $scheduled_date = new DateTime($value['value'], new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+      if ($scheduled_date <= $datetime_utc) {
+        unset($scheduledValue[$key]);
+        $this->updateEntity($entity, $value['moderation_state'], $scheduledField, $scheduledValue);
+      }
     }
   }
 
