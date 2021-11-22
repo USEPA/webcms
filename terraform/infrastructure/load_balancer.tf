@@ -6,7 +6,7 @@ resource "aws_lb" "load_balancer" {
   subnets            = local.public_subnets
 
   access_logs {
-    bucket  = aws_s3_bucket.elb_logs.bucket
+    bucket  = coalesce(var.lb_logging_bucket, aws_s3_bucket.elb_logs.bucket)
     enabled = true
   }
 
@@ -81,7 +81,7 @@ resource "aws_lb" "app_load_balancer" {
   security_groups = [data.aws_ssm_parameter.alb_security_group]
 
   access_logs {
-    bucket  = aws_s3_bucket.elb_logs.bucket
+    bucket  = coalesce(var.lb_logging_bucket, aws_s3_bucket.elb_logs.bucket)
     enabled = true
   }
 
