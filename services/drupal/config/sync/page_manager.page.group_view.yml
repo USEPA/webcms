@@ -1,14 +1,22 @@
 uuid: 2cc8afd8-fccc-4717-9c98-96b92d51ef0d
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - user_permission_condition
 id: group_view
 label: 'Group view'
 description: ''
 use_admin_theme: true
 path: '/group/{group}'
 access_logic: and
-access_conditions: {  }
+access_conditions:
+  -
+    id: user_permission
+    permission: 'access group overview'
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'
 parameters:
   group:
     machine_name: group
