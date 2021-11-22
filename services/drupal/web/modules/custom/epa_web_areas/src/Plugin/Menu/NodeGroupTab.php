@@ -10,7 +10,7 @@ use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Provides route parameters needed to link to the current user tracker tab.
+ * Provides route parameters needed to link to the group dashboard.
  */
 class NodeGroupTab extends LocalTaskDefault implements ContainerFactoryPluginInterface {
 
@@ -23,7 +23,7 @@ class NodeGroupTab extends LocalTaskDefault implements ContainerFactoryPluginInt
   protected $groupStorage;
 
   /**
-   * Construct the UserTrackerTab object.
+   * Construct the NodeGroupTab object.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
