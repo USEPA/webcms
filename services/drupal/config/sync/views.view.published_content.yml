@@ -836,55 +836,6 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
-        users_in_groups:
-          id: users_in_groups
-          table: group_content_field_data
-          field: users_in_groups
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: users_in_groups_op
-            label: 'User''s groups'
-            description: ''
-            use_operator: 0
-            operator: users_in_groups_op
-            operator_limit_selection: 0
-            operator_list: {  }
-            identifier: users_in_groups
-            required: 0
-            remember: 0
-            multiple: 0
-            remember_roles:
-              authenticated: authenticated
-              anonymous: 0
-              layout_editor: 0
-              alerts_manager: 0
-              block_manager: 0
-              system_editor: 0
-              system_webmaster: 0
-              menu_admin: 0
-              administrator: 0
-            reduce: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: 0
-          entity_type: group_content
-          plugin_id: epa_web_areas_users_groups
       sorts: {  }
       title: 'Published Content'
       empty:
@@ -1250,56 +1201,6 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
-        users_in_groups:
-          id: users_in_groups
-          table: group_content_field_data
-          field: users_in_groups
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          operator: or
-          value:
-            - '0'
-          group: 1
-          exposed: false
-          expose:
-            operator_id: users_in_groups_op
-            label: 'User''s groups'
-            description: ''
-            use_operator: 0
-            operator: users_in_groups_op
-            operator_limit_selection: 0
-            operator_list: {  }
-            identifier: users_in_groups
-            required: 0
-            remember: 0
-            multiple: 0
-            remember_roles:
-              authenticated: authenticated
-              anonymous: 0
-              layout_editor: 0
-              alerts_manager: 0
-              block_manager: 0
-              system_editor: 0
-              system_webmaster: 0
-              menu_admin: 0
-              administrator: 0
-            reduce: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: 0
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: 0
-          entity_type: group_content
-          plugin_id: epa_web_areas_users_groups
         moderation_state:
           id: moderation_state
           table: node_field_data
@@ -1343,6 +1244,47 @@ display:
             group_items: {  }
           entity_type: node
           plugin_id: moderation_state_filter
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            - '0'
+          group: '1'
+          exposed: false
+          expose:
+            operator_id: false
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: 0
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
       filter_groups:
         operator: AND
         groups:
@@ -1393,6 +1335,377 @@ display:
       display_extenders:
         views_ajax_get:
           ajax_get: false
+      relationships:
+        uid:
+          id: uid
+          table: node_field_data
+          field: uid
+          admin_label: author
+          required: true
+          plugin_id: standard
+        group_content:
+          id: group_content
+          table: node_field_data
+          field: group_content
+          relationship: none
+          group_type: group
+          admin_label: 'Content group content'
+          required: false
+          group_content_plugins:
+            'group_node:event': '0'
+            'group_node:faq': '0'
+            'group_node:news_release': '0'
+            'group_node:page': '0'
+            'group_node:perspective': '0'
+            'group_node:public_notice': '0'
+            'group_node:regulation': '0'
+            'group_node:webform': '0'
+            'group_node:web_area': '0'
+          entity_type: node
+          plugin_id: group_content_to_entity_reverse
+      defaults:
+        relationships: false
+        filters: false
+        filter_groups: false
+      filters:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: title_op
+            label: Title
+            description: ''
+            use_operator: false
+            operator: title_op
+            identifier: title
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: string
+          entity_type: node
+          entity_field: title
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: gid_op
+            label: 'Web Area'
+            description: ''
+            use_operator: false
+            operator: gid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: gid
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          handler: 'default:group'
+          handler_settings:
+            target_bundles:
+              web_area: web_area
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            auto_create_bundle: ''
+          widget: autocomplete
+          entity_type: group_content
+          entity_field: gid
+          plugin_id: entity_reference
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            all: all
+            0: '0'
+          group: 1
+          exposed: true
+          expose:
+            operator_id: users_in_groups_op
+            label: 'Web Area'
+            description: ''
+            use_operator: 0
+            operator: users_in_groups_op
+            operator_limit_selection: 0
+            operator_list: {  }
+            identifier: users_in_groups
+            required: 0
+            remember: 0
+            multiple: 0
+            remember_roles:
+              authenticated: authenticated
+              anonymous: 0
+              layout_editor: 0
+              alerts_manager: 0
+              block_manager: 0
+              system_editor: 0
+              system_webmaster: 0
+              menu_admin: 0
+              administrator: 0
+            reduce: 1
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: 0
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: type_op
+            label: 'Content type'
+            description: ''
+            use_operator: false
+            operator: type_op
+            identifier: type
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+            reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          plugin_id: bundle
+          entity_type: node
+          entity_field: type
+        uid:
+          id: uid
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_op
+            label: Author
+            description: ' '
+            use_operator: false
+            operator: uid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: user
+          entity_field: uid
+          plugin_id: user_name
+        moderation_state:
+          id: moderation_state
+          table: node_field_data
+          field: moderation_state
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: in
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
+          group: 1
+          exposed: true
+          expose:
+            operator_id: moderation_state_op
+            label: 'Moderation state'
+            description: ''
+            use_operator: false
+            operator: moderation_state_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: moderation_state
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: true
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: moderation_state_filter
+        status_1:
+          id: status_1
+          table: node_field_data
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
     display_plugin: page
     display_title: Page
     id: page_1
