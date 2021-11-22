@@ -8,6 +8,7 @@ dependencies:
   module:
     - content_moderation
     - datetime
+    - epa_web_areas
     - group
     - node
     - user
@@ -32,6 +33,12 @@ display:
         type: tag
       query:
         type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: false
+          replica: false
+          query_comment: ''
+          query_tags: {  }
       exposed_form:
         type: basic
         options:
@@ -814,8 +821,11 @@ display:
               authenticated: authenticated
               anonymous: '0'
               layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
             reduce: true
           is_grouped: false
@@ -872,6 +882,55 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: users_in_groups_op
+            label: 'User''s groups'
+            description: ''
+            use_operator: false
+            operator: users_in_groups_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: users_in_groups
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: 0
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
       sorts: {  }
       title: 'Published Content'
       empty:
@@ -904,6 +963,7 @@ display:
             'group_node:faq': '0'
             'group_node:news_release': '0'
             'group_node:page': '0'
+            'group_node:perspective': '0'
             'group_node:public_notice': '0'
             'group_node:regulation': '0'
             'group_node:webform': '0'
