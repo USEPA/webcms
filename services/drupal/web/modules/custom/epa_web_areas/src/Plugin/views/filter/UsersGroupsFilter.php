@@ -5,7 +5,6 @@ namespace Drupal\epa_web_areas\Plugin\views\filter;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\ManyToOne;
 use Drupal\views\ViewExecutable;
-use Drupal\views\Views;
 
 /**
  * Filters nodes based on user's groups
