@@ -1,0 +1,35 @@
+uuid: fe82e126-0d9e-4236-8d3d-8c5cdbfbe715
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_publisher
+    - node.type.perspective
+    - taxonomy.vocabulary.press_office
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: node.perspective.field_publisher
+field_name: field_publisher
+entity_type: node
+bundle: perspective
+label: Publisher
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      press_office: press_office
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

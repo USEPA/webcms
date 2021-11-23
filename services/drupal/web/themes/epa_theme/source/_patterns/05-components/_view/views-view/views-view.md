@@ -2,6 +2,7 @@
 el: .views-view
 title: Views View
 state: complete
+hidden: true
 ---
 
 __Variables:__

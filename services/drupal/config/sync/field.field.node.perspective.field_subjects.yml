@@ -1,0 +1,35 @@
+uuid: 19b56734-8f09-4693-9e4c-9855d8333875
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subjects
+    - node.type.perspective
+    - taxonomy.vocabulary.perspectives_subjects
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: node.perspective.field_subjects
+field_name: field_subjects
+entity_type: node
+bundle: perspective
+label: Subjects
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      perspectives_subjects: perspectives_subjects
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

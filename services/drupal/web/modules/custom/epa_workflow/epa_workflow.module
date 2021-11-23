@@ -222,10 +222,61 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['current']['#value'] = NULL;
 
     $form['new_state']['#required'] = TRUE;
+
+    // Only show an "Edit" link to the user if we're on the latest revision of the node.
+    $storage = $form_state->getStorage();
+    if (isset($storage['entity']) && $storage['entity'] instanceof NodeInterface) {
+      $node = $storage['entity'];
+      if ($node->isLatestRevision()) {
+        $link_options = [
+          'attributes' => [
+            'class' => [
+              'button'
+            ],
+          ],
+        ];
+
+        $edit_link = Link::fromTextAndUrl(
+          t('Edit'),
+          Url::fromRoute(
+            'entity.node.edit_form',
+            ['node' => $node->id()],
+            $link_options
+          )
+        );
+
+        $form['node_edit_link'] = $edit_link->toRenderable();
+      }
+    }
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
     _epa_workflow_add_compliance_checkboxes($form);
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node instanceof NodeInterface && !$node->isNew()) {
+
+    // Loading will always return the "Current revision".
+    /** @var \Drupal\node\NodeInterface $current */
+    $current = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->load($node->id());
+
+    /*
+     * The revision ID of the "Current revision" (published) will be different
+     * than the most recent revision (latest version).
+     */
+    if ($node->getRevisionId() !== $current->getRevisionId()) {
+      $url = $node->toUrl('version-history')->toString();
+      $markup = t("<strong>Note:</strong> The revision you are editing is not the currently published content. It may include edits that are not visible on the published page. Refer to the <a target='_blank' href='@url'>revision page</a> to see other revisions and revert if necessary.", ['@url' => $url]);
+      \Drupal::messenger()->addWarning($markup);
+    }
   }
 }
 
@@ -293,6 +344,11 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
 
 /**
  * Implements hook_menu_local_tasks_alter().
+ *
+ * Overriding titles for tabs AND hiding the node Edit tab. Edit link will now
+ * only appear if we're on the latest_version route now.
+ *
+ * @see \epa_workflow_form_alter()
  */
 function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
   // Level 0 links are tabs and level 1 are subtabs.
@@ -320,6 +376,11 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
         }
       }
     }
+  }
+
+  // Hide the node edit tab always.
+  if (isset($data['tabs'][0]['entity.node.edit_form'])) {
+    unset($data['tabs'][0]['entity.node.edit_form']);
   }
 }
 
@@ -405,7 +466,6 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
     t('applicable Section 508 requirements'),
     Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
   );
-
   $link_508 = $link_508->toString();
 
   $link_external = Link::fromTextAndUrl(
@@ -415,7 +475,6 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   $link_external = $link_external->toString();
 
   // Create a checkbox for 508 compliance agreement
-  // $form['workflow_508_compliant'] = [
   $compliance_checkbox = [
     '#type' => 'checkbox',
     '#title' => t('I certify that this page complies with:'),

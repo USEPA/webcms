@@ -1,3 +1,7 @@
+{% if form.node_edit_link %}
+  {{ form.node_edit_link }}
+{% endif %}
+
 <ul class="entity-moderation-form">
   <li class="entity-moderation-form__item">{{ form.current }}</li>
   <li class="entity-moderation-form__item">{{ form.new_state }}</li>
@@ -5,4 +9,4 @@
   <li class="entity-moderation-form__item">{{ form.workflow_508_compliant }}</li>
   <li class="entity-moderation-form__item">{{ form.submit }}</li>
 </ul>
-{{ form|without('current', 'new_state', 'revision_log', 'submit', 'workflow_508_compliant') }}
+{{ form|without('current', 'new_state', 'revision_log', 'submit', 'workflow_508_compliant', 'node_edit_link') }}
