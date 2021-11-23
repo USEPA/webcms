@@ -44,6 +44,17 @@ resource "aws_security_group" "memcached" {
   })
 }
 
+resource "aws_security_group" "alb" {
+  name        = "webcms-${var.environment}-alb"
+  description = "Security group for the ALB"
+
+  vpc_id = aws_vpc.vpc.id
+
+  tags = merge(var.tags, {
+    Name = "WebCMS ALB (${var.environment})"
+  })
+}
+
 resource "aws_security_group" "traefik" {
   name        = "webcms-${var.environment}-traefik"
   description = "Security group for the Traefik reverse proxy"
@@ -143,6 +154,40 @@ resource "aws_security_group_rule" "terraform_database_egress" {
 
 #endregion
 
+#region ALB
+
+# Allow HTTP ingress to the ALB from arbitrary sources. Note that we don't limit
+# this to just the NLB's public subnets; in an AWS environment, the ALB's
+# security group rules apply not to the NLB's IP but the client IP.
+resource "aws_security_group_rule" "public_alb_http_ingress" {
+  description = "Allows HTTP ingress to the ALB"
+
+  security_group_id = aws_security_group.alb.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 80
+  to_port   = 80
+
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+# Allow HTTPS ingress to the ALB from arbitrary sources.
+resource "aws_security_group_rule" "public_alb_https_ingress" {
+  description = "Allows HTTPS ingress to the ALB"
+
+  security_group_id = aws_security_group.alb.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+#endregion
+
 #region Traefik
 
 # Allow outbound HTTPS egress for Traefik. This is necessary in order to allow pulling
@@ -222,6 +267,60 @@ resource "aws_security_group_rule" "traefik_drupal_egress" {
   protocol  = "tcp"
   from_port = 443
   to_port   = 443
+
+  source_security_group_id = aws_security_group.drupal.id
+}
+
+# Allow traffic on port 443 from the ALB to Drupal
+resource "aws_security_group_rule" "drupal_alb_ingress" {
+  description = "Allows Drupal to receive traffic from the ALB"
+
+  security_group_id = aws_security_group.drupal.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "alb_drupal_egress" {
+  description = "Allows the ALB to send traffic to Drupal"
+
+  security_group_id = aws_security_group.alb.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.drupal.id
+}
+
+# Allow traffic on port 8080 from the ALB for health checks
+resource "aws_security_group_rule" "drupal_alb_health_ingress" {
+  description = "Allows Drupal to receive health check traffic from the ALB"
+
+  security_group_id = aws_security_group.drupal.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 8080
+  to_port   = 8080
+
+  source_security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_security_group_rule" "alb_drupal_health_egress" {
+  description = "Allows the ALB to send health check traffic to Drupal"
+
+  security_group_id = aws_security_group.alb.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 8080
+  to_port   = 8080
 
   source_security_group_id = aws_security_group.drupal.id
 }

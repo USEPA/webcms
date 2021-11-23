@@ -18,6 +18,18 @@ resource "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #endregion
 
+#region ALB
+
+resource "aws_ssm_parameter" "alb_listener" {
+  name  = "/webcms/${var.environment}/alb/listener"
+  type  = "String"
+  value = aws_lb_listener.alb_https.arn
+
+  tags = var.tags
+}
+
+#endregion
+
 #region Service endpoints
 
 resource "aws_ssm_parameter" "elasticache_endpoint" {

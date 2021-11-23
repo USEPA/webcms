@@ -53,9 +53,10 @@ This module creates a number of security groups for the various resources in the
 
 - The Aurora cluster permits ingress from the RDS proxy and the Terraform startup task.
 - Elasticsearch, RDS proxy, and Elasticache permit ingress from Drupal tasks on their well-known ports (respectively: 443, 3306, and 11211).
-- The Drupal task permits ingress from the Traefik router service.
+- The Drupal task permits ingress from the Traefik router service and from the ALB. The ALB is allowed access on ports 443 and 8080, the latter of which is the health check port.
 - Drupal is permitted egress on ports 80 and 443, as well as outbound SMTP. This reference module uses port 587, but the actual port may differ in other environments.
 - The Traefik router permits ingress from public subnets. Since network load balancers don't support security groups, this is the best we can do.
+- The ALB allows unlimited public ingress. Since the ALB is fronted by an NLB, the NLB forwards the IP address of the client connection.
 
 ## Module Outputs
 
@@ -77,6 +78,7 @@ The parameters are stored under the Parameter Store path `/webcms/${var.environm
   - `/webcms/${var.environment}/security-groups/proxy`: ID of the RDS proxy security group
   - `/webcms/${var.environment}/security-groups/elasticsearch`: ID of the Elasticsearch security group
   - `/webcms/${var.environment}/security-groups/memcached`: ID of the ElastiCache security group
+  - `/webcms/${var.environment}/security-groups/alb`: ID of the ALB security group
   - `/webcms/${var.environment}/security-groups/drupal`: ID of the Drupal task security group
   - `/webcms/${var.environment}/security-groups/traefik`: ID of the Traefik router security group
   - `/webcms/${var.environment}/security-groups/terraform-database`: ID of the database intialization security group

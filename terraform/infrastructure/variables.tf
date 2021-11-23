@@ -47,6 +47,12 @@ variable "lb_extra_certificates" {
   default     = []
 }
 
+variable "lb_logging_bucket" {
+  description = "Use custom S3 logging bucket instead of the default managed one."
+  type        = string
+  default     = null
+}
+
 variable "lb_internal" {
   description = "Whether or not this environment's NLB is internal."
   type        = bool

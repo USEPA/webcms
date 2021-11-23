@@ -26,6 +26,14 @@ data "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #endregion
 
+#region ALB
+
+data "aws_ssm_parameter" "alb_listener" {
+  name = "/webcms/${var.environment}/alb/listener"
+}
+
+#endregion
+
 #region Service endpoints
 
 data "aws_ssm_parameter" "elasticache_endpoint" {
