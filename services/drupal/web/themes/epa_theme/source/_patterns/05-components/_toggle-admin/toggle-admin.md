@@ -2,6 +2,7 @@
 el: .js-toggle-admin
 title: Toggle Admin
 state: complete
+hidden: true
 ---
 
 __Variables:__
