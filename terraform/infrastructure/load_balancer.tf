@@ -78,7 +78,7 @@ resource "aws_lb" "app_load_balancer" {
   load_balancer_type = "application"
 
   subnets         = local.public_subnets
-  security_groups = [data.aws_ssm_parameter.alb_security_group]
+  security_groups = [data.aws_ssm_parameter.alb_security_group.value]
 
   access_logs {
     bucket  = coalesce(var.lb_logging_bucket, aws_s3_bucket.elb_logs.bucket)
