@@ -1,0 +1,26 @@
+{% set classes = [
+  'usa-icon-list',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<ul class="{{ classes }}">
+  {% for item in list %}
+    <li class="usa-icon-list__item">
+      {% if item.icon %}
+      <div class="usa-icon-list__icon">
+        {% set icon_classes = [
+          icon_modifier_classes ? icon_modifier_classes,
+          item.icon.modifier_classes ? item.icon.modifier_classes
+        ]|join(' ')|trim %}
+        {% include '@uswds/icon/icon.twig' with {
+          'icon_name': item.icon.name,
+          'modifier_classes': icon_classes,
+        } %}
+      </div>
+      {% endif %}
+      <div class="usa-icon-list__content">
+        {{ item.content }}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
