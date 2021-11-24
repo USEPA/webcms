@@ -1,0 +1,71 @@
+diff --git a/core/lib/Drupal/Core/Entity/ContentEntityStorageBase.php b/core/lib/Drupal/Core/Entity/ContentEntityStorageBase.php
+index b69958d8e89df0c49d0933cedbeb1dbcb4a5ad72..d60430e339cb4125dc4254aeeb932b72aca2c7cb 100644
+--- a/core/lib/Drupal/Core/Entity/ContentEntityStorageBase.php
++++ b/core/lib/Drupal/Core/Entity/ContentEntityStorageBase.php
+@@ -388,8 +388,10 @@ public function getLatestRevisionId($entity_id) {
+ 
+     if (!isset($this->latestRevisionIds[$entity_id][LanguageInterface::LANGCODE_DEFAULT])) {
+       $result = $this->getQuery()
+-        ->latestRevision()
++        ->allRevisions()
+         ->condition($this->entityType->getKey('id'), $entity_id)
++        ->range(0, 1)
++        ->sort($this->entityType->getKey('revision'), 'DESC')
+         ->accessCheck(FALSE)
+         ->execute();
+ 
+diff --git a/core/lib/Drupal/Core/Entity/Query/Sql/Query.php b/core/lib/Drupal/Core/Entity/Query/Sql/Query.php
+index c2699dd4c9068a70c16a4fdec9b2aff83275df01..3fd98090887fd6bf91dab5279a3032f11184d1ed 100644
+--- a/core/lib/Drupal/Core/Entity/Query/Sql/Query.php
++++ b/core/lib/Drupal/Core/Entity/Query/Sql/Query.php
+@@ -132,8 +132,13 @@ protected function prepare() {
+     // Add a self-join to the base revision table if we're querying only the
+     // latest revisions.
+     if ($this->latestRevision && $revision_field) {
+-      $this->sqlQuery->leftJoin($base_table, 'base_table_2', "[base_table].[$id_field] = [base_table_2].[$id_field] AND [base_table].[$revision_field] < [base_table_2].[$revision_field]");
+-      $this->sqlQuery->isNull("base_table_2.$id_field");
++      // Fetch all latest revision ids in a sub-query
++      $revision_subquery = $this->connection->select($base_table, 'base_table');
++      $revision_subquery->addExpression("MAX(base_table.$revision_field)");
++      $revision_subquery->groupBy("base_table.$id_field");
++
++      // Restrict results only to latest ids
++      $this->sqlQuery->condition("base_table.$revision_field", $revision_subquery, 'IN');
+     }
+ 
+     if (is_null($this->accessCheck)) {
+diff --git a/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php b/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php
+index c1af0b9120a1f5fae905607d9ae8a6484810ced1..ffab05917100770857d24e43fb72669a03174e96 100644
+--- a/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryTest.php
+@@ -374,6 +374,30 @@ public function testEntityQuery() {
+       ->execute();
+     $expected = [1 => '1', 2 => '2', 3 => '3', 16 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+     $this->assertSame($expected, $results);
++
++    $results = $this->queryResults = $this->storage
++      ->getQuery()
++      ->latestRevision()
++      ->notExists("$figures.color")
++      ->accessCheck(TRUE)
++      ->execute();
++    $expected = [16 => '4', 8 => '8', 20 => '12'];
++    $this->assertSame($expected, $results);
++
++    // Update an entity.
++    $entity = EntityTestMulRev::load(4);
++    $entity->setNewRevision();
++    $entity->$figures->color = 'red';
++    $entity->save();
++
++    $results = $this->queryResults = $this->storage
++      ->getQuery()
++      ->latestRevision()
++      ->notExists("$figures.color")
++      ->accessCheck(TRUE)
++      ->execute();
++    $expected = [8 => '8', 20 => '12'];
++    $this->assertSame($expected, $results);
+   }
+ 
+   /**
