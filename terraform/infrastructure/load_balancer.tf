@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "http" {
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.load_balancer.arn
   port              = 443
-  protocol          = "HTTPS"
+  protocol          = "TLS"
 
   default_action {
     type             = "forward"
