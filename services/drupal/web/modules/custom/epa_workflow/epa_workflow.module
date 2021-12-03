@@ -260,6 +260,14 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['submit2'] = $form['submit'];
     $form['submit2']['#weight'] = -1000;
   }
+  if ($form_id == 'revision_overview_form') {
+    foreach ($form['node_revisions_table'] as $key => $row) {
+      // Add some text to the row if the revision is the published rev.
+      if (is_numeric($key) && in_array('is-published',$row['#attributes']['class'])) {
+        $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = "<strong>Currently published revision</strong>";
+      }
+    }
+  }
 }
 
 /**
