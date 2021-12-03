@@ -48,7 +48,7 @@ resource "aws_lb_target_group" "http" {
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.load_balancer.arn
   port              = 443
-  protocol          = "TCP"
+  protocol          = "HTTPS"
 
   default_action {
     type             = "forward"
@@ -109,7 +109,8 @@ resource "aws_lb_listener" "alb_health" {
 
 resource "aws_lb_target_group" "alb_http" {
   name = "webcms-${var.environment}-alb-http"
-
+  vpc_id      = data.aws_ssm_parameter.vpc_id.value
+  
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
