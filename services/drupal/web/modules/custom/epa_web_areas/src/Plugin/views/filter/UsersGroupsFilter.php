@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_web_areas\Plugin\views\filter;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\group\GroupMembershipLoaderInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
@@ -17,6 +18,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ViewsFilter("epa_web_areas_users_groups")
  */
 class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInterface {
+
+  protected $valueFormType = 'checkbox';
 
   /**
    * Group membership loader service.
@@ -70,12 +73,32 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
   public function query() {
     if (!empty($this->value)) {
       $groups = $this->getAllGroupsByUser();
-      if (!empty($groups)) {
-        $this->ensureMyTable();
-        $this->query->addWhere('AND', $this->tableAlias . '.' . $this->realField, $groups, 'IN');
+      if (empty($groups)) $groups = [-1];
+      $this->ensureMyTable();
+      $this->query->addWhere($this->options['group'], $this->tableAlias . '.' . $this->realField, $groups, 'IN');
+    }
+  }
+
+  public function valueForm(&$form, FormStateInterface $form_state) {
+    $default_value = $this->value;
+    $exposed = $form_state->get('exposed');
+
+    if ($exposed) {
+      $identifier = $this->options['expose']['identifier'];
+      $form['value']['#type'] = 'checkbox';
+      $form['value'] = [
+        '#type' => 'checkbox',
+        '#title' => 'Limit content to my web areas',
+        '#default_value' => $default_value,
+      ];
+      $user_input = $form_state->getUserInput();
+      if (!isset($user_input[$identifier])) {
+        $user_input[$identifier] = $default_value;
+        $form_state->setUserInput($user_input);
       }
     }
   }
+
 
   /**
    * Helper to generate options for our filter.
@@ -85,7 +108,8 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
    */
   public function generateOptions(): array {
     return [
-      $this->t('In my Web Areas'),
+      0 => $this->t('All web areas'),
+      1 => $this->t('In my Web Areas'),
     ];
   }
 

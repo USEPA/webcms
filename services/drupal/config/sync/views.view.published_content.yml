@@ -1419,56 +1419,6 @@ display:
           entity_type: group_content
           entity_field: gid
           plugin_id: entity_reference
-        users_in_groups:
-          id: users_in_groups
-          table: group_content_field_data
-          field: users_in_groups
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          operator: in
-          value:
-            all: all
-            0: '0'
-          group: 1
-          exposed: true
-          expose:
-            operator_id: users_in_groups_op
-            label: 'Web Area'
-            description: ''
-            use_operator: 0
-            operator: users_in_groups_op
-            operator_limit_selection: 0
-            operator_list: {  }
-            identifier: users_in_groups
-            required: 0
-            remember: 0
-            multiple: 0
-            remember_roles:
-              authenticated: authenticated
-              anonymous: 0
-              layout_editor: 0
-              alerts_manager: 0
-              block_manager: 0
-              system_editor: 0
-              system_webmaster: 0
-              menu_admin: 0
-              administrator: 0
-            reduce: 1
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: 0
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: group_content
-          plugin_id: epa_web_areas_users_groups
         type:
           id: type
           table: node_field_data
@@ -1625,18 +1575,26 @@ display:
           exposed: false
           expose:
             operator_id: ''
-            label: ''
+            label: 'Published status'
             description: ''
             use_operator: false
-            operator: ''
+            operator: status_1_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: ''
-            required: false
+            identifier: status_1
+            required: true
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
           is_grouped: false
           group_info:
             label: ''
@@ -1652,6 +1610,54 @@ display:
           entity_type: node
           entity_field: status
           plugin_id: boolean
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: null
+          group: 1
+          exposed: true
+          expose:
+            operator_id: users_in_groups_op
+            label: 'Limit content to my web areas'
+            description: ''
+            use_operator: 0
+            operator: users_in_groups_op
+            operator_limit_selection: 0
+            operator_list: {  }
+            identifier: users_in_groups
+            required: 0
+            remember: 0
+            multiple: 0
+            remember_roles:
+              authenticated: authenticated
+              anonymous: 0
+              layout_editor: 0
+              alerts_manager: 0
+              block_manager: 0
+              system_editor: 0
+              system_webmaster: 0
+              menu_admin: 0
+              administrator: 0
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: 0
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
       filter_groups:
         operator: AND
         groups:
