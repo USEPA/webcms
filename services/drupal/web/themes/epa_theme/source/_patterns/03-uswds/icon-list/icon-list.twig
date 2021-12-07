@@ -10,11 +10,12 @@
       <div class="usa-icon-list__icon">
         {% set icon_classes = [
           icon_modifier_classes ? icon_modifier_classes,
-          item.icon.modifier_classes ? item.icon.modifier_classes
+          item.icon.modifier_classes ? item.icon.modifier_classes,
         ]|join(' ')|trim %}
         {% include '@uswds/icon/icon.twig' with {
           'icon_name': item.icon.name,
           'modifier_classes': icon_classes,
+          'is_hidden': true,
         } %}
       </div>
       {% endif %}
