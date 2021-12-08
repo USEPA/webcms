@@ -1,5 +1,9 @@
 #region VPC
 
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/webcms/${var.environment}/vpc/id"
+}
+
 data "aws_ssm_parameter" "private_subnets" {
   name = "/webcms/${var.environment}/vpc/private-subnets"
 }
