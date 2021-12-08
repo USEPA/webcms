@@ -1,6 +1,6 @@
 # Create a target group for the Drupal service.
 resource "aws_lb_target_group" "drupal" {
-  name = "webcms-${var.environment}-${var.site}-${var.lang}-drupal"
+  name = "${var.environment}-${var.site}-${var.lang}"
 
   port        = 443
   protocol    = "HTTPS"
