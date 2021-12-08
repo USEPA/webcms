@@ -20,14 +20,77 @@
       @include svg-background(external-link--blue-dark);
     }
   }
+
+  // External links that are a button.
+  &.button,
+  &.usa-button {
+    &::after {
+      @include svg-background(external-link--white);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(external-link--white);
+      }
+    }
+  }
+
+  // Button variations.
+  &.usa-button.usa-button--outline,
+  &.usa-button.usa-button--unstyled {
+    &::after {
+      @include svg-background(external-link--blue-dark);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(external-link-hover);
+      }
+    }
+  }
+
+  &.usa-button.usa-button--outline.usa-button--inverse {
+    &::after {
+      @include svg-background(external-link--gray-2);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(external-link--gray-2);
+      }
+    }
+  }
+
+  &.usa-button.usa-button--accent-cool {
+    &::after {
+      @include svg-background(external-link--gray-7);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(external-link--gray-7);
+      }
+    }
+  }
+}
+
+/*
+repeated code in the following, as putting them in the same block breaks
+the string literal in the $external-urls variable
+ */
+
+/* stylelint-disable-next-line selector-no-qualifying-type */
+html.no-js a#{$external-urls} {
+  @extend %external-link;
 }
 
 /* stylelint-disable-next-line selector-no-qualifying-type */
-html.no-js {
-  a#{$external-urls},
-  .external-link {
-    @extend %external-link;
-  }
+html.no-js .external-link {
+  @extend %external-link;
 }
 
 // Hide external link icon for anchors without an href attribute.

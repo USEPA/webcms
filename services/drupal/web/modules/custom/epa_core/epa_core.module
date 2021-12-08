@@ -23,6 +23,24 @@ use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 
 /**
+ * Implements hook_theme().
+ */
+function epa_core_theme($existing, $type, $theme, $path) {
+  return [
+    'hierarchical_term_facet_formatter' => [
+      'variables' => [
+        'terms' => [],
+        'wrapper' => '',
+        'separator' => ' » ',
+        'link' => FALSE,
+        'facet_source' => ''
+      ],
+      'file' => 'epa_core.theme.inc',
+    ],
+  ];
+}
+
+/**
  * Implements hook_menu_local_tasks_alter().
  *
  * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
@@ -52,9 +70,13 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
  *
  * - Used to auto generate descriptions and keywords for news releases.
  * - Hide path field.
- * - Hide type field on news releasees
+ * - Hide type field on news releases
+ * - Hide type field on commentary
+ *
+ * @see \Drupal\epa_workflow\EPAPublished::process()
  */
 function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Creates a copy of the Save button and places it promptly in the revision info section of the form.
   if (isset($form['actions']['submit'])) {
     $submit_copy = $form['actions']['submit'];
     $submit_copy['#group'] = 'revision_information';
@@ -127,6 +149,10 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Add a custom validator for automated keyword generation.
       array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
+      break;
+    case 'node_commentary_form':
+    case 'node_commentary_edit_form':
+      $form['field_type']['#access'] = FALSE;
       break;
   }
 }
@@ -487,6 +513,9 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
       case 'news_release':
         $term_name = "news release";
         break;
+      case 'perspective':
+        $term_name = "speeches, testimony and transcripts";
+        break;
     }
     if (!empty($term_name)) {
       $term = taxonomy_term_load_multiple_by_name($term_name, 'type');
@@ -521,3 +550,34 @@ function epa_core_preprocess_form_element(array &$variables) {
     $variables['description_display'] = 'before';
   }
 }
+
+use Drupal\Core\Template\Attribute;
+
+/**
+ * Prepares variables for views-style-epa-core-uswds-collection.html.twig template.
+ */
+function template_preprocess_views_style_epa_core_uswds_collection(&$variables) {
+
+  $view = $variables['view'];
+
+  $variables['attributes']['class'] = ['usa-collection'];
+
+  foreach ($variables['rows'] as $id => $row) {
+    $variables['rows'][$id] = [];
+    $variables['rows'][$id]['content'] = $row;
+    $variables['rows'][$id]['attributes'] = new Attribute();
+    $variables['rows'][$id]['attributes']->addClass('usa-collection__item');
+  }
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_core_module_implements_alter(&$implementations, $hook) {
+  // Prevent group_content_menu module's form alter from happening.
+  // This prevents the menu settings from being displayed
+  if ($hook === 'form_alter' && isset($implementations['group_content_menu'])) {
+    unset($implementations['group_content_menu']);
+  }
+}
+

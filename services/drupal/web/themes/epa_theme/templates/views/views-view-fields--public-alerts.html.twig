@@ -6,10 +6,17 @@
 #}
 
 {% set type = fields.field_type.content|clean_class %}
-{% set classes %}sitewide-alert--{{ type }}{% endset %}
+{% if type == 'information' %}
+  {# USWDS uses 'info' instead of 'information' as the modifier #}
+  {% set type = 'info' %}
+{% elseif type == 'warning' %}
+  {# Warning alerts are deprecated. Emergency styling is used for any existing alerts. #}
+  {% set type = 'emergency' %}
+{% endif %}
+{% set classes %}usa-site-alert--{{ type }}{% endset %}
 {% set show_close = false %}
 
-{% if type == 'information' or type == 'warning' %}
+{% if type == 'info' %}
   {% set show_close = true %}
 {% endif %}
 
@@ -18,16 +25,14 @@
 {%- endset %}
 
 {% set label -%}
-  {%- if type == 'information' -%}
+  {%- if type == 'info' -%}
     {{- 'Information'|t -}}
   {%- elseif type == 'emergency' -%}
     {{- 'Emergency'|t -}}
-  {%- elseif type == 'warning' -%}
-    {{- 'Warning'|t -}}
-  {% endif %}
+  {%- endif -%}
 {%- endset %}
 
-{% include '@components/sitewide-alert/sitewide-alert.twig' with {
+{% include '@components/site-alert/site-alert.twig' with {
   'modifier_classes': classes,
   'show_close': show_close,
   'hash': hash,

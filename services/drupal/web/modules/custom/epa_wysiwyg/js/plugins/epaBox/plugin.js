@@ -75,7 +75,7 @@
             box.append('<div class="box box--related-info u-align-' + data.position + '">');
 
             if (data.title !== '') {
-              box.append('<div class="box__title">' + data.title + '</div>');
+              box.append('<h2 class="box__title">' + data.title + '</h2>');
             }
 
             box.append('<div class="box__content">');

@@ -61,6 +61,10 @@ function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInte
   if (isset($form['field_allow_news_releases'])) {
     $form['field_allow_news_releases']['#access'] = $account->hasPermission('permit news releases');
   }
+
+  if (isset($form['field_allow_perspectives'])) {
+    $form['field_allow_perspectives']['#access'] = $account->hasPermission('permit perspectives');
+  }
 }
 
 /**
@@ -375,4 +379,19 @@ function epa_web_areas_preprocess_node(&$variables) {
   if ($group && $group->hasField('field_navigation_style')) {
     $variables['nav_style'] = $group->field_navigation_style->value;
   }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function epa_web_areas_views_data_alter(array &$data) {
+  $data['group_content_field_data']['users_in_groups'] = [
+    'title' => t('User\'s groups'),
+    'filter' => [
+      'title' => t('User\'s groups'),
+      'help' => t('Filters on the groups the user is a member of.'),
+      'field' => 'gid',
+      'id' => 'epa_web_areas_users_groups'
+    ],
+  ];
 }

@@ -106,6 +106,8 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
   private function doUpdateFor($entityType) {
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($entityType);
 
+    $datetime_utc = new DateTime('now', new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+
     foreach ($bundles as $bundleName => $value) {
 
       $scheduledFields = $this->getScheduledFields($entityType, $bundleName);
@@ -117,7 +119,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
             $query = $this->entityTypeManager->getStorage($entityType)
               ->getQuery('AND');
             $query->condition($entityType === 'media' ? 'bundle' : 'type', $bundleName);
-            $query->condition($scheduledField, NULL, 'IS NOT NULL');
+            $query->condition($scheduledField, $datetime_utc->format('c'), '<=');
             $query->accessCheck(FALSE);
             $query->$revisionLimiter();
             $entities = $query->execute();
@@ -171,13 +173,11 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
     if (empty($scheduledValue)) {
       return;
     }
-    $currentModerationState = $entity->get('moderation_state')
-      ->getValue()[0]['value'];
 
+    $datetime_utc = new DateTime('now', new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
     foreach ($scheduledValue as $key => $value) {
-      if ($currentModerationState === $value['moderation_state'] ||
-        $this->getTimestampFromIso8601($value['value']) <= $this->dateTime->getCurrentTime()) {
-
+      $scheduled_date = new DateTime($value['value'], new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+      if ($scheduled_date <= $datetime_utc) {
         unset($scheduledValue[$key]);
         $this->updateEntity($entity, $value['moderation_state'], $scheduledField, $scheduledValue);
       }
