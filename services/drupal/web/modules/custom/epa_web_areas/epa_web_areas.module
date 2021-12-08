@@ -380,3 +380,18 @@ function epa_web_areas_preprocess_node(&$variables) {
     $variables['nav_style'] = $group->field_navigation_style->value;
   }
 }
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function epa_web_areas_views_data_alter(array &$data) {
+  $data['group_content_field_data']['users_in_groups'] = [
+    'title' => t('User\'s groups'),
+    'filter' => [
+      'title' => t('User\'s groups'),
+      'help' => t('Filters on the groups the user is a member of.'),
+      'field' => 'gid',
+      'id' => 'epa_web_areas_users_groups'
+    ],
+  ];
+}
