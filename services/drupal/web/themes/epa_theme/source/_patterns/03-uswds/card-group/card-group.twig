@@ -1,0 +1,22 @@
+{% set classes = [
+  'usa-card-group',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<ul class="{{ classes }}">
+  {% if is_demo %}
+    {% for card in cards %}
+      {% include '@uswds/card/card.twig' with {
+        'title': card.title,
+        'content': card.content,
+        'media': card.media,
+        'modifier_classes': card.modifier_classes,
+        'layout_classes': card.layout_classes,
+        'button_text': card.button_text,
+        'button_url': card.button_url,
+      } %}
+    {% endfor %}
+  {% else %}
+    {{ cards }}
+  {% endif %}
+</ul>
