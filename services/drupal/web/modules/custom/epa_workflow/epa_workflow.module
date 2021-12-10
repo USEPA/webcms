@@ -616,3 +616,11 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
     unset($implementations['scheduled_publish']);
   }
 }
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['node_revisions_table'][0]['operations']['#prefix'] = '<strong>Latest revision</strong><br>';
+}
+
