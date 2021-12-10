@@ -1,3 +1,4 @@
+{% if not standalone_template %}
 <script type="application/json" data-drupal-selector="drupal-settings-json">{}</script>
 <script src="../../../../../core/assets/vendor/jquery/jquery.min.js?v=2.2.4"></script>
 <script src="../../../../../core/assets/vendor/jquery-once/jquery.once.min.js?v=2.1.1"></script>
@@ -19,7 +20,31 @@
 <script src="../../../js/dist/toggle-admin.min.js?{{ cacheBuster }}"></script>
 <script src="../../../js/dist/definition.min.js?{{ cacheBuster }}"></script>
 <script src="../../../js/dist/external-links.min.js?{{ cacheBuster }}"></script>
-
+{% else %}
+{# Custom Standalone template head #}
+<script src="https://www.epa.gov/core/assets/vendor/jquery/jquery.min.js?v=3.6.0"></script>
+<script src="https://www.epa.gov/core/assets/vendor/css-escape/css.escape.js?v=1.5.1"></script>
+<script src="https://www.epa.gov/core/assets/vendor/jquery-once/jquery.once.min.js?v=2.2.3"></script>
+<script src="https://www.epa.gov/core/misc/drupalSettingsLoader.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/misc/drupal.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/misc/drupal.init.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/assets/vendor/picturefill/picturefill.min.js?v=3.0.3"></script>
+<script src="https://www.epa.gov/core/assets/vendor/tabbable/index.umd.min.js?v=5.2.0"></script>
+<script src="https://www.epa.gov/modules/custom/epa_wysiwyg/js/plugins/epaNew/epaNew.js?r33yib"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/common.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/scripts.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/sitewide-alert.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/definition.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/external-links.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/themes/epa_theme/js/dist/media-link.min.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/assets/vendor/jquery-form/jquery.form.min.js?v=4.3.0"></script>
+<script src="https://www.epa.gov/core/misc/progress.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/modules/responsive_image/js/responsive_image.ajax.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/misc/ajax.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/core/themes/stable/js/ajax.js?v=9.2.6"></script>
+<script src="https://www.epa.gov/modules/contrib/views_ajax_get/views_ajax_get.js?r33yib"></script>
+<script src="https://www.epa.gov/modules/custom/epa_alerts/js/epaAlerts.js?r33yib" defer async></script>
+{% endif %}
 <!--DO NOT REMOVE-->
 {{ patternLabFoot | raw }}
 </body>
