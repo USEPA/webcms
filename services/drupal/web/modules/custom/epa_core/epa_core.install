@@ -55,16 +55,16 @@ WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
  * about a non-existent service.
  */
 function epa_core_update_9002() {
-  $purge_processors = \Drupal::service('purge.processors');
-  $enabled = $purge_processors->getPluginsEnabled();
-  $id = 'd56e9792a2';
+  $purge_purgers = \Drupal::service('purge.purgers');
+  $enabled = $purge_purgers->getPluginsEnabled();
+  $id = 'akamai_tag';
   if (in_array($id, $enabled)) {
     foreach ($enabled as $i => $plugin_id) {
       if ($id === $plugin_id) {
         unset($enabled[$i]);
       }
     }
-    $purge_processors->setPluginsEnabled($enabled);
+    $purge_purgers->setPluginsEnabled($enabled);
   }
 }
 
