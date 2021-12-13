@@ -51,6 +51,24 @@ WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
 }
 
 /**
+ * Disable Akamai purge processor before disabling the module to avoid an error
+ * about a non-existent service.
+ */
+function epa_core_update_9002() {
+  $purge_processors = \Drupal::service('purge.processors');
+  $enabled = $purge_processors->getPluginsEnabled();
+  $id = 'd56e9792a2';
+  if (in_array($id, $enabled)) {
+    foreach ($enabled as $i => $plugin_id) {
+      if ($id === $plugin_id) {
+        unset($enabled[$i]);
+      }
+    }
+    $purge_processors->setPluginsEnabled($enabled);
+  }
+}
+
+/**
  * Create the new News Release term with 730 day review cycle.
  */
 function _epa_core_create_news_release_type_term() {
