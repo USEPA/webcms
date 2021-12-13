@@ -624,3 +624,9 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
   $form['node_revisions_table'][0]['operations']['#prefix'] = '<strong>Latest revision</strong><br>';
 }
 
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['actions']['submit']['#value'] = 'Copy and Set as Latest Revision';
+}
