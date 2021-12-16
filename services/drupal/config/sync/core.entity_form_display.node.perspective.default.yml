@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.perspective.field_author_names
     - field.field.node.perspective.field_authors
     - field.field.node.perspective.field_channel
     - field.field.node.perspective.field_description
@@ -130,6 +131,16 @@ content:
       label: 'Group name'
       help_text: ''
       multiple: false
+    third_party_settings: {  }
+  field_author_names:
+    type: entity_reference_autocomplete
+    weight: 17
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_authors:
     type: paragraphs
@@ -262,6 +273,7 @@ content:
       save_lineage: false
       hierarchy_depth: 0
       required_depth: 0
+      none_label: '- Please select -'
     third_party_settings: {  }
     type: cshs
     region: content
