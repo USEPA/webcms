@@ -14,7 +14,7 @@ use Drupal\editor\Entity\Editor;
  *
  * @CKEditorPlugin(
  *   id = "epaBox",
- *   label = @Translation("Related Info Summary Box")
+ *   label = @Translation("Related Info Box")
  * )
  */
 class EPABox extends CKEditorPluginBase {
