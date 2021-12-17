@@ -3,13 +3,11 @@
     'page_title': title
   } %}
 
-  {% block messages %}
-    {{ messages }}
-  {% endblock %}
-
-  {% block local_tasks %}
-    {{ tasks }}
-  {% endblock %}
+  {% if show_admin_info %}
+    <div class="js-toggle-admin-content">
+      {{ admin_info }}
+    </div>
+  {% endif %}
 
   {% include '@layouts/resource-directory/resource-directory.twig' with {
     'has_sidebar': has_sidebar,

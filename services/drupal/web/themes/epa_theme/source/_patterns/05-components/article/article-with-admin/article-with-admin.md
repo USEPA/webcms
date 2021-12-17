@@ -10,5 +10,5 @@ __Variables:__
 
 __Blocks:__
 * title: Twig block for title.
-* local_tasks: Twig block for local tasks.
+* admin_info: Twig block for status messages and local tasks.
 * content: Twig block for main content.
