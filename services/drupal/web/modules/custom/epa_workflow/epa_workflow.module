@@ -616,3 +616,21 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
     unset($implementations['scheduled_publish']);
   }
 }
+
+/**
+ * Implements hook_entity_presave().
+ */
+function epa_workflow_entity_presave(EntityInterface $entity) {
+  if ($entity->bundle() == 'perspective') {
+    $author_paragraphs = $entity->field_author_as_para->getValue();
+    $tids = [];
+    foreach ($author_paragraphs as $author) {
+      array_push($tids, $author['subform']['field_a'][0]['target_id']);
+    }
+    foreach ($tids as $tid) {
+      $entity->field_author_names[] = [
+        'target_id' => $tid
+      ];
+    }
+  }
+}
