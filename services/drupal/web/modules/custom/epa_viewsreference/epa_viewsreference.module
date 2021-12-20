@@ -33,5 +33,13 @@ function epa_viewsreference_field_widget_form_alter(array &$element, FormStateIn
     if (isset($element["options"]["exposed_filters"]["vr_exposed_filters_visible"])) {
       $element["options"]["exposed_filters"]["vr_exposed_filters_visible"]['#access'] = FALSE;
     }
+
+    // Make "DESC" be the default sort order for Perspectives.
+    if (isset($element["target_id"]["#default_value"]) && $element["target_id"]["#default_value"] === 'dynamic_list_perspectives' && isset($element['options']['exposed_sorts']['sort_order']['#options'])) {
+      $element['options']['exposed_sorts']['sort_order']['#options'] = [
+        'DESC' => t('Desc'),
+        'ASC' => t('Asc'),
+      ];
+    }
   }
 }
