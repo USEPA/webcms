@@ -17,6 +17,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\paragraphs\Entity\Paragraph;
+
 
 /**
  * Implements hook_entity_base_field_info().
@@ -622,11 +624,15 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
  */
 function epa_workflow_entity_presave(EntityInterface $entity) {
   if ($entity->bundle() == 'perspective') {
-    $author_paragraphs = $entity->field_author_as_para->getValue();
+    $author_paragraphs = $entity->field_authors->getValue();
     $tids = [];
     foreach ($author_paragraphs as $author) {
-      array_push($tids, $author['subform']['field_a'][0]['target_id']);
+      $target_id = $author['target_id'];
+      $paragraph = Paragraph::load($target_id);
+      $author_tid = $paragraph->field_author->target_id;
+      array_push($tids, $author_tid);
     }
+    $entity->field_author_names = [];
     foreach ($tids as $tid) {
       $entity->field_author_names[] = [
         'target_id' => $tid
