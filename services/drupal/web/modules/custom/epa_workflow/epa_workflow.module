@@ -17,6 +17,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\paragraphs\Entity\Paragraph;
+
 
 /**
  * Implements hook_entity_base_field_info().
@@ -448,6 +450,30 @@ function epa_workflow_node_presave(NodeInterface $node) {
     $node->setRevisionLogMessage(t('Transitioned to %state as part of a bulk operation.', [
       '%state' => $new_state,
     ]));
+  }
+
+  // Update field_author_names with values from field_authors.
+  if ($node->bundle() == 'perspective') {
+    if (!$node->field_authors->isEmpty()) {
+      $author_paragraphs = $node->field_authors->getValue();
+      $tids = [];
+      foreach ($author_paragraphs as $author) {
+        $target_id = $author['target_id'];
+        $paragraph = Paragraph::load($target_id);
+        $author_tid = $paragraph->field_author->target_id;
+        array_push($tids, $author_tid);
+      }
+      $node->field_author_names = [];
+      foreach ($tids as $tid) {
+        $node->field_author_names[] = [
+          'target_id' => $tid
+        ];
+      }
+    }
+    else {
+      // Clear new field value if field_authors is empty.
+      $node->field_author_names = [];
+    }
   }
 }
 
