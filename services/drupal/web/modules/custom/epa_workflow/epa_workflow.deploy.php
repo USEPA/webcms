@@ -215,3 +215,72 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
+
+/**
+ * For all existing Perspective, if values exist in field_authors,
+ * populate the new taxonomy reference field, field_author_names, with the
+ * names of the authors. This elimiates duplicate entities in the dynamic lists.
+ */
+function epa_workflow_deploy_0028_populate_perspective_author_names_field(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Query all published perspectives.
+    $result = \Drupal::entityQuery('node')
+      ->condition('type', 'perspective')
+      ->execute();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+
+    \Drupal::logger('epa_workflow')->notice($sandbox['total'] . ' perspectives.');
+  }
+
+  $batch_size = 25;
+
+  // sort nid asc
+  // keep track of highest nid
+  // increment high water mark
+  // can save these values in $sandbox
+
+  // test pub persp that has author but not in new author field
+  // make sure after this, it has a new value and is still pub
+  $nids = \Drupal::entityQuery('node')
+    ->condition('type', 'perspective')
+    ->range(0, $batch_size)
+    ->execute();
+
+  if (empty($nids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface[] $nodes */
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadMultiple($nids);
+
+  foreach ($nodes as $node) {
+    \Drupal::logger('epa_workflow')->notice($node->title->value);
+    if (!$node->field_authors->isEmpty()) {
+      $author_paragraphs = $node->field_authors->getValue();
+      $tids = [];
+      foreach ($author_paragraphs as $author) {
+        $target_id = $author['target_id'];
+        $paragraph = Drupal\paragraphs\Entity\Paragraph::load($target_id);
+        $author_tid = $paragraph->field_author->target_id;
+        array_push($tids, $author_tid);
+      }
+      $node->field_author_names = [];
+      foreach ($tids as $tid) {
+        $node->field_author_names[] = [
+          'target_id' => $tid
+        ];
+      }
+    }
+    else {
+      // Clear new field value if field_authors is empty.
+      $node->field_author_names = [];
+    }
+    $node->save();
+    $sandbox['current']++;
+  }
+}
