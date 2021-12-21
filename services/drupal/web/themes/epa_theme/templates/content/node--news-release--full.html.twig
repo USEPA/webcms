@@ -34,15 +34,16 @@
   {{ drupal_entity('block', 'webareaheader', check_access=false) }}
 {% endset %}
 
-{% set messages %}
-  {{ drupal_block('system_messages_block', wrapper=false) }}
-{% endset %}
-
-{% set local_tasks %}
-  {{ drupal_block('local_tasks_block', wrapper=false) }}
-  {{ drupal_block('local_actions_block', wrapper=false) }}
+{% set admin_info %}
+  {{ region_messages }}
   {{ content.epa_content_moderation_control }}
 {% endset %}
+
+{% set show_admin_info = false %}
+
+{% if admin_info|render|striptags|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
 
 {% set footer %}
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
@@ -82,8 +83,8 @@
     'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
-    'messages': messages,
-    'tasks': local_tasks,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
     'body': body,
     'sidenav': sidenav,
     'footer': footer,
@@ -95,8 +96,8 @@
     'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
-    'messages': messages,
-    'tasks': local_tasks,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
     'body': body,
     'footer': footer,
   } %}
