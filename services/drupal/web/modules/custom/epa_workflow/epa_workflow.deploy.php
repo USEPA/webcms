@@ -221,7 +221,7 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
  * populate the new taxonomy reference field, field_author_names, with the
  * names of the authors. This elimiates duplicate entities in the dynamic lists.
  */
-function epa_workflow_deploy_0028_populate_perspective_author_names_field(&$sandbox) {
+function epa_workflow_deploy_0005_populate_perspective_author_names_field(&$sandbox) {
   if (!isset($sandbox['total'])) {
     // Query all published perspectives.
     $result = \Drupal::entityQuery('node')
