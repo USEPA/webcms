@@ -25,8 +25,14 @@
  */
 #}
 
+{% set image_classes = [
+  'u-align-right',
+  image_modifier_classes ? image_modifier_classes,
+]|join(' ')|trim %}
+
 {% include '@uswds/summary-box/summary-box.twig' with {
   'heading': content.field_title|field_value,
   'content': content.field_body|field_value,
   'image': content.field_media_image|field_value,
+  'image_modifier_classes': image_classes,
 } %}
