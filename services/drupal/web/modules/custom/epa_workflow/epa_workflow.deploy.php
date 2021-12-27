@@ -221,36 +221,41 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
  * populate the new taxonomy reference field, field_author_names, with the
  * names of the authors. This elimiates duplicate entities in the dynamic lists.
  */
-function epa_workflow_deploy_0005_populate_perspective_author_names_field(&$sandbox) {
+function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sandbox) {
   if (!isset($sandbox['total'])) {
-    // Query all published perspectives.
-    $result = \Drupal::entityQuery('node')
-      ->condition('type', 'perspective')
-      ->execute();
+    // Query all perspectives.
+    $result = \Drupal::database()->query(
+      "SELECT nid
+              FROM {node}
+              WHERE type = 'perspective'
+              ORDER BY nid DESC")
+      ->fetchCol('nid');
 
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
+    $sandbox['highest_nid'] = reset($result);
+    $sandbox['high_water_mark'] = 0;
 
     \Drupal::logger('epa_workflow')->notice($sandbox['total'] . ' perspectives.');
   }
 
-  $batch_size = 25;
-
-  // sort nid asc
-  // keep track of highest nid
-  // increment high water mark
-  // can save these values in $sandbox
-
-  // test pub persp that has author but not in new author field
-  // make sure after this, it has a new value and is still pub
-  $nids = \Drupal::entityQuery('node')
-    ->condition('type', 'perspective')
-    ->range(0, $batch_size)
-    ->execute();
+  $nids = \Drupal::database()->query(
+    "SELECT nid 
+          FROM {node} 
+          WHERE type = 'perspective' AND nid > :high_water_mark AND nid <= :highest_nid
+          ORDER BY nid ASC
+          LIMIT 25;", [
+            ':high_water_mark' => $sandbox['high_water_mark'], 
+            ':highest_nid' => $sandbox['highest_nid']
+          ])
+    ->fetchCol('nid');
 
   if (empty($nids)) {
     $sandbox['#finished'] = 1;
     return;
+  }
+  else {
+    $sandbox['#finished'] = 0;
   }
 
   /** @var \Drupal\node\NodeInterface[] $nodes */
@@ -259,7 +264,7 @@ function epa_workflow_deploy_0005_populate_perspective_author_names_field(&$sand
     ->loadMultiple($nids);
 
   foreach ($nodes as $node) {
-    \Drupal::logger('epa_workflow')->notice($node->title->value);
+    $sandbox['high_water_mark'] = $node->id();
     if (!$node->field_authors->isEmpty()) {
       $author_paragraphs = $node->field_authors->getValue();
       $tids = [];
