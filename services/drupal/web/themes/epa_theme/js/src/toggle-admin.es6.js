@@ -5,9 +5,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.toggleAdmin = {
     attach(context) {
       const toggleButton = context.querySelector('.js-toggle-admin');
-      const adminContent = context.querySelectorAll(
-        '.usa-alert, .button-group--base[aria-label="Primary tasks"], #content-moderation-entity-moderation-form'
-      );
+      const adminContent = context.querySelectorAll('.js-toggle-admin-content');
 
       if (toggleButton !== null) {
         toggleButton.addEventListener('click', event => {

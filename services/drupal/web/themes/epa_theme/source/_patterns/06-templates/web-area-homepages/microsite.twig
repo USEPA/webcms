@@ -1,15 +1,13 @@
 {% set content %}
   {% include '@components/page-title/page-title.twig' with {
-    'page_title': title
+    'page_title': title,
   } %}
 
-  {% block messages %}
-    {{ messages }}
-  {% endblock %}
-
-  {% block local_tasks %}
-    {{ tasks }}
-  {% endblock %}
+  {% if show_admin_info %}
+    <div class="js-toggle-admin-content">
+      {{ admin_info }}
+    </div>
+  {% endif %}
 
   {{ slideshow }}
   {{ body }}
