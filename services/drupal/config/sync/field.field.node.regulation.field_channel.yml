@@ -6,8 +6,6 @@ dependencies:
     - field.storage.node.field_channel
     - node.type.regulation
     - taxonomy.vocabulary.channels
-  content:
-    - 'taxonomy_term:channels:5a512a6a-01eb-43b3-9cf6-824c87bafbce'
   module:
     - custom_add_another
 third_party_settings:
@@ -22,10 +20,8 @@ label: Channel
 description: 'Use <a href="https://www.epa.gov/webguide/metadata-web-area-homepages#channel" class="external" target="_blank">this guide</a> for choosing the right channel.'
 required: true
 translatable: false
-default_value:
-  -
-    target_uuid: 5a512a6a-01eb-43b3-9cf6-824c87bafbce
-default_value_callback: ''
+default_value: {  }
+default_value_callback: 'epa_core_default_value_field_channel'
 settings:
   handler: 'default:taxonomy_term'
   handler_settings:

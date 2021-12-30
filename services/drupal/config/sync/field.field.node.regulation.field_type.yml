@@ -6,8 +6,6 @@ dependencies:
     - field.storage.node.field_type
     - node.type.regulation
     - taxonomy.vocabulary.type
-  content:
-    - 'taxonomy_term:type:8f6958bf-a20c-42fd-92dd-c7e70e255319'
   module:
     - custom_add_another
 third_party_settings:
@@ -22,10 +20,8 @@ label: Type
 description: 'Use <a href="https://www.epa.gov/webguide/metadata-basic-pages#type" class="external" target="_blank">this guide</a> for choosing the right type.'
 required: true
 translatable: false
-default_value:
-  -
-    target_uuid: 8f6958bf-a20c-42fd-92dd-c7e70e255319
-default_value_callback: ''
+default_value: {  }
+default_value_callback: 'epa_core_default_value_field_type'
 settings:
   handler: 'default:taxonomy_term'
   handler_settings:
