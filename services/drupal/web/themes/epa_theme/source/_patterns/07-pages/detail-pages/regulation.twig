@@ -112,8 +112,7 @@
 {% set page_content %}
   {% include '@templates/detail-pages/page.twig' with {
     'title': page_title,
-    'messages': page_messages,
-    'tasks': page_tasks,
+    'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
   } %}
@@ -121,5 +120,5 @@
 
 {# pass page_content to default page wrapper #}
 {% include '@pages/_page-default.twig' with {
-  'content': page_content
+  'content': page_content,
 } %}
