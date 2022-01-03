@@ -240,12 +240,12 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
   }
 
   $nids = \Drupal::database()->query(
-    "SELECT nid 
-          FROM {node} 
+    "SELECT nid
+          FROM {node}
           WHERE type = 'perspective' AND nid > :high_water_mark AND nid <= :highest_nid
           ORDER BY nid ASC
           LIMIT 25;", [
-            ':high_water_mark' => $sandbox['high_water_mark'], 
+            ':high_water_mark' => $sandbox['high_water_mark'],
             ':highest_nid' => $sandbox['highest_nid']
           ])
     ->fetchCol('nid');
@@ -265,26 +265,6 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
 
   foreach ($nodes as $node) {
     $sandbox['high_water_mark'] = $node->id();
-    if (!$node->field_authors->isEmpty()) {
-      $author_paragraphs = $node->field_authors->getValue();
-      $tids = [];
-      foreach ($author_paragraphs as $author) {
-        $target_id = $author['target_id'];
-        $paragraph = Drupal\paragraphs\Entity\Paragraph::load($target_id);
-        $author_tid = $paragraph->field_author->target_id;
-        array_push($tids, $author_tid);
-      }
-      $node->field_author_names = [];
-      foreach ($tids as $tid) {
-        $node->field_author_names[] = [
-          'target_id' => $tid
-        ];
-      }
-    }
-    else {
-      // Clear new field value if field_authors is empty.
-      $node->field_author_names = [];
-    }
     $node->save();
     $sandbox['current']++;
   }
