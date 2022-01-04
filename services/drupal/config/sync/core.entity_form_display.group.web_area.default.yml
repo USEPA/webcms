@@ -3,8 +3,8 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.group.web_area.field_allow_perspectives
     - field.field.group.web_area.field_allow_news_releases
+    - field.field.group.web_area.field_allow_perspectives
     - field.field.group.web_area.field_contact_us_form
     - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_homepage
@@ -13,9 +13,12 @@ dependencies:
     - field.field.group.web_area.field_migration_review_complete
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
+    - field.field.group.web_area.field_share_image
     - field.field.group.web_area.field_web_area_comments
     - field.field.group.web_area.field_web_council_representative
     - group.type.web_area
+  module:
+    - media_library
 id: group.web_area.default
 targetEntityType: group
 bundle: web_area
@@ -95,6 +98,13 @@ content:
       match_limit: 10
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_share_image:
+    type: media_library_widget
+    weight: 13
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
     region: content
   field_web_area_comments:
     weight: 8
