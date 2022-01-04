@@ -1,7 +1,7 @@
 ---
-el: .icon
-title: EPA Icon
-state: complete
+el: .usa-icon
+title: Icon
+state: inreview
 ---
 
 __Variables:__
