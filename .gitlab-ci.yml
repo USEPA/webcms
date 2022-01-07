@@ -436,6 +436,7 @@ infrastructure:preproduction:init:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
+    - gitlab-terraform init -upgrade
     - gitlab-terraform init
   environment:
     name: infra/preproduction
