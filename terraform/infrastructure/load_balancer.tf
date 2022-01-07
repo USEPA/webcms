@@ -33,7 +33,7 @@ resource "aws_lb_target_group" "http" {
 
   port        = 80
   protocol    = "TCP"
-  target_type = "ip"
+  target_type = "alb"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
 
   health_check {
@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "https" {
 
   port        = 443
   protocol    = "TCP"
-  target_type = "ip"
+  target_type = "alb"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
 
   health_check {
