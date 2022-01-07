@@ -36,12 +36,6 @@ resource "aws_lb_target_group" "http" {
   target_type = "alb"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
 
-  health_check {
-    enabled  = true
-    interval = 30
-    port     = 80
-    protocol = "HTTP"
-  }
 }
 
 resource "aws_lb_target_group_attachment" "alb_attachment_http" {
@@ -72,12 +66,6 @@ resource "aws_lb_target_group" "https" {
   target_type = "alb"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
 
-  health_check {
-    enabled  = true
-    interval = 30
-    port     = 443
-    protocol = "HTTPS"
-  }
 }
 
 resource "aws_lb_target_group_attachment" "alb_attachment_https" {
