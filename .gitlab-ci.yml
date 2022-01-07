@@ -450,6 +450,7 @@ infrastructure:preproduction:validate:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
+    - gitlab-terraform init -upgrade
     - gitlab-terraform validate
   environment:
     name: infra/preproduction
@@ -463,6 +464,7 @@ infrastructure:preproduction:plan:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
+    - gitlab-terraform init -upgrade
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   environment:
