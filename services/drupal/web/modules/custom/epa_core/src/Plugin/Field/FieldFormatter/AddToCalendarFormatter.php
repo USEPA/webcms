@@ -53,7 +53,7 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
     $settings = $this->getSettings();
     $field = $this->fieldDefinition;
     $location_field_types = ['string', 'text_with_summary', 'address'];
-    $description_field_types = ['string', 'text_long', 'text_with_summary', 'string_long', 'entity_reference_revisions'];
+    $description_field_types = ['string', 'text_long', 'text_with_summary', 'string_long'];
     $description_options = $location_options = [FALSE => 'None'];
 
     $entity_field_list = \Drupal::service('entity_field.manager')
