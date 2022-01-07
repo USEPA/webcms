@@ -40,7 +40,7 @@ resource "aws_lb_target_group" "http" {
     enabled  = true
     interval = 30
     port     = 80
-    protocol = "TCP"
+    protocol = "HTTP"
   }
 }
 
@@ -76,7 +76,7 @@ resource "aws_lb_target_group" "https" {
     enabled  = true
     interval = 30
     port     = 443
-    protocol = "TCP"
+    protocol = "HTTPS"
   }
 }
 
