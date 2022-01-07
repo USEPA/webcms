@@ -56,10 +56,8 @@ resource "aws_lb_target_group_attachment" "alb_attachment_http" {
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.load_balancer.arn
   port              = 443
-  protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = var.lb_default_certificate
-
+  protocol          = "TCP"
+  
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.https.arn
