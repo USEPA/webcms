@@ -83,20 +83,6 @@ resource "aws_ecs_service" "traefik" {
   force_new_deployment    = true
   propagate_tags          = "SERVICE"
 
-  # HTTP (port 80) configuration
-  load_balancer {
-    container_name   = "traefik"
-    container_port   = 80
-    target_group_arn = aws_lb_target_group.http.arn
-  }
-
-  # HTTPS (port 443) configuration
-  load_balancer {
-    container_name   = "traefik"
-    container_port   = 443
-    target_group_arn = aws_lb_target_group.https.arn
-  }
-
   network_configuration {
     subnets          = local.private_subnets
     assign_public_ip = false
