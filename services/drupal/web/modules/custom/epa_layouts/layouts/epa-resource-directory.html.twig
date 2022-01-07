@@ -58,7 +58,7 @@
 
 {% if main_content|trim and content_sidebar %}
   {% set sidebar_classes = ['l-sidebar__sidebar'] %}
-  <div class="l-sidebar">
+  <div{{ attributes.addClass(['l-sidebar']) }}">
     <div class="l-sidebar__main">
       {{ main_content }}
     </div>
@@ -67,6 +67,8 @@
     </div>
   </div>
 {% else %}
-  {{ main_content }}
-  {{ content_sidebar }}
+  <div{{ attributes }}">
+    {{ main_content }}
+    {{ content_sidebar }}
+  </div>
 {% endif %}
