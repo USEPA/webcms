@@ -3,7 +3,7 @@ resource "aws_lb_target_group" "drupal" {
   name = "${var.environment}-${var.site}-${var.lang}"
 
   port        = 443
-  protocol    = "HTTPS"
+  protocol    = "TCP"
   target_type = "ip"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
   
