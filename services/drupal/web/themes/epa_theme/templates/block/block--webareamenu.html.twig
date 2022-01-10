@@ -1,30 +1,7 @@
 {#
- /**
-  * @file
-  * Theme override for the group menus block.
-  */
+/**
+ * @file
+ * Theme override for the group menus block.
+ */
 #}
-
-{% set classes = [
-  'margin-0',
-] %}
-
-{% set attributes = attributes.addClass(classes) %}
-
-{% if logged_in %}
-  {% embed '@components/block/block.twig' with {
-    'hide_wrapper': not logged_in,
-    'has_constrain': false,
-    'hide_content_wrapper': true,
-    'title_prefix': title_prefix,
-    'title_suffix': title_suffix,
-  } %}
-
-    {% block content %}
-      {{ content }}
-    {% endblock %}
-
-  {% endembed %}
-{% else %}
-  {{ content }}
-{% endif %}
+{% extends "block--admin.html.twig" %}
