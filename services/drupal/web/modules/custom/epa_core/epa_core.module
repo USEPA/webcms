@@ -516,9 +516,32 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
       case 'perspective':
         $term_name = "speeches, testimony and transcripts";
         break;
+      case 'regulation':
+        $term_name = "other policies and guidance";
+        break;
     }
     if (!empty($term_name)) {
       $term = taxonomy_term_load_multiple_by_name($term_name, 'type');
+      if (!empty($term)) {
+        $term = reset($term);
+        return $term->id();
+      }
+    }
+  }
+}
+
+/**
+ * Provides default values for our channel fields across a couple content types.
+ */
+function epa_core_default_value_field_channel(ContentEntityInterface $entity, FieldDefinitionInterface $definition) {
+  if ($entity->getEntityTypeId() === 'node') {
+    switch ($entity->bundle()) {
+      case 'regulation':
+        $term_name = "laws & regulations";
+        break;
+    }
+    if (!empty($term_name)) {
+      $term = taxonomy_term_load_multiple_by_name($term_name, 'channels');
       if (!empty($term)) {
         $term = reset($term);
         return $term->id();

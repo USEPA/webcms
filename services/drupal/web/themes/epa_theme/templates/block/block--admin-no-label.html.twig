@@ -1,0 +1,35 @@
+{#
+/**
+ * @file
+ * Theme for an admin block.
+ *
+ * This block template gets extended by blocks that should only show the wrapper
+ * when a user is logged in.
+ */
+#}
+{% set classes = [
+  'margin-0',
+] %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% set block_content %}
+  {% block block_content %}
+    {{ content }}
+  {% endblock %}
+{% endset %}
+
+{% embed '@components/block/block.twig' with {
+  'hide_wrapper': not logged_in,
+  'has_constrain': false,
+  'title_prefix': title_prefix,
+  'label': false,
+  'title_suffix': title_suffix,
+  'hide_content_wrapper': true,
+} %}
+
+  {% block content %}
+    {{ block_content }}
+  {% endblock %}
+
+{% endembed %}

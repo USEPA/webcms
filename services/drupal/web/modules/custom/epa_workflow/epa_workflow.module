@@ -17,6 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\paragraphs\Entity\Paragraph;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -449,6 +450,30 @@ function epa_workflow_node_presave(NodeInterface $node) {
       '%state' => $new_state,
     ]));
   }
+
+  // Update field_author_names with values from field_authors.
+  if ($node->bundle() == 'perspective') {
+    if (!$node->field_authors->isEmpty()) {
+      $author_paragraphs = $node->field_authors->getValue();
+      $tids = [];
+      foreach ($author_paragraphs as $author) {
+        $target_id = $author['target_id'];
+        $paragraph = Paragraph::load($target_id);
+        $author_tid = $paragraph->field_author->target_id;
+        array_push($tids, $author_tid);
+      }
+      $node->field_author_names = [];
+      foreach ($tids as $tid) {
+        $node->field_author_names[] = [
+          'target_id' => $tid
+        ];
+      }
+    }
+    else {
+      // Clear new field value if field_authors is empty.
+      $node->field_author_names = [];
+    }
+  }
 }
 
 /**
@@ -615,4 +640,18 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
   if ($hook == 'cron' && isset($implementations['scheduled_publish'])) {
     unset($implementations['scheduled_publish']);
   }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['node_revisions_table'][0]['operations']['#prefix'] = '<strong>Latest revision</strong><br>';
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['actions']['submit']['#value'] = 'Copy and Set as Latest Revision';
 }
