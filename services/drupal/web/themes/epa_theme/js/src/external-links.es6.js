@@ -13,7 +13,11 @@ import Drupal from 'drupal';
       function linkIsExternal(linkElement) {
         let external = true;
 
-        if (linkElement.host === 'epa.gov' || linkElement.host === 'www.epa.gov' || linkElement.host.endsWith('epa.gov')) {
+        if (
+          linkElement.host === 'epa.gov' ||
+          linkElement.host === 'www.epa.gov' ||
+          linkElement.host.endsWith('epa.gov')
+        ) {
           external = false;
         }
         if (allowedDomains.includes(linkElement.host)) {
