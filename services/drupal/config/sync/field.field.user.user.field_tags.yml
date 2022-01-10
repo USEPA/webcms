@@ -1,0 +1,35 @@
+uuid: af819317-b3e4-4054-ad49-c325ce5c2161
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_tags
+    - taxonomy.vocabulary.user_tags
+  module:
+    - custom_add_another
+    - user
+third_party_settings:
+  custom_add_another:
+    custom_add_another: 'Add another tag'
+    custom_remove: ''
+id: user.user.field_tags
+field_name: field_tags
+entity_type: user
+bundle: user
+label: Tags
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      user_tags: user_tags
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

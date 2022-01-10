@@ -1,0 +1,35 @@
+uuid: e161c8af-0210-4661-bf3f-b22c7117658a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_author_names
+    - node.type.perspective
+    - taxonomy.vocabulary.author
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: node.perspective.field_author_names
+field_name: field_author_names
+entity_type: node
+bundle: perspective
+label: 'Author Names'
+description: 'Hidden field, that stores the names of the Authors associated with this <i>Perspective</i>.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      author: author
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

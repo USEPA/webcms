@@ -215,3 +215,57 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
+
+/**
+ * For all existing Perspective, if values exist in field_authors,
+ * populate the new taxonomy reference field, field_author_names, with the
+ * names of the authors. This elimiates duplicate entities in the dynamic lists.
+ */
+function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Query all perspectives.
+    $result = \Drupal::database()->query(
+      "SELECT nid
+              FROM {node}
+              WHERE type = 'perspective'
+              ORDER BY nid DESC")
+      ->fetchCol('nid');
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+    $sandbox['highest_nid'] = reset($result);
+    $sandbox['high_water_mark'] = 0;
+
+    \Drupal::logger('epa_workflow')->notice($sandbox['total'] . ' perspectives.');
+  }
+
+  $nids = \Drupal::database()->query(
+    "SELECT nid
+          FROM {node}
+          WHERE type = 'perspective' AND nid > :high_water_mark AND nid <= :highest_nid
+          ORDER BY nid ASC
+          LIMIT 25;", [
+            ':high_water_mark' => $sandbox['high_water_mark'],
+            ':highest_nid' => $sandbox['highest_nid']
+          ])
+    ->fetchCol('nid');
+
+  if (empty($nids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+  else {
+    $sandbox['#finished'] = 0;
+  }
+
+  /** @var \Drupal\node\NodeInterface[] $nodes */
+  $nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadMultiple($nids);
+
+  foreach ($nodes as $node) {
+    $sandbox['high_water_mark'] = $node->id();
+    $node->save();
+    $sandbox['current']++;
+  }
+}
