@@ -6,6 +6,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\addtocal\Form\AddToCalForm;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList;
 
 /**
  * Plugin implementation of the 'HierarchicalFacetFormatter' formatter.
@@ -28,6 +29,8 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
     return [
         'location' => ['value' => FALSE, 'tokenized' => ''],
         'description' => ['value' => FALSE, 'tokenized' => ''],
+        'past_events' => FALSE, // The version of the addtocal module we are using doesn't actually implement this setting correctly.
+        'separator' => '-',
       ] + parent::defaultSettings();
   }
 
@@ -121,10 +124,22 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
     $field_name = $field->get('field_name');
     $settings['field_name'] = $field_name;
 
+    // Hide the form if
     foreach ($elements as $delta => $element) {
       $form = new AddToCalForm($entity, $settings, $delta);
       $form = \Drupal::formBuilder()->getForm($form);
-      $elements[$delta] += $form;
+
+      /** @var DateTimeFieldItemList $dates */
+      $dates = $entity->get($field_name);
+      // Date range field has different structure
+      if (!empty($dates[$delta]->start_date) && !empty($dates[$delta]->end_date)) {
+        $start_date_object = $dates[$delta]->start_date;
+      }
+      else {
+        $start_date_object = $dates[$delta]->date;
+      }
+      $form['#access'] = new \DateTime('now') < $start_date_object->getPhpDateTime();
+      $elements[$delta]['addtocal'] = $form;
     }
 
     return $elements;
