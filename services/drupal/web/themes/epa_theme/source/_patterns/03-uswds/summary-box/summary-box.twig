@@ -20,7 +20,7 @@
       ]|join(' ')|trim %}
 
       {% if image_url %}
-      <a class="usa-summary-box__image-link" href="{{ image_url }}">
+        <a class="usa-summary-box__image-link" href="{{ image_url }}">
       {% endif %}
 
         {% include '@components/figure/figure.twig' with {
@@ -30,19 +30,20 @@
         } %}
 
       {% if image_url %}
-      </a>
+        </a>
       {% endif %}
-
     {% endif %}
 
     {% if heading %}
       <{{ heading_element ?: 'h3' }} class="usa-summary-box__heading" id="{{ summary_box_id }}">
         {% if heading_url %}
-        <a href="{{ heading_url }}">
+          <a href="{{ heading_url }}">
         {% endif %}
+
         {{ heading }}
+
         {% if heading_url %}
-        </a>
+          </a>
         {% endif %}
       </{{ heading_element ?: 'h3' }}>
     {% endif %}
