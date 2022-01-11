@@ -19,19 +19,37 @@
         image_modifier_classes ? image_modifier_classes,
       ]|join(' ')|trim %}
 
-      {% include '@components/figure/figure.twig' with {
-        'modifier_classes': image_classes,
-        'caption': false,
-        'media': image,
-      } %}
+      {% if image_url %}
+      <a class="usa-summary-box__image-link" href="{{ image_url }}">
+      {% endif %}
+
+        {% include '@components/figure/figure.twig' with {
+          'modifier_classes': image_classes,
+          'caption': false,
+          'media': image,
+        } %}
+
+      {% if image_url %}
+      </a>
+      {% endif %}
+
     {% endif %}
 
     {% if heading %}
-      <{{ heading_element ?: 'h3' }} class="usa-summary-box__heading" id="{{ summary_box_id }}">{{ heading }}</{{ heading_element ?: 'h3' }}>
+      <{{ heading_element ?: 'h3' }} class="usa-summary-box__heading" id="{{ summary_box_id }}">
+        {% if heading_url %}
+        <a href="{{ heading_url }}">
+        {% endif %}
+        {{ heading }}
+        {% if heading_url %}
+        </a>
+        {% endif %}
+      </{{ heading_element ?: 'h3' }}>
     {% endif %}
 
     <div class="usa-summary-box__text">
       {{ content }}
+      {{ footer_content }}
     </div>
   </div>
 </div>
