@@ -3,8 +3,8 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.group.web_area.field_allow_perspectives
     - field.field.group.web_area.field_allow_news_releases
+    - field.field.group.web_area.field_allow_perspectives
     - field.field.group.web_area.field_contact_us_form
     - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_homepage
@@ -13,6 +13,7 @@ dependencies:
     - field.field.group.web_area.field_migration_review_complete
     - field.field.group.web_area.field_navigation_style
     - field.field.group.web_area.field_publisher
+    - field.field.group.web_area.field_share_image
     - field.field.group.web_area.field_web_area_comments
     - field.field.group.web_area.field_web_council_representative
     - group.type.web_area
@@ -109,6 +110,15 @@ content:
       link: true
     third_party_settings: {  }
     type: entity_reference_label
+    region: content
+  field_share_image:
+    type: entity_reference_entity_view
+    weight: 12
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
     region: content
   field_web_area_comments:
     weight: 7

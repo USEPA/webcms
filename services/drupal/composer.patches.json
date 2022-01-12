@@ -13,7 +13,7 @@
       "Workaround for \"Call to a member function getLabel() after enabling layout_builder\"": "https://www.drupal.org/files/issues/2020-04-08/2985882-field-85.patch",
       "#3165306 - Add type column to entity revision tables": "https://www.drupal.org/files/issues/2021-02-12/add-type-on-entity-revision-tables-3165306-22-9_1_x.patch",
       "Change icon for media library in CKEditor": "patches/drupal-switch-ckeditor-media-library-icon-2.patch",
-      "Improve performance of LatestRevision Views filter": "https://www.drupal.org/files/issues/2019-11-29/drupal-latest_revision_views_filter_performance-2949939-8.patch",
+      "Improve performance of LatestRevision Views filter": "https://www.drupal.org/files/issues/2021-07-27/drupal-views_filter_latest_revision_performance-2949939-20.patch",
       "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch",
       "#3047022 - Properly handle block_content access control for revisions": "https://www.drupal.org/files/issues/2021-02-11/3047022-56.patch",
       "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2020-11-11/drupal_core-mediaembed_default_view_mode-3109289-24.patch",
@@ -22,8 +22,8 @@
       "Do not crash when an entity is missing from a views relationship (this may need to be just papering over an underlying problem)": "https://www.drupal.org/files/issues/2020-09-08/get_cache_tags_null-3169694-2.patch",
       "Validation for views datetime filter": "patches/views-exposed-datetime-validation-2.patch",
       "Fix off-canvas style issues that pertain to multi-select lists": "https://www.drupal.org/files/issues/2020-01-28/drupal_core-settings_tray_multiple_select_css-3080698-9.patch",
-      "Add Views autocomplete filter for all entity reference fields": "https://www.drupal.org/files/issues/2021-06-15/2429699-414.patch",
-      "Provides a link to the latest revision": "https://www.drupal.org/files/issues/2020-09-02/2906455-29.patch",
+      "Add Views autocomplete filter for all entity reference fields": "https://www.drupal.org/files/issues/2021-11-09/2429699-446.patch",
+      "Provides a link to the latest revision": "https://www.drupal.org/files/issues/2021-11-03/2906455-33.patch",
       "Avoid exception that blocks page rendering when image file is missing from disk": "https://www.drupal.org/files/issues/2827921-remove-missing-responsive-image-width-exception.patch",
       "Allow referencing unpublished nodes if user has access to them": "https://www.drupal.org/files/issues/2021-06-09/2845144_52.patch",
       "Action on embedded form improperly set https://www.drupal.org/project/drupal/issues/2840283": "https://www.drupal.org/files/issues/2021-08-10/linked-display-2840283-48.patch",
@@ -34,7 +34,12 @@
       "Allow modules to alter EditorLinkDialog to specify link text": "https://www.drupal.org/files/issues/2020-09-11/2741945-85.patch",
       "Display node title by default when creating link with drupalink, allow configuration.": "https://www.drupal.org/files/issues/2021-03-04/2961554-19.patch",
       "Fix aria-describedby in radios and checkboxes.": "https://www.drupal.org/files/issues/2020-09-08/2839344_0.patch",
-      "Allow overriding of which view is used for Media Library": "patches/drupal-switch-media-library-view-2971209.patch"
+      "Allow overriding of which view is used for Media Library": "patches/drupal-switch-media-library-view-2971209.patch",
+      "Improve performance of looking up latest revision": "patches/drupal-speedup_latest_revision_queries-2950869-mr715-730a0c.patch",
+      "Improve consistency of revision terminology labeling in revision UI": "https://www.drupal.org/files/issues/2021-12-03/2899719-D9_2-36.patch",
+      "Allow reverting current revision": "https://www.drupal.org/files/issues/2021-12-10/allow-reverting-current-rev-3252521-D9_2-5.patch",
+      "Prevent reverting latest revision (custom patch so that it plays nicely with our patches for 3252521 and 2899719)": "patches/disallow-reverting-latest-rev-3252540-D9_2-2-custom.patch",
+      "Use EPA-preferred terminology for revision reversion operation. This patch needs to be applied on top of the patches for 3252521, 2899719, and 3252540": "patches/rename-revision-revert-operation-button.patch"
     },
     "drupal/s3fs": {
       "Module should initialize default credentials provider instead of instance profile when use_instance_profile is TRUE": "https://www.drupal.org/files/issues/2020-03-24/3122091-2-s3fs-default-provider.patch",
@@ -49,7 +54,8 @@
       "Use VBO with group permissions": "https://www.drupal.org/files/issues/2020-08-17/3020883-22.patch",
       "Avoid fatal errors with Layout Builder rendering by checking if group is being rendered in preview mode": "https://www.drupal.org/files/issues/2020-10-02/group-check_if_in_preview-3174615-2.patch",
       "Display node bundles in alpha order": "https://www.drupal.org/files/issues/2020-10-20/group-order_node_bundles-3178031-2.patch",
-      "Add contexts": "https://www.drupal.org/files/issues/2021-02-19/2815971-28.patch"
+      "Add contexts": "https://www.drupal.org/files/issues/2021-02-19/2815971-28.patch",
+      "Allow GroupQueryAccessHandler to accept any permission as an operation": "https://www.drupal.org/files/issues/2020-08-07/group-GroupQueryAccessHandler_permissions_as_oprations-3163943-3.patch"
     },
     "drupal/groupmedia": {
       "Display media bundles in alpha order": "https://www.drupal.org/files/issues/2020-10-20/groupmedia-order_bundles-3178034-3.patch"
@@ -91,7 +97,8 @@
     },
     "drupal/elasticsearch_connector": {
       "Parse data facets from epoch milliseconds format to seconds": "https://www.drupal.org/files/issues/2020-11-27/3096887-elasticsearch_connector_-7.x-parse_date_facets-7.patch",
-      "Facet OR: global aggregation does not take views filter into account": "https://www.drupal.org/files/issues/2021-02-02/elasticsearch_connector-facet_OR_global_aggregation_does_not_take_views_filter_into_account-3014805-24.patch"
+      "Facet OR: global aggregation does not take views filter into account": "https://www.drupal.org/files/issues/2021-02-02/elasticsearch_connector-facet_OR_global_aggregation_does_not_take_views_filter_into_account-3014805-24.patch",
+      "Accurately count total number of results": "https://www.drupal.org/files/issues/2021-11-18/3250145-1-track-total-hits.patch"
     },
     "drupal/redis": {
       "Enable cluster mode support": "https://www.drupal.org/files/issues/2020-02-06/2900947-17.patch"
@@ -154,7 +161,9 @@
       "Fixes invalid address: (Reply-To) error": "https://www.drupal.org/files/issues/2021-03-11/smtp_invalid-address_reply-to_3191046_13.patch"
     },
     "drupal/group_content_menu": {
-      "Set active trail correctly": "https://www.drupal.org/files/issues/2021-04-21/group_content_menu-active_trail_cache_problem-3209011-10.patch"
+      "Set active trail correctly": "https://www.drupal.org/files/issues/2021-04-21/group_content_menu-active_trail_cache_problem-3209011-10.patch",
+      "Update node form alter logic to be more passive (https://www.drupal.org/project/group_content_menu/issues/3211822)": "https://www.drupal.org/files/issues/2021-05-12/3211822-10.patch",
+      "Menu item edit permissions issues (https://www.drupal.org/project/group_content_menu/issues/3152938)": "https://www.drupal.org/files/issues/2021-10-20/3152938-40_0.patch"
     },
     "drupal/media_migration": {
       "Add media_wysiwyg_filter just once": "https://www.drupal.org/files/issues/2020-11-07/media_migration-add_media_wysiwyg_filter_once-3181180-2.patch"
@@ -186,6 +195,13 @@
     },
     "drupal/linked_field": {
       "Generate relative links rather than absolute": "https://www.drupal.org/files/issues/2020-05-22/linked_field-relative-destination-url-3139179-1-D8.patch"
+    },
+    "drupal/diff": {
+      "Patch diff interface to get language to match core patches in these issues: 3252521, 2899719, and 3252540": "patches/diff-patch-revision-language-to-match-3252521-2899719-3252540-2.patch",
+      "Add classes to allow color-coding of revisions list": "https://www.drupal.org/files/issues/2021-12-03/diff-add_classes-3252547-2.patch"
+    },
+    "drupal/entitygroupfield":  {
+      "Limit available groups in widget to ones user has permission to.": "https://www.drupal.org/files/issues/2020-08-07/entitygroupfield-Autocomplete_permissions-3163814-4.patch"
     }
   }
 }
