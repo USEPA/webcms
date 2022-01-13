@@ -158,7 +158,7 @@ variables:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-cloudfront")
       when: manual
 
     - if: >-
@@ -282,7 +282,7 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-cloudfront"'
 
    # These correspond to the three production targets in services/drupal/Dockerfile. The
    # ordering here is important for builds with a limited pool of servers: by ensuring that
@@ -324,7 +324,7 @@ build:metrics:dev:
   extends: .kaniko
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-cloudfront"'
 
   script:
     - /kaniko/executor
@@ -391,7 +391,7 @@ build:traefik:dev:
   extends: .kaniko
   stage: infrastructure_preprod_build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-cloudfront"'
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
@@ -406,7 +406,7 @@ copy:newrelic:dev:
   extends: .kaniko
   stage: copy
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-cloudfront"'
   script:
     - mkdir -p /workspace
     - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
@@ -445,7 +445,7 @@ infrastructure:preproduction:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_validate
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-cloudfront"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
