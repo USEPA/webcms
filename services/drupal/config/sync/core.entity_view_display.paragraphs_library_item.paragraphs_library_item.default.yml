@@ -1,20 +1,25 @@
-uuid: b493e548-e382-453d-88c5-1b4ac4e08789
+uuid: 9c3d9f57-fac1-46db-89de-102013628ef5
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.paragraphs_library_item.summary
     - field.field.paragraphs_library_item.paragraphs_library_item.field_web_areas
   module:
-    - paragraphs
+    - entity_reference_revisions
     - paragraphs_library
-_core:
-  default_config_hash: 298FcPciNgWk7pojyH1AA-0apcAkJulU6N3PO89ZXIk
-id: paragraphs_library_item.paragraphs_library_item.summary
+id: paragraphs_library_item.paragraphs_library_item.default
 targetEntityType: paragraphs_library_item
 bundle: paragraphs_library_item
-mode: summary
+mode: default
 content:
+  field_web_areas:
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
   label:
     type: string
     weight: 0
@@ -25,13 +30,13 @@ content:
     third_party_settings: {  }
   paragraphs:
     label: hidden
-    type: paragraph_summary
+    type: entity_reference_revisions_entity_view
     weight: 0
     region: content
-    settings: {  }
+    settings:
+      view_mode: default
+      link: ''
     third_party_settings: {  }
 hidden:
-  content_moderation_control: true
-  field_web_areas: true
   langcode: true
   search_api_excerpt: true

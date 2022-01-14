@@ -2,6 +2,8 @@ uuid: 09d9194d-1ecb-411d-854e-31e2c10128b7
 langcode: en
 status: true
 dependencies:
+  config:
+    - field.storage.paragraphs_library_item.field_web_areas
   module:
     - entity_browser
     - paragraphs
@@ -375,6 +377,69 @@ display:
           entity_type: paragraphs_library_item
           entity_field: uid
           plugin_id: field
+        field_web_areas:
+          id: field_web_areas
+          table: paragraphs_library_item__field_web_areas
+          field: field_web_areas
+          relationship: none
+          group_type: group
+          admin_label: ''
+          label: 'Web Area(s)'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: target_id
+          type: entity_reference_label
+          settings:
+            link: true
+          group_column: target_id
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
         paragraphs__target_id:
           id: paragraphs__target_id
           table: paragraphs_library_item_field_data
@@ -738,6 +803,57 @@ display:
           entity_type: paragraphs_library_item
           entity_field: uid
           plugin_id: entity_reference
+        field_web_areas_target_id:
+          id: field_web_areas_target_id
+          table: paragraphs_library_item__field_web_areas
+          field: field_web_areas_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_web_areas_target_id_op
+            label: 'Web Area(s)'
+            description: ''
+            use_operator: false
+            operator: field_web_areas_target_id_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_web_areas_target_id
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          handler: 'default:group'
+          handler_settings: {  }
+          widget: autocomplete
+          plugin_id: entity_reference
       sorts: {  }
       title: 'Paragraphs library'
       header: {  }
@@ -783,7 +899,8 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-      tags: {  }
+      tags:
+        - 'config:field.storage.paragraphs_library_item.field_web_areas'
   entity_browser:
     display_plugin: entity_browser
     id: entity_browser
@@ -798,4 +915,5 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-      tags: {  }
+      tags:
+        - 'config:field.storage.paragraphs_library_item.field_web_areas'
