@@ -680,7 +680,7 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
       }
     }
     // If the current revision is published and has a Sunset Date set.
-    if ($current_revision->status->value == 1 && isset($current_revision->field_expiration_date->value)) {
+    if ($current_revision->status->value && isset($current_revision->field_expiration_date->value)) {
       $current_formatted_date_time = $date_formatter->format(
         $current_revision->field_expiration_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
       );
