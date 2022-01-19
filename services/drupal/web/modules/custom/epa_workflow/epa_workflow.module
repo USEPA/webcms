@@ -661,8 +661,14 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
     // If latest revision and has a Publish Date set.
     if (isset($latest_revision->field_publish_date->value)) {
       $latest_revision_moderation_state = $latest_revision->moderation_state->value;
-      $latest_revision_date = $latest_revision->field_publish_date->date->format('F d, Y');
-      $latest_revision_time = $latest_revision->field_publish_date->date->format('h:i a');
+      $timezone = date_default_timezone_get();
+      $date_formatter = \Drupal::service('date.formatter');
+
+      $latest_formatted_date_time = $date_formatter->format(
+        $latest_revision->field_publish_date->date->getTimestamp(), 'custom', 'F d, Y-h:i a', $timezone
+      );
+      $latest_revision_date = substr($latest_formatted_date_time, 0, strpos($latest_formatted_date_time, '-'));
+      $latest_revision_time = substr($latest_formatted_date_time, strpos($latest_formatted_date_time, '-') + 1, strlen($latest_formatted_date_time) - 1);
 
       // Is in the “Draft, approved” state.
       if ($latest_revision_moderation_state == 'draft_approved') {
@@ -677,9 +683,13 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
     }
     // If the current revision is published and has a Sunset Date set.
     if ($current_revision->status->value == 1 && isset($current_revision->field_expiration_date->value)) {
-      $current_revision_sunset_date = $current_revision->field_expiration_date->date->format('F d, Y');
-      $current_revision_sunset_time = $current_revision->field_expiration_date->date->format('h:i a');  
-      $message = '<br>This content will automatically sunset, and be unpublished, on ' . $current_revision_sunset_date . ' at ' . $current_revision_sunset_time . '.';
+      $current_formatted_date_time = $date_formatter->format(
+        $current_revision->field_expiration_date->date->getTimestamp(), 'custom', 'F d, Y-h:i a', $timezone
+      );
+      $current_sunset_date = substr($current_formatted_date_time, 0, strpos($current_formatted_date_time, '-'));
+      $current_sunset_time = substr($current_formatted_date_time, strpos($current_formatted_date_time, '-') + 1, strlen($current_formatted_date_time) - 1);
+
+      $message = '<br>This content will automatically sunset, and be unpublished, on ' . $current_sunset_date . ' at ' . $current_sunset_time . '.';
       // search for current revision.
       foreach ($form['node_revisions_table'] as $delta => $revision) {
         if (isset($revision['#attributes']) && in_array('revision-current', $revision['#attributes']['class'])) {
