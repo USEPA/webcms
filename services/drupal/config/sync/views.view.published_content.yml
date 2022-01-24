@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_review_deadline
+    - taxonomy.vocabulary.epa_organization
     - workflows.workflow.epa_default
   module:
     - content_moderation
@@ -11,6 +12,7 @@ dependencies:
     - epa_web_areas
     - group
     - node
+    - taxonomy
     - user
     - views_autocomplete_filters
 _core:
@@ -1313,6 +1315,17 @@ display:
             'group_node:web_area': '0'
           entity_type: node
           plugin_id: group_content_to_entity_reverse
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
+          group_type: group
+          admin_label: Group
+          required: false
+          entity_type: group_content
+          entity_field: gid
+          plugin_id: standard
       defaults:
         relationships: false
         filters: false
@@ -1510,6 +1523,59 @@ display:
           entity_type: user
           entity_field: uid
           plugin_id: user_name
+        field_publisher_target_id:
+          id: field_publisher_target_id
+          table: group__field_publisher
+          field: field_publisher_target_id
+          relationship: gid
+          group_type: group
+          admin_label: ''
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_publisher_target_id_op
+            label: Publisher
+            description: ''
+            use_operator: false
+            operator: field_publisher_target_id_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_publisher_target_id
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          type: textfield
+          limit: true
+          vid: epa_organization
+          hierarchy: false
+          error_message: true
+          plugin_id: taxonomy_index_tid
         moderation_state:
           id: moderation_state
           table: node_field_data
@@ -1672,6 +1738,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user
         - 'user.node_grants:view'
         - user.permissions
       max-age: -1

@@ -4,13 +4,11 @@
     'contextual_links': contextual_links,
   } %}
 
-  {% block messages %}
-    {{ messages }}
-  {% endblock %}
-
-  {% block local_tasks %}
-    {{ tasks }}
-  {% endblock %}
+  {% if show_admin_info %}
+    <div class="js-toggle-admin-content">
+      {{ admin_info }}
+    </div>
+  {% endif %}
 
   {% block intro %}
     {{ intro }}

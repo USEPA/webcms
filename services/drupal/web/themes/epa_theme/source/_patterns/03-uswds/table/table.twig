@@ -3,6 +3,7 @@
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
+{% if scrollable %}<div class="usa-table-container--scrollable" tabindex="0">{% endif %}
 <table class="{{ classes }}">
   {% if caption %}
     <caption>{{ caption }}</caption>
@@ -49,3 +50,4 @@
 {% if sortable %}
   <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
 {% endif %}
+{% if scrollable %}</div>{% endif %}

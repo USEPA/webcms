@@ -1,0 +1,42 @@
+uuid: 9c3d9f57-fac1-46db-89de-102013628ef5
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraphs_library_item.paragraphs_library_item.field_web_areas
+  module:
+    - entity_reference_revisions
+    - paragraphs_library
+id: paragraphs_library_item.paragraphs_library_item.default
+targetEntityType: paragraphs_library_item
+bundle: paragraphs_library_item
+mode: default
+content:
+  field_web_areas:
+    weight: 1
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+    region: content
+  label:
+    type: string
+    weight: 0
+    label: hidden
+    region: content
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+  paragraphs:
+    label: hidden
+    type: entity_reference_revisions_entity_view
+    weight: 0
+    region: content
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+hidden:
+  langcode: true
+  search_api_excerpt: true
