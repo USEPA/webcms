@@ -23,14 +23,14 @@
       editor.addCommand('epaBoxCommand', new CKEDITOR.dialogCommand('epaBoxDialog'));
 
       editor.ui.addButton('epaBoxButton', {
-        label: 'Related Info Box',
+        label: 'Related Info Summary Box',
         command: 'epaBoxCommand',
         icon: iconPath
       });
 
       CKEDITOR.dialog.add('epaBoxDialog', function(editor) {
         return {
-          title: 'EPA Box',
+          title: 'Related Info Summary Box',
           minWidth: 400,
           minHeight: 200,
           contents: [{

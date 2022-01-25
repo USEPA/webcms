@@ -1,0 +1,35 @@
+uuid: c35b68b9-a15b-4228-8757-d870bb148c38
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraphs_library_item.field_web_areas
+    - group.type.web_area
+  module:
+    - custom_add_another
+    - paragraphs_library
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: paragraphs_library_item.paragraphs_library_item.field_web_areas
+field_name: field_web_areas
+entity_type: paragraphs_library_item
+bundle: paragraphs_library_item
+label: 'Web Areas'
+description: 'Optionally identify Web Areas that are likely to use this paragraph. This is only to assist in finding paragraphs and has no affect on who can edit or use the paragraph.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:group'
+  handler_settings:
+    target_bundles:
+      web_area: web_area
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
