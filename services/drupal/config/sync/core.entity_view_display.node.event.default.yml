@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
+    - field.field.node.event.field_daterange
     - field.field.node.event.field_deadline
     - field.field.node.event.field_description
     - field.field.node.event.field_display_arcgis_map
@@ -35,6 +36,7 @@ dependencies:
     - datetime
     - entity_reference_revisions
     - link
+    - smart_date
     - user
 id: node.event.default
 targetEntityType: node
@@ -56,6 +58,19 @@ content:
       date_format: 'Y-m-d\TH:i:s'
     third_party_settings: {  }
     type: date_range_without_time
+    region: content
+  field_daterange:
+    weight: 8
+    label: above
+    settings:
+      format: default
+      force_chronological: false
+      add_classes: false
+      time_wrapper: true
+      format_type: medium
+      timezone_override: ''
+    third_party_settings: {  }
+    type: smartdate_default
     region: content
   field_deadline:
     weight: 5

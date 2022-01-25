@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
+    - field.field.node.event.field_daterange
     - field.field.node.event.field_deadline
     - field.field.node.event.field_description
     - field.field.node.event.field_display_arcgis_map
@@ -40,6 +41,7 @@ dependencies:
     - link
     - paragraphs
     - shs
+    - smart_date
 third_party_settings:
   field_group:
     group_other_metadata:
@@ -98,7 +100,7 @@ third_party_settings:
         - group_javascript
         - group_other_metadata
       parent_name: ''
-      weight: 12
+      weight: 13
       format_type: tabs
       format_settings:
         id: ''
@@ -113,7 +115,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 14
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -139,8 +141,38 @@ content:
     third_party_settings: {  }
     type: daterange_default
     region: content
+  field_daterange:
+    weight: 3
+    settings:
+      default_tz: ''
+      add_abbreviations: after
+      custom_tz: America/New_York
+      allowed_timezones:
+        - America/Anchorage
+        - America/Denver
+        - America/Halifax
+        - America/Los_Angeles
+        - America/New_York
+        - America/Winnipeg
+        - Pacific/Guam
+        - Pacific/Honolulu
+        - Pacific/Pago_Pago
+        - Pacific/Wake
+      hide_date: false
+      modal: false
+      default_duration: 60
+      default_duration_increments: |-
+        30
+        60|1 hour
+        90
+        120|2 hours
+        custom
+      show_extra: true
+    third_party_settings: {  }
+    type: smartdate_timezone
+    region: content
   field_deadline:
-    weight: 5
+    weight: 6
     settings: {  }
     third_party_settings: {  }
     type: datetime_default
@@ -169,14 +201,14 @@ content:
     type: options_shs
     region: content
   field_event_cancellation:
-    weight: 4
+    weight: 5
     settings:
       display_label: true
     third_party_settings: {  }
     type: boolean_checkbox
     region: content
   field_event_host:
-    weight: 10
+    weight: 11
     settings:
       size: 60
       placeholder: ''
@@ -184,7 +216,7 @@ content:
     type: string_textfield
     region: content
   field_event_type:
-    weight: 9
+    weight: 10
     settings: {  }
     third_party_settings: {  }
     type: options_select
@@ -206,7 +238,7 @@ content:
     type: options_shs
     region: content
   field_hublinks:
-    weight: 11
+    weight: 12
     settings:
       match_operator: CONTAINS
       size: 60
@@ -232,7 +264,7 @@ content:
     type: options_select
     region: content
   field_links:
-    weight: 8
+    weight: 9
     settings:
       placeholder_url: ''
       placeholder_title: ''
@@ -240,7 +272,7 @@ content:
     type: link_default
     region: content
   field_location:
-    weight: 6
+    weight: 7
     settings: {  }
     third_party_settings: {  }
     type: address_default
@@ -262,7 +294,7 @@ content:
     type: string_textarea
     region: content
   field_paragraphs:
-    weight: 7
+    weight: 8
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -293,13 +325,13 @@ content:
     region: content
   langcode:
     type: language_select
-    weight: 3
+    weight: 4
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
-    weight: 18
+    weight: 19
     settings: {  }
     third_party_settings: {  }
     type: moderation_state_default
@@ -308,21 +340,21 @@ content:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 15
+    weight: 16
     region: content
     third_party_settings: {  }
   status:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 17
+    weight: 18
     region: content
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     settings:
       display_label: true
-    weight: 16
+    weight: 17
     region: content
     third_party_settings: {  }
   title:
@@ -335,7 +367,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 13
+    weight: 14
     region: content
     settings:
       match_operator: CONTAINS
@@ -344,7 +376,7 @@ content:
       match_limit: 10
     third_party_settings: {  }
   url_redirects:
-    weight: 19
+    weight: 20
     region: content
     settings: {  }
     third_party_settings: {  }
