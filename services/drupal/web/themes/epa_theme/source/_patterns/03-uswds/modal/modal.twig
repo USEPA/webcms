@@ -1,0 +1,46 @@
+{% set classes = [
+  'usa-modal',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<a
+  href="#{{ modal_id }}"
+  class="usa-button"
+  aria-controls="{{ modal_id }}"
+  data-open-modal
+>{{ button_text }}</a
+>
+<div
+  class="{{ classes }}"
+  id="{{ modal_id }}"
+  aria-labelledby="{{ modal_id }}-heading"
+  aria-describedby="{{ modal_id }}-description"
+  {% if modal_force_action %}data-force-action{% endif %}
+>
+  <div class="usa-modal__content">
+    <div class="usa-modal__main">
+      <h2 class="usa-modal__heading" id="{{ modal_id }}-heading">
+        {{ modal_header }}
+      </h2>
+      <div class="usa-prose">
+        <p id="{{ modal_id }}-description">
+          {{ modal_description }}
+        </p>
+      </div>
+      <div class="usa-modal__footer">
+        {{ modal_footer }}
+      </div>
+    </div>
+    {% if not modal_force_action %}
+    <button
+      class="usa-button usa-button--unstyled usa-modal__close"
+      aria-label="Close this window"
+      data-close-modal
+    >
+      <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+        <use xlink:href="{{ epa_theme_image_path }}sprite.svg#close"></use>
+      </svg>
+    </button>
+    {% endif %}
+  </div>
+</div>

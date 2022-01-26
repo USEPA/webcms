@@ -1,6 +1,6 @@
 ---
 el: .icon
-title: Icon
+title: EPA Icon
 state: complete
 ---
 
