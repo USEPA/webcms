@@ -36,7 +36,8 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
 
-    // Only users with system_webmaster role or admin permission can delete library items.
+    // Only users with delete paragraph library items permissino
+    // or admin permission can delete library items.
     if ($operation === 'delete') {
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'delete paragraph library items'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
