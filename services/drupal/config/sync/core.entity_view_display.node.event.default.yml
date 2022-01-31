@@ -32,18 +32,17 @@ dependencies:
     - node.type.event
   module:
     - address
-    - date_range_formatter
     - datetime
     - entity_reference_revisions
+    - epa_core
     - link
-    - smart_date
     - user
 id: node.event.default
 targetEntityType: node
 bundle: event
 mode: default
 content:
-  field_date:
+  field_daterange:
     weight: 0
     label: above
     settings:
@@ -57,20 +56,7 @@ content:
       separator: '-'
       date_format: 'Y-m-d\TH:i:s'
     third_party_settings: {  }
-    type: date_range_without_time
-    region: content
-  field_daterange:
-    weight: 8
-    label: above
-    settings:
-      format: default
-      force_chronological: false
-      add_classes: false
-      time_wrapper: true
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
-    type: smartdate_default
+    type: date_range_without_time_smartdate
     region: content
   field_deadline:
     weight: 5
@@ -139,6 +125,7 @@ hidden:
   content_moderation_control: true
   entitygroupfield: true
   field_channel: true
+  field_date: true
   field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true

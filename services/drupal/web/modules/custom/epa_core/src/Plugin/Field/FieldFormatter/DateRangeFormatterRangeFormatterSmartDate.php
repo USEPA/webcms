@@ -31,6 +31,7 @@ class DateRangeFormatterRangeFormatterSmartDate extends DateRangeFormatterRangeF
         /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
         $start_date = $item->value;
         /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
+        // $item->timezone;
         $end_date = $item->end_value;
         if ($start_date !== $end_date) {
           $format = $this->getSetting('several_years');
@@ -44,18 +45,18 @@ class DateRangeFormatterRangeFormatterSmartDate extends DateRangeFormatterRangeF
             $format = $this->getSetting('one_day');
           }
 
-          $date_str = \Drupal::service('date.formatter')->format($start_date, 'custom', preg_replace('/\{([a-zA-Z])\}/', '{\\\$1}', t($format)));
+          $date_str = \Drupal::service('date.formatter')->format($start_date, 'custom', preg_replace('/\{([a-zA-Z])\}/', '{\\\$1}', t($format)), $item->timezone);
           $matches = array();
           if (preg_match_all('/\{([a-zA-Z])\}/', $date_str, $matches)) {
             foreach ($matches[1] as $match) {
-              $date_str = preg_replace('/\{' . $match . '\}/', \Drupal::service('date.formatter')->format($end_date, 'custom', $match), $date_str);
+              $date_str = preg_replace('/\{' . $match . '\}/', \Drupal::service('date.formatter')->format($end_date, 'custom', $match, $item->timezone), $date_str);
             }
           }
           $elements[$delta] = ['#markup' => '<span class="date-display-range">' . $date_str . '</span>',];
 
         }
         else {
-          $elements[$delta] = ['#markup' => \Drupal::service('date.formatter')->format($start_date, 'custom', t($this->getSetting('one_day')))];
+          $elements[$delta] = ['#markup' => \Drupal::service('date.formatter')->format($start_date, 'custom', t($this->getSetting('one_day')), $item->timezone)];
         }
       }
     }
