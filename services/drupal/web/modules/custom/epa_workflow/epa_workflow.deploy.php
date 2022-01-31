@@ -302,7 +302,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   $batch = 25;
 
-  // Get
+  // Get the next batch of records
   $query = Drupal::database()->select('node__field_date', 'date');
   $query->addField('date', 'entity_id');
   $query->addField('date', 'revision_id');
@@ -326,16 +326,20 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   foreach ($records as $node_field) {
 
+    // Keeping track of the process of the bach process
     $sandbox['current_entity_id'] = $node_field->entity_id;
     $sandbox['current_processed']++;
 
     $date_start = $node_field->field_date_value;
     $date_end = $node_field->field_date_end_value;
 
+    // Converting datetime to unix timestamp
     $date_start = strtotime($date_start);
     $date_end = strtotime($date_end);
 
+    // divide by 60 to account for minutes
     $duration = ($date_end - $date_start) / 60;
+
     $insert->values([
       $node_field->entity_id,
       $node_field->revision_id,
