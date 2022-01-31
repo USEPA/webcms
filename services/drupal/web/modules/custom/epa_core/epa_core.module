@@ -604,3 +604,11 @@ function epa_core_module_implements_alter(&$implementations, $hook) {
   }
 }
 
+/**
+ * Implements hook_entity_type_build().
+ */
+function epa_core_entity_type_build(array &$entity_types) {
+  if (isset($entity_types['paragraph'])) {
+    $entity_types['paragraph']->setHandlerClass('access', 'Drupal\epa_core\EpaCoreLibraryItemAccessControlHandler');
+  }
+}
