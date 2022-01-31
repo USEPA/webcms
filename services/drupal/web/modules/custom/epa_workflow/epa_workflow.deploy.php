@@ -275,57 +275,7 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
  * `field_daterange` to allow for individual items to have selectable timezones
  *
  */
-//function epa_workflow_deploy_0008_migrate_field_date_to_field_daterange(&$sandbox) {
-//
-//  // Need to get the field data to query to build the array.
-//  $query = Drupal::database()->select('node__field_date', 'date');
-//  $query->addField('date', 'entity_id');
-//  $query->addField('date', 'revision_id');
-//  $query->addField('date', 'field_date_value');
-//  $query->addField('date', 'field_date_end_value');
-//  $query->condition('bundle', 'event', '=');
-//  $result = $query->execute()->fetchAll();
-//
-//  $insert = Drupal::database()->insert('node__field_daterange');
-//  $insert->fields([
-//    'entity_id',
-//    'revision_id',
-//    'langcode',
-//    'delta',
-//    'field_daterange_value',
-//    'field_daterange_end_value',
-//    'field_daterange_duration',
-//  ]);
-//
-//  foreach ($result as $node_field) {
-//
-//    $date_start = $node_field->field_date_value;
-//    $date_end = $node_field->field_date_end_value;
-//
-//    $date_start = strtotime($date_start);
-//    $date_end = strtotime($date_end);
-//
-//    $duration = ($date_end - $date_start) / 60;
-//    $insert->values([
-//      $node_field->entity_id,
-//      $node_field->revision_id,
-//      'en',
-//      0,
-//      $date_start,
-//      $date_end,
-//      $duration,
-//    ]);
-//    $insert->execute();
-//  }
-//}
-
-
-/**
- * Need to migrate the event field `field_date` to a smart date field
- * `field_daterange` to allow for individual items to have selectable timezones
- *
- */
-function epa_workflow_deploy_0018_migrate_field_data_to_field_daterange(&$sandbox) {
+function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbox) {
 
   if (!isset($sandbox['total'])) {
 
