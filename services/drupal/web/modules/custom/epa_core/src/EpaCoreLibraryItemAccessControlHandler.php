@@ -8,9 +8,9 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\paragraphs_library\LibraryItemAccessControlHandler;
 
 /**
- * Access controller for the paragraphs entity.
+ * Override access control handler for the paragraphs_library_item entity type.
  *
- * @see \Drupal\paragraphs\Entity\Paragraph.
+ * @see \Drupal\paragraphs_library\LibraryItemAccessControlHandler
  */
 class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHandler {
 
@@ -27,22 +27,26 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
     
-    // Users can update if they have 'edit paragraph library item' permission
-    // and they own the paragraph; or if they have admin permission.
+    // Users can update if they have the 'edit paragraph library item'
+    // permission and they own the paragraph.
     if ($operation === 'update') {
       $access = $access->allowedIf($library_item->getOwnerId() == $account->id());
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'edit own paragraph library items'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, 'edit paragraph library item'));
-      $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
 
-    // Only users with delete paragraph library items permissino
-    // or admin permission can delete library items.
+    // Only users with delete paragraph library items permission
     if ($operation === 'delete') {
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'delete paragraph library items'));
-      $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
     return $access;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
+    return AccessResult::allowedIfHasPermission($account, 'create paragraph library item');
   }
 
 }
