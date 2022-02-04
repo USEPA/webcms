@@ -42,11 +42,4 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
     return $access;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'create paragraph library item');
-  }
-
 }
