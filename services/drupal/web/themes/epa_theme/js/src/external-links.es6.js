@@ -16,7 +16,8 @@ import Drupal from 'drupal';
         if (
           linkElement.host === 'epa.gov' ||
           linkElement.host === 'www.epa.gov' ||
-          linkElement.host.endsWith('epa.gov')
+          linkElement.host.endsWith('.epa.gov') ||
+          linkElement.host === window.location.host
         ) {
           external = false;
         }
