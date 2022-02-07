@@ -36,6 +36,7 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
     // permission and they own the paragraph; or if they have admin permission.
     if ($operation === 'update') {
       $access = $access->allowedIf($library_item->getOwnerId() == $account->id());
+      $access->cachePerUser();
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'edit own paragraph library items'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, 'edit paragraph library item'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
