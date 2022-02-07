@@ -22,7 +22,7 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
     // administrative permission. Ensure to collect the required cacheability
     // metadata and combine both the published and the referenced access check
     // together, both must allow access if unpublished.
-    $access = AccessResult::neutral()->addCacheableDependency($library_item);
+    $access = AccessResult::neutral();
     if ($operation === 'view') {
       if (!$library_item->isPublished()) {
         $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
