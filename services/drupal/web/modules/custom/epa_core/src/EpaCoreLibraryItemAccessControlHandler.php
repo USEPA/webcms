@@ -8,9 +8,9 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\paragraphs_library\LibraryItemAccessControlHandler;
 
 /**
- * Access controller for the paragraphs entity.
+ * Override access control handler for the paragraphs_library_item entity type.
  *
- * @see \Drupal\paragraphs\Entity\Paragraph.
+ * @see \Drupal\paragraphs_library\LibraryItemAccessControlHandler
  */
 class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHandler {
 
@@ -22,24 +22,31 @@ class EpaCoreLibraryItemAccessControlHandler extends LibraryItemAccessControlHan
     // administrative permission. Ensure to collect the required cacheability
     // metadata and combine both the published and the referenced access check
     // together, both must allow access if unpublished.
-    $access = AccessResult::allowed()->addCacheableDependency($library_item);
-    if ($operation === 'view' && !$library_item->isPublished()) {
-      $access = $access->andIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
+    $access = AccessResult::neutral();
+    if ($operation === 'view') {
+      if (!$library_item->isPublished()) {
+        $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
+      }
+      else {
+        $access = $access->allowed();
+      }
     }
-    
-    // Users can update if they have 'edit paragraph library item' permission
-    // and they own the paragraph; or if they have admin permission.
+
+    // Users can update if they have the 'edit paragraph library item'
+    // permission and they own the paragraph; or if they have admin permission.
     if ($operation === 'update') {
       $access = $access->allowedIf($library_item->getOwnerId() == $account->id());
+      $access->addCacheableDependency($library_item);
+      $access->cachePerUser();
       $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'edit own paragraph library items'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, 'edit paragraph library item'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
 
-    // Only users with delete paragraph library items permissino
+    // Only users with delete paragraph library items permission
     // or admin permission can delete library items.
     if ($operation === 'delete') {
-      $access = $access->andIf(AccessResult::allowedIfHasPermission($account, 'delete paragraph library items'));
+      $access = $access->orIf(AccessResult::allowedIfHasPermission($account, 'delete paragraph library items'));
       $access = $access->orIf(AccessResult::allowedIfHasPermission($account, $this->entityType->getAdminPermission()));
     }
     return $access;
