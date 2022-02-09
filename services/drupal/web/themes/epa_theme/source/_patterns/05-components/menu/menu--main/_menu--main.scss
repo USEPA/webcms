@@ -108,6 +108,13 @@
       width: auto;
       z-index: 1;
 
+      &.menu--wide {
+        grid-template-columns: 1fr 1fr 1fr;
+        .menu__item:first-child {
+          grid-column: 1 / span 3;
+        }
+      }
+
       // stylelint-disable-next-line selector-no-qualifying-type
       html.js &[hidden] {
         display: none;
