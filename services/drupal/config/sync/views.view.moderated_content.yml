@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.paragraph.field_body
     - taxonomy.vocabulary.epa_organization
   module:
     - content_moderation
@@ -11,6 +12,7 @@ dependencies:
     - node
     - paragraphs
     - taxonomy
+    - text
     - user
     - views_autocomplete_filters
     - views_bulk_operations
@@ -799,6 +801,68 @@ display:
           destination: false
           entity_type: node
           plugin_id: entity_operations
+        field_body:
+          id: field_body
+          table: paragraph__field_body
+          field: field_body
+          relationship: field_paragraphs
+          group_type: group
+          admin_label: 'Main column paragraph body'
+          label: Body
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: text_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
       filters:
         title:
           id: title
@@ -842,6 +906,62 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: string
+        combine:
+          id: combine
+          table: views
+          field: combine
+          relationship: none
+          group_type: group
+          admin_label: 'Search body paragraphs'
+          operator: contains
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: combine_op
+            label: 'Body text contains'
+            description: ''
+            use_operator: false
+            operator: combine_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: combine
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+              paragraphs_library_editor: '0'
+            placeholder: ''
+            autocomplete_filter: 0
+            autocomplete_min_chars: '0'
+            autocomplete_items: '10'
+            autocomplete_raw_suggestion: 1
+            autocomplete_raw_dropdown: 1
+            autocomplete_dependent: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          fields:
+            field_body: field_body
+          plugin_id: views_autocomplete_filters_combine
         gid:
           id: gid
           table: group_content_field_data
@@ -1233,61 +1353,6 @@ display:
             group_items: {  }
           entity_type: group_content
           plugin_id: epa_web_areas_users_groups
-        field_body_value:
-          id: field_body_value
-          table: paragraph__field_body
-          field: field_body_value
-          relationship: field_paragraphs
-          group_type: group
-          admin_label: ''
-          operator: contains
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_body_value_op
-            label: Body
-            description: ''
-            use_operator: false
-            operator: field_body_value_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: field_body_value
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-              paragraphs_library_editor: '0'
-            placeholder: 'Keyword or phrase'
-            autocomplete_filter: 0
-            autocomplete_min_chars: '0'
-            autocomplete_items: '10'
-            autocomplete_field: ''
-            autocomplete_raw_suggestion: 1
-            autocomplete_raw_dropdown: 1
-            autocomplete_dependent: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          plugin_id: views_autocomplete_filters_string
       sorts: {  }
       title: 'Bulk Operations'
       header: {  }
@@ -1359,11 +1424,11 @@ display:
           plugin_id: standard
         field_paragraphs:
           id: field_paragraphs
-          table: node_revision__field_paragraphs
+          table: node__field_paragraphs
           field: field_paragraphs
-          relationship: none
+          relationship: nid
           group_type: group
-          admin_label: 'field_paragraphs: Paragraph'
+          admin_label: 'Main column paragraphs'
           required: false
           plugin_id: standard
       arguments: {  }
@@ -1390,6 +1455,7 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:field.storage.paragraph.field_body'
         - 'config:workflow_list'
   moderated_content:
     display_plugin: page
@@ -1987,6 +2053,68 @@ display:
           destination: false
           entity_type: node
           plugin_id: entity_operations
+        field_body:
+          id: field_body
+          table: paragraph__field_body
+          field: field_body
+          relationship: field_paragraphs
+          group_type: group
+          admin_label: 'Main column paragraph body'
+          label: Body
+          exclude: true
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: text_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          plugin_id: field
       defaults:
         fields: false
         header: false
@@ -2034,6 +2162,7 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:field.storage.paragraph.field_body'
         - 'config:workflow_list'
   page_1:
     display_plugin: page
@@ -2057,4 +2186,5 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:field.storage.paragraph.field_body'
         - 'config:workflow_list'
