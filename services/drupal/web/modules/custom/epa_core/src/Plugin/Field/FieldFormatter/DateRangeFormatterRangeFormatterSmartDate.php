@@ -1,7 +1,10 @@
 <?php
 namespace Drupal\epa_core\Plugin\Field\FieldFormatter;
 
+use Drupal\addtocal\Form\AddToCalForm;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList;
+use Drupal\epa_core\Plugin\Field\FieldFormatter\AddToCalendarFormatter;
 
 /**
 * Plugin implementation of the 'Custom' formatter for 'daterange' fields.
@@ -17,13 +20,19 @@ use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRa
 *   }
 * )
 */
-class DateRangeFormatterRangeFormatterSmartDate extends DateRangeFormatterRangeFormatter {
+class DateRangeFormatterRangeFormatterSmartDate extends AddToCalendarFormatter {
 
   /**
    * {@inheritdoc}
    */
   public function viewElements($items, $langcode) {
     $elements = [];
+
+    $entity = $items->getEntity();
+    $settings = $this->getSettings();
+    $field = $this->fieldDefinition;
+    $field_name = $field->get('field_name');
+    $settings['field_name'] = $field_name;
 
     foreach ($items as $delta => $item) {
 
@@ -59,6 +68,29 @@ class DateRangeFormatterRangeFormatterSmartDate extends DateRangeFormatterRangeF
           $elements[$delta] = ['#markup' => \Drupal::service('date.formatter')->format($start_date, 'custom', t($this->getSetting('one_day')), $item->timezone)];
         }
       }
+
+      // Adding AddtoCal
+      $form = new AddToCalForm($entity, $settings, $delta);
+      $form = \Drupal::formBuilder()->getForm($form);
+
+      /** @var DateTimeFieldItemList $dates */
+      $dates = $entity->get($field_name);
+      // Date range field has different structure
+
+      if (!empty($start_date) && !empty($end_date)) {
+        $start_date_object = $dates[$delta];
+      }
+      else {
+        $start_date_object = $dates[$delta]->date;
+      }
+      //$d = new \DateTime('now');
+      //$u =  strtotime($start_date, 'z');
+      //$form['#access'] = strtotime($cur_date) < strtotime($start_date);
+      $now = strtotime('now');
+      $t = $start_date;
+      $form['#access'] = true;
+      $test =  $now < $start_date;
+      $elements[$delta]['addtocal'] = $form;
     }
     return $elements;
   }
