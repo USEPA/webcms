@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInterface {
 
-  protected $valueFormType = 'checkbox';
+  protected $valueFormType = 'select';
 
   /**
    * Group membership loader service.
@@ -63,7 +63,10 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
   public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
     parent::init($view, $display, $options);
     $this->valueTitle = $this->t('Filter on Groups the current user belongs to.');
-    $this->definition['options callback'] = [$this, 'generateOptions'];
+    $this->valueOptions = [
+      'groups' => $this->t('Limit to my Web Areas'),
+    ];
+
     $this->currentDisplay = $view->current_display;
   }
 
@@ -71,7 +74,7 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
    * {@inheritDoc}
    */
   public function query() {
-    if (!empty($this->value)) {
+    if (is_array($this->value) && reset($this->value) == 'groups') {
       $groups = $this->getAllGroupsByUser();
       if (empty($groups)) $groups = [-1];
       $this->ensureMyTable();
@@ -79,39 +82,6 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
     }
   }
 
-  public function valueForm(&$form, FormStateInterface $form_state) {
-    $default_value = $this->value;
-    $exposed = $form_state->get('exposed');
-
-    if ($exposed) {
-      $identifier = $this->options['expose']['identifier'];
-      $form['value']['#type'] = 'checkbox';
-      $form['value'] = [
-        '#type' => 'checkbox',
-        '#title' => 'Limit content to my web areas',
-        '#default_value' => $default_value,
-      ];
-      $user_input = $form_state->getUserInput();
-      if (!isset($user_input[$identifier])) {
-        $user_input[$identifier] = $default_value;
-        $form_state->setUserInput($user_input);
-      }
-    }
-  }
-
-
-  /**
-   * Helper to generate options for our filter.
-   *
-   * @return array
-   *   Array of options.
-   */
-  public function generateOptions(): array {
-    return [
-      0 => $this->t('All web areas'),
-      1 => $this->t('In my Web Areas'),
-    ];
-  }
 
   /**
    * Gets all Group entity IDs for the currently logged in user.
