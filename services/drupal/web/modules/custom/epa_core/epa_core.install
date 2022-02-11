@@ -51,20 +51,6 @@ WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
 }
 
 /**
- * Fix improperly-stored sunset date values.
- */
-function epa_core_update_9002() {
-  \Drupal::database()->query('UPDATE {node__field_expiration_date} SET field_expiration_date_value = CONCAT(field_expiration_date_value, \'T05:00:00\') where LENGTH(field_expiration_date_value) < 11')
-  ->execute();
-  \Drupal::database()->query('UPDATE {node_revision__field_expiration_date} SET field_expiration_date_value = CONCAT(field_expiration_date_value, \'T05:00:00\') where LENGTH(field_expiration_date_value) < 11')
-    ->execute();
-  \Drupal::database()->query('UPDATE {node__field_scheduled_transition} SET field_scheduled_transition_value = CONCAT(field_scheduled_transition_value, \'T05:00:00\') where LENGTH(field_scheduled_transition_value) < 11')
-    ->execute();
-  \Drupal::database()->query('UPDATE {node_revision__field_scheduled_transition} SET field_scheduled_transition_value = CONCAT(field_scheduled_transition_value, \'T05:00:00\') where LENGTH(field_scheduled_transition_value) < 11')
-    ->execute();
-}
-
-/**
  * Create the new News Release term with 730 day review cycle.
  */
 function _epa_core_create_news_release_type_term() {
