@@ -2,6 +2,7 @@
 namespace Drupal\epa_core\Plugin\Field\FieldFormatter;
 
 use Drupal\addtocal\Form\AddToCalForm;
+use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList;
 use Drupal\epa_core\Plugin\Field\FieldFormatter\AddToCalendarFormatter;
@@ -78,6 +79,12 @@ class DateRangeFormatterSmartDateAddToCal extends AddToCalendarFormatter {
       // Adjusting the timezone
       $now = new \DateTime('', new \DateTimeZone($timezone));
       $now = $now->format('Y-m-d H:i:s');
+
+      // Testing datetimeplus to compare
+      // Doesn't look like timezone conversion is working using `eastern`
+      // No matter what the timezone is used.
+      $test = new DateTimePlus();
+      $test->createFromTimestamp($start_date, $timezone);
 
       $event_start_date = new \DateTime(date('Y-m-d H:i:s', $start_date), new \DateTimeZone(($timezone)));
       $event_start_date = $event_start_date->format('Y-m-d H:i:s');
