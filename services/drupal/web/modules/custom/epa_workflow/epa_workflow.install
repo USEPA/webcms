@@ -80,3 +80,17 @@ function epa_workflow_update_9000() {
     LEFT JOIN {paragraphs_item_revision} ON {paragraphs_item_revision}.revision_id = {paragraphs_item_revision_field_data}.revision_id
         WHERE {paragraphs_item_revision}.revision_id IS NULL;")->execute();
 }
+
+/**
+ * Fix improperly-stored sunset date values.
+ */
+function epa_workflow_update_9001() {
+  \Drupal::database()->query('UPDATE {node__field_expiration_date} SET field_expiration_date_value = CONCAT(field_expiration_date_value, \'T05:00:00\') where LENGTH(field_expiration_date_value) < 11')
+    ->execute();
+  \Drupal::database()->query('UPDATE {node_revision__field_expiration_date} SET field_expiration_date_value = CONCAT(field_expiration_date_value, \'T05:00:00\') where LENGTH(field_expiration_date_value) < 11')
+    ->execute();
+  \Drupal::database()->query('UPDATE {node__field_scheduled_transition} SET field_scheduled_transition_value = CONCAT(field_scheduled_transition_value, \'T05:00:00\') where LENGTH(field_scheduled_transition_value) < 11')
+    ->execute();
+  \Drupal::database()->query('UPDATE {node_revision__field_scheduled_transition} SET field_scheduled_transition_value = CONCAT(field_scheduled_transition_value, \'T05:00:00\') where LENGTH(field_scheduled_transition_value) < 11')
+    ->execute();
+}
