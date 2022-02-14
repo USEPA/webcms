@@ -84,11 +84,23 @@ display:
           summary: ''
           description: ''
           columns:
+            nid: nid
             title: title
             gid: gid
+            type: type
             moderation_state: moderation_state
+            changed: changed
             field_review_deadline: field_review_deadline
+            name: name
+            field_body: field_body
           info:
+            nid:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             title:
               sortable: true
               default_sort_order: asc
@@ -103,6 +115,13 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
+            type:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             moderation_state:
               sortable: true
               default_sort_order: asc
@@ -110,6 +129,13 @@ display:
               separator: ''
               empty_column: false
               responsive: priority-medium
+            changed:
+              sortable: true
+              default_sort_order: desc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             field_review_deadline:
               sortable: true
               default_sort_order: asc
@@ -117,7 +143,21 @@ display:
               separator: ''
               empty_column: false
               responsive: priority-low
-          default: field_review_deadline
+            name:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_body:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+          default: changed
           empty_table: true
       row:
         type: fields
@@ -881,6 +921,8 @@ display:
         filters: false
         filter_groups: false
         header: false
+        style: false
+        row: false
       pager:
         type: some
         options:
@@ -1258,6 +1300,56 @@ display:
             value: '<div class="messages messages--warning">You have [view:total-rows] content items that will be expiring soon.</div>'
             format: filtered_html
           plugin_id: text
+      style:
+        type: table
+        options:
+          grouping: {  }
+          row_class: ''
+          default_row_class: true
+          override: true
+          sticky: true
+          caption: ''
+          summary: ''
+          description: ''
+          columns:
+            title: title
+            gid: gid
+            moderation_state: moderation_state
+            field_review_deadline: field_review_deadline
+          info:
+            title:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            gid:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            moderation_state:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: priority-medium
+            field_review_deadline:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: priority-low
+          default: field_review_deadline
+          empty_table: true
+      row:
+        type: fields
+        options: {  }
     cache_metadata:
       max-age: -1
       contexts:
