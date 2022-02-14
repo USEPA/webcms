@@ -128,6 +128,11 @@ function epa_workflow_mail_alter(&$message) {
   if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
     $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
 
+    // Avoid sending the notification messages to the site email address; prefer donotreply.
+    if ($message['to'] == 'drupal_admin@epa.gov') {
+      $message['to'] = 'donotreply@epa.gov';
+    }
+
     // Log here to avoid having to create our own mail service
     $logger = \Drupal::logger('epa_workflow');
     $transition = \Drupal::service('content_moderation_notifications.notification_information')->getTransition($message['params']['context']['node']);
