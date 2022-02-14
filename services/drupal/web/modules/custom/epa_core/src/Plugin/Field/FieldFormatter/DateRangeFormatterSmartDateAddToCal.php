@@ -71,33 +71,24 @@ class DateRangeFormatterSmartDateAddToCal extends AddToCalendarFormatter {
         }
       }
 
-      $t = date_default_timezone_get();
       // Adding AddtoCal
       $form = new AddToCalForm($entity, $settings, $delta);
       $form = \Drupal::formBuilder()->getForm($form);
 
-      // Adjusting the timezone
-      $now = new \DateTime('', new \DateTimeZone($timezone));
-      $now = $now->format('Y-m-d H:i:s');
+      // Creating the unix timestamp to be datetime format
+      // to account for timezone for comparison.
+      $event = new DateTimePlus();
+      $event = $event->createFromTimestamp($start_date, new \DateTimeZone($timezone));
+      $event = $event->getPhpDateTime();
 
-      // Testing datetimeplus to compare
-      // Doesn't look like timezone conversion is working using `eastern`
-      // No matter what the timezone is used.
-      $test = new DateTimePlus();
-      $test->createFromTimestamp($start_date, $timezone);
+      // Creating datetime object of the current time
+      // to account for timezone for comparison.
+      $now = new DateTimePlus('', new \DateTimeZone($timezone));
+      $now = $now->getPhpDateTime();
 
-      $event_start_date = new \DateTime(date('Y-m-d H:i:s', $start_date), new \DateTimeZone(($timezone)));
-      $event_start_date = $event_start_date->format('Y-m-d H:i:s');
-
-      // Need to compare the current time & the event date.
-      // To display the addtocal or not.
-      // @TODO: need to work on getting timezones accounted for
-      // When the event was setup for 3pm ASKT
-      // $now = current time 11am
-      // $event_start_date = 19.
-      // So it looks like while comparing them may be a little more difficult since the $now time (- offset) and
-      // $event-start_date appears to be (+ offset) to eastern.
-      $form['#access'] =  $now < $event_start_date;
+      // Need to verify the date object to see if event is in the past.
+      // if it is in the past DO NOT show AddToCal
+      $form['#access'] =  $now < $event;
 
       $elements[$delta]['addtocal'] = $form;
     }
