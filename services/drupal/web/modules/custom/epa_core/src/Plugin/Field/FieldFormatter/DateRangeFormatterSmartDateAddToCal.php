@@ -2,7 +2,7 @@
 namespace Drupal\epa_core\Plugin\Field\FieldFormatter;
 
 use Drupal\addtocal\Form\AddToCalForm;
-use Drupal\Component\Datetime\DateTimePlus;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList;
 use Drupal\epa_core\Plugin\Field\FieldFormatter\AddToCalendarFormatter;
@@ -77,13 +77,13 @@ class DateRangeFormatterSmartDateAddToCal extends AddToCalendarFormatter {
 
       // Creating the unix timestamp to be datetime format
       // to account for timezone for comparison.
-      $event = new DateTimePlus();
+      $event = new DrupalDateTime();
       $event = $event->createFromTimestamp($start_date, new \DateTimeZone($timezone));
       $event = $event->getPhpDateTime();
 
       // Creating datetime object of the current time
       // to account for timezone for comparison.
-      $now = new DateTimePlus('', new \DateTimeZone($timezone));
+      $now = new DrupalDateTime('', new \DateTimeZone($timezone));
       $now = $now->getPhpDateTime();
 
       // Need to verify the date object to see if event is in the past.
