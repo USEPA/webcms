@@ -112,4 +112,37 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
 
     return $form;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $elements = parent::viewElements($items, $langcode);
+    $entity = $items->getEntity();
+    $settings = $this->getSettings();
+    $field = $this->fieldDefinition;
+    $field_name = $field->get('field_name');
+    $settings['field_name'] = $field_name;
+
+    // Hide the form if
+    foreach ($elements as $delta => $element) {
+      $form = new AddToCalForm($entity, $settings, $delta);
+      $form = \Drupal::formBuilder()->getForm($form);
+
+      /** @var DateTimeFieldItemList $dates */
+      $dates = $entity->get($field_name);
+      // Date range field has different structure
+      if (!empty($dates[$delta]->start_date) && !empty($dates[$delta]->end_date)) {
+        $start_date_object = $dates[$delta]->start_date;
+      }
+      else {
+        $start_date_object = $dates[$delta]->date;
+      }
+      $form['#access'] = new \DateTime('now') < $start_date_object->getPhpDateTime();
+      $elements[$delta]['addtocal'] = $form;
+    }
+
+    return $elements;
+  }
+
 }
