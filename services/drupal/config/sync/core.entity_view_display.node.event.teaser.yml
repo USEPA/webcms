@@ -6,6 +6,7 @@ dependencies:
     - core.entity_view_mode.node.teaser
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
+    - field.field.node.event.field_daterange
     - field.field.node.event.field_deadline
     - field.field.node.event.field_description
     - field.field.node.event.field_display_arcgis_map
@@ -31,22 +32,22 @@ dependencies:
     - field.field.node.event.field_type
     - node.type.event
   module:
-    - date_range_formatter
+    - epa_core
     - user
 id: node.event.teaser
 targetEntityType: node
 bundle: event
 mode: teaser
 content:
-  field_date:
-    type: date_range_without_time
+  field_daterange:
+    type: date_range_without_time_smartdate
     weight: 0
     region: content
     label: inline
     settings:
       timezone_override: ''
       single: 'F j, Y g:i a T'
-      single_all_day: 'F j, Y '
+      single_all_day: 'F j, Y'
       one_day: 'F j, Y g:i a - {g}:{i} {a} T'
       one_month: 'F j, Y g:i a - {F} {j}, {Y} {g}:{i} {a} T'
       several_months: 'F j, Y g:i a - {F} {j}, {Y} {g}:{i} {a} T'
@@ -56,7 +57,7 @@ content:
     third_party_settings: {  }
   field_description:
     type: basic_string
-    weight: 0
+    weight: 1
     region: content
     label: hidden
     settings: {  }
@@ -65,6 +66,7 @@ hidden:
   content_moderation_control: true
   entitygroupfield: true
   field_channel: true
+  field_date: true
   field_deadline: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
