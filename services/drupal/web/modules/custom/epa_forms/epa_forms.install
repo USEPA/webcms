@@ -24,6 +24,7 @@ function epa_forms_update_9000(&$sandbox) {
     }
     $form->save();
     $sandbox['current']++;
+    \Drupal::logger('epa_forms')->notice('Fixed form '. $form->id());
   }
-  \Drupal::logger('epa_forms')->notice($sandbox['current'] . 'forms with an invalid default subject or body processed.');
+  \Drupal::logger('epa_forms')->notice($sandbox['current'] . ' forms with an invalid default subject or body processed.');
 }
