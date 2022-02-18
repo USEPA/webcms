@@ -909,6 +909,10 @@ if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
 
+$config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod') ? 'black' : 'red');
+$config['environment_indicator.indicator']['fg_color'] = '#fff';
+$config['environment_indicator.indicator']['name'] = $env_name;
+
 /**
  * Load local development override configuration, if available.
  *
