@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.slideshow.field_slides
+    - field.field.paragraph.slideshow.field_slideshow_style
     - field.field.paragraph.slideshow.field_title
     - paragraphs.paragraphs_type.slideshow
   module:
@@ -15,7 +16,7 @@ mode: default
 content:
   field_slides:
     type: paragraphs
-    weight: 1
+    weight: 2
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -31,6 +32,12 @@ content:
         collapse_edit_all: collapse_edit_all
         duplicate: '0'
     third_party_settings: {  }
+    region: content
+  field_slideshow_style:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
     region: content
   field_title:
     weight: 0
