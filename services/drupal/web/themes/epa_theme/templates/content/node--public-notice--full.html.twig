@@ -36,12 +36,6 @@
   {{ content.epa_content_moderation_control }}
 {% endset %}
 
-{% set show_admin_info = false %}
-
-{% if admin_info|render|striptags|trim %}
-  {% set show_admin_info = true %}
-{% endif %}
-
 {% set footer %}
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
@@ -101,7 +95,7 @@
     'contact_link': contact_link,
     'title': title,
     'admin_info': admin_info,
-    'show_admin_info': show_admin_info,
+    'show_admin_info': true,
     'body': body,
     'sidenav': sidenav,
     'footer': footer,
@@ -114,7 +108,7 @@
     'contact_link': contact_link,
     'title': title,
     'admin_info': admin_info,
-    'show_admin_info': show_admin_info,
+    'show_admin_info': true,
     'body': body,
     'footer': footer,
   } %}

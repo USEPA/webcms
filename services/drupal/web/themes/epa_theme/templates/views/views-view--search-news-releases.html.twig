@@ -21,12 +21,6 @@
   {{ drupal_block('local_actions_block', wrapper=false) }}
 {% endset %}
 
-{% set show_admin_info = false %}
-
-{% if admin_info|render|striptags|trim %}
-  {% set show_admin_info = true %}
-{% endif %}
-
 {% set area_footer %}
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
@@ -79,7 +73,7 @@
   'title': view.title,
   'contextual_links': title_suffix.contextual_links,
   'admin_info': admin_info,
-  'show_admin_info': show_admin_info,
+  'show_admin_info': true,
   'intro': intro,
   'search': search,
   'filters': filters,
