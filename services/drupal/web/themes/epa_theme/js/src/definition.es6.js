@@ -13,7 +13,7 @@ import Drupal from 'drupal';
         const tooltip = definition.querySelector('.js-definition__tooltip');
         const definitionId = `definition-${now}-${index}`;
 
-        trigger.setAttribute('aria-described-by', definitionId);
+        trigger.setAttribute('aria-describedby', definitionId);
         tooltip.setAttribute('id', definitionId);
         tooltip.setAttribute('aria-hidden', true);
 
