@@ -4,6 +4,8 @@ namespace Drupal\epa_core\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\samlauth\Event\SamlauthEvents;
+use Drupal\samlauth\Event\SamlauthUserSyncEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -111,12 +113,30 @@ class EpaCoreEventSubscriber implements EventSubscriberInterface {
     $event->setResponse(new Response($this->t('Access denied'), Response::HTTP_FORBIDDEN));
   }
 
+  /**
+   * Performs actions to synchronize users with SAML data on login.
+   *
+   * @param \Drupal\samlauth\Event\SamlauthUserSyncEvent $event
+   *   The event.
+   */
+  public function onUserSync(SamlauthUserSyncEvent $event) {
+    $account = $event->getAccount();
+    $attributes = $event->getAttributes();
+
+    // Synchronize Full Name.
+    $full_name = !empty($attributes['displayname'][0]) ? $attributes['displayname'][0] : NULL;
+    if ($full_name) {
+      $account->set('field_full_name', $full_name);
+      $event->markAccountChanged();
+    }
+  }
 
   /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
     $events[KernelEvents::REQUEST][] = ['onKernelRequest', 100];
+    $events[SamlauthEvents::USER_SYNC][] = ['onUserSync'];
     return $events;
   }
 
