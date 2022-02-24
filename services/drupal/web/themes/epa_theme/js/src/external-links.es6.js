@@ -4,8 +4,31 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.externalLinks = {
     attach(context, settings) {
+      const allowedDomains = [
+        'webcms-uploads-dev.s3.amazonaws.com',
+        'webcms-uploads-stage.s3.amazonaws.com',
+        'webcms-uploads-prod.s3.amazonaws.com',
+        'webcms-uploads-qa.s3.amazonaws.com',
+      ];
+      function linkIsExternal(linkElement) {
+        let external = true;
+
+        if (
+          linkElement.host === 'epa.gov' ||
+          linkElement.host === 'www.epa.gov' ||
+          linkElement.host.endsWith('.epa.gov') ||
+          linkElement.host === window.location.host
+        ) {
+          external = false;
+        }
+        if (allowedDomains.includes(linkElement.host)) {
+          external = false;
+        }
+
+        return external;
+      }
       const externalLinks = context.querySelectorAll(
-        "a:not([href=''], [href$='.gov'], [href*='.gov/'], [href$='.mil'], [href*='.mil/'], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'], [href*='webcms-uploads-dev.s3.amazonaws.com'], [href*='webcms-uploads-stage.s3.amazonaws.com'], [href*='webcms-uploads-prod.s3.amazonaws.com'], [href*='webcms-uploads-qa.s3.amazonaws.com'])"
+        "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])"
       );
       const translate = {
         en: ['Exit', 'Exit EPA website'],
@@ -23,7 +46,7 @@ import Drupal from 'drupal';
         vi: ['Thoát ra', 'Thoát ra khỏi trang web EPA'],
       };
       externalLinks.forEach(function(el) {
-        if (el.hasAttribute('href')) {
+        if (el.hasAttribute('href') && linkIsExternal(el)) {
           let translated = Drupal.t('Exit');
           let translatedAccessible = Drupal.t('Exit EPA Website');
           const article = el.closest('article[lang]');
