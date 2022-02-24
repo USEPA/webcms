@@ -260,15 +260,21 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       $date_formatter = \Drupal::service('date.formatter');
 
       $review_deadline = $date_formatter->format(
-        $node->field_review_deadline->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+        $node->field_review_deadline->date->getTimestamp(), 'custom', 'F d, Y h:i a T', $timezone
       );
 
-      $form['current'] = [
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
-        '#markup' => t('Review deadline:<br> @review-deadline', [
-          '@review-deadline' => $review_deadline
-        ]),
+      $form['review_deadline'] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => [
+            'form-item',
+          ],
+        ],
+        '#children' =>[
+          '#markup' => t('Review deadline:<br> @review-deadline', [
+            '@review-deadline' => $review_deadline
+          ]),
+        ]
       ];
 
     }
