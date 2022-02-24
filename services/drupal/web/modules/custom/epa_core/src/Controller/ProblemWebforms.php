@@ -39,7 +39,7 @@ class ProblemWebforms extends ControllerBase {
    */
   public function list() {
     $db = $this->container->get('database');
-    $ids = $db->query("SELECT SUBSTRING(name, 17) FROM config WHERE name LIKE 'webform.webform.%' AND (data LIKE '%s:7:\"subject\";s:7:\"default\"%' OR data LIKE '%s:4:\"body\";s:7:\"default\"%')", [], ['allow_delimiter_in_query' => TRUE])->fetchCol();
+    $ids = $db->query("SELECT SUBSTRING(name, 17) FROM config WHERE name LIKE 'webform.webform.%' AND (data LIKE '%s:7:\"subject\";s:7:\"default\"%' OR data LIKE '%s:4:\"body\";s:7:\"default\"%' OR data LIKE '%s:9:\"from_mail\";s:7:\"default\"%' OR data LIKE '%s:9:\"from_name\";s:7:\"default\"%')", [], ['allow_delimiter_in_query' => TRUE])->fetchCol();
 
     $storage = $this->container->get('entity_type.manager')->getStorage('webform');
     $forms = $storage->loadMultiple($ids);

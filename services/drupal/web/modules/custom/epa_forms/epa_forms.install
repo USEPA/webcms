@@ -24,7 +24,37 @@ function epa_forms_update_9000(&$sandbox) {
     }
     $form->save();
     $sandbox['current']++;
-    \Drupal::logger('epa_forms')->notice('Fixed form '. $form->id());
+    \Drupal::logger('epa_forms')->notice('Fixed subject and body on form '. $form->id());
   }
   \Drupal::logger('epa_forms')->notice($sandbox['current'] . ' forms with an invalid default subject or body processed.');
+}
+
+/**
+ * Fix webforms that had their "from" field set to 'default' rather than the correct value of '_default'
+ */
+function epa_forms_update_9001(&$sandbox) {
+  $ids = \Drupal::database()->query("SELECT SUBSTRING(name, 17) FROM {config} WHERE name LIKE 'webform.webform.%' AND (data LIKE '%s:9:\"from_mail\";s:7:\"default\"%' OR data LIKE '%s:9:\"from_name\";s:7:\"default\"%') LIMIT 30", [], ['allow_delimiter_in_query' => TRUE])->fetchCol();
+  if (!isset($sandbox['current'])) $sandbox['current'] = 0;
+  if (!isset($sandbox['#finished'])) $sandbox['#finished'] = 0;
+  if (empty($ids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+  $storage = \Drupal::entityTypeManager()->getStorage('webform');
+  $forms = $storage->loadMultiple($ids);
+  foreach ($forms as $form) {
+    $handlers = $form->getHandlers('email');
+    foreach ($handlers as $handler) {
+      foreach (['from_name','from_mail'] as $key) {
+        $setting = $handler->getSetting($key);
+        if (!empty($setting) && $setting == 'default') {
+          $handler->setSetting($key, '_default');
+        }
+      }
+    }
+    $form->save();
+    $sandbox['current']++;
+    \Drupal::logger('epa_forms')->notice('Fixed default mail and name on form '. $form->id());
+  }
+  \Drupal::logger('epa_forms')->notice($sandbox['current'] . ' forms with an invalid default from_name or from_mail processed.');
 }
