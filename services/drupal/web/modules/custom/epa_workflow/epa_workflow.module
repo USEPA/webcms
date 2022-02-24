@@ -254,6 +254,24 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         $form['node_edit_link'] = $edit_link->toRenderable();
       }
     }
+    if (isset($node) && $node->isPublished()) {
+
+      $timezone = date_default_timezone_get();
+      $date_formatter = \Drupal::service('date.formatter');
+
+      $review_deadline = $date_formatter->format(
+        $node->field_review_deadline->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+      );
+
+      $form['current'] = [
+        '#prefix' => '<div>',
+        '#suffix' => '</div>',
+        '#markup' => t('Review deadline:<br> @review-deadline', [
+          '@review-deadline' => $review_deadline
+        ]),
+      ];
+
+    }
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
@@ -682,6 +700,9 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
       else if ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
         $message = '<br>The revision is scheduled to publish on ' . $latest_formatted_date_time . ', but will only do so if this draft is approved. Currently, the draft is NOT approved.';
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
+      }
+      else if ($latest_revision_moderation_state == 'published') {
+
       }
     }
     // If the current revision is published and has a Sunset Date set.
