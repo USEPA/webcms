@@ -254,6 +254,9 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         $form['node_edit_link'] = $edit_link->toRenderable();
       }
     }
+
+    // Want to display the `field_review_deadline` date
+    // on the moderation block only on published content.
     if (isset($node) && $node->isPublished()) {
 
       $timezone = date_default_timezone_get();
@@ -262,6 +265,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       $review_deadline = $date_formatter->format(
         $node->field_review_deadline->date->getTimestamp(), 'custom', 'F d, Y h:i a T', $timezone
       );
+
 
       $form['review_deadline'] = [
         '#type' => 'container',
