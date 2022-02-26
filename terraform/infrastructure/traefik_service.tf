@@ -77,7 +77,7 @@ resource "aws_ecs_service" "traefik" {
   cluster         = aws_ecs_cluster.cluster.name
   task_definition = aws_ecs_task_definition.traefik.arn
 
-  desired_count = 2
+  desired_count = 0
 
   enable_ecs_managed_tags = true
   force_new_deployment    = true
