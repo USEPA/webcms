@@ -15,7 +15,7 @@
 
 {% set display_sidenav = false %}
 
-{% if sidenav|render|striptags|trim %}
+{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
   {% set display_sidenav = true %}
 {% endif %}
 
@@ -38,7 +38,7 @@
 
 {% set show_admin_info = false %}
 
-{% if admin_info|striptags|trim %}
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
   {% set show_admin_info = true %}
 {% endif %}
 
@@ -48,7 +48,7 @@
 
 {% set has_footer = false %}
 
-{% if footer|render|striptags|trim %}
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
   {% set has_footer = true %}
 {% endif %}
 
