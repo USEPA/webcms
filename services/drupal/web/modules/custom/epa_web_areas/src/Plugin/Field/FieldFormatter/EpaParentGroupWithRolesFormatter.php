@@ -34,7 +34,7 @@ class EpaParentGroupWithRolesFormatter extends EntityReferenceFormatterBase {
       }
 
       $elements[$delta] = [
-        '#markup' => '<div>'. $group->toLink()->toString() .' ('. implode(', ', $role_names) .')</div>',
+        '#markup' => '<div>'. $group->toLink()->toString() .' | <div class="field__label is-inline">Editor in Chief</div><div class="field__content">'. $group->field_editor_in_chief->entity->toLink()->toString() .'</div> | <div class="field__label is-inline">Roles</div><div class="field__content">'. implode(', ', $role_names) .'</div></div>',
         '#cache' => ['tags' => $entity->getCacheTags()],
       ];
     }
