@@ -259,34 +259,26 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     // on the moderation block only on published content
     // and the `field_review_deadline` has a value
     if (
-      isset(
-        $node,
-        $node->field_review_deadline,
-        $node->field_review_deadline->date)
+      isset($node)
+      && !$node->field_review_deadline->isEmpty()
       && $node->isPublished()
       )
     {
 
-      $timezone = date_default_timezone_get();
-      $date_formatter = \Drupal::service('date.formatter');
-
-      $review_deadline = $date_formatter->format(
-        $node->field_review_deadline->date->getTimestamp(), 'custom', 'F d, Y h:i a T', $timezone
-      );
-
+      $review_deadline = $node->field_review_deadline->view([
+        'label' => 'hidden',
+        'type' => 'datetime_default',
+        'settings' => [
+          'format_type' => 'medium',
+        ],
+      ]);
+      $renderer = \Drupal::service('renderer');
+      $review_deadline = $renderer->render($review_deadline);
 
       $form['review_deadline'] = [
-        '#type' => 'container',
-        '#attributes' => [
-          'class' => [
-            'form-item',
-          ],
-        ],
-        '#children' =>[
-          '#markup' => t('Review deadline:<br> @review-deadline', [
-            '@review-deadline' => $review_deadline
-          ]),
-        ]
+        '#type' => 'item',
+        '#title' => t("Review deadline"),
+        '#markup' => $review_deadline
       ];
 
     }
