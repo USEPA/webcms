@@ -256,8 +256,9 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     }
 
     // Want to display the `field_review_deadline` date
-    // on the moderation block only on published content.
-    if (isset($node) && $node->isPublished()) {
+    // on the moderation block only on published content
+    // and the `field_review_deadline` has a value
+    if (isset($node, $node->field_review_deadline->date) && $node->isPublished()) {
 
       $timezone = date_default_timezone_get();
       $date_formatter = \Drupal::service('date.formatter');
