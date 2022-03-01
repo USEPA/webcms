@@ -15,7 +15,7 @@
 
 {% set display_sidenav = false %}
 
-{% if sidenav|render|striptags|trim %}
+{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
   {% set display_sidenav = true %}
 {% endif %}
 
@@ -36,13 +36,19 @@
   {{ content.epa_content_moderation_control }}
 {% endset %}
 
+{% set show_admin_info = false %}
+
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
+
 {% set footer %}
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
 {% set has_footer = false %}
 
-{% if footer|render|striptags|trim %}
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
   {% set has_footer = true %}
 {% endif %}
 
@@ -83,7 +89,7 @@
     'contact_link': contact_link,
     'title': title,
     'admin_info': admin_info,
-    'show_admin_info': true,
+    'show_admin_info': show_admin_info,
     'body': body,
     'sidenav': sidenav,
     'footer': footer,
@@ -96,7 +102,7 @@
     'contact_link': contact_link,
     'title': title,
     'admin_info': admin_info,
-    'show_admin_info': true,
+    'show_admin_info': show_admin_info,
     'body': body,
     'footer': footer,
   } %}
