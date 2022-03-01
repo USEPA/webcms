@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_web_areas\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceFormatterBase;
 
@@ -33,11 +34,11 @@ class EpaParentGroupWithRolesFormatter extends EntityReferenceFormatterBase {
         $role_names[] = $role->label();
       }
 
-      $eic = !empty($group->field_editor_in_chief) ? $group->field_editor_in_chief->entity->toLink()->toString() : "none";
+      $eic = !$group->field_editor_in_chief->isEmpty() ? $group->field_editor_in_chief->entity->toLink()->toString() : "none";
 
       $elements[$delta] = [
         '#markup' => '<div>'. $group->toLink()->toString() .' | <div class="field__label is-inline">Editor in Chief</div><div class="field__content">'. $eic .'</div> | <div class="field__label is-inline">Roles</div><div class="field__content">'. implode(', ', $role_names) .'</div></div>',
-        '#cache' => ['tags' => $entity->getCacheTags()],
+        '#cache' => ['tags' => Cache::mergeTags($entity->getCacheTags(),$group->getCacheTags())],
       ];
     }
 
