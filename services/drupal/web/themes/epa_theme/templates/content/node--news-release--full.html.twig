@@ -39,13 +39,19 @@
   {{ content.epa_content_moderation_control }}
 {% endset %}
 
+{% set show_admin_info = false %}
+
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
+
 {% set footer %}
   {{ drupal_entity('block', 'webareafooter', check_access=false) }}
 {% endset %}
 
 {% set has_footer = false %}
 
-{% if footer|render|striptags|trim %}
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
   {% set has_footer = true %}
 {% endif %}
 
@@ -69,7 +75,7 @@
   ) }}
 {% endset %}
 
-{% if sidenav|render|striptags|trim %}
+{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_footer': has_footer,
@@ -78,7 +84,7 @@
     'contact_link': contact_link,
     'title': label,
     'admin_info': admin_info,
-    'show_admin_info': true,
+    'show_admin_info': show_admin_info,
     'body': body,
     'sidenav': sidenav,
     'footer': footer,
@@ -91,7 +97,7 @@
     'contact_link': contact_link,
     'title': label,
     'admin_info': admin_info,
-    'show_admin_info': true,
+    'show_admin_info': show_admin_info,
     'body': body,
     'footer': footer,
   } %}
