@@ -401,6 +401,14 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#default_value"] = '';
     $form["media"][0]["fields"]["name"]["widget"][0]["value"]["#description"] = t('Please give this item a descriptive title.');
   }
+
+  if ($form_id === 'views_bulk_operations_configure_action') {
+    $storage = $form_state->getStorage();
+    // If we're reassigning the owner make the input element larger.
+    if ($storage["views_bulk_operations"]["action_id"] === 'node_assign_owner_action' && isset($form["owner_uid"])) {
+      $form["owner_uid"]["#size"] = "60";
+    }
+  }
 }
 
 /**
