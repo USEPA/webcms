@@ -218,6 +218,15 @@ COPY web web
 COPY config config
 COPY drush drush
 
+# Copy additional certificates for use by Drupal and bundle them into the system
+# certificates
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates
+
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
