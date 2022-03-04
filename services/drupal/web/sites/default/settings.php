@@ -809,19 +809,6 @@ $config['s3fs.settings']['use_instance_profile'] = TRUE;
 $config['s3fs.settings']['bucket'] = getenv('WEBCMS_S3_BUCKET');
 $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
-// Optionally serve our S3 files off the same domain as the site.
-// We'll be doing this in production using Akamai to proxy the requests to S3.
-
-// We're currently getting away with something kind of tricky here.  As long as
-// the specified domain does not specify a port, the code in S3FS will just accept
-// the domain as-specified, including the path, which is appropriate for our
-// production use-case. If we specify a port (as we do for local dev with minio),
-// then we can't also specify a path due to the way the S3FS module extracts the
-// port, so then we have to rely on the patch we wrote here: https://www.drupal.org/node/3203137
-if(getenv('WEBCMS_S3_USES_DOMAIN') && getenv('WEBCMS_SITE_HOSTNAME')) {
-  $config['s3fs.settings']['use_cname'] = TRUE;
-  $config['s3fs.settings']['domain'] = getenv('WEBCMS_SITE_HOSTNAME') .'/sites/default';
-}
 
 $settings['s3fs.use_s3_for_public'] = TRUE;
 $settings['s3fs.use_s3_for_private'] = TRUE;
@@ -904,8 +891,6 @@ if ($settings['f1_sso_enabled']) {
   $config['samlauth.authentication']['drupal_login_roles'] = ['authenticated' => '0'];
 }
 
-$config['akamai.settings']['rest_api_url'] = getenv('WEBCMS_AKAMAI_API_HOST');
-$config['akamai.settings']['disabled'] = !(bool) getenv('WEBCMS_AKAMAI_ENABLED');
 
 $config['webform.settings']['settings']['default_form_exception_message'] = '';
 
@@ -926,6 +911,10 @@ $config['shield.settings']['method'] = 1;
 if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
+
+$config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod') ? 'black' : 'red');
+$config['environment_indicator.indicator']['fg_color'] = '#fff';
+$config['environment_indicator.indicator']['name'] = $env_name;
 
 /**
  * Load local development override configuration, if available.

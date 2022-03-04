@@ -1,7 +1,12 @@
 uuid: 76be75f6-f9e2-4c7a-b0c8-7b276faf20f7
 langcode: en
 status: true
-dependencies: {  }
+dependencies:
+  module:
+    - role_expose
+third_party_settings:
+  role_expose:
+    role_expose: 3
 id: system_webmaster
 label: 'System Webmaster'
 weight: -4
@@ -43,7 +48,10 @@ permissions:
   - 'delete any alert block content'
   - 'delete any media'
   - 'delete media'
+  - 'delete paragraph library items'
+  - 'edit own paragraph library items'
   - 'edit paragraph library item'
+  - 'execute node_assign_owner_action node'
   - 'export news releases'
   - 'permit news releases'
   - 'permit perspectives'
@@ -69,5 +77,6 @@ permissions:
   - 'view all media revisions'
   - 'view any unpublished content'
   - 'view latest version'
+  - 'view paragraphs library listing'
   - 'view the administration theme'
   - 'view unpublished paragraphs'

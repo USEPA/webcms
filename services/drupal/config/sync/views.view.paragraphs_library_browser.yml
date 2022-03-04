@@ -8,6 +8,7 @@ dependencies:
     - entity_browser
     - paragraphs
     - paragraphs_library
+    - user
     - views_autocomplete_filters
 _core:
   default_config_hash: 1JRFcz5C2u0_XbanN1ZK55S1KDMAwDhJuIVhtw6m7XY
@@ -26,8 +27,9 @@ display:
     position: 0
     display_options:
       access:
-        type: none
-        options: {  }
+        type: perm
+        options:
+          perm: 'access paragraphs_library_items entity browser pages'
       cache:
         type: tag
         options: {  }
@@ -899,6 +901,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user.permissions
       tags:
         - 'config:field.storage.paragraphs_library_item.field_web_areas'
   entity_browser:
@@ -907,7 +910,9 @@ display:
     display_title: 'Entity browser'
     position: 2
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
       rendering_language: '***LANGUAGE_language_interface***'
     cache_metadata:
       max-age: -1
@@ -915,5 +920,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user.permissions
       tags:
         - 'config:field.storage.paragraphs_library_item.field_web_areas'

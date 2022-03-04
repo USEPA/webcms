@@ -238,6 +238,15 @@ COPY web web
 COPY config config
 COPY drush drush
 
+# Copy additional certificates for use by Drupal and bundle them into the system
+# certificates
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates
+
 # Add the entrypoint logic to configure the New Relic extension
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
 RUN chmod +x /webcms-entrypoint

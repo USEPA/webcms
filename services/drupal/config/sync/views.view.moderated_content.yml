@@ -222,6 +222,10 @@ display:
               action_id: 'moderation_state_change:node'
               preconfiguration:
                 add_confirmation: false
+            1:
+              action_id: node_assign_owner_action
+              preconfiguration:
+                add_confirmation: false
             7:
               action_id: views_bulk_operations_delete_entity
               preconfiguration:
@@ -1097,45 +1101,6 @@ display:
             group_items: {  }
           entity_type: node
           plugin_id: moderation_state_filter
-        latest_translation_affected_revision:
-          id: latest_translation_affected_revision
-          table: node_revision
-          field: latest_translation_affected_revision
-          relationship: none
-          group_type: group
-          admin_label: ''
-          operator: '='
-          value: ''
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: node
-          plugin_id: latest_translation_affected_revision
         moderation_state_1:
           id: moderation_state_1
           table: node_field_data
@@ -1197,7 +1162,7 @@ display:
           exposed: true
           expose:
             operator_id: users_in_groups_op
-            label: 'Limit content to my web areas'
+            label: 'Web area filter'
             description: ''
             use_operator: 0
             operator: users_in_groups_op
@@ -1232,6 +1197,45 @@ display:
             group_items: {  }
           entity_type: group_content
           plugin_id: epa_web_areas_users_groups
+        latest_revision:
+          id: latest_revision
+          table: node_revision
+          field: latest_revision
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: ''
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: node
+          plugin_id: latest_revision
       sorts: {  }
       title: 'Bulk Operations'
       header: {  }
