@@ -35,8 +35,8 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: true
+    allow_custom: false
     sections:
       -
         layout_id: layout_onecol
@@ -47,30 +47,33 @@ third_party_settings:
             uuid: 3c0e9f36-d2dd-42ff-bdf9-1b70d29f51e3
             region: content
             configuration:
+              id: 'field_block:node:perspective:field_paragraphs'
               label_display: '0'
               context_mapping:
                 entity: layout_builder.entity
-              id: 'field_block:node:perspective:field_paragraphs'
               formatter:
+                type: entity_reference_revisions_entity_view
                 label: above
                 settings:
                   view_mode: default
                   link: ''
                 third_party_settings: {  }
-                type: entity_reference_revisions_entity_view
-            additional: {  }
             weight: 7
+            additional: {  }
           fa939fbf-0f5f-4c4d-b7f0-3e97678ea976:
             uuid: fa939fbf-0f5f-4c4d-b7f0-3e97678ea976
             region: content
             configuration:
               id: 'field_block:node:perspective:field_release'
               label: 'Release Date'
-              provider: layout_builder
               label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
               formatter:
-                label: hidden
                 type: datetime_default
+                label: hidden
                 settings:
                   timezone_override: ''
                   format_type: medium_no_time
@@ -88,22 +91,22 @@ third_party_settings:
                       rel: ''
                       text: ''
                     token: ''
-              context_mapping:
-                entity: layout_builder.entity
-                view_mode: view_mode
-            additional: {  }
             weight: 2
+            additional: {  }
           8fb43927-332e-41d2-9824-fd6f4ef7b8d2:
             uuid: 8fb43927-332e-41d2-9824-fd6f4ef7b8d2
             region: content
             configuration:
               id: 'field_block:node:perspective:field_authors'
               label: 'Author bios'
-              provider: layout_builder
               label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
               formatter:
-                label: hidden
                 type: entity_reference_revisions_entity_view
+                label: hidden
                 settings:
                   view_mode: default
                 third_party_settings:
@@ -120,22 +123,22 @@ third_party_settings:
                       rel: ''
                       text: ''
                     token: ''
-              context_mapping:
-                entity: layout_builder.entity
-                view_mode: view_mode
-            additional: {  }
             weight: 8
+            additional: {  }
           fd1dcbe7-5e00-4baa-beb4-4413d0187598:
             uuid: fd1dcbe7-5e00-4baa-beb4-4413d0187598
             region: content
             configuration:
               id: 'field_block:node:perspective:field_subjects'
               label: 'Related Information'
-              provider: layout_builder
               label_display: visible
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
               formatter:
-                label: hidden
                 type: tokenized_field_formatter
+                label: hidden
                 settings:
                   token_string: '<a href="/perspectives/search/perspectives_subjects/[term:tid]">Read other EPA Perspectives about [term:name]</a>'
                 third_party_settings:
@@ -152,212 +155,209 @@ third_party_settings:
                       rel: ''
                       text: ''
                     token: ''
-              context_mapping:
-                entity: layout_builder.entity
-                view_mode: view_mode
-            additional: {  }
             weight: 5
+            additional: {  }
           50c7a665-d0e2-448d-9ba4-86a146dd0591:
             uuid: 50c7a665-d0e2-448d-9ba4-86a146dd0591
             region: content
             configuration:
               id: 'fixed_block_content:perspectives_editors_note'
               label: 'Perspectives: Editor’s Note'
-              provider: fixed_block_content
               label_display: '0'
+              provider: fixed_block_content
               view_mode: ''
               context_mapping: {  }
-            additional: {  }
             weight: 9
+            additional: {  }
           5a5cb5e8-adc8-4419-8076-dbac981f3912:
             uuid: 5a5cb5e8-adc8-4419-8076-dbac981f3912
             region: content
             configuration:
+              id: 'field_block:node:perspective:field_geographic_locations'
               label_display: '0'
               context_mapping:
                 entity: layout_builder.entity
-              id: 'field_block:node:perspective:field_geographic_locations'
               formatter:
+                type: entity_reference_label
                 label: above
                 settings:
                   link: true
                 third_party_settings: {  }
-                type: entity_reference_label
-            additional: {  }
             weight: 10
+            additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories: {  }
     entity_view_mode_restriction:
-      whitelisted_blocks: {  }
-      blacklisted_blocks: {  }
       allowed_layouts: {  }
+      blacklisted_blocks: {  }
+      whitelisted_blocks: {  }
 id: node.perspective.default
 targetEntityType: node
 bundle: perspective
 mode: default
 content:
   field_author_names:
-    weight: 20
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 20
     region: content
   field_authors:
     type: entity_reference_revisions_entity_view
-    weight: 14
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 14
     region: content
   field_channel:
-    weight: 7
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 7
     region: content
   field_description:
-    weight: 4
+    type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 4
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 8
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 8
     region: content
   field_geographic_locations:
-    weight: 19
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 19
     region: content
   field_keywords:
-    weight: 5
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 5
     region: content
   field_language:
-    weight: 3
+    type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: list_default
+    weight: 3
     region: content
   field_last_published:
-    weight: 15
+    type: datetime_default
     label: above
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
-    type: datetime_default
+    weight: 15
     region: content
   field_machine_name:
-    weight: 10
+    type: string
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    type: string
+    weight: 10
     region: content
   field_media_image:
     type: entity_reference_entity_view
-    weight: 13
     label: above
     settings:
       view_mode: default
       link: false
     third_party_settings: {  }
+    weight: 13
     region: content
   field_page_head:
-    weight: 9
+    type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 9
     region: content
   field_paragraphs:
-    weight: 2
+    type: entity_reference_revisions_entity_view
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
+    weight: 2
     region: content
   field_publish_date:
-    weight: 1
+    type: datetime_default
     label: above
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
-    type: datetime_default
+    weight: 1
     region: content
   field_publisher:
-    weight: 18
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 18
     region: content
   field_release:
-    weight: 16
+    type: datetime_default
     label: above
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
-    type: datetime_default
+    weight: 16
     region: content
   field_review_deadline:
-    weight: 11
+    type: datetime_default
     label: above
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
-    type: datetime_default
+    weight: 11
     region: content
   field_subjects:
-    weight: 17
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 17
     region: content
   field_type:
-    weight: 6
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 6
     region: content
   links:
-    weight: 0
-    region: content
     settings: {  }
     third_party_settings: {  }
+    weight: 0
+    region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
