@@ -42,9 +42,6 @@ function epa_theme_preprocess_media(&$vars) {
  * Implements hook_preprocess_responsive_image().
  */
 function epa_theme_preprocess_responsive_image(&$vars) {
-  // We want the width attribute added in case they upload small images.
-  $vars['img_element']['#attributes']['width'] = $vars['width'];
-
   // Add class to box images.
   if ($vars['responsive_image_style_id'] == 'responsive_box_image') {
     $vars['img_element']['#attributes']['class'][] = 'box__image';
