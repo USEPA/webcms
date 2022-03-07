@@ -18,7 +18,9 @@ bundle: author
 mode: default
 content:
   field_author:
+    type: inline_entity_form_complex
     weight: 0
+    region: content
     settings:
       form_mode: default
       override_labels: true
@@ -27,23 +29,23 @@ content:
       allow_new: true
       allow_existing: true
       match_operator: CONTAINS
-      revision: false
+      allow_duplicate: false
       collapsible: false
       collapsed: false
-      allow_duplicate: false
+      revision: false
     third_party_settings: {  }
-    type: inline_entity_form_complex
-    region: content
   field_biography:
+    type: text_textarea
     weight: 4
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: text_textarea
-    region: content
   field_office:
+    type: string_textfield
     weight: 2
+    region: content
     settings:
       size: 120
       placeholder: ''
@@ -51,10 +53,10 @@ content:
       maxlength:
         maxlength_js: 240
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
-    type: string_textfield
-    region: content
   field_position:
+    type: string_textfield
     weight: 1
+    region: content
     settings:
       size: 60
       placeholder: ''
@@ -62,8 +64,6 @@ content:
       maxlength:
         maxlength_js: 240
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
-    type: string_textfield
-    region: content
 hidden:
   created: true
   status: true

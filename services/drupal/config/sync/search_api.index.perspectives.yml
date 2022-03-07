@@ -131,13 +131,16 @@ processor_settings:
   aggregated_field: {  }
   entity_status: {  }
   hierarchy:
+    weights:
+      preprocess_index: -47
     fields:
       field_author: taxonomy_term-parent
       field_publisher: taxonomy_term-parent
       field_subjects: taxonomy_term-parent
-    weights:
-      preprocess_index: -47
   html_filter:
+    weights:
+      preprocess_index: -50
+      preprocess_query: -47
     all_fields: false
     fields:
       - title
@@ -149,33 +152,30 @@ processor_settings:
       h2: 3
       h3: 2
       strong: 2
-    weights:
-      preprocess_index: -50
-      preprocess_query: -47
   language_with_fallback: {  }
   rendered_item: {  }
   tokenizer:
-    all_fields: false
-    fields:
-      - title
-    ignored: ._-
-    spaces: '[^[:alnum:]]'
-    overlap_cjk: 1
-    minimum_word_size: '3'
     weights:
       preprocess_index: -48
       preprocess_query: -44
-  transliteration:
     all_fields: false
     fields:
       - title
+    spaces: '[^[:alnum:]]'
+    ignored: ._-
+    overlap_cjk: 1
+    minimum_word_size: '3'
+  transliteration:
     weights:
       preprocess_index: -49
       preprocess_query: -46
+    all_fields: false
+    fields:
+      - title
 tracker_settings:
   default:
     indexing_order: fifo
 options:
-  index_directly: true
   cron_limit: 50
+  index_directly: true
 server: localhost
