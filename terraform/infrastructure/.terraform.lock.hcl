@@ -2,20 +2,21 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/hashicorp/aws" {
-  version     = "3.21.0"
-  constraints = "3.21.0"
+  version     = "3.71.0"
+  constraints = "3.71.0"
   hashes = [
-    "h1:jvcUKDDNFXjIRWoxfw55vvfFTlSgnLMYe1qiSZNtWoE=",
-    "zh:11b8c85d063775029245e86ebce346ed86aa77aefaa72dc558da37ea347aa77c",
-    "zh:15f0f5bcbcffe1d2aeaa595f6573f0779932bd3a7647f28ad6aacf1a20f35562",
-    "zh:4459e3de50fa9ff64ce50b812ddbcfe7f6fe5fcdd1c23c35a85f11bda5ee8cdb",
-    "zh:4a146a958ff5997dca61c016330ed0546093873cce2791cdb727ef897b3d5bdd",
-    "zh:698717e66ad6cd58842b696c46c1f4d97c0e3cdad1b872665d79f74e6bbc4310",
-    "zh:7e270b37e275d17195993c0b13221e400a67eb26850517977a0587de092a055f",
-    "zh:7f14438403ca2ebbe39561f13b78d44bad83d519e907414c2e1f1dc9c2059c0f",
-    "zh:9799606edd2079c92e181e8a0f022ac69f2e7093bb23cc9348dc9db9b76aa7da",
-    "zh:b947e1a3768650aab0d4679a5202d17464f4ad8c429a57627f9cadf5b78843fc",
-    "zh:f7fbd8827afcbab1c5da907283acde543cd0ad8513cec0eea14afb7b926b5a5a",
+    "h1:fRtSUKJoc3+qkCtsLSQQiW3ilz59tcxzWtnknfqDXy4=",
+    "zh:173134d8861a33ed60a48942ad2b96b9d06e85c506d7f927bead47a28f4ebdd2",
+    "zh:2996c8e96930f526f1761e99d14c0b18d83e287b1362aa2fa1444cf848ece613",
+    "zh:43903da1e0a809a1fb5832e957dbe2321b86630d6bfdd8b47728647a72fd912d",
+    "zh:43e71fd8924e7f7b56a0b2a82e29edf07c53c2b41ee7bb442a2f1c27e03e86ae",
+    "zh:4f4c73711f64a3ff85f88bf6b2594e5431d996b7a59041ff6cbc352f069fc122",
+    "zh:5045241b8695ffbd0730bdcd91393b10ffd0cfbeaad6254036e42ead6687d8fd",
+    "zh:6a8811a0fb1035c09aebf1f9b15295523a9a7a2627fd783f50c6168a82e192dd",
+    "zh:8d273c04d7a8c36d4366329adf041c480a0f1be10a7269269c88413300aebdb8",
+    "zh:b90505897ae4943a74de2b88b6a9e7d97bf6dc325a0222235996580edff28656",
+    "zh:ea5e422942ac6fc958229d27d4381c89d21d70c5c2c67a6c06ff357bcded76f6",
+    "zh:f1536d7ff2d3bfd668e3ac33d8956b4f988f87fdfdcc371c7d94b98d5dba53e2",
   ]
 }
 
@@ -24,6 +25,7 @@ provider "registry.terraform.io/hashicorp/random" {
   constraints = "~> 3.0"
   hashes = [
     "h1:BZMEPucF+pbu9gsPk0G0BHx7YP04+tKdq2MrRDF1EDM=",
+    "h1:EPIax4Ftp2SNdB9pUfoSjxoueDoLc/Ck3EUoeX0Dvsg=",
     "zh:2bbb3339f0643b5daa07480ef4397bd23a79963cc364cdfbb4e86354cb7725bc",
     "zh:3cd456047805bf639fbf2c761b1848880ea703a054f76db51852008b11008626",
     "zh:4f251b0eda5bb5e3dc26ea4400dba200018213654b69b4a5f96abee815b4f5ff",
