@@ -31,8 +31,8 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
   layout_builder_restrictions:
     allowed_block_categories:
       - 'Chaos Tools'
@@ -51,6 +51,8 @@ third_party_settings:
       - Webform
       - core
     entity_view_mode_restriction:
+      allowed_layouts: {  }
+      blacklisted_blocks: {  }
       whitelisted_blocks:
         'Chaos Tools': {  }
         'Content fields':
@@ -70,18 +72,16 @@ third_party_settings:
         User: {  }
         Webform: {  }
         core: {  }
-      blacklisted_blocks: {  }
-      allowed_layouts: {  }
 id: node.page.link
 targetEntityType: node
 bundle: page
 mode: link
 content:
   field_links:
-    weight: 101
-    region: content
     settings: {  }
     third_party_settings: {  }
+    weight: 101
+    region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
