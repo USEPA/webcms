@@ -4,10 +4,12 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.slideshow.field_slides
+    - field.field.paragraph.slideshow.field_slideshow_style
     - field.field.paragraph.slideshow.field_title
     - paragraphs.paragraphs_type.slideshow
   module:
     - entity_reference_revisions
+    - options
 id: paragraph.slideshow.default
 targetEntityType: paragraph
 bundle: slideshow
@@ -21,6 +23,13 @@ content:
       link: ''
     third_party_settings: {  }
     weight: 1
+    region: content
+  field_slideshow_style:
+    weight: 2
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_key
     region: content
   field_title:
     type: string
