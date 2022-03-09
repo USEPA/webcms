@@ -254,6 +254,34 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         $form['node_edit_link'] = $edit_link->toRenderable();
       }
     }
+
+    // Want to display the `field_review_deadline` date
+    // on the moderation block only on published content
+    // and the `field_review_deadline` has a value
+    if (
+      isset($node)
+      && !$node->field_review_deadline->isEmpty()
+      && $node->isPublished()
+      )
+    {
+
+      $review_deadline = $node->field_review_deadline->view([
+        'label' => 'hidden',
+        'type' => 'datetime_default',
+        'settings' => [
+          'format_type' => 'medium',
+        ],
+      ]);
+      $renderer = \Drupal::service('renderer');
+      $review_deadline = $renderer->render($review_deadline);
+
+      $form['review_deadline'] = [
+        '#type' => 'item',
+        '#title' => t("Review deadline"),
+        '#markup' => $review_deadline
+      ];
+
+    }
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
