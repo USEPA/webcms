@@ -1,0 +1,13 @@
+diff --git a/core/modules/node/src/Controller/NodeController.php b/core/modules/node/src/Controller/NodeController.php
+index 29573787ff..daa53284bf 100644
+--- a/core/modules/node/src/Controller/NodeController.php
++++ b/core/modules/node/src/Controller/NodeController.php
+@@ -244,7 +244,7 @@ public function revisionOverview(NodeInterface $node) {
+         }
+         else {
+           $links = [];
+-          if ($revision->access('revert revision')) {
++          if ($revision->access('revert revision') && !$revision->isLatestRevision()) {
+             $links['revert'] = [
+               'title' => $this->t('Copy as latest revision'),
+               'url' => $has_translations ?
