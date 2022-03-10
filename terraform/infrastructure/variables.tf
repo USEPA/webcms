@@ -144,3 +144,29 @@ variable "traefik_max_capacity" {
 }
 
 #endregion
+variable "lb_logging_bucket" {
+  description = "Use custom S3 logging bucket instead of the default managed one."
+  type        = string
+  default     = null
+}
+
+variable "cf_certificate" {
+  description = "ARN of the IAM/ACM certificate for the load balancer."
+  type        = string
+}
+
+variable "cf_aliases" {
+    description = "List of cloudfront aliases"
+    type        = list(string)
+}
+
+variable "cf_origin_domain" {
+    description = "CloudFront origin domain name"
+    type        = string
+}
+
+variable "cf_origin_id" {
+    description = "CloudFront origin ID"
+    type        = string
+}
+
