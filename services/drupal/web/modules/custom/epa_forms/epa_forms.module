@@ -72,7 +72,7 @@ function epa_forms_form_alter(&$form, FormStateInterface $form_state, $form_id) 
     case 'node_webform_edit_form':
       $node = $form_state->getFormObject()->getEntity();
       if (!empty($node) && !$node->get('webform')->isEmpty() && $webform = $node->get('webform')->entity) {
-        $form['webform']['widget'][0]['target_id']['#access'] = FALSE;
+        $form['webform']['widget'][0]['target_id']['#access'] = \Drupal::currentUser()->hasPermission('administer webform');
         $form['webform']['widget'][0]['settings']['#open'] = FALSE;
 
         $weight = $form['webform']['#weight'] - .5;
