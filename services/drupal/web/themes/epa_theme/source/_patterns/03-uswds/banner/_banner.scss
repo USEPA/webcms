@@ -1,3 +1,14 @@
+.usa-banner__content {
+  // stylelint-disable-next-line selector-no-qualifying-type
+  html:not(.no-js) &[hidden] {
+    display: none;
+  }
+  // stylelint-disable-next-line selector-no-qualifying-type
+  html.no-js .usa-banner:hover & {
+    display: block;
+  }
+}
+
 .usa-banner__button {
   @media print {
     display: none;
