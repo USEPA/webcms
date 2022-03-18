@@ -1,9 +1,9 @@
-uuid: b491b972-550d-4069-ad84-c9807a5e4aac
+uuid: 73ad7486-39fd-4cc7-a4f6-c63c557e7ae9
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.link
+    - core.entity_view_mode.node.search_index
     - field.field.node.faq.body
     - field.field.node.faq.field_channel
     - field.field.node.faq.field_description
@@ -28,30 +28,37 @@ dependencies:
     - node.type.faq
   module:
     - layout_builder
+    - text
     - user
 third_party_settings:
   layout_builder:
     allow_custom: false
     enabled: false
-id: node.faq.link
+id: node.faq.search_index
 targetEntityType: node
 bundle: faq
-mode: link
+mode: search_index
 content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+    region: content
   field_links:
     weight: 0
     region: content
     settings: {  }
     third_party_settings: {  }
   field_question:
-    weight: 2
+    type: basic_string
+    weight: 0
+    region: content
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
-    region: content
 hidden:
-  body: true
   content_moderation_control: true
   entitygroupfield: true
   field_channel: true

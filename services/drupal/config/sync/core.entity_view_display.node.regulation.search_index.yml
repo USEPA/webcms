@@ -1,8 +1,9 @@
-uuid: 7b6885a3-deef-4a9b-826a-d3682e5cbffe
+uuid: dbe493dd-cd1c-4d94-94cb-2cf35d9ed864
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.search_index
     - field.field.node.regulation.field_additional_resources
     - field.field.node.regulation.field_cfr
     - field.field.node.regulation.field_channel
@@ -31,14 +32,18 @@ dependencies:
     - field.field.node.regulation.field_type
     - node.type.regulation
   module:
-    - datetime_range
     - entity_reference_revisions
+    - layout_builder
     - text
     - user
-id: node.regulation.default
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.regulation.search_index
 targetEntityType: node
 bundle: regulation
-mode: default
+mode: search_index
 content:
   field_additional_resources:
     weight: 2
@@ -72,16 +77,6 @@ content:
     third_party_settings: {  }
     type: entity_reference_revisions_entity_view
     region: content
-  field_effective_dates:
-    type: daterange_default
-    weight: 8
-    region: content
-    label: above
-    settings:
-      timezone_override: ''
-      format_type: medium_no_time
-      separator: '-'
-    third_party_settings: {  }
   field_federal_register_citations:
     weight: 5
     label: above
@@ -124,6 +119,7 @@ hidden:
   entitygroupfield: true
   field_channel: true
   field_description: true
+  field_effective_dates: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
   field_geographic_locations: true
