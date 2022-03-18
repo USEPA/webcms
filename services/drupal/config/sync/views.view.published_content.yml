@@ -1315,7 +1315,7 @@ display:
         footer: false
       display_description: ''
       link_display: '0'
-      link_url: '/admin/content/published?title=&gid=&type=All&uid=&moderation_state=All&users_in_groups=0&order=field_review_deadline&sort=asc'
+      link_url: ''
       header:
         area:
           id: area
@@ -1338,15 +1338,15 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          plugin_id: text
           empty: false
-          content:
-            value: '<a class="button button--primary" href="admin/content/published?title=&gid=&type=All&uid=&moderation_state%5B%5D=epa_default-published_needs_review&moderation_state%5B%5D=epa_default-published_expiring&moderation_state%5B%5D=epa_default-published_day_til_expire&users_in_groups=0">View All</a>'
-            format: filtered_html
           tokenize: false
-      display_extenders:
-        views_ajax_get:
-          ajax_get: false
+          content:
+            value: '<a class="button button--primary" href="admin/content/published?title=&gid=&type=All&uid=&moderation_state%5B%5D=epa_default-published_needs_review&moderation_state%5B%5D=epa_default-published_expiring&moderation_state%5B%5D=epa_default-published_day_til_expire&users_in_groups=groups&order=field_review_deadline&sort=asc">View All</a>'
+            format: filtered_html
+          plugin_id: text
+        display_extenders:
+          views_ajax_get:
+            ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:
