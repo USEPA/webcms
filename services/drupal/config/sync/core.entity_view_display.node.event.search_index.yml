@@ -1,11 +1,11 @@
-uuid: 25b2078f-1ac3-48ee-8e1e-f3b9e165eb7b
+uuid: b0a0cae9-7521-4219-9f3e-750698ed0256
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_view_mode.node.search_index
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
-    - field.field.node.event.field_daterange
     - field.field.node.event.field_deadline
     - field.field.node.event.field_description
     - field.field.node.event.field_display_arcgis_map
@@ -33,110 +33,60 @@ dependencies:
     - node.type.event
   module:
     - address
-    - datetime
     - entity_reference_revisions
-    - epa_core
-    - link
+    - layout_builder
     - user
-id: node.event.default
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.event.search_index
 targetEntityType: node
 bundle: event
-mode: default
+mode: search_index
 content:
-  field_daterange:
-    type: date_range_without_time_smartdate
-    label: above
-    settings:
-      timezone_override: ''
-      single: 'l, F j, Y \<\b\r\> g:i a T'
-      single_all_day: 'l, F j, Y '
-      one_day: 'l, F j, Y \<\b\r\> g:i a - {g}:{i} {a} T'
-      one_month: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
-      several_months: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
-      several_years: 'l, F j, Y - {l}, {F} {j}, {Y} \<\b\r\> g:i a - {g}:{i} {a} T'
-      location:
-        value: field_location
-        tokenized: ''
-      description:
-        value: field_description
-        tokenized: ''
-      past_events: false
-      separator: '-'
-      date_format: 'Y-m-d\TH:i:s'
-    third_party_settings: {  }
-    weight: 0
-    region: content
-  field_deadline:
-    type: datetime_default
-    label: above
-    settings:
-      timezone_override: ''
-      format_type: medium
-    third_party_settings: {  }
-    weight: 5
-    region: content
-  field_event_cancellation:
-    type: boolean
-    label: hidden
-    settings:
-      format: default
-      format_custom_false: ''
-      format_custom_true: ''
-    third_party_settings: {  }
-    weight: 7
-    region: content
   field_event_host:
-    type: string
+    weight: 2
     label: above
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 2
+    type: string
     region: content
   field_event_type:
     type: entity_reference_label
+    weight: 3
+    region: content
     label: above
     settings:
       link: false
     third_party_settings: {  }
-    weight: 3
-    region: content
-  field_links:
-    type: link
-    label: above
-    settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
-    third_party_settings: {  }
-    weight: 6
-    region: content
   field_location:
-    type: address_default
+    weight: 1
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 1
+    type: address_default
     region: content
   field_paragraphs:
-    type: entity_reference_revisions_entity_view
+    weight: 4
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 4
+    type: entity_reference_revisions_entity_view
     region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
   field_channel: true
   field_date: true
+  field_deadline: true
   field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
+  field_event_cancellation: true
   field_expiration_date: true
   field_geographic_locations: true
   field_hublinks: true
@@ -144,6 +94,7 @@ hidden:
   field_keywords: true
   field_language: true
   field_last_published: true
+  field_links: true
   field_machine_name: true
   field_page_head: true
   field_publish_date: true
