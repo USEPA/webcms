@@ -1,9 +1,9 @@
-uuid: 7c072584-09ee-459d-9dce-6bd82a08983b
+uuid: 4d9cba35-d005-4947-b9e4-1c4a9702b6b4
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.link
+    - core.entity_view_mode.node.search_index
     - field.field.node.page.field_channel
     - field.field.node.page.field_description
     - field.field.node.page.field_env_laws_regs_and_treaties
@@ -27,13 +27,14 @@ dependencies:
     - field.field.node.page.layout_builder__layout
     - node.type.page
   module:
+    - entity_reference_revisions
     - layout_builder
     - layout_builder_restrictions
     - user
 third_party_settings:
   layout_builder:
-    enabled: false
     allow_custom: false
+    enabled: false
   layout_builder_restrictions:
     allowed_block_categories:
       - 'Chaos Tools'
@@ -52,8 +53,6 @@ third_party_settings:
       - Webform
       - core
     entity_view_mode_restriction:
-      allowed_layouts: {  }
-      blacklisted_blocks: {  }
       whitelisted_blocks:
         'Chaos Tools': {  }
         'Content fields':
@@ -73,15 +72,35 @@ third_party_settings:
         User: {  }
         Webform: {  }
         core: {  }
-id: node.page.link
+      blacklisted_blocks: {  }
+      allowed_layouts: {  }
+id: node.page.search_index
 targetEntityType: node
 bundle: page
-mode: link
+mode: search_index
 content:
   field_links:
+    weight: 101
+    region: content
     settings: {  }
     third_party_settings: {  }
-    weight: 101
+  field_paragraphs:
+    weight: 13
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    type: entity_reference_revisions_entity_view
+    region: content
+  field_paragraphs_1:
+    type: entity_reference_revisions_entity_view
+    weight: 14
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
     region: content
 hidden:
   content_moderation_control: true
@@ -98,8 +117,6 @@ hidden:
   field_last_published: true
   field_machine_name: true
   field_page_head: true
-  field_paragraphs: true
-  field_paragraphs_1: true
   field_publish_date: true
   field_review_deadline: true
   field_scheduled_transition: true

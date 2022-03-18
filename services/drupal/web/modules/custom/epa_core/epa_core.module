@@ -9,6 +9,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -618,5 +619,29 @@ function epa_core_module_implements_alter(&$implementations, $hook) {
 function epa_core_entity_type_build(array &$entity_types) {
   if (isset($entity_types['paragraphs_library_item'])) {
     $entity_types['paragraphs_library_item']->setHandlerClass('access', 'Drupal\epa_core\EpaCoreLibraryItemAccessControlHandler');
+  }
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function epa_core_node_presave(EntityInterface $node) {
+  if ($node->hasField('field_search_text')){
+    // Render using front-end theme and anonymous user
+    $account_switcher = \Drupal::service('account_switcher');
+    $account_switcher->switchTo(new AnonymousUserSession());
+    $theme_manager = \Drupal::service('theme.manager');
+    $active_theme = $theme_manager->getActiveTheme();
+    $default_theme_name = \Drupal::config('system.theme')->get('default');
+    $default_theme = \Drupal::service('theme.initialization')->getActiveThemeByName($default_theme_name);
+    $theme_manager->setActiveTheme($default_theme);
+
+    $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
+    $full_output = $view_builder->view($node,'search_index');
+    $node->field_search_text->setValue(strip_tags(render($full_output)));
+
+    // Switch back to original theme and user.
+    $account_switcher->switchBack();
+    $theme_manager->setActiveTheme($active_theme);
   }
 }
