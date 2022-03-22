@@ -281,6 +281,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
     // custom date format handling
     if (stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
+      $defaults = [
+        $parts[0],
+        'medium',
+        ''
+        ];
+      $parts = array_replace($defaults, $parts);
       $name = $parts[0];
     }
 
