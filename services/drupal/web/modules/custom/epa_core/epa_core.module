@@ -610,6 +610,11 @@ function epa_core_module_implements_alter(&$implementations, $hook) {
   if ($hook === 'form_alter' && isset($implementations['group_content_menu'])) {
     unset($implementations['group_content_menu']);
   }
+
+  // Prevent siteimprove module from rendering into the admin bar.
+  if ($hook === 'toolbar' && isset($implementations['siteimprove'])) {
+    unset($implementations['siteimprove']);
+  }
 }
 
 /**
