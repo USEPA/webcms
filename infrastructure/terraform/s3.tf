@@ -20,7 +20,7 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
         Effect    = "Allow"
         Principal = "*"
         Action    = ["s3:GetObject"]
-        Resource  = ["arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/files/*"]
+        Resource  = ["arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/files/*", "arn:aws:s3:::${aws_s3_bucket.uploads.bucket}/archive/*"]
       }
     ]
   })
