@@ -1,9 +1,9 @@
-uuid: c7a7342a-b9b4-4171-b704-0c20eecf3d39
+uuid: eb094315-c527-4f6a-b0e9-54cf1ba0c089
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.search_index
     - field.field.node.public_notice.body
     - field.field.node.public_notice.field_applicants_or_respondents
     - field.field.node.public_notice.field_channel
@@ -38,50 +38,93 @@ dependencies:
     - field.field.node.public_notice.field_type_of_proposed_action
     - node.type.public_notice
   module:
-    - datetime
+    - entity_reference_revisions
+    - layout_builder
+    - text
     - user
-id: node.public_notice.teaser
+third_party_settings:
+  layout_builder:
+    allow_custom: false
+    enabled: false
+id: node.public_notice.search_index
 targetEntityType: node
 bundle: public_notice
-mode: teaser
+mode: search_index
 content:
-  field_computed_comments_due_date:
-    type: datetime_default
-    weight: 0
-    region: content
-    label: inline
-    settings:
-      timezone_override: ''
-      format_type: medium_no_time
+  body:
+    label: above
+    type: text_default
+    weight: 1
+    settings: {  }
     third_party_settings: {  }
-  field_description:
-    type: basic_string
-    weight: 2
     region: content
+  field_applicants_or_respondents:
+    type: entity_reference_revisions_entity_view
+    weight: 2
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_docket_numbers:
+    type: entity_reference_revisions_entity_view
+    weight: 3
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    region: content
+  field_federal_register_citations:
+    type: entity_reference_revisions_entity_view
+    weight: 4
+    region: content
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+  field_how_to_comment:
+    weight: 7
     label: hidden
     settings: {  }
     third_party_settings: {  }
-  field_geographic_locations:
-    type: entity_reference_label
-    weight: 1
+    type: text_default
     region: content
+  field_links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  field_permit_number:
+    weight: 5
     label: inline
     settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
+    region: content
+  field_related_documents:
+    type: entity_reference_entity_view
+    weight: 6
+    label: above
+    settings:
+      view_mode: link_with_description
       link: false
     third_party_settings: {  }
+    region: content
 hidden:
-  body: true
   content_moderation_control: true
   entitygroupfield: true
-  field_applicants_or_respondents: true
   field_channel: true
   field_comments_due_date: true
   field_comments_extension_date: true
-  field_docket_numbers: true
+  field_computed_comments_due_date: true
+  field_description: true
   field_env_laws_regs_and_treaties: true
   field_expiration_date: true
-  field_federal_register_citations: true
-  field_how_to_comment: true
+  field_geographic_locations: true
   field_hublinks: true
   field_is_searchable_collection: true
   field_keywords: true
@@ -91,11 +134,9 @@ hidden:
   field_machine_name: true
   field_notice_sort_date: true
   field_page_head: true
-  field_permit_number: true
   field_programs_or_statutes: true
   field_publication_date: true
   field_publish_date: true
-  field_related_documents: true
   field_review_deadline: true
   field_scheduled_transition: true
   field_search_text: true
