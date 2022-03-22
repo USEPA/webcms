@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "uploads_policy" {
     sid       = "AddPerm"
     effect    = "Allow"
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.uploads[each.key].arn}/files/*"]
+    resources = ["${aws_s3_bucket.uploads[each.key].arn}/files/*", "${aws_s3_bucket.uploads[each.key].arn}/archive/*"]
 
     principals {
       type        = "*"
