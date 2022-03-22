@@ -638,9 +638,7 @@ function epa_core_entity_type_build(array &$entity_types) {
  */
 function epa_core_node_presave(EntityInterface $node) {
   if ($node->hasField('field_search_text')){
-    // Render using front-end theme and anonymous user
-    $account_switcher = \Drupal::service('account_switcher');
-    $account_switcher->switchTo(new AnonymousUserSession());
+    // Render using front-end theme
     $theme_manager = \Drupal::service('theme.manager');
     $active_theme = $theme_manager->getActiveTheme();
     $default_theme_name = \Drupal::config('system.theme')->get('default');
@@ -651,8 +649,7 @@ function epa_core_node_presave(EntityInterface $node) {
     $full_output = $view_builder->view($node,'search_index');
     $node->field_search_text->setValue(strip_tags(render($full_output)));
 
-    // Switch back to original theme and user.
-    $account_switcher->switchBack();
+    // Revert to the active theme
     $theme_manager->setActiveTheme($active_theme);
   }
 }
