@@ -909,6 +909,31 @@ if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'
   include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
 }
 
+/*
+ * Only want to show applicable URL's for each environment
+ * separating out F1 environments & EPA environments.
+ */
+if (isset($_SERVER['HTTP_HOST'])) {
+  $suffix_env_ind = '_epa';
+
+  $environment_config = [
+    'dev',
+    'espanol',
+    'espanol_prod',
+    'espanol_stage',
+    'prod',
+    'qa',
+    'stage'
+  ];
+
+  if (stripos($_SERVER['HTTP_HOST'], '.byf1.io')) {
+    $suffix_env_ind = '_f1';
+  }
+  foreach ($environment_config as $env_conf) {
+    $config['environment_indicator.switcher.' . $env_conf . $suffix_env_ind]['status'] = true;
+  }
+}
+
 $config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod') ? 'black' : 'red');
 $config['environment_indicator.indicator']['fg_color'] = '#fff';
 $config['environment_indicator.indicator']['name'] = $env_name;
