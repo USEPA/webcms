@@ -35,7 +35,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     // Always deny access to node/add and media/add to force group relationship.
     // Also deny access to the form used to delete group content entities since we want to avoid orphaned content.
-    $route_names = ['node.add', 'node.add_page', 'entity.media.add_page', 'entity.media.add_form', 'entity.group_content.delete_form'];
+    $route_names = ['node.add', 'node.add_page', 'entity.media.add_page', 'entity.media.add_form'];
     foreach ($route_names as $route_name) {
       if ($route = $collection->get($route_name)) {
         $route->setRequirement('_access', 'FALSE');
