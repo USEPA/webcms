@@ -918,9 +918,6 @@ if (isset($_SERVER['HTTP_HOST'])) {
 
   $environment_config = [
     'dev',
-    'espanol',
-    'espanol_prod',
-    'espanol_stage',
     'prod',
     'qa',
     'stage'
@@ -930,6 +927,9 @@ if (isset($_SERVER['HTTP_HOST'])) {
     $suffix_env_ind = '_f1';
   }
   foreach ($environment_config as $env_conf) {
+    if ($env_lang == 'es') {
+      $env_conf = 'espanol_' .$env_conf;
+    }
     $config['environment_indicator.switcher.' . $env_conf . $suffix_env_ind]['status'] = true;
   }
 }
