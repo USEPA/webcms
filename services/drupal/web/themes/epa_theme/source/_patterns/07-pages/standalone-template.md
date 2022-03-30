@@ -1,4 +1,4 @@
 ---
-title: Standalone Template
+title: EPA Standard Template
 state: inreview
 ---

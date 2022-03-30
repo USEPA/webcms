@@ -2,17 +2,79 @@
 
 namespace Drupal\epa_clone\EventSubscriber;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldConfigInterface;
 use Drupal\entity_clone\Event\EntityCloneEvent;
 use Drupal\entity_clone\Event\EntityCloneEvents;
+use Drupal\epa_forms\EpaFormsUniquifier;
 use Drupal\node\Entity\Node;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 
 class EPAEntityCloneSubscriber implements EventSubscriberInterface {
 
+  /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+
+  /**
+   * Constructs a new EPAEntityCloneSubscriber object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
+   *   The entity type manager.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_manager) {
+    $this->entityTypeManager = $entity_manager;
+  }
+
   public static function getSubscribedEvents() {
     $events[EntityCloneEvents::POST_CLONE][] = ['postClone', -1000];
+    $events[EntityCloneEvents::PRE_CLONE][] = ['preClone'];
     return $events;
+  }
+
+  public function preClone(EntityCloneEvent $event) {
+    $cloned_entity = $event->getClonedEntity();
+    if ($cloned_entity instanceof Node) {
+      foreach ($cloned_entity->getFieldDefinitions() as $field_id => $field_definition) {
+        // Clone referenced webforms when a  node is cloned.
+        if ($field_definition instanceof FieldConfigInterface && in_array($field_definition->getType(), ['webform'], TRUE)) {
+          $field = $cloned_entity->get($field_id);
+          /** @var \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $value */
+          if ($field->count() > 0) {
+            $referenced_entities = [];
+            foreach ($field as $value) {
+              // Check if we're not dealing with an entity
+              // that has been deleted in the meantime.
+              if (!$referenced_entity = $value->get('entity')->getTarget()) {
+                continue;
+              }
+              /** @var \Drupal\Core\Entity\ContentEntityInterface $referenced_entity */
+              $referenced_entity = $value->get('entity')
+                ->getTarget()
+                ->getValue();
+
+              $cloned_reference = $referenced_entity->createDuplicate();
+              /** @var \Drupal\entity_clone\EntityClone\EntityCloneInterface $entity_clone_handler */
+              $entity_clone_handler = $this->entityTypeManager->getHandler($referenced_entity->getEntityTypeId(), 'entity_clone');
+
+              $properties = array (
+                'id' => EpaFormsUniquifier::getFormIdForNode($cloned_entity),
+                'label' => 'Cloned: '. $referenced_entity->label(),
+              );
+              $entity_clone_handler->cloneEntity($referenced_entity, $cloned_reference, $properties);
+
+              $referenced_entities[] = $cloned_reference->id();
+            }
+            $cloned_entity->set($field_id, $referenced_entities);
+          }
+        }
+      }
+    }
   }
 
   /**
