@@ -111,13 +111,14 @@
       &.is-wide {
         grid-template-columns: 1fr 1fr 1fr;
 
+        // stylelint-disable-next-line
         .menu__item:first-child {
           grid-column: 1 / span 3;
         }
       }
 
       // stylelint-disable-next-line selector-no-qualifying-type
-      html.js &[hidden] {
+      html:not(.no-js) &[hidden] {
         display: none;
       }
     }
