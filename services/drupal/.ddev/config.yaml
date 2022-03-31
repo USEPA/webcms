@@ -13,8 +13,11 @@ mysql_version: "5.7"
 nfs_mount_enabled: false
 mutagen_enabled: false
 use_dns_when_possible: true
-composer_version: "2.2.9"
+composer_version: "2.2.10"
 web_environment: []
+hooks:
+  post-start:
+    - exec: "user=$(whoami) && group=$(groups) && sudo chown -R $user:$group /var/www/html/web/sites/default/files"
 
 # Key features of ddev's config.yaml:
 
