@@ -3,36 +3,46 @@
 1. First, start the project:
 
    ```
-   f1 up
+   cd services/drupal && ddev start
    ```
 
 2. Next, create the S3 bucket for s3fs:
 
    ```
-   f1 run aws s3 mb s3://drupal
+   ddev aws-setup
    ```
 
-3. Finally, allow anonymous access to the `public/` prefix of the S3 bucket: 
+3. After that, please download the latest database and put it in the `.ddev/db/` folder.
 
+4. Import the database by running: 
+
+   ```   
+   ddev epa-import 
    ```
-   f1 run aws s3api put-bucket-policy --bucket drupal --policy "$(cat services/minio/policy.json)"
+
+7. After the import you will need to restart:
+
+   ```   
+   ddev poweroff && ddev start 
    ```
 
-4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
+--- 4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
 
-5. Install dependencies: ```f1 composer install```
+5. Install dependencies: ```ddev composer install```
 
-6. Build the CSS and Pattern Lab: `f1 run gesso gulp build`.
+6. Install the requirements for the theme: `ddev gesso install`.
 
-7. Install Drupal from config (or restore a backup).  You can install from config by running: ```f1 drush si --existing-config```
+7. Build the CSS and Pattern Lab: `ddev gesso build`. If you want to run `watch` please run `ddev gesso watch`
 
-8. Ensure the latest configuration has been fully applied and clear cache: ```f1 drush cim -y; f1 drush cr``` 
+9. Install Drupal from config (or restore a backup).  You can install from config by running: ```ddev drush si --existing-config```
 
-9. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+10. Ensure the latest configuration has been fully applied and clear cache: ```ddev drush cim -y; ddev drush cr``` 
 
-10. Note the username/password generated!
+---- 11. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-11. Access the app at https://localhost:8443/
+---- 12. Note the username/password generated!
+
+13. Access the app at https://epa-ddev.ddev.site
 
 # Testing migrations
 
