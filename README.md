@@ -20,27 +20,46 @@
    ddev epa-import 
    ```
 
-7. After the import you will need to restart:
+5. After the import you will need to restart:
 
    ```   
-   ddev poweroff && ddev start 
+   ddev poweroff && ddev start
    ```
 
---- 4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
+6. Copy `cp .env.example .env`.
 
-5. Install dependencies: ```ddev composer install```
+7. Copy environment settings:
+   
+   ```    
+   cp web/sites/default/settings.local.env.php web/sites/default/settings.local.php
+   ```
 
-6. Install the requirements for the theme: `ddev gesso install`.
+8. Install dependencies: 
 
-7. Build the CSS and Pattern Lab: `ddev gesso build`. If you want to run `watch` please run `ddev gesso watch`
+   ```
+   ddev composer install
+   ```
 
-9. Install Drupal from config (or restore a backup).  You can install from config by running: ```ddev drush si --existing-config```
+9. Install the requirements for the theme: `ddev gesso install`.
 
-10. Ensure the latest configuration has been fully applied and clear cache: ```ddev drush cim -y; ddev drush cr``` 
+   ```
+   ddev gesso install
+   ```
 
----- 11. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+10a. Build the CSS and Pattern Lab: 
+   ```
+   ddev gesso build
+   ```
+10b. Watch the CSS and Pattern Lab:
+   ```
+   ddev gesso watch
+   ```
 
----- 12. Note the username/password generated!
+11. Install Drupal from config (or restore a backup).  You can install from config by running: ```ddev drush si --existing-config```
+
+12. Ensure the latest configuration has been fully applied and clear cache: ```ddev drush cim -y; ddev drush cr``` 
+
+11. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
 13. Access the app at https://epa-ddev.ddev.site
 
