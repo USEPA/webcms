@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.card_group.field_card_style
     - field.field.paragraph.card_group.field_cards
     - paragraphs.paragraphs_type.card_group
   module:
@@ -12,8 +13,14 @@ targetEntityType: paragraph
 bundle: card_group
 mode: default
 content:
-  field_cards:
+  field_card_style:
     weight: 0
+    settings: {  }
+    third_party_settings: {  }
+    type: options_select
+    region: content
+  field_cards:
+    weight: 1
     settings:
       title: Card
       title_plural: Cards
