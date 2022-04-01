@@ -1,5 +1,19 @@
 <?php
 
+function epa_theme_menu_active_item(&$items) {
+  $current_path = \Drupal::request()->getRequestUri();
+  foreach ($items as $key => $item) {
+    // if path is current path, set active to li
+    if ($item['url']->toString() == $current_path) {
+      // add active link
+      $items[$key]['current'] = true;
+    }
+    if (!empty($items[$key]['below'])) {
+      epa_theme_menu_active_item($items[$key]['below']);
+    }
+  }
+}
+
  /**
  * Implements theme_preprocess_menu()
  *
@@ -9,6 +23,7 @@ function epa_theme_preprocess_menu(&$vars) {
   if ($vars['theme_hook_original'] === 'menu__group_menu') {
     $vars['attributes']['class'][] = 'menu--sidenav';
   }
+  epa_theme_menu_active_item($vars['items']);
 }
 
 /**
