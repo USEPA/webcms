@@ -55,13 +55,19 @@
    ddev gesso watch
    ```
 
-11. Install Drupal from config (or restore a backup).  You can install from config by running: ```ddev drush si --existing-config```
+11. Install Drupal from config (or restore a backup).  You can install from config by running:
+   ```
+   ddev drush si --existing-config
+   ``` 
 
-12. Ensure the latest configuration has been fully applied and clear cache: ```ddev drush cim -y; ddev drush cr``` 
+12. Ensure the latest configuration has been fully applied and clear cache: 
+   ```
+   ddev drush cim -y; ddev drush cr
+   ```
 
-11. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+14. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-13. Access the app at https://epa-ddev.ddev.site
+15. Access the app at https://epa-ddev.ddev.site
 
 # Testing migrations
 
