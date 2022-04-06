@@ -21,6 +21,7 @@ dependencies:
     - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_search_text
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
     - node.type.perspective
@@ -75,6 +76,14 @@ content:
   field_env_laws_regs_and_treaties:
     type: entity_reference_label
     weight: 17
+    region: content
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+  field_geographic_locations:
+    type: entity_reference_label
+    weight: 19
     region: content
     label: above
     settings:
@@ -199,6 +208,6 @@ content:
 hidden:
   content_moderation_control: true
   field_author_names: true
-  field_geographic_locations: true
+  field_search_text: true
   links: true
   search_api_excerpt: true
