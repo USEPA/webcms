@@ -12,7 +12,7 @@
    ddev aws-setup
    ```
 
-3. After that, please download the latest database and put it in the `.ddev/db/` folder.
+3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.
 
 4. Import the database by running: 
 
