@@ -11,6 +11,9 @@
 #    images to deploy and thus wouldn't be able to continue safely.
 # 3. We use the terraform.apply.yml template to run our application deployment.
 
+env:
+  WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
+
 steps:
   - label: ":docker: Build images"
     command: bash .buildkite/build-images.sh
