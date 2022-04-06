@@ -32,7 +32,7 @@ resource "aws_ecs_task_definition" "drush_task" {
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
 
-  requires_compatibilities = ["EC2", "FARGATE"]
+  requires_compatibilities = ["FARGATE"]
 
   cpu    = 1024
   memory = 2048
@@ -148,7 +148,7 @@ resource "aws_cloudwatch_event_target" "cron" {
   role_arn  = aws_iam_role.events.arn
 
   ecs_target {
-    launch_type         = "EC2"
+    launch_type         = "FARGATE"
     task_count          = 1
     task_definition_arn = aws_ecs_task_definition.drush_task[count.index].arn
 

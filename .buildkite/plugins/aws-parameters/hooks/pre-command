@@ -1,33 +1,88 @@
 #!/bin/bash
 
-# This script downloads AWS Parameter Store values and saves them as files to the checkout
-# prior to the Buildkite command step executing, making it ideal to load configuration
-# files.
+# This script loads AWS Parameter Store values and saves them to the file system.
+# Optionally, this plugin can assume a role to read parameters.
+#
+# The plugin's configuration schema is as follows:
+#
+#     plugins:
+#     - ./.buildkite/plugins/aws-parameters:
+#         role: [ARN of role to read parameters]
+#         params:
+#         - key: /parameter/store/path
+#           file: /path/to/file
+#
+# The 'role' key is optional. If provided, the plugin will assume a role for the duration
+# of its invocation and remove the credentials when it's finished.
+#
+# The 'params' key is required, and each of 'key' and 'file' are required flags.
+
+# A small bash syntax note: ${!foo} is dereference syntax; if foo=BAR, then ${!foo} is the
+# same as ${BAR}, which is how we can create keys and read their values dynamically.
 
 set -euo pipefail
 
-echo "~~~ :aws: Loading parameters..."
+role_arn="${BUILDKITE_PLUGIN_AWS_PARAMETERS_ROLE:-}"
+if test -n "$role_arn"; then
+  echo "~~~ :aws: Assuming parameter role $role_arn"
 
-# Usage:
-#   get-parameter NAME FILE
-#
-# NAME: The name of a Parameter Store parameter. The prefix /buildkite/terraform is
-#       automatically applied.
-# FILE: The destination file in the infrastructure/terraform directory.
-#
-# This function copies an AWS Parameter Store parameter into a destination file. This is
-# mostly intended to be used for downloading data to be used during the Terraform-related
-# steps.
-get-parameter() {
-  local -r name="/buildkite/terraform/$1"
-  local -r file="infrastructure/terraform/$2"
+  if ! output="$(
+    aws sts assume-role \
+      --role-arn "$role_arn" \
+      --role-session-name "$BUILDKITE_PIPELINE_SLUG@$BUILDKITE_BRANCH-$BUILDKITE_BUILD_NUMBER"
+  )"; then
+    echo "Failed to assume role $role_arn" >&2
+    echo "^^^ +++"
+    exit 1
+  fi
 
-  aws ssm get-parameter --name "$name" |
-    jq -r '.Parameter.Value' \
-      >"$file"
+  AWS_ACCESS_KEY_ID="$(jq -r .Credentials.AccessKeyId <<<"$output")"
+  AWS_SECRET_ACCESS_KEY="$(jq -r .Credentials.SecretAccessKey <<<"$output")"
+  AWS_SESSION_TOKEN="$(jq -r .Credentials.SessionToken <<<"$output")"
 
-  echo "Loaded parameter $name into $file"
-}
+  export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+fi
 
-get-parameter backend-config backend.config
-get-parameter "variables-$WEBCMS_ENVIRONMENT" terraform.tfvars
+echo "~~~ :aws: Loading parameters"
+
+i=0
+while true; do
+  prefix="BUILDKITE_PLUGIN_AWS_PARAMETERS_PARAMS_${i}"
+
+  key_name="${prefix}_KEY"
+  file_name="${prefix}_FILE"
+
+  # If there is no key variable at this location, we assume we've reached the end of the
+  # parameter list.
+  if test -z "${!key_name:-}"; then
+    break
+  fi
+
+  # On the other hand, if the file is missing, this is a hard configuration error and we
+  # cannot proceed.
+  if test -z "${!file_name:-}"; then
+    echo "A file name is required to save the parameter '${!key_name}'" >&2
+    echo "^^^ +++"
+    exit 1
+  fi
+
+  key="${!key_name}"
+  file="${!file_name}"
+
+  echo "Loading $key into $file"
+
+  aws \
+    --region us-east-2 \
+    --out text \
+    ssm get-parameter \
+      --name "$key" \
+      --query 'Parameter.Value' \
+  | tee "$file"
+
+  i=$((i + 1))
+done
+
+if test -n "$role_arn"; then
+  echo "~~~ :aws: Cleaning up assumed role"
+  unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
+fi
