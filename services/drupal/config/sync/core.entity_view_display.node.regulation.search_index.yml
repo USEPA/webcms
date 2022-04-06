@@ -1,0 +1,140 @@
+uuid: dbe493dd-cd1c-4d94-94cb-2cf35d9ed864
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.search_index
+    - field.field.node.regulation.field_additional_resources
+    - field.field.node.regulation.field_cfr
+    - field.field.node.regulation.field_channel
+    - field.field.node.regulation.field_compliance
+    - field.field.node.regulation.field_description
+    - field.field.node.regulation.field_docket_numbers
+    - field.field.node.regulation.field_effective_dates
+    - field.field.node.regulation.field_env_laws_regs_and_treaties
+    - field.field.node.regulation.field_expiration_date
+    - field.field.node.regulation.field_federal_register_citations
+    - field.field.node.regulation.field_geographic_locations
+    - field.field.node.regulation.field_hublinks
+    - field.field.node.regulation.field_is_searchable_collection
+    - field.field.node.regulation.field_keywords
+    - field.field.node.regulation.field_language
+    - field.field.node.regulation.field_last_published
+    - field.field.node.regulation.field_legal_authorities
+    - field.field.node.regulation.field_machine_name
+    - field.field.node.regulation.field_page_head
+    - field.field.node.regulation.field_publish_date
+    - field.field.node.regulation.field_review_deadline
+    - field.field.node.regulation.field_rule_history
+    - field.field.node.regulation.field_rule_summary
+    - field.field.node.regulation.field_scheduled_transition
+    - field.field.node.regulation.field_search_text
+    - field.field.node.regulation.field_type
+    - node.type.regulation
+  module:
+    - entity_reference_revisions
+    - layout_builder
+    - text
+    - user
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.regulation.search_index
+targetEntityType: node
+bundle: regulation
+mode: search_index
+content:
+  field_additional_resources:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_cfr:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_compliance:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_docket_numbers:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_federal_register_citations:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_legal_authorities:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+  field_rule_history:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_rule_summary:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  content_moderation_control: true
+  entitygroupfield: true
+  field_channel: true
+  field_description: true
+  field_effective_dates: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_page_head: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_search_text: true
+  field_type: true
+  langcode: true
+  links: true
+  search_api_excerpt: true

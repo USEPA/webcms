@@ -60,6 +60,10 @@
         'class': link_classes
       } %}
 
+      {% if item.current %}
+        {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
+      {% endif %}
+
       {% spaceless %}
         <li {{ add_attributes(additional_item_attributes) }}>
           {% if item.below and menu_level == 0 %}

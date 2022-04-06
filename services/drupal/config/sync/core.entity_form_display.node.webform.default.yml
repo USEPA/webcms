@@ -16,6 +16,7 @@ dependencies:
     - field.field.node.webform.field_publish_date
     - field.field.node.webform.field_review_deadline
     - field.field.node.webform.field_scheduled_transition
+    - field.field.node.webform.field_search_text
     - field.field.node.webform.field_type
     - field.field.node.webform.webform
     - node.type.webform
@@ -35,62 +36,62 @@ third_party_settings:
         - field_description
         - field_type
         - field_geographic_locations
+      label: 'Primary Metadata'
+      region: content
       parent_name: group_additional_fields
       weight: 9
       format_type: tab
       format_settings:
-        id: ''
         classes: ''
+        id: ''
         formatter: open
         description: ''
         required_fields: true
-      label: 'Primary Metadata'
-      region: content
     group_other_metadata:
       children:
         - field_language
         - field_publish_date
         - field_expiration_date
         - field_machine_name
+      label: 'Other Metadata'
+      region: content
       parent_name: group_additional_fields
       weight: 11
       format_type: tab
       format_settings:
-        id: ''
         classes: ''
+        id: ''
         formatter: closed
         description: ''
         required_fields: true
-      label: 'Other Metadata'
-      region: content
     group_javascript:
       children:
         - field_page_head
+      label: 'Page Javascript'
+      region: content
       parent_name: group_additional_fields
       weight: 10
       format_type: tab
       format_settings:
-        id: ''
         classes: ''
+        id: ''
         formatter: closed
         description: ''
         required_fields: true
-      label: 'Page Javascript'
-      region: content
     group_additional_fields:
       children:
         - group_metadata
         - group_javascript
         - group_other_metadata
+      label: 'Additional Fields'
+      region: content
       parent_name: ''
       weight: 6
       format_type: tabs
       format_settings:
-        id: ''
         classes: ''
+        id: ''
         direction: vertical
-      label: 'Additional Fields'
-      region: content
 id: node.webform.default
 targetEntityType: node
 bundle: webform
@@ -107,13 +108,15 @@ content:
     weight: 1
     region: content
     settings:
-      required: true
-      label: 'Group name'
       help_text: ''
+      label: 'Group name'
       multiple: false
+      required: true
     third_party_settings: {  }
   field_description:
+    type: string_textarea
     weight: 10
+    region: content
     settings:
       rows: 5
       placeholder: ''
@@ -123,58 +126,58 @@ content:
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
         maxlength_js_enforce: true
         maxlength_js_truncate_html: false
-    type: string_textarea
-    region: content
   field_expiration_date:
+    type: datetime_default
     weight: 47
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_geographic_locations:
+    type: options_shs
     weight: 15
+    region: content
     settings:
       display_node_count: false
       create_new_items: false
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
-    region: content
   field_hublinks:
+    type: entity_reference_autocomplete
     weight: 5
+    region: content
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
     third_party_settings: {  }
-    type: entity_reference_autocomplete
-    region: content
   field_language:
+    type: options_select
     weight: 45
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_select
-    region: content
   field_machine_name:
+    type: string_textfield
     weight: 48
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_page_head:
+    type: string_textarea
     weight: 49
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: string_textarea
-    region: content
   field_paragraphs:
+    type: paragraphs
     weight: 2
+    region: content
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -189,20 +192,18 @@ content:
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
     third_party_settings: {  }
-    type: paragraphs
-    region: content
   field_publish_date:
-    weight: 46
-    settings: {  }
-    third_party_settings: {  }
     type: datetime_default
+    weight: 46
     region: content
-  field_type:
-    weight: 12
     settings: {  }
     third_party_settings: {  }
+  field_type:
     type: options_select
+    weight: 12
     region: content
+    settings: {  }
+    third_party_settings: {  }
   langcode:
     type: language_select
     weight: 3
@@ -211,31 +212,31 @@ content:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
+    type: moderation_state_default
     weight: 12
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: moderation_state_default
-    region: content
   promote:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 9
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 11
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 10
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   title:
     type: string_textfield
@@ -251,9 +252,9 @@ content:
     region: content
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
     third_party_settings: {  }
   url_redirects:
     weight: 13
@@ -261,16 +262,21 @@ content:
     settings: {  }
     third_party_settings: {  }
   webform:
+    type: webform_entity_reference_autocomplete
     weight: 4
+    region: content
     settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
       default_data: true
+      match_limit: '10'
       webforms: {  }
     third_party_settings: {  }
-    type: webform_entity_reference_select
-    region: content
 hidden:
   field_is_searchable_collection: true
   field_last_published: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_search_text: true
   path: true

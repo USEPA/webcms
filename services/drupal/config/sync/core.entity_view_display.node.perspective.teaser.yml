@@ -21,6 +21,7 @@ dependencies:
     - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_search_text
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
     - node.type.perspective
@@ -35,37 +36,37 @@ mode: teaser
 content:
   field_authors:
     type: tokenized_field_formatter
-    weight: 1
-    region: content
     label: hidden
     settings:
       token_string: '[paragraph:field_author:entity:name]'
     third_party_settings: {  }
+    weight: 1
+    region: content
   field_description:
     type: basic_string
-    weight: 3
-    region: content
     label: hidden
     settings: {  }
     third_party_settings: {  }
+    weight: 3
+    region: content
   field_media_image:
     type: entity_reference_entity_view
-    weight: 0
-    region: content
     label: hidden
     settings:
       view_mode: default
       link: false
     third_party_settings: {  }
+    weight: 0
+    region: content
   field_release:
     type: datetime_default
-    weight: 2
-    region: content
     label: hidden
     settings:
       timezone_override: ''
       format_type: medium_no_time
     third_party_settings: {  }
+    weight: 2
+    region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
@@ -82,6 +83,7 @@ hidden:
   field_publish_date: true
   field_publisher: true
   field_review_deadline: true
+  field_search_text: true
   field_subjects: true
   field_type: true
   langcode: true

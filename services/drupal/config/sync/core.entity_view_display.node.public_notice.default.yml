@@ -32,6 +32,7 @@ dependencies:
     - field.field.node.public_notice.field_related_documents
     - field.field.node.public_notice.field_review_deadline
     - field.field.node.public_notice.field_scheduled_transition
+    - field.field.node.public_notice.field_search_text
     - field.field.node.public_notice.field_type
     - field.field.node.public_notice.field_type_of_proposed_action
     - node.type.public_notice
@@ -46,85 +47,85 @@ bundle: public_notice
 mode: default
 content:
   body:
-    label: above
     type: text_default
-    weight: 1
+    label: above
     settings: {  }
     third_party_settings: {  }
+    weight: 1
     region: content
   field_applicants_or_respondents:
     type: entity_reference_revisions_entity_view
-    weight: 2
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 2
     region: content
   field_computed_comments_due_date:
     type: datetime_default
-    weight: 8
-    region: content
     label: inline
     settings:
       timezone_override: ''
       format_type: medium_no_time
     third_party_settings: {  }
+    weight: 8
+    region: content
   field_docket_numbers:
     type: entity_reference_revisions_entity_view
-    weight: 3
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 3
     region: content
   field_federal_register_citations:
     type: entity_reference_revisions_entity_view
-    weight: 4
-    region: content
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 4
+    region: content
   field_how_to_comment:
-    weight: 7
+    type: text_default
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: text_default
+    weight: 7
     region: content
   field_links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
   field_permit_number:
-    weight: 5
+    type: string
     label: inline
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    type: string
+    weight: 5
     region: content
   field_publication_date:
-    weight: 0
+    type: datetime_default
     label: inline
     settings:
       timezone_override: ''
       format_type: medium_no_time
     third_party_settings: {  }
-    type: datetime_default
+    weight: 0
     region: content
   field_related_documents:
     type: entity_reference_entity_view
-    weight: 6
     label: above
     settings:
       view_mode: link_with_description
       link: false
     third_party_settings: {  }
+    weight: 6
     region: content
 hidden:
   content_moderation_control: true
@@ -149,6 +150,7 @@ hidden:
   field_publish_date: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_search_text: true
   field_type: true
   field_type_of_proposed_action: true
   langcode: true

@@ -22,6 +22,7 @@ dependencies:
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
     - field.field.node.news_release.field_scheduled_transition
+    - field.field.node.news_release.field_search_text
     - field.field.node.news_release.field_secondary_headline
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_type
@@ -32,26 +33,26 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: node.news_release.search_index
 targetEntityType: node
 bundle: news_release
 mode: search_index
 content:
   field_links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
   field_paragraphs:
-    weight: 0
+    type: entity_reference_revisions_entity_view
     label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
+    weight: 0
     region: content
 hidden:
   content_moderation_control: true
@@ -73,6 +74,7 @@ hidden:
   field_release: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_search_text: true
   field_secondary_headline: true
   field_subjects: true
   field_type: true

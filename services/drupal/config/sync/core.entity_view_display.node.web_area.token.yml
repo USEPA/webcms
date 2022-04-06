@@ -19,6 +19,7 @@ dependencies:
     - field.field.node.web_area.field_publish_date
     - field.field.node.web_area.field_review_deadline
     - field.field.node.web_area.field_scheduled_transition
+    - field.field.node.web_area.field_search_text
     - field.field.node.web_area.field_type
     - field.field.node.web_area.layout_builder__layout
     - node.type.web_area
@@ -33,8 +34,8 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: node.web_area.token
 targetEntityType: node
 bundle: web_area
@@ -42,160 +43,161 @@ mode: token
 content:
   entitygroupfield:
     type: parent_group_entity_formatter
-    weight: 18
-    region: content
     label: above
     settings:
       view_mode: default
       link: false
     third_party_settings: {  }
+    weight: 18
+    region: content
   field_aside_block:
     type: text_default
-    weight: 17
-    region: content
     label: above
     settings: {  }
     third_party_settings: {  }
+    weight: 17
+    region: content
   field_banner:
     type: entity_reference_revisions_entity_view
-    weight: 11
-    region: content
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 11
+    region: content
   field_channel:
-    weight: 3
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 3
     region: content
   field_description:
-    weight: 8
+    type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 8
     region: content
   field_env_laws_regs_and_treaties:
-    weight: 4
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 4
     region: content
   field_expiration_date:
     type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
     weight: 14
     region: content
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
   field_geographic_locations:
-    weight: 5
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 5
     region: content
   field_keywords:
-    weight: 6
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 6
     region: content
   field_language:
-    weight: 7
+    type: list_key
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: list_key
+    weight: 7
     region: content
   field_last_published:
     type: datetime_default
-    weight: 15
-    region: content
     label: above
     settings:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
+    weight: 15
+    region: content
   field_page_head:
-    weight: 9
+    type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 9
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
-    weight: 10
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 10
     region: content
   field_publish_date:
     type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
     weight: 12
     region: content
-    label: above
-    settings:
-      format_type: medium
-      timezone_override: ''
-    third_party_settings: {  }
   field_review_deadline:
-    weight: 1
+    type: datetime_default
     label: above
     settings:
-      format_type: medium
       timezone_override: ''
+      format_type: medium
     third_party_settings: {  }
-    type: datetime_default
+    weight: 1
     region: content
   field_scheduled_transition:
     type: scheduled_publish_generic_formatter
-    weight: 13
-    region: content
     label: above
     settings:
       date_format: html_datetime
       text_pattern: '%moderation_state% - %date%'
     third_party_settings: {  }
+    weight: 13
+    region: content
   field_type:
-    weight: 2
+    type: entity_reference_label
     label: above
     settings:
       link: true
     third_party_settings: {  }
-    type: entity_reference_label
+    weight: 2
     region: content
   langcode:
     type: language
-    weight: 16
-    region: content
     label: above
     settings:
       link_to_entity: false
       native_language: false
     third_party_settings: {  }
-  links:
-    weight: 0
+    weight: 16
     region: content
+  links:
     settings: {  }
     third_party_settings: {  }
+    weight: 0
+    region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
+  field_search_text: true
   layout_builder__layout: true
   search_api_excerpt: true

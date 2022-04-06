@@ -20,6 +20,7 @@ dependencies:
     - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_search_text
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
     - node.type.perspective
@@ -40,15 +41,15 @@ third_party_settings:
         - group_primary_metadata
         - group_page_javascript
         - group_other_metadata
+      label: 'Additional Fields'
+      region: content
       parent_name: ''
       weight: 9
       format_type: tabs
-      region: content
       format_settings:
-        id: ''
         classes: ''
+        id: ''
         direction: vertical
-      label: 'Additional Fields'
     group_primary_metadata:
       children:
         - field_description
@@ -56,61 +57,61 @@ third_party_settings:
         - field_channel
         - field_geographic_locations
         - field_env_laws_regs_and_treaties
+      label: 'Primary Metadata'
+      region: content
       parent_name: group_additional_fields
       weight: 20
       format_type: tab
-      region: content
       format_settings:
-        id: ''
         classes: ''
-        description: ''
+        id: ''
         formatter: open
+        description: ''
         required_fields: true
-      label: 'Primary Metadata'
     group_page_javascript:
       children:
         - field_page_head
+      label: 'Page Javascript'
+      region: content
       parent_name: group_additional_fields
       weight: 21
       format_type: tab
-      region: content
       format_settings:
-        id: ''
         classes: ''
-        description: ''
+        id: ''
         formatter: closed
+        description: ''
         required_fields: true
-      label: 'Page Javascript'
     group_other_metadata:
       children:
         - field_language
         - field_publish_date
         - field_machine_name
+      label: 'Other Metadata'
+      region: content
       parent_name: group_additional_fields
       weight: 22
       format_type: tab
-      region: content
       format_settings:
-        id: ''
         classes: ''
-        description: ''
+        id: ''
         formatter: closed
+        description: ''
         required_fields: true
-      label: 'Other Metadata'
     group_authors:
       children:
         - field_authors
+      label: Authors
+      region: content
       parent_name: ''
       weight: 7
       format_type: details
-      region: content
       format_settings:
-        id: ''
         classes: ''
-        description: ''
+        id: ''
         open: true
+        description: ''
         required_fields: true
-      label: Authors
 id: node.perspective.default
 targetEntityType: node
 bundle: perspective
@@ -127,14 +128,15 @@ content:
     weight: 1
     region: content
     settings:
-      required: true
-      label: 'Group name'
       help_text: ''
+      label: 'Group name'
       multiple: false
+      required: true
     third_party_settings: {  }
   field_authors:
     type: paragraphs
     weight: 9
+    region: content
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -150,15 +152,16 @@ content:
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
     third_party_settings: {  }
-    region: content
   field_channel:
+    type: options_buttons
     weight: 16
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_buttons
-    region: content
   field_description:
+    type: string_textarea
     weight: 14
+    region: content
     settings:
       rows: 5
       placeholder: ''
@@ -168,69 +171,69 @@ content:
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
         maxlength_js_enforce: true
         maxlength_js_truncate_html: false
-    type: string_textarea
-    region: content
   field_env_laws_regs_and_treaties:
+    type: options_shs
     weight: 18
+    region: content
     settings:
       display_node_count: false
       create_new_items: false
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
-    region: content
   field_geographic_locations:
+    type: options_shs
     weight: 17
+    region: content
     settings:
       display_node_count: false
       create_new_items: false
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
-    region: content
   field_keywords:
+    type: entity_reference_autocomplete_tags
     weight: 15
+    region: content
     settings:
       match_operator: CONTAINS
       match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: entity_reference_autocomplete_tags
-    region: content
   field_language:
+    type: options_select
     weight: 16
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: options_select
-    region: content
   field_machine_name:
+    type: string_textfield
     weight: 18
+    region: content
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-    type: string_textfield
-    region: content
   field_media_image:
     type: media_library_widget
     weight: 8
+    region: content
     settings:
       media_types: {  }
     third_party_settings: {  }
-    region: content
   field_page_head:
+    type: string_textarea
     weight: 26
+    region: content
     settings:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
-    type: string_textarea
-    region: content
   field_paragraphs:
+    type: paragraphs
     weight: 4
+    region: content
     settings:
       title: Paragraph
       title_plural: Paragraphs
@@ -246,43 +249,41 @@ content:
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
     third_party_settings: {  }
-    type: paragraphs
-    region: content
   field_publish_date:
+    type: datetime_default
     weight: 17
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_publisher:
+    type: cshs
     weight: 6
+    region: content
     settings:
       force_deepest: false
       parent: '0'
       level_labels: ''
+      none_label: '- Please select -'
       save_lineage: false
       hierarchy_depth: 0
       required_depth: 0
-      none_label: '- Please select -'
     third_party_settings: {  }
-    type: cshs
-    region: content
   field_release:
+    type: datetime_default
     weight: 3
+    region: content
     settings: {  }
     third_party_settings: {  }
-    type: datetime_default
-    region: content
   field_subjects:
+    type: options_shs
     weight: 5
+    region: content
     settings:
       display_node_count: false
       create_new_items: false
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-    type: options_shs
-    region: content
   langcode:
     type: language_select
     weight: 2
@@ -293,29 +294,29 @@ content:
   moderation_state:
     type: moderation_state_default
     weight: 15
-    settings: {  }
     region: content
+    settings: {  }
     third_party_settings: {  }
   promote:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 12
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 14
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    settings:
-      display_label: true
     weight: 13
     region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   title:
     type: string_textfield
@@ -328,12 +329,12 @@ content:
   uid:
     type: entity_reference_autocomplete
     weight: 10
+    region: content
     settings:
       match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
-      match_limit: 10
-    region: content
     third_party_settings: {  }
   url_redirects:
     weight: 16
@@ -344,5 +345,6 @@ hidden:
   field_author_names: true
   field_last_published: true
   field_review_deadline: true
+  field_search_text: true
   field_type: true
   path: true

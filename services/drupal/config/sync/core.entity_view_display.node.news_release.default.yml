@@ -21,6 +21,7 @@ dependencies:
     - field.field.node.news_release.field_release
     - field.field.node.news_release.field_review_deadline
     - field.field.node.news_release.field_scheduled_transition
+    - field.field.node.news_release.field_search_text
     - field.field.node.news_release.field_secondary_headline
     - field.field.node.news_release.field_subjects
     - field.field.node.news_release.field_type
@@ -36,57 +37,57 @@ bundle: news_release
 mode: default
 content:
   field_links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
   field_paragraphs:
-    weight: 3
+    type: entity_reference_revisions_entity_view
     label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
+    weight: 3
     region: content
   field_press_office:
-    weight: 4
+    type: epa_core_hierarchical_term_facet_formatter
     label: inline
     settings:
       display: all
       link: true
       wrap: none
       separator: ' | '
-      facet_source: news_releases_press_office
       reverse: false
+      facet_source: news_releases_press_office
     third_party_settings: {  }
-    type: epa_core_hierarchical_term_facet_formatter
+    weight: 4
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
-    weight: 2
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 2
     region: content
   field_release:
-    weight: 1
+    type: datetime_default
     label: hidden
     settings:
       timezone_override: ''
       format_type: medium_no_time
     third_party_settings: {  }
-    type: datetime_default
+    weight: 1
     region: content
   field_secondary_headline:
-    weight: 0
+    type: string
     label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    type: string
+    weight: 0
     region: content
 hidden:
   content_moderation_control: true
@@ -105,6 +106,7 @@ hidden:
   field_publish_date: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_search_text: true
   field_subjects: true
   field_type: true
   langcode: true

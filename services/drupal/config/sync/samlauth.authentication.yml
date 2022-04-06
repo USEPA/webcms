@@ -1,23 +1,27 @@
-security_authn_requests_sign: true
-security_logout_requests_sign: true
-security_logout_responses_sign: true
-strict: true
-security_messages_sign: false
-security_lowercase_url_encoding: true
-request_set_name_id_policy: true
-security_want_name_id: false
-security_request_authn_context: false
 _core:
   default_config_hash: 3qI5Sabj5mdKmxHM6seoIC6obwDlSJYtF2FgltcnOkU
 login_menu_item_title: ''
 logout_menu_item_title: ''
 login_redirect_url: ''
 logout_redirect_url: ''
+error_redirect_url: ''
+error_throw: false
+local_login_saml_error: true
+logout_different_user: false
+drupal_login_roles:
+  authenticated: authenticated
+  layout_editor: '0'
+  alerts_manager: '0'
+  block_manager: '0'
+  system_editor: '0'
+  system_webmaster: '0'
+  administrator: '0'
 sp_entity_id: ''
 sp_name_id_format: 'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+sp_cert_folder: ''
 sp_x509_certificate: ''
 sp_private_key: ''
-sp_cert_folder: ''
+metadata_cache_http: true
 idp_entity_id: ''
 idp_single_sign_on_service: ''
 idp_single_log_out_service: ''
@@ -27,33 +31,6 @@ idp_x509_certificate: ''
 idp_x509_certificate_multi: ''
 unique_id_attribute: uid
 map_users: false
-create_users: true
-sync_name: false
-sync_mail: false
-user_name_attribute: uid
-user_mail_attribute: mail
-security_assertions_encrypt: false
-security_logout_reuse_sigs: false
-security_signature_algorithm: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
-debug_log_saml_out: false
-debug_log_saml_in: false
-debug_log_in: false
-debug_phpsaml: false
-use_proxy_headers: false
-debug_display_error_details: false
-drupal_login_roles:
-  authenticated: authenticated
-  layout_editor: '0'
-  alerts_manager: '0'
-  block_manager: '0'
-  system_editor: '0'
-  system_webmaster: '0'
-  administrator: '0'
-logout_different_user: false
-local_login_saml_error: true
-error_redirect_url: ''
-error_throw: false
-metadata_cache_http: true
 map_users_name: false
 map_users_mail: false
 map_users_roles:
@@ -63,4 +40,27 @@ map_users_roles:
   system_editor: '0'
   system_webmaster: '0'
   administrator: '0'
+create_users: true
+sync_name: false
+sync_mail: false
+user_name_attribute: uid
+user_mail_attribute: mail
+request_set_name_id_policy: true
+strict: true
+security_authn_requests_sign: true
+security_logout_requests_sign: true
+security_logout_responses_sign: true
+security_assertions_encrypt: false
+security_signature_algorithm: 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+security_messages_sign: false
+security_want_name_id: false
+security_request_authn_context: false
+security_lowercase_url_encoding: true
+security_logout_reuse_sigs: false
+debug_display_error_details: false
+debug_log_in: false
+debug_log_saml_in: false
+debug_log_saml_out: false
+debug_phpsaml: false
+use_proxy_headers: false
 use_base_url: true

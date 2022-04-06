@@ -23,6 +23,7 @@ dependencies:
     - field.field.node.faq.field_related_questions
     - field.field.node.faq.field_review_deadline
     - field.field.node.faq.field_scheduled_transition
+    - field.field.node.faq.field_search_text
     - field.field.node.faq.field_type
     - node.type.faq
   module:
@@ -30,24 +31,24 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: node.faq.link
 targetEntityType: node
 bundle: faq
 mode: link
 content:
   field_links:
-    weight: 0
-    region: content
     settings: {  }
     third_party_settings: {  }
+    weight: 0
+    region: content
   field_question:
-    weight: 2
+    type: basic_string
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 2
     region: content
 hidden:
   body: true
@@ -70,6 +71,7 @@ hidden:
   field_related_questions: true
   field_review_deadline: true
   field_scheduled_transition: true
+  field_search_text: true
   field_type: true
   langcode: true
   links: true
