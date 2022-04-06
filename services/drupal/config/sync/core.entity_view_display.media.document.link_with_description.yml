@@ -19,44 +19,44 @@ third_party_settings:
   media_inline_embed:
     embed_inline: true
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: media.document.link_with_description
 targetEntityType: media
 bundle: document
 mode: link_with_description
 content:
   field_description:
-    weight: 4
+    type: basic_string
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    type: basic_string
+    weight: 4
     region: content
   field_media_file:
-    weight: 0
+    type: epa_media_file_link_formatter
     label: hidden
     settings:
       show_extension: true
     third_party_settings: {  }
-    type: epa_media_file_link_formatter
+    weight: 0
     region: content
   field_publication_date:
     type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
     weight: 1
     region: content
-    label: hidden
-    settings:
-      link_to_entity: false
-    third_party_settings: {  }
   field_publication_number:
     type: string
-    weight: 2
-    region: content
     label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
+    weight: 2
+    region: content
 hidden:
   created: true
   entitygroupfield: true

@@ -35,60 +35,60 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
 id: node.news_release.full
 targetEntityType: node
 bundle: news_release
 mode: full
 content:
   field_links:
-    weight: 100
     settings: {  }
     third_party_settings: {  }
+    weight: 100
     region: content
   field_paragraphs:
-    weight: 4
+    type: entity_reference_revisions_entity_view
     label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
+    weight: 4
     region: content
   field_press_office:
-    weight: 0
+    type: entity_reference_shs
     label: hidden
     settings:
       link: 0
     third_party_settings: {  }
-    type: entity_reference_shs
+    weight: 0
     region: content
   field_press_officers:
     type: entity_reference_revisions_entity_view
-    weight: 3
     label: hidden
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 3
     region: content
   field_release:
-    weight: 2
+    type: datetime_default
     label: hidden
     settings:
       timezone_override: ''
       format_type: short_no_time
     third_party_settings: {  }
-    type: datetime_default
+    weight: 2
     region: content
   field_secondary_headline:
-    weight: 1
+    type: string
     label: hidden
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    type: string
+    weight: 1
     region: content
 hidden:
   content_moderation_control: true

@@ -1,12 +1,14 @@
+_core:
+  default_config_hash: xNvhVNcCJsZiYwYTw9TTnRv1SjLVO7H5BCK1U8Brvfo
 bypass_transactional_safe_connection: false
 queue:
   enabled: false
   timeouts:
-    lease_time: 30
-    time: 15
+    lease_time: !!float 30
+    time: !!float 15
   delays:
-    empty_delay: 0
-    item_delay: 0
+    empty_delay: !!float 0
+    item_delay: !!float 0
   throttle:
     enabled: true
     threads: 4
@@ -31,5 +33,3 @@ scheduler:
       - '*/10+@ * * * *'
   simple:
     rule: '*/15+@ * * * *'
-_core:
-  default_config_hash: xNvhVNcCJsZiYwYTw9TTnRv1SjLVO7H5BCK1U8Brvfo
