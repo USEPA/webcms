@@ -9,7 +9,7 @@
 # 2. We use a wait step to force Buildkite to pause until the image build completed
 #    successfully. If the build failed, then we most likely wouldn't have a full set of
 #    images to deploy and thus wouldn't be able to continue safely.
-# 3. We use the terraform.apply.yml template to
+# 3. We use the terraform.apply.yml template to run our application deployment.
 
 steps:
   - label: ":docker: Build images"
@@ -50,20 +50,32 @@ steps:
 
   - wait: ~
 
-  - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
-    depends_on:
-      - terraform-${WEBCMS_SITE}-en
-
-    command: bash .buildkite/run-drush.sh
+  - label: ":ecs: Drush (${WEBCMS_SITE}-{{matrix}})"
     env:
-      WEBCMS_SITE: ${WEBCMS_SITE}
-      WEBCMS_LANG: en
+      WEBCMS_LANG: {{matrix}}
 
-  - label: ":ecs: Drush (${WEBCMS_SITE}-es)"
-    depends_on:
-      - terraform-${WEBCMS_SITE}-es
+    matrix:
+      - en
+      - es
 
-    command: bash .buildkite/run-drush.sh
-    env:
-      WEBCMS_SITE: ${WEBCMS_SITE}
-      WEBCMS_LANG: en
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
+
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG
+            - WEBCMS_IMAGE_TAG
