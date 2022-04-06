@@ -82,6 +82,15 @@ gunzip < cleaned-d7-db.sql.gz | f1 drush sqlc --db-url mysql://web_d7:web_d7@mys
 - Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
 - Builds: see [.buildkite](.buildkite/README.md).
 
+# Troubleshooting
+
+If you run into an error trying to use `elasticsearch`. Please run the following command:
+```
+ddev poweroff && docker volume rm ddev-epa-ddev_elasticsearch && ddev start
+```
+
+You will need to `re-index`.
+
 # Disclaimer
 
 The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use.  EPA has relinquished control of the information and no longer has responsibility to protect the integrity , confidentiality, or availability of the information.  Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA.  The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.
