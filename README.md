@@ -62,7 +62,7 @@
 
 12. Ensure the latest configuration has been fully applied and clear cache: 
    ```
-   ddev drush cim -y; ddev drush cr
+   ddev drush deploy -y
    ```
 
 14. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
