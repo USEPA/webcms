@@ -40,34 +40,41 @@
    ddev composer install
    ```
 
-9. Install the requirements for the theme: `ddev gesso install`.
+9. Install the requirements for the theme: `ddev gesso install`:
 
    ```
    ddev gesso install
    ```
-
-10a. Build the CSS and Pattern Lab: 
-   ```
-   ddev gesso build
-   ```
-10b. Watch the CSS and Pattern Lab:
+   
+10. Building/watching the CSS and Pattern Lab:
+    1. to build
+      ```````
+      ddev gesso build 
+      ```````
+    2. to watch:
+      ```````
+      ddev gesso build
+      ```````
+   
+13. Watch the CSS and Pattern Lab:
+   
    ```
    ddev gesso watch
    ```
 
-11. Install Drupal from config (or restore a backup).  You can install from config by running:
+14. Install Drupal from config (or restore a backup).  You can install from config by running:
    ```
    ddev drush si --existing-config
    ``` 
 
-12. Ensure the latest configuration has been fully applied and clear cache: 
+15. Ensure the latest configuration has been fully applied and clear cache: 
    ```
    ddev drush deploy -y
    ```
 
-14. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+16. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-15. Access the app at https://epa-ddev.ddev.site
+17. Access the app at https://epa-ddev.ddev.site
 
 # Testing migrations
 
