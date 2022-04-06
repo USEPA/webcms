@@ -6,7 +6,7 @@ resource "aws_lb_target_group" "drupal" {
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
-  
+
   health_check {
     enabled  = true
     port     = 8080

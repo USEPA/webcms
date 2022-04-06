@@ -8,10 +8,10 @@ resource "aws_s3_bucket" "uploads" {
   versioning {
     enabled = true
   }
-  
+
   lifecycle_rule {
     enabled = true
-    
+
     noncurrent_version_expiration {
       days = 90
     }

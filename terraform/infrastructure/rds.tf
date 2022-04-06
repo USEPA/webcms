@@ -52,9 +52,9 @@ resource "aws_rds_cluster_parameter_group" "params" {
 
     apply_method = "pending-reboot"
   }
-  
+
   tags = var.tags
-  
+
 }
 
 resource "random_password" "rds_root_password" {
@@ -94,10 +94,10 @@ resource "aws_rds_cluster" "db" {
   tags = merge(
     var.tags,
     {
-      "cpm backup": "EPAWEB-Prod"
+      "cpm backup" : "EPAWEB-Prod"
     },
   )
-  
+
   # Ignore changes to the master password since it's stored in the Terraform state.
   # Instead, the value in Parameter Store should be treated as the sole source of truth.
   lifecycle {
@@ -116,11 +116,11 @@ resource "aws_rds_cluster_instance" "db_instance" {
 
   cluster_identifier   = aws_rds_cluster.db.cluster_identifier
   db_subnet_group_name = aws_rds_cluster.db.db_subnet_group_name
-  
+
   tags = merge(
     var.tags,
     {
-      "cpm backup": "EPAWEB-Prod"
+      "cpm backup" : "EPAWEB-Prod"
     },
   )
 }
