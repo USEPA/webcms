@@ -923,16 +923,15 @@ if (isset($_SERVER['HTTP_HOST'])) {
     'dev',
     'prod',
     'qa',
-    'stage'
+    'stage',
+    'espanol_stage',
+    'espanol_prod',
   ];
 
   if (stripos($_SERVER['HTTP_HOST'], '.byf1.io')) {
     $suffix_env_ind = '_f1';
   }
   foreach ($environment_config as $env_conf) {
-    if ($env_lang == 'es') {
-      $env_conf = 'espanol_' .$env_conf;
-    }
     $config['environment_indicator.switcher.' . $env_conf . $suffix_env_ind]['status'] = true;
   }
 }
