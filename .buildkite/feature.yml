@@ -46,7 +46,7 @@ steps:
                       --snapshotMode=redo \
                       --use-new-run \
                       --target="{{matrix}}" \
-                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-{{target}}:${WEBCMS_IMAGE_TAG}"
+                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-{{matrix}}:${WEBCMS_IMAGE_TAG}"
 
       - label: "Build fpm-metrics"
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
