@@ -120,6 +120,9 @@ steps:
       - en
       - es
 
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-{{matrix}}
+    concurrency: 1
+
     plugins:
       - cultureamp/aws-assume-role#v0.1.0:
           role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
