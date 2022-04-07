@@ -91,12 +91,25 @@ gunzip < cleaned-d7-db.sql.gz | f1 drush sqlc --db-url mysql://web_d7:web_d7@mys
 
 # Troubleshooting
 
+### Elasticsearch
 If you run into an error trying to use `elasticsearch`. Please run the following command:
 ```
 ddev poweroff && docker volume rm ddev-epa-ddev_elasticsearch && ddev start
 ```
 
 You will need to `re-index`.
+
+# Helpful commands
+
+Here is a list of helpful commands:
+* `ddev gesso install` > Installs the node modules needed for `epa_core`.
+* `ddev gesso build` > Builds the current assets for CSS & PatternLab.
+* `ddev gesso watch` > Same thing as build but will watch for changes.
+* `ddev ssh` > Goes into the web container.
+* `ddev drush` > Runs any drush command.
+* `ddev epa-import` > Will import a specific database.
+* `ddev epa-export` > Exports a database with the current date.
+* `ddev aws-setup` > Sets up the requirements to get drupal file system to work
 
 # Disclaimer
 

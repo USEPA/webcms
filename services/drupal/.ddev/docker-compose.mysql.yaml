@@ -10,10 +10,10 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_USER: web
       MYSQL_PASSWORD: web
+      MYSQL_DATABASE: web
     expose:
       - 13306:3306
     volumes:
-      #- ./services/mysql:/docker-entrypoint-initdb.d:ro,cached
       - ./db:/var/db
       - ".:/mnt/ddev_config"
       - type: volume
