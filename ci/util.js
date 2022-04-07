@@ -156,7 +156,7 @@ async function getLogsUrl(task) {
 
   // Read the log group name from Parameter Store
   const logGroup = await ssm.getParameter(
-    `/webcms/${vars.environment}/${vars.site}/${vars.lang}/log-groups/drush`
+    `${vars.site}/${vars.lang}/log-groups/drush`
   );
 
   // Use the posix helper from the path module to simplify the process of constructing
