@@ -16,7 +16,7 @@
 
         <li class="button-group__item{% if button.active %} is-active{% endif %}">
           {% block link %}
-            <a href="{{ button.url }}" class="{{ button_classes }}">
+            <a href="{{ button.url }}" class="{{ button_classes }}"{% if button.active %} aria-current="page"{% endif %}>
               {{ button.text }}
               {% if button.active %}
                 <span class="visually-hidden">{{ (active_label|default('(active)'))|t }}</span>

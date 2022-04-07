@@ -33,8 +33,8 @@ dependencies:
     - user
 third_party_settings:
   layout_builder:
-    allow_custom: false
     enabled: false
+    allow_custom: false
   layout_builder_restrictions:
     allowed_block_categories:
       - 'Chaos Tools'
@@ -53,6 +53,8 @@ third_party_settings:
       - Webform
       - core
     entity_view_mode_restriction:
+      allowed_layouts: {  }
+      blacklisted_blocks: {  }
       whitelisted_blocks:
         'Chaos Tools': {  }
         'Content fields':
@@ -72,35 +74,33 @@ third_party_settings:
         User: {  }
         Webform: {  }
         core: {  }
-      blacklisted_blocks: {  }
-      allowed_layouts: {  }
 id: node.page.search_index
 targetEntityType: node
 bundle: page
 mode: search_index
 content:
   field_links:
-    weight: 101
-    region: content
     settings: {  }
     third_party_settings: {  }
+    weight: 101
+    region: content
   field_paragraphs:
-    weight: 13
+    type: entity_reference_revisions_entity_view
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    type: entity_reference_revisions_entity_view
+    weight: 13
     region: content
   field_paragraphs_1:
     type: entity_reference_revisions_entity_view
-    weight: 14
     label: above
     settings:
       view_mode: default
       link: ''
     third_party_settings: {  }
+    weight: 14
     region: content
 hidden:
   content_moderation_control: true

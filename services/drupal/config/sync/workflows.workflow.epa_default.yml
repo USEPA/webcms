@@ -21,44 +21,44 @@ type_settings:
   states:
     draft:
       label: Draft
-      published: false
-      default_revision: false
       weight: -4
-    draft_approved:
       published: false
       default_revision: false
+    draft_approved:
       label: 'Draft, approved'
       weight: -2
-    draft_needs_review:
       published: false
       default_revision: false
+    draft_needs_review:
       label: 'Draft, needs review'
       weight: -3
+      published: false
+      default_revision: false
     published:
       label: Published
-      published: true
-      default_revision: true
       weight: -1
-    published_day_til_expire:
       published: true
       default_revision: true
+    published_day_til_expire:
       label: 'Published, one day until expiration'
       weight: 2
-    published_expiring:
       published: true
       default_revision: true
+    published_expiring:
       label: 'Published, scheduled for expiration'
       weight: 1
-    published_needs_review:
       published: true
       default_revision: true
+    published_needs_review:
       label: 'Published, needs review'
       weight: 0
-    unpublished:
-      published: false
+      published: true
       default_revision: true
+    unpublished:
       label: Unpublished
       weight: 3
+      published: false
+      default_revision: true
   transitions:
     approve_leave_unpublished:
       label: 'Approve; leave unpublished'
@@ -78,8 +78,6 @@ type_settings:
       weight: -1
     create_new_draft:
       label: 'Save as Draft'
-      to: draft
-      weight: -5
       from:
         - draft
         - published
@@ -87,6 +85,8 @@ type_settings:
         - published_expiring
         - published_needs_review
         - unpublished
+      to: draft
+      weight: -5
     prepare_for_expiration:
       label: 'Prepare for expiration'
       from:
@@ -95,14 +95,14 @@ type_settings:
       weight: 2
     publish:
       label: Publish
-      to: published
-      weight: 3
       from:
         - draft
         - draft_approved
         - draft_needs_review
         - published
         - unpublished
+      to: published
+      weight: 3
     return_to_author:
       label: 'Return to draft'
       from:
