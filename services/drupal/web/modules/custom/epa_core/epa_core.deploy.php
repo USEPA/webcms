@@ -52,7 +52,7 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
     $account_switcher = \Drupal::service('account_switcher');
     $account_switcher->switchTo($root_user);
 
-    while(!empty($sandbox['revisions']) && $counter < 200) {
+    while(!empty($sandbox['revisions']) && $counter < 50) {
       $vid = key($sandbox['revisions']);
       $node = node_revision_load($vid);
       $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
