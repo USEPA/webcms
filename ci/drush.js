@@ -104,6 +104,12 @@ async function main() {
     ui.log(`  NOTE: Drush exited from signal ${info.signal}`);
   }
 
+  // Output a blank line before outputting the logs link
+  ui.log();
+
+  const logsUrl =  await util.getLogsUrl(task);
+  ui.log(ui.link(logsUrl, `Task logs`));
+
   if (!info.success) {
     throw new Error("Drush task did not exit cleanly");
   }
