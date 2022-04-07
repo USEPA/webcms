@@ -15,6 +15,9 @@ steps:
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
         concurrency: 4
 
+        env:
+          TARGET: '{{matrix}}'
+
         matrix:
           - drupal
           - nginx
@@ -32,6 +35,10 @@ steps:
               image: gcr.io/kaniko-project/executor:debug
               workdir: /workspace
 
+              propagate-aws-auth-tokens: true
+              environment:
+                - TARGET
+
               entrypoint: /bin/sh
               command:
                 - -ec
@@ -45,8 +52,8 @@ steps:
                       --skip-unused-stages \
                       --snapshotMode=redo \
                       --use-new-run \
-                      --target="{{matrix}}" \
-                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-{{matrix}}:${WEBCMS_IMAGE_TAG}"
+                      --target="$$TARGET" \
+                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-$$TARGET:${WEBCMS_IMAGE_TAG}"
 
       - label: "Build fpm-metrics"
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
@@ -59,6 +66,8 @@ steps:
           - docker#v3.12.0:
               image: gcr.io/kaniko-project/executor:debug
               workdir: /workspace
+
+              propagate-aws-auth-tokens: true
 
               entrypoint: /bin/sh
               command:
