@@ -1,5 +1,7 @@
 # First-Time Setup
 
+Note: this has only been tested on ddev 1.19 and above.
+
 1. First, start the project:
 
    ```
@@ -12,14 +14,14 @@
    ddev aws-setup
    ```
 
-3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.
+3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
 4. Import the database by running: 
 
    ```   
    ddev epa-import 
    ```
-
+ 
 5. After the import you will need to restart:
 
    ```   
@@ -28,53 +30,41 @@
 
 6. Copy `cp .env.example .env`.
 
-7. Copy environment settings:
-   
-   ```    
-   cp web/sites/default/settings.local.env.php web/sites/default/settings.local.php
-   ```
-
-8. Install dependencies: 
+7. Install dependencies: 
 
    ```
    ddev composer install
    ```
 
-9. Install the requirements for the theme: `ddev gesso install`:
+8. Install the requirements for the theme: `ddev gesso install`:
 
    ```
    ddev gesso install
    ```
    
-10. Building/watching the CSS and Pattern Lab:
+9. Building/watching the CSS and Pattern Lab:
     1. to build
       ```````
       ddev gesso build 
       ```````
     2. to watch:
       ```````
-      ddev gesso build
+      ddev gesso watch
       ```````
-   
-13. Watch the CSS and Pattern Lab:
-   
-   ```
-   ddev gesso watch
-   ```
 
-14. Install Drupal from config (or restore a backup).  You can install from config by running:
+10. Install Drupal from config (or restore a backup).  You can install from config by running:
    ```
    ddev drush si --existing-config
    ``` 
 
-15. Ensure the latest configuration has been fully applied and clear cache: 
+11. Ensure the latest configuration has been fully applied and clear cache: 
    ```
    ddev drush deploy -y
    ```
 
-16. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-17. Access the app at https://epa-ddev.ddev.site
+13. Access the app at https://epa-ddev.ddev.site
 
 # Testing migrations
 
