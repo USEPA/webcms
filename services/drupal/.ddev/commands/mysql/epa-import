@@ -1,0 +1,22 @@
+#!/bin/bash
+
+## Description: Replace database
+## Usage: epa-import
+## Example: "ddev epa-import "
+
+
+select FILENAME in /var/db/*;
+do
+  case $FILENAME in
+    "$QUIT")
+      break
+      ;;
+    *)
+    echo "You have Selected: $FILENAME ($REPLY), Please press any key and press enter."
+    dump_name="$FILENAME"
+    ;;
+  esac
+done;
+
+rm -rf /var/lib/mysql 2>/dev/null
+tar xzf $dump_name  -C /var/lib/mysql
