@@ -27,6 +27,10 @@ $config['s3fs.settings']['use_customhost'] = TRUE;
 $config['s3fs.settings']['use_path_style_endpoint'] = TRUE;
 $config['s3fs.settings']['hostname'] = 'minio:9000';
 
+// Override output to point to localhost:8888 in order to see Minio-saved files
+$config['s3fs.settings']['use_cname'] = TRUE;
+$config['s3fs.settings']['domain'] = 'localhost:8888';
+
 // Map twig cache onto shared filesystem to allow drush to clear and write twig cache for local development.
 $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default/files/tmp/cache/twig';
 
@@ -53,4 +57,21 @@ $config['epa_cloudwatch']['credentials'] = [
   'access_key' => 'foo',
   'secret_key' => 'bar',
 ];
+$settings['memcache']['servers'] = ['memcached' . ':' . '11211' => 'default'];
+$settings['memcache']['key_prefix'] = 'epa_local';
+$settings['cache']['default'] = 'cache.backend.memcache';
+
+
 $config['epa_cloudwatch']['log_stream'] = 'app-drupal';
+
+$settings['config_sync_directory'] = '../config/sync';
+
+$databases['default']['default'] = array(
+  'database' => "web",
+  'username' => "web",
+  'password' => "web",
+  'host' => 'mysql',
+  'driver' => "mysql",
+  'port' => '3306',
+  'prefix' => "",
+);

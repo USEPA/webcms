@@ -1,38 +1,70 @@
 # First-Time Setup
 
+Note: this has only been tested on ddev 1.19 and above.
+
 1. First, start the project:
 
    ```
-   f1 up
+   cd services/drupal && ddev start
    ```
 
 2. Next, create the S3 bucket for s3fs:
 
    ```
-   f1 run aws s3 mb s3://drupal
+   ddev aws-setup
    ```
 
-3. Finally, allow anonymous access to the `public/` prefix of the S3 bucket: 
+3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
+
+4. Import the database by running: 
+
+   ```   
+   ddev epa-import 
+   ```
+ 
+5. After the import you will need to restart:
+
+   ```   
+   ddev poweroff && ddev start
+   ```
+
+6. Copy `cp .env.example .env`.
+
+7. Install dependencies: 
 
    ```
-   f1 run aws s3api put-bucket-policy --bucket drupal --policy "$(cat services/minio/policy.json)"
+   ddev composer install
    ```
 
-4. Copy `services/drupal/.env.example` to `services/drupal/.env`.
+8. Install the requirements for the theme: `ddev gesso install`:
 
-5. Install dependencies: ```f1 composer install```
+   ```
+   ddev gesso install
+   ```
+   
+9. Building/watching the CSS and Pattern Lab:
+    1. to build
+      ```````
+      ddev gesso build 
+      ```````
+    2. to watch:
+      ```````
+      ddev gesso watch
+      ```````
 
-6. Build the CSS and Pattern Lab: `f1 run gesso gulp build`.
+10. Install Drupal from config (or restore a backup).  You can install from config by running:
+   ```
+   ddev drush si --existing-config
+   ``` 
 
-7. Install Drupal from config (or restore a backup).  You can install from config by running: ```f1 drush si --existing-config```
+11. Ensure the latest configuration has been fully applied and clear cache: 
+   ```
+   ddev drush deploy -y
+   ```
 
-8. Ensure the latest configuration has been fully applied and clear cache: ```f1 drush cim -y; f1 drush cr``` 
+12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-9. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
-
-10. Note the username/password generated!
-
-11. Access the app at https://localhost:8443/
+13. Access the app at https://epa-ddev.ddev.site
 
 # Testing migrations
 
@@ -46,6 +78,28 @@ gunzip < cleaned-d7-db.sql.gz | f1 drush sqlc --db-url mysql://web_d7:web_d7@mys
 
 - Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
 - Builds: see [.buildkite](.buildkite/README.md).
+
+# Troubleshooting
+
+### Elasticsearch
+If you run into an error trying to use `elasticsearch`. Please run the following command:
+```
+ddev poweroff && docker volume rm ddev-epa-ddev_elasticsearch && ddev start
+```
+
+You will need to `re-index`.
+
+# Helpful commands
+
+Here is a list of helpful commands:
+* `ddev gesso install` > Installs the node modules needed for `epa_core`.
+* `ddev gesso build` > Builds the current assets for CSS & PatternLab.
+* `ddev gesso watch` > Same thing as build but will watch for changes.
+* `ddev ssh` > Goes into the web container.
+* `ddev drush` > Runs any drush command.
+* `ddev epa-import` > Will import a specific database.
+* `ddev epa-export` > Exports a database with the current date.
+* `ddev aws-setup` > Sets up the requirements to get drupal file system to work
 
 # Disclaimer
 
