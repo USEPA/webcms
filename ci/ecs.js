@@ -193,7 +193,7 @@ async function getDrushStatus(task) {
   // Carefully read the exit code and reason of the container: the extra nullish operators
   // here guard against situations where the task couldn't be started and thus could not
   // construct container statuses.
-  const { exitCode, reason } = containers?.[0] ?? {};
+  const { exitCode, reason } = containers?.find(container => container.name === "drush") ?? {};
 
   // Rename the reason fields to better indicate which code they're associated with.
   return { stopCode, stopReason: stoppedReason, exitCode, exitReason: reason };
