@@ -1,0 +1,110 @@
+From 951c508deca3842a3720f3488f7434438bfead64 Mon Sep 17 00:00:00 2001
+From: Stephen Lucero <slucero@forumone.com>
+Date: Thu, 7 Apr 2022 15:57:34 -0500
+Subject: [PATCH] [#3274102] Add new front page configuration option.
+
+Add a new configuration option to direct all environment links to the
+environment's front page.
+---
+ .../environment_indicator.settings.yml        |  1 +
+ .../schema/environment_indicator.schema.yml   |  3 +++
+ environment_indicator.module                  | 25 +++++++++++++++----
+ src/Form/EnvironmentIndicatorSettingsForm.php |  8 +++++-
+ 4 files changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/config/install/environment_indicator.settings.yml b/config/install/environment_indicator.settings.yml
+index 1817ad5..8c2c3de 100644
+--- a/config/install/environment_indicator.settings.yml
++++ b/config/install/environment_indicator.settings.yml
+@@ -1,3 +1,4 @@
+ toolbar_integration:
+   - toolbar
+ favicon: true
++frontpage: false
+diff --git a/config/schema/environment_indicator.schema.yml b/config/schema/environment_indicator.schema.yml
+index 2353888..f8b2d6c 100644
+--- a/config/schema/environment_indicator.schema.yml
++++ b/config/schema/environment_indicator.schema.yml
+@@ -36,3 +36,6 @@ environment_indicator.settings:
+     favicon:
+       type: boolean
+       label: 'Show a colored favicon for environment'
++    frontpage:
++      type: boolean
++      label: 'Direct environment links to the site front page'
+diff --git a/environment_indicator.module b/environment_indicator.module
+index ced91d8..256db11 100644
+--- a/environment_indicator.module
++++ b/environment_indicator.module
+@@ -289,8 +289,23 @@ function _environment_indicator_switcher_links() {
+   if (!$environment_entities = EnvironmentIndicator::loadMultiple()) {
+     return [];
+   }
+-  $current = Url::fromRoute('<current>');
+-  $current_path = $current->toString();
++
++  // Determine if configuration indicates the link should go to the front page.
++  $config = \Drupal::config('environment_indicator.settings');
++  $frontpage = $config->get('frontpage');
++
++  // Prepare link details based on frontpage settings.
++  if ($frontpage) {
++    $current_path = '';
++    $title = 'Opens the selected environment.';
++    $label = 'Open: @label';
++  } else {
++    $current = Url::fromRoute('<current>');
++    $current_path = $current->toString();
++    $title = 'Opens the current page in the selected environment.';
++    $label = 'Open in: @label';
++  }
++
+   $environment_entities = array_filter(
+     $environment_entities,
+     function (EnvironmentIndicator $entity) {
+@@ -298,13 +313,13 @@ function _environment_indicator_switcher_links() {
+     }
+   );
+   return array_map(
+-    function (EnvironmentIndicator $entity) use ($current_path) {
++    function (EnvironmentIndicator $entity) use ($current_path, $title, $label) {
+       return [
+         'attributes' => [
+           'style' => 'color: ' . $entity->getFgColor() . '; background-color: ' . $entity->getBgColor() . ';',
+-          'title' => t('Opens the current page in the selected environment.'),
++          'title' => t($title),
+         ],
+-        'title' => t('Open in: @label', ['@label' => $entity->label()]),
++        'title' => t($label, ['@label' => $entity->label()]),
+         'url' => Url::fromUri($entity->getUrl() . $current_path),
+         'type' => 'link',
+       ];
+diff --git a/src/Form/EnvironmentIndicatorSettingsForm.php b/src/Form/EnvironmentIndicatorSettingsForm.php
+index 2031394..1c1dcb0 100644
+--- a/src/Form/EnvironmentIndicatorSettingsForm.php
++++ b/src/Form/EnvironmentIndicatorSettingsForm.php
+@@ -39,6 +39,12 @@ class EnvironmentIndicatorSettingsForm extends ConfigFormBase implements FormInt
+       '#description' => $this->t('If checked, a favicon will be added with the environment colors when the indicator is shown.'),
+       '#default_value' => $config->get('favicon') ?: FALSE,
+     ];
++    $form['frontpage'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Link to environment front page'),
++      '#description' => $this->t('If checked, links to other environments will direct to the site\'s front page.'),
++      '#default_value' => $config->get('frontpage') ?: FALSE,
++    ];
+     return $form;
+   }
+ 
+@@ -54,7 +60,7 @@ class EnvironmentIndicatorSettingsForm extends ConfigFormBase implements FormInt
+    */
+   public function submitForm(array &$form, FormStateInterface $form_state) {
+     $config = $this->config('environment_indicator.settings');
+-    $properties = ['toolbar_integration', 'favicon'];
++    $properties = ['toolbar_integration', 'favicon', 'frontpage'];
+     array_walk($properties, function ($property) use ($config, $form_state) {
+       $config->set($property, $form_state->getValue($property));
+     });
+-- 
+GitLab
+
