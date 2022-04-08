@@ -1,0 +1,23 @@
+uuid: d06f269c-ceca-4bad-9129-07df8cbdf49a
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.gallery_medium
+    - image.style.gallery_small
+    - image.style.large_gallery
+id: responsive_gallery_image_large
+label: 'Responsive Gallery Image Large'
+image_style_mappings:
+  -
+    image_mapping_type: sizes
+    image_mapping:
+      sizes: '(max-width: 640px) calc(100vw - 2rem), 960px'
+      sizes_image_styles:
+        - gallery_medium
+        - gallery_small
+        - large_gallery
+    breakpoint_id: responsive_image.viewport_sizing
+    multiplier: 1x
+breakpoint_group: responsive_image
+fallback_image_style: large_gallery

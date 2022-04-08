@@ -22,44 +22,23 @@ base_table: search_api_index_news_releases
 base_field: search_api_id
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Master
+    display_plugin: default
     position: 0
     display_options:
-      access:
-        type: perm
-        options:
-          perm: 'access content'
-      cache:
-        type: search_api_tag
-        options: {  }
-      query:
-        type: views_query
-        options:
-          bypass_access: false
-          skip_access: false
-          preserve_facet_query_args: false
-      exposed_form:
-        type: basic
-        options:
-          submit_button: Search
-          reset_button: false
-          reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
-          expose_sort_order: true
-          sort_asc_label: Asc
-          sort_desc_label: Desc
+      title: 'Search News Releases'
+      fields: {  }
       pager:
         type: full
         options:
-          items_per_page: 15
           offset: 0
-          id: 0
+          items_per_page: 15
           total_pages: null
+          id: 0
           tags:
-            previous: '‹ previous'
             next: 'next ›'
+            previous: '‹ previous'
             first: '« first'
             last: 'last »'
           expose:
@@ -71,19 +50,65 @@ display:
             offset: false
             offset_label: Offset
           quantity: 9
-      style:
-        type: default
+      exposed_form:
+        type: basic
         options:
-          row_class: ''
-          default_row_class: false
-          uses_fields: false
-      row:
-        type: search_api
+          submit_button: Search
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
         options:
-          view_modes:
-            'entity:node':
-              news_release: teaser
-      fields: {  }
+          perm: 'access content'
+      cache:
+        type: search_api_tag
+        options: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: '<p>There are no results for your current search.</p>'
+            format: filtered_html
+          tokenize: false
+      sorts:
+        search_api_relevance:
+          id: search_api_relevance
+          table: search_api_index_news_releases
+          field: search_api_relevance
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          order: DESC
+          expose:
+            label: ''
+            field_identifier: search_api_relevance
+          exposed: false
+        field_release:
+          id: field_release
+          table: search_api_index_news_releases
+          field: field_release
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          order: DESC
+          expose:
+            label: ''
+            field_identifier: field_release
+          exposed: false
+      arguments: {  }
       filters:
         type:
           id: type
@@ -92,6 +117,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_options
           operator: or
           value:
             news_release: news_release
@@ -125,7 +151,6 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          plugin_id: search_api_options
         status:
           id: status
           table: search_api_index_news_releases
@@ -133,6 +158,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_numeric
           operator: '='
           value:
             min: ''
@@ -154,9 +180,9 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -169,7 +195,6 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          plugin_id: search_api_numeric
         search_api_fulltext:
           id: search_api_fulltext
           table: search_api_index_news_releases
@@ -177,6 +202,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: views_autocomplete_filters_search_api_fulltext
           operator: and
           value: ''
           group: 1
@@ -224,33 +250,25 @@ display:
           parse_mode: terms
           min_length: null
           fields: {  }
-          plugin_id: views_autocomplete_filters_search_api_fulltext
-      sorts:
-        search_api_relevance:
-          id: search_api_relevance
-          table: search_api_index_news_releases
-          field: search_api_relevance
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: DESC
-          exposed: false
-          expose:
-            label: ''
-          plugin_id: search_api
-        field_release:
-          id: field_release
-          table: search_api_index_news_releases
-          field: field_release
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: DESC
-          exposed: false
-          expose:
-            label: ''
-          plugin_id: search_api
-      title: 'Search News Releases'
+      style:
+        type: default
+        options:
+          row_class: ''
+          default_row_class: false
+          uses_fields: false
+      row:
+        type: search_api
+        options:
+          view_modes:
+            'entity:node':
+              news_release: teaser
+      query:
+        type: views_query
+        options:
+          bypass_access: false
+          skip_access: false
+          preserve_facet_query_args: false
+      relationships: {  }
       header:
         result:
           id: result
@@ -259,26 +277,10 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: result
           empty: false
           content: 'Displaying @start - @end of @total results'
-          plugin_id: result
       footer: {  }
-      empty:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: '<p>There are no results for your current search.</p>'
-            format: filtered_html
-          plugin_id: text
-      relationships: {  }
-      arguments: {  }
       display_extenders:
         views_ajax_get:
           ajax_get: false
@@ -293,29 +295,12 @@ display:
       tags:
         - 'config:search_api.index.news_releases'
   feed_1:
-    display_plugin: feed
     id: feed_1
     display_title: Feed
+    display_plugin: feed
     position: 2
     display_options:
-      display_extenders:
-        views_ajax_get:
-          ajax_get: false
-      row:
-        type: rss_fields
-        options:
-          title_field: title
-          link_field: nid
-          description_field: field_body
-          creator_field: field_press_office
-          date_field: field_release
-          guid_field_options:
-            guid_field: nid
-            guid_field_is_permalink: true
-      displays:
-        page_1: page_1
-        default: '0'
-      path: newsreleases/search/rss
+      title: 'EPA News Releases'
       fields:
         title:
           id: title
@@ -324,6 +309,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -386,7 +372,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          plugin_id: search_api_field
         field_body:
           id: field_body
           table: search_api_index_news_releases
@@ -394,6 +379,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: 'The main body text'
           exclude: false
           alter:
@@ -456,7 +442,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          plugin_id: search_api_field
         field_press_office:
           id: field_press_office
           table: search_api_index_news_releases
@@ -464,6 +449,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -555,7 +541,6 @@ display:
                 view_mode: default
               type_of_proposed_action:
                 display_method: label
-          plugin_id: search_api_field
         field_release:
           id: field_release
           table: search_api_index_news_releases
@@ -563,6 +548,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -626,7 +612,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          plugin_id: search_api_field
         nid:
           id: nid
           table: search_api_datasource_news_releases_entity_node
@@ -634,6 +619,8 @@ display:
           relationship: none
           group_type: group
           admin_label: 'Content datasource: ID (rewritten as link)'
+          entity_type: node
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -708,25 +695,40 @@ display:
             format_plural_values:
               - '1'
               - '@count'
-          entity_type: node
-          plugin_id: search_api_field
-      defaults:
-        fields: false
-        title: false
-        sitename_title: false
-        cache: true
-      title: 'EPA News Releases'
-      sitename_title: false
+      pager:
+        type: some
+        options:
+          offset: 0
+          items_per_page: 15
       style:
         type: epa_faceted_rss
         options:
           grouping: {  }
           description: ''
-      pager:
-        type: some
+      row:
+        type: rss_fields
         options:
-          items_per_page: 15
-          offset: 0
+          title_field: title
+          link_field: nid
+          description_field: field_body
+          creator_field: field_press_office
+          date_field: field_release
+          guid_field_options:
+            guid_field: nid
+            guid_field_is_permalink: true
+      defaults:
+        cache: true
+        title: false
+        fields: false
+        sitename_title: false
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: newsreleases/search/rss
+      sitename_title: false
+      displays:
+        page_1: page_1
+        default: '0'
     cache_metadata:
       max-age: -1
       contexts:
@@ -740,20 +742,11 @@ display:
         - 'config:field.storage.node.field_release'
         - 'config:search_api.index.news_releases'
   page_1:
-    display_plugin: page
     id: page_1
     display_title: Page
+    display_plugin: page
     position: 2
     display_options:
-      display_extenders:
-        views_ajax_get:
-          ajax_get: false
-      path: newsreleases/search
-      exposed_block: true
-      defaults:
-        cache: true
-        style: false
-        row: false
       style:
         type: epa_core_uswds_collection
         options:
@@ -764,6 +757,15 @@ display:
           view_modes:
             'entity:node':
               news_release: teaser
+      defaults:
+        cache: true
+        style: false
+        row: false
+      exposed_block: true
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: newsreleases/search
     cache_metadata:
       max-age: -1
       contexts:

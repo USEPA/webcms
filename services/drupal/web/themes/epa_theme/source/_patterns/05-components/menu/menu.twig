@@ -64,6 +64,10 @@
         'class': link_classes
       } %}
 
+      {% if item.current %}
+        {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
+      {% endif %}
+
       <li {{ add_attributes(additional_item_attributes) }}>
         {{ link(item.title, item.url, link_attributes) }}
         {% if item.below %}

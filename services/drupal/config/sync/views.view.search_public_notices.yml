@@ -23,44 +23,23 @@ base_table: search_api_index_public_notices
 base_field: search_api_id
 display:
   default:
-    display_plugin: default
     id: default
     display_title: Master
+    display_plugin: default
     position: 0
     display_options:
-      access:
-        type: perm
-        options:
-          perm: 'access content'
-      cache:
-        type: search_api_tag
-        options: {  }
-      query:
-        type: views_query
-        options:
-          bypass_access: false
-          skip_access: false
-          preserve_facet_query_args: false
-      exposed_form:
-        type: basic
-        options:
-          submit_button: Search
-          reset_button: false
-          reset_button_label: Reset
-          exposed_sorts_label: 'Sort by'
-          expose_sort_order: true
-          sort_asc_label: Asc
-          sort_desc_label: Desc
+      title: 'Search Public Notices'
+      fields: {  }
       pager:
         type: full
         options:
-          items_per_page: 15
           offset: 0
-          id: 0
+          items_per_page: 15
           total_pages: null
+          id: 0
           tags:
-            previous: '‹ previous'
             next: 'next ›'
+            previous: '‹ previous'
             first: '« first'
             last: 'last »'
           expose:
@@ -72,19 +51,65 @@ display:
             offset: false
             offset_label: Offset
           quantity: 9
-      style:
-        type: default
+      exposed_form:
+        type: basic
         options:
-          row_class: ''
-          default_row_class: false
-          uses_fields: false
-      row:
-        type: search_api
+          submit_button: Search
+          reset_button: false
+          reset_button_label: Reset
+          exposed_sorts_label: 'Sort by'
+          expose_sort_order: true
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      access:
+        type: perm
         options:
-          view_modes:
-            'entity:node':
-              public_notice: teaser
-      fields: {  }
+          perm: 'access content'
+      cache:
+        type: search_api_tag
+        options: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: '<p>There are no results for your current search.</p>'
+            format: filtered_html
+          tokenize: false
+      sorts:
+        search_api_relevance:
+          id: search_api_relevance
+          table: search_api_index_public_notices
+          field: search_api_relevance
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          order: DESC
+          expose:
+            label: ''
+            field_identifier: search_api_relevance
+          exposed: false
+        field_notice_sort_date:
+          id: field_notice_sort_date
+          table: search_api_index_public_notices
+          field: field_notice_sort_date
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          order: DESC
+          expose:
+            label: ''
+            field_identifier: field_notice_sort_date
+          exposed: false
+      arguments: {  }
       filters:
         type:
           id: type
@@ -93,6 +118,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_options
           operator: or
           value:
             public_notice: public_notice
@@ -126,7 +152,6 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          plugin_id: search_api_options
         status:
           id: status
           table: search_api_index_public_notices
@@ -134,6 +159,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_numeric
           operator: '='
           value:
             min: ''
@@ -155,9 +181,9 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -170,7 +196,6 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          plugin_id: search_api_numeric
         search_api_fulltext:
           id: search_api_fulltext
           table: search_api_index_public_notices
@@ -178,6 +203,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: views_autocomplete_filters_search_api_fulltext
           operator: and
           value: ''
           group: 1
@@ -225,7 +251,6 @@ display:
           parse_mode: terms
           min_length: null
           fields: {  }
-          plugin_id: views_autocomplete_filters_search_api_fulltext
         field_notice_sort_date:
           id: field_notice_sort_date
           table: search_api_index_public_notices
@@ -233,6 +258,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_date
           operator: '>='
           value:
             min: ''
@@ -255,9 +281,9 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-            placeholder: ''
             min_placeholder: ''
             max_placeholder: ''
+            placeholder: ''
           is_grouped: false
           group_info:
             label: ''
@@ -270,33 +296,25 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          plugin_id: search_api_date
-      sorts:
-        search_api_relevance:
-          id: search_api_relevance
-          table: search_api_index_public_notices
-          field: search_api_relevance
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: DESC
-          exposed: false
-          expose:
-            label: ''
-          plugin_id: search_api
-        field_notice_sort_date:
-          id: field_notice_sort_date
-          table: search_api_index_public_notices
-          field: field_notice_sort_date
-          relationship: none
-          group_type: group
-          admin_label: ''
-          order: DESC
-          exposed: false
-          expose:
-            label: ''
-          plugin_id: search_api
-      title: 'Search Public Notices'
+      style:
+        type: default
+        options:
+          row_class: ''
+          default_row_class: false
+          uses_fields: false
+      row:
+        type: search_api
+        options:
+          view_modes:
+            'entity:node':
+              public_notice: teaser
+      query:
+        type: views_query
+        options:
+          bypass_access: false
+          skip_access: false
+          preserve_facet_query_args: false
+      relationships: {  }
       header:
         result:
           id: result
@@ -305,26 +323,10 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: result
           empty: false
           content: 'Displaying @start - @end of @total results'
-          plugin_id: result
       footer: {  }
-      empty:
-        area:
-          id: area
-          table: views
-          field: area
-          relationship: none
-          group_type: group
-          admin_label: ''
-          empty: true
-          tokenize: false
-          content:
-            value: '<p>There are no results for your current search.</p>'
-            format: filtered_html
-          plugin_id: text
-      relationships: {  }
-      arguments: {  }
       display_extenders:
         views_ajax_get:
           ajax_get: false
@@ -339,33 +341,11 @@ display:
       tags:
         - 'config:search_api.index.public_notices'
   feed_1:
-    display_plugin: feed
     id: feed_1
     display_title: Feed
+    display_plugin: feed
     position: 2
     display_options:
-      display_extenders:
-        views_ajax_get:
-          ajax_get: false
-      row:
-        type: rss_fields
-        options:
-          title_field: title
-          link_field: nid
-          description_field: body
-          creator_field: uid
-          date_field: field_publication_date
-          guid_field_options:
-            guid_field: nid
-            guid_field_is_permalink: true
-      style:
-        type: epa_faceted_rss
-        options:
-          description: ''
-      path: publicnotices/notices-search/rss
-      displays:
-        page_1: page_1
-        default: '0'
       fields:
         nid:
           id: nid
@@ -374,6 +354,8 @@ display:
           relationship: none
           group_type: group
           admin_label: 'Content datasource: ID (rewritten as link)'
+          entity_type: node
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -448,8 +430,6 @@ display:
             format_plural_values:
               - '1'
               - '@count'
-          entity_type: node
-          plugin_id: search_api_field
         title:
           id: title
           table: search_api_index_public_notices
@@ -457,6 +437,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -519,7 +500,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          plugin_id: search_api_field
         field_publication_date:
           id: field_publication_date
           table: search_api_datasource_public_notices_entity_node
@@ -527,6 +507,8 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          entity_type: node
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -590,8 +572,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          entity_type: node
-          plugin_id: search_api_field
         body:
           id: body
           table: search_api_index_public_notices
@@ -599,6 +579,7 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -661,7 +642,6 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-          plugin_id: search_api_field
         uid:
           id: uid
           table: search_api_datasource_public_notices_entity_node
@@ -669,6 +649,8 @@ display:
           relationship: none
           group_type: group
           admin_label: 'Authored by (rewritten as U.S. EPA)'
+          entity_type: node
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -734,15 +716,35 @@ display:
             display_methods:
               user:
                 display_method: label
-          entity_type: node
-          plugin_id: search_api_field
-      defaults:
-        fields: false
       pager:
         type: some
         options:
-          items_per_page: 15
           offset: 0
+          items_per_page: 15
+      style:
+        type: epa_faceted_rss
+        options:
+          description: ''
+      row:
+        type: rss_fields
+        options:
+          title_field: title
+          link_field: nid
+          description_field: body
+          creator_field: uid
+          date_field: field_publication_date
+          guid_field_options:
+            guid_field: nid
+            guid_field_is_permalink: true
+      defaults:
+        fields: false
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: publicnotices/notices-search/rss
+      displays:
+        page_1: page_1
+        default: '0'
     cache_metadata:
       max-age: -1
       contexts:
@@ -756,22 +758,11 @@ display:
         - 'config:field.storage.node.field_publication_date'
         - 'config:search_api.index.public_notices'
   page_1:
-    display_plugin: page
     id: page_1
     display_title: Page
+    display_plugin: page
     position: 2
     display_options:
-      display_extenders:
-        views_ajax_get:
-          ajax_get: false
-      path: publicnotices/notices-search
-      defaults:
-        cache: true
-        style: false
-        row: false
-        filters: true
-        filter_groups: true
-      exposed_block: true
       style:
         type: epa_core_uswds_collection
         options:
@@ -782,6 +773,17 @@ display:
           view_modes:
             'entity:node':
               public_notice: teaser
+      defaults:
+        cache: true
+        style: false
+        row: false
+        filters: true
+        filter_groups: true
+      exposed_block: true
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: publicnotices/notices-search
     cache_metadata:
       max-age: -1
       contexts:
