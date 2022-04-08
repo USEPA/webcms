@@ -12,11 +12,11 @@ do
       break
       ;;
     *)
-    echo "You have Selected: $FILENAME ($REPLY) Please type 'q' and press enter."
+    echo "You have Selected: $FILENAME ($REPLY) Please type 'y' and press enter."
     dump_name="$FILENAME"
     ;;
   esac
 done;
 
-rm -rf /var/lib/mysql
+rm -rf /var/lib/mysql 2>/dev/null
 tar xzf $dump_name  -C /var/lib/mysql
