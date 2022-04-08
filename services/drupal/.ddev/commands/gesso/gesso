@@ -1,0 +1,25 @@
+#!/bin/sh
+
+## Description: Run Gesso commands to rebuild the theme
+## Usage: gesso install|build|watch|(some other command in the theme service)
+## Example: "ddev gesso build"
+
+case $1 in
+  install)
+    if test -e package-lock.json; then npm ci; else npm i; fi
+  ;;
+  build)
+    ## @todo Pick one and make sure Dockerfile is up to date.
+     gulp build
+  ;;
+  watch)
+    ## @todo Pick one and make sure Dockerfile is up to date.
+    gulp
+  ;;
+  "")
+    echo "Usage: gesso install|build|watch|(some other command in the theme service)"
+  ;;
+  *)
+    "$@"
+  ;;
+esac
