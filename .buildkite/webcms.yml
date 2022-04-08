@@ -89,7 +89,6 @@ steps:
                       --context=/workspace/services/metrics \
                       --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
 
-
   - wait: ~
 
   - label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"
@@ -112,15 +111,8 @@ steps:
 
   - wait: ~
 
-  - label: ":ecs: Drush (${WEBCMS_SITE}-{{matrix}})"
-    env:
-      WEBCMS_LANG: '{{matrix}}'
-
-    matrix:
-      - en
-      - es
-
-    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-{{matrix}}
+  - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-en
     concurrency: 1
 
     plugins:
@@ -142,8 +134,35 @@ steps:
             - AWS_REGION=us-east-2
             - WEBCMS_ENVIRONMENT
             - WEBCMS_SITE
-            - WEBCMS_LANG
+            - WEBCMS_LANG=en
             - WEBCMS_IMAGE_TAG
 
             # Propagate the BUILDKITE=true environment variable to tell the script to link to the logs
+            - BUILDKITE
+
+  - label: ":ecs: Drush (${WEBCMS_SITE}-es)"
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-es
+    concurrency: 1
+
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
+
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG=es
+            - WEBCMS_IMAGE_TAG
             - BUILDKITE
