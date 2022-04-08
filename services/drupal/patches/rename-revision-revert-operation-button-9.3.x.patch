@@ -1,0 +1,92 @@
+diff --git a/core/modules/content_moderation/tests/src/Functional/LayoutBuilderContentModerationIntegrationTest.php b/core/modules/content_moderation/tests/src/Functional/LayoutBuilderContentModerationIntegrationTest.php
+index aac01832b4..26269403ea 100644
+--- a/core/modules/content_moderation/tests/src/Functional/LayoutBuilderContentModerationIntegrationTest.php
++++ b/core/modules/content_moderation/tests/src/Functional/LayoutBuilderContentModerationIntegrationTest.php
+@@ -143,10 +143,10 @@ public function testLayoutModeration() {
+     // Revert to the previous revision.
+     $page->clickLink('Revisions');
+     // Assert that there are 4 total revisions and 3 revert links.
+-    $assert_session->elementsCount('named', ['link', 'Copy as latest revision'], 3);
++    $assert_session->elementsCount('named', ['link', 'Copy: Set as Latest Revision'], 3);
+     // Revert to the 2nd revision before modifying the layout.
+-    $this->clickLink('Copy as latest revision', 1);
+-    $page->pressButton('Copy as latest revision');
++    $this->clickLink('Copy: Set as Latest Revision', 1);
++    $page->pressButton('Copy: Set as Latest Revision');
+
+     $page->clickLink('View');
+     $assert_session->pageTextNotContains('Powered by Drupal');
+diff --git a/core/modules/file/tests/src/Functional/FileFieldRevisionTest.php b/core/modules/file/tests/src/Functional/FileFieldRevisionTest.php
+index 457ec23bc4..8aab0abe12 100644
+--- a/core/modules/file/tests/src/Functional/FileFieldRevisionTest.php
++++ b/core/modules/file/tests/src/Functional/FileFieldRevisionTest.php
+@@ -86,7 +86,7 @@ public function testRevisions() {
+
+     // Revert to the first revision and check that the original file is active.
+     $this->drupalGet('node/' . $nid . '/revisions/' . $node_vid_r1 . '/revert');
+-    $this->submitForm([], 'Copy as latest revision');
++    $this->submitForm([], 'Copy: Set as Latest Revision');
+     $node_storage->resetCache([$nid]);
+     $node = $node_storage->load($nid);
+     $node_file_r4 = File::load($node->{$field_name}->target_id);
+diff --git a/core/modules/layout_builder/src/Form/RevertOverridesForm.php b/core/modules/layout_builder/src/Form/RevertOverridesForm.php
+index e9bbd7f2e9..7581bfc21a 100644
+--- a/core/modules/layout_builder/src/Form/RevertOverridesForm.php
++++ b/core/modules/layout_builder/src/Form/RevertOverridesForm.php
+@@ -80,7 +80,7 @@ public function getQuestion() {
+    * {@inheritdoc}
+    */
+   public function getConfirmText() {
+-    return $this->t('Copy as latest revision');
++    return $this->t('Copy: Set as Latest Revision');
+   }
+
+   /**
+diff --git a/core/modules/node/src/Controller/NodeController.php b/core/modules/node/src/Controller/NodeController.php
+index daa53284bf..e072af0855 100644
+--- a/core/modules/node/src/Controller/NodeController.php
++++ b/core/modules/node/src/Controller/NodeController.php
+@@ -226,7 +226,7 @@ public function revisionOverview(NodeInterface $node) {
+           $links = [];
+           if ($revision->access('revert revision')  && !$revision->isLatestRevision()) {
+             $links['revert'] = [
+-              'title' => $this->t('Copy as latest revision'),
++              'title' => $this->t('Copy: Set as Latest Revision'),
+               'url' => $has_translations ?
+                 Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode]) :
+                 Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
+@@ -246,7 +246,7 @@ public function revisionOverview(NodeInterface $node) {
+           $links = [];
+           if ($revision->access('revert revision') && !$revision->isLatestRevision()) {
+             $links['revert'] = [
+-              'title' => $this->t('Copy as latest revision'),
++              'title' => $this->t('Copy: Set as Latest Revision'),
+               'url' => $has_translations ?
+                 Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode]) :
+                 Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
+diff --git a/core/modules/node/src/Form/NodeRevisionRevertForm.php b/core/modules/node/src/Form/NodeRevisionRevertForm.php
+index dbd668dfd0..e17d627a73 100644
+--- a/core/modules/node/src/Form/NodeRevisionRevertForm.php
++++ b/core/modules/node/src/Form/NodeRevisionRevertForm.php
+@@ -110,7 +110,7 @@ public function getCancelUrl() {
+    * {@inheritdoc}
+    */
+   public function getConfirmText() {
+-    return $this->t('Copy as latest revision');
++    return $this->t('Copy: Set as Latest Revision');
+   }
+
+   /**
+diff --git a/core/modules/node/src/Plugin/views/field/RevisionLinkRevert.php b/core/modules/node/src/Plugin/views/field/RevisionLinkRevert.php
+index 8b6d1e6f0b..18586e0b2e 100644
+--- a/core/modules/node/src/Plugin/views/field/RevisionLinkRevert.php
++++ b/core/modules/node/src/Plugin/views/field/RevisionLinkRevert.php
+@@ -27,7 +27,7 @@ protected function getUrlInfo(ResultRow $row) {
+    * {@inheritdoc}
+    */
+   protected function getDefaultLabel() {
+-    return $this->t('Copy as latest revision');
++    return $this->t('Copy: Set as Latest Revision');
+   }
+
+ }
