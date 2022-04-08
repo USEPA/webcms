@@ -52,7 +52,9 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
     $account_switcher = \Drupal::service('account_switcher');
     $account_switcher->switchTo($root_user);
 
-    while(!empty($sandbox['revisions']) && $counter < 50) {
+    $nodeStorage = \Drupal::entityTypeManager()->getStorage('node');
+
+    while(!empty($sandbox['revisions']) && $counter < 200) {
       $vid = key($sandbox['revisions']);
       $node = node_revision_load($vid);
       $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
@@ -79,6 +81,7 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
       $counter++;
       $sandbox['current']++;
       unset($sandbox['revisions'][$vid]);
+      $nodeStorage->resetCache([$node->id()]);
     }
 
     // Revert to the active theme
@@ -91,4 +94,10 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
   if (empty($sandbox['revisions'])) {
     $sandbox['#finished'] = 1;
   }
+
+  // Free up some memory.
+  drupal_static_reset();
+  $nodeStorage->resetCache();
+
+  \Drupal::logger('epa_core')->notice('Processed search text for ' . $sandbox['current'] .'/'. $sandbox['total'] .' nodes.');
 }
