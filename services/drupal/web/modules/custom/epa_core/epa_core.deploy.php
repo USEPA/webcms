@@ -15,11 +15,18 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
       ->fetchCol('vid');
 
     $latest_revs = \Drupal::database()->query(
-      "SELECT nid, max(vid) as latest_vid
-             FROM {node_revision} n
-             LEFT JOIN {node_revision__field_search_text} nf
-             ON n.vid = nf.revision_id WHERE nf.revision_id IS NULL GROUP BY nid")
-      ->fetchCol('latest_vid');
+      "SELECT n.nid, n.vid as vid
+            FROM {node_revision} n
+            INNER JOIN
+                (SELECT nid,
+                     max(vid) AS latest_vid
+                FROM {node_revision}
+                GROUP BY  nid) nr_latest
+                ON n.vid = nr_latest.latest_vid
+            LEFT JOIN {node_revision__field_search_text} nf
+                ON n.vid = nf.revision_id
+            WHERE nf.revision_id IS NULL")
+      ->fetchCol('vid');
 
     // Remove current revs from latest revs
     $latest_revs = array_diff($latest_revs, $current_revs);
