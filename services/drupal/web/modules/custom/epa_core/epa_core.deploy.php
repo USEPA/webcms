@@ -56,27 +56,30 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
 
     while(!empty($sandbox['revisions']) && $counter < 200) {
       $vid = key($sandbox['revisions']);
-      $node = node_revision_load($vid);
-      $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
-      $full_output = $view_builder->view($node,'search_index');
-      $full_output = strip_tags(\Drupal::service('renderer')->renderPlain($full_output));
-      $fields = [
-        'bundle' => $node->bundle(),
-        'deleted' => 0,
-        'entity_id' => $node->id(),
-        'revision_id' => $vid,
-        'langcode' => $lang,
-        'delta' => 0,
-        'field_search_text_value' => $full_output,
-      ];
-      $insert = Drupal::database()->insert('node_revision__field_search_text');
-      $insert->fields($fields);
-      $insert->execute();
-
-      if ($sandbox['revisions'][$vid] === 'current') {
-        $insert = Drupal::database()->insert('node__field_search_text');
+      if ($node = node_revision_load($vid)) {
+        $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
+        $full_output = $view_builder->view($node, 'search_index');
+        $full_output = strip_tags(\Drupal::service('renderer')
+          ->renderPlain($full_output));
+        $fields = [
+          'bundle' => $node->bundle(),
+          'deleted' => 0,
+          'entity_id' => $node->id(),
+          'revision_id' => $vid,
+          'langcode' => $lang,
+          'delta' => 0,
+          'field_search_text_value' => $full_output,
+        ];
+        $insert = Drupal::database()
+          ->insert('node_revision__field_search_text');
         $insert->fields($fields);
         $insert->execute();
+
+        if ($sandbox['revisions'][$vid] === 'current') {
+          $insert = Drupal::database()->insert('node__field_search_text');
+          $insert->fields($fields);
+          $insert->execute();
+        }
       }
       $counter++;
       $sandbox['current']++;
