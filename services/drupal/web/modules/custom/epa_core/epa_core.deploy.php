@@ -80,11 +80,11 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
           $insert->fields($fields);
           $insert->execute();
         }
+        $nodeStorage->resetCache([$node->id()]);
       }
       $counter++;
       $sandbox['current']++;
       unset($sandbox['revisions'][$vid]);
-      $nodeStorage->resetCache([$node->id()]);
     }
 
     // Revert to the active theme
