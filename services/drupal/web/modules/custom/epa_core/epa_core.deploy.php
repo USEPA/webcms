@@ -36,6 +36,7 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
     $revisions = $current_revs + $latest_revs;
 
     $sandbox['total'] = count($revisions);
+    \Drupal::logger('epa_core')->notice('Items to be processed: ' . $sandbox['total']);
     $sandbox['current'] = 0;
     $sandbox['revisions'] = $revisions;
     $sandbox['#finished'] = 0;
@@ -78,12 +79,12 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
           'field_search_text_value' => $full_output,
         ];
         $insert = Drupal::database()
-          ->insert('node_revision__field_search_text');
+          ->upsert('node_revision__field_search_text')->key('revision_id');
         $insert->fields($fields);
         $insert->execute();
 
         if ($sandbox['revisions'][$vid] === 'current') {
-          $insert = Drupal::database()->insert('node__field_search_text');
+          $insert = Drupal::database()->upsert('node__field_search_text')->key('revision_id');
           $insert->fields($fields);
           $insert->execute();
         }
