@@ -1,0 +1,31 @@
+version: "3.6"
+
+services:
+  minio:
+    container_name: ddev-${DDEV_SITENAME}-minio
+    image: minio/minio
+    depends_on:
+      - localstack
+    command:
+      - minio
+      - server
+      - /data
+    environment:
+      MINIO_ACCESS_KEY: minio_access
+      MINIO_SECRET_KEY: minio_secret
+      # Setting this value allows minio to discover the bucket name by introspecting the
+      # HTTP Host header, enabling requests to http://drupal.minio:9000 to succeed.
+      MINIO_DOMAIN: minio
+    networks:
+      default:
+        aliases:
+          - web.minio
+      ddev_default:
+    expose:
+      - 9000
+    volumes:
+      - type: volume
+        source: minio-data
+        target: /data
+volumes:
+  minio-data: null

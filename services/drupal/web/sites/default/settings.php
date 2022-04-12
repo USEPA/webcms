@@ -905,9 +905,6 @@ $config['shield.settings']['method'] = 1;
 //  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
 //}
 
-if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
-  include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
-}
 
 $config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod') ? 'black' : 'red');
 $config['environment_indicator.indicator']['fg_color'] = '#fff';
@@ -923,6 +920,16 @@ $config['environment_indicator.indicator']['name'] = $env_name;
  *
  * Keep this code block at the end of this file to take full effect.
  */
+// Automatically generated include for settings managed by ddev.
+$ddev_settings = dirname(__FILE__) . '/settings.ddev.php';
+if (getenv('IS_DDEV_PROJECT') == 'true' && is_readable($ddev_settings)) {
+  require $ddev_settings;
+}
+
+if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
+  include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
+}
+
 if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
 }
