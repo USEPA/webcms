@@ -1,0 +1,22 @@
+uuid: ae02d573-e38c-4c33-bcb9-a5d829c6dddb
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.gallery_medium
+    - image.style.gallery_medium_tall
+    - image.style.gallery_small_tall
+id: responsive_gallery_image_tall
+label: 'Responsive Gallery Image Tall'
+image_style_mappings:
+  -
+    image_mapping_type: sizes
+    image_mapping:
+      sizes: '(max-width: 640px) calc(100vw - 2rem), 640px'
+      sizes_image_styles:
+        - gallery_medium_tall
+        - gallery_small_tall
+    breakpoint_id: responsive_image.viewport_sizing
+    multiplier: 1x
+breakpoint_group: responsive_image
+fallback_image_style: gallery_medium

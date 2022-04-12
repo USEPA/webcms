@@ -1,0 +1,14 @@
+version: '3.6'
+services:
+  gesso:
+    container_name: ddev-${DDEV_SITENAME}-gesso
+    image: forumone/gesso:3-node-v12-php-7.4
+    command: "sleep infinity"
+    volumes:
+      - ./../web/themes/epa_theme:/var/www/html/web/themes/epa_theme:cached
+      - ".:/mnt/ddev_config"
+    working_dir: /var/www/html/web/themes/epa_theme
+    networks: [default, ddev_default]
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT

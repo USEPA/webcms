@@ -1,0 +1,13 @@
+version: "3.6"
+services:
+  localstack:
+    container_name: ddev-${DDEV_SITENAME}-localstack
+    image: localstack/localstack:0.12.10
+    networks: [default, ddev_default]
+    expose:
+      - 4566:4566
+    environment:
+      LOCALSTACK_SERVICES: logs
+      LOCALSTACK_START_WEB: '0'
+      AWS_ACCESS_KEY_ID: foobar
+      AWS_SECRET_ACCESS_KEY: foobar

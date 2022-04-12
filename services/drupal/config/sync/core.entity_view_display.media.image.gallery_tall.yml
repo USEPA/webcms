@@ -1,0 +1,49 @@
+uuid: 4060fca6-ec57-47aa-8ab1-392ff5e338f3
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.gallery_tall
+    - field.field.media.image.field_legacy_caption
+    - field.field.media.image.field_legacy_image_alignment
+    - field.field.media.image.field_limit_file_accessibility
+    - field.field.media.image.field_media_image
+    - field.field.media.image.field_media_tags
+    - media.type.image
+    - responsive_image.styles.responsive_gallery_image_tall
+  module:
+    - layout_builder
+    - media_inline_embed
+    - responsive_image
+third_party_settings:
+  media_inline_embed:
+    embed_inline: false
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: media.image.gallery_tall
+targetEntityType: media
+bundle: image
+mode: gallery_tall
+content:
+  field_media_image:
+    type: responsive_image
+    label: hidden
+    settings:
+      responsive_image_style: responsive_gallery_image_tall
+      image_link: file
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  entitygroupfield: true
+  field_legacy_caption: true
+  field_legacy_image_alignment: true
+  field_limit_file_accessibility: true
+  field_media_tags: true
+  langcode: true
+  name: true
+  search_api_excerpt: true
+  thumbnail: true
+  uid: true

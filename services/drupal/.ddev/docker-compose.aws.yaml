@@ -1,0 +1,24 @@
+version: "3.6"
+services:
+  # AWS cli image set to talk to Minio. `f1 run aws s3 [ARG...]' is the replacement for
+  # `aws s3 [ARG...]' with overrides set.
+  aws:
+    image: xueshanf/awscli
+    container_name: ddev-${DDEV_SITENAME}-aws
+    #command: "aws s3 mb s3://drupal"
+    networks: [default, ddev_default]
+    depends_on:
+      - minio
+      - localstack
+    environment:
+      AWS_ACCESS_KEY_ID: minio_access
+      AWS_SECRET_ACCESS_KEY: minio_secret
+      AWS_DEFAULT_REGION: us-east-1
+    volumes:
+      - ./minio:/tmp/minio
+      - ".:/mnt/ddev_config"
+    command: "'sleep 2073600'"
+    entrypoint: /bin/sh -c
+    #entrypoint:
+    #  - aws
+    #  - --endpoint-url=http://minio:9000/

@@ -11,10 +11,12 @@
   {% set images = images|merge([
     {
       'caption': slide.caption|view({label: 'hidden', settings: {}}),
-      'media': slide.media|view({type: 'entity_reference_entity_view', label: 'hidden', settings: {view_mode: 'gallery'}}),
+      'media': slide.media|view({type: 'entity_reference_entity_view', label: 'hidden', settings: {view_mode: paragraph.field_slideshow_style.value}}),
     }
   ]) %}
 {% endfor %}
+
+{% set classes = paragraph.field_slideshow_style.value %}
 
 {% include '@components/image-gallery/image-gallery.twig' with {
   'modifier_classes': classes,
