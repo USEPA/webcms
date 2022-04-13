@@ -653,3 +653,12 @@ function epa_core_node_presave(EntityInterface $node) {
     $theme_manager->setActiveTheme($active_theme);
   }
 }
+
+/**
+ * Implements HOOK_form_FORM_ID_alter().
+ */
+function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+ if (!empty($form["field_search_text_value"])) {
+     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+ }
+}
