@@ -33,7 +33,7 @@ import Drupal from 'drupal';
         allowedDomains.forEach(domain => {
           if (
             linkElement.host === domain ||
-            linkElement.host.endsWith(domain)
+            linkElement.host.endsWith(`.${domain}`)
           ) {
             external = false;
           }
