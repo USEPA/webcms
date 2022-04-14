@@ -911,10 +911,10 @@ $config['shield.settings']['method'] = 1;
  */
 if (isset($_SERVER['HTTP_HOST'])) {
   $suffix_env_ind = '_epa';
-  if (stripos($_SERVER['HTTP_HOST'], '.byf1.io')) {
+  if (strpos($_SERVER['HTTP_HOST'], '.byf1.io')) {
     $suffix_env_ind = '_f1';
   }
-  elseif (stripos($_SERVER['HTTP_HOST'], '.byf1.dev') || stripos($_SERVER['HTTP_HOST'], '.ddev.site')) {
+  elseif (strpos($_SERVER['HTTP_HOST'], '.byf1.dev') || strpos($_SERVER['HTTP_HOST'], '.ddev.site')) {
     $suffix_env_ind = '_f1a';
   }
 
