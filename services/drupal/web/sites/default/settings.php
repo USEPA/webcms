@@ -914,7 +914,7 @@ if (isset($_SERVER['HTTP_HOST'])) {
   if (stripos($_SERVER['HTTP_HOST'], '.byf1.io')) {
     $suffix_env_ind = '_f1';
   }
-  elseif (stripos($_SERVER['HTTP_HOST'], '.byf1.dev')) {
+  elseif (stripos($_SERVER['HTTP_HOST'], '.byf1.dev') || stripos($_SERVER['HTTP_HOST'], '.ddev.site')) {
     $suffix_env_ind = '_f1a';
   }
 
