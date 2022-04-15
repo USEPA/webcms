@@ -1,0 +1,168 @@
+# This file performs a deployment of the WebCMS to a specific site. It covers
+# both English and Spanish, and deploys them in parallel.
+#
+# The steps executed by this pipeline are as follows:
+#
+# 1. First, use Kaniko to build this project's Docker images. The images are
+#    built in parallel using a Buildkite matrix.
+# 2. We use a wait step to force Buildkite to pause until the image build
+#    completed successfully. If the build failed, then we most likely wouldn't
+#    have a full set of images to deploy and thus wouldn't be able to continue
+#    safely.
+# 3. We use the terraform.apply.yml template to run our application deployment.
+
+env:
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+  WEBCMS_SITE: ${WEBCMS_SITE}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG}
+  WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
+
+steps:
+  # This grouped step is identical to that of .buildkite/feature.yml. See the
+  # comments there for more information.
+  - group: ":docker: Build images"
+    steps:
+      - label: "Build {{matrix}}"
+        matrix:
+          - drupal
+          - nginx
+          - drush
+
+        concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
+        concurrency: 4
+
+        env:
+          TARGET: '{{matrix}}'
+
+        plugins:
+          - cultureamp/aws-assume-role#v0.1.0:
+              role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+
+          # Execute a Kaniko-powered build.
+          - docker#v3.12.0:
+              image: gcr.io/kaniko-project/executor:debug
+              workdir: /workspace
+
+              propagate-aws-auth-tokens: true
+              environment:
+                - TARGET
+
+              # Ensure this build script is kept in line with that of
+              # feature.yml, save for the use of the --destination flag to push
+              # the built image to the registry.
+              entrypoint: /bin/sh
+              command:
+                - -ec
+                - |
+                    echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+                    /kaniko/executor \
+                      --context=/workspace/services/drupal \
+                      --cache \
+                      --cache-copy-layers \
+                      --cache-repo="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-cache" \
+                      --skip-unused-stages \
+                      --snapshotMode=redo \
+                      --use-new-run \
+                      --target="$$TARGET" \
+                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-$$TARGET:${WEBCMS_IMAGE_TAG}"
+
+      - label: "Build fpm-metrics"
+        concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
+        concurrency: 4
+
+        plugins:
+          - cultureamp/aws-assume-role#v0.1.0:
+              role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
+
+          - docker#v3.12.0:
+              image: gcr.io/kaniko-project/executor:debug
+              workdir: /workspace
+
+              propagate-aws-auth-tokens: true
+
+              entrypoint: /bin/sh
+              command:
+                - -ec
+                - |
+                    echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+                    /kaniko/executor \
+                      --context=/workspace/services/metrics \
+                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
+
+  - wait: ~
+
+  - label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/en
+      WEBCMS_TF_MODULE: webcms
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: en
+
+  - label: ":terraform: WebCMS (${WEBCMS_SITE}-es)"
+    command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
+    env:
+      WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/${WEBCMS_SITE}/es
+      WEBCMS_TF_MODULE: webcms
+      WEBCMS_SITE: ${WEBCMS_SITE}
+      WEBCMS_LANG: es
+
+  - wait: ~
+
+  - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-en
+    concurrency: 1
+
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
+
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG=en
+            - WEBCMS_IMAGE_TAG
+
+            # Propagate the BUILDKITE=true environment variable to tell the script to link to the logs
+            - BUILDKITE
+
+  - label: ":ecs: Drush (${WEBCMS_SITE}-es)"
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-es
+    concurrency: 1
+
+    plugins:
+      - cultureamp/aws-assume-role#v0.1.0:
+          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
+
+      - docker#v3.8.0:
+          image: node:14-alpine
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd ci
+              npm ci
+              node drush.js
+
+          propagate-aws-auth-tokens: true
+          environment:
+            - AWS_REGION=us-east-2
+            - WEBCMS_ENVIRONMENT
+            - WEBCMS_SITE
+            - WEBCMS_LANG=es
+            - WEBCMS_IMAGE_TAG
+            - BUILDKITE

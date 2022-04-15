@@ -1,0 +1,57 @@
+# The structure of this file is, intentionally, a mirror of the pipeline in
+# terraform.plan.yml. The only difference is that the script executed in the Terraform
+# container actually applies the plan file. Do not use this pipeline for branches that
+# do not perform deployments.
+
+env:
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT?}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG?}
+
+  WEBCMS_SSM_NAMESPACE: ${WEBCMS_SSM_NAMESPACE?}
+
+  WEBCMS_TF_MODULE: ${WEBCMS_TF_MODULE?}
+
+  WEBCMS_SITE: ${WEBCMS_SITE:-}
+  WEBCMS_LANG: ${WEBCMS_LANG:-}
+
+  AWS_REGION: us-east-2
+
+steps:
+  - label: ":terraform: Apply ${WEBCMS_TF_MODULE} (${WEBCMS_SITE} ${WEBCMS_LANG})"
+
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/terraform-${WEBCMS_TF_MODULE}-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-${WEBCMS_LANG}
+    concurrency: 1
+
+    plugins:
+      - ./.buildkite/plugins/aws-parameters:
+          role: arn:aws:iam::316981092358:role/BuildkiteParameterReadRole
+          params:
+            - key: ${WEBCMS_SSM_NAMESPACE}/backend
+              file: terraform/${WEBCMS_TF_MODULE}/backend.tf
+            - key: ${WEBCMS_SSM_NAMESPACE}/providers
+              file: terraform/${WEBCMS_TF_MODULE}/providers_override.tf
+            - key: ${WEBCMS_SSM_NAMESPACE}/variables
+              file: terraform/${WEBCMS_TF_MODULE}/terraform.tfvars
+
+      - docker#v3.8.0:
+          # NB. When upgrading Terraform versions, make sure that this version is kept in
+          # sync with terraform.plan.yaml.
+          image: hashicorp/terraform:0.14.9
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd terraform/${WEBCMS_TF_MODULE}
+
+              terraform init
+              terraform plan -out plan
+              terraform apply plan
+          environment:
+            - TF_INPUT=0
+            - TF_IN_AUTOMATION=1
+
+            - TF_VAR_aws_region=us-east-2
+            - TF_VAR_environment=${WEBCMS_ENVIRONMENT}
+            - TF_VAR_site=${WEBCMS_SITE}
+            - TF_VAR_lang=${WEBCMS_LANG}
+            - TF_VAR_image_tag=${WEBCMS_IMAGE_TAG}

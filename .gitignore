@@ -20,9 +20,16 @@ docker-compose.override.yml
 *.tfstate
 *.tfstate.backup
 *.tfvars
+override.tf
+*_override.tf
 
-# Terraform override files
-*override.tf
+# Explicitly ignore backend configuration; these values need to be injected by CI/CD
+# systems
+backend.tf
+backend_override.tf
+
+# Do not ignore the database module's backend.tf. See README.md for more.
+!terraform/database/backend.tf
 
 # A local one-off script
 /scripts/stage-command.sh
