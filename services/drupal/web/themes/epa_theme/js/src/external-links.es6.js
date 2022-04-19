@@ -9,6 +9,14 @@ import Drupal from 'drupal';
         'webcms-uploads-stage.s3.amazonaws.com',
         'webcms-uploads-prod.s3.amazonaws.com',
         'webcms-uploads-qa.s3.amazonaws.com',
+        'airknowledge.gov',
+        'airnow.gov',
+        'clu-in.org',
+        'energystar.gov',
+        'relocatefeds.gov',
+        'urbanwaterpartners.gov',
+        'urbanwaters.gov',
+        'westcoastcollaborative.org',
       ];
       function linkIsExternal(linkElement) {
         let external = true;
@@ -21,9 +29,15 @@ import Drupal from 'drupal';
         ) {
           external = false;
         }
-        if (allowedDomains.includes(linkElement.host)) {
-          external = false;
-        }
+
+        allowedDomains.forEach(domain => {
+          if (
+            linkElement.host === domain ||
+            linkElement.host.endsWith(`.${domain}`)
+          ) {
+            external = false;
+          }
+        });
 
         return external;
       }

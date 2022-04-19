@@ -1,6 +1,11 @@
+{% if flag %}
+  {% set layout_classes = 'desktop:grid-col-6' %}
+{% endif %}
+
 {% set classes = [
   'usa-card',
   modifier_classes ? modifier_classes,
+  flag ? 'usa-card--flag',
   layout_classes ? layout_classes : 'tablet:grid-col-4'
 ]|join(' ')|trim %}
 
