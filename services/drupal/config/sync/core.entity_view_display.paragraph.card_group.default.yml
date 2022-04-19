@@ -3,15 +3,24 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.card_group.field_card_style
     - field.field.paragraph.card_group.field_cards
     - paragraphs.paragraphs_type.card_group
   module:
     - entity_reference_revisions
+    - options
 id: paragraph.card_group.default
 targetEntityType: paragraph
 bundle: card_group
 mode: default
 content:
+  field_card_style:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: list_key
+    region: content
   field_cards:
     type: entity_reference_revisions_entity_view
     label: hidden
