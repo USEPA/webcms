@@ -1,86 +1,12 @@
-# Generate a random ID for the ECS capacity provider to work around limitations in the AWS
-# API. At the time of writing, capacity providers can't be deleted. By using a randomly-generated
-# ID, we force Terraform to create new capacity providers whenever a destroy-and-replace
-# operation would be needed.
-#
-# Terraform's random provider is somewhat strange if you're not used to it: it stores
-# the randomly-generated value in its state in order to ensure that the value is consistent
-# between plan/apply runs (that is, it's only ever generated once). If there is more
-#
-# Further reading:
-# * https://www.terraform.io/docs/providers/aws/r/ecs_capacity_provider.html
-# * https://www.terraform.io/docs/providers/random/index.html
-
-# Save scaling factors as locals because we use them for keepers
-locals {
-  # Scale by 2 EC2s or 10% of the group's max capacity, whichever is greater
-  ecs-min-step-size = max(2, ceil(0.10 * var.server-max-capacity))
-
-  ecs-max-step-size = var.server-max-capacity
-}
-
-resource "random_pet" "capacity_provider" {
-  # A length of 2 gives us a pet name plus an adjective, which can hopefully give a
-  # useful mnemonic when looking at the capacity provider list.
-  length = 2
-
-  keepers = {
-    minimum_scaling_step_size = local.ecs-min-step-size
-    maximum_scaling_step_size = local.ecs-max-step-size
-  }
-}
-
-# Create the cluster's capacity provider first
-resource "aws_ecs_capacity_provider" "cluster_capacity" {
-  name = "webcms-capacity-${random_pet.capacity_provider.id}"
-
-  # This capacity provider draws from our EC2 autoscaling group
-  auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.servers.arn
-
-    managed_scaling {
-      status = "ENABLED"
-
-      # Aim for 75% utilization of the autoscaling group
-      target_capacity = 75
-
-      minimum_scaling_step_size = local.ecs-min-step-size
-      maximum_scaling_step_size = local.ecs-max-step-size
-    }
-
-    # managed_termination_protection = "ENABLED"
-  }
-
-  tags = merge(local.common-tags, {
-    # Give this capacity provider a name that matches the random_pet to aid debugging/triage
-    Name = "${local.name-prefix} ${random_pet.capacity_provider.id}"
-  })
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 # ECS cluster
 resource "aws_ecs_cluster" "cluster" {
   name = local.cluster-name
 
-  capacity_providers = [
-    # This is the mixed spot instances pool for stateless functionality - namely, Drupal.
-    aws_ecs_capacity_provider.cluster_capacity.name,
-
-    # This is an AWS-managed serverless-style capacity provider for on-demand Drush tasks.
-    # It offers a reasonable balance of performance and cost.
-    "FARGATE",
-
-    # For extremely CPU-intensive applications, however, this capacity provider can be
-    # used to bring in an extremely powerful instance.
-    aws_ecs_capacity_provider.migration_capacity.name,
-  ]
+  capacity_providers = ["FARGATE"]
 
   # We assume that all services will use the default autoscaling group as its capacity provider
   default_capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.cluster_capacity.name
+    capacity_provider = "FARGATE"
     weight            = 100
   }
 
@@ -113,6 +39,8 @@ resource "aws_ecs_task_definition" "drupal_task" {
   network_mode       = "awsvpc"
   task_role_arn      = aws_iam_role.drupal_container_role.arn
   execution_role_arn = aws_iam_role.drupal_execution_role.arn
+
+  requires_compatibilities = ["FARGATE"]
 
   # Setting reservations at the task level lets Docker be more flexible in how the
   # resources are used (mainly, it allows Drupal to soak up as much CPU capacity as it
@@ -153,8 +81,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.drupal.name,
-          awslogs-region = var.aws-region
+          awslogs-group         = aws_cloudwatch_log_group.drupal.name,
+          awslogs-region        = var.aws-region
+          awslogs-stream-prefix = "drupal"
         }
       }
     },
@@ -176,15 +105,23 @@ resource "aws_ecs_task_definition" "drupal_task" {
         # Inject the S3 domain name so that nginx can proxy to it - we do this instead of
         # the region and bucket name because in us-east-1, the domain isn't easy to
         # construct via "$bucket.s3-$region.amazonaws.com".
-        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name }
+        { name = "WEBCMS_S3_DOMAIN", value = aws_s3_bucket.uploads.bucket_regional_domain_name },
+
+        # Pass all the valid domain names as $WEBCMS_SERVER_NAMES
+        { name = "WEBCMS_SERVER_NAMES", value = join(" ", concat([var.site-hostname], var.alb-hostnames)) },
       ]
 
       # As with the Drupal container, we ask ECS to restart this task if nginx fails
       essential = true,
 
-      # Expose port 80 from the task. This is an HTTP port and is thus suitable for granting
-      # access to a load balancer.
-      portMappings = [{ containerPort = 80 }],
+      # Expose ports 80 and 443 from the task. These are both unencrypted HTTP ports; the
+      # difference is that port 80 is used for the HTTP->HTTPS upgrade, and port 443 is
+      # used to forward requests to Drupal. (The load balancer handles TLS termination
+      # for us.)
+      portMappings = [
+        { containerPort = 80 },
+        { containerPort = 443 },
+      ],
 
       dependsOn = [
         { containerName = "drupal", condition = "START" }
@@ -195,8 +132,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.nginx.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.nginx.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "nginx"
         }
       }
     },
@@ -228,8 +166,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.agent.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.agent.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "cloudwatch"
         }
       }
     },
@@ -380,8 +319,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
         logDriver = "awslogs",
 
         options = {
-          awslogs-group  = aws_cloudwatch_log_group.fpm_metrics.name,
-          awslogs-region = var.aws-region,
+          awslogs-group         = aws_cloudwatch_log_group.fpm_metrics.name,
+          awslogs-region        = var.aws-region,
+          awslogs-stream-prefix = "fpm-metrics"
         }
       }
     }
@@ -424,7 +364,7 @@ resource "aws_ecs_service" "drupal" {
 
   capacity_provider_strategy {
     base              = 0
-    capacity_provider = aws_ecs_capacity_provider.cluster_capacity.name
+    capacity_provider = "FARGATE"
     weight            = 100
   }
 
@@ -436,7 +376,14 @@ resource "aws_ecs_service" "drupal" {
   load_balancer {
     container_name   = "nginx"
     container_port   = 80
-    target_group_arn = aws_lb_target_group.drupal_target_group.arn
+    target_group_arn = aws_lb_target_group.drupal_http_target_group.arn
+  }
+
+  # Advertise port 443 to the load balancer
+  load_balancer {
+    container_name   = "nginx"
+    container_port   = 443
+    target_group_arn = aws_lb_target_group.drupal_https_target_group.arn
   }
 
   # Since we're running our tasks in AWSVPC mode, we have to give extra VPC configuration.
@@ -447,13 +394,6 @@ resource "aws_ecs_service" "drupal" {
     assign_public_ip = false
 
     security_groups = local.drupal-security-groups
-  }
-
-  # Ask ECS to prioritize spreading tasks across available EC2 instances before running
-  # multiple copies on a server. This should alleviate downtime
-  ordered_placement_strategy {
-    field = "instanceId"
-    type  = "spread"
   }
 
   # Ignore changes to the desired_count attribute - we assume that the application
@@ -481,40 +421,7 @@ data "aws_arn" "alb" {
 }
 
 data "aws_arn" "target_group" {
-  arn = aws_lb_target_group.drupal_target_group.arn
-}
-
-# Define an autoscaling rule. We scale when the load balancer reports an average of more
-# than 50 requests/target, indicating a high volume of traffic spread across too few
-# containers. If the metric goes above this threshold, ECS will add replicas of the
-# Drupal task.
-resource "aws_appautoscaling_policy" "drupal_autoscaling_elb" {
-  count = length(aws_appautoscaling_target.drupal)
-
-  name        = "webcms-drupal-scaling-elb-${local.env-suffix}"
-  policy_type = "TargetTrackingScaling"
-
-  # These identify what we're scaling (see the autoscaling target above)
-  # NB. Since these resources are all conditionally created, we key on count.index to
-  # avoid Terraform warnings about resource lists.
-  resource_id        = aws_appautoscaling_target.drupal[count.index].id
-  scalable_dimension = aws_appautoscaling_target.drupal[count.index].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.drupal[count.index].service_namespace
-
-  # Autoscaling rules: What is the condition that triggers scaling of the above target?
-  target_tracking_scaling_policy_configuration {
-    target_value = 50
-
-    # Wait 5 minutes before scaling in, but only 1 for scaling out.
-    scale_in_cooldown  = 5 * 60
-    scale_out_cooldown = 60
-
-    # Which metrics are we monitoring
-    predefined_metric_specification {
-      predefined_metric_type = "ALBRequestCountPerTarget"
-      resource_label         = "${substr(data.aws_arn.alb.resource, length("loadbalancer/"), length(data.aws_arn.alb.resource))}/${data.aws_arn.target_group.resource}"
-    }
-  }
+  arn = aws_lb_target_group.drupal_https_target_group.arn
 }
 
 # We define a second autoscaling policy to track high CPU usage. If CPU is above this
