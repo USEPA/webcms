@@ -79,12 +79,6 @@ variable "vpc-existing-gateway" {
   default     = null
 }
 
-variable "vpc-create-interfaces" {
-  description = "Should endpoint interfaces be created for EC2 and SSM?"
-  type        = bool
-  default     = true
-}
-
 variable "vpc-subnet-block" {
   description = "CIDR block to use when allocating subnets. Defaults to using the full CIDR range of the VPC."
   type        = string
@@ -152,26 +146,7 @@ variable "server-max-capacity" {
   type        = number
 }
 
-# Since we can't use iteration in a nested override block, we have to pick a number of
-# instances. We choose 3 for no particular reason other than it corresponds to AWS'
-# generic instance types: t2, t3, and t3a.
-#
-# Note that limitations in Terraform's ability to handle dynamic lists means that we have
-# to fix the number of instance types at 3. These can vary by generation (as mentioned
-# above, the dev site uses the same size across the t2, t3, and t3a generations), but they
-# could also vary by instance size (e.g., medium, large, and xlarge). We assume that the
-# dynamics of the spot instance market will defray the costs incurred by using older
-# generation (or larger size) instances.
-variable "server-instance-types" {
-  description = "Instance types to use with the WebCMS' servers (spot and on-demand)"
-
-  type = object({
-    primary   = string
-    secondary = string
-    tertiary  = string
-  })
-}
-
+# Extra options for the utility ASG
 variable "server-extra-bootstrap" {
   description = "Additional bootstrap code to run on the cluster EC2s"
   type        = string
