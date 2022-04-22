@@ -137,6 +137,8 @@ steps:
 
   - label: ":pipeline: :terraform: network"
     commands:
+      # Prevent WEBCMS_SITE from creating multiple concurrency groups for this
+      # Terraform plan run.
       - unset WEBCMS_SITE
       - buildkite-agent pipeline upload .buildkite/terraform.plan.yml
     env:
