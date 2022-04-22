@@ -16,6 +16,12 @@ function epa_theme_preprocess_filter_caption(&$vars) {
   foreach ($dom->getElementsByTagName('drupal-media') as $node) {
     $new_node = $node->cloneNode(TRUE);
 
+    if ($media = \Drupal::entityTypeManager()->getStorage('media')->loadByProperties(['uuid' => $node->getAttribute('data-entity-uuid')])) {
+      $media = reset($media);
+      $vars['bundle'] = $media->bundle();
+      if ($vars['bundle'] == 'remote_video') $vars['bundle'] = 'video'; // Map this to video since we have been using this term in our css everywhere already.
+    }
+
     // Re-insert the caption attribute into the media tag so that it is available
     // when rendering the media itself. This allows us to make decisions during
     // media rendering based upon whether or not there's a caption.
