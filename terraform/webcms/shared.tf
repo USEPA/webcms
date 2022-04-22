@@ -55,11 +55,11 @@ data "aws_ssm_parameter" "elasticsearch_endpoint" {
 #region Cron
 
 data "aws_ssm_parameter" "cron_event_rule" {
-  name = "/webcms/${var.environment}/cron/event-rule"
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-rule"
 }
 
 data "aws_ssm_parameter" "cron_event_role" {
-  name = "/webcms/${var.environment}/cron/event-role"
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-role"
 }
 
 #endregion
