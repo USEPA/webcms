@@ -140,12 +140,14 @@ steps:
     env:
       WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/network
       WEBCMS_TF_MODULE: network
+      WEBCMS_SITE: ''
 
   - label: ":pipeline: :terraform: infrastructure"
     command: buildkite-agent pipeline upload .buildkite/terraform.plan.yml
     env:
       WEBCMS_SSM_NAMESPACE: /terraform/${WEBCMS_ENVIRONMENT}/infrastructure
       WEBCMS_TF_MODULE: infrastructure
+      WEBCMS_SITE: ''
 
   # We arbitrarily choose English for a Terraform plan. The two sites' configurations
   # should not be so different that this will miss subtleties with Spanish-language
