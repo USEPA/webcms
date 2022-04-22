@@ -3,22 +3,7 @@ display:
   default:
     display_title: 'Por defecto'
     display_options:
-      exposed_form:
-        options:
-          submit_button: Filtro
-          reset_button_label: Restablecer
-          exposed_sorts_label: 'Ordenar por'
-          sort_asc_label: Asc
-          sort_desc_label: Desc
-      pager:
-        options:
-          expose:
-            items_per_page_label: 'Elementos por página'
-            items_per_page_options_all_label: '- Todo -'
-            offset_label: Desplazamiento
-          tags:
-            previous: '‹ Anterior'
-            next: 'Siguiente >'
+      title: Multimedia
       fields:
         media_bulk_form:
           action_title: Acción
@@ -39,13 +24,28 @@ display:
           separator: ', '
         operations:
           label: Operaciones
+      pager:
+        options:
+          tags:
+            next: 'Siguiente >'
+            previous: '‹ Anterior'
+          expose:
+            items_per_page_label: 'Elementos por página'
+            items_per_page_options_all_label: '- Todo -'
+            offset_label: Desplazamiento
+      exposed_form:
+        options:
+          submit_button: Filtro
+          reset_button_label: Restablecer
+          exposed_sorts_label: 'Ordenar por'
+          sort_asc_label: Asc
+          sort_desc_label: Desc
+      empty:
+        area_text_custom:
+          content: 'No hay medios disponibles.'
       filters:
         bundle:
           expose:
             label: Tipo
-      title: Multimedia
-      empty:
-        area_text_custom:
-          content: 'No hay medios disponibles.'
   media_page_list:
     display_title: Multimedia
