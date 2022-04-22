@@ -60,6 +60,27 @@ resource "aws_ssm_parameter" "elasticsearch_endpoint" {
 
 #region Cron
 
+resource "aws_ssm_parameter" "cron_event_rule_per_site" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-rule"
+  type  = "String"
+  value = aws_cloudwatch_event_rule.cron_per_site[each.value.site].name
+
+  tags = var.tags
+}
+
+resource "aws_ssm_parameter" "cron_event_role_per_site" {
+  for_each = local.sites
+
+  name = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-role"
+  type = "String"
+  value = aws_iam_role.events.arn
+
+  tags = var.tags
+}
+
+# Keep the legacy parameters for compatibility with existing deployments
 resource "aws_ssm_parameter" "cron_event_rule" {
   name  = "/webcms/${var.environment}/cron/event-rule"
   type  = "String"
