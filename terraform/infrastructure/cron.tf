@@ -64,10 +64,25 @@ resource "aws_iam_role_policy_attachment" "events_task_execution" {
   policy_arn = aws_iam_policy.events_task_execution.arn
 }
 
+# This event rule circumvents EventBridge quotas: without this, it is impossible
+# to run more than two sites in the same environment. Each site requires two
+# targets: one each for Drush on English and Spanish, and there is a maximum of
+# five targets per EventBridge rule. Hence, a third site will run into the quota
+# and fail to deploy.
+resource "aws_cloudwatch_event_rule" "cron_per_site" {
+  for_each = toset(var.sites)
+
+  name        = "WebCMS-${var.environment}-${each.key}-CronSchedule"
+  description = "Invokes Drush cron for the ${each.key} site"
+
+  # Run cron every 2 minutes
+  schedule_expression = "rate(2 minutes)"
+}
+
+# Keep the legacy schedule for compatibility with existing deployments
 resource "aws_cloudwatch_event_rule" "cron" {
   name        = "WebCMS-${var.environment}-CronSchedule"
   description = "Invokes Drush cron"
 
-  # Run cron every 2 minutes
   schedule_expression = "rate(2 minutes)"
 }
