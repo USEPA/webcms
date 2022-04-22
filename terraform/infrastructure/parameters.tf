@@ -73,8 +73,8 @@ resource "aws_ssm_parameter" "cron_event_rule_per_site" {
 resource "aws_ssm_parameter" "cron_event_role_per_site" {
   for_each = local.sites
 
-  name = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-role"
-  type = "String"
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-role"
+  type  = "String"
   value = aws_iam_role.events.arn
 
   tags = var.tags
