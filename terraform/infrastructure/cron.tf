@@ -75,8 +75,8 @@ resource "aws_cloudwatch_event_rule" "cron_per_site" {
   name        = "WebCMS-${var.environment}-${each.key}-CronSchedule"
   description = "Invokes Drush cron for the ${each.key} site"
 
-  # Run cron every 2 minutes
-  schedule_expression = "rate(2 minutes)"
+  # Run cron every 5 minutes
+  schedule_expression = "rate(5 minutes)"
 }
 
 # Keep the legacy schedule for compatibility with existing deployments
@@ -84,5 +84,5 @@ resource "aws_cloudwatch_event_rule" "cron" {
   name        = "WebCMS-${var.environment}-CronSchedule"
   description = "Invokes Drush cron"
 
-  schedule_expression = "rate(2 minutes)"
+  schedule_expression = "rate(5 minutes)"
 }
