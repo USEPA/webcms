@@ -304,11 +304,14 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $groups = \Drupal::service('epa_web_areas.web_areas_helper')
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
-            $contact_form = $group->field_contact_us_form->target_id;
-            $bubbleable_metadata->addCacheableDependency($group);
-            $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
-            $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
-              ->toString() : $original;
+            if ($forms = $group->field_contact_us_form->referencedEntities()) {
+              $contact_form = reset($forms);
+              $bubbleable_metadata->addCacheableDependency($group);
+              $bubbleable_metadata->addCacheableDependency($contact_form);
+              $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form->id()]) : NULL;
+              $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
+                ->toString() : $original;
+            }
           }
         }
         break;
