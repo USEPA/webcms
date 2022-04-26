@@ -1,0 +1,178 @@
+# This file is a template pipeline for Terraform plans. The pipeline is parameterized by a
+# few environment variables that must be present when it is uploaded:
+#
+# - WEBCMS_ENVIRONMENT: The environment for this module. See terraform/README.md for a
+#   more thorough definition.
+#
+# - WEBCMS_IMAGE_TAG: The image tag being deployed. Note that while not all modules use
+#   this value, all pipelines will have the image tag inherited from parent.yml. Thus, we
+#   assume that its absence is a symptom of a configuration problem.
+#
+# - WEBCMS_SSM_NAMESPACE: The path to the Parameter Store-based configuration for this
+#   plan run. We inject three files into the module:
+#
+#   1. The backend configuration (required per discussion in terraform/README.md),
+#   2. A provider override to switch to AssumeRole-based authentication, and
+#   3. The variables pertaining to this run.
+#
+#   The override is a convenience: instead of using an AssumeRole plugin in the Buildkite
+#   agent and having the Docker plugin propagate that auth into the container, we use
+#   Terraform's native support for AssumeRole. This allows the SDK to refresh credentials
+#   should they expire, and also prevents leaking authentication tokens to the console
+#   since they won't be part of the agent environment.
+#
+#   We save variables in Parameter Store in tfvars format. Different modules have
+#   different requirements, and it is difficult to parameterize an unknown number of
+#   TF_VAR_* environment variables. Thus, we use Parameter Store.
+#
+#   As mentioned in this directory's README, the Parameter Store namespace expects the
+#   following convention:
+#
+#   - The backend configuration can be found at ${WEBCMS_SSM_NAMESPACE}/backend
+#   - The provider override can be found at ${WEBCMS_SSM_NAMESPACE}]providers
+#   - The variables can be found at ${WEBCMS_SSM_NAMESPACE}/variables
+#
+#   We don't construct the namespace by convention, as the network and infrastructure
+#   modules use a different hierarchy than the webcms module does. Specifically, the
+#   webcms is the only module where these inputs are scoped by WEBCMS_SITE and
+#   WEBCMS_LANG, so it will be the only module that has those values in its Parameter
+#   Store path. If we did this unconditionally, the empty values would result in a path
+#   containing "///", which causes the API to return a validation error.
+#
+# - WEBCMS_TF_MODULE: The module being planned by Terraform. This corresponds to a
+#   subdirectory of terraform/.
+#
+# Additionally, there are two optional parameters that can further scope the module being
+# planned:
+#
+# - WEBCMS_SITE: The name of the site (e.g., dev, prod) targeted by this plan
+# - WEBCMS_LANG: The language (en or es) targeted by this plan
+#
+# In the env block below, we have to mark both of them as optional, but in reality, it is
+# likely a mistake if you supply one but not the other. We assume that our Terraform
+# validations will catch this issue before a larger plan is executed.
+#
+# The entire env block is, strictly speaking, superfluous: the agent already has access to
+# these environment variables, and we don't use them in scripts where the agent hasn't
+# already performed substitution. We do this anyway for a two reasons:
+#
+# 1. The special syntax ${NAME?} forces the agent to fail immediately if the variable NAME
+#    wasn't found in the environment. This allows us to avoid a problem cascade wherein
+#    Terraform used the string and created weirdly-named resources or caused
+#    hard-to-diagnose errors.
+#
+# 2. By listing the variables here, it serves as a documentation block of sorts for the
+#    inputs this pipeline expects.
+
+env:
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT?}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG?}
+
+  WEBCMS_SSM_NAMESPACE: ${WEBCMS_SSM_NAMESPACE?}
+  WEBCMS_TF_MODULE: ${WEBCMS_TF_MODULE?}
+
+  WEBCMS_SITE: ${WEBCMS_SITE:-}
+  WEBCMS_LANG: ${WEBCMS_LANG:-}
+
+  AWS_REGION: us-east-2
+
+steps:
+  # Label this step with the module. Note that for the infrastructure and network modules,
+  # the label will end with "( )", but this is as good as we can do with simple string
+  # interpolation.
+  - label: ":terraform: Plan ${WEBCMS_TF_MODULE} (${WEBCMS_SITE} ${WEBCMS_LANG})"
+
+    # The concurrency group here, while unwieldy, serves a few different purposes:
+    #
+    # 1. Concurrency group names in Buildkite are global to the Buildkite organization. We
+    #    introduce a namespace of sorts by using the pipeline slug as a prefix.
+    #
+    # 2. We want to be able to execute separate Terraform runs in parallel, but prevent
+    #    overlapping Terraform runs. A concrete example: it should be possible to run
+    #    Terraform against the English and Spanish sites at the same time, and build
+    #    multiple environments at the same time.
+    #
+    #    A Buildkite concurrency group is the perfect solution for this problem. While we
+    #    do make use of DynamoDB for locking, Terraform's behavior is report an error and
+    #    exit immediately. (This is often desirable in case a run failed without releasing
+    #    the lock.) What we want during a build is to wait for the current plan/apply to
+    #    finish before starting ours, which is the exact behavior of a concurrency group.
+    #
+    # As a final note, we unconditionally interpolate $WEBCMS_SITE and $WEBCMS_LANG
+    # despite them not always being set to a non-empty value. This is not an issue for
+    # Buildkite, it just means that the network and infrastructure modules' concurrency
+    # group names will end with "--". The group name doesn't have to look pretty, it just
+    # has to work.
+    concurrency_group: $BUILDKITE_PIPELINE_SLUG/terraform-${WEBCMS_TF_MODULE}-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-${WEBCMS_LANG}
+    concurrency: 1
+
+    plugins:
+      # This plugin is responsible for copying the Terraform configuration from Parameter
+      # Store into files to be read by the Terraform CLI. See the discussion in the
+      # comments above for what the parameters are for.
+      - ./.buildkite/plugins/aws-parameters:
+          role: arn:aws:iam::316981092358:role/BuildkiteParameterReadRole
+          params:
+            - key: ${WEBCMS_SSM_NAMESPACE}/backend
+              file: terraform/${WEBCMS_TF_MODULE}/backend.tf
+            - key: ${WEBCMS_SSM_NAMESPACE}/providers
+              file: terraform/${WEBCMS_TF_MODULE}/providers_override.tf
+            - key: ${WEBCMS_SSM_NAMESPACE}/variables
+              file: terraform/${WEBCMS_TF_MODULE}/terraform.tfvars
+
+      # Having loaded the configuration and ensured Terraform runs aren't overlapping each
+      # other, we can finally execute the official Terraform Docker image.
+      #
+      # This plugin performs a short script that changes to the module directory,
+      # initializes the backend and providers, and then outputs the Terraform plan to the
+      # Buildkite build logs.
+      #
+      # The environment variables we provide to the Terraform container can be broken down
+      # into two categories:
+      #
+      # 1. Variables that affect Terraform's behavior:
+      #
+      #   - TF_INPUT: The Buildkite agent emulates a standard terminal when executing
+      #     build jobs, and this means that Terraform thinks there is a human operator
+      #     present. By setting this explicitly to 0, we override this heuristic and force
+      #     it to fail when a required variable is not set.
+      #
+      #   - TF_IN_AUTOMATION: This asks Terraform to make its output more amenable to logs
+      #     and CI/CD runs. There is no specific guarantee by Terraform as to what changes
+      #     this makes, but it is consistent with the recommendations for CI/CD
+      #     implementations of Terraform, so we leave it set.
+      #
+      # 2. Default values for module inputs. The Terraform CLI treats this differently
+      #    than variables assigned in a .tfvars file or via the -var flag. If a variable
+      #    is not declared by the module, then Terraform will not read the corresponding
+      #    environment variable. This allows us to set values that may not be used without
+      #    the CLI reporting spurious errors.
+      #
+      #    All modules have variables named "aws_region" and "environment", so we populate
+      #    those using their corresponding TF_VAR_* environment variables. In addition, we
+      #    copy a few variables only used by the webcms module:
+      #
+      #    - TF_VAR_site is set to the value of WEBCMS_SITE
+      #    - TF_VAR_lang is set to the value of WEBCMS_LANG
+      #    - TF_VAR_image_tag is set to the value of WEBCMS_IMAGE_TAG
+      - docker#v3.8.0:
+          # NB. When upgrading Terraform versions, make sure that this version is kept in
+          # sync with terraform.apply.yaml.
+          image: hashicorp/terraform:0.14.9
+          entrypoint: /bin/sh
+          command:
+            - -ec
+            - |
+              cd terraform/${WEBCMS_TF_MODULE}
+
+              terraform init
+              terraform plan
+          environment:
+            - TF_INPUT=0
+            - TF_IN_AUTOMATION=1
+
+            - TF_VAR_aws_region=us-east-2
+            - TF_VAR_environment=${WEBCMS_ENVIRONMENT}
+            - TF_VAR_site=${WEBCMS_SITE}
+            - TF_VAR_lang=${WEBCMS_LANG}
+            - TF_VAR_image_tag=${WEBCMS_IMAGE_TAG}
