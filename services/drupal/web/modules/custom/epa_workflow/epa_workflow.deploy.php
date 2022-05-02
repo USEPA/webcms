@@ -13,7 +13,7 @@ function epa_workflow_deploy_0001_fix_broken_type_references(&$sandbox) {
              WHERE field_type_target_id NOT IN (
                 SELECT tid from taxonomy_term_data where vid = 'type'
              );")
-      ->fetchCol('entity_id');
+      ->fetchCol();
 
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
@@ -29,7 +29,7 @@ function epa_workflow_deploy_0001_fix_broken_type_references(&$sandbox) {
             SELECT tid from taxonomy_term_data where vid = 'type'
         )
         LIMIT 25;")
-    ->fetchCol('entity_id');
+    ->fetchCol();
 
   if (empty($nids)) {
     $sandbox['#finished'] = 1;
@@ -229,7 +229,7 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
               FROM {node}
               WHERE type = 'perspective'
               ORDER BY nid DESC")
-      ->fetchCol('nid');
+      ->fetchCol();
 
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
@@ -248,7 +248,7 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
             ':high_water_mark' => $sandbox['high_water_mark'],
             ':highest_nid' => $sandbox['highest_nid']
           ])
-    ->fetchCol('nid');
+    ->fetchCol();
 
   if (empty($nids)) {
     $sandbox['#finished'] = 1;
@@ -285,7 +285,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
       "SELECT entity_id
       FROM {node__field_date}
       ORDER BY entity_id DESC"
-    )->fetchCol('entity_id');
+    )->fetchCol();
 
     $sandbox['total'] = count($results);
     $sandbox['current_processed']= 0;
