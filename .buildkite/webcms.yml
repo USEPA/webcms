@@ -28,6 +28,9 @@ steps:
           - nginx
           - drush
 
+        agents:
+          queue: docker-builders
+
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
         concurrency: 4
 
