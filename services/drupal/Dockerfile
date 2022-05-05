@@ -12,7 +12,7 @@ FROM forumone/drupal8:7.4 AS memcached-ext
 WORKDIR /
 
 # First, install the tools we need to build and link the two libraries.
-RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++
+RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++ openssl-dev
 
 # Second, clone and build AWS' libmemcached fork. Aside from the `sed' invocation (see
 # comment below), this hews to that repo's instructions.
