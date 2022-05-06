@@ -12,13 +12,16 @@ FROM forumone/drupal8:7.4 AS memcached-ext
 WORKDIR /
 
 # First, install the tools we need to build and link the two libraries.
-RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++ openssl-dev
+RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++
 
 # Second, clone and build AWS' libmemcached fork. Aside from the `sed' invocation (see
 # comment below), this hews to that repo's instructions.
+#
+# Note the 'git checkout' command: we've pinned to working commits due to issues with the latest commits.
 RUN set -ex \
-  && git clone --depth 1 https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
+  && git clone https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
   && cd aws-elasticache-cluster-client-libmemcached \
+  && git checkout 1e39b7f7c700fe02457d1a05e00038ca930e3ccb \
   # Patch cmdline.cc per https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached/pull/4
   # The '65' here refers to the line where the declaration 'static char **environ' can be
   # found - we need to remove the 'static' declaration in order to match libmusl's
