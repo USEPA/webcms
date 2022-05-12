@@ -1,0 +1,13 @@
+{#
+/**
+ * @file
+ * Theme override for a field.
+ */
+#}
+
+{% for item in items %}
+  {% include '@components/video/video.twig' with {
+    'iframe_src': item.content['#attributes'].src,
+    'title': item.content['#attributes'].title,
+  } %}
+{% endfor %}

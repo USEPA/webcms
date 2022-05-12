@@ -16,21 +16,21 @@ Note: this has only been tested on ddev 1.19 and above.
 
 3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
-4. Import the database by running: 
+4. Import the database by running:
 
-   ```   
-   ddev epa-import 
    ```
- 
+   ddev epa-import
+   ```
+
 5. After the import you will need to restart:
 
-   ```   
+   ```
    ddev poweroff && ddev start
    ```
 
 6. Copy `cp .env.example .env`.
 
-7. Install dependencies: 
+7. Install dependencies:
 
    ```
    ddev composer install
@@ -41,11 +41,11 @@ Note: this has only been tested on ddev 1.19 and above.
    ```
    ddev gesso install
    ```
-   
+
 9. Building/watching the CSS and Pattern Lab:
     1. to build
       ```````
-      ddev gesso build 
+      ddev gesso build
       ```````
     2. to watch:
       ```````
@@ -55,16 +55,16 @@ Note: this has only been tested on ddev 1.19 and above.
 10. Install Drupal from config (or restore a backup).  You can install from config by running:
    ```
    ddev drush si --existing-config
-   ``` 
+   ```
 
-11. Ensure the latest configuration has been fully applied and clear cache: 
+11. Ensure the latest configuration has been fully applied and clear cache:
    ```
    ddev drush deploy -y
    ```
 
 12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-13. Access the app at https://epa-ddev.ddev.site
+13. Access the app at https://epa.ddev.site
 
 # Testing migrations
 
