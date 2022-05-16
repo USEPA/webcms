@@ -13,44 +13,46 @@ steps:
   # For all feature branches, only perform build & validation steps. Nothing is deployed
   # in this pipeline.
   - label: ":pipeline: Feature"
-    if: build.branch != "main" && build.branch != "integration" && build.branch != "migration"
+    if:
+      build.branch != "integration" &&
+      build.branch != "main" &&
+      build.branch != "release"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
       # We specify the staging site since most feature branches target main instead
       # of integration
       WEBCMS_ENVIRONMENT: preproduction
-      WEBCMS_SITE: stage
+      WEBCMS_SITE: main
 
   # Steps below this line are gated by build.branch matching a specific branch, and
   # build.pull_request_id == null, which prevents Buildkite from doing deployments if the
   # targeted branch is the source in a PR. (This is a rare but observed occurrence.)
+
   - label: ":pipeline: Infrastructure"
-    if: build.branch == "integration" && build.pull_request.id == null
+    if: build.branch == "main" && build.pull_request.id == null
 
     command: buildkite-agent pipeline upload .buildkite/infrastructure.yml
     env:
       WEBCMS_ENVIRONMENT: preproduction
 
-  # As with the above wait, we have to ensure the infrastructure was successfully deployed
-  # before continuing. (Note that in the case of non-main branches, the network and
-  # infrastructure steps are skipped, and the waits incur no penalty.)
+  # When the infrastructure pipeline is uploaded, we have to wait on it to
+  # succeed before deploying the application, as some resources may be
+  # created/modified that are needed for deployments. Note that if the pipeline
+  # is skipped, this wait incurs no penalty.
   - wait: ~
 
-  # On the integration branch, we deploy the dev site
-  - label: ":pipeline: Dev"
-    if: build.branch == "integration" && build.pull_request.id == null
+  # For each of the three branches we deploy (integration, main, and release),
+  # run the webcms.yml pipeline.
+  - label: ":pipeline: WebCMS (${BUILDKITE_BRANCH})"
+    if:
+      build.pull_request.id == null && (
+        build.branch == "integration" ||
+        build.branch == "main" ||
+        build.branch == "release"
+      )
 
     command: buildkite-agent pipeline upload .buildkite/webcms.yml
     env:
       WEBCMS_ENVIRONMENT: preproduction
-      WEBCMS_SITE: dev
-
-  # On the main branch, we deploy the stage site
-  - label: ":pipeline: Stage"
-    if: build.branch == "main" && build.pull_request.id == null
-
-    command: buildkite-agent pipeline upload .buildkite/webcms.yml
-    env:
-      WEBCMS_ENVIRONMENT: preproduction
-      WEBCMS_SITE: stage
+      WEBCMS_SITE: ${BUILDKITE_BRANCH}

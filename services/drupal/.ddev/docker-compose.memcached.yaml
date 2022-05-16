@@ -1,0 +1,20 @@
+version: '3.6'
+
+services:
+  memcached:
+    container_name: ddev-${DDEV_SITENAME}-memcached
+    image: memcached
+    restart: "no"
+    expose:
+      - 11211
+    # These labels ensure this service is discoverable by ddev.
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+    # Arguments passed to the memcached binary.
+    command: ["-m", "128"]
+    networks: [default, ddev_default]
+    volumes:
+      - ".:/mnt/ddev_config"
+  web:
+    links:
+      - memcached:memcached

@@ -12,6 +12,11 @@ const ssm = require("./ssm");
 const vars = require("./vars");
 
 /**
+ * Base address of a link to the AWS console.
+ */
+const consoleUrl = `https://${vars.region}.console.aws.amazon.com`;
+
+/**
  * Amount of time, in milliseconds, to wait in between checking Drush's status in ECS.
  */
 const pollInterval = 5_000;
@@ -156,7 +161,7 @@ async function getLogsUrl(task) {
 
   // Read the log group name from Parameter Store
   const logGroup = await ssm.getParameter(
-    `/webcms/${vars.environment}/${vars.site}/${vars.lang}/log-groups/drush`
+    `${vars.site}/${vars.lang}/log-groups/drush`
   );
 
   // Use the posix helper from the path module to simplify the process of constructing
@@ -169,9 +174,7 @@ async function getLogsUrl(task) {
   );
 
   // Start with the region-specific AWS Console URL.
-  const url = new URL(
-    `https://${vars.region}.console.amazon.com/cloudwatch/home`
-  );
+  const url = new URL(`${consoleUrl}/cloudwatch/home`);
 
   // We also set the region via query parameters, to mimic the behavior of the console.
   url.searchParams.set("region", vars.region);
@@ -193,7 +196,7 @@ async function getTaskUrl(task) {
 
   // As above, start with the region-specific console URL and set the ?region query string
   // parameter.
-  const url = new URL(`https://${vars.region}.console.aws.amazon.com`);
+  const url = new URL(consoleUrl);
   url.searchParams.set("region", vars.region);
 
   // Construct the path to the task's landing page in the V2 ECS console (at the time of

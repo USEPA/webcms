@@ -45,11 +45,11 @@ resource "aws_lb_target_group" "http" {
 }
 
 resource "aws_lb_target_group_attachment" "alb_attachment_http" {
-    target_group_arn = aws_lb_target_group.http.arn
-    # target to attach to this target group
-    target_id        = aws_lb.app_load_balancer.arn
-    #  If the target type is alb, the targeted Application Load Balancer must have at least one listener whose port matches the target group port.
-    port             = 80
+  target_group_arn = aws_lb_target_group.http.arn
+  # target to attach to this target group
+  target_id = aws_lb.app_load_balancer.arn
+  #  If the target type is alb, the targeted Application Load Balancer must have at least one listener whose port matches the target group port.
+  port = 80
 }
 
 # Listener for HTTPS
@@ -57,7 +57,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.load_balancer.arn
   port              = 443
   protocol          = "TCP"
-  
+
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.https.arn
@@ -71,7 +71,7 @@ resource "aws_lb_target_group" "https" {
   protocol    = "TCP"
   target_type = "alb"
   vpc_id      = data.aws_ssm_parameter.vpc_id.value
-health_check {
+  health_check {
     enabled  = true
     interval = 30
     port     = 8080
@@ -80,11 +80,11 @@ health_check {
 }
 
 resource "aws_lb_target_group_attachment" "alb_attachment_https" {
-    target_group_arn = aws_lb_target_group.https.arn
-    # target to attach to this target group
-    target_id        = aws_lb.app_load_balancer.arn
-    #  If the target type is alb, the targeted Application Load Balancer must have at least one listener whose port matches the target group port.
-    port             = 443
+  target_group_arn = aws_lb_target_group.https.arn
+  # target to attach to this target group
+  target_id = aws_lb.app_load_balancer.arn
+  #  If the target type is alb, the targeted Application Load Balancer must have at least one listener whose port matches the target group port.
+  port = 443
 }
 
 resource "aws_lb" "app_load_balancer" {
@@ -123,9 +123,9 @@ resource "aws_lb_listener" "alb_health" {
 }
 
 resource "aws_lb_target_group" "alb_http" {
-  name = "webcms-${var.environment}-alb-http"
-  vpc_id      = data.aws_ssm_parameter.vpc_id.value
-  
+  name   = "webcms-${var.environment}-alb-http"
+  vpc_id = data.aws_ssm_parameter.vpc_id.value
+
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
@@ -162,9 +162,9 @@ resource "aws_lb_listener" "alb_https" {
 
   port     = 443
   protocol = "HTTPS"
-  
+
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.alb_http.arn
   }
 }

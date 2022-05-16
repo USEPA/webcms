@@ -1,0 +1,35 @@
+version: "3.6"
+
+services:
+  minio:
+    container_name: ddev-${DDEV_SITENAME}-minio
+    image: minio/minio
+    depends_on:
+      - localstack
+    command:
+      - minio
+      - server
+      - /data
+    environment:
+      MINIO_ACCESS_KEY: minio_access
+      MINIO_SECRET_KEY: minio_secret
+      MINIO_DOMAIN: minio
+      VIRTUAL_HOST: $DDEV_HOSTNAME
+      HTTP_EXPOSE: 9001:9000
+      HTTPS_EXPOSE: 9002:9000
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: $DDEV_APPROOT
+    networks:
+      default:
+        aliases:
+          - web.minio
+      ddev_default:
+    expose:
+      - 9000
+    volumes:
+      - type: volume
+        source: minio-data
+        target: /data
+volumes:
+  minio-data: null

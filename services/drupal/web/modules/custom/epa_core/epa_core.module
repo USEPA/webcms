@@ -304,11 +304,14 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $groups = \Drupal::service('epa_web_areas.web_areas_helper')
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
-            $contact_form = $group->field_contact_us_form->target_id;
-            $bubbleable_metadata->addCacheableDependency($group);
-            $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
-            $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
-              ->toString() : $original;
+            if ($forms = $group->field_contact_us_form->referencedEntities()) {
+              $contact_form = reset($forms);
+              $bubbleable_metadata->addCacheableDependency($group);
+              $bubbleable_metadata->addCacheableDependency($contact_form);
+              $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form->id()]) : NULL;
+              $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
+                ->toString() : $original;
+            }
           }
         }
         break;
@@ -460,9 +463,8 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
     }
   }
 
-
-  if ($plugin_id == 'link_default') {
-    $test = 'test';
+  if ($plugin_id == 'smartdate_timezone' && isset($element['timezone']['#options'])) {
+    unset($element['timezone']['#options']['']);
   }
 
   // If a link field only supports external links remove the confusing help text
@@ -647,9 +649,19 @@ function epa_core_node_presave(EntityInterface $node) {
 
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
     $full_output = $view_builder->view($node,'search_index');
-    $node->field_search_text->setValue(strip_tags(render($full_output)));
+    $node->field_search_text->setValue(strip_tags(\Drupal::service('renderer')
+      ->renderPlain($full_output)));
 
     // Revert to the active theme
     $theme_manager->setActiveTheme($active_theme);
   }
+}
+
+/**
+ * Implements HOOK_form_FORM_ID_alter().
+ */
+function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+ if (!empty($form["field_search_text_value"])) {
+     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+ }
 }

@@ -908,8 +908,38 @@ $config['shield.settings']['method'] = 1;
 //  $settings['container_base_class'] = '\Drupal\webprofiler\DependencyInjection\TraceableContainer';
 //}
 
-if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
-  include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
+/*
+ * Only want to show applicable URL's for each environment
+ * separating out F1 environments & EPA environments.
+ */
+if (isset($_SERVER['HTTP_HOST'])) {
+  $suffix_env_ind = '_epa';
+  if (strpos($_SERVER['HTTP_HOST'], '.byf1.io')) {
+    $suffix_env_ind = '_f1';
+  }
+  elseif (strpos($_SERVER['HTTP_HOST'], '.byf1.dev') || strpos($_SERVER['HTTP_HOST'], '.ddev.site')) {
+    $suffix_env_ind = '_f1a';
+  }
+
+  $environment_config = [
+    'dev',
+    'prod',
+    'qa',
+    'stage',
+    'espanol_stage',
+    'espanol_prod',
+    'integration',
+    'integration_es',
+    'main',
+    'main_es',
+    'release',
+    'release_es'
+  ];
+
+
+  foreach ($environment_config as $env_conf) {
+    $config['environment_indicator.switcher.' . $env_conf . $suffix_env_ind]['status'] = true;
+  }
 }
 
 $config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod') ? 'black' : 'red');
@@ -926,6 +956,16 @@ $config['environment_indicator.indicator']['name'] = $env_name;
  *
  * Keep this code block at the end of this file to take full effect.
  */
+// Automatically generated include for settings managed by ddev.
+$ddev_settings = dirname(__FILE__) . '/settings.ddev.php';
+if (getenv('IS_DDEV_PROJECT') == 'true' && is_readable($ddev_settings)) {
+  require $ddev_settings;
+}
+
+if (!empty($env_name) && file_exists($app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php')){
+  include $app_root . '/' . $site_path . '/settings.'. $env_name .'.env.php';
+}
+
 if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
 }

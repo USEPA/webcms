@@ -19,7 +19,7 @@ function epa_media_update_9001(&$sandbox) {
         INNER JOIN file_managed AS fm ON m.field_media_file_target_id = fm.fid
         WHERE fm.filename like '%.json' OR fm.filename like '%.xml'
         AND m.bundle = 'document';")
-    ->fetchCol('entity_id');
+    ->fetchCol();
 
   $sandbox['total'] = count($media_ids);
 

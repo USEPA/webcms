@@ -27,12 +27,16 @@ export default function(threshold = 200, smoothScroll = true) {
         }
       };
       let stillScrolling = false;
-      window.addEventListener('scroll', () => {
-        if (stillScrolling !== false) {
-          clearTimeout(stillScrolling);
-        }
-        stillScrolling = setTimeout(scrollHandler, 60);
-      });
+      window.addEventListener(
+        'scroll',
+        () => {
+          if (stillScrolling !== false) {
+            clearTimeout(stillScrolling);
+          }
+          stillScrolling = setTimeout(scrollHandler, 60);
+        },
+        { passive: true }
+      );
     }
     if (smoothScroll) {
       backToTop.addEventListener('click', event => {

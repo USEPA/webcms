@@ -1,3 +1,9 @@
+env:
+  WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
+  WEBCMS_SITE: ${WEBCMS_SITE}
+  WEBCMS_IMAGE_TAG: ${WEBCMS_IMAGE_TAG}
+  WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
+
 steps:
   # Apply any pending updates to the VPC for this environment
   - label: ":pipeline: :terraform: network"
@@ -15,9 +21,8 @@ steps:
   # This step has to wait for the VPC due to the dependency on networking component IDs
   # (subnets, security groups, and the VPC itself).
   - label: ":pipeline: :terraform: infrastructure"
-    if: build.branch == "main" && build.pull_request.id == null
-
     command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
+
     env:
       WEBCMS_ENVIRONMENT: ${WEBCMS_ENVIRONMENT}
       WEBCMS_TF_MODULE: infrastructure
