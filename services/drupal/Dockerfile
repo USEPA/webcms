@@ -292,7 +292,9 @@ RUN docker-php-ext-enable memcached
 RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
-  libstdc++
+  libstdc++ \
+  # See ENTRYPOINT below
+  tini
 
 # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
 # instead of PHP)
@@ -312,4 +314,10 @@ RUN chmod +x /usr/local/bin/drush-migrate
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
 RUN chmod +x /webcms-entrypoint
 
-ENTRYPOINT ["/webcms-entrypoint"]
+# Replace the default crontab with one that runs Drush every five minutes. By
+# default, cron is not run (since there is no systemd equivalent in containers),
+# but we use this in the Drush ECS service definition.
+RUN echo '*/5 * * * * drush cron 2>&1' | crontab -
+
+# Wrap the entrypoint script with tini to allow graceful signal handling
+ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
