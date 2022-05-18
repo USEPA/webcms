@@ -90,7 +90,7 @@ resource "aws_ecs_service" "drush" {
   }
 
   network_configuration {
-    subnets = local.private_subnets
+    subnets          = local.private_subnets
     assign_public_ip = false
 
     security_groups = [data.aws_ssm_parameter.drupal_security_group.value]
