@@ -16,12 +16,19 @@ resource "aws_ecs_task_definition" "drush_task" {
       name  = "drush"
       image = "${data.aws_ssm_parameter.ecr_drush.value}:${var.image_tag}"
 
-      # By explicitly emptying these values, we allow task overrides to effectively
-      # take precedence over what is specified in the container. This enables us
-      # to specify "drush cron" in the CloudWatch event schedule, and run a shell
-      # script that runs "drush updb".
-      entryPoint = []
-      command    = []
+      # Set the default command for our task definition to be crond. This is
+      # required to run Drush as an ECS service (see below), but by setting it
+      # as a command, we are able to easily override it when dispatching, e.g.,
+      # deployment script updates.
+      #
+      # The arguments to crond are as follows:
+      # 1. -f: Run in the foreground
+      # 2. -L /dev/stdout: Log to container standard out
+      #
+      # These arguments make crond container-friendly: its status will be the
+      # status of the service as a whole, and its output will be picked up by
+      # Fargate and exported to CloudWatch.
+      command = ["crond", "-f", "-L", "/dev/stdout"]
 
       workingDirectory = "/var/www/html"
 
@@ -62,35 +69,32 @@ resource "aws_ecs_task_definition" "drush_task" {
   tags = var.tags
 }
 
-resource "aws_cloudwatch_event_target" "cron" {
-  target_id = "WebCMS-${var.environment}-${var.site}-${var.lang}-CronTask"
-  arn       = data.aws_ssm_parameter.ecs_cluster_arn.value
-  rule      = data.aws_ssm_parameter.cron_event_rule.value
-  role_arn  = data.aws_ssm_parameter.cron_event_role.value
+# This service is mostly identical to the Drupal service, save that it runs a
+# persistent Drush container for cron. (This is needed to avoid creating a large
+# number of AWS Config records every time EventBridge spawns a new container.)
+#
+# There are only two major differences between this and the Drupal service:
+# 1. It uses the Drush task definition and
+# 2. It does not define a load_balancer section.
+resource "aws_ecs_service" "drush" {
+  name            = "webcms-${var.environment}-${var.site}-${var.lang}-drush"
+  cluster         = data.aws_ssm_parameter.ecs_cluster_arn.value
+  desired_count   = 1
+  task_definition = aws_ecs_task_definition.drush_task.arn
 
-  ecs_target {
-    launch_type         = "FARGATE"
-    platform_version    = "1.4.0"
-    task_count          = 1
-    task_definition_arn = aws_ecs_task_definition.drush_task.arn
+  launch_type      = "FARGATE"
+  platform_version = "1.4.0"
 
-    network_configuration {
-      subnets         = local.private_subnets
-      security_groups = [data.aws_ssm_parameter.drupal_security_group.value]
-    }
+  deployment_controller {
+    type = "ECS"
   }
 
-  input = jsonencode({
-    containerOverrides = [
-      {
-        name = "drush"
-        command = [
-          "/var/www/html/vendor/bin/drush",
-          "--debug",
-          "--uri", "https://${var.drupal_hostname}",
-          "cron"
-        ]
-      }
-    ]
-  })
+  network_configuration {
+    subnets = local.private_subnets
+    assign_public_ip = false
+
+    security_groups = [data.aws_ssm_parameter.drupal_security_group.value]
+  }
+
+  tags = var.tags
 }
