@@ -21,6 +21,10 @@ steps:
           - nginx
           - drush
 
+        # Use the more powerful Docker builder agent pool
+        agents:
+          queue: docker-builders
+
         # This concurrency group is shared with the fpm-metrics container build
         # below this step.
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
