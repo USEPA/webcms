@@ -315,6 +315,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   $insert = Drupal::database()->insert('node__field_daterange');
   $insert->fields([
+    'bundle',
     'entity_id',
     'revision_id',
     'langcode',
@@ -322,6 +323,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     'field_daterange_value',
     'field_daterange_end_value',
     'field_daterange_duration',
+    'field_daterange_timezone',
   ]);
 
   foreach ($records as $node_field) {
@@ -341,6 +343,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     $duration = ($date_end - $date_start) / 60;
 
     $insert->values([
+      'event',
       $node_field->entity_id,
       $node_field->revision_id,
       $node_field->langcode,
@@ -348,6 +351,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
       $date_start,
       $date_end,
       $duration,
+      'America/New_York',
     ]);
     $insert->execute();
   }
@@ -364,12 +368,22 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 }
 
 /**
- * Fix bundle for previously migrated daterange values
+ * Fix bundle and language and TZ for previously migrated daterange values
  */
 function epa_workflow_deploy_0011_fix_daterange_bundle() {
   Drupal::database()->update('node__field_daterange')
     ->condition('bundle', '')
-    ->fields(['bundle' => 'event'])
+    ->fields([
+      'bundle' => 'event',
+      'langcode' => getenv('WEBCMS_LANG'),
+      ])
+    ->execute();
+
+  Drupal::database()->update('node__field_daterange')
+    ->isNull('field_daterange_timezone')
+    ->fields([
+      'field_daterange_timezone' => 'America/New_York',
+    ])
     ->execute();
 }
 
@@ -419,6 +433,7 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
       'field_daterange_value',
       'field_daterange_end_value',
       'field_daterange_duration',
+      'field_daterange_timezone',
     ]);
 
     // Keeping track of the process of the bach process
@@ -444,6 +459,7 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
       $date_start,
       $date_end,
       $duration,
+      'America/New_York',
     ]);
 
     try {
