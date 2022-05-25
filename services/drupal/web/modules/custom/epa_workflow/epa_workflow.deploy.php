@@ -364,12 +364,15 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 }
 
 /**
- * Fix bundle for previously migrated daterange values
+ * Fix bundle and language for previously migrated daterange values
  */
 function epa_workflow_deploy_0011_fix_daterange_bundle() {
   Drupal::database()->update('node__field_daterange')
     ->condition('bundle', '')
-    ->fields(['bundle' => 'event'])
+    ->fields([
+      'bundle' => 'event',
+      'langcode' => getenv('WEBCMS_LANG'),
+      ])
     ->execute();
 }
 
