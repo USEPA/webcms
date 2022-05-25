@@ -18,8 +18,9 @@ class EPAGroupForm extends GroupForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    $account = \Drupal::currentUser();
     // For web area type.
-    if ($this->entity->bundle() == 'web_area' && isset($form['field_homepage'])) {
+    if ($this->entity->bundle() == 'web_area' && isset($form['field_homepage']) && !$account->hasPermission('set group homepage')) {
       $form['field_homepage']['#access'] = FALSE;
       $homepage = $form['field_homepage']['widget'][0]['target_id']['#default_value'];
 

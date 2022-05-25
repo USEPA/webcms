@@ -69,6 +69,20 @@ function epa_core_update_9002() {
 }
 
 /**
+ * Set existing card body fields to use our new more restrictive input format.
+ */
+function epa_core_update_9003() {
+  $database = \Drupal::database();
+  foreach (['paragraph__field_body','paragraph_revision__field_body'] as $table)
+  if ($database->schema()->tableExists($table)) {
+    $database->update($table)
+      ->condition('bundle', 'card')
+      ->fields(['field_body_format' => 'restricted_html_no_links'])
+      ->execute();
+  }
+}
+
+/**
  * Create the new News Release term with 730 day review cycle.
  */
 function _epa_core_create_news_release_type_term() {
