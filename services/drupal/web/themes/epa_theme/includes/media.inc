@@ -42,6 +42,8 @@ function epa_theme_preprocess_filter_caption(&$vars) {
  */
 function epa_theme_preprocess_media(&$vars) {
   $vars['has_caption'] = isset($vars['attributes']['data-caption']);
+  $media = $vars['media'];
+  $vars['filesize'] = format_size($media->getSource()->getMetadata($media,'filesize'));
 }
 
 /**
