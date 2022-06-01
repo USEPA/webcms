@@ -8,7 +8,7 @@ function _epa_core_populate_search_index_queue() {
            FROM {node} n
            LEFT JOIN {node_revision__field_search_text} nf
            ON n.vid = nf.revision_id WHERE nf.revision_id IS NULL")
-    ->fetchCol('vid');
+    ->fetchCol();
 
   $latest_revs = \Drupal::database()->query(
     "SELECT n.nid, n.vid as vid
@@ -22,7 +22,7 @@ function _epa_core_populate_search_index_queue() {
           LEFT JOIN {node_revision__field_search_text} nf
               ON n.vid = nf.revision_id
           WHERE nf.revision_id IS NULL")
-    ->fetchCol('vid');
+    ->fetchCol(1);
 
   // Remove current revs from latest revs
   $latest_revs = array_diff($latest_revs, $current_revs);

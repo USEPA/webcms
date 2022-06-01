@@ -14,6 +14,7 @@ dependencies:
   module:
     - image
     - layout_builder
+    - linked_field
     - media_inline_embed
 third_party_settings:
   layout_builder:
@@ -30,9 +31,15 @@ content:
     type: image
     label: hidden
     settings:
-      image_link: file
+      image_link: ''
       image_style: thumbnail
-    third_party_settings: {  }
+    third_party_settings:
+      linked_field:
+        linked: '1'
+        type: custom
+        destination: '[media:field_media_oembed_video]'
+        advanced: {  }
+        token: ''
     weight: 0
     region: content
 hidden:

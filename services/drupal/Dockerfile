@@ -16,9 +16,12 @@ RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++
 
 # Second, clone and build AWS' libmemcached fork. Aside from the `sed' invocation (see
 # comment below), this hews to that repo's instructions.
+#
+# Note the 'git checkout' command: we've pinned to working commits due to issues with the latest commits.
 RUN set -ex \
-  && git clone --depth 1 https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
+  && git clone https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
   && cd aws-elasticache-cluster-client-libmemcached \
+  && git checkout 1e39b7f7c700fe02457d1a05e00038ca930e3ccb \
   # Patch cmdline.cc per https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached/pull/4
   # The '65' here refers to the line where the declaration 'static char **environ' can be
   # found - we need to remove the 'static' declaration in order to match libmusl's
@@ -289,7 +292,9 @@ RUN docker-php-ext-enable memcached
 RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
   # Needed by the Elasticache memcached client
-  libstdc++
+  libstdc++ \
+  # See ENTRYPOINT below
+  tini
 
 # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
 # instead of PHP)
@@ -309,4 +314,10 @@ RUN chmod +x /usr/local/bin/drush-migrate
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
 RUN chmod +x /webcms-entrypoint
 
-ENTRYPOINT ["/webcms-entrypoint"]
+# Replace the default crontab with one that runs Drush every five minutes. By
+# default, cron is not run (since there is no systemd equivalent in containers),
+# but we use this in the Drush ECS service definition.
+RUN echo '*/5 * * * * drush cron 2>&1' | crontab -
+
+# Wrap the entrypoint script with tini to allow graceful signal handling
+ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]

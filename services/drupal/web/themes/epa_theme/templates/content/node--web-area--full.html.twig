@@ -1,0 +1,75 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set header_info %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set admin_info %}
+  {{ region_messages }}
+  {{ content.epa_content_moderation_control }}
+{% endset %}
+
+{% set show_admin_info = false %}
+
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set has_footer = false %}
+
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
+{% set slideshow %}
+  {{ node.field_banner|view({settings: {}}) }}
+{% endset %}
+
+{% set body %}
+  {{ content|without(
+    'epa_content_moderation_control',
+    'field_banner'
+  ) }}
+{% endset %}
+
+{% include '@templates/web-area-homepages/microsite.twig' with {
+  'has_header': true,
+  'has_footer': has_footer,
+  'header_info': header_info,
+  'contact_link': contact_link,
+  'title': label,
+  'admin': admin_info,
+  'show_admin_info': show_admin_info,
+  'slideshow': slideshow,
+  'body': body,
+  'footer': footer,
+} %}

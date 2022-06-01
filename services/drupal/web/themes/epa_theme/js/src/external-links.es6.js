@@ -5,10 +5,6 @@ import Drupal from 'drupal';
   Drupal.behaviors.externalLinks = {
     attach(context, settings) {
       const allowedDomains = [
-        'webcms-uploads-dev.s3.amazonaws.com',
-        'webcms-uploads-stage.s3.amazonaws.com',
-        'webcms-uploads-prod.s3.amazonaws.com',
-        'webcms-uploads-qa.s3.amazonaws.com',
         'airknowledge.gov',
         'airnow.gov',
         'clu-in.org',
