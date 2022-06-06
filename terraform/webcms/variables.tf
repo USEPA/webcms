@@ -5,6 +5,11 @@ variable "aws_region" {
   type        = string
 }
 
+variable "cloudfront_distributionid" {
+  description = "Cloudfront distribution ID to use"
+  type        = string
+}
+
 #endregion
 
 #region Deployment variables
