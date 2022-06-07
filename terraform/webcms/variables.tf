@@ -5,9 +5,14 @@ variable "aws_region" {
   type        = string
 }
 
+#endregion
+
+#region AWS ID variables
+
 variable "cloudfront_distributionid" {
   description = "Cloudfront distribution ID to use"
   type        = string
+  default     = ""
 }
 
 #endregion
