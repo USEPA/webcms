@@ -210,6 +210,7 @@ locals {
   drupal_environment = [
     { name = "WEBCMS_S3_BUCKET", value = data.aws_ssm_parameter.drupal_s3_bucket.value },
     { name = "WEBCMS_S3_REGION", value = var.aws_region },
+    { name = "WEBCMS_CF_DISTRIBUTIONID", value = var.cloudfront_distributionid },
     { name = "WEBCMS_SITE_URL", value = "https://${var.drupal_hostname}" },
     { name = "WEBCMS_SITE_HOSTNAME", value = var.drupal_hostname },
     { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
