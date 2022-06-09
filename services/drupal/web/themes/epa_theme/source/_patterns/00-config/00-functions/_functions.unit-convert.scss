@@ -2,6 +2,10 @@
 // @param {Number} $value - unitless number
 // @return {String} - unit type
 
+@use 'uswds' as *;
+@use '00-functions.gesso' as *;
+@use '../config.settings' as *;
+
 @function convert($value, $unit: px) {
   @if unitless($value) {
     @if $unit == px {
