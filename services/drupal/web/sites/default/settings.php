@@ -946,6 +946,9 @@ $config['environment_indicator.indicator']['bg_color'] = (($env_name === 'prod')
 $config['environment_indicator.indicator']['fg_color'] = '#fff';
 $config['environment_indicator.indicator']['name'] = $env_name;
 
+$settings['aws.region'] = getenv('WEBCMS_S3_REGION');
+$settings['aws.distributionid'] = getenv('WEBCMS_CF_DISTRIBUTIONID');
+
 /**
  * Load local development override configuration, if available.
  *
