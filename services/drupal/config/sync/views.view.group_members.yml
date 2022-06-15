@@ -135,7 +135,7 @@ display:
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
-          empty: '<div class="item-list"><ul><li>&lt;none&gt;</li></ul></div>'
+          empty: '<div class="item-list"><ul><li>Member</li></ul></div>'
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
@@ -153,17 +153,17 @@ display:
           multi_type: ul
           separator: ', '
           field_api_classes: false
-        changed:
-          id: changed
-          table: group_content_field_data
-          field: changed
-          relationship: none
+        status:
+          id: status
+          table: users_field_data
+          field: status
+          relationship: gc__user
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: changed
+          entity_type: user
+          entity_field: status
           plugin_id: field
-          label: Updated
+          label: 'User status'
           exclude: false
           alter:
             alter_text: false
@@ -205,11 +205,11 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: value
-          type: timestamp
+          type: boolean
           settings:
-            date_format: short
-            custom_date_format: ''
-            timezone: ''
+            format: custom
+            format_custom_false: Blocked
+            format_custom_true: Active
           group_column: value
           group_columns: {  }
           group_rows: true
