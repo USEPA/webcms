@@ -1,6 +1,9 @@
 // @file
 // Styles for an Outline Button Group.
 
+@use 'uswds' as *;
+@use '../../../00-config' as *;
+
 .button-group--outline {
   .button-group__item {
     border: 0;
@@ -31,11 +34,11 @@
     @extend .usa-button--outline;
 
     &:focus {
-      @extend .usa-button--outline:hover;
+      @extend .usa-button--outline, :hover;
     }
 
     &.is-active {
-      @extend .usa-button--outline:active;
+      @extend .usa-button--outline, :active;
     }
   }
 }
