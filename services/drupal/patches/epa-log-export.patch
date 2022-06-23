@@ -1,0 +1,13 @@
+diff --git a/src/Plugin/views/display/DataExport.php b/src/Plugin/views/display/DataExport.php
+index 8b4db87..3ed7d78 100644
+--- a/src/Plugin/views/display/DataExport.php
++++ b/src/Plugin/views/display/DataExport.php
+@@ -153,6 +153,8 @@ class DataExport extends RestExport {
+     ];
+     batch_set($batch_definition);
+ 
++    \Drupal::logger('views_data_export')->notice($total_rows . ' rows exported using Views Data Export.  View: ' . $view->id() . ', Display: ' . $view->current_display);
++
+     return batch_process();
+   }
+ 
