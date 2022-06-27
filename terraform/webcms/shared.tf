@@ -40,8 +40,8 @@ data "aws_ssm_parameter" "alb_listener" {
 
 #region Service endpoints
 
-data "aws_ssm_parameter" "elasticache_endpoint" {
-  name = "/webcms/${var.environment}/endpoints/elasticache"
+data "aws_ssm_parameter" "elasticache_endpoints" {
+  name = "/webcms/${var.environment}/endpoints/elasticache-nodes"
 }
 
 data "aws_ssm_parameter" "rds_proxy_endpoint" {
@@ -237,9 +237,9 @@ locals {
     { name = "WEBCMS_MAIL_PROTOCOL", value = var.email_protocol },
     { name = "WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS", value = var.email_enable_workflow_notifications ? "1" : "0" },
 
-    # Injected host names
+    # Injected hosts' names and ports
     { name = "WEBCMS_SEARCH_HOST", value = "https://${data.aws_ssm_parameter.elasticsearch_endpoint.value}:443" },
-    { name = "WEBCMS_CACHE_HOST", value = data.aws_ssm_parameter.elasticache_endpoint.value },
+    { name = "WEBCMS_CACHE_HOSTS", value = data.aws_ssm_parameter.elasticache_endpoints.value },
 
     # SAML
     { name = "WEBCMS_SAML_SP_ENTITY_ID", value = var.saml_sp_entity_id },
