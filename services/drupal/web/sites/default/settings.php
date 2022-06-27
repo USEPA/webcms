@@ -843,14 +843,22 @@ switch ($env_state) {
     $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
     $config['auto_entitylabel.settings.node.faq']['status'] = 0;
   case 'run':
-    $settings['memcache']['servers'] = [getenv('WEBCMS_CACHE_HOST') .':11211' => 'default'];
+    // Convert the comma-separated list of ElastiCache endpoints to memcache's expected server format
+    $memcached_nodes = getenv('WEBCMS_CACHE_HOSTS');
+    if (empty($memcached_nodes)) {
+      // If the list is empty (or unset), skip initializing the array
+      $memcached_nodes = [];
+    } else {
+      // Place every ElastiCache node in the 'default' server group.
+      $memcached_nodes = explode(',', $memcached_nodes);
+      $memcached_nodes = array_fill_keys($memcached_nodes, 'default');
+    }
+
+    $settings['memcache']['servers'] = $memcached_nodes;
+
     $settings['memcache']['options'] = [
       Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
     ];
-
-    if (defined('Memcached::OPT_CLIENT_MODE')) {
-      $settings['memcache']['options'][Memcached::OPT_CLIENT_MODE] = Memcached::DYNAMIC_CLIENT_MODE;
-    }
 
     // Allow sharing of memcache server by multiple sites within a hosting environment.
     $settings['memcache']['key_prefix'] = $env_name . '-' . $env_lang;
