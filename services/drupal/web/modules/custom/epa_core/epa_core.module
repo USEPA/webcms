@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
@@ -664,4 +665,22 @@ function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) 
  if (!empty($form["field_search_text_value"])) {
      $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
  }
+}
+
+
+/**
+ * Implements hook_entity_base_field_info_alter().
+ */
+function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
+  // If entity is user show user status and last access.
+  if ($entity_type->id() == 'user') {
+    if (isset($fields['status'])) {
+      $fields['status']->setDisplayConfigurable('view', TRUE)
+        ->setTargetEntityTypeId('user');
+    }
+    if (isset($fields['access'])) {
+      $fields['access']->setDisplayConfigurable('view', TRUE)
+        ->setTargetEntityTypeId('user');
+    }
+  }
 }
