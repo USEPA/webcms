@@ -1,6 +1,7 @@
 // @file
 // Styles for Drupal dropbuttons.
 
+@use 'sass:math';
 @use 'uswds' as *;
 @use '../../00-config' as *;
 
@@ -71,7 +72,10 @@ $dropbutton-toggle-icon-size: rem(12px) !default;
   @include button();
   @include svg-background(dropbutton-arrow-down);
   background-position: 50%
-    (($dropbutton-toggle-height / 2) - ($dropbutton-toggle-icon-size / 2));
+    (
+      math.div($dropbutton-toggle-height, 2) -
+        math.div($dropbutton-toggle-icon-size, 2)
+    );
   background-repeat: no-repeat;
   background-size: $dropbutton-toggle-icon-size;
   border-bottom-left-radius: 0;

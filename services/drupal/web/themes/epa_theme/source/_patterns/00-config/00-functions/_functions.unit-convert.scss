@@ -2,6 +2,7 @@
 // @param {Number} $value - unitless number
 // @return {String} - unit type
 
+@use 'sass:math';
 @use 'uswds' as *;
 @use '00-functions.gesso' as *;
 @use '../config.settings' as *;
@@ -40,7 +41,7 @@
     @if (unit($value) != 'px') {
       $value: px($value, $base);
     }
-    @return ($value / $base) * 1em;
+    @return math.div($value, $base) * 1em;
   }
   @return $value;
 }
@@ -54,7 +55,7 @@
     @if (unit($value) != 'px') {
       $value: px($value, $base);
     }
-    @return ($value / $base) * 1rem;
+    @return math.div($value, $base) * 1rem;
   }
   @return $value;
 }

@@ -1,6 +1,7 @@
 // @file
 // Styles for the Footer.
 
+@use 'sass:math';
 @use 'uswds' as *;
 @use '../../00-config' as *;
 @use '../../02-base' as *;
@@ -23,7 +24,8 @@ $bp-footer-columns: 700px;
   margin: 0 rem(gesso-spacing(5)) rem(gesso-spacing(5)) 0;
 
   @include breakpoint($bp-footer-columns) {
-    margin-right: (rem(gesso-spacing(5)) / rem($bp-footer-columns)) * 100%;
+    margin-right: math.div(rem(gesso-spacing(5)), rem($bp-footer-columns)) *
+      100%;
   }
 }
 

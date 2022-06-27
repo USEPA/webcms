@@ -1,6 +1,7 @@
 // @file
 // Styles for the mobile menu.
 
+@use 'sass:math';
 @use 'uswds' as *;
 @use '../../00-config' as *;
 
@@ -75,7 +76,7 @@ $mobile-menu-line-height: line-height(ui, $theme-body-line-height);
   margin: 0;
   padding: (
       $mobile-menu-button-height -
-        ($mobile-menu-font-size * $mobile-menu-line-height) / 2
+        math.div($mobile-menu-font-size * $mobile-menu-line-height, 2)
     )
     gesso-spacing(2);
   text-align: left;
