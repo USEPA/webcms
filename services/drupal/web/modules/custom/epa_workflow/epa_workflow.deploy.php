@@ -289,7 +289,6 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
     $sandbox['total'] = count($results);
     $sandbox['current_processed']= 0;
-    $sandbox['max_entity_id'] = reset($results);
     $sandbox['current_entity_id'] = 0;
     $sandbox['batch_count'] = 0;
 
@@ -308,6 +307,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
   $query->addField('date', 'revision_id');
   $query->addField('date', 'field_date_value');
   $query->addField('date', 'field_date_end_value');
+  $query->addField('date', 'langcode');
   $query->condition('bundle', 'event', '=');
   $query->range($sandbox['batch_count'] * $batch,   $batch);
   $records = $query->execute()->fetchAll();
@@ -315,6 +315,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   $insert = Drupal::database()->insert('node__field_daterange');
   $insert->fields([
+    'bundle',
     'entity_id',
     'revision_id',
     'langcode',
@@ -322,6 +323,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     'field_daterange_value',
     'field_daterange_end_value',
     'field_daterange_duration',
+    'field_daterange_timezone',
   ]);
 
   foreach ($records as $node_field) {
@@ -341,15 +343,135 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     $duration = ($date_end - $date_start) / 60;
 
     $insert->values([
+      'event',
       $node_field->entity_id,
       $node_field->revision_id,
-      'en',
+      $node_field->langcode,
       0,
       $date_start,
       $date_end,
       $duration,
+      'America/New_York',
     ]);
     $insert->execute();
+  }
+
+  // If the number of records is less than 25
+  if (count($records) < $batch) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['current_processed'] / $sandbox['total']);
+    // Show the progress of the migration
+    \Drupal::logger('epa_workflow')->notice((int) ($sandbox['current_processed'] / $sandbox['total'] * 100) . '% field_date migration.');
+  }
+}
+
+/**
+ * Fix bundle and language and TZ for previously migrated daterange values
+ */
+function epa_workflow_deploy_0011_fix_daterange_bundle() {
+  Drupal::database()->update('node__field_daterange')
+    ->condition('bundle', '')
+    ->fields([
+      'bundle' => 'event',
+      'langcode' => getenv('WEBCMS_LANG'),
+      ])
+    ->execute();
+
+  Drupal::database()->update('node__field_daterange')
+    ->isNull('field_daterange_timezone')
+    ->fields([
+      'field_daterange_timezone' => 'America/New_York',
+    ])
+    ->execute();
+}
+
+/**
+ * Need to migrate the revisions for event field `field_date` to a smart date field
+ * `field_daterange`
+ *
+ */
+function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox) {
+
+  if (!isset($sandbox['total'])) {
+
+    // Get the total number of records that need
+    // tobe migrated.
+    $results = Drupal::database()->query(
+      "SELECT revision_id
+      FROM {node_revision__field_date} WHERE bundle = 'event'
+      ORDER BY revision_id ASC"
+    )->fetchCol();
+
+    $sandbox['total'] = count($results);
+    $sandbox['current_processed']= 0;
+    $sandbox['current_vid'] = 0;
+
+    \Drupal::logger('epa_workflow')->notice($sandbox['total'] . ' field_date migration.');
+  }
+
+  $batch = 25;
+
+  // Get the next batch of records
+  $query = Drupal::database()->select('node_revision__field_date', 'date')
+    ->fields('date', ['entity_id', 'revision_id','field_date_value','field_date_end_value','langcode'])
+    ->condition('bundle', 'event', '=')
+    ->condition('revision_id', $sandbox['current_vid'], '>')
+    ->orderBy('revision_id', 'ASC')
+    ->range(0, $batch);
+  $records = $query->execute()->fetchAll();
+
+  foreach ($records as $node_field) {
+    $insert = Drupal::database()->insert('node_revision__field_daterange');
+    $insert->fields([
+      'bundle',
+      'entity_id',
+      'revision_id',
+      'langcode',
+      'delta',
+      'field_daterange_value',
+      'field_daterange_end_value',
+      'field_daterange_duration',
+      'field_daterange_timezone',
+    ]);
+
+    // Keeping track of the process of the bach process
+    $sandbox['current_vid'] = $node_field->revision_id;
+    $sandbox['current_processed']++;
+
+    $date_start = $node_field->field_date_value;
+    $date_end = $node_field->field_date_end_value;
+
+    // Converting datetime to unix timestamp
+    $date_start = strtotime($date_start);
+    $date_end = strtotime($date_end);
+
+    // divide by 60 to account for minutes
+    $duration = ($date_end - $date_start) / 60;
+
+    $insert->values([
+      'event',
+      $node_field->entity_id,
+      $node_field->revision_id,
+      $node_field->langcode,
+      0,
+      $date_start,
+      $date_end,
+      $duration,
+      'America/New_York',
+    ]);
+
+    try {
+      $insert->execute();
+    }
+    catch (Exception $e) {
+      $classname = get_class($e);
+      // If this is a duplicate record then we can ignore the issue, otherwise re-throw the exception.
+      if ('Drupal\Core\Database\IntegrityConstraintViolationException' !== $classname) {
+        throw $e;
+      }
+    }
   }
 
   // If the number of records is less than 25

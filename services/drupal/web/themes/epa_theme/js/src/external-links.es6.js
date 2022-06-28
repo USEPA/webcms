@@ -5,10 +5,6 @@ import Drupal from 'drupal';
   Drupal.behaviors.externalLinks = {
     attach(context, settings) {
       const allowedDomains = [
-        'webcms-uploads-dev.s3.amazonaws.com',
-        'webcms-uploads-stage.s3.amazonaws.com',
-        'webcms-uploads-prod.s3.amazonaws.com',
-        'webcms-uploads-qa.s3.amazonaws.com',
         'airknowledge.gov',
         'airnow.gov',
         'clu-in.org',
@@ -50,7 +46,10 @@ import Drupal from 'drupal';
         ar: ['خروج', 'الخروج من موقع وكالة حماية البيئة'],
         zh_CN: ['退出', '退出环保署网页'],
         zh_TW: ['退出', '退出環保署網頁'],
-        fr: ['Exit', 'Exit EPA Website'],
+        bn: ['বাহির', 'ইপিএ এর ওয়েবসাইট থেকে বাইরে যান'],
+        de: ['Verlassen', 'EPA-Website verlassen'],
+        fr: ['Quitter', 'Quitter le site de l’EPA'],
+        gu: ['બહાર નીકળો', 'EPAની વેબસાઇટમાંથી બહાર નીકળો'],
         ht: ['Sòti', 'Sòti sou sit entènèt EPA a'],
         it: ['Exit', 'Exit EPA Website'],
         ko: ['출구', 'EPA 웹사이트 종료'],
