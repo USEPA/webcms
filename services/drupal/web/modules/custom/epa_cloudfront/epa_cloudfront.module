@@ -1,0 +1,34 @@
+<?php
+
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function epa_cloudfront_module_implements_alter(&$implementations, $hook) {
+  if ($hook === 'entity_update' && isset($implementations['cloudfront_cache_path_invalidate'])) {
+    unset($implementations['cloudfront_cache_path_invalidate']);
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ *
+ * Ensures the cache expiration is only called when a node is published or
+ * unpublished, not as a result of just any edit.
+ */
+function epa_cloudfront_entity_update(EntityInterface $entity) {
+  $current_user = \Drupal::currentUser();
+
+  if (!$current_user->isAnonymous()) {
+    $entity_type = $entity->getEntityTypeId();
+    if ($entity_type == 'content_moderation_state' &&
+      $entity->content_entity_type_id->value == 'node' &&
+      in_array($entity->moderation_state->value,['published','unpublished'])) {
+        if ($moderated_entity = \Drupal::entityTypeManager()->getStorage($entity->content_entity_type_id->value)->loadRevision($entity->content_entity_revision_id->value)) {
+          cloudfront_cache_path_invalidate_entity_update($moderated_entity);
+        }
+    }
+  }
+}
+
