@@ -2,22 +2,7 @@
 // This stylesheet is not loaded by the theme.
 
 @use 'sass:math';
-
-// We’re adding this function directly instead of @use-ing the functions
-// partial since that will pull in the entire USWDS library.
-// Convert values to rem.
-@function rem($value, $base: 16px) {
-  @if (type-of($base) != 'number' or unit($base) != 'px') {
-    @error "Base font size must be in pixels.";
-  }
-  @if (type-of($value) == 'number' and unit($value) != 'rem') {
-    @if (unit($value) != 'px') {
-      $value: px($value, $base);
-    }
-    @return math.div($value, $base) * 1rem;
-  }
-  @return $value;
-}
+@use '_patterns/00-config' as *;
 
 // The container for the 'view all' screen, which contains the list of patterns.
 .pl-c-pattern-index {

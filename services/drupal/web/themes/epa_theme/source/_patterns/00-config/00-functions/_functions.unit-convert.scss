@@ -1,12 +1,10 @@
-/// Convert unitless number to unit value
+@use 'sass:math';
+@use '00-functions.gesso' as *;
+@use 'functions.numbers' as *;
+
+// Convert unitless number to unit value
 // @param {Number} $value - unitless number
 // @return {String} - unit type
-
-@use 'sass:math';
-@use 'uswds' as *;
-@use '00-functions.gesso' as *;
-@use '../config.settings' as *;
-
 @function convert($value, $unit: px) {
   @if unitless($value) {
     @if $unit == px {

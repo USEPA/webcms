@@ -1,8 +1,9 @@
 // @file
 // Button styles
 
-@use 'uswds' as *;
-@use '../../uswds-theme-settings.artifact' as *;
+@use '../uswds-theme.artifact' as *;
+@use '../00-functions' as *;
+@use 'usa-button' as *;
 
 $button-border-radius: radius($theme-button-border-radius) !default;
 $button-background-color: gesso-color(button, primary, background) !default;
@@ -68,7 +69,7 @@ $button-font-size: gesso-base-font-size() !default;
   }
 
   &[disabled] {
-    @include button-disabled;
+    @include button-disabled();
     background-color: $color-background-disabled;
     color: $color-text-disabled;
   }
