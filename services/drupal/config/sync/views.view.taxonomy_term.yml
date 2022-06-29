@@ -325,6 +325,22 @@ display:
             offset_label: Offset
           quantity: 9
       sorts:
+        changed:
+          id: changed
+          table: node_field_data
+          field: changed
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: changed
+          plugin_id: date
+          order: DESC
+          expose:
+            label: 'Date Updated'
+            field_identifier: changed
+          exposed: true
+          granularity: second
         title:
           id: title
           table: node_field_data
@@ -340,20 +356,6 @@ display:
             label: Title
             field_identifier: title
           exposed: true
-        created:
-          id: created
-          table: taxonomy_index
-          field: created
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: date
-          order: DESC
-          expose:
-            label: ''
-            field_identifier: created
-          exposed: false
-          granularity: second
       query:
         type: views_query
         options: {  }
