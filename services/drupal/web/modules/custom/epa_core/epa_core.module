@@ -690,11 +690,19 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
  */
 function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
 {
-  if ($field_definition->getName() == 'status' &&
-    $field_definition->getTargetEntityTypeId() == 'user' &&
-    $operation == 'view'
-  ) {
-    return AccessResult::allowedIfHasPermission($account, 'view group user status field');
+  if ($field_definition->getTargetEntityTypeId() == 'user') {
+    switch ($field_definition->getName()) {
+      case 'status':
+        if ($operation == 'view') {
+          return AccessResult::allowedIfHasPermission($account, 'view group user status field');
+        }
+        break;
+      case 'access':
+        if ($operation == 'view') {
+          return AccessResult::allowedIfHasPermission($account, 'view group user last access field');
+        }
+        break;
+    }
   }
   return AccessResult::neutral();
 }
