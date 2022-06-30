@@ -5,6 +5,7 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
@@ -682,4 +683,18 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
         ->setTargetEntityTypeId('user');
     }
   }
+}
+
+/**
+ * Implements hook_entity_field_access().
+ */
+function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
+{
+  if ($field_definition->getName() == 'status' &&
+    $field_definition->getTargetEntityTypeId() == 'user' &&
+    $operation == 'view'
+  ) {
+    return AccessResult::allowedIfHasPermission($account, 'view group user status field');
+  }
+  return AccessResult::neutral();
 }
