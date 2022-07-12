@@ -57,7 +57,25 @@ function epa_theme_preprocess_node__news_release__full(&$variables) {
         break;
       case 'fr':
         $link = Link::fromTextAndUrl(
-          'Lisez les communiqués de presse de l\'EPA en français',
+          'Lire les communiqués de presse de l’EPA en français',
+          $language_url
+        );
+        break;
+      case 'de':
+        $link = Link::fromTextAndUrl(
+          'Lesen Sie EPA-Pressemitteilungen auf Deutsch',
+          $language_url
+        );
+        break;
+      case 'bn':
+        $link = Link::fromTextAndUrl(
+          'বাংলায়> প্রকাশিত ইপিএ খবর পড়ুন',
+          $language_url
+        );
+        break;
+      case 'gu':
+        $link = Link::fromTextAndUrl(
+          'EPA ની સમાચાર જાહેરાત ગુજરાતી માં વાંચો',
           $language_url
         );
         break;
