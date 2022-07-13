@@ -14,12 +14,22 @@ targetEntityType: user
 bundle: user
 mode: default
 content:
+  access:
+    type: timestamp_ago
+    label: inline
+    settings:
+      future_format: '@interval hence'
+      past_format: '@interval ago'
+      granularity: 5
+    third_party_settings: {  }
+    weight: 2
+    region: content
   entitygroupfield:
     type: epa_parent_group_with_roles_formatter
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 5
     region: content
   field_full_name:
     type: string
@@ -27,19 +37,39 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: -3
+    weight: 0
+    region: content
+  login:
+    type: timestamp_ago
+    label: inline
+    settings:
+      future_format: '@interval hence'
+      past_format: '@interval ago'
+      granularity: 3
+    third_party_settings: {  }
+    weight: 3
     region: content
   mail:
     type: email_mailto
     label: inline
     settings: {  }
     third_party_settings: {  }
-    weight: -2
+    weight: 4
     region: content
   masquerade:
     settings: {  }
     third_party_settings: {  }
-    weight: 3
+    weight: 6
+    region: content
+  status:
+    type: boolean
+    label: inline
+    settings:
+      format: custom
+      format_custom_false: Blocked
+      format_custom_true: Active
+    third_party_settings: {  }
+    weight: 1
     region: content
 hidden:
   field_email_opt_in: true
