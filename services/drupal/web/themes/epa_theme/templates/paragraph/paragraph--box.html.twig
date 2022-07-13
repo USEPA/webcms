@@ -11,6 +11,7 @@
 
   {% set classes = [
     box_style ? 'box--' ~ box_style,
+    content.field_alignment|field_value ? 'u-align-' ~ content.field_alignment|field_value|render,
   ]|join(' ')|trim %}
 
   {% set icon = '' %}
