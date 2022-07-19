@@ -40,6 +40,15 @@ resource "aws_ssm_parameter" "elasticache_endpoint" {
   tags = var.tags
 }
 
+# Provide the ElastiCache nodes as a comma-separated list of host:port addresses for loading in settings.php.
+resource "aws_ssm_parameter" "elasticache_node_endpoints" {
+  name  = "/webcms/${var.environment}/endpoints/elasticache-nodes"
+  type  = "StringList"
+  value = join(",", [for node in aws_elasticache_cluster.cache.cache_nodes : "${node.address}:${node.port}"])
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "rds_proxy_endpoint" {
   name  = "/webcms/${var.environment}/endpoints/rds-proxy"
   type  = "String"
