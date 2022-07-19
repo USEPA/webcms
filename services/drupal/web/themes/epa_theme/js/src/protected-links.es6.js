@@ -1,4 +1,4 @@
-// Eternal Links script
+// Protected Links script
 import Drupal from 'drupal';
 
 (function(Drupal) {
