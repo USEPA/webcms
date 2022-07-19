@@ -1,4 +1,4 @@
-// Eternal Links script
+// External Links script
 import Drupal from 'drupal';
 
 (function(Drupal) {
