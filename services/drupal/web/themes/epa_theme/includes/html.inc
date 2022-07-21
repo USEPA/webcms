@@ -40,10 +40,6 @@ function epa_theme_preprocess_html(&$vars, $hook) {
       $vars['page_js'] = $node->field_page_head->value;
     }
   }
-
-  if (\Drupal::request()->attributes->get('taxonomy_term')) {
-    $vars['page']['#title'] = html_entity_decode($vars['page']['#title']);
-  }
 }
 
 /**
