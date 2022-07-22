@@ -251,6 +251,10 @@ function epa_core_token_info() {
   $view_argument_1 = [
     'name' => 'The first argument of the view'
   ];
+  $term_description = [
+    'name' => t('Term description'),
+    'description' => t('Default term description.'),
+  ];
 
   $tokens['tokens'] = [
     'node' => [
@@ -265,6 +269,9 @@ function epa_core_token_info() {
     ],
     'view' => [
       'argument-1' => $view_argument_1,
+    ],
+    'term' => [
+      'term-description' => $term_description
     ]
   ];
   return $tokens;
@@ -356,6 +363,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $replacements[$original] = $args[0];
           }
         }
+        break;
+      case 'term-description':
+        $config = \Drupal::config('term.settings');
+        $term_description = $config->get('default_description');
+
+        $replacements[$original] = $term_description;
         break;
     }
   }
