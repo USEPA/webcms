@@ -3,11 +3,13 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.node.field_paragraphs
     - field.storage.node.field_press_office
     - field.storage.node.field_release
     - search_api.index.news_releases
   module:
     - datetime
+    - entity_reference_revisions
     - epa_core
     - epa_rss
     - search_api
@@ -372,15 +374,16 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
-        field_body:
-          id: field_body
-          table: search_api_index_news_releases
-          field: field_body
+        field_paragraphs:
+          id: field_paragraphs
+          table: search_api_datasource_news_releases_entity_node
+          field: field_paragraphs
           relationship: none
           group_type: group
           admin_label: ''
+          entity_type: node
           plugin_id: search_api_field
-          label: 'The main body text'
+          label: ''
           exclude: false
           alter:
             alter_text: false
@@ -391,7 +394,7 @@ display:
             external: false
             replace_spaces: false
             path_case: none
-            trim_whitespace: true
+            trim_whitespace: false
             alt: ''
             rel: ''
             link_class: ''
@@ -405,7 +408,7 @@ display:
             more_link: false
             more_link_text: ''
             more_link_path: ''
-            strip_tags: true
+            strip_tags: false
             trim: false
             preserve_tags: ''
             html: false
@@ -413,19 +416,19 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
-          element_default_classes: false
+          element_default_classes: true
           empty: ''
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: value
-          type: text_trimmed
+          click_sort_column: target_id
+          type: entity_reference_revisions_entity_view
           settings:
-            trim_length: 300
-          group_column: value
+            view_mode: default
+          group_column: ''
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -433,7 +436,7 @@ display:
           delta_reversed: false
           delta_first_last: false
           multi_type: separator
-          separator: ', '
+          separator: ''
           field_api_classes: false
           field_rendering: true
           fallback_handler: search_api
@@ -710,7 +713,7 @@ display:
         options:
           title_field: title
           link_field: nid
-          description_field: field_body
+          description_field: field_paragraphs
           creator_field: field_press_office
           date_field: field_release
           guid_field_options:
@@ -738,6 +741,7 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:field.storage.node.field_paragraphs'
         - 'config:field.storage.node.field_press_office'
         - 'config:field.storage.node.field_release'
         - 'config:search_api.index.news_releases'
