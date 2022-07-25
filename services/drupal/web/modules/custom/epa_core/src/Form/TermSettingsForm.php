@@ -21,14 +21,14 @@ class TermSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['term.settings'];
+    return ['epa_core.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('term.settings');
+    $config = $this->config('epa_core.settings');
     $form['default_description'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Term Default Description'),
@@ -43,7 +43,7 @@ class TermSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = $this->config('term.settings');
+    $config = $this->config('epa_core.settings');
     $config->set('default_description', $form_state->getValue('default_description'));
     $config->save();
 

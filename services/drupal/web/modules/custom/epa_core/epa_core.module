@@ -366,7 +366,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         break;
       case 'term-description':
         if ($type == 'term' && !empty($data['term'])) {
-          $config = \Drupal::config('term.settings');
+          $config = \Drupal::config('epa_core.settings');
           $term_description = $config->get('default_description');
           // Term description can contain tokens, so we need to replace them.
           $token = \Drupal::token();
