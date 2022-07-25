@@ -282,6 +282,25 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       ];
 
     }
+
+    // Display the Revision Author Information
+    if (
+      isset($node)
+      && $node->getRevisionUser()
+    )
+    {
+
+      $revision_author = $node->getRevisionUser()->get('name')->value;
+      $author_uid = $node->getRevisionUserId();
+
+      $form['revision_author'] = [
+        '#type' => 'item',
+        '#title' => t("Revision Saved By"),
+        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a'
+      ];
+
+    }
+
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {

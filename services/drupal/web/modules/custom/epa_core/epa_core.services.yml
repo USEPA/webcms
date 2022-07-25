@@ -11,3 +11,6 @@ services:
     arguments: ['@config.factory']
     tags:
       - { name: event_subscriber }
+  entity.autocomplete_matcher:
+    class: Drupal\epa_core\Entity\EntityAutocompleteMatcher
+    arguments: [ '@plugin.manager.entity_reference_selection' ]
