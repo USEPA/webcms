@@ -365,10 +365,15 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         }
         break;
       case 'term-description':
-        $config = \Drupal::config('term.settings');
-        $term_description = $config->get('default_description');
+        if ($type == 'term' && !empty($data['term'])) {
+          $config = \Drupal::config('term.settings');
+          $term_description = $config->get('default_description');
+          // Term description can contain tokens, so we need to replace them.
+          $token = \Drupal::token();
+          $term_description = $token->replace($term_description, ['term' => $data['term']]);
+          $replacements[$original] = $term_description;
+        }
 
-        $replacements[$original] = $term_description;
         break;
     }
   }
