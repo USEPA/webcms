@@ -13,6 +13,7 @@ import Drupal from 'drupal';
         'urbanwaterpartners.gov',
         'urbanwaters.gov',
         'westcoastcollaborative.org',
+        'usepa.sharepoint.com',
       ];
       function linkIsExternal(linkElement) {
         let external = true;
@@ -60,7 +61,6 @@ import Drupal from 'drupal';
       };
       externalLinks.forEach(function(el) {
         if (el.hasAttribute('href') && linkIsExternal(el)) {
-          let translated = Drupal.t('Exit');
           let translatedAccessible = Drupal.t('Exit EPA Website');
           const article = el.closest('article[lang]');
           if (article) {
@@ -68,12 +68,11 @@ import Drupal from 'drupal';
             if (!(lang in translate)) {
               lang = 'en';
             }
-            translated = translate[lang][0];
             translatedAccessible = translate[lang][1];
           }
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="usa-tag external-link__tag" title="${translatedAccessible}"><span aria-hidden="true">${translated}</span><span class="u-visually-hidden"> ${translatedAccessible}</span></span>`
+            `<span class="external-link__tag" title="${translatedAccessible}"><svg class="usa-icon" aria-hidden="true" focusable="false" role="img"><use href="/themes/epa_theme/images/sprite.svg#launch"></use></svg></span>`
           );
         }
       });
