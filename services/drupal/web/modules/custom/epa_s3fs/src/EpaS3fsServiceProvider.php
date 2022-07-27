@@ -19,6 +19,11 @@ class EpaS3fsServiceProvider extends ServiceProviderBase {
       $container->getDefinition('stream_wrapper.public')
         ->setClass('Drupal\epa_s3fs\StreamWrapper\EpaPublicS3fsStream');
     }
+    if ($container->getDefinition('stream_wrapper.public')->getClass() == 'Drupal\s3fs_file_proxy_to_s3\StreamWrapper\PublicS3fsFileProxyToS3Stream') {
+      $container->getDefinition('stream_wrapper.public')
+        ->setClass('Drupal\epa_s3fs\StreamWrapper\EpaPublicS3fsFileProxyStream');
+    }
+
   }
 
 }

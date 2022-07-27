@@ -40,6 +40,11 @@ class EpaPublicS3fsStream extends PublicS3fsStream {
    *   A web accessible URL for the resource.
    */
   public function getExternalUrl() {
+    // If we want to serve the files off a different domain then we bypass our
+    // custom code and just rely on the parent.
+    if (!empty($this->config['use_cname']) && !empty($this->config['domain'])) {
+      return parent::getExternalUrl();
+    }
     // In case we're on Windows, replace backslashes with forward-slashes.
     // Note that $uri is the unaltered value of the File's URI, while
     // $s3_key may be changed at various points to account for implementation
