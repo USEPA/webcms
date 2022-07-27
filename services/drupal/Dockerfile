@@ -243,7 +243,7 @@ RUN chmod +x /webcms-entrypoint
 # Replace the default crontab with one that runs Drush every five minutes. By
 # default, cron is not run (since there is no systemd equivalent in containers),
 # but we use this in the Drush ECS service definition.
-RUN echo '*/5 * * * * drush cron 2>&1' | crontab -
+RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
 
 # Wrap the entrypoint script with tini to allow graceful signal handling
 ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
