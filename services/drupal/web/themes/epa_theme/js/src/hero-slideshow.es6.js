@@ -29,6 +29,13 @@ import { tns } from 'tiny-slider/src/tiny-slider';
             sliderObject.pause();
           }
         });
+
+        slider.addEventListener('focusin', function() {
+          sliderObject.pause();
+        });
+        slider.addEventListener('focusout', function() {
+          sliderObject.play();
+        });
       });
     },
   };
