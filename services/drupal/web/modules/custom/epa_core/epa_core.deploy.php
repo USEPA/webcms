@@ -99,3 +99,49 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
+
+/**
+ * Sets terms with empty description to global term description token.
+ */
+function epa_core_deploy_0001_update_term_path(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Query all terms that don't have a description set.
+    $result = \Drupal::database()->query(
+      'SELECT tid FROM taxonomy_term_field_data;')
+      ->fetchCol();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' term paths to be updated.');
+  }
+
+  // Query 500 at a time for batch.
+  $tids = \Drupal::database()->query(
+    'SELECT tid FROM taxonomy_term_field_data
+        LIMIT 500;')
+    ->fetchCol();
+
+  if (empty($tids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_term')
+    ->loadMultiple($tids);
+
+  foreach ($terms as $term) {
+    $term->path->pathauto = 1;
+    $term->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' term paths updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
