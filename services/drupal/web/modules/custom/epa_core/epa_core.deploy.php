@@ -119,7 +119,9 @@ function epa_core_deploy_0001_update_term_path(&$sandbox) {
   // Query 500 at a time for batch.
   $tids = \Drupal::database()->query(
     'SELECT tid FROM taxonomy_term_field_data
-        LIMIT 500;')
+        ORDER BY tid ASC
+        LIMIT 500
+        OFFSET '. $sandbox['current'] . ';')
     ->fetchCol();
 
   if (empty($tids)) {
