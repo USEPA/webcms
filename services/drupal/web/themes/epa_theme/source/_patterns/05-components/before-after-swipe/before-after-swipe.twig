@@ -1,0 +1,19 @@
+{% set classes = [
+  'before-after-swipe',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set media %}
+<two-up class="before-after-swipe__main">
+  <div>{{ before }}</div>
+  <div>{{ after }}</div>
+</two-up>
+{% endset %}
+
+{#<div class="{{ classes }}" title="{{ text }}">#}
+  {% include '@components/figure/figure.twig' with {
+    'modifier_classes': classes,
+    'caption': caption,
+    'media': media,
+  }%}
+{#</div>#}

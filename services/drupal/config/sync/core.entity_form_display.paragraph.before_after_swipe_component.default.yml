@@ -1,0 +1,56 @@
+uuid: 49802172-e4f5-4529-98e9-923e39754b97
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.before_after_swipe_component.field_image_one
+    - field.field.paragraph.before_after_swipe_component.field_image_two
+    - field.field.paragraph.before_after_swipe_component.field_slider_caption
+    - field.field.paragraph.before_after_swipe_component.field_slider_image_style
+    - field.field.paragraph.before_after_swipe_component.field_slider_orientation
+    - paragraphs.paragraphs_type.before_after_swipe_component
+  module:
+    - media_library
+    - text
+id: paragraph.before_after_swipe_component.default
+targetEntityType: paragraph
+bundle: before_after_swipe_component
+mode: default
+content:
+  field_image_one:
+    type: media_library_widget
+    weight: 0
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_image_two:
+    type: media_library_widget
+    weight: 1
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+  field_slider_caption:
+    type: text_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_slider_image_style:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_slider_orientation:
+    type: options_select
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true
