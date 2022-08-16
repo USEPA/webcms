@@ -101,9 +101,10 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
 }
 
 /**
- * Sets terms with empty description to global term description token.
+ * Explicitly sets each taxonomy term to have its path set by pathauto then re-saves
+ * terms to ensure they get the latest generated path.
  */
-function epa_core_deploy_0001_update_term_path(&$sandbox) {
+function epa_core_deploy_0002_update_term_path(&$sandbox) {
   if (!isset($sandbox['total'])) {
     // Query all terms that don't have a description set.
     $result = \Drupal::database()->query(
