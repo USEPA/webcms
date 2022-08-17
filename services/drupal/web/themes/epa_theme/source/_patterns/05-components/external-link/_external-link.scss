@@ -8,9 +8,10 @@
     background-size: 100% 100%;
     content: '';
     display: inline-block;
-    height: 0.65em;
+    height: 1em;
     margin: -1px rem(units(0.5)) 0;
-    width: 0.65em;
+    vertical-align: middle;
+    width: 1em;
   }
 
   &:hover,
@@ -40,13 +41,13 @@
   &.usa-button.usa-button--outline,
   &.usa-button.usa-button--unstyled {
     &::after {
-      @include svg-background(external-link--blue-dark);
+      @include svg-background(external-link--blue-base);
     }
     &:hover,
     &:focus,
     &:active {
       &::after {
-        @include svg-background(external-link-hover);
+        @include svg-background(external-link--blue-dark);
       }
     }
   }
@@ -96,9 +97,4 @@ html.no-js .external-link {
 // Hide external link icon for anchors without an href attribute.
 a:not([href])::after {
   display: none !important;
-}
-
-.external-link__tag {
-  display: inline-block;
-  text-decoration: none;
 }
