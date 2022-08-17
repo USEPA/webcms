@@ -64,7 +64,10 @@ import Drupal from 'drupal';
           let translatedAccessible = Drupal.t('Exit EPA Website');
           const article = el.closest('article[lang]');
           if (article) {
-            const lang = article.getAttribute('lang');
+            let lang = article.getAttribute('lang');
+            if (!(lang in translate)) {
+              lang = 'en';
+            }
             translated = translate[lang][0];
             translatedAccessible = translate[lang][1];
           }
