@@ -32,7 +32,7 @@ import Drupal from 'drupal';
           const translatedAccessible = Drupal.t('Link to protected area');
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="protected-link__tag" title="${translatedAccessible}"><svg class="icon icon--exit is-spaced-before" aria-hidden="true" focusable="false" role="img"><use href="/themes/epa_theme/images/sprite.svg#lock"></use></svg></span>`
+            `<svg class="icon icon--exit is-spaced-before" role="img"><title>${translatedAccessible}</title><use href="/themes/epa_theme/images/sprite.svg#lock"></use></svg>`
           );
         }
       });
