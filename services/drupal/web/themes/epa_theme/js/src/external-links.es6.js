@@ -72,7 +72,7 @@ import Drupal from 'drupal';
           }
           el.insertAdjacentHTML(
             'beforeend',
-            `<span class="external-link__tag" title="${translatedAccessible}"><svg class="icon icon--exit is-spaced-before" aria-hidden="true"><use href="/themes/epa_theme/images/sprite.svg#launch"></use></svg></span>`
+            `<svg class="icon icon--exit is-spaced-before" role="img"><title>${translatedAccessible}</title><use href="/themes/epa_theme/images/sprite.svg#launch"></use></svg>`
           );
         }
       });
