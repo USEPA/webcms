@@ -352,36 +352,6 @@ resource "aws_ssm_parameter" "saml_sp_key" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "akamai_access_token" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/akamai-access-token"
-  type  = "String"
-  value = aws_secretsmanager_secret.akamai_access_token[each.key].arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "akamai_client_token" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/akamai-client-token"
-  type  = "String"
-  value = aws_secretsmanager_secret.akamai_client_token[each.key].arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "akamai_client_secret" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/akamai-client-secret"
-  type  = "String"
-  value = aws_secretsmanager_secret.akamai_client_secret[each.key].arn
-
-  tags = var.tags
-}
-
 #endregion
 
 #region Terraform configuration
