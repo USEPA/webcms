@@ -18,8 +18,6 @@
       - [Sensitive Values](#sensitive-values)
     - [Email Variables](#email-variables)
       - [Sensitive Values](#sensitive-values-1)
-    - [Akamai Variables](#akamai-variables)
-      - [Sensitive Values](#sensitive-values-2)
     - [SAML Variables](#saml-variables)
       - [Sensitive Values](#sensitive-values-3)
   - [Parameter Store](#parameter-store)
@@ -94,7 +92,6 @@ These values customize the Drupal ECS service's behavior. For instance, it deter
 - `drupal_extra_hostnames`: An optional `list(string)` of additional hostnames that Traefik should allow for routing. This covers use cases such as providing an "origin" host name that can be accessed separately from a caching tier/CDN, or providing VPN-internal addresses. Note that these host names are _not_ provided to Drupal when a request is made.
 - `drupal_min_capacity`: The minimum number of ECS tasks to run for Drupal. While this value defaults to 1, production deployments should use a larger value in order to supply high availability even during low-traffic scenarios.
 - `drupal_max_capacity`: The maximum number of ECS tasks to run for Drupal. This value is only limited by AWS service quotas (and your budget); plan for low values (e.g., 5) for dev environments and large (e.g., 30 or more) for production-ready deployments. Autoscaling rules will ensure this value is only used when demand requires it.
-- `drupal_use_s3_domain`: This determines whether or not Drupal outputs direct links to files in S3, or tells the s3fs module to proxy links to files.
 - `drupal_csrf_origin_whitelist`: This is an optional list of origins provided to [Security Kit](https://www.drupal.org/project/seckit)'s `seckit_csrf.origin_whitelist` configuration. Security Kit checks this list when non-idemptotent (e.g., POST, PUT, DELETE, etc.) requests are sent. If the requesting origin isn't in the list (or is absent entirely), the request is rejected. Note that the value of `var.drupal_hostname` is implicitly added to this list by the module and does not need to be added manually.
 - `drupal_state`: This value exists to work around a chicken-and-egg problem when deploying Drupal for the first time. This value _must_ be one of `"run"` or `"build"`. See the next section for how these influence Drupal's behavior.
 
@@ -135,23 +132,6 @@ These variables influence how Drupal uses SMTP.
 SMTP credentials are saved in Secrets Manager instead of being provided in plain text with Terraform.
 
 - `/webcms/${var.environment}/${var.site}/${var.lang}/mail-password`: The SMTP password.
-
-#### Akamai Variables
-
-These variables influence how Drupal interacts with Akamai caching. Specifically, they control whether or not Drupal uses content purging and, if enabled, where the API endpoint is. These variables have sensible defaults that disable Akamai, so this can be ignored unless building the production sites.
-
-- `akamai_enabled`: Tells Drupal if Akamai caching is in use.
-- `akamai_api_host`: The URL of the Akamai endpoint to purge content. Only relevant if `akamai_enabled` is true. The default valaue here is a junk URL that can be left alone when Akamai caching is not in use.
-
-##### Sensitive Values
-
-There are three Akamai-related values that need to be populated. These values are required even if Akamai is disabled; in cases such as this, it is acceptable to simply store the empty string or junk data (such as `DISABLED` or another marker) here.
-
-These values correspond to authentication parameters used by Akamai's APIs. See the [Getting Started](https://developer.akamai.com/api/getting-started) documentation for more information.
-
-- `/webcms/${var.environment}/${var.site}/${var.lang}/akamai-access-token`: The Akamai access token.
-- `/webcms/${var.environment}/${var.site}/${var.lang}/akamai-client-token`: The Akamai client token.
-- `/webcms/${var.environment}/${var.site}/${var.lang}/akamai-client-secret`: The Akamai client secret.
 
 #### SAML Variables
 
@@ -206,9 +186,6 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license`: The ARN of the New Relic license key.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key`: The ARN of the private key for Drupal's SAML certificate.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-access-token`: The ARN of the Akamai API access token.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-token`: The ARN of the Akamai API client token.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-secret`: The ARN of the Akamai API client secret.
 
 ## Resources
 
