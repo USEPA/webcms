@@ -4,22 +4,25 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.beforeAfterSwipe = {
     attach(context, settings) {
-      const beforeAfter = context.querySelector('.before-after-swipe');
-      const slider = beforeAfter.querySelector('.before-after-swipe__slider');
+      const beforeAfters = context.querySelectorAll('.before-after-swipe');
 
-      function update(e) {
-        const sliderPos = e.target.value;
-        e.target.parentElement.style.setProperty(
-          '--split-point',
-          `${sliderPos}%`
-        );
-        context.querySelector(
-          '.before-after-swipe__slider-button'
-        ).style.left = `calc(${sliderPos}%`;
-      }
+      beforeAfters.forEach(beforeAfter => {
+        const slider = beforeAfter.querySelector('.before-after-swipe__slider');
 
-      slider.addEventListener('input', update);
-      slider.addEventListener('change', update);
+        function update(e) {
+          const sliderPos = e.target.value;
+          e.target.parentElement.style.setProperty(
+            '--split-point',
+            `${sliderPos}%`
+          );
+          e.target.parentElement.querySelector(
+            '.before-after-swipe__slider-button'
+          ).style.left = `calc(${sliderPos}%`;
+        }
+
+        slider.addEventListener('input', update);
+        slider.addEventListener('change', update);
+      });
     },
   };
 })(Drupal);
