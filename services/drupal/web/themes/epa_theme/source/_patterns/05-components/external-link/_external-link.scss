@@ -78,6 +78,84 @@
   }
 }
 
+%protected-link {
+  &::after {
+    @include svg-background(lock--blue-base);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    content: '';
+    display: inline-block;
+    height: 1em;
+    margin: -1px rem(units(0.5)) 0;
+    vertical-align: middle;
+    width: 1em;
+  }
+
+  &:hover,
+  &:focus,
+  &:active {
+    &::after {
+      @include svg-background(lock--blue-dark);
+    }
+  }
+
+  // External links that are a button.
+  &.button,
+  &.usa-button {
+    &::after {
+      @include svg-background(lock--white);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(lock--white);
+      }
+    }
+  }
+
+  // Button variations.
+  &.usa-button.usa-button--outline,
+  &.usa-button.usa-button--unstyled {
+    &::after {
+      @include svg-background(lock--blue-base);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(lock--blue-dark);
+      }
+    }
+  }
+
+  &.usa-button.usa-button--outline.usa-button--inverse {
+    &::after {
+      @include svg-background(lock--gray-2);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(lock--gray-2);
+      }
+    }
+  }
+
+  &.usa-button.usa-button--accent-cool {
+    &::after {
+      @include svg-background(lock--gray-7);
+    }
+    &:hover,
+    &:focus,
+    &:active {
+      &::after {
+        @include svg-background(lock--gray-7);
+      }
+    }
+  }
+}
+
 /*
 repeated code in the following, as putting them in the same block breaks
 the string literal in the $external-urls variable
@@ -91,6 +169,11 @@ html.no-js a#{$external-urls} {
 /* stylelint-disable-next-line selector-no-qualifying-type */
 html.no-js .external-link {
   @extend %external-link;
+}
+
+/* stylelint-disable-next-line selector-no-qualifying-type */
+html.no-js body a#{$intranet-urls} {
+  @extend %protected-link;
 }
 
 // Hide external link icon for anchors without an href attribute.
