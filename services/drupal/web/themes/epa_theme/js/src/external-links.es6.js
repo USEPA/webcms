@@ -42,7 +42,7 @@ import Drupal from 'drupal';
         "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])"
       );
       const translate = {
-        en: ['Exit', 'Exit EPA website'],
+        en: ['Exit', 'Exit EPA’s website'],
         es: ['Salir', 'Salir del sitio web de la EPA'],
         ar: ['خروج', 'الخروج من موقع وكالة حماية البيئة'],
         zh_CN: ['退出', '退出环保署网页'],
@@ -52,7 +52,7 @@ import Drupal from 'drupal';
         fr: ['Quitter', 'Quitter le site de l’EPA'],
         gu: ['બહાર નીકળો', 'EPAની વેબસાઇટમાંથી બહાર નીકળો'],
         ht: ['Sòti', 'Sòti sou sit entènèt EPA a'],
-        it: ['Exit', 'Exit EPA Website'],
+        it: ['Exit', 'Exit EPA’s Website'],
         ko: ['출구', 'EPA 웹사이트 종료'],
         pt: ['Sair', 'Sair do site da EPA'],
         ru: ['Покинуть', 'Покинуть веб сайт EPA'],
@@ -61,7 +61,7 @@ import Drupal from 'drupal';
       };
       externalLinks.forEach(function(el) {
         if (el.hasAttribute('href') && linkIsExternal(el)) {
-          let translatedAccessible = Drupal.t('Exit EPA Website');
+          let translatedAccessible = Drupal.t('Exit EPA’s Website');
           const article = el.closest('article[lang]');
           if (article) {
             let lang = article.getAttribute('lang');
