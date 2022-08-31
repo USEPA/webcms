@@ -91,39 +91,6 @@ resource "aws_secretsmanager_secret" "saml_sp_key" {
   tags = var.tags
 }
 
-resource "aws_secretsmanager_secret" "akamai_access_token" {
-  for_each = local.sites
-
-  name        = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/akamai-access-token"
-  description = "Akamai access token."
-
-  recovery_window_in_days = 0
-
-  tags = var.tags
-}
-
-resource "aws_secretsmanager_secret" "akamai_client_token" {
-  for_each = local.sites
-
-  name        = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/akamai-client-token"
-  description = "Akamai client token."
-
-  recovery_window_in_days = 0
-
-  tags = var.tags
-}
-
-resource "aws_secretsmanager_secret" "akamai_client_secret" {
-  for_each = local.sites
-
-  name        = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/akamai-client-secret"
-  description = "Akamai client secret."
-
-  recovery_window_in_days = 0
-
-  tags = var.tags
-}
-
 #endregion
 
 #region New Relic
