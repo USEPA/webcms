@@ -94,3 +94,75 @@ function epa_workflow_update_9001() {
   \Drupal::database()->query('UPDATE {node_revision__field_scheduled_transition} SET field_scheduled_transition_value = CONCAT(field_scheduled_transition_value, \'T05:00:00\') where LENGTH(field_scheduled_transition_value) < 11')
     ->execute();
 }
+
+/**
+ * Fix duplicate scheduled transitions.
+ */
+function epa_workflow_update_9002() {
+  // If there are multiple copies of the transition to "published_needs_review"
+  // for a given revision, copy the latest scheduled version of that transition
+  // to the delta 0 position.
+  // We need to make sure we're only messing with "published_needs_review"
+  // transitions; it's possible there could be duplicates based on other
+  // transitions for other reasons (like scheduled sunset dates)
+  \Drupal::database()->query('UPDATE {node__field_scheduled_transition} AS t1
+LEFT JOIN (SELECT entity_id,
+         revision_id,
+         max(field_scheduled_transition_value) AS transition_date,
+         count(*) AS dupes
+    FROM {node__field_scheduled_transition}
+    WHERE field_scheduled_transition_moderation_state = \'published_needs_review\'
+    GROUP BY  revision_id
+    HAVING dupes > 1) AS t2
+    ON t1.revision_id = t2.revision_id SET field_scheduled_transition_value = t2.transition_date
+WHERE t2.revision_id IS NOT NULL
+        AND t1.delta = 0
+        AND t1.field_scheduled_transition_moderation_state = \'published_needs_review\'')->execute();
+
+  \Drupal::database()->query('UPDATE {node_revision__field_scheduled_transition} AS t1
+LEFT JOIN
+    (SELECT entity_id,
+         revision_id,
+         max(field_scheduled_transition_value) AS transition_date,
+         count(*) AS dupes
+    FROM {node_revision__field_scheduled_transition}
+    WHERE field_scheduled_transition_moderation_state = \'published_needs_review\'
+    GROUP BY  revision_id
+    HAVING dupes > 1) AS t2
+    ON t1.revision_id = t2.revision_id SET field_scheduled_transition_value = t2.transition_date
+WHERE t2.revision_id IS NOT NULL
+        AND t1.delta = 0
+        AND t1.field_scheduled_transition_moderation_state = \'published_needs_review\'')->execute();
+
+  // Now that we've copied the preferred version of the transition to delta
+  // position 0 delete the additional redundant ones
+  \Drupal::database()->query('DELETE
+FROM {node_revision__field_scheduled_transition}
+WHERE revision_id IN
+    (SELECT revision_id
+    FROM
+        (SELECT revision_id,
+         max(field_scheduled_transition_value) AS transition_date,
+         count(*) AS dupes
+        FROM {node_revision__field_scheduled_transition}
+        WHERE field_scheduled_transition_moderation_state = \'published_needs_review\'
+        GROUP BY  revision_id
+        HAVING dupes > 1) t2)
+            AND field_scheduled_transition_moderation_state = \'published_needs_review\'
+        AND delta > 0')->execute();
+
+  \Drupal::database()->query('DELETE
+FROM {node__field_scheduled_transition}
+WHERE revision_id IN
+    (SELECT revision_id
+    FROM
+        (SELECT revision_id,
+         max(field_scheduled_transition_value) AS transition_date,
+         count(*) AS dupes
+        FROM {node__field_scheduled_transition}
+        WHERE field_scheduled_transition_moderation_state = \'published_needs_review\'
+        GROUP BY  revision_id
+        HAVING dupes > 1) t2)
+            AND field_scheduled_transition_moderation_state = \'published_needs_review\'
+        AND delta > 0')->execute();
+}
