@@ -106,8 +106,7 @@ function epa_workflow_update_9002() {
   // transitions; it's possible there could be duplicates based on other
   // transitions for other reasons (like scheduled sunset dates)
   \Drupal::database()->query('UPDATE {node__field_scheduled_transition} AS t1
-LEFT JOIN (SELECT entity_id,
-         revision_id,
+LEFT JOIN (SELECT revision_id,
          max(field_scheduled_transition_value) AS transition_date,
          count(*) AS dupes
     FROM {node__field_scheduled_transition}
@@ -121,8 +120,7 @@ WHERE t2.revision_id IS NOT NULL
 
   \Drupal::database()->query('UPDATE {node_revision__field_scheduled_transition} AS t1
 LEFT JOIN
-    (SELECT entity_id,
-         revision_id,
+    (SELECT revision_id,
          max(field_scheduled_transition_value) AS transition_date,
          count(*) AS dupes
     FROM {node_revision__field_scheduled_transition}
