@@ -161,10 +161,6 @@ There are a number of sensitive values that must be populated by an administrato
 1. The Drupal hash salt must be generated and saved in `/webcms/${var.environment}/${site}/${lang}/drupal-hash-salt`. This value **must** differ between site/language combinations in order to prevent one-time tokens such as password resets from being reused. Use a secure random number generator such as the `openssl rand` utility to generate a large number of bytes (at least 32).
 2. For email, the SMTP password must be saved in the secret `/webcms/${var.environment}/${site}/${lang}/mail-password`.
 3. An x509 certificate and private key will need to be generated for each Drupal site and language. The private key needs to be set in `/webcms/${var.environment}/${site}/${lang}/saml-sp-key`.
-4. If Akamai is being used, access credentials will need to be created and stored. See the [Getting Started](https://developer.akamai.com/api/getting-started) documentation for more information. We store three secrets based on these credentials:
-   1. `/webcms/${var.environment}/${site}/${lang}/akamai-access-token`
-   2. `/webcms/${var.environment}/${site}/${lang}/akamai-client-token`
-   3. `/webcms/${var.environment}/${site}/${lang}/akamai-client-secret`
 
 ### Mirror Images
 
