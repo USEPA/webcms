@@ -255,10 +255,15 @@ function epa_core_token_info() {
     'name' => t('Term description'),
     'description' => t('Default term description.'),
   ];
+  $add_to_cal_description = [
+    'name' => t('Add to Cal Description'),
+    'description' => t('Description for events when they are added to a calendar'),
+  ];
 
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
+      'add-to-cal-description' => $add_to_cal_description,
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -271,8 +276,8 @@ function epa_core_token_info() {
       'argument-1' => $view_argument_1,
     ],
     'term' => [
-      'term-description' => $term_description
-    ]
+      'term-description' => $term_description,
+    ],
   ];
   return $tokens;
 }
@@ -373,11 +378,40 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $term_description = $token->replace($term_description, ['term' => $data['term']]);
           $replacements[$original] = $term_description;
         }
-
+        break;
+      case 'add-to-cal-description':
+        $node = \Drupal::routeMatch()->getParameter('node');
+        if ($node->bundle() == 'event') {
+          $cal_description = $node->get('field_add_to_cal_description')->value;
+          $default_description = $node->get('field_description')->value;
+          $token = \Drupal::token();
+          if (!empty($cal_description)) {
+            $add_to_cal_description = $token->replace($cal_description);
+          } elseif (!empty($default_description)) {
+            $add_to_cal_description = $token->replace($default_description);
+          }
+        }
+        $replacements[$original] = $add_to_cal_description;
         break;
     }
   }
   return $replacements;
+}
+
+function epa_core_addtocal_alter(array &$overridable_items) {
+  $overridable_items['override_status'] = TRUE;
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node->bundle() == 'event') {
+    $cal_description = $node->get('field_add_to_cal_description')->value;
+    $default_description = $node->get('field_description')->value;
+    $token = \Drupal::token();
+    if (!empty($cal_description)) {
+      $add_to_cal_description = $token->replace($cal_description);
+    } elseif (!empty($default_description)) {
+      $add_to_cal_description = $token->replace($default_description);
+    }
+  }
+  $overridable_items['description'] = $add_to_cal_description;
 }
 
 /**
@@ -724,3 +758,5 @@ function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefini
   }
   return AccessResult::neutral();
 }
+
+
