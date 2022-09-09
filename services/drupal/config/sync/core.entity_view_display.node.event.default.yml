@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.event.field_add_to_cal_description
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
     - field.field.node.event.field_daterange
@@ -58,8 +59,8 @@ content:
         value: field_location
         tokenized: ''
       description:
-        value: field_description
-        tokenized: ''
+        value: '0'
+        tokenized: '[node:add-to-cal-description]'
       past_events: false
       separator: '-'
       date_format: 'Y-m-d\TH:i:s'
@@ -132,6 +133,7 @@ content:
 hidden:
   content_moderation_control: true
   entitygroupfield: true
+  field_add_to_cal_description: true
   field_channel: true
   field_date: true
   field_description: true
