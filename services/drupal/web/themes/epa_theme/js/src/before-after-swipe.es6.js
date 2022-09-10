@@ -1,13 +1,17 @@
-// Eternal Links script
+// Before/After Swipe script
 import Drupal from 'drupal';
 
 (function(Drupal) {
   Drupal.behaviors.beforeAfterSwipe = {
     attach(context, settings) {
-      const beforeAfters = context.querySelectorAll('.before-after-swipe');
+      const beforeAfters = context.querySelectorAll('.js-before-after-swipe');
 
       beforeAfters.forEach(beforeAfter => {
-        const slider = beforeAfter.querySelector('.before-after-swipe__slider');
+        const slider = beforeAfter.querySelector(
+          '.js-before-after-swipe__slider'
+        );
+
+        beforeAfter.classList.add('is-enabled');
 
         function update(e) {
           const sliderPos = e.target.value;
@@ -16,7 +20,7 @@ import Drupal from 'drupal';
             `${sliderPos}%`
           );
           e.target.parentElement.querySelector(
-            '.before-after-swipe__slider-button'
+            '.js-before-after-swipe__slider-button'
           ).style.left = `calc(${sliderPos}%`;
         }
 

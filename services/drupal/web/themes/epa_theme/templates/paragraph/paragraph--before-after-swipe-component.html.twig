@@ -24,12 +24,16 @@
  * @ingroup themeable
  */
 #}
+{% set media %}
+  {% include '@components/before-after-swipe/before-after-swipe.twig' with {
+    'attributes': '',
+    'before': content.field_image_one|field_value,
+    'after': content.field_image_two|field_value,
+  } %}
+{% endset %}
 
-{{ attach_library('epa_theme/before_after_swipe') }}
-
-{% include '@components/before-after-swipe/before-after-swipe.twig' with {
-  'modifier_classes': classes,
-  'before': content.field_image_one|field_value,
-  'after': content.field_image_two|field_value,
+{% include '@components/figure/figure.twig' with {
+  'is_demo': false,
+  'media': media,
   'caption': content.field_slider_caption|field_value,
 } %}

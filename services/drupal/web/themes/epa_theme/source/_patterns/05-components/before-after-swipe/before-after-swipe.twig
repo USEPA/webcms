@@ -1,20 +1,20 @@
+{{ attach_library('epa_theme/before_after_swipe') }}
+
 {% set classes = [
   'before-after-swipe',
+  'js-before-after-swipe',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
-{% set media %}
-<div class="before-after-swipe__main">
-  <div class="before-after-swipe__img before-after-swipe__img--background">{{ before }}</div>
-  <div class="before-after-swipe__img before-after-swipe__img--foreground">{{ after }}</div>
-  <input type="range" min="1" max="100" value="50" class="before-after-swipe__slider" name="before-after-swipe__slider" id="before-after-swipe__slider" />
-  <div class="before-after-swipe__slider-button"></div>
+<div class="{{ classes }}">
+  <div class="before-after-swipe__image before-after-swipe__image--before">{{ before }}</div>
+  <div class="before-after-swipe__image before-after-swipe__image--after">{{ after }}</div>
+  <input class="before-after-swipe__slider js-before-after-swipe__slider" type="range" min="1" max="100" value="50">
+  <div class="before-after-swipe__slider-button js-before-after-swipe__slider-button">
+    {%- include '@uswds/icon/icon.twig' with {
+      'icon_name': 'unfold_more',
+      'modifier_classes': 'before-after-swipe__slider-button-icon',
+      'is_hidden': true,
+    } -%}
+  </div>
 </div>
-{% endset %}
-
-{% include '@components/figure/figure.twig' with {
-  'modifier_classes': classes,
-  'caption': caption,
-  'media': media,
-}%}
-
