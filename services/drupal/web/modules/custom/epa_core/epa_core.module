@@ -23,6 +23,7 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Implements hook_theme().
@@ -263,7 +264,6 @@ function epa_core_token_info() {
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
-      'add-to-cal-description' => $add_to_cal_description,
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -379,20 +379,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $replacements[$original] = $term_description;
         }
         break;
-      case 'add-to-cal-description':
-        $node = \Drupal::routeMatch()->getParameter('node');
-        if ($node->bundle() == 'event') {
-          $cal_description = $node->get('field_add_to_cal_description')->value;
-          $default_description = $node->get('field_description')->value;
-          $token = \Drupal::token();
-          if (!empty($cal_description)) {
-            $add_to_cal_description = $token->replace($cal_description);
-          } elseif (!empty($default_description)) {
-            $add_to_cal_description = $token->replace($default_description);
-          }
-        }
-        $replacements[$original] = $add_to_cal_description;
-        break;
     }
   }
   return $replacements;
@@ -404,15 +390,30 @@ function epa_core_addtocal_alter(array &$overridable_items) {
   if ($node->bundle() == 'event') {
     $cal_description = $node->get('field_add_to_cal_description')->value;
     $default_description = $node->get('field_description')->value;
-    $token = \Drupal::token();
     if (!empty($cal_description)) {
-      $add_to_cal_description = $token->replace($cal_description);
+      $description = $cal_description;
     } elseif (!empty($default_description)) {
-      $add_to_cal_description = $token->replace($default_description);
+      $description = $default_description;
     }
+    $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
+    if (!empty($event_type)) {
+      $event_type_full = '<p>Event Type: ' . $event_type . '</p>';
+    }
+    $event_host = $node->get('field_event_host')->value;
+    if (!empty($event_host)) {
+      $event_host_full = '<p>Event host: ' . $event_host . '</p>';
+    }
+
+    $links = $node->field_links->view('default');
+    $rendered_links = \Drupal::service('renderer')->renderRoot($links);
+    $rendered_links_processed = str_replace("\n", '', $rendered_links);
+
+    $full_description = $description . $event_type_full . $event_host_full . $rendered_links_processed;
   }
-  $overridable_items['description'] = $add_to_cal_description;
+  $overridable_items['description'] = $full_description;
 }
+
+
 
 /**
  * Implements hook_entity_revision_delete().
