@@ -297,7 +297,24 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       $form['revision_author'] = [
         '#type' => 'item',
         '#title' => t("Revision Saved By"),
-        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a'
+        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a>'
+      ];
+
+    }
+
+    // Display the Node ID
+    if (
+      isset($node)
+      && $node->id()
+    )
+    {
+
+      $nid = $node->id();
+
+      $form['nid'] = [
+        '#type' => 'item',
+        '#title' => t("Node ID"),
+        '#markup' => $nid
       ];
 
     }

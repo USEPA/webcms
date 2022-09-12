@@ -3,6 +3,7 @@
 {% endif %}
 
 <ul class="entity-moderation-form">
+  <li class="entity-moderation-form__item">{{ form.nid }}</li>
   <li class="entity-moderation-form__item">{{ form.current }}</li>
   <li class="entity-moderation-form__item">{{ form.revision_author }}</li>
   <li class="entity-moderation-form__item">{{ form.review_deadline }}</li>
@@ -11,4 +12,4 @@
   <li class="entity-moderation-form__item">{{ form.workflow_508_compliant }}</li>
   <li class="entity-moderation-form__item">{{ form.submit }}</li>
 </ul>
-{{ form|without('current', 'revision_author', 'review_deadline', 'new_state', 'revision_log', 'submit', 'workflow_508_compliant', 'node_edit_link') }}
+{{ form|without('nid', 'current', 'revision_author', 'review_deadline', 'new_state', 'revision_log', 'submit', 'workflow_508_compliant', 'node_edit_link') }}
