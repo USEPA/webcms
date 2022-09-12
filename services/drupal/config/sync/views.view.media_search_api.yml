@@ -821,7 +821,7 @@ display:
           expose:
             operator_id: gid_op
             label: 'Web Area'
-            description: 'The area in which the media was created.'
+            description: 'Filter by web area'
             use_operator: false
             operator: gid_op
             operator_limit_selection: false
@@ -1006,27 +1006,27 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-        gid:
-          id: gid
+        users_in_groups:
+          id: users_in_groups
           table: search_api_index_media
-          field: gid
+          field: users_in_groups
           relationship: none
           group_type: group
           admin_label: ''
-          plugin_id: search_api_numeric
+          plugin_id: epa_search_api_web_areas_users_groups
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: gid_op
-            label: 'Web Area'
-            description: ''
+            operator_id: users_in_groups_op
+            label: 'Web area filter'
+            description: 'Limit to content in your web areas'
             use_operator: false
-            operator: gid_op
+            operator: users_in_groups_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: gid
+            identifier: users_in_groups
             required: false
             remember: false
             multiple: false
@@ -1041,9 +1041,6 @@ display:
               system_webmaster: '0'
               menu_admin: '0'
               administrator: '0'
-            min_placeholder: null
-            max_placeholder: null
-            placeholder: null
             reduce: 0
           is_grouped: false
           group_info:
