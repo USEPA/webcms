@@ -54,6 +54,8 @@ if (defined('Memcached::OPT_CLIENT_MODE')) {
 
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
 
+$settings['container_yamls'][] = $app_root . '/' . $site_path . '/development.services.yml';
+
 ini_set('max_execution_time', 0);
 
 // Provide override configuration for epa_cloudwatch to redirect
