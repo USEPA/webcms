@@ -206,7 +206,9 @@ function epa_workflow_field_widget_form_alter(array &$element, FormStateInterfac
   $plugin_id = $context['widget']->getPluginId();
 
   if ('moderation_state_default' === $plugin_id && isset($element["state"]["#options"]) && key_exists('draft', $element["state"]["#options"])) {
-    $element["state"]["#default_value"] = 'draft';
+    if (!in_array($element["state"]["#default_value"],['draft_needs_review'])) {
+      $element["state"]["#default_value"] = 'draft';
+    }
     $element["#access"] = FALSE;
   }
 }
