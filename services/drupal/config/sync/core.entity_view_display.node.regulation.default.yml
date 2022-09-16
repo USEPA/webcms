@@ -21,6 +21,7 @@ dependencies:
     - field.field.node.regulation.field_last_published
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
+    - field.field.node.regulation.field_meta_tags
     - field.field.node.regulation.field_page_head
     - field.field.node.regulation.field_publish_date
     - field.field.node.regulation.field_review_deadline
@@ -33,6 +34,7 @@ dependencies:
   module:
     - datetime_range
     - entity_reference_revisions
+    - metatag
     - text
     - user
 id: node.regulation.default
@@ -104,6 +106,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 100
+    region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
     region: content
   field_rule_history:
     type: text_default

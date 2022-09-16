@@ -24,6 +24,7 @@ dependencies:
     - field.field.node.event.field_links
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
+    - field.field.node.event.field_meta_tags
     - field.field.node.event.field_page_head
     - field.field.node.event.field_paragraphs
     - field.field.node.event.field_publish_date
@@ -38,6 +39,7 @@ dependencies:
     - entity_reference_revisions
     - epa_core
     - link
+    - metatag
     - user
 id: node.event.default
 targetEntityType: node
@@ -120,6 +122,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 1
+    region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 8
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
