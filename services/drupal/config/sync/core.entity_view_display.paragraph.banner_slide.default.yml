@@ -3,19 +3,29 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.banner_slide.field_banner_image
     - field.field.paragraph.banner_slide.field_image
     - field.field.paragraph.banner_slide.field_text
     - field.field.paragraph.banner_slide.field_title
     - image.style.hero
     - paragraphs.paragraphs_type.banner_slide
   module:
-    - image
+    - svg_image
     - text
 id: paragraph.banner_slide.default
 targetEntityType: paragraph
 bundle: banner_slide
 mode: default
 content:
+  field_banner_image:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
   field_image:
     type: image_url
     label: hidden
