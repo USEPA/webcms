@@ -481,7 +481,7 @@ infrastructure:preproduction:apply:
   stage: infrastructure_preprod_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-
+      when: manual
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
