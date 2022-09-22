@@ -5,9 +5,15 @@
  */
 #}
 
+{% if content.field_banner_image|field_value is not null %}
+  {% set background_image = file_url(content.field_banner_image|field_target_entity.field_media_image.entity.uri.value) %}
+{% else %}
+  {% set background_image = content.field_image|field_value|render %}
+{% endif %}
+
 {% include '@components/hero/hero--slideshow/hero--slideshow.twig' with {
   modifier_classes: 'usa-hero--reversed',
-  background_image: content.field_image|field_value|render,
+  background_image: background_image,
   title_element: 'h2',
   title: content.field_title|field_value|render,
   content: content.field_text|field_value|render,
