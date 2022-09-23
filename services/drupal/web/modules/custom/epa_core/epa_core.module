@@ -256,10 +256,6 @@ function epa_core_token_info() {
     'name' => t('Term description'),
     'description' => t('Default term description.'),
   ];
-  $add_to_cal_description = [
-    'name' => t('Add to Cal Description'),
-    'description' => t('Description for events when they are added to a calendar'),
-  ];
 
   $tokens['tokens'] = [
     'node' => [
@@ -391,24 +387,28 @@ function epa_core_addtocal_alter(array &$overridable_items) {
     $cal_description = $node->get('field_add_to_cal_description')->value;
     $default_description = $node->get('field_description')->value;
     if (!empty($cal_description)) {
-      $description = $cal_description;
+      $description = "$cal_description \n ";
     } elseif (!empty($default_description)) {
-      $description = $default_description;
+      $description = "$default_description \n ";
     }
     $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
     if (!empty($event_type)) {
-      $event_type_full = '<p>Event Type: ' . $event_type . '</p>';
+      $event_type_full = "Event Type: $event_type \n ";
     }
     $event_host = $node->get('field_event_host')->value;
     if (!empty($event_host)) {
-      $event_host_full = '<p>Event host: ' . $event_host . '</p>';
+      $event_host_full = "Event host: $event_host \n ";
     }
-
+    $links = $node->get('field_links')->getValue();
+    $links_string = "Links: \n ";
+    foreach ($links as $link) {
+      $text = $link['title'];
+      $url = $link['uri'];
+      $links_string .= "$text" . ": " . $url . " \n ";
+    }
     $links = $node->field_links->view('default');
-    $rendered_links = \Drupal::service('renderer')->renderRoot($links);
-    $rendered_links_processed = str_replace("\n", '', $rendered_links);
 
-    $full_description = $description . $event_type_full . $event_host_full . $rendered_links_processed;
+    $full_description = $description . $event_type_full . $event_host_full . $links_string;
   }
   $overridable_items['description'] = $full_description;
 }
