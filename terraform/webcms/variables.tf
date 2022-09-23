@@ -92,11 +92,6 @@ variable "drupal_csrf_origin_whitelist" {
   default     = []
 }
 
-variable "drupal_use_s3_domain" {
-  description = "Determines whether S3 assets will be served from the same domain as the main site. Set to false to serve directly from S3 domain."
-  type        = bool
-}
-
 #endregion
 
 #region Email
@@ -134,22 +129,6 @@ variable "email_protocol" {
 variable "email_enable_workflow_notifications" {
   description = "Enable this to allow the system to email notifications to content editors about workflow state changes. This should only be enabled with care; we do not want a non-production environment mailing 'real' users notifications that they need to come review their content."
   type        = bool
-}
-
-#endregion
-
-#region Akamai
-
-variable "akamai_enabled" {
-  description = "Set to TRUE if this site is being served via Akamai; otherwise FALSE."
-  type        = bool
-  default     = false
-}
-
-variable "akamai_api_host" {
-  description = "The URL of the Akamai CCU API host. It should be in the format *.purge.akamaiapis.net/"
-  type        = string
-  default     = "https://xxxx-xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxx.luna.akamaiapis.net/"
 }
 
 #endregion
