@@ -387,30 +387,37 @@ function epa_core_addtocal_alter(array &$overridable_items) {
     $cal_description = $node->get('field_add_to_cal_description')->value;
     $default_description = $node->get('field_description')->value;
     if (!empty($cal_description)) {
-      $description = "$cal_description \n ";
+      $description = "$cal_description" . "\n";
+      $ics_description = "$cal_description" . '\n';
     } elseif (!empty($default_description)) {
-      $description = "$default_description \n ";
+      $description = "$default_description" . "\n";
+      $ics_description = "$default_description" . '\n';
     }
     $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
     if (!empty($event_type)) {
-      $event_type_full = "Event Type: $event_type \n ";
+      $event_type_full = "Event Type: $event_type" . "\n";
+      $ics_event_type_full = "Event Type: $event_type" . '\n';
     }
     $event_host = $node->get('field_event_host')->value;
     if (!empty($event_host)) {
-      $event_host_full = "Event host: $event_host \n ";
+      $event_host_full = "Event host: $event_host" . "\n";
+      $event_host_full = "Event host: $event_host" . '\n';
     }
     $links = $node->get('field_links')->getValue();
-    $links_string = "Links: \n ";
+    $links_string = "Links:" . "\n";
+    $ics_links_string = "Links:" . '\n';
     foreach ($links as $link) {
       $text = $link['title'];
       $url = $link['uri'];
-      $links_string .= "$text" . ": " . $url . " \n ";
+      $links_string .= "$text" . ": " . $url . "\n";
+      $links_string .= "$text" . ": " . $url . '\n';
     }
-    $links = $node->field_links->view('default');
-
     $full_description = $description . $event_type_full . $event_host_full . $links_string;
+    $full_description_ics = $ics_description . $ics_event_type_full . $event_host_full . $ics_links_string;
   }
   $overridable_items['description'] = $full_description;
+  $overridable_items['ics_description'] = $full_description_ics;
+  file_put_contents('/tmp/aimee.txt', var_export($overridable_items, true), FILE_APPEND);
 }
 
 
