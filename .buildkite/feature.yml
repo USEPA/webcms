@@ -104,7 +104,7 @@ steps:
                       --snapshotMode=redo \
                       --use-new-run \
                       --target="$$TARGET" \
-                      --no-push
+                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-$$TARGET:${WEBCMS_IMAGE_TAG}"
 
       # The FPM metrics sidecar is a much smaller image, so we can just let
       # Kaniko build it without any caching logic. The build is otherwise
