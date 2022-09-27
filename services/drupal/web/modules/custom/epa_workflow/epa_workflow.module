@@ -272,7 +272,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         'label' => 'hidden',
         'type' => 'datetime_default',
         'settings' => [
-          'format_type' => 'medium',
+          'format_type' => 'medium_no_time',
         ],
       ]);
       $renderer = \Drupal::service('renderer');
@@ -298,7 +298,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
       $form['revision_author'] = [
         '#type' => 'item',
-        '#title' => t("Revision Saved By"),
+        '#title' => t("Revision saved by"),
         '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a>'
       ];
 
