@@ -2,14 +2,57 @@
   {{ form.node_edit_link }}
 {% endif %}
 
-<ul class="entity-moderation-form">
-  <li class="entity-moderation-form__item">{{ form.nid }}</li>
-  <li class="entity-moderation-form__item">{{ form.current }}</li>
-  <li class="entity-moderation-form__item">{{ form.revision_author }}</li>
-  <li class="entity-moderation-form__item">{{ form.review_deadline }}</li>
-  <li class="entity-moderation-form__item">{{ form.new_state }}</li>
-  <li class="entity-moderation-form__item">{{ form.revision_log }}</li>
-  <li class="entity-moderation-form__item">{{ form.workflow_508_compliant }}</li>
-  <li class="entity-moderation-form__item">{{ form.submit }}</li>
-</ul>
+<div class="box box--special">
+  <div class="box__content">
+    {% if form.nid %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': nid.title,
+        'field_items': [{ content: nid.content }],
+      } %}
+    {% endif %}
+
+    {% if form.revision_author %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': revision_author.title,
+        'field_items': [{ content: revision_author.content }],
+      } %}
+    {% endif %}
+
+    {% if form.review_deadline %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': review_deadline.title,
+        'field_items': [{ content: review_deadline.content }],
+      } %}
+    {% endif %}
+
+    {% if form.current %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': current.title,
+        'field_items': [{ content: current.content }],
+      } %}
+    {% endif %}
+
+    {{ form.new_state }}
+    {{ form.revision_log }}
+    {{ form.workflow_508_compliant }}
+    {{ form.submit }}
+  </div>
+</div>
+
 {{ form|without('nid', 'current', 'revision_author', 'review_deadline', 'new_state', 'revision_log', 'submit', 'workflow_508_compliant', 'node_edit_link') }}
