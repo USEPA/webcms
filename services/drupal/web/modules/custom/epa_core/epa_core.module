@@ -385,39 +385,36 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
 
 function epa_core_addtocal_alter(array &$overridable_items) {
   $overridable_items['override_status'] = TRUE;
+  $add_to_cal_components = [];
   $node = \Drupal::routeMatch()->getParameter('node');
   if ($node->bundle() == 'event') {
-    $cal_description = $node->get('field_add_to_cal_description')->value;
-    $default_description = $node->get('field_description')->value;
-    if (!empty($cal_description)) {
-      $description = $cal_description;
-    } elseif (!empty($default_description)) {
-      $description = $default_description;
+    $description = $node->get('field_add_to_cal_description')->value;
+    if (empty($description)) {
+      $description = $node->get('field_description')->value;
     }
+    if ($description) {
+      $add_to_cal_components[] = $description;
+    }
+
     $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
     if (!empty($event_type)) {
-      $event_type_full = "Event Type: $event_type";
+      $add_to_cal_components[] = "Event Type: $event_type";
     }
     $event_host = $node->get('field_event_host')->value;
     if (!empty($event_host)) {
-      $event_host_full = "Event host: $event_host";
+      $add_to_cal_components[] = "Event host: $event_host";
     }
-    $links = $node->get('field_links')->getValue();
-    $links_string = "Links:\n";
-    foreach ($links as $link) {
-      $text = $link['title'];
-      $url = $link['uri'];
-      if (!UrlHelper::isExternal($url)){
-        $nid = Url::fromUri($url)->getRouteParameters()['node'];
-        $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/'.$nid);
-        $host = \Drupal::request()->getHost();
-        $url = "https://".$host.$alias;
-      }
-      $links_string .= "$text: $url\n";
+    foreach ($node->field_links as $link) {
+      $url = $link->getUrl();
+      $url->setAbsolute();
+      $title = $link->title;
+      $links_string .= $title ? $title .': ':''. $url->toString() ."\n";
     }
-    $full_description = $description . "\n\n" .  $event_type_full . "\n\n" . $event_host_full . "\n\n" . $links_string;
+    if (!empty($links_string)) {
+      $add_to_cal_components[] = "Links:\n". $links_string;
+    }
   }
-  $overridable_items['description'] = $full_description;
+  $overridable_items['description'] = implode("\n\n", $add_to_cal_components);
 }
 
 
