@@ -23,7 +23,9 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\search_api\Utility\Utility;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\Component\Utility\UrlHelper;
 
 /**
  * Implements hook_theme().
@@ -387,26 +389,32 @@ function epa_core_addtocal_alter(array &$overridable_items) {
     $cal_description = $node->get('field_add_to_cal_description')->value;
     $default_description = $node->get('field_description')->value;
     if (!empty($cal_description)) {
-      $description = "$cal_description" . "\n";
+      $description = $cal_description;
     } elseif (!empty($default_description)) {
-      $description = "$default_description" . "\n";
+      $description = $default_description;
     }
     $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
     if (!empty($event_type)) {
-      $event_type_full = "Event Type: $event_type" . "\n";
+      $event_type_full = "Event Type: $event_type";
     }
     $event_host = $node->get('field_event_host')->value;
     if (!empty($event_host)) {
-      $event_host_full = "Event host: $event_host" . "\n";
+      $event_host_full = "Event host: $event_host";
     }
     $links = $node->get('field_links')->getValue();
-    $links_string = "Links:" . "\n";
+    $links_string = "Links:\n";
     foreach ($links as $link) {
       $text = $link['title'];
       $url = $link['uri'];
-      $links_string .= "$text" . ": " . $url . "\n";
+      if (!UrlHelper::isExternal($url)){
+        $nid = Url::fromUri($url)->getRouteParameters()['node'];
+        $alias = \Drupal::service('path_alias.manager')->getAliasByPath('/node/'.$nid);
+        $host = \Drupal::request()->getHost();
+        $url = "https://".$host.$alias;
+      }
+      $links_string .= "$text: $url\n";
     }
-    $full_description = $description . $event_type_full . $event_host_full . $links_string;
+    $full_description = $description . "\n\n" .  $event_type_full . "\n\n" . $event_host_full . "\n\n" . $links_string;
   }
   $overridable_items['description'] = $full_description;
 }
