@@ -4,10 +4,14 @@ status: true
 dependencies:
   config:
     - field.field.media.banner_image.field_media_image
-    - image.style.large
+    - image.style.thumbnail
     - media.type.banner_image
   module:
+    - media_inline_embed
     - svg_image
+third_party_settings:
+  media_inline_embed:
+    embed_inline: false
 id: media.banner_image.default
 targetEntityType: media
 bundle: banner_image
@@ -18,7 +22,7 @@ content:
     label: visually_hidden
     settings:
       image_link: ''
-      image_style: large
+      image_style: thumbnail
       svg_attributes:
         width: null
         height: null

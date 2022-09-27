@@ -51,68 +51,88 @@ function epa_core_deploy_0001_populate_search_text(&$sandbox) {
 /**
  * Sets terms with empty description to global term description token.
  */
-//function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
-//  $text = 'This page shows all of the pages at epa.gov that are tagged with \[term:name\] at this time.';
-//  if (!isset($sandbox['total'])) {
-//    // Query all terms that don't have a description set.
-//    $result = \Drupal::database()->query(
-//      'SELECT tid FROM taxonomy_term_field_data
-//        WHERE description__value IS NULL OR
-//              description__value = :value OR
-//              description__value REGEXP :regex', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
-//        ->fetchCol();
-//
-//    $sandbox['total'] = count($result);
-//    $sandbox['current'] = 0;
-//
-//    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' terms with outdated descriptions.');
-//  }
-//
-//  // Query 500 at a time for batch.
-//  $tids = \Drupal::database()->query(
-//    'SELECT tid FROM taxonomy_term_field_data
-//        WHERE description__value IS NULL OR
-//              description__value = :value OR
-//              description__value REGEXP :regex
-//            LIMIT 500;', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
-//    ->fetchCol();
-//
-//  if (empty($tids)) {
-//    $sandbox['#finished'] = 1;
-//    return;
-//  }
-//
-//  $terms = \Drupal::entityTypeManager()
-//    ->getStorage('taxonomy_term')
-//    ->loadMultiple($tids);
-//
-//  foreach ($terms as $term) {
-//    $term->set('description', ['value' => '[term:term-description]', 'format' => 'filtered_html']);
-//    $term->save();
-//    $sandbox['current']++;
-//  }
-//
-//  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' terms descriptions updated.');
-//
-//  if ($sandbox['current'] >= $sandbox['total']) {
-//    $sandbox['#finished'] = 1;
-//  } else {
-//    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
-//  }
-//}
+function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
+  $text = 'This page shows all of the pages at epa.gov that are tagged with \[term:name\] at this time.';
+  if (!isset($sandbox['total'])) {
+    // Query all terms that don't have a description set.
+    $result = \Drupal::database()->query(
+      'SELECT tid FROM taxonomy_term_field_data
+        WHERE description__value IS NULL OR
+              description__value = :value OR
+              description__value REGEXP :regex', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
+        ->fetchCol();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' terms with outdated descriptions.');
+  }
+
+  // Query 500 at a time for batch.
+  $tids = \Drupal::database()->query(
+    'SELECT tid FROM taxonomy_term_field_data
+        WHERE description__value IS NULL OR
+              description__value = :value OR
+              description__value REGEXP :regex
+            LIMIT 500;', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
+    ->fetchCol();
+
+  if (empty($tids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_term')
+    ->loadMultiple($tids);
+
+  foreach ($terms as $term) {
+    $term->set('description', ['value' => '[term:term-description]', 'format' => 'filtered_html']);
+    $term->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' terms descriptions updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
 
 /**
- *
+ * Moves images on banner slides to banner image field
+ * and creates banner image entity where necessary.
  */
-function epa_core_deploy_0001_test_update_banner_slide_images(&$sandbox) {
-
+function epa_core_deploy_0001_update_banner_slide_images(&$sandbox) {
   $prefixes = ['paragraph_revision', 'paragraph'];
 
-  $sandbox['current'] = 0;
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = 0;
+    $sandbox['current'] = 0;
+    $sandbox['images_created'] = 0;
+    // Query all images that are being used with banner slides.
+    foreach ($prefixes as $prefix) {
+
+      $result = \Drupal::database()->query(
+        'SELECT fi.field_image_target_id
+        FROM ' . $prefix . '__field_image AS fi
+        LEFT JOIN ' . $prefix . '__field_banner_image AS fb ON fi.revision_id = fb.revision_id
+        WHERE fb.revision_id IS NULL
+        AND fi.bundle = :value;', [':value' => 'banner_slide'])
+        ->fetchCol();
+
+      $sandbox['total'] += count($result);
+
+    }
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' image files associated with banner slides.');
+  }
 
   foreach ($prefixes as $prefix) {
 
-    $revision_files = \Drupal::database()->query(
+    $files = \Drupal::database()->query(
       'SELECT fi.field_image_target_id, fi.field_image_alt, fm.filename, fm.langcode, fi.entity_id, fi.revision_id
         FROM ' . $prefix . '__field_image AS fi
         LEFT JOIN file_managed AS fm ON fm.fid = fi.field_image_target_id
@@ -122,7 +142,7 @@ function epa_core_deploy_0001_test_update_banner_slide_images(&$sandbox) {
           LIMIT 500;',  [':value' => 'banner_slide'])
       ->fetchAll();
 
-    foreach ($revision_files as $file) {
+    foreach ($files as $file) {
       $banner_media = \Drupal::database()->query(
         'SELECT entity_id
           FROM media__field_media_image
@@ -144,6 +164,7 @@ function epa_core_deploy_0001_test_update_banner_slide_images(&$sandbox) {
         $image_media->save();
         $langcode = $image_media->language()->getId();
         $banner_image_target_id = $image_media->id();
+        $sandbox['images_created']++;
       } else {
         $banner_image_target_id = $banner_media[0];
         $langcode = $file->langcode;
@@ -165,15 +186,16 @@ function epa_core_deploy_0001_test_update_banner_slide_images(&$sandbox) {
         ->execute();
       $sandbox['current']++;
     }
-    $image_files = count($revision_files) . ' files in ' . $prefix);
-    dump($i . ' images in ' . $prefix . ' updated');
   }
 
-  if (empty($revision_files)) {
+  if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-    return;
+    \Drupal::logger('epa_core')->notice('Banner slide image update complete');
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 
-  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images updated.');
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
 
 }
+
