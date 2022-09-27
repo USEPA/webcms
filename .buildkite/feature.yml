@@ -62,9 +62,7 @@ steps:
               # 2. Kaniko build caching is enabled. Intermediate layers are
               #    pushed to a cache repository in ECR. Subsequent builds can
               #    query the cache instead of re-executing more expensive build
-              #    steps. We also cache COPY instructions, in order to
-              #    ameliorate the cost of copying /var/www/html for nginx and
-              #    drush.
+              #    steps.
               # 3. The snapshot mode is set to "redo" instead of "full". This
               #    uses cheaper but less accurate metadata for FS snapshots. We
               #    assume this won't cause any issues for us, as any changes in
@@ -91,7 +89,6 @@ steps:
                     /kaniko/executor \
                       --context=/workspace/services/drupal \
                       --cache \
-                      --cache-copy-layers \
                       --cache-repo="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-cache" \
                       --skip-unused-stages \
                       --snapshotMode=redo \
