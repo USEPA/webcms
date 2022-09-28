@@ -7,10 +7,8 @@ dependencies:
     - field.field.paragraph.banner_slide.field_image
     - field.field.paragraph.banner_slide.field_text
     - field.field.paragraph.banner_slide.field_title
-    - image.style.thumbnail
     - paragraphs.paragraphs_type.banner_slide
   module:
-    - focal_point
     - media_library
     - text
 id: paragraph.banner_slide.default
@@ -20,20 +18,10 @@ mode: default
 content:
   field_banner_image:
     type: media_library_widget
-    weight: 3
-    region: content
-    settings:
-      media_types: {  }
-    third_party_settings: {  }
-  field_image:
-    type: image_focal_point
     weight: 2
     region: content
     settings:
-      progress_indicator: throbber
-      preview_image_style: thumbnail
-      preview_link: true
-      offsets: '50,50'
+      media_types: {  }
     third_party_settings: {  }
   field_text:
     type: text_textarea
@@ -53,4 +41,5 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
+  field_image: true
   status: true

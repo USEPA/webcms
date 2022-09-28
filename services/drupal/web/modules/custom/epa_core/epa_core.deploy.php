@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 
 function _epa_core_populate_search_index_queue() {
@@ -148,3 +149,102 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
+
+/**
+ * Moves images on banner slides to banner image field
+ * and creates banner image entity where necessary.
+ */
+function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
+  $prefixes = ['paragraph_revision', 'paragraph'];
+
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = 0;
+    $sandbox['current'] = 0;
+    $sandbox['images_created'] = 0;
+    // Query all images that are being used with banner slides.
+    foreach ($prefixes as $prefix) {
+
+      $result = \Drupal::database()->query(
+        'SELECT fi.field_image_target_id
+        FROM ' . $prefix . '__field_image AS fi
+        LEFT JOIN ' . $prefix . '__field_banner_image AS fb ON fi.revision_id = fb.revision_id
+        WHERE fb.revision_id IS NULL
+        AND fi.bundle = :value;', [':value' => 'banner_slide'])
+        ->fetchCol();
+
+      $sandbox['total'] += count($result);
+
+    }
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' image files associated with banner slides.');
+  }
+
+  foreach ($prefixes as $prefix) {
+
+    $files = \Drupal::database()->query(
+      'SELECT fi.field_image_target_id, fi.field_image_alt, fm.filename, fm.langcode, fi.entity_id, fi.revision_id
+        FROM ' . $prefix . '__field_image AS fi
+        LEFT JOIN file_managed AS fm ON fm.fid = fi.field_image_target_id
+        LEFT JOIN ' . $prefix . '__field_banner_image AS fb ON fi.revision_id = fb.revision_id
+        WHERE fb.revision_id IS NULL
+        AND fi.bundle = :value
+          LIMIT 500;',  [':value' => 'banner_slide'])
+      ->fetchAll();
+
+    foreach ($files as $file) {
+      $banner_media = \Drupal::database()->query(
+        'SELECT entity_id
+          FROM media__field_media_image
+          WHERE field_media_image_target_id = ' . $file->field_image_target_id . '
+            AND bundle = :value;', [':value' => 'banner_image'])
+        ->fetchCol();
+
+      if (empty($banner_media)) {
+        $image_media = Media::create([
+          'bundle' => 'banner_image',
+          'uid' => \Drupal::currentUser()->id(),
+          'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
+          'field_media_image' => [
+            'target_id' => $file->field_image_target_id,
+            'alt' => $file->field_image_alt,
+            'title' => $file->filename,
+          ],
+        ]);
+        $image_media->save();
+        $langcode = $image_media->language()->getId();
+        $banner_image_target_id = $image_media->id();
+        $sandbox['images_created']++;
+      } else {
+        $banner_image_target_id = $banner_media[0];
+        $langcode = $file->langcode;
+        if (empty($langcode)) {
+          $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+        }
+      }
+      $connection = \Drupal::service('database');
+      $result = $connection->insert($prefix . '__field_banner_image')
+        ->fields([
+          'bundle' => 'banner_slide',
+          'deleted' => 0,
+          'entity_id' => $file->entity_id,
+          'revision_id' => $file->revision_id,
+          'langcode' => $langcode,
+          'delta' => 0,
+          'field_banner_image_target_id' => $banner_image_target_id
+        ])
+        ->execute();
+      $sandbox['current']++;
+    }
+  }
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+    \Drupal::logger('epa_core')->notice('Banner slide image update complete');
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
+
+}
+
