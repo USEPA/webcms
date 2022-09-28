@@ -117,13 +117,16 @@ COPY ./scripts scripts
 COPY ./patches patches
 
 # Copy Composer manifest files
-COPY composer.json composer.lock composer.patches.json ./
+COPY composer.json composer.lock composer.patches.json auth.json ./
 
 # Perform a production-quality Composer build
 RUN composer install \
   --ignore-platform-reqs \
   --no-dev \
   --optimize-autoloader
+
+# Remove any Composer authentication file if present.
+RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
 FROM forumone/gesso:3-node-v12-php-8.0 AS gesso
