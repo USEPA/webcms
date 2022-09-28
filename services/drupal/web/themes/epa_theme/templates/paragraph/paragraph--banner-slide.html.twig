@@ -6,7 +6,7 @@
 #}
 
 {% if content.field_banner_image|field_value is not null %}
-  {% set background_image = file_url(content.field_banner_image|field_target_entity.field_media_image.entity.uri.value) %}
+  {% set background_image = content.field_banner_image|field_value|render %}
 {% else %}
   {% set background_image = content.field_image|field_value|render %}
 {% endif %}
