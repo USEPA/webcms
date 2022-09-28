@@ -5,6 +5,7 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -371,7 +372,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $term_description = $config->get('default_description');
           // Term description can contain tokens, so we need to replace them.
           $token = \Drupal::token();
-          $term_description = $token->replace($term_description, ['term' => $data['term']]);
+          $term_description = PlainTextOutput::renderFromHtml($token->replace($term_description, ['term' => $data['term']]));
           $replacements[$original] = $term_description;
         }
 

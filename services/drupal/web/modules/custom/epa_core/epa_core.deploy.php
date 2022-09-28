@@ -102,10 +102,59 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
 }
 
 /**
+ * Explicitly sets each taxonomy term to have its path set by pathauto then re-saves
+ * terms to ensure they get the latest generated path.
+ */
+function epa_core_deploy_0002_update_term_path(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Query all terms that don't have a description set.
+    $result = \Drupal::database()->query(
+      'SELECT tid FROM taxonomy_term_field_data;')
+      ->fetchCol();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' term paths to be updated.');
+  }
+
+  // Query 500 at a time for batch.
+  $tids = \Drupal::database()->query(
+    'SELECT tid FROM taxonomy_term_field_data
+        ORDER BY tid ASC
+        LIMIT 500
+        OFFSET '. $sandbox['current'] . ';')
+    ->fetchCol();
+
+  if (empty($tids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_term')
+    ->loadMultiple($tids);
+
+  foreach ($terms as $term) {
+    $term->path->pathauto = 1;
+    $term->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' term paths updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
  * Moves images on banner slides to banner image field
  * and creates banner image entity where necessary.
  */
-function epa_core_deploy_0001_update_banner_slide_images(&$sandbox) {
+function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
   $prefixes = ['paragraph_revision', 'paragraph'];
 
   if (!isset($sandbox['total'])) {
