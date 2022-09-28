@@ -23,6 +23,12 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 128 * (1024 * 1024)
   }
 
+  # Use READ-COMMITTED for the transaction isolation level per Drupal recommendations
+  parameter {
+    name  = "tx_isolation"
+    value = "READ-COMMITTED"
+  }
+
   # Slow query logging
 
   # Enable the slow query log
