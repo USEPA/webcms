@@ -730,11 +730,11 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
     ->loadRevision($latest_vid);
 
   if ($latest_revision instanceof NodeInterface && !$latest_revision->isNew()) {
+    $timezone = date_default_timezone_get();
+    $date_formatter = \Drupal::service('date.formatter');
     // If latest revision and has a Publish Date set.
     if (isset($latest_revision->field_publish_date->value)) {
       $latest_revision_moderation_state = $latest_revision->moderation_state->value;
-      $timezone = date_default_timezone_get();
-      $date_formatter = \Drupal::service('date.formatter');
 
       $latest_formatted_date_time = $date_formatter->format(
         $latest_revision->field_publish_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
