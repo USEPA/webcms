@@ -67,6 +67,22 @@ resource "aws_ssm_parameter" "elasticsearch_endpoint" {
 
 #endregion
 
+#region RDS
+
+resource "aws_ssm_parameter" "rds_cluster_identifier" {
+  name = "/webcms/${var.environment}/rds/cluster-identifier"
+  type = "String"
+  
+  tags = var.tags
+}
+  
+resource "aws_ssm_parameter" "mysql_endpoint_parameter" {
+  name = "/webcms/${var.environment}/rds/mysql-endpoint"
+  type = "String"
+  
+  tags = var.tags
+}
+  
 #region Cron
 
 resource "aws_ssm_parameter" "cron_event_rule_per_site" {
