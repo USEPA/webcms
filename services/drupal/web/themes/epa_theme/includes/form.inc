@@ -34,8 +34,6 @@ function epa_theme_preprocess_form(&$vars) {
  * Implements template_preprocess_form().
  */
 function epa_theme_preprocess_entity_moderation_form(&$vars) {
-  $vars['testing'] = 'preprocess';
-
   if (isset($vars['form']['nid'])) {
     $vars['nid']['title'] = $vars['form']['nid']['#title'];
     $vars['nid']['content'] = [
