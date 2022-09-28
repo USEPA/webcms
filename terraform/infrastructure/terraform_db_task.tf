@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "terraform_database_task" {
         },
 
         # Pass in the MySQL provider's endpoint; see https://registry.terraform.io/providers/winebarrel/mysql/latest/docs#argument-reference
-        { name = "TF_VAR_mysql_endpoint", value = "${aws_rds_cluster.db.endpoint}:3306" },
+        { name = "TF_VAR_mysql_endpoint", value = "${data.aws_ssm_parameter.mysql_endpoint_parameter.value}:3306" },
 
         # See terraform/database/README.md for more on why these are regular env vars
         { name = "BACKEND_STORAGE", value = aws_s3_bucket.tfstate.bucket },
