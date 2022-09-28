@@ -404,11 +404,12 @@ function epa_core_addtocal_alter(array &$overridable_items) {
     if (!empty($event_host)) {
       $add_to_cal_components[] = "Event host: $event_host";
     }
+    $links_string = '';
     foreach ($node->field_links as $link) {
       $url = $link->getUrl();
       $url->setAbsolute();
       $title = $link->title;
-      $links_string .= $title ? $title .': ':''. $url->toString() ."\n";
+      $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
     }
     if (!empty($links_string)) {
       $add_to_cal_components[] = "Links:\n". $links_string;
