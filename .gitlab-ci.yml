@@ -426,7 +426,7 @@ copy:newrelic:dev:
 # preproduction environment encompasses two sites: development and staging, hence
 # the subregions below the infrastructure step.
 
-# Preproduction infrastructure builds are triggered only by the 'main' branch.
+# Preproduction infrastructure builds are triggered only by the 'live' branch.
 infrastructure:preproduction:init:
   extends: .infrastructure
   stage: infrastructure_preprod_init
@@ -492,7 +492,73 @@ infrastructure:preproduction:apply:
   environment:
     name: infra/preproduction
 
+#sub-region us-west-2: 
+# These steps deploy into the infra/preproduction-west environment
+# the infra/preproduction-west environment is pointed to the us-west-2 region within the DrupalCloud AWS accounts
+infrastructure:preproduction:init:
+  extends: .infrastructure
+  stage: infrastructure_preprod_init
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform init
+  environment:
+    name: infra/preproduction-west
 
+infrastructure:preproduction:validate:
+  extends: .infrastructure
+  stage: infrastructure_preprod_validate
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform validate
+  environment:
+    name: infra/preproduction-west
+
+infrastructure:preproduction:plan:
+  extends: .infrastructure
+  stage: infrastructure_preprod_plan
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  environment:
+    name: infra/preproduction-west
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+infrastructure:preproduction:apply:
+  extends: .infrastructure
+  stage: infrastructure_preprod_apply
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: manual
+  dependencies: ["infrastructure:preproduction:plan"]
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform apply
+  environment:
+    name: infra/preproduction-west
 
 
 
