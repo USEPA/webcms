@@ -170,18 +170,6 @@ data "aws_ssm_parameter" "saml_sp_key" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key"
 }
 
-data "aws_ssm_parameter" "akamai_access_token" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-access-token"
-}
-
-data "aws_ssm_parameter" "akamai_client_token" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-token"
-}
-
-data "aws_ssm_parameter" "akamai_client_secret" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/akamai-client-secret"
-}
-
 #endregion
 
 #region Locals
@@ -197,9 +185,6 @@ locals {
     { name = "WEBCMS_HASH_SALT", valueFrom = data.aws_ssm_parameter.hash_salt.value },
     { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_ssm_parameter.mail_pass.value },
     { name = "WEBCMS_SAML_SP_KEY", valueFrom = data.aws_ssm_parameter.saml_sp_key.value },
-    { name = "WEBCMS_AKAMAI_ACCESS_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_access_token.value },
-    { name = "WEBCMS_AKAMAI_CLIENT_TOKEN", valueFrom = data.aws_ssm_parameter.akamai_client_token.value },
-    { name = "WEBCMS_AKAMAI_CLIENT_SECRET", valueFrom = data.aws_ssm_parameter.akamai_client_secret.value },
     { name = "WEBCMS_NEW_RELIC_LICENSE", valueFrom = data.aws_ssm_parameter.newrelic_license.value },
   ]
 
@@ -216,13 +201,8 @@ locals {
     { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
     { name = "WEBCMS_SITE", value = var.site },
     { name = "WEBCMS_LANG", value = var.lang },
-    { name = "WEBCMS_S3_USES_DOMAIN", value = var.drupal_use_s3_domain ? "1" : "0" },
     { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = join(",", var.drupal_csrf_origin_whitelist) },
     { name = "WEBCMS_LOG_GROUP", value = data.aws_ssm_parameter.drupal_log_group.value },
-
-    # Akamai
-    { name = "WEBCMS_AKAMAI_ENABLED", value = var.akamai_enabled ? "1" : "0" },
-    { name = "WEBCMS_AKAMAI_API_HOST", value = var.akamai_api_host },
 
     # DB info
     { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },

@@ -23,6 +23,12 @@ resource "aws_rds_cluster_parameter_group" "params" {
     value = 128 * (1024 * 1024)
   }
 
+  # Use READ-COMMITTED for the transaction isolation level per Drupal recommendations
+  parameter {
+    name  = "tx_isolation"
+    value = "READ-COMMITTED"
+  }
+
   # Slow query logging
 
   # Enable the slow query log
@@ -66,7 +72,7 @@ resource "aws_rds_cluster" "db" {
 
   engine         = "aurora-mysql"
   engine_mode    = "provisioned"
-  engine_version = "5.7.mysql_aurora.2.09.0"
+  engine_version = "5.7.mysql_aurora.2.10.2"
 
   master_username = "root"
   master_password = random_password.rds_root_password.result
