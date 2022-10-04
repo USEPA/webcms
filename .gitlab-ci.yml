@@ -503,6 +503,8 @@ infrastructure:preproduction-west:init:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform init
@@ -517,6 +519,8 @@ infrastructure:preproduction-west:validate:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform validate
@@ -531,6 +535,8 @@ infrastructure:preproduction-west:plan:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform plan
@@ -554,6 +560,8 @@ infrastructure:preproduction-west:apply:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform apply
