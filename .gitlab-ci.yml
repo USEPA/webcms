@@ -501,7 +501,7 @@ infrastructure:preproduction-west:init:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
+    TF_STATE_NAME: dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform init
@@ -515,7 +515,7 @@ infrastructure:preproduction-west:validate:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
+    TF_STATE_NAME: dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform validate
@@ -529,7 +529,7 @@ infrastructure:preproduction-west:plan:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
+    TF_STATE_NAME: dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform plan
@@ -541,7 +541,7 @@ infrastructure:preproduction-west:plan:
     paths:
       - $TF_ROOT/plan.cache
     reports:
-      terraform: $TF_ROOT/plan.json
+      terraform: $TF_ROOT/plan-west.json
 
 infrastructure:preproduction-west:apply:
   extends: .infrastructure
@@ -549,10 +549,10 @@ infrastructure:preproduction-west:apply:
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
       when: manual
-  dependencies: ["infrastructure:preproduction:plan"]
+  dependencies: ["infrastructure:preproduction-west:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
+    TF_STATE_NAME: dev-west
   script:
     - gitlab-terraform init -upgrade
     - gitlab-terraform apply
