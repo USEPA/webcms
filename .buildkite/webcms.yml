@@ -38,6 +38,12 @@ steps:
           TARGET: '{{matrix}}'
 
         plugins:
+          - seek-oss/aws-sm#v2.3.1:
+              region: us-east-1
+              file:
+                - path: services/drupal/auth.json
+                  secret-id: buildkite/github_access_token
+
           - cultureamp/aws-assume-role#v0.1.0:
               role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
 
@@ -61,7 +67,6 @@ steps:
                     /kaniko/executor \
                       --context=/workspace/services/drupal \
                       --cache \
-                      --cache-copy-layers \
                       --cache-repo="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-cache" \
                       --skip-unused-stages \
                       --snapshotMode=redo \
