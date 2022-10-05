@@ -1,0 +1,25 @@
+diff --git a/js/coffee.js b/js/coffee.js
+index 39940f4..53f9f1c 100644
+--- a/js/coffee.js
++++ b/js/coffee.js
+@@ -136,10 +136,17 @@
+                 }
+ 
+                 if (!DrupalCoffee.isItemSelected) {
+-                  var $firstItem = $(DrupalCoffee.results).find('li:first').data('item.autocomplete');
+-                  if (typeof $firstItem === 'object') {
+-                    DrupalCoffee.redirect($firstItem.value, openInNewWindow);
++                  var inputVal = DrupalCoffee.field.val();
++                  if (inputVal.match(/^[0-9]+$/)) {
++                    var nodeUrl = "/node/" + inputVal;
++                    DrupalCoffee.redirect(nodeUrl, openInNewWindow);
+                     event.preventDefault();
++                  } else {
++                    var $firstItem = $(DrupalCoffee.results).find('li:first').data('item.autocomplete');
++                    if (typeof $firstItem === 'object') {
++                      DrupalCoffee.redirect($firstItem.value, openInNewWindow);
++                      event.preventDefault();
++                    }
+                   }
+                 }
+               }
