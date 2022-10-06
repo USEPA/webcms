@@ -12,7 +12,11 @@ stages:
   - infrastructure_preprod_validate
   - infrastructure_preprod_plan
   - infrastructure_preprod_apply
-
+  - infrastructure_preprod_west_init
+  - infrastructure_preprod_west_validate
+  - infrastructure_preprod_west_plan
+  - infrastructure_preprod_west_apply
+  
   # Docker builds
   - build
   - copy
@@ -497,7 +501,7 @@ infrastructure:preproduction:apply:
 # the infra/preproduction-west environment is pointed to the us-west-2 region within the DrupalCloud AWS accounts
 infrastructure:preproduction-west:init:
   extends: .infrastructure
-  stage: infrastructure_preprod_init
+  stage: infrastructure_preprod_west_init
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
@@ -513,7 +517,7 @@ infrastructure:preproduction-west:init:
 
 infrastructure:preproduction-west:validate:
   extends: .infrastructure
-  stage: infrastructure_preprod_validate
+  stage: infrastructure_preprod_west_validate
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
@@ -529,7 +533,7 @@ infrastructure:preproduction-west:validate:
 
 infrastructure:preproduction-west:plan:
   extends: .infrastructure
-  stage: infrastructure_preprod_plan
+  stage: infrastructure_preprod_west_plan
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
@@ -546,13 +550,13 @@ infrastructure:preproduction-west:plan:
   artifacts:
     name: plan
     paths:
-      - $TF_ROOT/plan-west.cache
+      - $TF_ROOT/plan.cache
     reports:
-      terraform: $TF_ROOT/plan-west.json
+      terraform: $TF_ROOT/plan.json
 
 infrastructure:preproduction-west:apply:
   extends: .infrastructure
-  stage: infrastructure_preprod_apply
+  stage: infrastructure_preprod_west_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
       when: manual
