@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "drupal_es_access" {
 }
 
 resource "aws_iam_policy" "drupal_es_access" {
-  name        = "WebCMS-${var.environment}-ElasticsearchAccess"
+  name        = "WebCMS-${var.aws_region}-${var.environment}-ElasticsearchAccess"
   description = "Grants read/write access to Elasticsearch"
 
   policy = data.aws_iam_policy_document.drupal_es_access.json
