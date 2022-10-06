@@ -981,9 +981,9 @@ if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
 }
 
-$settings['fast404_path_check'] = TRUE;
-$settings['fast404_respect_redirect'] = TRUE;
-if (file_exists($app_root . '/modules/contrib/fast_404/fast404.inc')) {
-  include_once $app_root . '/modules/contrib/fast_404/fast404.inc';
-  fast404_preboot($settings);
-}
+//$settings['fast404_path_check'] = TRUE;
+//$settings['fast404_respect_redirect'] = TRUE;
+//if (file_exists($app_root . '/modules/contrib/fast_404/fast404.inc')) {
+//  include_once $app_root . '/modules/contrib/fast_404/fast404.inc';
+//  fast404_preboot($settings);
+//}
