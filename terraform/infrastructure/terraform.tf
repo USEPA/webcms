@@ -28,7 +28,7 @@ resource "aws_s3_bucket_public_access_block" "tfstate" {
 
 # Create a DynamoDB table for Terraform locks
 resource "aws_dynamodb_table" "terraform_locks" {
-  name         = "WebCMS-${var.environment}-TerraformLocks"
+  name         = "WebCMS-${var.aws_region}-${var.environment}-TerraformLocks"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "terraform_locks_access" {
 }
 
 resource "aws_iam_policy" "terraform_locks_access" {
-  name        = "${var.iam_prefix}-${var.environment}-TerraformLocksAccess"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-TerraformLocksAccess"
   description = "Grants read-write access to the TerraformLocks table"
 
   policy = data.aws_iam_policy_document.terraform_locks_access.json
