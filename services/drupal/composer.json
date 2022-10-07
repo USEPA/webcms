@@ -225,6 +225,7 @@
         "drupal/ckeditor_specialchars": "^1.2",
         "drupal/ckeditorheight": "^1.8",
         "drupal/cloudfront_cache_path_invalidate": "^2.2",
+        "drupal/coffee": "^1.2",
         "drupal/components": "^2.0",
         "drupal/config_filter": "^1.8",
         "drupal/config_ignore": "^2.3",
@@ -341,6 +342,7 @@
         "vlucas/phpdotenv": "^2.4",
         "webflo/drupal-finder": "^1.0.0",
         "webmozart/path-util": "^2.3",
+        "wikimedia/composer-merge-plugin": "^2.0",
         "zaporylie/composer-drupal-optimizations": "^1.0"
     },
     "require-dev": {
@@ -365,7 +367,8 @@
             "cweagans/composer-patches": true,
             "drupal/core-composer-scaffold": true,
             "zaporylie/composer-drupal-optimizations": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "autoload": {
@@ -421,6 +424,11 @@
             "file-mapping": {
                 "[web-root]/robots.txt": false
             }
+        },
+        "merge-plugin": {
+            "include": [
+                "web/modules/contrib/webform/composer.libraries.json"
+            ]
         }
     }
 }
