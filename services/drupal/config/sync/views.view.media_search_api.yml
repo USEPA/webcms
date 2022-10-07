@@ -11,7 +11,6 @@ dependencies:
     - search_api
     - svg_image
     - views_autocomplete_filters
-    - views_bulk_operations
 id: media_search_api
 label: 'Media (search api)'
 module: views
@@ -28,15 +27,15 @@ display:
     display_options:
       title: 'Media Search'
       fields:
-        views_bulk_operations_bulk_form:
-          id: views_bulk_operations_bulk_form
-          table: views
-          field: views_bulk_operations_bulk_form
+        search_api_bulk_form:
+          id: search_api_bulk_form
+          table: search_api_index_media
+          field: search_api_bulk_form
           relationship: none
           group_type: group
           admin_label: ''
-          plugin_id: views_bulk_operations_bulk_form
-          label: 'Views bulk operations'
+          plugin_id: search_api_bulk_form
+          label: ''
           exclude: false
           alter:
             alter_text: false
@@ -69,7 +68,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -77,18 +76,12 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          batch: true
-          batch_size: 10
-          form_step: true
-          buttons: false
           action_title: Action
-          clear_on_exposed: true
-          force_selection_info: false
+          include_exclude: include
           selected_actions:
-            1:
-              action_id: views_bulk_operations_delete_entity
-              preconfiguration:
-                label_override: 'Delete selected media'
+            - media_delete_action
+          link_to_item: 0
+          use_highlighting: 0
         thumbnail:
           id: thumbnail
           table: search_api_datasource_media_entity_media
@@ -1176,15 +1169,15 @@ display:
     position: 1
     display_options:
       fields:
-        views_bulk_operations_bulk_form:
-          id: views_bulk_operations_bulk_form
-          table: views
-          field: views_bulk_operations_bulk_form
+        search_api_bulk_form:
+          id: search_api_bulk_form
+          table: search_api_index_media
+          field: search_api_bulk_form
           relationship: none
           group_type: group
           admin_label: ''
-          plugin_id: views_bulk_operations_bulk_form
-          label: 'Views bulk operations'
+          plugin_id: search_api_bulk_form
+          label: ''
           exclude: false
           alter:
             alter_text: false
@@ -1217,7 +1210,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: true
+          element_label_colon: false
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -1225,18 +1218,12 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          batch: true
-          batch_size: 10
-          form_step: true
-          buttons: false
           action_title: Action
-          clear_on_exposed: true
-          force_selection_info: false
+          include_exclude: include
           selected_actions:
-            1:
-              action_id: views_bulk_operations_delete_entity
-              preconfiguration:
-                label_override: 'Delete selected media'
+            - media_delete_action
+          link_to_item: 0
+          use_highlighting: 0
         thumbnail:
           id: thumbnail
           table: search_api_datasource_media_entity_media
