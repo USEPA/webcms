@@ -25,6 +25,13 @@ class EPAPublished extends EPAModeration {
     $this->setReviewDeadline();
     $this->setLastPublishedDate();
 
+    if ($this->contentEntityRevision->hasField('field_review_deadline') &&
+      $this->contentEntityRevision->hasField('field_expiration_date') &&
+      !$this->contentEntityRevision->get('field_expiration_date')->isEmpty() &&
+      $this->contentEntityRevision->field_review_deadline->value > $this->contentEntityRevision->field_expiration_date->value) {
+      $this->scheduleTransition('field_expiration_date', 'unpublished', TRUE);
+    }
+
     if ($this->contentHasFieldValue('field_review_deadline')) {
       $transition_date = $this->contentEntityRevision->field_review_deadline->date;
       $transition_date->sub(new \DateInterval("P3W"));
