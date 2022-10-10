@@ -2,6 +2,8 @@
 
 use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
+use Drupal\search_api\Entity\Server;
+
 
 function _epa_core_populate_search_index_queue() {
   $queue = \Drupal::queue('epa_search_text_indexer');
@@ -147,6 +149,24 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
     $sandbox['#finished'] = 1;
   } else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Tag all search indexes as needing reindexing due to the changes to our
+ * processor and field settings.
+ */
+function epa_core_deploy_refresh_indexes() {
+  _epa_core_refresh_indexes('localhost');
+}
+
+/*
+ * Helper function to refresh all search indexes on a server.
+ */
+function _epa_core_refresh_indexes($server_name) {
+  $localhost = Server::load($server_name);
+  foreach ($localhost->getIndexes() as $index) {
+    $index->reindex();
   }
 }
 
