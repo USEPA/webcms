@@ -26,7 +26,22 @@ import { tns } from 'tiny-slider/src/tiny-slider';
         sliderObject.events.on('transitionEnd', function() {
           const sliderInfo = sliderObject.getInfo();
           if (sliderInfo.displayIndex === 1) {
+            sliderInfo.container.dataset.sliderNoAutoplay = true;
             sliderObject.pause();
+          }
+        });
+
+        // Pause autoplay when focus moves into slider.
+        slider.addEventListener('focusin', function() {
+          sliderObject.pause();
+        });
+
+        // Restart autoplay when moving focus out of slider if still within
+        // first loop.
+        slider.addEventListener('focusout', function() {
+          const sliderInfo = sliderObject.getInfo();
+          if (!sliderInfo.container.dataset.sliderNoAutoplay) {
+            sliderObject.play();
           }
         });
       });
