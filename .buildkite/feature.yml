@@ -37,6 +37,16 @@ steps:
           TARGET: '{{matrix}}'
 
         plugins:
+          # Save a Composer authentication file (see [1]) in order to avoid
+          # GitHub rate limits.
+          #
+          # [1]: https://getcomposer.org/doc/articles/authentication-for-private-packages.md#authentication-in-auth-json-per-project
+          - seek-oss/aws-sm#v2.3.1:
+              region: us-east-1
+              file:
+                - path: services/drupal/auth.json
+                  secret-id: buildkite/github_access_token
+
           # Assume cross-account build role. We don't log in directly to ECR as Kaniko is able
           # to do that for us.
           - cultureamp/aws-assume-role#v0.1.0:
@@ -62,9 +72,7 @@ steps:
               # 2. Kaniko build caching is enabled. Intermediate layers are
               #    pushed to a cache repository in ECR. Subsequent builds can
               #    query the cache instead of re-executing more expensive build
-              #    steps. We also cache COPY instructions, in order to
-              #    ameliorate the cost of copying /var/www/html for nginx and
-              #    drush.
+              #    steps.
               # 3. The snapshot mode is set to "redo" instead of "full". This
               #    uses cheaper but less accurate metadata for FS snapshots. We
               #    assume this won't cause any issues for us, as any changes in
@@ -91,7 +99,6 @@ steps:
                     /kaniko/executor \
                       --context=/workspace/services/drupal \
                       --cache \
-                      --cache-copy-layers \
                       --cache-repo="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-cache" \
                       --skip-unused-stages \
                       --snapshotMode=redo \

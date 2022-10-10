@@ -23,3 +23,19 @@
     color: color('gray-10');
   }
 }
+
+// display alerts on the alerts page even when closed out elsewhere.
+.view--public-alerts.view--display-page_1 {
+  .usa-site-alert {
+    margin-bottom: .5em;
+
+    &.u-hidden {
+      display: block !important;
+    }
+
+    // hide close button since it doesn't do anything here
+    .usa-alert__close {
+      display: none;
+    }
+  }
+}

@@ -31,6 +31,49 @@ function epa_theme_preprocess_form(&$vars) {
 }
 
 /**
+ * Implements template_preprocess_form().
+ */
+function epa_theme_preprocess_entity_moderation_form(&$vars) {
+  if (isset($vars['form']['nid'])) {
+    $vars['nid']['title'] = $vars['form']['nid']['#title'];
+    $vars['nid']['content'] = [
+      '#markup' => $vars['form']['nid']['#markup'],
+    ];
+  }
+
+  if (isset($vars['form']['revision_author'])) {
+    $vars['revision_author']['title'] = $vars['form']['revision_author']['#title'];
+    $vars['revision_author']['content'] = [
+      '#markup' => $vars['form']['revision_author']['#markup'],
+    ];
+  }
+
+  if (isset($vars['form']['review_deadline'])) {
+    $vars['review_deadline']['title'] = $vars['form']['review_deadline']['#title'];
+    $vars['review_deadline']['content'] = [
+      '#markup' => $vars['form']['review_deadline']['#markup'],
+    ];
+  }
+
+  if (isset($vars['form']['current'])) {
+    $vars['current']['title'] = $vars['form']['current']['#title'];
+    $vars['current']['content'] = [
+      '#markup' => $vars['form']['current']['#markup'],
+    ];
+  }
+}
+
+/**
+ * Implements HOOK_form_FORM_ID_alter().
+ */
+function epa_theme_form_content_moderation_entity_moderation_form_alter(&$form, &$form_state, $form_id) {
+  $form['new_state']['#title'] = t('Change state to');
+  $form['new_state']['#wrapper_attributes']['class'][] = 'is-inline';
+  $form['revision_log']['#wrapper_attributes']['class'][] = 'is-inline';
+  $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'is-inline';
+}
+
+/**
  * Implements HOOK_form_FORM_ID_alter().
  */
 function epa_theme_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
