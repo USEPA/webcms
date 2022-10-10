@@ -82,7 +82,9 @@ steps:
               # 4. We use Kaniko's (experimental) system to determine if a RUN
               #    command needs to be re-run. Allegedly this improves build
               #    performance by a significant degree.
-              # 5. For feature branch builds, we do not push the final image.
+              # 5. We use Buildkite's commit and tag variables to save to the
+              #    GIT_COMMIT and GIT_TAG build args.
+              # 6. For feature branch builds, we do not push the final image.
               #
               # Note that in this script, ${FOO} is interpolated by the
               # Buildkite agent, whereas $$FOO is translated to $FOO later: this
@@ -103,6 +105,8 @@ steps:
                       --skip-unused-stages \
                       --snapshotMode=redo \
                       --use-new-run \
+                      --build-arg GIT_TAG="$BUILDKITE_TAG" \
+                      --build-arg GIT_COMMIT="$BUILDKITE_COMMIT" \
                       --target="$$TARGET" \
                       --no-push
 
