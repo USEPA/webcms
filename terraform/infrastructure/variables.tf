@@ -76,7 +76,7 @@ variable "db_instance_count" {
   type        = number
 }
 
-variable "proxy_endpoint" {
+variable "proxy_target_endpoint" {
   description = "Name of the endpoint the proxy connects to"
   type = string
 }
