@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\group\Entity\Group;
 use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Entity\Server;
@@ -177,20 +178,33 @@ function _epa_core_refresh_indexes($server_name) {
 function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
   $prefixes = ['paragraph_revision', 'paragraph'];
 
+  $replacements = [
+    ':group_type' => 'web_area-group_node-%',
+    ':value' => 'banner_slide'
+  ];
+
   if (!isset($sandbox['total'])) {
     $sandbox['total'] = 0;
     $sandbox['current'] = 0;
     $sandbox['images_created'] = 0;
     // Query all images that are being used with banner slides.
     foreach ($prefixes as $prefix) {
-
       $result = \Drupal::database()->query(
-        'SELECT fi.field_image_target_id
-        FROM ' . $prefix . '__field_image AS fi
-        LEFT JOIN ' . $prefix . '__field_banner_image AS fb ON fi.revision_id = fb.revision_id
-        WHERE fb.revision_id IS NULL
-        AND fi.bundle = :value;', [':value' => 'banner_slide'])
-        ->fetchCol();
+        'SELECT DISTINCT fi.field_image_target_id
+FROM {'. $prefix .'__field_image} AS fi
+LEFT JOIN {file_managed} AS fm
+    ON fm.fid = fi.field_image_target_id
+LEFT JOIN {'. $prefix .'__field_banner_image} AS pfb
+    ON fi.revision_id = pfb.revision_id
+LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
+    ON fi.revision_id = fbs.field_banner_slides_target_revision_id
+LEFT JOIN {node_revision__field_banner} AS nfb
+    ON nfb.field_banner_target_revision_id = fbs.revision_id
+LEFT JOIN {group_content_field_data} gfd
+    ON gfd.entity_id = nfb.entity_id
+        AND gfd.type LIKE :group_type
+WHERE pfb.revision_id IS NULL
+        AND fi.bundle = :value;', $replacements)->fetchCol();
 
       $sandbox['total'] += count($result);
 
@@ -202,13 +216,27 @@ function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
   foreach ($prefixes as $prefix) {
 
     $files = \Drupal::database()->query(
-      'SELECT fi.field_image_target_id, fi.field_image_alt, fm.filename, fm.langcode, fi.entity_id, fi.revision_id
-        FROM ' . $prefix . '__field_image AS fi
-        LEFT JOIN file_managed AS fm ON fm.fid = fi.field_image_target_id
-        LEFT JOIN ' . $prefix . '__field_banner_image AS fb ON fi.revision_id = fb.revision_id
-        WHERE fb.revision_id IS NULL
-        AND fi.bundle = :value
-          LIMIT 500;',  [':value' => 'banner_slide'])
+      'SELECT DISTINCT fi.field_image_target_id,
+         fi.field_image_alt,
+         fm.filename,
+         fm.langcode,
+         fi.entity_id,
+         fi.revision_id,
+         gfd.gid
+FROM {'. $prefix .'__field_image} AS fi
+LEFT JOIN {file_managed} AS fm
+    ON fm.fid = fi.field_image_target_id
+LEFT JOIN {'. $prefix .'__field_banner_image} AS pfb
+    ON fi.revision_id = pfb.revision_id
+LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
+    ON fi.revision_id = fbs.field_banner_slides_target_revision_id
+LEFT JOIN {node_revision__field_banner} AS nfb
+    ON nfb.field_banner_target_revision_id = fbs.revision_id
+LEFT JOIN {group_content_field_data} gfd
+    ON gfd.entity_id = nfb.entity_id
+        AND gfd.type LIKE :group_type
+WHERE pfb.revision_id IS NULL
+        AND fi.bundle = :value LIMIT 500;',  $replacements)
       ->fetchAll();
 
     foreach ($files as $file) {
@@ -233,6 +261,10 @@ function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
         $image_media->save();
         $langcode = $image_media->language()->getId();
         $banner_image_target_id = $image_media->id();
+        if (!empty($file->gid)) {
+          $group = Group::load($file->gid);
+          $group->addContent($image_media, 'group_media:' . $image_media->bundle());
+        }
         $sandbox['images_created']++;
       } else {
         $banner_image_target_id = $banner_media[0];
