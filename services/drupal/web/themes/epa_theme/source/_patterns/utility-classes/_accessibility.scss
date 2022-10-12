@@ -1,18 +1,20 @@
 // @file
 // Accessibility utility classes
 
+@use '../00-config' as *;
+
 .element-invisible, // Drupal 7 class
 .visually-hidden,
 .u-visually-hidden,
 .usa-sr-only {
-  @include visually-hidden-important;
+  @include visually-hidden-important();
 
   &.element-focusable, // Drupal 7 class
   &.focusable,
   &.u-focusable {
     &:focus,
     &:active {
-      @include visually-hidden-off-important;
+      @include visually-hidden-off-important();
     }
   }
 }
@@ -20,10 +22,10 @@
 .element-hidden, // Drupal 7 class
 .hidden,
 .u-hidden {
-  @include hidden-important;
+  @include hidden-important();
 }
 
 .invisible,
 .u-invisible {
-  @include invisible-important;
+  @include invisible-important();
 }
