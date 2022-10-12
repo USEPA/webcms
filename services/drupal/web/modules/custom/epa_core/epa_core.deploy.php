@@ -204,7 +204,8 @@ LEFT JOIN {group_content_field_data} gfd
     ON gfd.entity_id = nfb.entity_id
         AND gfd.type LIKE :group_type
 WHERE pfb.revision_id IS NULL
-        AND fi.bundle = :value;', $replacements)->fetchCol();
+        AND fi.bundle = :value
+        AND gid IS NOT NULL;', $replacements)->fetchCol();
 
       $sandbox['total'] += count($result);
 
@@ -236,7 +237,9 @@ LEFT JOIN {group_content_field_data} gfd
     ON gfd.entity_id = nfb.entity_id
         AND gfd.type LIKE :group_type
 WHERE pfb.revision_id IS NULL
-        AND fi.bundle = :value LIMIT 500;',  $replacements)
+        AND fi.bundle = :value
+        AND gid IS NOT NULL
+        LIMIT 500;',  $replacements)
       ->fetchAll();
 
     foreach ($files as $file) {
