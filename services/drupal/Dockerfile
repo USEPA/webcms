@@ -260,6 +260,17 @@ RUN chmod +x /webcms-entrypoint
 ENTRYPOINT ["/webcms-entrypoint"]
 CMD [ "php-fpm" ]
 
+# Add build metadata to the image. We expose two optional build args:
+# * GIT_TAG, the named Git tag being built.
+# * GIT_COMMIT, the Git commit being built.
+#
+# These args are converted to environment variables that can be read by, e.g.,
+# settings.php to display to users the current running code.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
+
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
@@ -324,3 +335,10 @@ RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
 
 # Wrap the entrypoint script with tini to allow graceful signal handling
 ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
+
+# Add build metadata to the image. See the comments for these ARG instructions
+# in the Drupal stage for more details.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}

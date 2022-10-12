@@ -44,6 +44,17 @@ function epa_core_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_rebuild().
+ */
+function epa_core_rebuild() {
+  $release = getenv('GIT_COMMIT');
+  if ($tag = getenv('GIT_TAG')) {
+    $release = $tag;
+  }
+  \Drupal::state()->set('environment_indicator.current_release', $release);
+}
+
+/**
  * Implements hook_menu_local_tasks_alter().
  *
  * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
