@@ -1,0 +1,39 @@
+uuid: 4155eaee-e9c4-4a15-966f-18bffc2402ae
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.link_with_metadata
+    - field.field.media.banner_image.field_media_image
+    - media.type.banner_image
+  module:
+    - epa_wysiwyg
+    - layout_builder
+    - media_inline_embed
+third_party_settings:
+  media_inline_embed:
+    embed_inline: false
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: media.banner_image.link_with_metadata
+targetEntityType: media
+bundle: banner_image
+mode: link_with_metadata
+content:
+  field_media_image:
+    type: epa_media_file_link_formatter
+    label: hidden
+    settings:
+      show_extension: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  created: true
+  entitygroupfield: true
+  langcode: true
+  name: true
+  search_api_excerpt: true
+  thumbnail: true
+  uid: true
