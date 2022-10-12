@@ -983,6 +983,7 @@ if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
 
 $settings['fast404_path_check'] = TRUE;
 $settings['fast404_respect_redirect'] = TRUE;
+$settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
 if (file_exists($app_root . '/modules/contrib/fast_404/fast404.inc')) {
   include_once $app_root . '/modules/contrib/fast_404/fast404.inc';
   fast404_preboot($settings);
