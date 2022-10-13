@@ -158,12 +158,12 @@ variables:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert")
       when: manual
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert")
       when: on_success
 
     - when: never
@@ -282,7 +282,7 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
    # These correspond to the three production targets in services/drupal/Dockerfile. The
    # ordering here is important for builds with a limited pool of servers: by ensuring that
@@ -324,7 +324,7 @@ build:metrics:dev:
   extends: .kaniko
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   script:
     - /kaniko/executor
@@ -342,7 +342,7 @@ build:database:dev:
   extends: .kaniko
   stage: build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   script:
     - /kaniko/executor
@@ -373,7 +373,7 @@ copy:cloudwatch:dev:
   extends: .kaniko
   stage: copy
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   script:
     - mkdir -p /workspace
@@ -391,7 +391,7 @@ build:traefik:dev:
   extends: .kaniko
   stage: infrastructure_preprod_build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
@@ -406,7 +406,7 @@ copy:newrelic:dev:
   extends: .kaniko
   stage: copy
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   script:
     - mkdir -p /workspace
     - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
@@ -431,7 +431,7 @@ infrastructure:preproduction:init:
   extends: .infrastructure
   stage: infrastructure_preprod_init
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -445,7 +445,7 @@ infrastructure:preproduction:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_validate
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -459,7 +459,7 @@ infrastructure:preproduction:plan:
   extends: .infrastructure
   stage: infrastructure_preprod_plan
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -480,7 +480,7 @@ infrastructure:preproduction:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_apply
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
       when: manual
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
@@ -520,7 +520,7 @@ deploy:dev:init:en:
   extends: .deploy
   stage: deploy:dev:init:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_LANG: en
@@ -544,7 +544,7 @@ deploy:dev:init:es:
   extends: .deploy
   stage: deploy:dev:init:es
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_LANG: es
@@ -570,7 +570,7 @@ deploy:dev:validate:en:
   extends: .deploy
   stage: deploy:dev:validate:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -588,7 +588,7 @@ deploy:dev:validate:es:
   extends: .deploy
   stage: deploy:dev:validate:es
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -604,7 +604,7 @@ deploy:dev:plan-en:
   extends: .deploy
   stage: deploy:dev:plan:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -635,7 +635,7 @@ deploy:dev:plan-es:
   extends: .deploy
   stage: deploy:dev:plan:es
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -705,12 +705,12 @@ deploy:dev:apply-en:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert" || $CI_COMMIT_BRANCH == "ci-work")
       when: manual
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert" || $CI_COMMIT_BRANCH == "ci-work")
       when: on_success
 
     - when: never
@@ -755,12 +755,12 @@ deploy:dev:apply-es:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert" || $CI_COMMIT_BRANCH == "ci-work")
       when: manual
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert" || $CI_COMMIT_BRANCH == "ci-work")
       when: on_success
 
     - when: never
@@ -777,7 +777,7 @@ deploy:dev:apply-es:
   extends: .deploy
   stage: deploy:stage:init
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   when: manual
 
@@ -802,7 +802,7 @@ deploy:dev:apply-es:
   extends: .deploy
   stage: deploy:stage:validate
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   when: manual
 
   parallel:
@@ -826,7 +826,7 @@ deploy:dev:apply-es:
   extends: .deploy
   stage: deploy:stage:plan
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   when: manual
 
@@ -897,12 +897,12 @@ deploy:dev:apply-es:
 #   rules:
 #     - if: >-
 #         $TF_MODULE == "infrastructure" &&
-#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert")
 #       when: manual
 
 #     - if: >-
 #         $TF_MODULE == "webcms" &&
-#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live-revert")
 #       when: on_success
 
 #     - when: never
@@ -921,7 +921,7 @@ update:dev:en:
   extends: .update
   stage: update:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -939,7 +939,7 @@ update:dev:es:
   extends: .update
   stage: update:es
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -965,7 +965,7 @@ Artifacts:
   rules:
     - if: $CI_COMMIT_TAG != ""
       when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live-revert"'
   script:
     - echo "Creating artifacts"
   artifacts:
