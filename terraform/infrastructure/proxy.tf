@@ -112,7 +112,7 @@ resource "aws_db_proxy_target" "proxy" {
   db_proxy_name     = aws_db_proxy.proxy.name
   target_group_name = aws_db_proxy_default_target_group.proxy.name
 
-  db_cluster_identifier = "webcms-${var.environment}"
+  db_cluster_identifier = "webcms-${var.environment}-encrypted"
 }
 
 #endregion
