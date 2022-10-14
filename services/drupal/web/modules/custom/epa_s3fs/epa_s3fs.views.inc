@@ -1,34 +1,24 @@
 <?php
 
 /**
- * @file
- * Primary module hooks for EPA S3FS module.
- *
- * @DCG
- * This file is no longer required in Drupal 8.
- * @see https://www.drupal.org/node/2217931
+ * Implements hook_views_data().
  */
-
-
-///**
-// * Implements hook_views_data().
-// */
 //function epa_s3fs_views_data() {
 //  $data = [];
 //
 //  // S3FS table.
 //  $data['s3fs_file'] = [];
-//  $data['s3fs_file']['table']['group'] = t('Files');
+//  $data['s3fs_file']['table']['group'] = t('S3 Files');
 //  $data['s3fs_file']['table']['base'] =[
 //    'field' => 'uri',
-//    'title' => t('S3 File System (s3fs)'),
+//    'title' => t('S3 Files (s3fs)'),
 //    'help' => t('S3 File System records exposed to Views.'),
 //  ];
 //
 //  // URI field
 //  $data['s3fs_file']['uri'] = [
 //    'title' => t('S3FS URI'),
-//    'help' => t('The S3 URI of the file.'),
+//    'help' => t('The S3FS URI of the file.'),
 //    'field' => [
 //      'id' => 'standard',
 //    ],
@@ -56,7 +46,7 @@
 //
 //  return $data;
 //}
-//
+
 //function epa_s3fs_views_data_alter() {
 //  $data['file']['s3fs_file'] = [
 //    'title' => t('S3FS File'),
