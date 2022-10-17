@@ -64,7 +64,7 @@ This module expects inputs from two sources: Terraform variables and Parameter S
 - RDS & Aurora variables
   - `db_instance_type`: A supported [instance type](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html) for the Aurora reader and writer instances.
   - `db_instance_count`: Number of reader/writer instances. In a production environment, this should be greater than one in order to support fast failover.
-  - `proxy_target_endpoint` : The name of the RDS cluster endpoint that the proxy points to.
+  - `regional_cluster_endpoint` : The regional Aurora endpoint that the application will point to
 - Elasticsearch variables
   - `search_instance_type`: The [instance type](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-instance-types.html) of the Elasticsearch data nodes.
   - `search_instance_count`: The number of data nodes to deploy into the Elasticsearch cluster.
