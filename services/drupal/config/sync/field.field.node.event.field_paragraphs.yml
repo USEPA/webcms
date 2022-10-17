@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_paragraphs
     - node.type.event
+    - paragraphs.paragraphs_type.before_after_swipe_component
     - paragraphs.paragraphs_type.box
     - paragraphs.paragraphs_type.card_group
     - paragraphs.paragraphs_type.dynamic_list
@@ -42,10 +43,14 @@ settings:
       slideshow: slideshow
       from_library: from_library
       card_group: card_group
+      before_after_swipe_component: before_after_swipe_component
     negate: 0
     target_bundles_drag_drop:
       applicants_or_respondents:
         weight: -26
+        enabled: false
+      author:
+        weight: 23
         enabled: false
       banner:
         weight: -22
@@ -53,6 +58,9 @@ settings:
       banner_slide:
         weight: -21
         enabled: false
+      before_after_swipe_component:
+        weight: 26
+        enabled: true
       box:
         weight: -31
         enabled: true

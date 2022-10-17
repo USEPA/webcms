@@ -235,15 +235,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -286,11 +286,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: true
-          group_column: target_id
+            link_to_entity: true
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -1343,12 +1343,13 @@ display:
           columns:
             nid: nid
             title: title
-            gid: gid
+            label: label
             type: type
             name: name
             moderation_state: moderation_state
             moderation_state_1: moderation_state_1
             changed: changed
+            revision_uid: revision_uid
             operations: operations
           default: changed
           info:
@@ -1366,7 +1367,7 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            gid:
+            label:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -1408,6 +1409,13 @@ display:
               separator: ''
               empty_column: false
               responsive: priority-medium
+            revision_uid:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             operations:
               align: ''
               separator: ''
@@ -1642,15 +1650,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -1693,11 +1701,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: false
-          group_column: target_id
+            link_to_entity: false
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -2175,6 +2183,9 @@ display:
             gid:
               alias: ''
               raw_output: false
+            label:
+              alias: web_area
+              raw_output: false
             type:
               alias: ''
               raw_output: false
@@ -2185,6 +2196,9 @@ display:
               alias: ''
               raw_output: false
             moderation_state_1:
+              alias: ''
+              raw_output: false
+            revision_uid:
               alias: ''
               raw_output: false
             changed:
@@ -2362,15 +2376,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -2413,11 +2427,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: true
-          group_column: target_id
+            link_to_entity: true
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0

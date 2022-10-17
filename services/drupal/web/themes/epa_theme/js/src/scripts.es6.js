@@ -1,7 +1,7 @@
 // Custom scripts file
 
 // Include USWDS Javascript.
-require('uswds');
+require('@uswds/uswds');
 
 import domready from 'domready';
 import navigation from './modules/navigation';

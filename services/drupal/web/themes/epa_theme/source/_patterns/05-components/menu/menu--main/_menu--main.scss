@@ -1,6 +1,9 @@
 // @file
 // Styles for the main menu.
 
+@use 'sass:math';
+@use '../../../00-config' as *;
+
 .menu--main {
   @include list-clean();
   background: gesso-brand(blue, base);
@@ -26,7 +29,7 @@
     font-size: font-size(heading, sm);
     font-weight: bold;
     justify-content: space-between;
-    line-height: units(2) / font-size(heading, sm);
+    line-height: math.div(units(2), font-size(heading, sm));
     padding: gesso-spacing(2) gesso-spacing(3);
     text-align: left;
     text-decoration: none;
@@ -81,16 +84,16 @@
 
       @include at-media($theme-header-min-width) {
         > .menu__subnav .menu__link {
-          @include visually-hidden-off;
+          @include visually-hidden-off();
         }
       }
     }
 
     .menu__subnav .menu__link {
-      @include visually-hidden;
+      @include visually-hidden();
 
       &:focus {
-        @include visually-hidden-off;
+        @include visually-hidden-off();
       }
     }
   }

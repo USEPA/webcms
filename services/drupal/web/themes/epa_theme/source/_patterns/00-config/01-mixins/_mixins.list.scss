@@ -1,5 +1,9 @@
 // @file
-// Various Mixins for List styles
+// Various mixins for list styles
+
+@use '../config.settings' as *;
+@use '../00-functions' as *;
+@use 'mixins.breakpoint' as *;
 
 @mixin list-clean {
   list-style-type: none;
@@ -36,7 +40,7 @@
 }
 
 @mixin list-pipeline($pipeline-border-color: gesso-color(ui, generic, border)) {
-  @include clearfix;
+  @include clearfix();
   list-style-type: none;
   margin-left: 0;
   padding-left: 0;

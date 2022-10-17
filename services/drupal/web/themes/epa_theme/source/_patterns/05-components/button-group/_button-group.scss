@@ -1,13 +1,17 @@
 // @file
 // Styles for a Button Group.
 
+@use '../../00-config' as *;
+@use 'usa-button' as *;
+@use '../button/button' as *;
+
 .button-group {
   display: flex;
   margin: units(3) 0;
 }
 
 .button-group__list {
-  @include list-clean;
+  @include list-clean();
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -84,6 +88,6 @@
   width: 100%;
 
   &.is-active {
-    @extend .usa-button:active;
+    @extend .usa-button, :active;
   }
 }
