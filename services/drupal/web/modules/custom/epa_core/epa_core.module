@@ -214,11 +214,13 @@ function _epa_core_load_taxonomy_hierarchy($terms) {
   foreach ($terms as $term) {
     $term_id = $term['target_id'];
     $term_object = $term_storage->load($term_id);
-    $default_keywords[] = $term_object->label();
-    $ancestors = $term_storage->loadAllParents($term_id);
-    if (!empty($ancestors)) {
-      foreach ($ancestors as $ancestor) {
-        $default_keywords[] = $ancestor->label();
+    if ($term_object) {
+      $default_keywords[] = $term_object->label();
+      $ancestors = $term_storage->loadAllParents($term_id);
+      if (!empty($ancestors)) {
+        foreach ($ancestors as $ancestor) {
+          $default_keywords[] = $ancestor->label();
+        }
       }
     }
   }
