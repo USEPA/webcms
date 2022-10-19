@@ -1,6 +1,9 @@
 // @file
 // Styles for a Site Logo.
 
+@use 'sass:math';
+@use '../../00-config' as *;
+
 $logo-height: 147px;
 $logo-width: 1060px;
 
@@ -32,7 +35,7 @@ $logo-width: 1060px;
 
 .site-logo__image {
   display: block;
-  padding-bottom: $logo-height / $logo-width * 100%;
+  padding-bottom: math.div($logo-height, $logo-width) * 100%;
   position: relative;
   width: 100%;
 }

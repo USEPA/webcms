@@ -11,18 +11,19 @@ const cleanValue = require('./cleanValue');
  * @return {string}
  */
 function createSassVariables(data) {
-  let output = '';
+  let output = "@forward 'uswds-core' with (\n";
   for (const [key, value] of Object.entries(data)) {
     switch (typeof value) {
       case 'string':
       case 'number':
-        output += `$theme-${key}: ${cleanValue(value)};\n`;
+        output += `  $theme-${key}: ${cleanValue(value)},\n`;
         break;
       default:
-        output += `$theme-${key}: ${value};\n`;
+        output += `  $theme-${key}: ${value},\n`;
         break;
     }
   }
+  output += ');\n';
   return output;
 }
 
@@ -30,7 +31,7 @@ function createSassVariables(data) {
  * Render the USWDS Sass config variables.
  * @param {import('./types').GessoData} data
  */
-function renderUswdsConfig(data) {
+function renderUswdsTheme(data) {
   if (typeof data !== 'object' || Array.isArray(data)) {
     throw new NaniError({
       shortMessage: `Expecting non-array object for rendering sass; got ${typeof data}`,
@@ -46,4 +47,4 @@ function renderUswdsConfig(data) {
   }
 }
 
-module.exports = renderUswdsConfig;
+module.exports = renderUswdsTheme;
