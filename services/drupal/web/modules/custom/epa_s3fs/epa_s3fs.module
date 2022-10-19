@@ -26,7 +26,7 @@ function epa_s3fs_views_data() {
   ];
 
   // URI field
-  $data['s3fs_file']['uri'] = [
+  $data['s3fs_file']['uri_collated'] = [
     'title' => t('S3FS URI'),
     'help' => t('The S3 URI of the file.'),
     'field' => [
@@ -64,7 +64,7 @@ function epa_s3fs_views_data_alter(&$data) {
 
     'relationship' => [
       'base' => 's3fs_file',
-      'base field' => 'uri',
+      'base field' => 'uri_collated',
       'field' => 'uri',
       'id' => 'standard',
       'label' => t('S3FS Files'),
