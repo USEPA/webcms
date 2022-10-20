@@ -1,0 +1,194 @@
+diff --git a/config/schema/content_moderation_notifications.schema.yml b/config/schema/content_moderation_notifications.schema.yml
+index db19abe..de077b7 100644
+--- a/config/schema/content_moderation_notifications.schema.yml
++++ b/config/schema/content_moderation_notifications.schema.yml
+@@ -33,6 +33,11 @@ content_moderation_notifications.content_moderation_notification.*:
+       sequence:
+         type: string
+         label: 'Roles'
++    flags:
++      type: sequence
++      sequence:
++        type: string
++        label: 'Flags'
+     author:
+       type: boolean
+       label: 'Original Author'
+diff --git a/content_moderation_notifications.services.yml b/content_moderation_notifications.services.yml
+index 9c61ce5..c9289be 100644
+--- a/content_moderation_notifications.services.yml
++++ b/content_moderation_notifications.services.yml
+@@ -4,4 +4,4 @@ services:
+     arguments: ['@entity_type.manager', '@content_moderation.moderation_information']
+   content_moderation_notifications.notification:
+     class: Drupal\content_moderation_notifications\Notification
+-    arguments: ['@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@content_moderation_notifications.notification_information', '@?token.entity_mapper', '@?group.group_route_context']
++    arguments: ['@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@content_moderation_notifications.notification_information', '@?token.entity_mapper', '@?group.group_route_context', '@?flag.flag']
+diff --git a/src/ContentModerationNotificationInterface.php b/src/ContentModerationNotificationInterface.php
+index 97886be..f1256e1 100644
+--- a/src/ContentModerationNotificationInterface.php
++++ b/src/ContentModerationNotificationInterface.php
+@@ -89,6 +89,13 @@ interface ContentModerationNotificationInterface extends ConfigEntityInterface {
+    */
+   public function getGroupRoles();
+ 
++  /**
++   * Get the flag types for which to send this notification.
++   *
++   * @return string[]
++   */
++  public function getFlags();
++
+   /**
+    * Gets the notification subject.
+    *
+diff --git a/src/Entity/ContentModerationNotification.php b/src/Entity/ContentModerationNotification.php
+index fd73fb3..2f9ea83 100644
+--- a/src/Entity/ContentModerationNotification.php
++++ b/src/Entity/ContentModerationNotification.php
+@@ -53,6 +53,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
+  *     "group_type",
+  *     "group_use",
+  *     "group_roles",
++ *     "flags"
+  *     "author",
+  *     "revision_author",
+  *     "site_mail",
+@@ -145,6 +146,13 @@ class ContentModerationNotification extends ConfigEntityBase implements ContentM
+    */
+   public $group_roles = [];
+ 
++  /**
++   * The flag types for this notification.
++   *
++   * @var string[]
++   */
++  public $flags = [];
++
+   /**
+    * The associated workflow for these notifications.
+    *
+@@ -203,6 +211,13 @@ class ContentModerationNotification extends ConfigEntityBase implements ContentM
+     return $this->get('group_roles');
+   }
+ 
++  /**
++   * {@inheritDoc}
++   */
++  public function getFlags() {
++    return $this->get('flags');
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/src/Form/ContentModerationNotificationsFormBase.php b/src/Form/ContentModerationNotificationsFormBase.php
+index 08868d4..8584485 100644
+--- a/src/Form/ContentModerationNotificationsFormBase.php
++++ b/src/Form/ContentModerationNotificationsFormBase.php
+@@ -271,6 +271,33 @@ class ContentModerationNotificationsFormBase extends EntityForm {
+     }
+ 
+     // Send email to the original author?
++    // Flag module notification modifications.
++    if ($this->moduleHandler->moduleExists('flag')) {
++      $form['flag_wrapper'] = [
++        '#type' => 'container',
++        '#prefix' => '<div id="flag_wrapper">',
++        '#suffix' => '</div>',
++      ];
++
++      /** @var \Drupal\flag\Entity\Flag[] $flags */
++      $flags = $this->entityTypeManager
++        ->getStorage('flag')
++        ->loadMultiple();
++      $flag_options = [];
++      foreach ($flags as $flag) {
++        $flag_options[$flag->id()] = $flag->label();
++      }
++
++      $form['flag_wrapper']['flags'] = [
++        '#type' => 'checkboxes',
++        '#title' => $this->t('Flag types'),
++        '#options' => $flag_options,
++        '#default_value' => isset($content_moderation_notification->flags) ? $content_moderation_notification->flags : [],
++        '#description' => $this->t('Send notifications to all users who have flagged with these flags.'),
++      ];
++    }
++
++    // Send email to author?
+     $form['author'] = [
+       '#type' => 'checkbox',
+       '#title' => $this->t('Email the original content author?'),
+diff --git a/src/Notification.php b/src/Notification.php
+index f4f9e3d..a2c3c1e 100644
+--- a/src/Notification.php
++++ b/src/Notification.php
+@@ -9,6 +9,7 @@ use Drupal\Core\Mail\MailManagerInterface;
+ use Drupal\Core\Plugin\Context\ContextProviderInterface;
+ use Drupal\Core\Session\AccountInterface;
+ use Drupal\group\Entity\Group;
++use Drupal\flag\FlagService;
+ use Drupal\token\TokenEntityMapperInterface;
+ use Drupal\user\EntityOwnerInterface;
+ use Drupal\user\RoleInterface;
+@@ -65,6 +66,13 @@ class Notification implements NotificationInterface {
+    */
+   protected $contextProvider;
+ 
++  /**
++   * The Flag service.
++   *
++   * @var \Drupal\flag\FlagService
++   */
++  protected $flagService;
++
+   /**
+    * Creates a new ModerationInformation instance.
+    *
+@@ -80,8 +88,10 @@ class Notification implements NotificationInterface {
+    *   The notification information service.
+    * @param \Drupal\token\TokenEntityMapperInterface $token_entity_mappper
+    *   The token entity mapper service.
++   * @param \Drupal\flag\FlagService $flag_service
++   *   The Flag service.
+    */
+-  public function __construct(AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, ModuleHandlerInterface $module_handler, NotificationInformationInterface $notification_information, TokenEntityMapperInterface $token_entity_mappper = NULL, ContextProviderInterface $context_provider = NULL) {
++  public function __construct(AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, ModuleHandlerInterface $module_handler, NotificationInformationInterface $notification_information, TokenEntityMapperInterface $token_entity_mappper = NULL, ContextProviderInterface $context_provider = NULL, FlagService $flag_service = NULL) {
+     $this->currentUser = $current_user;
+     $this->entityTypeManager = $entity_type_manager;
+     $this->mailManager = $mail_manager;
+@@ -89,6 +99,7 @@ class Notification implements NotificationInterface {
+     $this->notificationInformation = $notification_information;
+     $this->tokenEntityMapper = $token_entity_mappper;
+     $this->contextProvider = $context_provider;
++    $this->flagService = $flag_service;
+   }
+ 
+   /**
+@@ -213,6 +224,25 @@ class Notification implements NotificationInterface {
+         }
+       }
+ 
++      // Specific part to use flag module functionality
++      if ($this->moduleHandler->moduleExists('flag')
++        && !empty($notification->getFlags())) {
++        // To get all users who have flagged the entity we need to get the flag.
++        $flag_ids = $notification->getFlags();
++        /** @var \Drupal\flag\Entity\Flag[] $flags */
++        $flags = $this->entityTypeManager
++          ->getStorage('flag')
++          ->loadMultiple($flag_ids);
++        foreach ($flags as $flag) {
++          /** @var \Drupal\user\Entity\User[] $users */
++          $users = $this->flagService->getFlaggingUsers($entity, $flag);
++
++          foreach ($users as $user) {
++            $data['to'][] = $user->getEmail();
++          }
++        }
++      }
++
+       // Adhoc emails.
+       $adhoc_emails = $notification->getEmails();
+       $template = [
