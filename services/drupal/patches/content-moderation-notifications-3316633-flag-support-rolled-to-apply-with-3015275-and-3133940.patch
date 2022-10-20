@@ -31,7 +31,7 @@ index 97886be..f1256e1 100644
 @@ -89,6 +89,13 @@ interface ContentModerationNotificationInterface extends ConfigEntityInterface {
     */
    public function getGroupRoles();
- 
+
 +  /**
 +   * Get the flag types for which to send this notification.
 +   *
@@ -50,14 +50,14 @@ index fd73fb3..2f9ea83 100644
   *     "group_type",
   *     "group_use",
   *     "group_roles",
-+ *     "flags"
++ *     "flags",
   *     "author",
   *     "revision_author",
   *     "site_mail",
 @@ -145,6 +146,13 @@ class ContentModerationNotification extends ConfigEntityBase implements ContentM
     */
    public $group_roles = [];
- 
+
 +  /**
 +   * The flag types for this notification.
 +   *
@@ -71,7 +71,7 @@ index fd73fb3..2f9ea83 100644
 @@ -203,6 +211,13 @@ class ContentModerationNotification extends ConfigEntityBase implements ContentM
      return $this->get('group_roles');
    }
- 
+
 +  /**
 +   * {@inheritDoc}
 +   */
@@ -88,7 +88,7 @@ index 08868d4..8584485 100644
 +++ b/src/Form/ContentModerationNotificationsFormBase.php
 @@ -271,6 +271,33 @@ class ContentModerationNotificationsFormBase extends EntityForm {
      }
- 
+
      // Send email to the original author?
 +    // Flag module notification modifications.
 +    if ($this->moduleHandler->moduleExists('flag')) {
@@ -135,7 +135,7 @@ index f4f9e3d..a2c3c1e 100644
 @@ -65,6 +66,13 @@ class Notification implements NotificationInterface {
     */
    protected $contextProvider;
- 
+
 +  /**
 +   * The Flag service.
 +   *
@@ -164,12 +164,12 @@ index f4f9e3d..a2c3c1e 100644
      $this->contextProvider = $context_provider;
 +    $this->flagService = $flag_service;
    }
- 
+
    /**
 @@ -213,6 +224,25 @@ class Notification implements NotificationInterface {
          }
        }
- 
+
 +      // Specific part to use flag module functionality
 +      if ($this->moduleHandler->moduleExists('flag')
 +        && !empty($notification->getFlags())) {
