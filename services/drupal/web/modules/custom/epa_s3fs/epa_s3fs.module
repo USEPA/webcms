@@ -25,7 +25,7 @@ function epa_s3fs_views_data() {
     'help' => t('S3 File System records exposed to Views.'),
   ];
 
-  // URI field
+  // URI collated field.
   $data['s3fs_file']['uri_collated'] = [
     'title' => t('S3FS URI'),
     'help' => t('The S3 URI of the file.'),
@@ -43,6 +43,10 @@ function epa_s3fs_views_data() {
   return $data;
 }
 
+
+/**
+ * Implements hook_views_data_alter().
+ */
 function epa_s3fs_views_data_alter(&$data) {
   $data['file_managed']['s3fs_file'] = [
     'title' => t('S3FS File'),
