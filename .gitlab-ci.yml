@@ -872,6 +872,7 @@ deploy:dev-west:init:en:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -896,6 +897,7 @@ deploy:dev-west:init:es:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -922,6 +924,7 @@ deploy:dev-west:validate:en:
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   environment:
     name: site/dev-west-$WEBCMS_LANG
@@ -939,6 +942,7 @@ deploy:dev-west:validate:es:
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
   environment:
     name: site/dev-west-$WEBCMS_LANG
   script:
@@ -956,6 +960,7 @@ deploy:dev-west:plan-en:
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -987,6 +992,7 @@ deploy:dev-west:plan-es:
     WEBCMS_SITE: dev
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -1022,6 +1028,7 @@ deploy:dev-west:apply-en:
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -1056,7 +1063,7 @@ deploy:dev-west:apply-en:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
+      when: manual
 
     - when: never
 
@@ -1072,6 +1079,7 @@ deploy:dev-west:apply-es:
     WEBCMS_SITE: dev
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
   # resource group to prevent overlapping Terraform runs. The environment names here are
@@ -1106,7 +1114,7 @@ deploy:dev-west:apply-es:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
+      when: manual
 
     - when: never
 
