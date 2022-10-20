@@ -17,7 +17,7 @@ function epa_s3fs_fix_table_indexes($table = 's3fs_file') {
   // column that is a copy of s3fs_file.uri but in a collation that matches that
   // of file_managed.uri.
   \Drupal::database()
-    ->query('ALTER TABLE {' . $table . '} ADD COLUMN uri_collated varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci GENERATED ALWAYS AS (uri)');
+    ->query('ALTER TABLE {' . $table . '} ADD COLUMN uri_collated varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin GENERATED ALWAYS AS (uri)');
   \Drupal::database()
     ->query('CREATE INDEX epa_s3fs__uri_collated ON {'. $table .'}(uri_collated)');
 }
