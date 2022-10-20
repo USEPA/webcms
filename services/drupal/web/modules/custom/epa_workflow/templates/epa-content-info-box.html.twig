@@ -1,0 +1,68 @@
+{% if node_edit_link %}
+  {{ node_edit_link }}
+{% endif %}
+
+<div class="box box--special">
+  <div class="box__content">
+    {% if nid %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': nid['#title'],
+        'field_items': [{ content: nid['#markup'] }],
+      } %}
+    {% endif %}
+
+    {% if revision_author %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': revision_author['#title'],
+        'field_items': [{ content: revision_author['#markup'] }],
+      } %}
+    {% endif %}
+
+
+    {% if review_deadline %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': review_deadline['#title'],
+        'field_items': [{ content: review_deadline['#markup'] }],
+      } %}
+    {% endif %}
+
+    {% if current %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': current['#title'],
+        'field_items': [{ content: current['#markup'] }],
+      } %}
+    {% endif %}
+
+    {% if flag_link %}
+      {% include '@components/field/field.twig' with {
+        'element': 'div',
+        'modifier_classes': 'field--tight',
+        'label_display': 'inline',
+        'label_element': 'div',
+        'label': flag_link['#title'],
+        'field_items': [{ content: flag_link['#markup'] }],
+      } %}
+    {% endif %}
+
+    {% if content_moderation_form %}
+      {{ content_moderation_form }}
+    {% endif %}
+
+  </div>
+</div>
