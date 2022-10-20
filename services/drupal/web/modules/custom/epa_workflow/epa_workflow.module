@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -175,6 +176,16 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
       }
     }
   }
+
+  // The notifications make all users BCC by default so there's no good way to
+  // validate that the correct users are being sent the notification. This
+  // settings variable being set will allow us to see the list of users in the
+  // message body now.
+  if (Settings::get('epa_content_moderation_email_debug', NULL)) {
+    $user_list = implode(', ', $data['to']);
+    $data['params']['message'] .= $user_list;
+  }
+
 }
 
 /**
