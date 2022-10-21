@@ -330,6 +330,8 @@ build:drupal:
       --context=$CI_PROJECT_DIR/services/drupal
       --target=$WEBCMS_TARGET
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
@@ -345,6 +347,7 @@ build:metrics:dev:
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/metrics
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -363,6 +366,7 @@ build:database:dev:
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/terraform/database
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -395,6 +399,8 @@ copy:cloudwatch:dev:
     - /kaniko/executor
       --context=/workspace
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -411,6 +417,7 @@ build:traefik:dev:
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/traefik
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
@@ -427,6 +434,7 @@ copy:newrelic:dev:
     - /kaniko/executor
       --context=/workspace
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
