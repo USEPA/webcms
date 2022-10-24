@@ -4,6 +4,10 @@
 
 <div class="box box--special">
   <div class="box__content">
+    {% if flag_link %}
+      {{ flag_link }}
+    {% endif %}
+
     {% if nid %}
       {% include '@components/field/field.twig' with {
         'element': 'div',
@@ -26,7 +30,6 @@
       } %}
     {% endif %}
 
-
     {% if review_deadline %}
       {% include '@components/field/field.twig' with {
         'element': 'div',
@@ -47,10 +50,6 @@
         'label': current['#title'],
         'field_items': [{ content: current['#markup'] }],
       } %}
-    {% endif %}
-
-    {% if flag_link %}
-      {{ flag_link }}
     {% endif %}
 
     {% if content_moderation_form %}
