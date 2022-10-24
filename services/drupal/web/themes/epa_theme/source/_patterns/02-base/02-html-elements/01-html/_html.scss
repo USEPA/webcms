@@ -1,8 +1,11 @@
 // @file
 // HTML styles.
 
+@use 'sass:math';
+@use '../../../00-config' as *;
+
 html {
-  @include add-kerning;
-  font-size: 100% * (gesso-base-font-size() / 16px);
+  @include add-kerning();
+  font-size: 100% * math.div(gesso-base-font-size(), 16px);
   min-height: 100%;
 }

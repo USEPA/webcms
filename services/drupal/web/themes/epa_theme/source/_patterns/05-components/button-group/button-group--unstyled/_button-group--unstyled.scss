@@ -1,6 +1,9 @@
 // @file
 // Styles for an Unstyled Button Group.
 
+@use '../../../00-config' as *;
+@use 'usa-button' as *;
+
 .button-group--unstyled {
   .button-group__item {
     border: 0;
@@ -11,11 +14,11 @@
     padding: units(1);
 
     &:focus {
-      @extend .usa-button--unstyled:hover;
+      @extend .usa-button--unstyled, :hover;
     }
 
     &.is-active {
-      @extend .usa-button--unstyled:active;
+      @extend .usa-button--unstyled, :active;
       font-weight: gesso-font-weight(bold);
     }
   }

@@ -1,84 +1,55 @@
-FROM forumone/drupal8:7.4 AS memcached-ext
+FROM forumone/drupal8:8.0 AS memcached-ext
 
-# This build stage builds and installs the AWS Elasticache client for Memcached. It's a
-# manual clone & build process for two reasons:
-# 1. The client cannot be found on PECL, and
-# 2. We cannot use precompiled artifacts due to differences in libc implementations (glibc vs. musl).
+# Set working directory to /tmp
+WORKDIR /tmp
 
-# cf. https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached
-# cf. https://github.com/awslabs/aws-elasticache-cluster-client-memcached-for-php/tree/php7
+# First, install compile-time dependencies
+RUN apk add --no-cache $PHPIZE_DEPS libmemcached-dev zlib-dev
 
-# Change the working directory to / from /var/www/html
-WORKDIR /
+# Next, install the prequisite igbinary extension
+RUN pecl install igbinary
 
-# First, install the tools we need to build and link the two libraries.
-RUN apk add --no-cache $PHPIZE_DEPS git zlib-dev libevent-dev g++
-
-# Second, clone and build AWS' libmemcached fork. Aside from the `sed' invocation (see
-# comment below), this hews to that repo's instructions.
-#
-# Note the 'git checkout' command: we've pinned to working commits due to issues with the latest commits.
+# Finally, build and install memcached. We have to do this instead of the
+# traditional pecl install method because we pass custom flags to memcached's
+# ./configure script, which does not appear to be supported by the pecl command.
 RUN set -ex \
-  && git clone https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached.git \
-  && cd aws-elasticache-cluster-client-libmemcached \
-  && git checkout 1e39b7f7c700fe02457d1a05e00038ca930e3ccb \
-  # Patch cmdline.cc per https://github.com/awslabs/aws-elasticache-cluster-client-libmemcached/pull/4
-  # The '65' here refers to the line where the declaration 'static char **environ' can be
-  # found - we need to remove the 'static' declaration in order to match libmusl's
-  # declaration.
-  && sed -ie '65s/static //' libtest/cmdline.cc \
-  && touch configure.ac aclocal.m4 configure Makefile.am Makefile.in \
-  && mkdir BUILD \
-  && cd BUILD \
-  && ../configure --prefix=/usr/local/libmemcached --with-pic --disable-sasl \
-  && make -j$(nproc) \
-  && make install
-
-# Next, clone and build the cluster client.
-RUN set -ex \
-  && git clone --branch php7 --depth 1 https://github.com/awslabs/aws-elasticache-cluster-client-memcached-for-php.git \
-  && cd aws-elasticache-cluster-client-memcached-for-php \
+  && PECL_MEMCACHED_VERSION=3.2.0 \
+  && cd /tmp \
+  && pecl download memcached-$PECL_MEMCACHED_VERSION \
+  && tar xzf memcached-$PECL_MEMCACHED_VERSION.tgz \
+  && cd memcached-$PECL_MEMCACHED_VERSION \
   && phpize \
-  && ./configure --with-libmemcached-dir=/usr/local/libmemcached --disable-memcached-sasl \
-  # Replace link to libmemcached with static library; lets us fully remove the AWS libmemcached fork (see README)
-  && sed -i "s#-lmemcached#/usr/local/libmemcached/lib/libmemcached.a -lcrypt -lpthread -lm -lstdc++#" Makefile \
-  && make -j$(nproc) \
+  && ./configure --enable-memcached-igbinary \
+  && make \
   && make install
 
-# At this point, we now have a fully-realized "memcached.so"
-# available in the PHP extensions directory. It will be copied into the dev, base, and
-# drush build stages.
+FROM forumone/drupal8:8.0 AS base
 
-FROM forumone/drupal8:7.4-xdebug AS dev
-
-# Development-only dependencies/config here
-
-# Download and install New Relic, but don't enable it. This allows us to use the extension
-# functions in our own code.
-ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
+# Download and install the New Relic APM extension. Note that, unlike in the docs, we do
+# not configure the extension here. That must happen at runtime since the license keys
+# and application names are environment-dependent.
 RUN set -ex \
-  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
+  && NEW_RELIC_AGENT_VERSION=9.21.0.311 \
+  && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
-  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
-  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall* \
-  && echo newrelic.enabled=false >> $(php -r "echo(PHP_CONFIG_FILE_SCAN_DIR);")/newrelic.ini
+  && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
+  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
 
-# Copy and enable the AWS Elasticache memcached extension
+# Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
-RUN docker-php-ext-enable memcached
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/igbinary.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/
+RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
 RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
-  # Needed by the Elasticache memcached client
-  libstdc++ \
+  # Needed by the memcached extension
+  libmemcached \
   # GNU wget to override BusyBox
   wget
 
-# Note that any configuration applied to the prod image must be mirrored here, due to the
-# difference in base layers.
 RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
@@ -132,52 +103,6 @@ RUN set -ex \
     echo 'access.format="[%T] %R %m %r %{REQUEST_URI}e mem(bytes): %M cpu%%: %{total}C dur(secs): %d"'; \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
-FROM forumone/drupal8:7.4 AS base
-
-# This is the base production layer. We use it here in order to make it easier to ensure
-# that both the dev and base targets are in sync with each other.
-
-# Download and install the New Relic APM extension. Note that, unlike in the docs, we do
-# not configure the extension here. That must happen at runtime since the license keys
-# and application names are environment-dependent.
-ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
-RUN set -ex \
-  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
-  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
-  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
-  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
-
-# Copy and enable the AWS Elasticache memcached extension
-COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
-RUN docker-php-ext-enable memcached
-
-# APK packages needed by this image
-RUN f1-ext-install pecl:apcu builtin:sockets \
-  && apk add --no-cache \
-  # Needed by the Elasticache memcached client
-  libstdc++ \
-  # GNU wget to override BusyBox
-  wget
-
-RUN set -ex \
-  && { \
-    echo 'memory_limit=512M'; \
-    echo 'upload_max_filesize=1G'; \
-    echo 'post_max_size=1G'; \
-  } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
-  && sed -i \
-    -e 's/^;\(ping\.path =\)/\1/' \
-    -e 's/^;\(pm\.status_path =\)/\1/' \
-    /usr/local/etc/php-fpm.d/www.conf
-
-# See notes above
-RUN set -ex \
-  && { \
-    echo 'access.format="[%T] %R %m %r %{REQUEST_URI}e mem(bytes): %M cpu%%: %{total}C dur(secs): %d"'; \
-  } | tee /usr/local/etc/php-fpm.d/zz-log.conf
-
 # Install Composer dependencies
 FROM composer:2 AS deps
 
@@ -204,7 +129,7 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:3-node-v12-php-7.4 AS gesso
+FROM forumone/gesso:3-node-v12-php-8.0 AS gesso
 
 WORKDIR /app
 
@@ -251,7 +176,9 @@ RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
     echo "$cert" >> /etc/ca-certificates.conf; \
   done \
-  && update-ca-certificates
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Add the entrypoint logic to configure the New Relic extension
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
@@ -259,6 +186,17 @@ RUN chmod +x /webcms-entrypoint
 
 ENTRYPOINT ["/webcms-entrypoint"]
 CMD [ "php-fpm" ]
+
+# Add build metadata to the image. We expose two optional build args:
+# * GIT_TAG, the named Git tag being built.
+# * GIT_COMMIT, the Git commit being built.
+#
+# These args are converted to environment variables that can be read by, e.g.,
+# settings.php to display to users the current running code.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
@@ -275,27 +213,28 @@ COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM forumone/drupal8-cli:7.4 AS drush
+FROM forumone/drupal8-cli:8.0 AS drush
 
 # Download and install New Relic
-ENV NEW_RELIC_AGENT_VERSION=9.17.1.301
 RUN set -ex \
-  && curl -L https://download.newrelic.com/php_agent/archive/${NEW_RELIC_AGENT_VERSION}/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl.tar.gz | tar -C /tmp -zx \
+  && NEW_RELIC_AGENT_VERSION=9.21.0.311 \
+  && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
-  && /tmp/newrelic-php5-${NEW_RELIC_AGENT_VERSION}-linux-musl/newrelic-install install \
+  && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
   && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
 
-# Copy and enable the AWS Elasticache memcached extension
+# Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
-RUN docker-php-ext-enable memcached
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/igbinary.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/
+RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
 RUN f1-ext-install pecl:apcu builtin:sockets \
   && apk add --no-cache \
-  # Needed by the Elasticache memcached client
-  libstdc++ \
+  # Needed by the memcached extension
+  libmemcached  \
   # See ENTRYPOINT below
   tini
 
@@ -308,6 +247,16 @@ RUN set -ex \
 
 # Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
+
+# Copy additional certificates for use by Drupal and bundle them into the system
+# certificates
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
@@ -324,3 +273,10 @@ RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
 
 # Wrap the entrypoint script with tini to allow graceful signal handling
 ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
+
+# Add build metadata to the image. See the comments for these ARG instructions
+# in the Drupal stage for more details.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}

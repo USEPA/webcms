@@ -1,11 +1,13 @@
-/// Remove the unit of a length
-/// @param {Number} $number - Number to remove unit from
-/// @return {Number} - Unitless number
+@use 'sass:math';
+
+// Remove the unit of a length
+// @param {Number} $number - Number to remove unit from
+// @return {Number} - Unitless number
+// Already in USWDS so we’re commenting it out here.
 @function strip-unit($number) {
   @if type-of($number) == 'number' and not unitless($number) {
-    @return $number / ($number * 0 + 1);
+    @return math.div($number, ($number * 0 + 1));
   }
-
   @return $number;
 }
 
@@ -44,11 +46,11 @@
     $n: $n * 10;
   }
   @if $mode == round {
-    @return round($number * $n) / $n;
+    @return math.div(round($number * $n), $n);
   } @else if $mode == ceil {
-    @return ceil($number * $n) / $n;
+    @return math.div(ceil($number * $n), $n);
   } @else if $mode == floor {
-    @return floor($number * $n) / $n;
+    @return math.div(floor($number * $n), $n);
   } @else {
     @warn '#{ $mode } is undefined keyword.';
     @return $number;
