@@ -6,10 +6,12 @@ dependencies:
     - image.style.thumbnail
     - search_api.index.media
     - taxonomy.vocabulary.media_tags
+    - user.role.authenticated
   module:
     - epa_web_areas
     - search_api
     - svg_image
+    - user
     - views_autocomplete_filters
 id: media_search_api
 label: 'Media (search api)'
@@ -778,8 +780,10 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       access:
-        type: none
-        options: {  }
+        type: role
+        options:
+          role:
+            authenticated: authenticated
       cache:
         type: none
         options: {  }
@@ -1238,6 +1242,7 @@ display:
         - url
         - url.query_args
         - user
+        - user.roles
       tags:
         - 'config:search_api.index.media'
   media_page_list:
@@ -1980,5 +1985,6 @@ display:
         - url
         - url.query_args
         - user
+        - user.roles
       tags:
         - 'config:search_api.index.media'
