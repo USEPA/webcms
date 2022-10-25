@@ -1362,6 +1362,29 @@ through all possible variants
 */
 /* prettier-ignore */
 /* prettier-ignore */
+ol, ul {
+  margin-bottom: 1em;
+  margin-top: 1em;
+  line-height: 1.5;
+  padding-left: 3ch;
+}
+ol:last-child, ul:last-child {
+  margin-bottom: 0;
+}
+ol ul, ul ul,
+ol ol,
+ul ol {
+  margin-top: 0.25em;
+}
+
+li {
+  margin-bottom: 0.25em;
+  max-width: 68ex;
+}
+li:last-child {
+  margin-bottom: 0;
+}
+
 /* stylelint-disable */
 @font-face {
   font-family: "Roboto Mono Web";
@@ -1490,7 +1513,7 @@ through all possible variants
   src: url(../fonts/merriweather/Latin-Merriweather-BoldItalic.woff2) format("woff2"), url(../fonts/merriweather/Latin-Merriweather-BoldItalic.woff) format("woff"), url(../fonts/merriweather/Latin-Merriweather-BoldItalic.ttf) format("truetype");
 }
 /* stylelint-enable */
-.usa-button, .button, .button:focus, .hero-slideshow__nav-button, .hero-slideshow__nav-button:focus {
+.usa-button {
   font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
   font-size: 1.06rem;
   line-height: 0.9;
@@ -1511,33 +1534,33 @@ through all possible variants
   width: 100%;
 }
 @media all and (min-width: 30em) {
-  .usa-button, .button, .button:focus, .hero-slideshow__nav-button, .hero-slideshow__nav-button:focus {
+  .usa-button {
     width: auto;
   }
 }
-.usa-button:visited, .button:visited, .hero-slideshow__nav-button:visited {
+.usa-button:visited {
   color: white;
 }
-.usa-button:hover, .button:hover, .hero-slideshow__nav-button:hover, .button:focus, .hero-slideshow__nav-button:focus, .usa-button.usa-button--hover, .usa-button--hover.button, .usa-button--hover.hero-slideshow__nav-button {
+.usa-button:hover, .usa-button.usa-button--hover {
   color: white;
   background-color: #1a4480;
   border-bottom: 0;
   text-decoration: none;
 }
-.usa-button:active, .button:active, .hero-slideshow__nav-button:active, .usa-button.usa-button--active, .usa-button--active.button, .usa-button--active.hero-slideshow__nav-button {
+.usa-button:active, .usa-button.usa-button--active {
   color: white;
   background-color: #162e51;
 }
-.usa-button:not([disabled]):focus, .button:not([disabled]):focus, .hero-slideshow__nav-button:not([disabled]):focus, .usa-button:not([disabled]).usa-focus, .button:not([disabled]).usa-focus, .hero-slideshow__nav-button:not([disabled]).usa-focus {
+.usa-button:not([disabled]):focus, .usa-button:not([disabled]).usa-focus {
   outline-offset: 0.25rem;
 }
-.usa-button:disabled, .button:disabled, .hero-slideshow__nav-button:disabled {
+.usa-button:disabled {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   background-color: #c9c9c9;
   color: white;
 }
-.usa-button:disabled:hover, .button:disabled:hover, .hero-slideshow__nav-button:disabled:hover, .button:disabled:focus, .hero-slideshow__nav-button:disabled:focus, .usa-button:disabled.usa-button--hover, .button:disabled.usa-button--hover, .hero-slideshow__nav-button:disabled.usa-button--hover, .usa-button:disabled:active, .button:disabled:active, .hero-slideshow__nav-button:disabled:active, .usa-button:disabled.usa-button--active, .button:disabled.usa-button--active, .hero-slideshow__nav-button:disabled.usa-button--active, .usa-button:disabled:focus, .usa-button:disabled.usa-focus, .button:disabled.usa-focus, .hero-slideshow__nav-button:disabled.usa-focus {
+.usa-button:disabled:hover, .usa-button:disabled.usa-button--hover, .usa-button:disabled:active, .usa-button:disabled.usa-button--active, .usa-button:disabled:focus, .usa-button:disabled.usa-focus {
   background-color: #c9c9c9;
   border: 0;
   -webkit-box-shadow: none;
@@ -1552,7 +1575,7 @@ through all possible variants
   color: #1b1b1b;
   background-color: #00bde3;
 }
-.usa-button--accent-cool:hover, .usa-button--accent-cool.button:focus, .usa-button--accent-cool.hero-slideshow__nav-button:focus, .usa-button--accent-cool.usa-button--hover {
+.usa-button--accent-cool:hover, .usa-button--accent-cool.usa-button--hover {
   color: #1b1b1b;
   background-color: #28a0cb;
 }
@@ -1569,7 +1592,7 @@ through all possible variants
   color: #1b1b1b;
   background-color: #fa9441;
 }
-.usa-button--accent-warm:hover, .usa-button--accent-warm.button:focus, .usa-button--accent-warm.hero-slideshow__nav-button:focus, .usa-button--accent-warm.usa-button--hover {
+.usa-button--accent-warm:hover, .usa-button--accent-warm.usa-button--hover {
   color: white;
   background-color: #c05600;
 }
@@ -1587,7 +1610,7 @@ through all possible variants
 .usa-button--outline:visited {
   color: #005ea2;
 }
-.usa-button--outline:hover, .usa-button--outline.button:focus, .usa-button--outline.hero-slideshow__nav-button:focus, .usa-button--outline.usa-button--hover {
+.usa-button--outline:hover, .usa-button--outline.usa-button--hover {
   background-color: transparent;
   -webkit-box-shadow: inset 0 0 0 2px #1a4480;
           box-shadow: inset 0 0 0 2px #1a4480;
@@ -1607,7 +1630,7 @@ through all possible variants
 .usa-button--outline.usa-button--inverse:visited {
   color: #dfe1e2;
 }
-.usa-button--outline.usa-button--inverse:hover, .usa-button--outline.usa-button--inverse.button:focus, .usa-button--outline.usa-button--inverse.hero-slideshow__nav-button:focus, .usa-button--outline.usa-button--inverse.usa-button--hover {
+.usa-button--outline.usa-button--inverse:hover, .usa-button--outline.usa-button--inverse.usa-button--hover {
   -webkit-box-shadow: inset 0 0 0 2px #f0f0f0;
           box-shadow: inset 0 0 0 2px #f0f0f0;
   color: #f0f0f0;
@@ -1637,7 +1660,7 @@ through all possible variants
 .usa-button--outline.usa-button--inverse.usa-button--unstyled:visited {
   color: #54278f;
 }
-.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.button:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.hero-slideshow__nav-button:focus {
+.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover {
   color: #1a4480;
 }
 .usa-button--outline.usa-button--inverse.usa-button--unstyled:active {
@@ -1647,7 +1670,7 @@ through all possible variants
   outline: 0.25rem solid #2491ff;
   outline-offset: 0;
 }
-.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.button:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.hero-slideshow__nav-button:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled {
+.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-button--hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-button--active, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled.usa-focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled.usa-focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled:disabled, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--disabled {
   -moz-osx-font-smoothing: inherit;
   -webkit-font-smoothing: inherit;
   background-color: transparent;
@@ -1667,7 +1690,7 @@ through all possible variants
 .usa-button--outline.usa-button--inverse.usa-button--unstyled:visited {
   color: #dfe1e2;
 }
-.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.button:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.hero-slideshow__nav-button:focus, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--hover {
+.usa-button--outline.usa-button--inverse.usa-button--unstyled:hover, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--hover {
   color: #f0f0f0;
 }
 .usa-button--outline.usa-button--inverse.usa-button--unstyled:active, .usa-button--outline.usa-button--inverse.usa-button--unstyled.usa-button--active {
@@ -1678,7 +1701,7 @@ through all possible variants
   color: white;
   background-color: #71767a;
 }
-.usa-button--base:hover, .usa-button--base.button:focus, .usa-button--base.hero-slideshow__nav-button:focus, .usa-button--base.usa-button--hover {
+.usa-button--base:hover, .usa-button--base.usa-button--hover {
   color: white;
   background-color: #565c65;
 }
@@ -1691,7 +1714,7 @@ through all possible variants
   color: white;
   background-color: #d83933;
 }
-.usa-button--secondary:hover, .usa-button--secondary.button:focus, .usa-button--secondary.hero-slideshow__nav-button:focus, .usa-button--secondary.usa-button--hover {
+.usa-button--secondary:hover, .usa-button--secondary.usa-button--hover {
   color: white;
   background-color: #b50909;
 }
@@ -1744,6 +1767,12 @@ through all possible variants
 .usa-button--outline-inverse:disabled:active,
 .usa-button--outline-inverse:disabled.usa-button--active,
 .usa-button--outline-inverse:disabled:focus,
+.usa-button--outline-inverse:disabled.usa-focus,
+.usa-button--outline-inverse:disabled:hover,
+.usa-button--outline-inverse:disabled.usa-button--hover,
+.usa-button--outline-inverse:disabled:active,
+.usa-button--outline-inverse:disabled.usa-button--active,
+.usa-button--outline-inverse:disabled:focus,
 .usa-button--outline-inverse:disabled.usa-focus {
   background-color: transparent;
   border: 0;
@@ -1781,7 +1810,7 @@ through all possible variants
 .usa-button--unstyled:visited {
   color: #54278f;
 }
-.usa-button--unstyled:hover, .usa-button--unstyled.button:focus, .usa-button--unstyled.hero-slideshow__nav-button:focus {
+.usa-button--unstyled:hover {
   color: #1a4480;
 }
 .usa-button--unstyled:active {
@@ -1791,7 +1820,7 @@ through all possible variants
   outline: 0.25rem solid #2491ff;
   outline-offset: 0;
 }
-.usa-button--unstyled:hover, .usa-button--unstyled.button:focus, .usa-button--unstyled.hero-slideshow__nav-button:focus, .usa-button--unstyled.usa-button--hover, .usa-button--unstyled:disabled:hover, .usa-button--unstyled:disabled.usa-button--hover, .usa-button--unstyled.usa-button--disabled:hover, .usa-button--unstyled.usa-button--disabled.usa-button--hover, .usa-button--unstyled:active, .usa-button--unstyled.usa-button--active, .usa-button--unstyled:disabled:active, .usa-button--unstyled:disabled.usa-button--active, .usa-button--unstyled.usa-button--disabled:active, .usa-button--unstyled.usa-button--disabled.usa-button--active, .usa-button--unstyled:disabled:focus, .usa-button--unstyled:disabled.usa-focus, .usa-button--unstyled.usa-button--disabled:focus, .usa-button--unstyled.usa-button--disabled.usa-focus, .usa-button--unstyled:disabled, .usa-button--unstyled.usa-button--disabled {
+.usa-button--unstyled:hover, .usa-button--unstyled.usa-button--hover, .usa-button--unstyled:disabled:hover, .usa-button--unstyled:disabled.usa-button--hover, .usa-button--unstyled.usa-button--disabled:hover, .usa-button--unstyled.usa-button--disabled.usa-button--hover, .usa-button--unstyled:active, .usa-button--unstyled.usa-button--active, .usa-button--unstyled:disabled:active, .usa-button--unstyled:disabled.usa-button--active, .usa-button--unstyled.usa-button--disabled:active, .usa-button--unstyled.usa-button--disabled.usa-button--active, .usa-button--unstyled:disabled:focus, .usa-button--unstyled:disabled.usa-focus, .usa-button--unstyled.usa-button--disabled:focus, .usa-button--unstyled.usa-button--disabled.usa-focus, .usa-button--unstyled:disabled, .usa-button--unstyled.usa-button--disabled {
   -moz-osx-font-smoothing: inherit;
   -webkit-font-smoothing: inherit;
   background-color: transparent;
@@ -1809,230 +1838,868 @@ through all possible variants
   color: #162e51;
 }
 
-.button, .hero-slideshow__nav-button {
-  margin-bottom: 0.5rem;
-  margin-right: 0;
+* {
+  -webkit-transition-duration: 200ms;
+          transition-duration: 200ms;
+  -webkit-transition-property: background-color, border-color, color, opacity, text-shadow, -webkit-box-shadow, -webkit-transform;
+  transition-property: background-color, border-color, color, opacity, text-shadow, -webkit-box-shadow, -webkit-transform;
+  transition-property: background-color, border-color, box-shadow, color, opacity, text-shadow, transform;
+  transition-property: background-color, border-color, box-shadow, color, opacity, text-shadow, transform, -webkit-box-shadow, -webkit-transform;
+  -webkit-transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+          transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
 }
-.button:focus, .hero-slideshow__nav-button:focus {
-  z-index: 1;
+
+@media print {
+  * {
+    background-color: transparent !important;
+    -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+
+  @page {
+    margin: 2cm;
+  }
 }
-@media (min-width: 30em) {
-  .button, .hero-slideshow__nav-button {
-    margin-right: 0.5rem;
+[id] {
+  scroll-margin-top: 1em;
+}
+
+html {
+  -webkit-font-feature-settings: "kern" 1;
+          font-feature-settings: "kern" 1;
+  -webkit-font-kerning: normal;
+          font-kerning: normal;
+  font-size: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: 1.06rem;
+  line-height: 1.5;
+  background-color: #fff;
+  color: #1b1b1b;
+  margin: 0;
+  padding: 0;
+  word-wrap: break-word;
+}
+body.has-open-mobile-menu {
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media print {
+  nav {
+    display: none;
   }
 }
 
-.tns-outer {
-  padding: 0 !important;
+summary {
+  display: list-item;
 }
-.tns-outer [hidden] {
-  display: none !important;
+
+iframe {
+  border: 0;
+  max-width: 100%;
 }
-.tns-outer [aria-controls], .tns-outer [data-action] {
+@media print {
+  iframe {
+    display: none;
+  }
+}
+
+h6,
+.h6, h5,
+.h5,
+.field__label.is-inline, h4,
+.h4,
+.field__label, h3,
+.h3, h2,
+.h2, h1 {
+  margin-bottom: 0;
+  margin-top: 0;
+  clear: none;
+  margin-bottom: 1rem;
+  clear: none;
+  -webkit-hyphens: none;
+      -ms-hyphens: none;
+          hyphens: none;
+  text-rendering: optimizeLegibility;
+}
+* + h6,
+* + .h6, * + h5,
+* + .h5,
+* + .field__label.is-inline, * + h4,
+* + .h4,
+* + .field__label, * + h3,
+* + .h3, * + h2,
+* + .h2, * + h1 {
+  margin-top: 1em;
+}
+@media print {
+  h6,
+.h6, h5,
+.h5,
+.field__label.is-inline, h4,
+.h4,
+.field__label, h3,
+.h3, h2,
+.h2, h1 {
+    orphans: 3;
+    page-break-after: avoid;
+    widows: 3;
+  }
+  h6::after,
+.h6::after, h5::after,
+.h5::after,
+.field__label.is-inline::after, h4::after,
+.h4::after,
+.field__label::after, h3::after,
+.h3::after, h2::after,
+.h2::after, h1::after {
+    display: inline-block;
+  }
+}
+
+h1 {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 2.44rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+@media (min-width: max-width 40rem) {
+  h1 {
+    font-size: 1.95rem;
+  }
+}
+
+h2,
+.h2 {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+@media (min-width: max-width 40rem) {
+  h2,
+.h2 {
+    font-size: 1.34rem;
+  }
+}
+
+h3,
+.h3 {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.34rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+@media (min-width: max-width 40rem) {
+  h3,
+.h3 {
+    font-size: 1.1rem;
+  }
+}
+
+h4,
+.h4,
+.field__label {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h5,
+.h5,
+.field__label.is-inline {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 0.91rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h6,
+.h6 {
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: 0.87rem;
+  font-weight: normal;
+  letter-spacing: 0.025em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+p {
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+@media print {
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}
+p:empty {
+  margin: 0 !important;
+}
+
+a {
+  background-color: transparent;
+  color: #005ea2;
+  -webkit-text-decoration-skip: objects;
+}
+a:visited {
+  color: #54278f;
+}
+a:hover, a:focus {
+  color: #1a4480;
+}
+a:active {
+  color: #162e51;
+}
+@media print {
+  a, a:visited {
+    text-decoration: none;
+  }
+  a[href]::after {
+    content: " <" attr(href) ">";
+    font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+    font-size: 10pt;
+    font-weight: normal;
+    text-transform: lowercase;
+  }
+  a[href^="/"]::after {
+    content: " <https://epa.gov" attr(href) ">";
+  }
+  a[href^="javascript:"]::after, a[href^="mailto:"]::after, a[href^="tel:"]::after, a[href^="#"]::after, a[href*="?"]::after {
+    content: "";
+  }
+}
+
+abbr[title] {
+  border-bottom: 1px dotted;
+  text-decoration: none;
+}
+@media (min-width: max-width 40rem) {
+  abbr[title] {
+    border-bottom: 0;
+  }
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+}
+abbr:hover {
+  cursor: help;
+}
+@media print {
+  abbr[title] {
+    border-bottom: 0;
+  }
+  abbr[title]::after {
+    content: " (" attr(title) ")";
+  }
+}
+
+cite {
+  color: #565c65;
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: 0.93rem;
+  font-style: normal;
+  font-weight: normal;
+  letter-spacing: 0.025em;
+  line-height: 1.6;
+}
+
+dfn {
+  font-style: normal;
+}
+
+ins {
+  text-decoration: none;
+}
+
+mark {
+  background: #ff0;
+  color: #000;
+}
+
+small {
+  font-size: 80%;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+var {
+  font-style: normal;
+}
+
+blockquote {
+  font-family: Merriweather Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 1.1rem;
+  font-weight: normal;
+  line-height: 1.7;
+  background-color: #fff;
+  border-left: 0.5rem solid #00bde3;
+  clear: both;
+  margin: 0 0 1.5rem;
+  padding: 1.25rem 0 1.25rem 1.25rem;
+}
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+* + blockquote {
+  margin-top: 1.5rem;
+}
+
+blockquote cite {
+  display: block;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+blockquote p {
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+blockquote cite em {
+  border-left: 1px solid #71767a;
+  font-weight: normal;
+  margin-left: 0.25rem;
+  padding-left: 0.5rem;
+}
+@media print {
+  blockquote {
+    page-break-inside: avoid;
+  }
+}
+
+pre {
+  margin: 0 0 1rem;
+  overflow: auto;
+}
+* + pre {
+  margin-top: 1rem;
+}
+@media print {
+  pre {
+    page-break-inside: avoid;
+  }
+}
+
+hr {
+  border-top: solid #a9aeb1;
+  border-width: 1px 0 0;
+  -webkit-box-sizing: content-box;
+          box-sizing: content-box;
+  height: 0;
+  margin: 0 0 1.5rem;
+  overflow: auto;
+}
+* + hr {
+  margin-top: 1.5rem;
+}
+
+address {
+  font-style: normal;
+}
+
+ul {
+  list-style-type: disc;
+  margin-top: 0;
+}
+[dir=rtl] ul {
+  padding-left: 0;
+  padding-right: 3ch;
+}
+ul:last-child {
+  margin-bottom: revert;
+}
+ul ol,
+ul ul {
+  margin-top: 0.5rem;
+}
+ul ul {
+  list-style-type: circle;
+}
+ul ul ul {
+  list-style-type: square;
+}
+
+ol {
+  margin-top: 0;
+}
+[dir=rtl] ol {
+  padding-left: 0;
+  padding-right: 3ch;
+}
+ol:last-child {
+  margin-bottom: revert;
+}
+ol ol,
+ol ul {
+  margin-top: 0.5rem;
+}
+ol ol {
+  list-style-type: lower-alpha;
+}
+ol ol ol {
+  list-style-type: lower-roman;
+}
+
+li {
+  max-width: unset;
+}
+@media print {
+  li {
+    page-break-inside: avoid;
+  }
+}
+
+dd {
+  margin: 0 0 1rem 3ch;
+}
+[dir=rtl] dd {
+  margin-left: 0;
+  margin-right: 3ch;
+}
+
+dl {
+  margin: 0 0 1rem;
+}
+
+table {
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: 1.06rem;
+  line-height: 1.5;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: #1b1b1b;
+  margin: 1.25rem 0;
+  text-align: left;
+  /* stylelint-disable selector-class-pattern */
+  /* stylelint-enable selector-class-pattern */
+}
+table thead th {
+  background-clip: padding-box;
+  color: #1b1b1b;
+  font-weight: 700;
+  line-height: 1.3;
+}
+table thead th,
+table thead td {
+  background-color: #dfe1e2;
+  color: #1b1b1b;
+}
+table tbody th {
+  text-align: left;
+}
+table th,
+table td {
+  background-color: white;
+  border: 1px solid #1b1b1b;
+  font-weight: normal;
+  padding: 0.5rem 1rem;
+}
+table caption {
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+table th[data-sortable] {
+  padding-right: 2.5rem;
+  position: relative;
+}
+table th[data-sortable]::after {
+  border-bottom-color: transparent;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  bottom: 0;
+  content: "";
+  height: 0;
+  left: 0;
+  position: absolute;
+  width: 100%;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button, table th[data-sortable][aria-sort=none] .usa-table__header__button {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  color: #005ea2;
+  text-decoration: underline;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  height: 2rem;
+  width: 2rem;
+  background-position: center center;
+  background-size: 1.5rem;
+  color: #71767a;
   cursor: pointer;
-}
-
-.tns-slider {
-  -webkit-transition: all 0s;
-  -moz-transition: all 0s;
-  transition: all 0s;
-}
-.tns-slider > .tns-item {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.tns-horizontal.tns-subpixel {
-  white-space: nowrap;
-}
-.tns-horizontal.tns-subpixel > .tns-item {
   display: inline-block;
-  vertical-align: top;
-  white-space: normal;
-}
-.tns-horizontal.tns-no-subpixel:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-.tns-horizontal.tns-no-subpixel > .tns-item {
-  float: left;
-}
-.tns-horizontal.tns-carousel.tns-no-subpixel > .tns-item {
-  margin-right: -100%;
-}
-
-.tns-no-calc {
-  position: relative;
-  left: 0;
-}
-
-.tns-gallery {
-  position: relative;
-  left: 0;
-  min-height: 1px;
-}
-.tns-gallery > .tns-item {
+  margin: 0;
   position: absolute;
-  left: -100%;
-  -webkit-transition: transform 0s, opacity 0s;
-  -moz-transition: transform 0s, opacity 0s;
-  -webkit-transition: opacity 0s, -webkit-transform 0s;
-  transition: opacity 0s, -webkit-transform 0s;
-  transition: transform 0s, opacity 0s;
-  transition: transform 0s, opacity 0s, -webkit-transform 0s;
+  right: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  top: 50%;
+  -webkit-transform: translate(0, -50%);
+          transform: translate(0, -50%);
 }
-.tns-gallery > .tns-slide-active {
-  position: relative;
-  left: auto !important;
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:visited, table th[data-sortable][aria-sort=none] .usa-table__header__button:visited {
+  color: #54278f;
 }
-.tns-gallery > .tns-moving {
-  -webkit-transition: all 0.25s;
-  -moz-transition: all 0.25s;
-  transition: all 0.25s;
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:hover, table th[data-sortable][aria-sort=none] .usa-table__header__button:hover {
+  color: #1a4480;
 }
-
-.tns-autowidth {
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:active, table th[data-sortable][aria-sort=none] .usa-table__header__button:active {
+  color: #162e51;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:focus, table th[data-sortable][aria-sort=none] .usa-table__header__button:focus {
+  outline: 0.25rem solid #2491ff;
+  outline-offset: 0;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled:hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled.usa-button--hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled:hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled.usa-button--hover, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled:active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled.usa-button--active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled:active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled.usa-button--active, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled:focus, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled.usa-focus, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled:focus, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled.usa-focus, table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled, table th[data-sortable][aria-sort=none] .usa-table__header__button:hover, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--hover, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled:hover, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled.usa-button--hover, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled:hover, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled.usa-button--hover, table th[data-sortable][aria-sort=none] .usa-table__header__button:active, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--active, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled:active, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled.usa-button--active, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled:active, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled.usa-button--active, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled:focus, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled.usa-focus, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled:focus, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled.usa-focus, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  text-decoration: underline;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:disabled, table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--disabled, table th[data-sortable][aria-sort=none] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--disabled {
+  color: #c9c9c9;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--hover, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--hover {
+  color: #1a4480;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button.usa-button--active, table th[data-sortable][aria-sort=none] .usa-table__header__button.usa-button--active {
+  color: #162e51;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button .usa-icon, table th[data-sortable][aria-sort=none] .usa-table__header__button .usa-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: middle;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button .usa-icon > g, table th[data-sortable][aria-sort=none] .usa-table__header__button .usa-icon > g {
+  fill: transparent;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button .usa-icon > g.unsorted, table th[data-sortable][aria-sort=none] .usa-table__header__button .usa-icon > g.unsorted {
+  fill: #1b1b1b;
+}
+table th[data-sortable]:not([aria-sort]) .usa-table__header__button:hover .usa-icon > g.unsorted, table th[data-sortable][aria-sort=none] .usa-table__header__button:hover .usa-icon > g.unsorted {
+  fill: black;
+}
+table th[data-sortable][aria-sort=descending], table th[data-sortable][aria-sort=ascending] {
+  background-color: #97d4ea;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  color: #005ea2;
+  text-decoration: underline;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  height: 2rem;
+  width: 2rem;
+  background-position: center center;
+  background-size: 1.5rem;
+  color: #71767a;
+  cursor: pointer;
   display: inline-block;
-}
-
-.tns-lazy-img {
-  -webkit-transition: opacity 0.6s;
-  -moz-transition: opacity 0.6s;
-  transition: opacity 0.6s;
-  opacity: 0.6;
-}
-.tns-lazy-img.tns-complete {
-  opacity: 1;
-}
-
-.tns-ah {
-  -webkit-transition: height 0s;
-  -moz-transition: height 0s;
-  transition: height 0s;
-}
-
-.tns-ovh {
-  overflow: hidden;
-}
-
-.tns-visually-hidden {
+  margin: 0;
   position: absolute;
-  left: -10000em;
+  right: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  top: 50%;
+  -webkit-transform: translate(0, -50%);
+          transform: translate(0, -50%);
 }
-
-.tns-transparent {
-  opacity: 0;
-  visibility: hidden;
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:visited {
+  color: #54278f;
 }
-
-.tns-fadeIn {
-  opacity: 1;
-  filter: alpha(opacity=100);
-  z-index: 0;
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:hover {
+  color: #1a4480;
 }
-
-.tns-normal, .tns-fadeOut {
-  opacity: 0;
-  filter: alpha(opacity=0);
-  z-index: -1;
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:active {
+  color: #162e51;
 }
-
-.tns-vpfix {
-  white-space: nowrap;
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:focus {
+  outline: 0.25rem solid #2491ff;
+  outline-offset: 0;
 }
-.tns-vpfix > div, .tns-vpfix > li {
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled:hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled.usa-button--hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled:hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled.usa-button--hover, table th[data-sortable][aria-sort=descending] .usa-table__header__button:active, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--active, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled:active, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled.usa-button--active, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled:active, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled.usa-button--active, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled:focus, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled.usa-focus, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled:focus, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled.usa-focus, table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  text-decoration: underline;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--disabled {
+  color: #c9c9c9;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--hover {
+  color: #1a4480;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button.usa-button--active {
+  color: #162e51;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button .usa-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: middle;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button .usa-icon > g {
+  fill: transparent;
+}
+table th[data-sortable][aria-sort=descending] .usa-table__header__button .usa-icon > g.descending {
+  fill: #1b1b1b;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  color: #005ea2;
+  text-decoration: underline;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  height: 2rem;
+  width: 2rem;
+  background-position: center center;
+  background-size: 1.5rem;
+  color: #71767a;
+  cursor: pointer;
   display: inline-block;
-}
-
-.tns-t-subp2 {
-  margin: 0 auto;
-  width: 310px;
-  position: relative;
-  height: 10px;
-  overflow: hidden;
-}
-.tns-t-ct {
-  width: 2333.3333333333%;
-  width: -webkit-calc(100% * 70 / 3);
-  width: -moz-calc(100% * 70 / 3);
-  width: calc(100% * 70 / 3);
+  margin: 0;
   position: absolute;
-  right: 0;
+  right: 0.25rem;
+  text-align: center;
+  text-decoration: none;
+  top: 50%;
+  -webkit-transform: translate(0, -50%);
+          transform: translate(0, -50%);
 }
-.tns-t-ct:after {
-  content: "";
-  display: table;
-  clear: both;
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:visited {
+  color: #54278f;
 }
-.tns-t-ct > div {
-  width: 1.4285714286%;
-  width: -webkit-calc(100% / 70);
-  width: -moz-calc(100% / 70);
-  width: calc(100% / 70);
-  height: 10px;
-  float: left;
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:hover {
+  color: #1a4480;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:active {
+  color: #162e51;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:focus {
+  outline: 0.25rem solid #2491ff;
+  outline-offset: 0;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled:hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled.usa-button--hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled:hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled.usa-button--hover, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled:active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled.usa-button--active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled:active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled.usa-button--active, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled:focus, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled.usa-focus, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled:focus, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled.usa-focus, table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled {
+  -moz-osx-font-smoothing: inherit;
+  -webkit-font-smoothing: inherit;
+  background-color: transparent;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  text-decoration: underline;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button:disabled, table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--disabled {
+  color: #c9c9c9;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--hover {
+  color: #1a4480;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button.usa-button--active {
+  color: #162e51;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button .usa-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: middle;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button .usa-icon > g {
+  fill: transparent;
+}
+table th[data-sortable][aria-sort=ascending] .usa-table__header__button .usa-icon > g.ascending {
+  fill: #1b1b1b;
+}
+table thead th[aria-sort] {
+  background-color: #97d4ea;
+  color: #1b1b1b;
+}
+table td[data-sort-active],
+table th[data-sort-active] {
+  background-color: #e1f3f8;
+  color: #1b1b1b;
 }
 
-.hero-slideshow {
-  margin-bottom: 1.5rem;
+@media print {
+  thead {
+    display: table-header-group;
+  }
 }
 
-.hero-slideshow__list {
-  list-style-type: none;
+tbody th {
+  background-color: #f0f0f0;
+  font-weight: 700;
+}
+
+@media print {
+  tr {
+    page-break-inside: avoid;
+  }
+}
+
+button {
+  overflow: visible;
+}
+
+fieldset {
+  border: 0;
   margin: 0;
   padding: 0;
 }
-.hero-slideshow__list:last-child {
+
+input {
+  line-height: normal;
+}
+
+legend {
+  border: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  color: inherit;
+  display: table;
+  margin: 0;
+  max-width: 100%;
+  padding: 0;
+  white-space: normal;
+}
+
+optgroup {
+  font-weight: 700;
+}
+
+textarea {
+  overflow: auto;
+}
+
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+
+canvas {
+  display: inline-block;
+}
+
+figure {
+  margin: 0;
+}
+
+img {
+  border: 0;
+  font-style: italic;
+  height: auto;
+  max-width: 100%;
+  vertical-align: middle;
+}
+@media print {
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+}
+
+svg:not(:root) {
+  overflow: hidden;
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.field__label {
+  display: block;
   margin-bottom: 0;
 }
-.hero-slideshow__list li {
-  margin: 0;
-  padding-left: 0;
+.field__label.is-inline {
+  display: inline-block;
+  margin-bottom: 0;
+  margin-right: 0.25rem;
 }
-.hero-slideshow__list li::before {
-  display: none;
+.field__label.is-inline::after {
+  content: ":";
 }
-@supports (display: grid) {
-  .hero-slideshow__list {
-    display: grid;
-  }
-}
-
-.hero-slideshow__item {
-  max-width: 100%;
-}
-@supports (display: grid) {
-  .hero-slideshow__item {
-    display: -webkit-box !important;
-    display: -ms-flexbox !important;
-    display: flex !important;
-    grid-column: 1/2;
-    grid-row: 1/2;
-    position: relative !important;
-  }
+.field__label.is-inline + .field__content {
+  display: inline;
 }
 
-.hero-slideshow__nav {
-  display: none;
-  margin-top: -3rem;
-  min-height: 3rem;
-  position: relative;
-}
-.js .hero-slideshow__nav {
-  display: block;
-}
-
-.hero-slideshow__nav-button {
-  background-color: #71767a;
+.field--alternate-font .field__label {
+  font-family: Source Sans Pro Web, "Noto Sans Arabic", "Noto Sans BN homepage", "Noto Sans GU homepage", "Noto Sans KR homepage", "Noto Sans SC homepage", "Noto Sans BN", "Noto Sans GU", "Noto Sans KR", "Noto Sans SC", "Noto Sans TC", "Helvetica Neue", Helvetica, Arial, sans;
+  font-size: inherit;
   margin-right: 0.5rem;
-  width: auto;
 }
-.hero-slideshow__nav-button:hover, .hero-slideshow__nav-button:focus {
-  background-color: #005ea2;
+.field--alternate-font .field__content {
+  font-weight: 700;
 }
-.hero-slideshow__nav-button:active, .hero-slideshow__nav-button.tns-nav-active {
-  background-color: #1a4480;
+
+.field--list .field__label.is-inline + .field__content {
+  display: inline-block;
+  vertical-align: top;
 }
-/*# sourceMappingURL=hero-slideshow.css.map */
+
+.field--simple .field__label {
+  display: inline-block;
+  font-family: revert;
+  font-size: revert;
+  line-height: revert;
+  margin-bottom: 0;
+  margin-right: 0.25rem;
+}
+.field--simple .field__label::after {
+  content: ":";
+}
+
+.field--tight {
+  margin-bottom: 0;
+}
+/*# sourceMappingURL=index.css.map */
