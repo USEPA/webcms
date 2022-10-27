@@ -329,6 +329,8 @@ build:drupal:
       --snapshotMode=redo
       --use-new-run
       --context=$CI_PROJECT_DIR/services/drupal
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --target=$WEBCMS_TARGET
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
@@ -347,6 +349,8 @@ build:metrics:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/metrics
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
   variables:
@@ -366,6 +370,8 @@ build:database:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/terraform/database
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
   variables:
@@ -399,6 +405,8 @@ copy:cloudwatch:dev:
     - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
     - /kaniko/executor
       --context=/workspace
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
       
@@ -417,6 +425,8 @@ build:traefik:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/traefik
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
   variables:
@@ -434,6 +444,8 @@ copy:newrelic:dev:
     - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
     - /kaniko/executor
       --context=/workspace
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
       --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
   variables:
