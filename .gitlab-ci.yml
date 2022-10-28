@@ -590,7 +590,6 @@ infrastructure:preproduction-west:apply:
   stage: infrastructure_preprod_west_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-      when: manual
   dependencies: ["infrastructure:preproduction-west:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -816,7 +815,6 @@ deploy:dev:apply-en:
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: manual
-
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
@@ -866,7 +864,6 @@ deploy:dev:apply-es:
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: manual
-
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
@@ -1084,7 +1081,7 @@ deploy:dev-west:apply-en:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: on_success
 
     - when: never
 
@@ -1135,7 +1132,7 @@ deploy:dev-west:apply-es:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: on_success
 
     - when: never
 
