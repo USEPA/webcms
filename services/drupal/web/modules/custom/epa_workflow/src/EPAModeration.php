@@ -119,10 +119,6 @@ abstract class EPAModeration implements EPAModerationInterface {
       $this->isAutomated = TRUE;
       $this->contentEntityRevision->set('epa_revision_automated', NULL);
     }
-
-    if ($this->contentEntityRevision->isPublished()) {
-      $this->scheduleTransition('field_expiration_date', 'unpublished');
-    }
   }
 
   /**
@@ -154,8 +150,22 @@ abstract class EPAModeration implements EPAModerationInterface {
    *   The scheduled transition date as string or DateTime.
    * @param string $moderation_state
    *   The scheduled moderation state.
+   * @param bool $bypass_sunset_check
+   *   If this is set to FALSE then the transition will only be scheduled if the
+   *   expiration date (sunset date) is either empty or set to a date later than
+   *   the review date.
    */
-  protected function scheduleTransition($transition_date, $moderation_state) {
+  protected function scheduleTransition($transition_date, $moderation_state, $bypass_sunset_check = FALSE) {
+    // Enforce sunset check whereby we only schedule this transition if the
+    // sunset date is empty or occurs after the review date.
+    if (!$bypass_sunset_check &&
+      $this->contentEntityRevision->hasField('field_review_deadline') &&
+      $this->contentEntityRevision->hasField('field_expiration_date') &&
+      !$this->contentEntityRevision->get('field_expiration_date')->isEmpty() &&
+      $this->contentEntityRevision->field_review_deadline->value > $this->contentEntityRevision->field_expiration_date->value) {
+      return FALSE;
+    }
+
     // Set date value.
     if (is_string($transition_date)) {
       // Stop if content doesn't have a publish date.

@@ -92,7 +92,8 @@ function epa_workflow_form_content_moderation_notification_form_alter(array &$fo
   $workflow_process = $notification->getThirdPartySetting('epa_workflow', 'workflow_process', 'any');
   $workflow_options = [
     'any' => t('Any'),
-    'automatic' => t('Automatic'),
+    'automatic' => t('Automatic workflow'),
+    'sunset' => t('Unpublishing due to sunset date'),
     'manual' => t('Manual'),
   ];
 
@@ -205,7 +206,9 @@ function epa_workflow_field_widget_form_alter(array &$element, FormStateInterfac
   $plugin_id = $context['widget']->getPluginId();
 
   if ('moderation_state_default' === $plugin_id && isset($element["state"]["#options"]) && key_exists('draft', $element["state"]["#options"])) {
-    $element["state"]["#default_value"] = 'draft';
+    if (!in_array($element["state"]["#default_value"],['draft_needs_review'])) {
+      $element["state"]["#default_value"] = 'draft';
+    }
     $element["#access"] = FALSE;
   }
 }
@@ -269,7 +272,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
         'label' => 'hidden',
         'type' => 'datetime_default',
         'settings' => [
-          'format_type' => 'medium',
+          'format_type' => 'medium_no_time',
         ],
       ]);
       $renderer = \Drupal::service('renderer');
@@ -295,8 +298,25 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
       $form['revision_author'] = [
         '#type' => 'item',
-        '#title' => t("Revision Saved By"),
-        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a'
+        '#title' => t("Revision saved by"),
+        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a>'
+      ];
+
+    }
+
+    // Display the Node ID
+    if (
+      isset($node)
+      && $node->id()
+    )
+    {
+
+      $nid = $node->id();
+
+      $form['nid'] = [
+        '#type' => 'item',
+        '#title' => t("Node ID"),
+        '#markup' => $nid
       ];
 
     }
@@ -710,11 +730,11 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
     ->loadRevision($latest_vid);
 
   if ($latest_revision instanceof NodeInterface && !$latest_revision->isNew()) {
+    $timezone = date_default_timezone_get();
+    $date_formatter = \Drupal::service('date.formatter');
     // If latest revision and has a Publish Date set.
     if (isset($latest_revision->field_publish_date->value)) {
       $latest_revision_moderation_state = $latest_revision->moderation_state->value;
-      $timezone = date_default_timezone_get();
-      $date_formatter = \Drupal::service('date.formatter');
 
       $latest_formatted_date_time = $date_formatter->format(
         $latest_revision->field_publish_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
