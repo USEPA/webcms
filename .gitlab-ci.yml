@@ -287,6 +287,8 @@ variables:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+    - cd $CI_PROJECT_DIR/services/drupal
+    - cp $auth_json auth.json
 
 #region Image builds
 
@@ -516,7 +518,6 @@ infrastructure:preproduction:apply:
   stage: infrastructure_preprod_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-      when: manual
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
