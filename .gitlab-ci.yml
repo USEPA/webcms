@@ -287,9 +287,7 @@ variables:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-    - cd $CI_PROJECT_DIR/services/drupal
-    - cp $auth_json auth.json
-
+    
 #region Image builds
 
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
@@ -325,6 +323,7 @@ build:drupal:
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
   script:
+    - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
@@ -418,7 +417,7 @@ copy:cloudwatch:dev:
 
 # Build custom Traefik image based off the 2.4 tag. Use latest tag(Keep this as "latest" Traefik tag mentions found
 # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
-build:traefik:dev:
+.build:traefik:dev:
   extends: .kaniko
   stage: infrastructure_preprod_build
   rules:
