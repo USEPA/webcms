@@ -1,10 +1,10 @@
-uuid: 7b0ee581-6cc5-4160-a177-e0b22a3dd9e8
+uuid: 2cb4f9dd-bea2-4bdc-af37-82440afe4154
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.paragraph.field_image
-    - paragraphs.paragraphs_type.banner_slide
+    - field.storage.media.field_media_image
+    - media.type.banner_image
   module:
     - custom_add_another
     - image
@@ -12,20 +12,20 @@ third_party_settings:
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
-id: paragraph.banner_slide.field_image
-field_name: field_image
-entity_type: paragraph
-bundle: banner_slide
+id: media.banner_image.field_media_image
+field_name: field_media_image
+entity_type: media
+bundle: banner_image
 label: Image
 description: ''
-required: false
-translatable: false
+required: true
+translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
   handler: 'default:file'
   handler_settings: {  }
-  file_directory: 'images/banners/[date:custom:Y]-[date:custom:m]'
+  file_directory: '[date:custom:Y]-[date:custom:m]'
   file_extensions: 'png gif jpg jpeg'
   max_filesize: ''
   max_resolution: ''
@@ -35,7 +35,7 @@ settings:
   title_field: false
   title_field_required: false
   default_image:
-    uuid: ''
+    uuid: null
     alt: ''
     title: ''
     width: null

@@ -8,8 +8,9 @@ dependencies:
     - taxonomy.vocabulary.media_tags
   module:
     - epa_media
-    - image
+    - epa_web_areas
     - search_api
+    - svg_image
     - user
     - views_autocomplete_filters
 id: media_library
@@ -79,6 +80,7 @@ display:
           view_modes:
             'entity:media':
               audio: media_library
+              banner_image: media_library
               document: media_library
               image: media_library
               other: media_library
@@ -418,6 +420,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
@@ -438,6 +441,65 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+        gid:
+          id: gid
+          table: search_api_index_media
+          field: gid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_entity_reference
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: gid_op
+            label: 'Web Area'
+            description: ''
+            use_operator: false
+            operator: gid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: gid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: 0
+          handler: 'default:group'
+          handler_settings:
+            target_bundles:
+              web_area: web_area
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            auto_create_bundle: ''
+          widget: autocomplete
       filter_groups:
         operator: AND
         groups:
@@ -809,6 +871,7 @@ display:
           view_modes:
             'entity:media':
               audio: link_with_metadata
+              banner_image: link_with_metadata
               document: link_with_metadata
               image: link_with_metadata
               other: link_with_metadata
