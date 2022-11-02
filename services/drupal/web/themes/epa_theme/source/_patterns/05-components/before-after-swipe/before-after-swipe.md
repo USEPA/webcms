@@ -1,7 +1,7 @@
 ---
 el: .before-after-swipe
 title: Before/After Swipe
-state: inreview
+state: complete
 ---
 
 __Variables:__

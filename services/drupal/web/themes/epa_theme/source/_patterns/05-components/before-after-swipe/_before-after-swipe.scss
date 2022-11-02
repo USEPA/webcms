@@ -1,3 +1,9 @@
+// @file
+// Styles for the Before/After Swipe.
+
+@use 'sass:math';
+@use '../../00-config' as *;
+
 $before-after-swipe-border-size: rem(2px);
 $before-after-swipe-button-size: rem(44px);
 
@@ -15,12 +21,17 @@ $before-after-swipe-button-size: rem(44px);
 
     .before-after-swipe__image--before {
       border-bottom: 0;
-      clip-path: inset(0 calc(100% - var(--split-point) + #{$before-after-swipe-border-size}) 0 0);
+      clip-path: inset(
+        0 calc(100% - var(--split-point) + #{$before-after-swipe-border-size}) 0
+          0
+      );
       z-index: 1;
     }
 
     .before-after-swipe__image--after {
-      clip-path: inset(0 0 0 calc(var(--split-point) + #{$before-after-swipe-border-size}));
+      clip-path: inset(
+        0 0 0 calc(var(--split-point) + #{$before-after-swipe-border-size})
+      );
       z-index: 2;
     }
 
@@ -82,7 +93,10 @@ $before-after-swipe-button-size: rem(44px);
   height: $before-after-swipe-button-size;
   justify-content: center;
   left: 50%;
-  margin: #{$before-after-swipe-button-size / -2} 0 0 #{$before-after-swipe-button-size / -2};
+  margin: #{math.div($before-after-swipe-button-size, -2)} 0 0 #{math.div(
+      $before-after-swipe-button-size,
+      -2
+    )};
   pointer-events: none;
   position: absolute;
   top: 50%;
