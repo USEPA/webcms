@@ -11,6 +11,7 @@
 
   {% set classes = [
     box_style ? 'box--' ~ box_style,
+    content.field_alignment|field_value ? 'u-align-' ~ content.field_alignment|field_value|render,
   ]|join(' ')|trim %}
 
   {% set icon = '' %}
@@ -59,6 +60,7 @@
     'content': content.field_paragraphs|field_value|render,
     'footer_content': footer_content,
     'image_modifier_classes': image_classes,
+    'modifier_classes': content.field_alignment|field_value ? 'u-align-' ~ content.field_alignment|field_value|render,
   } %}
 
 {% endif %}
