@@ -1,6 +1,8 @@
 <?php
 
 use Drupal\node\NodeInterface;
+use Drupal\search_api\Entity\Server;
+
 
 function _epa_core_populate_search_index_queue() {
   $queue = \Drupal::queue('epa_search_text_indexer');
@@ -97,5 +99,72 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
     $sandbox['#finished'] = 1;
   } else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Explicitly sets each taxonomy term to have its path set by pathauto then re-saves
+ * terms to ensure they get the latest generated path.
+ */
+function epa_core_deploy_0002_update_term_path(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Query all terms that don't have a description set.
+    $result = \Drupal::database()->query(
+      'SELECT tid FROM taxonomy_term_field_data;')
+      ->fetchCol();
+
+    $sandbox['total'] = count($result);
+    $sandbox['current'] = 0;
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' term paths to be updated.');
+  }
+
+  // Query 500 at a time for batch.
+  $tids = \Drupal::database()->query(
+    'SELECT tid FROM taxonomy_term_field_data
+        ORDER BY tid ASC
+        LIMIT 500
+        OFFSET '. $sandbox['current'] . ';')
+    ->fetchCol();
+
+  if (empty($tids)) {
+    $sandbox['#finished'] = 1;
+    return;
+  }
+
+  $terms = \Drupal::entityTypeManager()
+    ->getStorage('taxonomy_term')
+    ->loadMultiple($tids);
+
+  foreach ($terms as $term) {
+    $term->path->pathauto = 1;
+    $term->save();
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' term paths updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  } else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Tag all search indexes as needing reindexing due to the changes to our
+ * processor and field settings.
+ */
+function epa_core_deploy_refresh_indexes() {
+  _epa_core_refresh_indexes('localhost');
+}
+
+/*
+ * Helper function to refresh all search indexes on a server.
+ */
+function _epa_core_refresh_indexes($server_name) {
+  $localhost = Server::load($server_name);
+  foreach ($localhost->getIndexes() as $index) {
+    $index->reindex();
   }
 }

@@ -7,6 +7,11 @@
 $config['smtp.settings']['smtp_port'] = 1025;
 $config['smtp.settings']['smtp_protocol'] = 'standard';
 
+$config['smtp.settings']['smtp_on'] = FALSE;
+$config['system.mail']['interface'] = [
+  'default' => 'php_mail',
+];
+
 // Don't initiate TLS sessions during local development; the MySQL certificate is
 // self-signed, which OpenSSL rejects
 unset($databases['default']['default']['pdo'][PDO::MYSQL_ATTR_SSL_CA]);
@@ -47,6 +52,8 @@ if (defined('Memcached::OPT_CLIENT_MODE')) {
 }
 
 $settings['container_yamls'][] = DRUPAL_ROOT . '/sites/development.services.yml';
+
+$settings['container_yamls'][] = $app_root . '/' . $site_path . '/development.services.yml';
 
 ini_set('max_execution_time', 0);
 

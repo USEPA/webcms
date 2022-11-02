@@ -1,7 +1,10 @@
-/// Convert unitless number to unit value
+@use 'sass:math';
+@use '00-functions.gesso' as *;
+@use 'functions.numbers' as *;
+
+// Convert unitless number to unit value
 // @param {Number} $value - unitless number
 // @return {String} - unit type
-
 @function convert($value, $unit: px) {
   @if unitless($value) {
     @if $unit == px {
@@ -36,7 +39,7 @@
     @if (unit($value) != 'px') {
       $value: px($value, $base);
     }
-    @return ($value / $base) * 1em;
+    @return math.div($value, $base) * 1em;
   }
   @return $value;
 }
@@ -50,7 +53,7 @@
     @if (unit($value) != 'px') {
       $value: px($value, $base);
     }
-    @return ($value / $base) * 1rem;
+    @return math.div($value, $base) * 1rem;
   }
   @return $value;
 }

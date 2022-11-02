@@ -5,6 +5,7 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -40,6 +41,17 @@ function epa_core_theme($existing, $type, $theme, $path) {
       'file' => 'epa_core.theme.inc',
     ],
   ];
+}
+
+/**
+ * Implements hook_rebuild().
+ */
+function epa_core_rebuild() {
+  $release = getenv('GIT_COMMIT');
+  if ($tag = getenv('GIT_TAG')) {
+    $release = $tag;
+  }
+  \Drupal::state()->set('environment_indicator.current_release', $release);
 }
 
 /**
@@ -202,11 +214,13 @@ function _epa_core_load_taxonomy_hierarchy($terms) {
   foreach ($terms as $term) {
     $term_id = $term['target_id'];
     $term_object = $term_storage->load($term_id);
-    $default_keywords[] = $term_object->label();
-    $ancestors = $term_storage->loadAllParents($term_id);
-    if (!empty($ancestors)) {
-      foreach ($ancestors as $ancestor) {
-        $default_keywords[] = $ancestor->label();
+    if ($term_object) {
+      $default_keywords[] = $term_object->label();
+      $ancestors = $term_storage->loadAllParents($term_id);
+      if (!empty($ancestors)) {
+        foreach ($ancestors as $ancestor) {
+          $default_keywords[] = $ancestor->label();
+        }
       }
     }
   }
@@ -370,7 +384,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $term_description = $config->get('default_description');
           // Term description can contain tokens, so we need to replace them.
           $token = \Drupal::token();
-          $term_description = $token->replace($term_description, ['term' => $data['term']]);
+          $term_description = PlainTextOutput::renderFromHtml($token->replace($term_description, ['term' => $data['term']]));
           $replacements[$original] = $term_description;
         }
 
