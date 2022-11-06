@@ -63,10 +63,12 @@
 
 {% set body %}
   {{ content.field_daterange }}
+  {{ content.field_deadline }}
   {{ content.field_location }}
   {{ content|without(
     'epa_content_moderation_info_box',
     'field_daterange',
+    'field_deadline',
     'field_location',
     'field_event_cancellation'
   ) }}
