@@ -20,7 +20,7 @@ class EPADraftApproved extends EPAModeration {
   public function process(ContentModerationStateInterface $moderation_entity) {
     parent::process($moderation_entity);
 
-    $this->scheduleTransition('field_publish_date', 'published');
+    $this->scheduleTransition('field_publish_date', 'published', TRUE);
   }
 
   /**

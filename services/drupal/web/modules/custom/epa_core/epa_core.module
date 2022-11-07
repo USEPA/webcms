@@ -47,6 +47,17 @@ function epa_core_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_rebuild().
+ */
+function epa_core_rebuild() {
+  $release = getenv('GIT_COMMIT');
+  if ($tag = getenv('GIT_TAG')) {
+    $release = $tag;
+  }
+  \Drupal::state()->set('environment_indicator.current_release', $release);
+}
+
+/**
  * Implements hook_menu_local_tasks_alter().
  *
  * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
@@ -206,11 +217,13 @@ function _epa_core_load_taxonomy_hierarchy($terms) {
   foreach ($terms as $term) {
     $term_id = $term['target_id'];
     $term_object = $term_storage->load($term_id);
-    $default_keywords[] = $term_object->label();
-    $ancestors = $term_storage->loadAllParents($term_id);
-    if (!empty($ancestors)) {
-      foreach ($ancestors as $ancestor) {
-        $default_keywords[] = $ancestor->label();
+    if ($term_object) {
+      $default_keywords[] = $term_object->label();
+      $ancestors = $term_storage->loadAllParents($term_id);
+      if (!empty($ancestors)) {
+        foreach ($ancestors as $ancestor) {
+          $default_keywords[] = $ancestor->label();
+        }
       }
     }
   }
