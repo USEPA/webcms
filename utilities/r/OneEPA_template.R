@@ -3,6 +3,16 @@ require(shiny)
 ui <- fluidPage(
   tags$html(class = "no-js", lang="en"),
   tags$head(
+	HTML(
+		"<!-- Google Tag Manager -->
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+		new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+		j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+		'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','GTM-L8ZB');</script>
+		<!-- End Google Tag Manager -->
+		"
+		),
     tags$meta(charset="utf-8"),
     tags$meta(property="og:site_name", content="US EPA"),
     #tags$link(rel = "stylesheet", type = "text/css", href = "css/uswds.css"),
@@ -24,7 +34,7 @@ ui <- fluidPage(
     tags$meta(name="HandheldFriendly", content="true"),
     tags$meta(name="viewport", content="width=device-width, initial-scale=1.0"),
     tags$meta(`http-equiv`="x-ua-compatible", content="ie=edge"),
-    tags$title('ContDataQC | US EPA'),
+# update this line with your title:    tags$title('ContDataQC | US EPA'),
     tags$link(rel="icon", type="image/x-icon", href="https://www.epa.gov/themes/epa_theme/images/favicon.ico"),
     tags$meta(name="msapplication-TileColor", content="#FFFFFF"),
     tags$meta(name="msapplication-TileImage", content="https://www.epa.gov/themes/epa_theme/images/favicon-144.png"),
@@ -70,8 +80,7 @@ ui <- fluidPage(
     ))
   ),
   tags$body(class="path-themes not-front has-wide-template", id="top",
-    tags$script(src = 'https://cdnjs.cloudflare.com/ajax/libs/uswds/3.0.0-beta.3/js/uswds.min.js')
-  ),
+  tags$script(src = 'https://cdnjs.cloudflare.com/ajax/libs/uswds/3.0.0-beta.3/js/uswds.min.js')),
   
   # Site Header
   HTML(
@@ -79,9 +88,10 @@ ui <- fluidPage(
       <a id="skip-to-main" href="#main" class="skiplinks__link visually-hidden focusable">Skip to main content</a>
     </div>
 
-    <!-- Google Tag Manager (noscript) -->
-    <!--noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-L8ZB" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript-->
-    <!-- End Google Tag Manager (noscript) -->
+	<!-- Google Tag Manager (noscript) -->
+	<noscript><iframe src=https://www.googletagmanager.com/ns.html?id=GTM-L8ZB
+	height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	<!-- End Google Tag Manager (noscript) -->
 
     <div class="dialog-off-canvas-main-canvas" data-off-canvas-main-canvas>
     <section class="usa-banner" aria-label="Official government website">
@@ -288,32 +298,32 @@ ui <- fluidPage(
             <h2>Discover.</h2>
             <ul class="menu menu--footer">
               <li class="menu__item">
-                <a href="/accessibility" class="menu__link">Accessibility</a>
+                <a href="https://www.epa.gov/accessibility" class="menu__link">Accessibility</a>
               </li>
               <!--li class="menu__item"><a href="#" class="menu__link">EPA Administrator</a></li-->
               <li class="menu__item">
-                <a href="/planandbudget" class="menu__link">Budget &amp; Performance</a>
+                <a href="https://www.epa.gov/planandbudget" class="menu__link">Budget &amp; Performance</a>
               </li>
               <li class="menu__item">
-                <a href="/contracts" class="menu__link">Contracting</a>
+                <a href="https://www.epa.gov/contracts" class="menu__link">Contracting</a>
               </li>
               <li class="menu__item">
-                <a href="/home/wwwepagov-snapshots" class="menu__link">EPA www Web Snapshot</a>
+                <a href="https://www.epa.gov/home/wwwepagov-snapshots" class="menu__link">EPA www Web Snapshot</a>
               </li>
               <li class="menu__item">
-                <a href="/grants" class="menu__link">Grants</a>
+                <a href="https://www.epa.gov/grants" class="menu__link">Grants</a>
               </li>
               <li class="menu__item">
-                <a href="/ocr/whistleblower-protections-epa-and-how-they-relate-non-disclosure-agreements-signed-epa-employees" class="menu__link">No FEAR Act Data</a>
+                <a href="https://www.epa.gov/ocr/whistleblower-protections-epa-and-how-they-relate-non-disclosure-agreements-signed-epa-employees" class="menu__link">No FEAR Act Data</a>
               </li>
               <li class="menu__item">
-                <a href="/web-policies-and-procedures/plain-writing" class="menu__link">Plain Writing</a>
+                <a href="https://www.epa.gov/web-policies-and-procedures/plain-writing" class="menu__link">Plain Writing</a>
               </li>
               <li class="menu__item">
-                <a href="/privacy" class="menu__link">Privacy</a>
+                <a href="https://www.epa.gov/privacy" class="menu__link">Privacy</a>
               </li>
               <li class="menu__item">
-                <a href="/privacy/privacy-and-security-notice" class="menu__link">Privacy and Security Notice</a>
+                <a href="https://www.epa.gov/privacy/privacy-and-security-notice" class="menu__link">Privacy and Security Notice</a>
               </li>
             </ul>
           </div>
@@ -324,22 +334,22 @@ ui <- fluidPage(
                 <a href="https://www.data.gov/" class="menu__link">Data.gov</a>
               </li>
               <li class="menu__item">
-                <a href="/office-inspector-general/about-epas-office-inspector-general" class="menu__link">Inspector General</a>
+                <a href="https://www.epa.gov/office-inspector-general/about-epas-office-inspector-general" class="menu__link">Inspector General</a>
               </li>
               <li class="menu__item">
-                <a href="/careers" class="menu__link">Jobs</a>
+                <a href="https://www.epa.gov/careers" class="menu__link">Jobs</a>
               </li>
               <li class="menu__item">
-                <a href="/newsroom" class="menu__link">Newsroom</a>
+                <a href="https://www.epa.gov/newsroom" class="menu__link">Newsroom</a>
               </li>
               <li class="menu__item">
-                <a href="/data" class="menu__link">Open Government</a>
+                <a href="https://www.epa.gov/data" class="menu__link">Open Government</a>
               </li>
               <li class="menu__item">
                 <a href="https://www.regulations.gov/" class="menu__link">Regulations.gov</a>
               </li>
               <li class="menu__item">
-                <a href="/newsroom/email-subscriptions-epa-news-releases" class="menu__link">Subscribe</a>
+                <a href="https://www.epa.gov/newsroom/email-subscriptions-epa-news-releases" class="menu__link">Subscribe</a>
               </li>
               <li class="menu__item">
                 <a href="https://www.usa.gov/" class="menu__link">USA.gov</a>
@@ -353,19 +363,19 @@ ui <- fluidPage(
             <h2>Ask.</h2>
             <ul class="menu menu--footer">
               <li class="menu__item">
-                <a href="/home/forms/contact-epa" class="menu__link">Contact EPA</a>
+                <a href="https://www.epa.gov/home/forms/contact-epa" class="menu__link">Contact EPA</a>
               </li>
               <li class="menu__item">
-                <a href="/web-policies-and-procedures/epa-disclaimers" class="menu__link">EPA Disclaimers</a>
+                <a href="https://www.epa.gov/web-policies-and-procedures/epa-disclaimers" class="menu__link">EPA Disclaimers</a>
               </li>
               <li class="menu__item">
-                <a href="/aboutepa/epa-hotlines" class="menu__link">Hotlines</a>
+                <a href="https://www.epa.gov/aboutepa/epa-hotlines" class="menu__link">Hotlines</a>
               </li>
               <li class="menu__item">
-                <a href="/foia" class="menu__link">FOIA Requests</a>
+                <a href="https://www.epa.gov/foia" class="menu__link">FOIA Requests</a>
               </li>
               <li class="menu__item">
-                <a href="/home/frequent-questions-specific-epa-programstopics" class="menu__link">Frequent Questions</a>
+                <a href="https://www.epa.gov/home/frequent-questions-specific-epa-programstopics" class="menu__link">Frequent Questions</a>
               </li>
             </ul>
             <h2>Follow.</h2>

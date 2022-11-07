@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_web_areas\Plugin\views\filter;
 
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\group\GroupMembershipLoaderInterface;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;

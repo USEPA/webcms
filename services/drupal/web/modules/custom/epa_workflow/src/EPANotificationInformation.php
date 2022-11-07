@@ -40,18 +40,38 @@ class EPANotificationInformation extends NotificationInformation {
   public function getNotifications(EntityInterface $entity) {
     $notifications = [];
 
-    $exclude_process = !empty($entity->epa_revision_automated) && !empty($entity->epa_revision_automated->value) && $entity->epa_revision_automated->value ? 'manual' : 'automatic';
-
     if ($this->isModeratedEntity($entity)) {
       $workflow = $this->getWorkflow($entity);
       if ($transition = $this->getTransition($entity)) {
+
+        // Determine what kicked off this transition so we can make better decisions on which notifications to send.
+        $transition_process = !empty($entity->epa_revision_automated) && !empty($entity->epa_revision_automated->value) && $entity->epa_revision_automated->value ? 'automatic' : 'manual';
+        $workflow_processes = ['any'];
+
+        // We don't have a direct way of knowing why this is being unpublished,
+        // but if we know this was kicked off automatically and we know it is
+        // unpublishing and the sunset date is earlier than the review date, then
+        // we can safely assume it's being sunsetted.
+        if ($transition_process == 'automatic' &&
+          $entity->hasField('field_review_deadline') &&
+          $entity->hasField('field_expiration_date') &&
+          !$entity->get('field_expiration_date')->isEmpty() &&
+          'unpublish' == $transition->id() &&
+          $entity->field_review_deadline->value > $entity->field_expiration_date->value) {
+          $workflow_processes[] = 'sunset';
+        }
+        else {
+          $workflow_processes[] = $transition_process;
+        }
+
+
         // Find out if we have a config entity that contains this transition.
         $query = $this->entityTypeManager->getStorage('content_moderation_notification')
           ->getQuery()
           ->condition('workflow', $workflow->id())
           ->condition('status', 1)
           ->condition('transitions.' . $transition->id(), $transition->id())
-          ->condition('third_party_settings.epa_workflow.workflow_process', $exclude_process, '<>');
+          ->condition('third_party_settings.epa_workflow.workflow_process', $workflow_processes, 'IN');
 
         $notification_ids = $query->execute();
 
