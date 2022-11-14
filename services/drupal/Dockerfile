@@ -176,7 +176,9 @@ RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
     echo "$cert" >> /etc/ca-certificates.conf; \
   done \
-  && update-ca-certificates
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Add the entrypoint logic to configure the New Relic extension
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
@@ -184,6 +186,17 @@ RUN chmod +x /webcms-entrypoint
 
 ENTRYPOINT ["/webcms-entrypoint"]
 CMD [ "php-fpm" ]
+
+# Add build metadata to the image. We expose two optional build args:
+# * GIT_TAG, the named Git tag being built.
+# * GIT_COMMIT, the Git commit being built.
+#
+# These args are converted to environment variables that can be read by, e.g.,
+# settings.php to display to users the current running code.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
@@ -235,6 +248,16 @@ RUN set -ex \
 # Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
 
+# Copy additional certificates for use by Drupal and bundle them into the system
+# certificates
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate
@@ -250,3 +273,10 @@ RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
 
 # Wrap the entrypoint script with tini to allow graceful signal handling
 ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
+
+# Add build metadata to the image. See the comments for these ARG instructions
+# in the Drupal stage for more details.
+ARG GIT_TAG=""
+ARG GIT_COMMIT=""
+
+ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
