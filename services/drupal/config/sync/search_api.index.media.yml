@@ -3,18 +3,18 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_description
-    - field.storage.media.field_media_tags
-    - field.storage.media.field_publication_number
     - field.storage.media.field_media_audio_file
+    - field.storage.media.field_description
     - field.storage.media.field_media_file
     - field.storage.media.field_media_file_1
     - field.storage.media.field_media_image
+    - field.storage.media.field_publication_number
+    - field.storage.media.field_media_tags
     - search_api.server.localhost
   module:
+    - file
     - media
     - user
-    - file
     - entitygroupfield
     - group
     - search_api
@@ -72,6 +72,7 @@ field_settings:
     datasource_id: 'entity:media'
     property_path: field_description
     type: text
+    boost: 0.5
     dependencies:
       config:
         - field.storage.media.field_description
@@ -145,6 +146,7 @@ field_settings:
     datasource_id: 'entity:media'
     property_path: name
     type: text
+    boost: !!float 5
     dependencies:
       module:
         - media
@@ -280,4 +282,5 @@ tracker_settings:
 options:
   cron_limit: 50
   index_directly: true
+  track_changes_in_references: true
 server: localhost
