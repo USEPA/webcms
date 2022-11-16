@@ -135,7 +135,7 @@ resource "aws_secretsmanager_secret_version" "newrelic_license" {
 resource "aws_secretsmanager_secret" "basic_auth" {
   for_each = toset(var.sites)
 
-  name = "/webcms/${var.environment}/${each.value}/basic-auth"
+  name        = "/webcms/${var.environment}/${each.value}/basic-auth"
   description = "Basic authentication credentials"
 
   recovery_window_in_days = 0
