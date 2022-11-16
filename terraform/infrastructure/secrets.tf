@@ -124,3 +124,37 @@ resource "aws_secretsmanager_secret_version" "newrelic_license" {
 }
 
 #endregion
+
+#region Basic Authentication
+
+# Create an optional secret to store basic authentication credentials. This is
+# used to, e.g., block access to preproduction sites by bots/crawlers.
+#
+# Note that, like the newrelic_license secret, this is a per-site secret, not a
+# per-language secret.
+resource "aws_secretsmanager_secret" "basic_auth" {
+  for_each = toset(var.sites)
+
+  name = "/webcms/${var.environment}/${each.value}/basic-auth"
+  description = "Basic authentication credentials"
+
+  recovery_window_in_days = 0
+
+  tags = var.tags
+}
+
+# Create an empty/default set of basic auth credentials. Like the
+# newrelic_license secret version resource above, this exists solely to
+# prepopulate the secret with a value to prevent ECS deployments from breaking.
+resource "aws_secretsmanager_secret_version" "basic_auth" {
+  for_each = toset(var.sites)
+
+  secret_id = aws_secretsmanager_secret.basic_auth[each.value].id
+
+  secret_string = "."
+
+  lifecycle {
+    ignore_changes = [secret_string, version_stages]
+  }
+}
+#endregion
