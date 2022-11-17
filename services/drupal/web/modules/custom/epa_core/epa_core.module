@@ -25,6 +25,9 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\search_api\Utility\Utility;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\Component\Utility\UrlHelper;
 
 /**
  * Implements hook_theme().
@@ -286,8 +289,8 @@ function epa_core_token_info() {
       'argument-1' => $view_argument_1,
     ],
     'term' => [
-      'term-description' => $term_description
-    ]
+      'term-description' => $term_description,
+    ],
   ];
   return $tokens;
 }
@@ -388,12 +391,48 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $term_description = PlainTextOutput::renderFromHtml($token->replace($term_description, ['term' => $data['term']]));
           $replacements[$original] = $term_description;
         }
-
         break;
     }
   }
   return $replacements;
 }
+
+function epa_core_addtocal_alter(array &$overridable_items) {
+  $overridable_items['override_status'] = TRUE;
+  $add_to_cal_components = [];
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node->bundle() == 'event') {
+    $description = $node->get('field_add_to_cal_description')->value;
+    if (empty($description)) {
+      $description = $node->get('field_description')->value;
+    }
+    if ($description) {
+      $add_to_cal_components[] = $description;
+    }
+
+    $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
+    if (!empty($event_type)) {
+      $add_to_cal_components[] = "Event Type: $event_type";
+    }
+    $event_host = $node->get('field_event_host')->value;
+    if (!empty($event_host)) {
+      $add_to_cal_components[] = "Event host: $event_host";
+    }
+    $links_string = '';
+    foreach ($node->field_links as $link) {
+      $url = $link->getUrl();
+      $url->setAbsolute();
+      $title = $link->title;
+      $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
+    }
+    if (!empty($links_string)) {
+      $add_to_cal_components[] = "Links:\n". $links_string;
+    }
+  }
+  $overridable_items['description'] = implode("\n\n", $add_to_cal_components);
+}
+
+
 
 /**
  * Implements hook_entity_revision_delete().
@@ -739,3 +778,5 @@ function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefini
   }
   return AccessResult::neutral();
 }
+
+
