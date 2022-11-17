@@ -190,7 +190,6 @@ locals {
     { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_ssm_parameter.mail_pass.value },
     { name = "WEBCMS_SAML_SP_KEY", valueFrom = data.aws_ssm_parameter.saml_sp_key.value },
     { name = "WEBCMS_NEW_RELIC_LICENSE", valueFrom = data.aws_ssm_parameter.newrelic_license.value },
-    { name = "WEBCMS_BASIC_AUTH", valueFrom = data.aws_ssm_parameter.basic_auth.value },
   ]
 
   #endregion
