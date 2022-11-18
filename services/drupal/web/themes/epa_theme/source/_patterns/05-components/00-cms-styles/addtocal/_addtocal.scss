@@ -1,15 +1,28 @@
 // @file
 // Styles for the Add to Cal module.
+@use 'usa-button' as *;
 
 .addtocal-container {
   .addtocal {
+    @extend .usa-button;
+    margin-right: 0;
+
     + div {
       left: auto !important;
+      min-width: 159px;
       right: 0;
     }
   }
 
   .form-item__label {
+    font-size: 1rem;
+    margin: 0;
+    padding: 3px;
+    text-align: center;
     white-space: nowrap;
+
+    &::before {
+      content: none;
+    }
   }
 }
