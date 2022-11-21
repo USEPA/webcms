@@ -82,7 +82,10 @@ const lintStyles = () => {
 };
 
 const buildSass = mode => {
-  return src('*.scss', { cwd: './source' })
+  return src([
+      'source/*.scss',
+      'source/_patterns/05-components/*/*.scss'
+    ])
     .pipe(sourcemaps.init())
     .pipe(
       sass({

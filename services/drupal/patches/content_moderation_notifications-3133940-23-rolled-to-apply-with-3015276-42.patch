@@ -1,0 +1,193 @@
+diff --git a/config/schema/content_moderation_notifications.schema.yml b/config/schema/content_moderation_notifications.schema.yml
+index 93d8b4f..db19abe 100644
+--- a/config/schema/content_moderation_notifications.schema.yml
++++ b/config/schema/content_moderation_notifications.schema.yml
+@@ -35,7 +35,10 @@ content_moderation_notifications.content_moderation_notification.*:
+         label: 'Roles'
+     author:
+       type: boolean
+-      label: 'Author'
++      label: 'Original Author'
++    revision_author:
++      type: boolean
++      label: 'Revision Author'
+     site_mail:
+       type: boolean
+       label: Disable site mail
+diff --git a/src/ContentModerationNotificationInterface.php b/src/ContentModerationNotificationInterface.php
+index 9593fdd..49e13f5 100644
+--- a/src/ContentModerationNotificationInterface.php
++++ b/src/ContentModerationNotificationInterface.php
+@@ -24,6 +24,13 @@ interface ContentModerationNotificationInterface extends ConfigEntityInterface {
+    *   Returns TRUE if the notification should be sent to the entity author.
+    */
+   public function sendToAuthor();
++   /**
++    * Send the notification to the revision author.
++    *
++    * @return bool
++    *   Returns TRUE if the notification should be sent to the revision author.
++    */
++  public function sendToRevisionAuthor();
+ 
+   /**
+    * Send the notification to the site mail address.
+diff --git a/src/Controller/ContentModerationNotificationsListBuilder.php b/src/Controller/ContentModerationNotificationsListBuilder.php
+index 2e1c653..4d378d4 100644
+--- a/src/Controller/ContentModerationNotificationsListBuilder.php
++++ b/src/Controller/ContentModerationNotificationsListBuilder.php
+@@ -42,7 +42,8 @@ class ContentModerationNotificationsListBuilder extends ConfigEntityListBuilder
+     $header['status'] = $this->t('Status');
+     $header['transition'] = $this->t('Transitions');
+     $header['roles'] = $this->t('Email Roles');
+-    $header['author'] = $this->t('Email Author');
++    $header['author'] = $this->t('Original Author');
++    $header['revision_author'] = $this->t('Revision Author');
+     $header['emails'] = $this->t('Adhoc Emails');
+     return $header + parent::buildHeader();
+   }
+@@ -94,6 +95,7 @@ class ContentModerationNotificationsListBuilder extends ConfigEntityListBuilder
+ 
+     $row['roles'] = implode(', ', $roles);
+     $row['author'] = $entity->author ? $this->t('Yes') : $this->t('No');
++    $row['revision_author'] = $entity->revision_author ? $this->t('Yes') : $this->t('No');
+     $row['emails'] = $entity->emails;
+     return $row + parent::buildRow($entity);
+   }
+diff --git a/src/Entity/ContentModerationNotification.php b/src/Entity/ContentModerationNotification.php
+index ac67ab2..776dd0d 100644
+--- a/src/Entity/ContentModerationNotification.php
++++ b/src/Entity/ContentModerationNotification.php
+@@ -54,6 +54,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
+  *     "group_use",
+  *     "group_roles",
+  *     "author",
++ *     "revision_author",
+  *     "site_mail",
+  *     "emails",
+  *     "subject",
+@@ -65,12 +66,19 @@ use Drupal\Core\Entity\EntityStorageInterface;
+ class ContentModerationNotification extends ConfigEntityBase implements ContentModerationNotificationInterface {
+ 
+   /**
+-   * Send notification to the revision author.
++   * Send notification to the original author.
+    *
+    * @var bool
+    */
+   public $author = FALSE;
+ 
++  /**
++   * Send notification to the revision author.
++   *
++   * @var bool
++   */
++  public $revision_author = FALSE;
++
+   /**
+    * Disable notification to the site mail address.
+    *
+@@ -230,6 +238,13 @@ class ContentModerationNotification extends ConfigEntityBase implements ContentM
+     return $this->get('author');
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function sendToRevisionAuthor() {
++    return $this->get('revision_author');
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/src/Form/ContentModerationNotificationsFormBase.php b/src/Form/ContentModerationNotificationsFormBase.php
+index 432d89c..c55f2fe 100644
+--- a/src/Form/ContentModerationNotificationsFormBase.php
++++ b/src/Form/ContentModerationNotificationsFormBase.php
+@@ -271,13 +271,22 @@ class ContentModerationNotificationsFormBase extends EntityForm {
+       ];
+     }
+ 
+-    // Send email to author?
++    // Send email to the original author?
+     $form['author'] = [
+       '#type' => 'checkbox',
+-      '#title' => $this->t('Email the author?'),
++      '#title' => $this->t('Email the original content author?'),
+       '#default_value' => $content_moderation_notification->sendToAuthor(),
+       '#description' => $this->t('Send notifications to the current author of the content.'),
+     ];
++
++    // Send email to the revision author?
++    $form['revision_author'] = [
++      '#type' => 'checkbox',
++      '#title' => $this->t('Email the revision author?'),
++      '#default_value' => $content_moderation_notification->sendToRevisionAuthor(),
++       '#description' => $this->t('Send notifications to the current author of the content.'),
++     ];
++
+     $form['site_mail'] = [
+       '#type' => 'checkbox',
+       '#title' => $this->t('Disable the site email address'),
+diff --git a/src/Notification.php b/src/Notification.php
+index eed4470..47be0e6 100644
+--- a/src/Notification.php
++++ b/src/Notification.php
+@@ -159,6 +159,22 @@ class Notification implements NotificationInterface {
+         }
+       }
+ 
++      if ($notification->revision_author and ($entity instanceof EntityOwnerInterface)) {
++        if (!$entity->getOwner()->isAnonymous()) {
++          $revisionListIds = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->revisionIds($entity);
++          // Sort $revisionListIds current revision to oldest.
++          $revisionListIds = array_reverse($revisionListIds);
++          if (isset($revisionListIds[1])) {
++            // Load the previous revision.
++            $revision = $this->entityTypeManager->getStorage('node')->loadRevision($revisionListIds[1]);
++          }
++          else {
++            $revision = $this->entityTypeManager->getStorage('node')->loadRevision($revisionListIds[0]);
++          }
++          $data['to'][] = $revision->getRevisionUser()->getEmail();
++        }
++      }
++
+       // Get Roles.
+       foreach ($notification->getRoleIds() as $role) {
+         /** @var \Drupal\Core\Entity\EntityStorageInterface $user_storage */
+@@ -231,7 +247,6 @@ class Notification implements NotificationInterface {
+ 
+       // Force to BCC.
+       $data['params']['headers']['Bcc'] = implode(',', $data['to']);
+-
+       $recipient = '';
+       if (!$notification->disableSiteMail()) {
+         $recipient = \Drupal::config('system.site')->get('mail');
+diff --git a/tests/src/Unit/Entity/ContentModerationNotificationTest.php b/tests/src/Unit/Entity/ContentModerationNotificationTest.php
+index 378a40f..a13f92e 100644
+--- a/tests/src/Unit/Entity/ContentModerationNotificationTest.php
++++ b/tests/src/Unit/Entity/ContentModerationNotificationTest.php
+@@ -49,6 +49,7 @@ class ContentModerationNotificationTest extends UnitTestCase {
+       'format' => 'test_format',
+     ],
+     'author' => TRUE,
++    'revision_author' => TRUE,
+     'emails' => 'foo@example.com',
+   ];
+ 
+@@ -68,6 +69,13 @@ class ContentModerationNotificationTest extends UnitTestCase {
+     $this->assertEquals(TRUE, $this->notification->sendToAuthor());
+   }
+ 
++  /**
++   * @covers ::sendToRevisionAuthor
++   */
++  public function testSendToRevisionAuthor() {
++    $this->assertEquals(TRUE, $this->notification->sendToRevisionAuthor());
++  }
++
+   /**
+    * @covers ::getEmails
+    */

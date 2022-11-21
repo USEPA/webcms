@@ -14,6 +14,7 @@ dependencies:
     - field.field.node.news_release.field_language
     - field.field.node.news_release.field_last_published
     - field.field.node.news_release.field_machine_name
+    - field.field.node.news_release.field_meta_tags
     - field.field.node.news_release.field_paragraphs
     - field.field.node.news_release.field_press_office
     - field.field.node.news_release.field_press_officers
@@ -33,6 +34,7 @@ dependencies:
     - datetime
     - entitygroupfield
     - field_group
+    - metatag
     - paragraphs
     - shs
 third_party_settings:
@@ -174,6 +176,13 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_meta_tags:
+    type: metatag_firehose
+    weight: 49
+    region: content
+    settings:
+      sidebar: true
     third_party_settings: {  }
   field_paragraphs:
     type: paragraphs

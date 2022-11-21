@@ -16,6 +16,7 @@ dependencies:
     - field.field.node.faq.field_language
     - field.field.node.faq.field_last_published
     - field.field.node.faq.field_machine_name
+    - field.field.node.faq.field_meta_tags
     - field.field.node.faq.field_page_head
     - field.field.node.faq.field_publish_date
     - field.field.node.faq.field_question
@@ -26,6 +27,7 @@ dependencies:
     - field.field.node.faq.field_type
     - node.type.faq
   module:
+    - metatag
     - text
     - user
 id: node.faq.default
@@ -44,6 +46,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 0
+    region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 3
     region: content
   field_question:
     type: basic_string
