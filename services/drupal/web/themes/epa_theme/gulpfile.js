@@ -106,6 +106,14 @@ const buildSass = mode => {
         }),
       ])
     )
+    .pipe(rename(function (path) {
+      if(path.basename === 'index') {
+        path.basename = path.dirname;
+      }
+      if(path.dirname != '.') {
+        path.dirname = '.';
+      }
+    }))
     .pipe(sourcemaps.write('.'))
     .pipe(dest('css'));
 };
