@@ -1159,18 +1159,32 @@ display:
               menu_admin: '0'
               administrator: '0'
             reduce: false
-          is_grouped: false
+          is_grouped: true
           group_info:
-            label: ''
-            description: ''
-            identifier: ''
+            label: 'Usage restrictions'
+            description: 'Show only restricted media.'
+            identifier: field_banner_image_restricted
             optional: true
             widget: select
             multiple: false
             remember: false
             default_group: All
             default_group_multiple: {  }
-            group_items: {  }
+            group_items:
+              1:
+                title: Unrestricted
+                operator: not
+                value:
+                  restricted: restricted
+              2:
+                title: Restricted
+                operator: or
+                value:
+                  restricted: restricted
+              3:
+                title: ''
+                operator: or
+                value: {  }
           reduce_duplicates: false
       filter_groups:
         operator: AND
