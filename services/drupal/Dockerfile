@@ -211,6 +211,12 @@ COPY status.conf *.map /etc/nginx/conf.d/
 # Copy configuration templates
 COPY default.conf /etc/nginx/templates/default.conf.template
 
+# Copy nginx startup script
+COPY scripts/ecs/nginx-entrypoint.sh /webcms-entrypoint
+
+ENTRYPOINT [ "/webcms-entrypoint" ]
+CMD [ "nginx", "-g", "daemon off;" ]
+
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
 FROM forumone/drupal8-cli:8.0 AS drush
