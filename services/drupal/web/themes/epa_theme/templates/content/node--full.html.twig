@@ -38,7 +38,7 @@
 
 {% set admin_info %}
   {{ region_messages }}
-  {{ content.epa_content_moderation_control }}
+  {{ content.epa_content_moderation_info_box }}
 {% endset %}
 
 {% set show_admin_info = false %}
@@ -77,7 +77,7 @@
     'title': label,
     'admin_info': admin_info,
     'show_admin_info': show_admin_info,
-    'body': content|without('epa_content_moderation_control'),
+    'body': content|without('epa_content_moderation_info_box' ),
     'sidenav': sidenav,
     'footer': footer,
   } %}
@@ -90,7 +90,7 @@
     'title': label,
     'admin_info': admin_info,
     'show_admin_info': show_admin_info,
-    'body': content|without('epa_content_moderation_control'),
+    'body': content|without('epa_content_moderation_info_box'),
     'footer': footer,
   } %}
 {% endif %}
