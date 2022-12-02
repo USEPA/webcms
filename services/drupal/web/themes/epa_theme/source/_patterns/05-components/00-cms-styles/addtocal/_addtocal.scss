@@ -1,9 +1,17 @@
 // @file
 // Styles for the Add to Cal module.
 @use 'usa-button' as *;
+@use '../../../00-config' as *;
 
 .addtocal-container {
-  float: right;
+  float: none;
+  margin-bottom: 12px;
+  margin-top: 12px;
+
+  @include breakpoint(gesso-breakpoint(mobile-lg)) {
+    float: right;
+    margin-top: 0;
+  }
 
   .addtocal {
     @extend .usa-button;
