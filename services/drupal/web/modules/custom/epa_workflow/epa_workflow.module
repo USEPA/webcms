@@ -614,7 +614,11 @@ function epa_workflow_node_update(NodeInterface $node) {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
     $last_revision = $storage->loadRevision($node->leapfrog);
     $last_revision->setNewRevision();
-    $last_revision->isDefaultRevision(FALSE);
+    // If our default revision is not published then this leapfrogged revision
+    // should also take over the default revision spot. This follows the model
+    // of what core does. If the default revision IS published then our leapfrog
+    // revision is only the latest revision and does not take over the default.
+    $last_revision->isDefaultRevision(!$node->isPublished());
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
     $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
