@@ -1,7 +1,9 @@
 // @file
 // Styles for a Hero Slideshow.
 
-@import 'tiny-slider';
+@use '../../00-config' as *;
+@use '../../05-components/button/button' as *;
+@use 'tiny-slider';
 
 .hero-slideshow {
   margin-bottom: rem(gesso-spacing(3));
@@ -25,6 +27,16 @@
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     position: relative !important;
+  }
+
+  .no-js & {
+    &:first-child {
+      z-index: 1;
+    }
+
+    &:not(:first-child) {
+      display: none;
+    }
   }
 }
 

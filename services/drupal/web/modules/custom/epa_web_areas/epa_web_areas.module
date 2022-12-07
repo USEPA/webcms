@@ -402,4 +402,20 @@ function epa_web_areas_views_data_alter(array &$data) {
       'id' => 'epa_web_areas_users_groups'
     ],
   ];
+
+  $data['search_api_index_media']['users_in_groups'] = [
+    'title' => t('In user\'s groups'),
+    'filter' => [
+      'title' => t('In user\'s groups'),
+      'help' => t('Filters content that belongs to groups the user is a member of.'),
+      'field' => 'gid',
+      'id' => 'epa_search_api_web_areas_users_groups'
+    ],
+  ];
+
+  if (!empty($data["search_api_index_media"]["gid"]["filter"])) {
+    $data["search_api_index_media"]["gid"]["filter"]['field_name'] = 'gid';
+    $data["search_api_index_media"]["gid"]["filter"]['entity_type'] = 'group_content';
+    $data["search_api_index_media"]["gid"]["filter"]['id'] = 'search_api_entity_reference';
+  }
 }

@@ -1,13 +1,8 @@
 // CSS styles and overrides for Pattern Lab only.
 // This stylesheet is not loaded by the theme.
 
-@import '_patterns/uswds-theme-settings.artifact';
-@import 'breakpoint';
-// Required USWDS styles.
-@import 'packages/required';
-// Gesso configuration.
-@import '_patterns/00-config/**/*.scss';
-@import '_patterns/01-global/**/*.scss';
+@use 'sass:math';
+@use '_patterns/00-config' as *;
 
 // The container for the 'view all' screen, which contains the list of patterns.
 .pl-c-pattern-index {
@@ -52,7 +47,7 @@ $swatch-padding: 1rem;
 .pattern-lab-color-swatch {
   border: 1px solid #c1c1c1;
   flex: 0 0 ($swatch-size + 2 * $swatch-padding);
-  margin: 0 $swatch-padding / 2 $swatch-padding;
+  margin: 0 math.div($swatch-padding, 2) $swatch-padding;
   max-width: ($swatch-size + 2 * $swatch-padding);
   padding: $swatch-padding;
 }
@@ -93,8 +88,10 @@ $swatch-padding: 1rem;
   font-weight: 700;
   margin-bottom: rem(5px);
   text-align: center;
+}
 
-  @include breakpoint(800px) {
+@media (min-width: 50em) {
+  .pattern-lab-font__family {
     text-align: left;
   }
 }
@@ -103,8 +100,10 @@ $swatch-padding: 1rem;
   display: flex;
   flex-direction: column;
   margin: rem(30px) 0;
+}
 
-  @include breakpoint(800px) {
+@media (min-width: 50em) {
+  .pattern-lab-font__item {
     flex-direction: row;
   }
 }
@@ -117,8 +116,10 @@ $swatch-padding: 1rem;
   padding: rem(20px) 0;
   text-align: center;
   width: 100%;
+}
 
-  @include breakpoint(800px) {
+@media (min-width: 50em) {
+  .pattern-lab-font__preview {
     border-bottom: 0;
     border-right: 2px solid #eee;
     margin: rem(5px) rem(30px) 0 0;
@@ -134,8 +135,10 @@ $swatch-padding: 1rem;
   line-height: 1;
   text-align: center;
   width: 100%;
+}
 
-  @include breakpoint(800px) {
+@media (min-width: 50em) {
+  .pattern-lab-font__preview-character {
     flex-shrink: 0;
     text-align: left;
     width: 35%;
@@ -145,8 +148,10 @@ $swatch-padding: 1rem;
 .pattern-lab-font__preview-meta {
   text-align: center;
   width: 100%;
+}
 
-  @include breakpoint(800px) {
+@media (min-width: 50em) {
+  .pattern-lab-font__preview-meta {
     text-align: left;
   }
 }
@@ -187,7 +192,7 @@ $shadow-gutter: rem(50px);
   display: flex;
   flex: 0 0 $shadow-swatch;
   height: $shadow-swatch;
-  margin: 0 ($shadow-gutter / 2) $shadow-gutter;
+  margin: 0 math.div($shadow-gutter, 2) $shadow-gutter;
   width: $shadow-swatch;
 }
 
@@ -281,7 +286,7 @@ $swatch-padding: 1rem;
 .pattern-lab-color-swatch {
   border: 1px solid #c1c1c1;
   flex: 0 0 ($swatch-size + 2 * $swatch-padding);
-  margin: 0 $swatch-padding/2 $swatch-padding;
+  margin: 0 math.div($swatch-padding, 2) $swatch-padding;
   max-width: ($swatch-size + 2 * $swatch-padding);
   padding: $swatch-padding;
 }

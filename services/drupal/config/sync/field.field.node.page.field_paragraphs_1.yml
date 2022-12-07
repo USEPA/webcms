@@ -5,6 +5,14 @@ dependencies:
   config:
     - field.storage.node.field_paragraphs_1
     - node.type.page
+    - paragraphs.paragraphs_type.before_after_swipe_component
+    - paragraphs.paragraphs_type.box
+    - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.from_library
+    - paragraphs.paragraphs_type.header
+    - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
+    - paragraphs.paragraphs_type.slideshow
   module:
     - custom_add_another
     - entity_reference_revisions
@@ -33,10 +41,14 @@ settings:
       dynamic_list: dynamic_list
       slideshow: slideshow
       from_library: from_library
+      before_after_swipe_component: before_after_swipe_component
     negate: 0
     target_bundles_drag_drop:
       applicants_or_respondents:
         weight: -26
+        enabled: false
+      author:
+        weight: 23
         enabled: false
       banner:
         weight: -22
@@ -44,9 +56,18 @@ settings:
       banner_slide:
         weight: -21
         enabled: false
+      before_after_swipe_component:
+        weight: 26
+        enabled: true
       box:
         weight: -31
         enabled: true
+      card:
+        weight: 28
+        enabled: false
+      card_group:
+        weight: 29
+        enabled: false
       cfr:
         weight: -25
         enabled: false
@@ -79,6 +100,9 @@ settings:
         enabled: false
       press_officers:
         weight: -18
+        enabled: false
+      slide:
+        weight: 41
         enabled: false
       slideshow:
         weight: -28

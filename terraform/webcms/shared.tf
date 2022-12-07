@@ -158,6 +158,10 @@ data "aws_ssm_parameter" "newrelic_license" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license"
 }
 
+data "aws_ssm_parameter" "basic_auth" {
+  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/basic-auth"
+}
+
 data "aws_ssm_parameter" "hash_salt" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt"
 }
