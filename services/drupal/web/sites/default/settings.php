@@ -972,6 +972,12 @@ if (getenv('WEBCMS_MAIL_HOST') == 'mailhog.epa.internal') {
   $settings['epa_content_moderation_email_debug'] = TRUE;
 }
 
+$settings['fast404_path_check'] = TRUE;
+$settings['fast404_respect_redirect'] = TRUE;
+// Ensure we do not send fast404 responses for sites/production/files/* since requests for those files need to get redirected to sites/default/files/*
+$settings['fast404_exts'] = '^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$';
+$settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
+
 /**
  * Load local development override configuration, if available.
  *
@@ -996,9 +1002,6 @@ if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
   include $app_root . '/' . $site_path . '/settings.local.php';
 }
 
-$settings['fast404_path_check'] = TRUE;
-$settings['fast404_respect_redirect'] = TRUE;
-$settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
 if (file_exists($app_root . '/modules/contrib/fast_404/fast404.inc')) {
   include_once $app_root . '/modules/contrib/fast_404/fast404.inc';
   fast404_preboot($settings);
