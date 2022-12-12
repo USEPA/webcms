@@ -1,0 +1,19 @@
+diff --git a/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php b/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
+index a725510d6b..55aa84b5e2 100644
+--- a/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
++++ b/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
+@@ -116,6 +116,14 @@ public function mediaEntityMetadata(Request $request) {
+       }
+     }
+ 
++    // Adding the URL string to edit media items to metadata.
++    $response['edit_url'] = $media->toUrl('edit-form')->toString();
++    
++    // Adding file URL to image source metadata.
++    $file_id = $media->{$image_field}->target_id;
++    $file = File::load($file_id);
++    $response['imageSourceMetadata']['filepath'] = $file->createFileUrl();
++
+     // Note that we intentionally do not use:
+     // - \Drupal\Core\Cache\CacheableResponse because caching it on the server
+     //   side is wasteful, hence there is no need for cacheability metadata.
