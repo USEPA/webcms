@@ -94,6 +94,16 @@ variable "drupal_csrf_origin_whitelist" {
 
 #endregion
 
+#region Drush service Configuration
+
+variable "drush_tasks" {
+  description = "The number of drush tasks to implement per site.  There will be a default value of 1.  The intent is to only have to specify this if you want something other than the default 1 task."
+  type        = number
+  default     = 1
+}
+
+#end region
+
 #region Email
 
 variable "email_auth_user" {
