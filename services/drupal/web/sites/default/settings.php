@@ -975,7 +975,7 @@ if (getenv('WEBCMS_MAIL_HOST') == 'mailhog.epa.internal') {
 $settings['fast404_path_check'] = TRUE;
 $settings['fast404_respect_redirect'] = TRUE;
 // Ensure we do not send fast404 responses for sites/production/files/* since requests for those files need to get redirected to sites/default/files/*
-$settings['fast404_exts'] = '^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$';
+$settings['fast404_exts'] = '/^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
 $settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
 
 /**
