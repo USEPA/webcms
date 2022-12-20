@@ -53,7 +53,7 @@ export default class EpaDrupalMediaUI extends Plugin {
       button.bind('isEnabled').to(linkCommand, 'isEnabled');
 
       this.listenTo(button, 'execute', () => {
-        editor.execute('EditDrupalMedia')
+        editor.execute('EditDrupalMedia');
       });
 
       return button;

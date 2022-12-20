@@ -45,9 +45,6 @@ export default class EpaFileUrlUI extends Plugin {
         tooltip: true,
       });
 
-      // Bind button to the command.
-      // button.bind('isEnabled').to(linkCommand, 'isEnabled');
-
       this.listenTo(button, 'execute', () => {
         const modelElement = editor.model.document.selection.getSelectedElement();
         const metadataRepository = editor.plugins.get(
@@ -58,10 +55,8 @@ export default class EpaFileUrlUI extends Plugin {
           metadataRepository
             .getMetadata(modelElement)
             .then((metadata) => {
-              console.log(metadata);
-              // window.open(metadata.edit_url, '_blank');
               navigator.clipboard.writeText(metadata.imageSourceMetadata.filepath);
-              alert("Copied the text: " + metadata.imageSourceMetadata.filepath);
+              alert("Copied the file path: " + metadata.imageSourceMetadata.filepath);
             })
             .catch((e) => {
               // There isn't any UI indication for errors because this should be
