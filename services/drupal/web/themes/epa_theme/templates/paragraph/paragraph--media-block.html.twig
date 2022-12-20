@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set box_style = content.field_style|field_value|render %}
+
+{% if box_style != 'default' %}
+
+  {% set classes = [
+    box_style ? 'box--' ~ box_style,
+    content.field_alignment|field_value ? 'u-align-' ~ content.field_alignment|field_value|render,
+  ]|join(' ')|trim %}
+
+  {% set icon = '' %}
+  {% if box_style == 'alert' %}
+    {% set icon = 'warning' %}
+  {% elseif box_style == 'rss' %}
+    {% set icon = 'rss' %}
+  {% endif %}
+
+  {% include '@components/box/box.twig' with {
+    'modifier_classes': classes,
+    'title': {
+      'tag': content.field_title_heading|field_value ? content.field_title_heading.0['#markup'] : 'h2',
+      'text': content.field_title|field_value|render,
+      'icon': icon,
+      'url': content.field_image|field_value|render ? '' : content.field_header_link.0['#url_title']
+    },
+    'image_url': content.field_header_link.0['#url_title'],
+    'image': content.field_image|field_value|render,
+    'content': content.field_paragraphs|field_value|render,
+    'footer': {
+      'text': content.field_link.0['#title'],
+      'url': content.field_link.0['#url_title'],
+    },
+    'role': box_style == 'alert' ? 'alert': false,
+    'label': box_style == 'alert' ? 'Alert'|t: false,
+  } %}
+
+{% else %}
+
+  {% set image_classes = [
+    'u-align-left',
+  ]|join(' ')|trim %}
+
+  {% if content.field_link|field_value %}
+    {% set footer_content %}
+      <p><a class="usa-button" href="{{ content.field_link.0['#url_title'] }}">{{ content.field_link.0['#title'] }}</a></p>
+    {% endset %}
+  {% endif %}
+
+  {% include '@uswds/summary-box/summary-box.twig' with {
+    'heading': content.field_title|field_value|render,
+    'heading_element': content.field_title_heading|field_value ? content.field_title_heading.0['#markup'] : 'h2',
+    'heading_url': content.field_header_link.0['#url_title'],
+    'image': content.field_image|field_value|render,
+    'content': content.field_paragraphs|field_value|render,
+    'footer_content': footer_content,
+    'image_modifier_classes': image_classes,
+    'modifier_classes': content.field_alignment|field_value ? 'u-align-' ~ content.field_alignment|field_value|render,
+  } %}
+
+{% endif %}
+
+{% set catch_cache = content|render %}
