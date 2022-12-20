@@ -1,14 +1,22 @@
 diff --git a/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php b/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
-index a725510d6b..55aa84b5e2 100644
+index a725510d6b..391a48efce 100644
 --- a/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
 +++ b/core/modules/ckeditor5/src/Controller/CKEditor5MediaController.php
-@@ -116,6 +116,14 @@ public function mediaEntityMetadata(Request $request) {
+@@ -11,6 +11,7 @@
+ use Drupal\Core\Entity\EntityRepositoryInterface;
+ use Drupal\Core\Session\AccountInterface;
+ use Drupal\editor\Entity\Editor;
++use Drupal\file\Entity\File;
+ use Drupal\image\Plugin\Field\FieldType\ImageItem;
+ use Drupal\media\MediaInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+@@ -116,6 +117,14 @@ public function mediaEntityMetadata(Request $request) {
        }
      }
- 
+
 +    // Adding the URL string to edit media items to metadata.
 +    $response['edit_url'] = $media->toUrl('edit-form')->toString();
-+    
++
 +    // Adding file URL to image source metadata.
 +    $file_id = $media->{$image_field}->target_id;
 +    $file = File::load($file_id);
