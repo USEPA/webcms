@@ -1,0 +1,15 @@
+{% set tagline_content %}
+  <div class="grid-row grid-gap">
+    <div class="tablet:grid-col-4">
+      <h2 class="font-heading-xl margin-top-0 tablet:margin-bottom-0">{{ content.field_heading|field_value }}</h2>
+    </div>
+    <div class="tablet:grid-col-8 usa-prose">
+      {{ content.field_text|field_value|render }}
+    </div>
+  </div>
+{% endset %}
+
+{% include '@uswds/section/section.twig' with {
+  'modifier_classes': 'grid-container',
+  'content': tagline_content,
+} only %}
