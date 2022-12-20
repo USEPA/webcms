@@ -40,7 +40,7 @@ export default class EpaFileUrlUI extends Plugin {
 
       button.set({
         isEnabled: true,
-        label: Drupal.t('Copy filepath'),
+        label: Drupal.t('Copy file path'),
         icon: linkIcon,
         tooltip: true,
       });
