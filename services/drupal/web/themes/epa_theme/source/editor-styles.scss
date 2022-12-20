@@ -1,0 +1,19 @@
+// @file
+// WYSIWYG styles
+@use 'sass:meta';
+
+// Configuration
+@use '_patterns/00-config' as * with($wysiwyg: true);
+
+// stylelint-disable
+div.paragraph--view-mode--preview,
+div.ck-content {
+  // stylelint-enable
+  @include meta.load-css('_patterns/01-global');
+  @include meta.load-css('_patterns/02-base');
+  @include meta.load-css('_patterns/03-uswds');
+  @include meta.load-css('_patterns/04-layouts');
+  @include meta.load-css('_patterns/05-components');
+  @include meta.load-css('_patterns/shame');
+  @extend %theme-default;
+}
