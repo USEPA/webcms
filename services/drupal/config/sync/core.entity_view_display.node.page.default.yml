@@ -14,6 +14,7 @@ dependencies:
     - field.field.node.page.field_language
     - field.field.node.page.field_last_published
     - field.field.node.page.field_machine_name
+    - field.field.node.page.field_meta_tags
     - field.field.node.page.field_page_head
     - field.field.node.page.field_paragraphs
     - field.field.node.page.field_paragraphs_1
@@ -31,6 +32,7 @@ dependencies:
     - epa_layouts
     - layout_builder
     - layout_builder_restrictions
+    - metatag
     - options
     - scheduled_publish
     - user
@@ -108,6 +110,21 @@ third_party_settings:
                       text: ''
                     token: ''
             weight: 0
+            additional: {  }
+          f102bc4c-49c8-4113-baed-7848d38da425:
+            uuid: f102bc4c-49c8-4113-baed-7848d38da425
+            region: main
+            configuration:
+              id: 'field_block:node:page:field_meta_tags'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: metatag_empty_formatter
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 1
             additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
@@ -257,6 +274,13 @@ content:
     third_party_settings: {  }
     weight: 127
     region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 140
+    region: main
   field_page_head:
     type: basic_string
     label: above
