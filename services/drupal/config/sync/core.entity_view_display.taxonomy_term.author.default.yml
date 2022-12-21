@@ -4,22 +4,25 @@ status: true
 dependencies:
   config:
     - field.field.taxonomy_term.author.field_image
+    - image.style.medium_portait
     - taxonomy.vocabulary.author
   module:
-    - text
+    - image
 id: taxonomy_term.author.default
 targetEntityType: taxonomy_term
 bundle: author
 mode: default
 content:
-  description:
-    type: text_default
+  field_image:
+    type: image
     label: hidden
-    settings: {  }
+    settings:
+      image_link: ''
+      image_style: medium_portait
     third_party_settings: {  }
     weight: 0
     region: content
 hidden:
-  field_image: true
+  description: true
   langcode: true
   search_api_excerpt: true
