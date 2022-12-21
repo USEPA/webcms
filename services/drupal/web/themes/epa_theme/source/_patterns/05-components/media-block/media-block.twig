@@ -1,12 +1,18 @@
 {% set classes = [
-  'tag-link',
-  modifier_classes ? modifier_classes,
+	'',
+	modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
-<div class="usa-media-block tablet:grid-col">
+<div class="usa-media-block tablet:grid-col {{ classes }}">
   <img class="usa-media-block__img" src="{{ field_media_block_image.src }}" alt="{{ field_media_block_image.alt }}">
   <div class="usa-media-block__body">
-    <h2 class="usa-graphic-list__heading">{{ field_title }}</h2>
+    <h2 class="usa-graphic-list__heading">
+    	{% if field_link %} 
+    		<a href="{{ field_link }}">{{ field_title }}</a>
+    	{% else %} 
+    		{{ field_title }}
+    	{% endif %} 
+    </h2>
     {{ field_body }}
   </div>
 </div>
