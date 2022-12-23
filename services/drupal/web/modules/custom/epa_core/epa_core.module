@@ -98,7 +98,10 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $submit_copy = $form['actions']['submit'];
     $submit_copy['#group'] = 'revision_information';
     $submit_copy['#weight'] = 100;
-    $form['revision_information']['submit_copy'] = $submit_copy;
+    $form['revision_information']['actions'] = [
+      '#type' => "actions",
+      'submit' => $submit_copy,
+      ];
   }
 
   switch ($form_id) {
