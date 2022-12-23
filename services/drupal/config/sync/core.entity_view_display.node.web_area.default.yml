@@ -81,16 +81,31 @@ third_party_settings:
             region: main
             configuration:
               id: 'field_block:node:web_area:field_wide_content'
+              label: 'Wide Content'
               label_display: '0'
+              provider: layout_builder
               context_mapping:
                 entity: layout_builder.entity
+                view_mode: view_mode
               formatter:
                 type: entity_reference_revisions_entity_view
-                label: above
+                label: hidden
                 settings:
                   view_mode: default
-                  link: ''
-                third_party_settings: {  }
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
             weight: 1
             additional: {  }
         third_party_settings: {  }
@@ -127,6 +142,7 @@ third_party_settings:
         'Chaos Tools': {  }
         'Content fields':
           - 'field_block:node:web_area:field_paragraphs'
+          - 'field_block:node:web_area:field_wide_content'
         'Custom block types': {  }
         'Custom blocks': {  }
         'EPA Alerts': {  }

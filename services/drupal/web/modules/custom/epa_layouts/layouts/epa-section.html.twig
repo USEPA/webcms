@@ -1,25 +1,23 @@
 {#
 /**
  * @file
- * Default theme implementation to display a one-column layout.
- *
- * Available variables:
- * - content: The content for this layout.
- * - attributes: HTML attributes for the layout <div>.
- *
- * @ingroup themeable
+ * Template for a generic layout.
  */
 #}
 {%
   set classes = [
   'layout',
-  'layout--onecol',
+  'layout--' ~ layout.id|clean_class,
 ]
 %}
 {% if content %}
   <div{{ attributes.addClass(classes) }}>
-    <div {{ region_attributes.content.addClass('layout__region', 'layout__region--content') }}>
-      {{ content.content }}
-    </div>
+    {% for region in layout.getRegionNames %}
+      {% if content[region] %}
+        <div {{ region_attributes[region].addClass('layout__region', 'layout__region--' ~ region|clean_class) }}>
+          {{ content[region] }}
+        </div>
+      {% endif %}
+    {% endfor %}
   </div>
 {% endif %}
