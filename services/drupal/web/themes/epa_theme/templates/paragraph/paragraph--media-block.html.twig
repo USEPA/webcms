@@ -2,5 +2,8 @@
   'field_title': content.field_title|field_value,
   'field_body': content.field_body|field_value|render,
   'field_link' : content.field_link[0]['#url'],
-  'field_media_block_image': content.field_media_block_image[0],
+  'field_media_block_image': {
+    'src': file_url(paragraph.field_media_block_image.entity.field_media_image.entity.fileuri),
+    'alt': content.field_media_block_image[0]['#media'].field_media_image.alt,
+  },
 } %}
