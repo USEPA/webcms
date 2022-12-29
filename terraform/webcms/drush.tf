@@ -79,7 +79,7 @@ resource "aws_ecs_task_definition" "drush_task" {
 resource "aws_ecs_service" "drush" {
   name            = "webcms-${var.environment}-${var.site}-${var.lang}-drush"
   cluster         = data.aws_ssm_parameter.ecs_cluster_arn.value
-  desired_count   = 1
+  desired_count   = var.drush_tasks
   task_definition = aws_ecs_task_definition.drush_task.arn
 
   launch_type      = "FARGATE"
