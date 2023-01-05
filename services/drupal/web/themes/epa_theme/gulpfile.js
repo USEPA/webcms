@@ -28,6 +28,19 @@ const lintPatternLab = require('./lib/lintPatternLab');
 const writeFile = util.promisify(fs.writeFile);
 const os = require('os');
 
+const plumber = require('gulp-plumber');
+const notify = require('gulp-notify');
+const inject = require('gulp-inject');
+
+const log = require('fancy-log');
+
+const plumberErrorHandler = {
+  errorHandler: notify.onError({
+    title: 'Gulp',
+    message: 'Error: <%= error.message %>',
+  }),
+};
+
 const buildConfig = async () => {
   const configDir = path.join(__dirname, '/source/_patterns/00-config');
   const ymlDir = path.join(__dirname, './source/_data');
@@ -198,19 +211,44 @@ const buildPatterns = (exports.buildPatterns = series(
 ));
 const buildImages = (exports.buildImages = createSprite);
 
+const generateTestUrls = () => {
+  return src('vrt_urls-base.txt')
+    .pipe(plumber(plumberErrorHandler))
+    .pipe(
+      inject(src('./source/_patterns/**/*.twig', { read: false }), {
+        starttag: '<!-- startinject -->',
+        endtag: '<!-- endinject -->',
+        removeTags: true,
+        transform: (filepath, file, i, length) => {
+          const filepathClean = filepath.substr(9);
+          const parts = filepathClean
+            .replace(/[0-9]{1,2}-(?=[^\/]+\/)/gi, '')
+            .replace(/\.twig/gi, '')
+            .split('/');
+          let path = '';
+          let patternParts = '';
+          if (parts[3] === undefined) {
+            patternParts = `${parts[1]}-${parts[2]}`;
+          } else {
+            patternParts = `${parts[1]}-${parts[2]}-${parts[3]}`;
+          }
+          path = `${parts[0]}/${patternParts}/${patternParts}.rendered.html`;
+          const url = `https://www.epa.gov/themes/epa_theme/pattern-lab/${path}`;
+          return url;
+        },
+      })
+    )
+    .pipe(rename('vrt_urls.txt'))
+    .pipe(dest('.'));
+};
+
 const build = (isProduction = true) => {
   const scriptTask = isProduction ? bundleScripts : bundleScriptsDev;
   const stylesTask = isProduction ? compileStyles : compileStylesDev;
   task('bundleScripts', scriptTask);
   task('compileStyles', stylesTask);
   return series(
-    buildConfig,
-    parallel(
-      task('bundleScripts'),
-      buildImages,
-      task('compileStyles'),
-      buildPatterns
-    )
+    generateTestUrls
   );
 };
 
