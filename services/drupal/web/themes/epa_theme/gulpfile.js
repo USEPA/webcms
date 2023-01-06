@@ -227,6 +227,12 @@ const generateTestUrls = () => {
             .split('/');
           let path = '';
           let patternParts = '';
+          // Ignore any components in files or directories starting with underscore
+          for (let i=1; i < parts.length; i++) {
+            if (parts[i].startsWith('_')) {
+              return;
+            }
+          }
           if (parts[3] === undefined) {
             patternParts = `${parts[1]}-${parts[2]}`;
           } else {
@@ -248,6 +254,13 @@ const build = (isProduction = true) => {
   task('bundleScripts', scriptTask);
   task('compileStyles', stylesTask);
   return series(
+    buildConfig,
+    parallel(
+      task('bundleScripts'),
+      buildImages,
+      task('compileStyles'),
+      buildPatterns
+    ),
     generateTestUrls
   );
 };
