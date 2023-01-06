@@ -22,13 +22,11 @@
 
 namespace Drupal\epa_workflow\Plugin\Action;
 
-use Drupal\Core\Entity\EntityBase;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\Core\Entity\RevisionLogInterface;
-use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
@@ -96,8 +94,6 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       // Should return default revision, which will be published or archived, and I believe we don't have archived content on the site, but double check this in the db.
       // TODO this is throwing an error I think on 'default'
       $entity_vids = \Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
-//      end($entity_vids);
-//      $current_vid = prev($entity_vids);
       foreach ($entity_vids as $vid) {
         if (\Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid)->isPublished()) {
           $entity = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid);
