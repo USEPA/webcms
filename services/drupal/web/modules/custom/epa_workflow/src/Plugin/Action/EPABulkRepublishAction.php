@@ -28,6 +28,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
@@ -94,11 +95,18 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
     if (!$entity->isDefaultRevision()) {
       // Should return default revision, which will be published or archived, and I believe we don't have archived content on the site, but double check this in the db.
       // TODO this is throwing an error I think on 'default'
-      $entity = EntityBase::load($entity);
+      $entity_vids = \Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
+//      end($entity_vids);
+//      $current_vid = prev($entity_vids);
+      foreach ($entity_vids as $vid) {
+        if (\Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid)->isPublished()) {
+          $entity = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid);
+        }
+      }
     }
     $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity)->get('moderation_state')->getString();
     // TODO check for 'archived' state then handle appropriately if it exists.
-    if (in_array($content_moderation_state, $valid_states)) {
+    if (in_array($content_moderation_state, $valid_states) && $entity->isPublished()) {
       $new_state = 'published';
       $entity->set('moderation_state', $new_state);
       if ($entity instanceof RevisionLogInterface) {
