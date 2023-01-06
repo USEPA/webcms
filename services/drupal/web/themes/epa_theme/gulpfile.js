@@ -32,8 +32,6 @@ const plumber = require('gulp-plumber');
 const notify = require('gulp-notify');
 const inject = require('gulp-inject');
 
-const log = require('fancy-log');
-
 const plumberErrorHandler = {
   errorHandler: notify.onError({
     title: 'Gulp',
