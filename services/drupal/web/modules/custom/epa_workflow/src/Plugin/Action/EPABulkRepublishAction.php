@@ -103,6 +103,7 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       foreach ($entity_vids as $vid) {
         if (\Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid)->isPublished()) {
           $entity = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid);
+          $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity)->get('moderation_state')->getString();
         }
       }
     }
