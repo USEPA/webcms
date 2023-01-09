@@ -116,7 +116,7 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       $entity->save();
     }
 
-    return $this->t('The selected content formerly matching any these states: "Published needs review", Published scheduled for expiration", and "Published, one day until expiration" were republished and state set to "published".');
+    return $this->t('The selected content with current revisions formerly matching any these states: "Published needs review", Published scheduled for expiration", and "Published, one day until expiration" were republished and state set to "published".');
   }
 
   /**
