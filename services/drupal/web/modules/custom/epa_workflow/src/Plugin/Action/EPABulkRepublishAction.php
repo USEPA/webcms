@@ -85,14 +85,20 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
     );
   }
 
+  /**
+   * @param $entity
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
   public function execute($entity = NULL)
   {
-    // TODO retrieve node (latest revision) get current revision from that then get the moderation state from that.
-    // Do some processing..
     $valid_states = ['published_expiring', 'published_day_til_expire', 'published_needs_review'];
-    if (!$entity->isDefaultRevision()) {
-      // Should return default revision, which will be published or archived, and I believe we don't have archived content on the site, but double check this in the db.
-      // TODO this is throwing an error I think on 'default'
+    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity)->get('moderation_state')->getString();
+    // Return default revision, which will be published or archived.
+    // Including in check for 'archived' in the case we ever add this state to the content view, this action will still work as expected.
+    if (!$entity->isDefaultRevision() || $content_moderation_state == 'archived') {
       $entity_vids = \Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
       foreach ($entity_vids as $vid) {
         if (\Drupal::entityTypeManager()->getStorage('node')->loadRevision($vid)->isPublished()) {
@@ -100,8 +106,6 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
         }
       }
     }
-    $content_moderation_state = ContentModerationState::loadFromModeratedEntity($entity)->get('moderation_state')->getString();
-    // TODO check for 'archived' state then handle appropriately if it exists.
     if (in_array($content_moderation_state, $valid_states) && $entity->isPublished()) {
       $new_state = 'published';
       $entity->set('moderation_state', $new_state);
@@ -111,8 +115,8 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       }
       $entity->save();
     }
-    // Don't return anything for a default completion message, otherwise return translatable markup.
-    return $this->t('The selected content in "Published needs review", Published scheduled for expiration", and "Published, one day until expiration" states were republished.');
+
+    return $this->t('The selected content formerly matching any these states: "Published needs review", Published scheduled for expiration", and "Published, one day until expiration" were republished and state set to "published".');
   }
 
   /**
@@ -120,8 +124,6 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE)
   {
-    // If certain fields are updated, access should be checked against them as well.
-    // @see Drupal\Core\Field\FieldUpdateActionBase::access().
     return $object->access('update', $account, $return_as_object);
   }
 
