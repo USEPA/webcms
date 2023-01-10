@@ -353,7 +353,13 @@
         "zaporylie/composer-drupal-optimizations": "^1.0"
     },
     "require-dev": {
-        "drupal/core-dev": "~9.4.7"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
+        "drupal/core-dev": "~9.4.7",
+        "mglaman/phpstan-drupal": "^1.1",
+        "phpstan/extension-installer": "^1.2",
+        "phpstan/phpstan": "^1.9",
+        "phpstan/phpstan-deprecation-rules": "^1.1",
+        "squizlabs/php_codesniffer": "^3.7"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -375,7 +381,8 @@
             "drupal/core-composer-scaffold": true,
             "zaporylie/composer-drupal-optimizations": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "wikimedia/composer-merge-plugin": true
+            "wikimedia/composer-merge-plugin": true,
+            "phpstan/extension-installer": true
         }
     },
     "autoload": {
@@ -385,8 +392,21 @@
         "files": ["load.environment.php"]
     },
     "scripts": {
+        "install-codestandards": [
+            "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
+        ],
+        "php-stan": [
+            "./vendor/bin/phpstan"
+        ],
+        "phpcs": [
+            "./vendor/bin/phpcs"
+        ],
+        "phpcbf": [
+            "./vendor/bin/phpcbf"
+        ],
         "post-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createFilesDir"
+            "DrupalProject\\composer\\ScriptHandler::createFilesDir",
+            "@install-codestandards"
         ],
         "post-update-cmd": [
             "DrupalProject\\composer\\ScriptHandler::createFilesDir"
