@@ -93,3 +93,18 @@ function _epa_core_create_news_release_type_term() {
   $term->field_term_days_til_review = 730;
   $term->save();
 }
+
+/**
+ * As part of https://forumone.atlassian.net/browse/EPAD8-1962 to set cardinality
+ * of the Press Office field to 1 we will remove records where delta > 0.
+ */
+function epa_core_update_9004() {
+  $database = \Drupal::database();
+  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      $database->delete($table)
+        ->condition('delta', 0, '>')
+        ->execute();
+    }
+  }
+}
