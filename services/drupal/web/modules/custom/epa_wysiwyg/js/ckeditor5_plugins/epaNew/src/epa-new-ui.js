@@ -1,7 +1,7 @@
 import { Plugin } from 'ckeditor5/src/core';
 import { ButtonView } from 'ckeditor5/src/ui';
 // @TODO: Get .gif or .png files working in webpack to then change the icon out.
-import icon from '../../../../icons/simpleBox.svg';
+import icon from '../../../../icons/sparkles.svg';
 
 export default class EPANewUi extends Plugin {
   init() {
@@ -14,9 +14,10 @@ export default class EPANewUi extends Plugin {
 
       // Create the toolbar button.
       buttonView.set({
-        label: editor.t('New! Icon'),
+        label: editor.t('New!'),
         icon,
         tooltip: true,
+        withText: true,
       });
 
       // Bind the state of the button to the command.
