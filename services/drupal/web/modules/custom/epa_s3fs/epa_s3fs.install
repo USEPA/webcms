@@ -1,4 +1,30 @@
 <?php
 function epa_s3fs_install() {
   module_set_weight('epa_s3fs', 10);
+  epa_s3fs_fix_table_indexes();
+}
+
+function epa_s3fs_fix_table_indexes($table = 's3fs_file') {
+  // The s3fs_file table has a uri column that we would like to join to the
+  // file_managed table to allow us to get more info about S3fs files into Views.
+  // The problem is that the s3fs_file.uri column uses a different (and,
+  // critically, case-sensitive character set and collation from file_managed.uri.
+  // This collation mis-match leads to disastrously slow query performance.
+  // We need s3fs_file.uri to remain case-sensitive since S3 filenames are case-
+  // sensitive, and we are nervous about changing the collation on file_managed.uri
+  // since that could cause unpredictable results for other queries in the system
+  // that are joining on that table.  So instead we are creating a generated
+  // column that is a copy of s3fs_file.uri but in a collation that matches that
+  // of file_managed.uri.
+  \Drupal::database()
+    ->query('ALTER TABLE {' . $table . '} ADD COLUMN uri_collated varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin GENERATED ALWAYS AS (uri)');
+  \Drupal::database()
+    ->query('CREATE INDEX epa_s3fs__uri_collated ON {'. $table .'}(uri_collated)');
+}
+
+/**
+ * Add a generated column to the S3FS table for better join performance.
+ */
+function epa_s3fs_update_9000() {
+  epa_s3fs_fix_table_indexes();
 }

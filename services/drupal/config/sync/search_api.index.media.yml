@@ -3,18 +3,18 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_media_audio_file
     - field.storage.media.field_description
+    - field.storage.media.field_media_tags
+    - field.storage.media.field_publication_number
+    - field.storage.media.field_media_audio_file
     - field.storage.media.field_media_file
     - field.storage.media.field_media_file_1
     - field.storage.media.field_media_image
-    - field.storage.media.field_publication_number
-    - field.storage.media.field_media_tags
     - search_api.server.localhost
   module:
-    - file
     - media
     - user
+    - file
     - entitygroupfield
     - group
     - search_api
@@ -178,6 +178,7 @@ datasource_settings:
 processor_settings:
   add_url: {  }
   aggregated_field: {  }
+  entity_type: {  }
   ignorecase:
     weights:
       preprocess_index: -20
@@ -186,7 +187,6 @@ processor_settings:
     fields:
       - aggregated_filenames
       - author_name
-      - bundle
       - field_description
       - field_publication_number
       - filename
