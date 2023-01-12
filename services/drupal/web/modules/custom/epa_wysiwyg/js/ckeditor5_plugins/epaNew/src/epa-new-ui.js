@@ -1,6 +1,5 @@
 import { Plugin } from 'ckeditor5/src/core';
 import { ButtonView } from 'ckeditor5/src/ui';
-// @TODO: Get .gif or .png files working in webpack to then change the icon out.
 import icon from '../../../../icons/sparkles.svg';
 
 export default class EPANewUi extends Plugin {
