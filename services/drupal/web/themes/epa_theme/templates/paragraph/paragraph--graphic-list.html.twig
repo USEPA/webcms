@@ -5,7 +5,7 @@
     {
       'field_title': drupal_field('field_title', 'paragraph', paragraph_id)|without('#theme'),
       'field_body': drupal_field('field_body', 'paragraph', paragraph_id)|without('#theme'),
-      'field_link': drupal_field('field_link', 'paragraph', paragraph_id)|without('#theme')[0]['#url'],
+      'field_link': content.field_media_block[i]['#paragraph'].field_link.0.uri,
       'field_media_block_image': {
 		    'src': drupal_field('field_media_block_image', 'paragraph', content.field_media_block[i]['#paragraph'].id.value)|without('#theme')[0]['#media'].field_media_image.entity.fileuri,
 		    'alt': drupal_field('field_media_block_image', 'paragraph', content.field_media_block[i]['#paragraph'].id.value)|without('#theme')[0]['#media'].field_media_image.alt,
