@@ -746,7 +746,7 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -754,6 +754,10 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.public_notices_comments_due_date'
+        - 'config:facets.facet.public_notices_location_of_prop_action'
+        - 'config:facets.facet.public_notices_program_or_statute'
+        - 'config:facets.facet.public_notices_proposed_actions'
         - 'config:field.storage.node.body'
         - 'config:field.storage.node.field_publication_date'
         - 'config:search_api.index.public_notices'
@@ -785,7 +789,7 @@ display:
           ajax_get: false
       path: publicnotices/notices-search
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_interface'
         - url
@@ -793,4 +797,8 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.public_notices_comments_due_date'
+        - 'config:facets.facet.public_notices_location_of_prop_action'
+        - 'config:facets.facet.public_notices_program_or_statute'
+        - 'config:facets.facet.public_notices_proposed_actions'
         - 'config:search_api.index.public_notices'
