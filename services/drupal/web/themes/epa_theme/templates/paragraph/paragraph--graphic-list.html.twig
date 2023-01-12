@@ -1,10 +1,22 @@
-{% include '@components/graphic-list/graphic-list.twig' with {
-  'media_blocks': content.field_media_block,
-} %}
+{% set paragraph_media_blocks = [] %}
+{% for i in content.field_media_block['#items']|keys %}
+  {% set paragraph_id = content.field_media_block[i]['#paragraph'].id.value %}
+  {% set paragraph_media_blocks = paragraph_media_blocks|merge([
+    {
+      'field_title': drupal_field('field_title', 'paragraph', paragraph_id)|without('#theme'),
+      'field_body': drupal_field('field_body', 'paragraph', paragraph_id)|without('#theme'),
+      'field_link': drupal_field('field_link', 'paragraph', paragraph_id)|without('#theme')[0]['#url'],
+      'field_media_block_image': {
+		    'src': drupal_field('field_media_block_image', 'paragraph', content.field_media_block[i]['#paragraph'].id.value)|without('#theme')[0]['#media'].field_media_image.entity.fileuri,
+		    'alt': drupal_field('field_media_block_image', 'paragraph', content.field_media_block[i]['#paragraph'].id.value)|without('#theme')[0]['#media'].field_media_image.alt,
+		  },
+    }
+  ]) %}
+{% endfor %}
 
-<!--<section class="usa-graphic-list usa-section usa-section--dark">
+<section class="usa-graphic-list usa-section usa-section--dark">
   <div class="grid-container">
-    {% for block in media_blocks %}
+    {% for block in paragraph_media_blocks %}
       {% if loop.index0 % 2 == 0 %}
         <div class="usa-graphic-list__row grid-row grid-gap">
       {% endif %}
@@ -12,11 +24,14 @@
           'field_title': block.field_title,
           'field_body': block.field_body,
           'field_link': block.field_link,
-          'field_media_block_image': block.field_media_block_image,
+          'field_media_block_image': {
+				    'src': file_url(block.field_media_block_image.src),
+				    'alt': block.field_media_block_image.alt,
+				  },
         } %}
       {% if loop.index0 % 2 == 1 or loop.last %}
         </div>
       {% endif %}
     {% endfor %}  
   </div>
-</section>-->
+</section>
