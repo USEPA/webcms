@@ -12,7 +12,7 @@ use Drupal\filter\Plugin\FilterBase;
  *   id = "epa_filter_empty_paragraphs",
  *   title = @Translation("Filter empty paragraphs"),
  *   description = @Translation("Removes empty paragraphs from html output."),
- *   type = Drupal\filter\Plugin\FilterInterface::TYPE_MARKUP_LANGUAGE,
+ *   type = Drupal\filter\Plugin\FilterInterface::TYPE_TRANSFORM_IRREVERSIBLE,
  * )
  * @package Drupal\epa_wysiwyg\Plugin\Filter
  */
