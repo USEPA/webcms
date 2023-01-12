@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.web_area.field_keywords
     - field.field.node.web_area.field_language
     - field.field.node.web_area.field_last_published
+    - field.field.node.web_area.field_meta_tags
     - field.field.node.web_area.field_page_head
     - field.field.node.web_area.field_paragraphs
     - field.field.node.web_area.field_publish_date
@@ -28,6 +29,7 @@ dependencies:
     - epa_layouts
     - layout_builder
     - layout_builder_restrictions
+    - metatag
     - options
     - scheduled_publish
     - text
@@ -75,6 +77,21 @@ third_party_settings:
                     token: ''
             weight: 0
             additional: {  }
+          4908b795-23aa-4ee8-8a52-dce89dfcd636:
+            uuid: 4908b795-23aa-4ee8-8a52-dce89dfcd636
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_meta_tags'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: metatag_empty_formatter
+                label: above
+                settings: {  }
+                third_party_settings: {  }
+            weight: 1
+            additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
     allowed_block_categories:
@@ -98,7 +115,12 @@ third_party_settings:
       - Webform
       - core
     entity_view_mode_restriction:
-      allowed_layouts: {  }
+      allowed_layouts:
+        - epa_one_column
+        - epa_one_column_sidebar
+        - epa_two_column
+        - epa_three_column
+        - epa_four_column
       blacklisted_blocks: {  }
       whitelisted_blocks:
         'Chaos Tools': {  }
@@ -197,6 +219,13 @@ content:
       format_type: medium
     third_party_settings: {  }
     weight: 134
+    region: main
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 136
     region: main
   field_page_head:
     type: basic_string

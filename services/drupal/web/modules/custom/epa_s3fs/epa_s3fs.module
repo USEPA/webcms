@@ -8,3 +8,56 @@
  * This file is no longer required in Drupal 8.
  * @see https://www.drupal.org/node/2217931
  */
+
+
+/**
+ * Implements hook_views_data().
+ */
+function epa_s3fs_views_data() {
+  $data = [];
+
+  // S3FS table.
+  $data['s3fs_file'] = [];
+  $data['s3fs_file']['table']['group'] = t('Files');
+  $data['s3fs_file']['table']['base'] =[
+    'field' => 'uri',
+    'title' => t('S3 File System (s3fs)'),
+    'help' => t('S3 File System records exposed to Views.'),
+  ];
+
+  // URI collated field.
+  $data['s3fs_file']['uri_collated'] = [
+    'title' => t('S3FS URI'),
+    'help' => t('The S3 URI of the file.'),
+    'field' => [
+      'id' => 'standard',
+    ],
+    'sort' => [
+      'id' => 'standard',
+    ],
+    'filter' => [
+      'id' => 'string',
+    ],
+  ];
+
+  return $data;
+}
+
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function epa_s3fs_views_data_alter(&$data) {
+  $data['file_managed']['s3fs_file'] = [
+    'title' => t('S3FS File'),
+    'help' => t('Details about the file stored in S3FS'),
+
+    'relationship' => [
+      'base' => 's3fs_file',
+      'base field' => 'uri_collated',
+      'field' => 'uri',
+      'id' => 'standard',
+      'label' => t('S3FS Files'),
+    ],
+  ];
+}
