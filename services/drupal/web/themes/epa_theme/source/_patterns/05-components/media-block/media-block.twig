@@ -4,7 +4,13 @@
 ]|join(' ')|trim %}
 
 <div class="usa-media-block tablet:grid-col {{ classes }}">
+	{% if field_link %} 
+  	<a href="{{ field_link }}">
+  {% endif %}  		
   <img class="usa-media-block__img" src="{{ field_media_block_image.src }}" alt="{{ field_media_block_image.alt }}">
+  {% if field_link %} 
+  	</a>
+  {% endif %}  	
   <div class="usa-media-block__body">
     <h2 class="usa-graphic-list__heading">
     	{% if field_link %} 
