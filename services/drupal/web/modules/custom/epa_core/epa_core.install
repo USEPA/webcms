@@ -96,13 +96,37 @@ function _epa_core_create_news_release_type_term() {
 
 /**
  * As part of https://forumone.atlassian.net/browse/EPAD8-1962 to set cardinality
- * of the Press Office field to 1 we will remove records where delta > 0.
+ * of the Press Office field to 1 we will remove records where delta is greater
+ * than the minimum delta value.
  */
 function epa_core_update_9004() {
   $database = \Drupal::database();
   foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
     if ($database->schema()->tableExists($table)) {
+      // Query to find all rows with the lowest delta value.
+      // SELECT MIN(delta) FROM {$table}
+      $sub_query = $database->select($table)
+        ->addExpression('MIN(delta)');
+
+      // Now delete all rows that are greater than that minimum delta.
+      // DELETE FROM {$table} WHERE delta > (SELECT MIN(delta) FROM {$table});
       $database->delete($table)
+        ->condition('delta', $sub_query, '>')
+        ->execute();
+    }
+  }
+}
+
+/**
+ * Field Press Office deltas potentially are not in correct index order. Update
+ * the tables to reset any deltas that are not 0 to be 0.
+ */
+function epa_core_update_9005() {
+  $database = \Drupal::database();
+  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      $database->update($table)
+        ->fields(['delta' => 0])
         ->condition('delta', 0, '>')
         ->execute();
     }
