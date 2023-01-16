@@ -12,7 +12,7 @@ export default class InsertEpaNewTagCommand extends Command {
     const { selection } = model.document;
 
     model.change((writer) => {
-      // Insert <epaNew>*</epaNewx> at the current selection position without
+      // Insert <epaNew>*</epaNew> at the current selection position without
       // pasting over what's in the selection.
       const position = selection.getFirstPosition();
       model.insertObject(createEpaNewTag(writer), position, null, {
