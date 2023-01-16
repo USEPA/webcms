@@ -103,15 +103,17 @@ function epa_core_update_9004() {
   $database = \Drupal::database();
   foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
     if ($database->schema()->tableExists($table)) {
-      // Query to find all rows with the lowest delta value.
-      // SELECT MIN(delta) FROM {$table}
-      $sub_query = $database->select($table)
-        ->addExpression('MIN(delta)');
+      // UPDATE node__field_press_office as node
+      // LEFT JOIN (SELECT revision_id, MIN(delta) as delta
+      // FROM node__field_press_office GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta
+      // SET node.delta = 0
+      // WHERE min_delta.delta > 0;
+      $database->query("UPDATE {$table} AS node LEFT JOIN (SELECT revision_id, MIN(delta) AS delta FROM {$table} GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta SET node.delta = 0 WHERE min_delta.delta > 0");
 
       // Now delete all rows that are greater than that minimum delta.
-      // DELETE FROM {$table} WHERE delta > (SELECT MIN(delta) FROM {$table});
+      // DELETE FROM {$table} WHERE delta > 0;
       $database->delete($table)
-        ->condition('delta', $sub_query, '>')
+        ->condition('delta', 0, '>')
         ->execute();
     }
   }
@@ -126,7 +128,7 @@ function epa_core_update_9005() {
   foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
     if ($database->schema()->tableExists($table)) {
       $database->update($table)
-        ->fields(['delta' => 0])
+        ->fields(['delta'])
         ->condition('delta', 0, '>')
         ->execute();
     }
