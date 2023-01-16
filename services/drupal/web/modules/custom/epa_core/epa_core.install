@@ -120,17 +120,8 @@ function epa_core_update_9004() {
 }
 
 /**
- * Field Press Office deltas potentially are not in correct index order. Update
- * the tables to reset any deltas that are not 0 to be 0.
+ * No longer needed, but was implemented in earlier development so we need the
+ * update hook to still exist.
  */
 function epa_core_update_9005() {
-  $database = \Drupal::database();
-  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
-    if ($database->schema()->tableExists($table)) {
-      $database->update($table)
-        ->fields(['delta'])
-        ->condition('delta', 0, '>')
-        ->execute();
-    }
-  }
 }
