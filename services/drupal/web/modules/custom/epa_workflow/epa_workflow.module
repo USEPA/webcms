@@ -7,6 +7,7 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -14,10 +15,12 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -173,6 +176,16 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
       }
     }
   }
+
+  // The notifications make all users BCC by default so there's no good way to
+  // validate that the correct users are being sent the notification. This
+  // settings variable being set will allow us to see the list of users in the
+  // message body now.
+  if (Settings::get('epa_content_moderation_email_debug', NULL)) {
+    $user_list = implode(', ', $data['to']);
+    $data['params']['message'] .= $user_list;
+  }
+
 }
 
 /**
@@ -231,96 +244,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['current']['#value'] = NULL;
 
     $form['new_state']['#required'] = TRUE;
-
-    // Only show an "Edit" link to the user if we're on the latest revision of the node.
-    $storage = $form_state->getStorage();
-    if (isset($storage['entity']) && $storage['entity'] instanceof NodeInterface) {
-      $node = $storage['entity'];
-      if ($node->isLatestRevision()) {
-        $link_options = [
-          'attributes' => [
-            'class' => [
-              'button'
-            ],
-          ],
-        ];
-
-        $edit_link = Link::fromTextAndUrl(
-          t('Edit'),
-          Url::fromRoute(
-            'entity.node.edit_form',
-            ['node' => $node->id()],
-            $link_options
-          )
-        );
-
-        $form['node_edit_link'] = $edit_link->toRenderable();
-      }
-    }
-
-    // Want to display the `field_review_deadline` date
-    // on the moderation block only on published content
-    // and the `field_review_deadline` has a value
-    if (
-      isset($node)
-      && !$node->field_review_deadline->isEmpty()
-      && $node->isPublished()
-      )
-    {
-
-      $review_deadline = $node->field_review_deadline->view([
-        'label' => 'hidden',
-        'type' => 'datetime_default',
-        'settings' => [
-          'format_type' => 'medium_no_time',
-        ],
-      ]);
-      $renderer = \Drupal::service('renderer');
-      $review_deadline = $renderer->render($review_deadline);
-
-      $form['review_deadline'] = [
-        '#type' => 'item',
-        '#title' => t("Review deadline"),
-        '#markup' => $review_deadline
-      ];
-
-    }
-
-    // Display the Revision Author Information
-    if (
-      isset($node)
-      && $node->getRevisionUser()
-    )
-    {
-
-      $revision_author = $node->getRevisionUser()->get('name')->value;
-      $author_uid = $node->getRevisionUserId();
-
-      $form['revision_author'] = [
-        '#type' => 'item',
-        '#title' => t("Revision saved by"),
-        '#markup' => '<a href="/user/' . $author_uid . '">' . $revision_author . '</a>'
-      ];
-
-    }
-
-    // Display the Node ID
-    if (
-      isset($node)
-      && $node->id()
-    )
-    {
-
-      $nid = $node->id();
-
-      $form['nid'] = [
-        '#type' => 'item',
-        '#title' => t("Node ID"),
-        '#markup' => $nid
-      ];
-
-    }
-
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
@@ -427,8 +350,140 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
     if (!$entity->isLatestRevision() && !$entity->isDefaultRevision()) {
       return;
     }
-    $build['epa_content_moderation_control'] = \Drupal::formBuilder()->getForm(EntityModerationForm::class, $entity);
+
+    build_content_moderation_info_box($entity, $build);
   }
+}
+
+/**
+ * Helper function to build 'info box' for displaying content moderation info.
+ *
+ * @param \Drupal\Core\Entity\EntityInterface $entity
+ *   The entity (Node) to build the info box for.
+ * @param array $build
+ *   The current build render array.
+ *
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function build_content_moderation_info_box(EntityInterface $entity, array &$build): void {
+  /** @var \Drupal\Core\Render\Renderer $renderer */
+  $renderer = \Drupal::service('renderer');
+
+  $node_edit_link = NULL;
+  if ($entity->isLatestRevision() && $entity->access('update')) {
+    $link_options = [
+      'attributes' => [
+        'class' => [
+          'button'
+        ],
+      ],
+    ];
+
+    $edit_link = Link::fromTextAndUrl(
+      t('Edit'),
+      Url::fromRoute(
+        'entity.node.edit_form',
+        ['node' => $entity->id()],
+        $link_options
+      )
+    );
+
+    $node_edit_link = $edit_link->toRenderable();
+  }
+
+  $nid = [
+    '#type' => 'item',
+    '#title' => t("Node ID"),
+    '#markup' => $entity->id(),
+  ];
+
+  // Build display for the author who made the revision.
+  $revision_author = NULL;
+  if ($entity->getRevisionUser()) {
+    $revision_author = $entity->getRevisionUser()->get('name')->value;
+    $author_uid = $entity->getRevisionUserId();
+    $revision_author_link = Link::createFromRoute(
+      $revision_author,
+      'entity.user.canonical',
+      ['user' => $author_uid]
+    )->toRenderable();
+
+    $revision_author = [
+      '#type' => 'item',
+      '#title' => t("Revision saved by"),
+      '#markup' => $revision_author_link,
+    ];
+  }
+
+  // Want to display the `field_review_deadline` date
+  // on the moderation block only on published content
+  // and the `field_review_deadline` has a value
+  $review_deadline = NULL;
+  if (!$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
+
+    $review_deadline_render = $entity->field_review_deadline->view([
+      'label' => 'hidden',
+      'type' => 'datetime_default',
+      'settings' => [
+        'format_type' => 'medium_no_time',
+      ],
+    ]);
+
+    $review_deadline_rendered = $renderer->render($review_deadline_render);
+
+    $review_deadline = [
+      '#type' => 'item',
+      '#title' => t("Review deadline"),
+      '#markup' => $review_deadline_rendered
+    ];
+
+  }
+
+  // The current moderation state.
+  $current = NULL;
+  if (!$entity->get('moderation_state')->isEmpty()) {
+    $current_state = $entity->get('moderation_state')->value;
+    /** @var \Drupal\workflows\WorkflowInterface $workflow */
+    $workflow = \Drupal::service('content_moderation.moderation_information')
+      ->getWorkflowForEntity($entity);
+
+    $current = [
+      '#type' => 'item',
+      '#title' => t('Moderation state'),
+      '#markup' => $workflow->getTypePlugin()
+        ->getState($current_state)
+        ->label(),
+    ];
+  }
+
+  // Flag link item for notification opt-in
+  /** @var \Drupal\flag\Entity\Flag $flag */
+  $flag = \Drupal::entityTypeManager()
+    ->getStorage('flag')
+    ->load('notification_opt_in');
+
+  // Normally we'd want to use the link_builder service provided by flag, but
+  // we really only want the link and not the extra div that comes with the
+  // flag template out of the box.
+  $flag_link_plugin = $flag->getLinkTypePlugin();
+  $flag_link = $flag_link_plugin->getAsFlagLink($flag, $entity);
+
+  $flag_link_item = [
+    '#markup' => $renderer->render($flag_link)
+  ];
+
+  $build['epa_content_moderation_info_box'] = [
+    '#theme' => 'epa_content_info_box',
+    '#node_edit_link' => $node_edit_link,
+    '#nid' => $nid,
+    '#revision_author' => $revision_author,
+    '#review_deadline' => $review_deadline,
+    '#current' => $current,
+    '#flag_link' => $flag_link_item,
+    '#content_moderation_form' => \Drupal::formBuilder()
+      ->getForm(EntityModerationForm::class, $entity),
+  ];
 }
 
 /**
@@ -559,7 +614,11 @@ function epa_workflow_node_update(NodeInterface $node) {
     $storage = \Drupal::entityTypeManager()->getStorage('node');
     $last_revision = $storage->loadRevision($node->leapfrog);
     $last_revision->setNewRevision();
-    $last_revision->isDefaultRevision(FALSE);
+    // If our default revision is not published then this leapfrogged revision
+    // should also take over the default revision spot. This follows the model
+    // of what core does. If the default revision IS published then our leapfrog
+    // revision is only the latest revision and does not take over the default.
+    $last_revision->isDefaultRevision(!$node->isPublished());
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
     $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
@@ -773,4 +832,23 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
  */
 function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateInterface $form_state, $form_id) {
   $form['actions']['submit']['#value'] = 'Copy and Set as Latest Revision';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function epa_workflow_theme($existing, $type, $theme, $path) {
+  return [
+    'epa_content_info_box' => [
+      'variables' => [
+        'node_edit_link' => NULL,
+        'nid' => NULL,
+        'revision_author' => NULL,
+        'review_deadline' => NULL,
+        'current' => NULL,
+        'flag_link' => NULL,
+        'content_moderation_form' => NULL,
+      ],
+    ],
+  ];
 }
