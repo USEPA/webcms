@@ -3,8 +3,10 @@ langcode: en
 status: true
 dependencies:
   module:
+    - epa_s3fs
     - file
     - user
+    - views_autocomplete_filters
 _core:
   default_config_hash: rRWxAX-IQkJ5viACQRovRkC784EyCl9493GU_G23n2Q
 id: files
@@ -621,6 +623,11 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+          2: OR
       style:
         type: table
         options:
@@ -725,7 +732,7 @@ display:
       footer: {  }
       display_extenders: {  }
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -739,9 +746,208 @@ display:
     display_plugin: page
     position: 1
     display_options:
+      filters:
+        filename:
+          id: filename
+          table: file_managed
+          field: filename
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: file
+          entity_field: filename
+          plugin_id: string
+          operator: word
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: filemime_op
+            label: Filename
+            description: ''
+            use_operator: false
+            operator: filename_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: filename
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        filemime:
+          id: filemime
+          table: file_managed
+          field: filemime
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: file
+          entity_field: filemime
+          plugin_id: string
+          operator: word
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: filemime_op
+            label: 'MIME type'
+            description: ''
+            use_operator: false
+            operator: filemime_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: filemime
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        status:
+          id: status
+          table: file_managed
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: file
+          entity_field: status
+          plugin_id: file_status
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: status_op
+            label: Status
+            description: ''
+            use_operator: false
+            operator: status_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: status
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        uri_collated:
+          id: uri_collated
+          table: s3fs_file
+          field: uri_collated
+          relationship: s3fs_file
+          group_type: group
+          admin_label: ''
+          plugin_id: views_autocomplete_filters_string
+          operator: 'not empty'
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uri_collated_op
+            label: 'S3 Status'
+            description: ''
+            use_operator: true
+            operator: uri_collated_op
+            operator_limit_selection: true
+            operator_list:
+              empty: empty
+              'not empty': 'not empty'
+            identifier: uri_collated
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            placeholder: ''
+            autocomplete_filter: 0
+            autocomplete_min_chars: '0'
+            autocomplete_items: '10'
+            autocomplete_field: ''
+            autocomplete_raw_suggestion: 1
+            autocomplete_raw_dropdown: 1
+            autocomplete_dependent: 0
+          is_grouped: true
+          group_info:
+            label: 'S3 Status'
+            description: ''
+            identifier: uri_collated
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: Missing
+                operator: empty
+                value: ''
+              2:
+                title: Present
+                operator: 'not empty'
+                value: ''
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
       defaults:
         pager: true
         relationships: false
+        filters: false
+        filter_groups: false
       relationships:
         fid:
           id: fid
@@ -750,6 +956,16 @@ display:
           relationship: none
           group_type: group
           admin_label: 'File usage'
+          required: false
+        s3fs_file:
+          id: s3fs_file
+          table: file_managed
+          field: s3fs_file
+          relationship: none
+          group_type: group
+          admin_label: 'S3FS Files'
+          entity_type: file
+          plugin_id: standard
           required: false
       display_description: ''
       display_extenders: {  }
@@ -762,7 +978,7 @@ display:
         menu_name: admin
         context: ''
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -1120,7 +1336,7 @@ display:
       display_extenders: {  }
       path: admin/content/files/usage/%
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_interface'
         - url
