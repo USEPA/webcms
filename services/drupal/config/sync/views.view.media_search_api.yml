@@ -1267,8 +1267,8 @@ display:
           label: Name
           exclude: false
           alter:
-            alter_text: false
-            text: ''
+            alter_text: true
+            text: '<a></a>'
             make_link: false
             path: ''
             absolute: false
@@ -1825,6 +1825,64 @@ display:
             use_highlighting: false
             multi_type: separator
             multi_separator: ', '
+        search_api_url:
+          id: search_api_url
+          table: search_api_index_media
+          field: search_api_url
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          label: 'Media URL'
+          exclude: false
+          alter:
+            alter_text: true
+            text: 'https://www.epa.gov{{ search_api_url }}'
+            make_link: false
+            path: ''
+            absolute: true
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          link_to_item: false
+          use_highlighting: false
+          multi_type: separator
+          multi_separator: ', '
+      pager:
+        type: some
+        options:
+          offset: 0
+          items_per_page: 10000
       style:
         type: data_export
         options:
@@ -1839,6 +1897,34 @@ display:
             encoding: utf8
             utf8_bom: '0'
             use_serializer_encode_only: false
+      row:
+        type: data_field
+        options:
+          field_options:
+            name_1:
+              alias: ''
+              raw_output: true
+            aggregated_filenames:
+              alias: ''
+              raw_output: false
+            bundle:
+              alias: ''
+              raw_output: false
+            author_name:
+              alias: ''
+              raw_output: false
+            changed:
+              alias: ''
+              raw_output: false
+            created_1:
+              alias: ''
+              raw_output: false
+            mid:
+              alias: ''
+              raw_output: false
+            web_area_name:
+              alias: ''
+              raw_output: false
       defaults:
         fields: false
       display_description: ''
@@ -1853,6 +1939,7 @@ display:
       automatic_download: true
       export_method: batch
       export_batch_size: 1000
+      export_limit: 10000
       store_in_public_file_directory: false
       custom_redirect_path: false
       redirect_to_display: media_page_list
@@ -1865,6 +1952,7 @@ display:
         - request_format
         - url
         - user
+        - user.roles
       tags:
         - 'config:search_api.index.media'
   media_page_list:
