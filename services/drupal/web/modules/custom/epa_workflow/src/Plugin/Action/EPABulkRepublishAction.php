@@ -13,8 +13,7 @@
  *   type = "",
  *   confirm = TRUE,
  *   requirements = {
- *   "_permission" = "administer nodes",
- *     "_custom_access" = TRUE,
+ *   "_permission" = "execute the bulk republish action",
  *   },
  * )
  */
@@ -25,7 +24,6 @@ namespace Drupal\epa_workflow\Plugin\Action;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\content_moderation\Entity\ContentModerationState;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
