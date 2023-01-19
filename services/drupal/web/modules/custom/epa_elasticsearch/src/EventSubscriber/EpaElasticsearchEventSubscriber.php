@@ -25,7 +25,7 @@ class EpaElasticsearchEventSubscriber implements EventSubscriberInterface {
 
     // For searches against the news release index weight recent results more
     // heavily.
-    if (!empty($params['index']) && $params['index'] == 'elasticsearch_index_web_news_releases' && !empty($params['body']['query'])) {
+    if (!empty($params['index']) && substr($params['index'], -13) == 'news_releases' && !empty($params['body']['query'])) {
       $now = new DrupalDateTime('now');
       $queryString = $params['body']['query'];
 
