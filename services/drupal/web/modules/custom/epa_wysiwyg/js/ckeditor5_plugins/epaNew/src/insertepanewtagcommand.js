@@ -9,11 +9,15 @@ import { Command } from 'ckeditor5/src/core';
 export default class InsertEpaNewTagCommand extends Command {
   execute() {
     const { model } = this.editor;
+    const { selection } = model.document;
 
     model.change((writer) => {
-      // Insert <simpleBox>*</simpleBox> at the current selection position
-      // in a way that will result in creating a valid model structure.
-      model.insertContent(createEpaNewTag(writer));
+      // Insert <epaNew>*</epaNew> at the current selection position without
+      // pasting over what's in the selection.
+      const position = selection.getFirstPosition();
+      model.insertObject(createEpaNewTag(writer), position, null, {
+        setSelection: 'after'
+      });
     });
   }
 
@@ -21,15 +25,15 @@ export default class InsertEpaNewTagCommand extends Command {
     const { model } = this.editor;
     const { selection } = model.document;
 
-    // Determine if the cursor (selection) is in a position where adding a
-    // simpleBox is permitted. This is based on the schema of the model(s)
+    // Determine if the cursor (selection) is in a position where adding a the new
+    // tag is permitted. This is based on the schema of the model(s)
     // currently containing the cursor.
     const allowedIn = model.schema.findAllowedParent(
       selection.getFirstPosition(),
       'epaNew',
     );
 
-    // If the cursor is not in a location where a simpleBox can be added, return
+    // If the cursor is not in a location where a new tag can be added, return
     // null so the addition doesn't happen.
     this.isEnabled = allowedIn !== null;
   }
