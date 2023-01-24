@@ -3,13 +3,16 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.media.field_banner_image_restricted
     - image.style.media_library
     - search_api.index.media
     - taxonomy.vocabulary.media_tags
   module:
     - epa_media
-    - image
+    - epa_web_areas
+    - options
     - search_api
+    - svg_image
     - user
     - views_autocomplete_filters
 id: media_library
@@ -35,6 +38,64 @@ display:
           group_type: group
           admin_label: ''
           plugin_id: search_api_rendered_item
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: '{{ search_api_rendered_item }} <br> {{ field_banner_image_restricted_1 }} '
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          view_modes:
+            'entity:media':
+              audio: media_library
+              banner_image: media_library
+              document: media_library
+              image: media_library
+              other: media_library
+              remote_video: media_library
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_datasource_media_entity_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: media
+          plugin_id: search_api_field
           label: ''
           exclude: false
           alter:
@@ -76,13 +137,26 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          view_modes:
-            'entity:media':
-              audio: media_library
-              document: media_library
-              image: media_library
-              other: media_library
-              remote_video: media_library
+          click_sort_column: value
+          type: list_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          field_rendering: true
+          fallback_handler: search_api
+          fallback_options:
+            link_to_item: false
+            use_highlighting: false
+            multi_type: separator
+            multi_separator: ', '
         search_api_media_library_select_form:
           id: search_api_media_library_select_form
           table: search_api_index_media
@@ -418,6 +492,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
@@ -438,6 +513,128 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+        gid:
+          id: gid
+          table: search_api_index_media
+          field: gid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_entity_reference
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: gid_op
+            label: 'Web Area'
+            description: 'Limit to content in your web areas.'
+            use_operator: false
+            operator: gid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: gid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: 0
+          handler: 'default:group'
+          handler_settings:
+            target_bundles:
+              web_area: web_area
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            auto_create_bundle: ''
+          widget: autocomplete
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_index_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_options
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_banner_image_restricted_op
+            label: 'Usage restrictions'
+            description: 'Show only restricted media.'
+            use_operator: false
+            operator: field_banner_image_restricted_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_banner_image_restricted
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: true
+          group_info:
+            label: 'Usage restrictions'
+            description: 'Restricted or unrestricted.'
+            identifier: field_banner_image_restricted
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: '1'
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: Unrestricted
+                operator: not
+                value:
+                  restricted: restricted
+              2:
+                title: Restricted
+                operator: or
+                value:
+                  restricted: restricted
+              3:
+                title: ''
+                operator: or
+                value: {  }
+          reduce_duplicates: false
       filter_groups:
         operator: AND
         groups:
@@ -475,6 +672,7 @@ display:
         - url.query_args
         - user
       tags:
+        - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
   widget:
     id: widget
@@ -556,6 +754,7 @@ display:
         - user
         - user.permissions
       tags:
+        - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
   widget_table:
     id: widget_table
@@ -809,10 +1008,81 @@ display:
           view_modes:
             'entity:media':
               audio: link_with_metadata
+              banner_image: link_with_metadata
               document: link_with_metadata
               image: link_with_metadata
               other: link_with_metadata
               remote_video: link_with_metadata
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_datasource_media_entity_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: media
+          plugin_id: search_api_field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: list_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          field_rendering: true
+          fallback_handler: search_api
+          fallback_options:
+            link_to_item: false
+            use_highlighting: false
+            multi_type: separator
+            multi_separator: ', '
         aggregated_filenames:
           id: aggregated_filenames
           table: search_api_index_media
@@ -1075,6 +1345,7 @@ display:
             thumbnail: thumbnail
             name_1: name_1
             search_api_rendered_item: name_1
+            field_banner_image_restricted: name_1
             aggregated_filenames: aggregated_filenames
             uid_1: uid_1
             changed_1: changed_1
@@ -1098,6 +1369,11 @@ display:
               empty_column: false
               responsive: ''
             search_api_rendered_item:
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_banner_image_restricted:
               align: ''
               separator: ''
               empty_column: false
@@ -1178,4 +1454,5 @@ display:
         - user
         - user.permissions
       tags:
+        - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
