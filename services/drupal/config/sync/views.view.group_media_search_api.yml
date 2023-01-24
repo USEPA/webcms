@@ -8,11 +8,12 @@ dependencies:
     - taxonomy.vocabulary.media_tags
   module:
     - csv_serialization
+    - file
     - group
-    - image
     - rest
     - search_api
     - serialization
+    - svg_image
     - views_autocomplete_filters
     - views_data_export
 id: group_media_search_api
@@ -986,9 +987,9 @@ display:
           alter:
             alter_text: false
             text: ''
-            make_link: false
+            make_link: true
             path: ''
-            absolute: false
+            absolute: true
             external: false
             replace_spaces: false
             path_case: none
@@ -1023,9 +1024,9 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: value
-          type: string
+          type: file_link
           settings:
-            link_to_entity: false
+            link_to_entity: 0
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -1475,6 +1476,59 @@ display:
             format_plural_values:
               - '1'
               - '@count'
+        search_api_url:
+          id: search_api_url
+          table: search_api_index_media
+          field: search_api_url
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api
+          label: 'Media URL'
+          exclude: false
+          alter:
+            alter_text: true
+            text: 'https://www.epa.gov{{ search_api_url }}'
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          link_to_item: false
+          use_highlighting: false
+          multi_type: separator
+          multi_separator: ', '
       style:
         type: data_export
         options:
@@ -1495,12 +1549,15 @@ display:
           field_options:
             name:
               alias: ''
+              raw_output: true
+            aggregated_filenames:
+              alias: ''
               raw_output: false
             bundle:
               alias: ''
               raw_output: false
             uid_1:
-              alias: uid
+              alias: Author
               raw_output: false
             changed:
               alias: ''
@@ -1508,7 +1565,7 @@ display:
             created:
               alias: ''
               raw_output: false
-            search_api_operations:
+            mid:
               alias: ''
               raw_output: false
       defaults:
@@ -1516,7 +1573,7 @@ display:
       display_extenders:
         views_ajax_get:
           ajax_get: false
-      path: group/%group/media/export
+      path: group/%group/media/export/test
       displays:
         page_1: page_1
         default: '0'
