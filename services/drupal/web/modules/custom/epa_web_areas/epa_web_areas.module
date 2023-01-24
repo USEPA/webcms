@@ -65,6 +65,10 @@ function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInte
   if (isset($form['field_allow_perspectives'])) {
     $form['field_allow_perspectives']['#access'] = $account->hasPermission('permit perspectives');
   }
+
+  if (isset($form['field_allow_speeches'])) {
+    $form['field_allow_speeches']['#access'] = $account->hasPermission('permit speeches');
+  }
 }
 
 /**
@@ -101,6 +105,10 @@ function epa_web_areas_entity_type_alter(array &$entity_types) {
     $entity_types['group']->setFormClass('add', $form_class);
     $entity_types['group']->setFormClass('edit', $form_class);
   }
+}
+
+function epa_web_areas_form_node_speeches_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $form['title']['widget'][0]['value']['#default_value'] = 'Remarks for';
 }
 
 /**
