@@ -1,0 +1,33 @@
+uuid: 88e81360-dffc-43ff-a592-708ee8cbffd4
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    workflow_process: any
+id: epa_content_has_been_published
+group_use: true
+group_type: web_area
+workflow: epa_default
+group_roles:
+  web_area-watcher: web_area-watcher
+  web_area-administrator: '0'
+  web_area-approver: '0'
+  web_area-editor: '0'
+  web_area-member: '0'
+transitions:
+  publish: publish
+roles: {  }
+flags:
+  notification_opt_in: notification_opt_in
+author: false
+revision_author: false
+site_mail: false
+emails: ''
+subject: 'EPA Content Has Been Published: [node:group:title] > [node:title]'
+body:
+  value: "<p>&lt;p&gt;The following EPA page has been published:&lt;/p&gt;</p>\r\n\r\n<p>&lt;p&gt;&amp;nbsp;&lt;/p&gt;</p>\r\n\r\n<p>&lt;p&gt;[node:group:title] &amp;gt; [node:title]&lt;/p&gt;</p>\r\n\r\n<p>&lt;p&gt;&lt;a href=\"[site:url]user/login?destination=[node:url:relative]\"&gt;[node:url]&lt;/a&gt;&lt;/p&gt;</p>\r\n\r\n<p>&nbsp;</p>\r\n"
+  format: filtered_html
+label: 'EPA Content Has Been Published'
