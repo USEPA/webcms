@@ -17,7 +17,9 @@ dependencies:
     - field.field.node.speeches.field_page_head
     - field.field.node.speeches.field_paragraphs
     - field.field.node.speeches.field_publish_date
+    - field.field.node.speeches.field_related_information
     - field.field.node.speeches.field_release
+    - field.field.node.speeches.field_show_image
     - field.field.node.speeches.field_subjects
     - field.field.node.speeches.field_text_location
     - field.field.node.speeches.field_type
@@ -41,7 +43,7 @@ third_party_settings:
       label: 'Additional Fields'
       region: content
       parent_name: ''
-      weight: 11
+      weight: 13
       format_type: tabs
       format_settings:
         classes: ''
@@ -105,7 +107,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 13
+    weight: 15
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -166,7 +168,7 @@ content:
     third_party_settings: {  }
   field_expiration_date:
     type: datetime_default
-    weight: 20
+    weight: 21
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -182,7 +184,7 @@ content:
     third_party_settings: {  }
   field_hublinks:
     type: entity_reference_autocomplete
-    weight: 10
+    weight: 12
     region: content
     settings:
       match_operator: CONTAINS
@@ -208,7 +210,7 @@ content:
     third_party_settings: {  }
   field_machine_name:
     type: string_textfield
-    weight: 21
+    weight: 22
     region: content
     settings:
       size: 60
@@ -216,7 +218,7 @@ content:
     third_party_settings: {  }
   field_media_image:
     type: entity_reference_autocomplete
-    weight: 9
+    weight: 11
     region: content
     settings:
       match_operator: CONTAINS
@@ -234,7 +236,7 @@ content:
     third_party_settings: {  }
   field_paragraphs:
     type: paragraphs
-    weight: 6
+    weight: 7
     region: content
     settings:
       title: Paragraph
@@ -257,15 +259,30 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_related_information:
+    type: link_default
+    weight: 10
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
   field_release:
     type: datetime_default
-    weight: 3
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_show_image:
+    type: boolean_checkbox
+    weight: 3
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   field_subjects:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 6
     region: content
     settings:
       match_operator: CONTAINS
@@ -275,7 +292,7 @@ content:
     third_party_settings: {  }
   field_text_location:
     type: string_textfield
-    weight: 4
+    weight: 5
     region: content
     settings:
       size: 60
@@ -293,7 +310,7 @@ content:
     third_party_settings: {  }
   field_video:
     type: link_default
-    weight: 8
+    weight: 9
     region: content
     settings:
       placeholder_url: ''
@@ -301,34 +318,34 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 7
+    weight: 8
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 17
+    weight: 19
     region: content
     settings: {  }
     third_party_settings: {  }
   promote:
-    type: boolean_checkbox
-    weight: 14
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
-  status:
     type: boolean_checkbox
     weight: 16
     region: content
     settings:
       display_label: true
     third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 18
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    weight: 15
+    weight: 17
     region: content
     settings:
       display_label: true
@@ -343,7 +360,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 12
+    weight: 14
     region: content
     settings:
       match_operator: CONTAINS
@@ -352,7 +369,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 18
+    weight: 20
     region: content
     settings: {  }
     third_party_settings: {  }
