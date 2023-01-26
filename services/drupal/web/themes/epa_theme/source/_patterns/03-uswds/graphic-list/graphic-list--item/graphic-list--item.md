@@ -1,6 +1,6 @@
 ---
 el: .media-block
-title: Media Block
+title: Graphic List Item
 state: complete
 ---
 
