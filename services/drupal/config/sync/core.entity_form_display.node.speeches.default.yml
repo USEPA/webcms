@@ -38,7 +38,6 @@ dependencies:
     - datetime
     - entitygroupfield
     - field_group
-    - inline_entity_form
     - link
     - media_library
     - metatag
@@ -54,7 +53,7 @@ third_party_settings:
       label: 'Additional Fields'
       region: content
       parent_name: ''
-      weight: 14
+      weight: 15
       format_type: tabs
       format_settings:
         classes: ''
@@ -76,10 +75,9 @@ third_party_settings:
       format_settings:
         classes: ''
         id: ''
-        formatter: closed
+        formatter: open
         description: ''
         required_fields: true
-        direction: vertical
     group_page_javascript:
       children:
         - field_page_head
@@ -91,7 +89,7 @@ third_party_settings:
       format_settings:
         classes: ''
         id: ''
-        formatter: open
+        formatter: closed
         description: ''
         required_fields: true
     group_other_metadata:
@@ -108,7 +106,22 @@ third_party_settings:
       format_settings:
         classes: ''
         id: ''
-        formatter: open
+        formatter: closed
+        description: ''
+        required_fields: true
+    group_speakers_or_presenters:
+      children:
+        - field_authors
+        - field_show_image
+      label: 'Speakers or Presenters'
+      region: content
+      parent_name: ''
+      weight: 2
+      format_type: details
+      format_settings:
+        classes: ''
+        id: ''
+        open: true
         description: ''
         required_fields: true
 id: node.speeches.default
@@ -118,7 +131,7 @@ mode: default
 content:
   created:
     type: datetime_timestamp
-    weight: 16
+    weight: 17
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -129,25 +142,27 @@ content:
     settings:
       help_text: ''
       label: 'Group name'
-      multiple: true
-      required: false
+      multiple: false
+      required: true
     third_party_settings: {  }
   field_authors:
-    type: inline_entity_form_complex
-    weight: 2
+    type: paragraphs
+    weight: 3
     region: content
     settings:
-      form_mode: default
-      override_labels: false
-      label_singular: ''
-      label_plural: ''
-      allow_new: true
-      allow_existing: false
-      match_operator: CONTAINS
-      allow_duplicate: false
-      collapsible: false
-      collapsed: false
-      revision: false
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: closed
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: author
+      features:
+        add_above: '0'
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
     third_party_settings: {  }
   field_channel:
     type: options_buttons
@@ -196,7 +211,7 @@ content:
     third_party_settings: {  }
   field_hublinks:
     type: entity_reference_autocomplete
-    weight: 13
+    weight: 14
     region: content
     settings:
       match_operator: CONTAINS
@@ -230,14 +245,14 @@ content:
     third_party_settings: {  }
   field_media_image:
     type: media_library_widget
-    weight: 11
+    weight: 12
     region: content
     settings:
       media_types: {  }
     third_party_settings: {  }
   field_meta_tags:
     type: metatag_firehose
-    weight: 22
+    weight: 23
     region: content
     settings:
       sidebar: true
@@ -252,7 +267,7 @@ content:
     third_party_settings: {  }
   field_paragraphs:
     type: paragraphs
-    weight: 7
+    weight: 8
     region: content
     settings:
       title: Paragraph
@@ -277,7 +292,7 @@ content:
     third_party_settings: {  }
   field_related_information:
     type: link_default
-    weight: 10
+    weight: 11
     region: content
     settings:
       placeholder_url: ''
@@ -285,20 +300,20 @@ content:
     third_party_settings: {  }
   field_release:
     type: datetime_default
-    weight: 4
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
   field_show_image:
     type: boolean_checkbox
-    weight: 3
+    weight: 4
     region: content
     settings:
       display_label: true
     third_party_settings: {  }
   field_subjects:
     type: options_shs
-    weight: 6
+    weight: 7
     region: content
     settings:
       display_node_count: false
@@ -308,7 +323,7 @@ content:
     third_party_settings: {  }
   field_text_location:
     type: string_textfield
-    weight: 5
+    weight: 6
     region: content
     settings:
       size: 60
@@ -322,7 +337,7 @@ content:
     third_party_settings: {  }
   field_video:
     type: link_default
-    weight: 9
+    weight: 10
     region: content
     settings:
       placeholder_url: ''
@@ -330,41 +345,41 @@ content:
     third_party_settings: {  }
   field_wide_template:
     type: boolean_checkbox
-    weight: 12
+    weight: 13
     region: content
     settings:
       display_label: true
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 8
+    weight: 9
     region: content
     settings:
       include_locked: true
     third_party_settings: {  }
   moderation_state:
     type: moderation_state_default
-    weight: 20
+    weight: 21
     region: content
     settings: {  }
     third_party_settings: {  }
   promote:
     type: boolean_checkbox
-    weight: 17
+    weight: 18
     region: content
     settings:
       display_label: true
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 19
+    weight: 20
     region: content
     settings:
       display_label: true
     third_party_settings: {  }
   sticky:
     type: boolean_checkbox
-    weight: 18
+    weight: 19
     region: content
     settings:
       display_label: true
@@ -379,7 +394,7 @@ content:
     third_party_settings: {  }
   uid:
     type: entity_reference_autocomplete
-    weight: 15
+    weight: 16
     region: content
     settings:
       match_operator: CONTAINS
@@ -388,7 +403,7 @@ content:
       placeholder: ''
     third_party_settings: {  }
   url_redirects:
-    weight: 21
+    weight: 22
     region: content
     settings: {  }
     third_party_settings: {  }
