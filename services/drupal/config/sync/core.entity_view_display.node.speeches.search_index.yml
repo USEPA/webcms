@@ -1,9 +1,9 @@
-uuid: 3b0a5b95-21a1-4365-8956-08b99f304f11
+uuid: b72a5cfe-24af-4f63-ae1f-53109d1b4084
 langcode: en
-status: false
+status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - core.entity_view_mode.node.search_index
     - field.field.node.speeches.field_authors
     - field.field.node.speeches.field_channel
     - field.field.node.speeches.field_description
@@ -34,25 +34,39 @@ dependencies:
     - field.field.node.speeches.field_wide_template
     - node.type.speeches
   module:
+    - entity_reference_revisions
+    - layout_builder
     - user
-id: node.speeches.teaser
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.speeches.search_index
 targetEntityType: node
 bundle: speeches
-mode: teaser
+mode: search_index
 content:
-  content_moderation_control:
-    settings: {  }
+  field_authors:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
     third_party_settings: {  }
-    weight: -20
+    weight: 1
     region: content
-  links:
-    settings: {  }
+  field_paragraphs:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
     third_party_settings: {  }
-    weight: 100
+    weight: 0
     region: content
 hidden:
+  content_moderation_control: true
   entitygroupfield: true
-  field_authors: true
   field_channel: true
   field_description: true
   field_env_laws_regs_and_treaties: true
@@ -67,7 +81,6 @@ hidden:
   field_media_image: true
   field_meta_tags: true
   field_page_head: true
-  field_paragraphs: true
   field_publish_date: true
   field_related_information: true
   field_release: true
@@ -81,4 +94,5 @@ hidden:
   field_video: true
   field_wide_template: true
   langcode: true
+  links: true
   search_api_excerpt: true

@@ -24,6 +24,7 @@ dependencies:
     - field.field.node.speeches.field_release
     - field.field.node.speeches.field_review_deadline
     - field.field.node.speeches.field_scheduled_transition
+    - field.field.node.speeches.field_search_text
     - field.field.node.speeches.field_show_image
     - field.field.node.speeches.field_subjects
     - field.field.node.speeches.field_text_location
@@ -44,11 +45,6 @@ targetEntityType: node
 bundle: speeches
 mode: default
 content:
-  content_moderation_control:
-    settings: {  }
-    third_party_settings: {  }
-    weight: -20
-    region: content
   field_authors:
     type: entity_reference_revisions_entity_view
     label: above
@@ -56,7 +52,7 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 102
+    weight: 2
     region: content
   field_channel:
     type: entity_reference_label
@@ -64,14 +60,14 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 112
+    weight: 11
     region: content
   field_description:
     type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 109
+    weight: 8
     region: content
   field_env_laws_regs_and_treaties:
     type: entity_reference_label
@@ -79,7 +75,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 114
+    weight: 13
     region: content
   field_expiration_date:
     type: datetime_default
@@ -88,7 +84,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 118
+    weight: 17
     region: content
   field_geographic_locations:
     type: entity_reference_label
@@ -96,7 +92,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 113
+    weight: 12
     region: content
   field_hublinks:
     type: entity_reference_label
@@ -104,7 +100,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 120
+    weight: 19
     region: content
   field_is_searchable_collection:
     type: boolean
@@ -114,7 +110,7 @@ content:
       format_custom_false: ''
       format_custom_true: ''
     third_party_settings: {  }
-    weight: 124
+    weight: 23
     region: content
   field_keywords:
     type: entity_reference_label
@@ -122,14 +118,14 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 110
+    weight: 9
     region: content
   field_language:
     type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 116
+    weight: 15
     region: content
   field_last_published:
     type: datetime_default
@@ -138,7 +134,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 125
+    weight: 24
     region: content
   field_machine_name:
     type: string
@@ -146,7 +142,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 119
+    weight: 18
     region: content
   field_media_image:
     type: entity_reference_label
@@ -154,21 +150,21 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 108
+    weight: 7
     region: content
   field_meta_tags:
     type: metatag_empty_formatter
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 130
+    weight: 27
     region: content
   field_page_head:
     type: basic_string
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 115
+    weight: 14
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
@@ -177,7 +173,7 @@ content:
       view_mode: default
       link: ''
     third_party_settings: {  }
-    weight: 101
+    weight: 1
     region: content
   field_publish_date:
     type: datetime_default
@@ -186,7 +182,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 117
+    weight: 16
     region: content
   field_related_information:
     type: link
@@ -198,7 +194,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
-    weight: 121
+    weight: 20
     region: content
   field_release:
     type: datetime_default
@@ -207,7 +203,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 105
+    weight: 4
     region: content
   field_review_deadline:
     type: datetime_default
@@ -216,7 +212,7 @@ content:
       timezone_override: ''
       format_type: medium
     third_party_settings: {  }
-    weight: 123
+    weight: 22
     region: content
   field_scheduled_transition:
     type: scheduled_publish_generic_formatter
@@ -225,7 +221,14 @@ content:
       date_format: html_datetime
       text_pattern: '%moderation_state% - %date%'
     third_party_settings: {  }
-    weight: 126
+    weight: 25
+    region: content
+  field_search_text:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 29
     region: content
   field_show_image:
     type: boolean
@@ -235,7 +238,7 @@ content:
       format_custom_false: ''
       format_custom_true: ''
     third_party_settings: {  }
-    weight: 122
+    weight: 21
     region: content
   field_subjects:
     type: entity_reference_label
@@ -243,7 +246,7 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 106
+    weight: 5
     region: content
   field_text_location:
     type: string
@@ -251,7 +254,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 104
+    weight: 3
     region: content
   field_type:
     type: entity_reference_label
@@ -259,19 +262,16 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 111
+    weight: 10
     region: content
   field_video:
-    type: link
+    type: entity_reference_entity_view
     label: above
     settings:
-      trim_length: 80
-      url_only: false
-      url_plain: false
-      rel: ''
-      target: ''
+      view_mode: default
+      link: false
     third_party_settings: {  }
-    weight: 107
+    weight: 28
     region: content
   field_wide_template:
     type: boolean
@@ -281,14 +281,15 @@ content:
       format_custom_false: ''
       format_custom_true: ''
     third_party_settings: {  }
-    weight: 129
+    weight: 26
     region: content
   links:
     settings: {  }
     third_party_settings: {  }
-    weight: 100
+    weight: 0
     region: content
 hidden:
+  content_moderation_control: true
   entitygroupfield: true
   langcode: true
   search_api_excerpt: true
