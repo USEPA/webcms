@@ -8,6 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Component\Datetime;
 
 /**
  * Action description.
@@ -94,6 +95,8 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       if ($entity instanceof RevisionLogInterface) {
         $entity->setRevisionLogMessage('Bulk re-publishing.');
         $entity->setRevisionUserId($this->account->id());
+        $entity->setRevisionCreationTime(\Drupal::time()
+          ->getRequestTime());
       }
       $entity->save();
       return $this->t('Content has been re-published.');
