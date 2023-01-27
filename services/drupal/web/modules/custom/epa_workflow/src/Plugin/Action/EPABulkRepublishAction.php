@@ -1,6 +1,16 @@
 <?php
 
+namespace Drupal\epa_workflow\Plugin\Action;
+
+use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Entity\RevisionLogInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+
 /**
+ * Action description.
  * Bulk republish the current published revision for
  * content in these states:
  * Published, needs review
@@ -13,28 +23,8 @@
  *   type = "",
  *   confirm = TRUE,
  *   requirements = {
- *   "_permission" = "execute the bulk republish action",
- *   },
- * )
- */
-
-
-namespace Drupal\epa_workflow\Plugin\Action;
-
-use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\Entity\RevisionLogInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-
-/**
- * Action description.
- *
- * @Action(
- *   id = "epa_workflow_bulk_republish",
- *   label = @Translation("Republish content"),
- *   type = ""
+ *     "_permission" = "execute the bulk republish action",
+ *   }
  * )
  */
 class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements ContainerFactoryPluginInterface
@@ -117,7 +107,7 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE)
   {
-    return $object->access('update', $account, $return_as_object);
+     return $object->access('update', $account, $return_as_object);
   }
 
 }
