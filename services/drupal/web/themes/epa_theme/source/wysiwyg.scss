@@ -2,7 +2,7 @@
 // WYSIWYG styles
 
 // Configuration
-@use '_patterns/00-config' as * with($wysiwyg: true);
+@use '_patterns/00-config' as *;
 @use '_patterns/01-global' as *;
 
 // Base styles
@@ -12,46 +12,47 @@
 // USWDS components
 // We pull in everything in 'packages/uswds' except for:
 // - 'uswds-global': pulled in elsewhere.
-// - 'uswds-typography': omitted in favor of Gesso’s base HTML styles.
+// - 'uswds-typography': omitted (except for usa-dark-background) in favor of
+//    Gesso’s base HTML styles.
 // - 'uswds-utilities': pulled in elsewhere.
-@use 'usa-accordion' as *;
-@use 'usa-alert' as *;
-@use 'usa-banner' as *;
-@use 'usa-breadcrumb' as *;
-@use 'usa-button-group' as *;
-@use 'usa-button' as *;
-@use 'usa-card' as *;
-@use 'usa-checklist' as *;
-@use 'usa-collection' as *;
-@use 'usa-dark-background' as *;
-@use 'usa-embed-container' as *;
-@use 'usa-footer' as *;
-@use 'usa-form' as *;
-@use 'usa-graphic-list' as *;
-@use 'usa-header' as *;
-@use 'usa-hero' as *;
-@use 'usa-icon-list' as *;
-@use 'usa-icon' as *;
-@use 'usa-identifier' as *;
-@use 'usa-layout-docs' as *;
-@use 'usa-layout-grid' as *;
-@use 'usa-media-block' as *;
-@use 'usa-modal' as *;
-@use 'usa-nav' as *;
-@use 'usa-pagination' as *;
-@use 'usa-process-list' as *;
-@use 'usa-search' as *;
-@use 'usa-section' as *;
-@use 'usa-sidenav' as *;
-@use 'usa-site-alert' as *;
-@use 'usa-skipnav' as *;
-@use 'usa-step-indicator' as *;
-@use 'usa-summary-box' as *;
-@use 'usa-table' as *;
-@use 'usa-tag' as *;
-@use 'usa-tooltip' as *;
-@use 'uswds-form-controls' as *;
-@use '_patterns/03-uswds' as *;
+@forward 'usa-dark-background';
+@forward 'usa-accordion';
+@forward 'usa-alert';
+@forward 'usa-banner';
+@forward 'usa-breadcrumb';
+@forward 'usa-button-group';
+@forward 'usa-button';
+@forward 'usa-card';
+@forward 'usa-checklist';
+@forward 'usa-collection';
+@forward 'usa-embed-container';
+@forward 'usa-footer';
+@forward 'usa-form';
+@forward 'usa-graphic-list';
+@forward 'usa-header';
+@forward 'usa-hero';
+@forward 'usa-icon-list';
+@forward 'usa-icon';
+@forward 'usa-identifier';
+@forward 'usa-layout-docs';
+@forward 'usa-layout-grid';
+@forward 'usa-media-block';
+@forward 'usa-modal';
+@forward 'usa-nav';
+@forward 'usa-pagination';
+@forward 'usa-process-list';
+@forward 'usa-search';
+@forward 'usa-section';
+@forward 'usa-sidenav';
+@forward 'usa-site-alert';
+@forward 'usa-skipnav';
+@forward 'usa-step-indicator';
+@forward 'usa-summary-box';
+@forward 'usa-table';
+@forward 'usa-tag';
+@forward 'usa-tooltip';
+@forward 'uswds-form-controls';
+@forward '_patterns/03-uswds';
 
 // Layouts
 @use '_patterns/04-layouts' as *;
