@@ -15,6 +15,8 @@ id: news_releases_press_office
 name: 'Press Office'
 weight: 0
 min_count: 1
+missing: false
+missing_label: others
 url_alias: press_office
 facet_source_id: 'search_api:views_page__search_news_releases__page_1'
 field_identifier: field_press_office
@@ -23,6 +25,9 @@ hard_limit: 0
 exclude: false
 use_hierarchy: true
 keep_hierarchy_parents_active: false
+hierarchy:
+  type: taxonomy
+  config: {  }
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 widget:
@@ -70,4 +75,9 @@ processor_configs:
     weights:
       pre_query: 50
       build: 15
+    settings: {  }
+  hierarchy_processor:
+    id: hierarchy_processor
+    weights:
+      build: 100
     settings: {  }
