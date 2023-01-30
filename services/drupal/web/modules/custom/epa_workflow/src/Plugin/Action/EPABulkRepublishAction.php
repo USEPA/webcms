@@ -8,7 +8,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Component\Datetime;
 
 /**
  * Action description.
@@ -20,7 +19,7 @@ use Drupal\Component\Datetime;
  *
  * @Action(
  *   id = "epa_workflow_bulk_republish",
- *   label = @Translation("Bulk Republish"),
+ *   label = @Translation("Republish"),
  *   type = "",
  *   confirm = TRUE,
  *   requirements = {
