@@ -207,21 +207,17 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   protected function setReviewDeadline($reset = FALSE) {
     // Stop if content doesn't use a review deadline.
+    $bundle = $this->contentEntityRevision->bundle();
+    $workflow_types = ['page' => 365, 'event' => 90, 'webform' => 90, 'faq' => 365, 'public_notice' => 90, 'regulation' => 365, 'web_area' => 90];
     if (!$this->contentEntityRevision->hasField('field_review_deadline')) {
       return;
     }
-
-    if ($reset) {
+    if (!in_array($bundle, array_keys($workflow_types)) || $reset){
       $this->contentEntityRevision->set('field_review_deadline', NULL);
       return;
     }
-
-    if (!$this->contentEntityRevision->get('field_type')->isEmpty()
-        && $this->contentEntityRevision->get('field_type')->entity
-        && !$this->contentEntityRevision->get('field_type')->entity->get('field_term_days_til_review')->isEmpty()
-    ) {
-      // Create datetime with appropriate offset.
-      $review_period = $this->contentEntityRevision->field_type->entity->field_term_days_til_review->value;
+    if (in_array($bundle, array_keys($workflow_types))) {
+      $review_period = $workflow_types[$bundle];
       $date = new DrupalDateTime();
       $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
       $date->add(new \DateInterval("P{$review_period}D"));
