@@ -14,7 +14,7 @@ Note: this has only been tested on ddev 1.19 and above.
    ddev aws-setup
    ```
 
-3. After that, please download the latest database and put it in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
+3. After that, please download the latest database (see https://forumone.atlassian.net/wiki/spaces/EPA/pages/1794637894/HOWTO+Import+D8+InnoDB+Cold+Backup) and put the .tar file in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
 4. Import the database by running:
 
@@ -53,6 +53,9 @@ Note: this has only been tested on ddev 1.19 and above.
       ```````
 
 10. Install Drupal from config (or restore a backup).  You can install from config by running:
+    
+    **Note**: Do not run this command if starting from a new installation. This will wipe the database out, instead skip to #11.
+    
    ```
    ddev drush si --existing-config
    ```
