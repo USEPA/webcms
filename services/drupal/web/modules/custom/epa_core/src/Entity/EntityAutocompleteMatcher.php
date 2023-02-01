@@ -36,7 +36,7 @@ class EntityAutocompleteMatcher extends \Drupal\Core\Entity\EntityAutocompleteMa
           $key = preg_replace('/\s\s+/', ' ', str_replace("\n", '', trim(Html::decodeEntities(strip_tags($key)))));
           // Names containing commas or quotes must be wrapped in quotes.
           $key = Tags::encode($key);
-          $matches[] = ['value' => $key, 'label' => $label];
+          $matches[] = ['value' => $key, 'label' => '(' . $entity_id . ') ' . $label];
         }
       }
     }
