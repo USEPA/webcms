@@ -10,11 +10,9 @@ p {
     orphans: 3;
     widows: 3;
   }
-}
 
-// Hide empty paragraphs except in WYSIWYG editor.
-body:not(.cke_editable) {
-  p {
+  // Hide empty paragraphs except in WYSIWYG editor.
+  @if not $wysiwyg {
     &:empty {
       margin: 0 !important;
     }
