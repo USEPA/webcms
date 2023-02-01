@@ -93,7 +93,7 @@ field_settings:
     type: text
     configuration:
       roles:
-        anonymous: anonymous
+        - anonymous
       view_mode:
         'entity:node':
           news_release: search_index
@@ -147,11 +147,14 @@ processor_settings:
     weights:
       preprocess_index: -49
       preprocess_query: -47
-    all_fields: false
+    all_fields: true
     fields:
       - field_description
+      - field_language
+      - field_secondary_headline
       - rendered_item
       - title
+      - type
     title: false
     alt: true
     tags:
