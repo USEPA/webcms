@@ -224,10 +224,8 @@ abstract class EPAModeration implements EPAModerationInterface {
       $review_deadline = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
       $this->contentEntityRevision->set('field_review_deadline', $review_deadline);
       if ($bundle == 'public_notice' && !$this->contentEntityRevision->get('field_notice_sort_date')->isEmpty()) {
-        $sort_date = new DrupalDateTime($this->contentEntityRevision->field_notice_sort_date->value);
-        $sort_date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
-        $review_deadline = $sort_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
-        $this->contentEntityRevision->set('field_review_deadline', $review_deadline);
+        $sort_date = $this->contentEntityRevision->field_notice_sort_date->date;
+        $this->contentEntityRevision->set('field_review_deadline', $sort_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT));
       }
     }
     else {
