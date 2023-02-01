@@ -172,6 +172,17 @@ function _epa_core_refresh_indexes($server_name) {
 }
 
 /**
+ * Updating the field definition config for node__field_press_office cardinality
+ * to be 1.
+ */
+function epa_core_deploy_0003_update_node_field_press_office_cardinality() {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $storage_definition = $manager->getFieldStorageDefinition('field_press_office', 'node');
+  $storage_definition->setCardinality(1);
+  $manager->updateFieldStorageDefinition($storage_definition);
+}
+
+/**
  * Moves images on banner slides to banner image field
  * and creates banner image entity where necessary.
  */
