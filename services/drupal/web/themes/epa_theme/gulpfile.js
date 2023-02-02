@@ -82,7 +82,10 @@ const lintStyles = () => {
 };
 
 const buildSass = mode => {
-  return src('*.scss', { cwd: './source' })
+  return src([
+      'source/*.scss',
+      'source/_patterns/05-components/*/*.scss'
+    ])
     .pipe(sourcemaps.init())
     .pipe(
       sass({
@@ -103,6 +106,14 @@ const buildSass = mode => {
         }),
       ])
     )
+    .pipe(rename(function (path) {
+      if(path.basename === 'index') {
+        path.basename = path.dirname;
+      }
+      if(path.dirname != '.') {
+        path.dirname = '.';
+      }
+    }))
     .pipe(sourcemaps.write('.'))
     .pipe(dest('css'));
 };
