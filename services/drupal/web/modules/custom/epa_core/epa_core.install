@@ -93,3 +93,35 @@ function _epa_core_create_news_release_type_term() {
   $term->field_term_days_til_review = 730;
   $term->save();
 }
+
+/**
+ * As part of https://forumone.atlassian.net/browse/EPAD8-1962 to set cardinality
+ * of the Press Office field to 1 we will remove records where delta is greater
+ * than the minimum delta value.
+ */
+function epa_core_update_9004() {
+  $database = \Drupal::database();
+  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      // UPDATE node__field_press_office as node
+      // LEFT JOIN (SELECT revision_id, MIN(delta) as delta
+      // FROM node__field_press_office GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta
+      // SET node.delta = 0
+      // WHERE min_delta.delta > 0;
+      $database->query("UPDATE {$table} AS node LEFT JOIN (SELECT revision_id, MIN(delta) AS delta FROM {$table} GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta SET node.delta = 0 WHERE min_delta.delta > 0");
+
+      // Now delete all rows that are greater than that minimum delta.
+      // DELETE FROM {$table} WHERE delta > 0;
+      $database->delete($table)
+        ->condition('delta', 0, '>')
+        ->execute();
+    }
+  }
+}
+
+/**
+ * No longer needed, but was implemented in earlier development so we need the
+ * update hook to still exist.
+ */
+function epa_core_update_9005() {
+}

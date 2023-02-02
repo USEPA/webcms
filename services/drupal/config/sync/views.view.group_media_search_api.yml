@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.storage.media.field_banner_image_restricted
     - image.style.thumbnail
     - search_api.index.media
     - taxonomy.vocabulary.media_tags
@@ -10,6 +11,7 @@ dependencies:
     - csv_serialization
     - file
     - group
+    - options
     - rest
     - search_api
     - serialization
@@ -154,6 +156,7 @@ display:
           view_modes:
             'entity:media':
               audio: link_with_metadata
+              banner_image: link_with_metadata
               document: link_with_metadata
               image: link_with_metadata
               other: link_with_metadata
@@ -211,6 +214,75 @@ display:
           use_highlighting: false
           multi_type: separator
           multi_separator: ', '
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_index_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: list_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          field_rendering: true
+          fallback_handler: search_api
+          fallback_options:
+            link_to_item: false
+            use_highlighting: false
+            multi_type: separator
+            multi_separator: ', '
         bundle:
           id: bundle
           table: search_api_index_media
@@ -866,6 +938,69 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_index_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_options
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_banner_image_restricted_op
+            label: 'Usage restrictions'
+            description: 'Show only restricted media.'
+            use_operator: false
+            operator: field_banner_image_restricted_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_banner_image_restricted
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: true
+          group_info:
+            label: 'Usage restrictions'
+            description: 'Restricted or unrestricted.'
+            identifier: field_banner_image_restricted
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: Unrestricted
+                operator: not
+                value:
+                  restricted: restricted
+              2:
+                title: Restricted
+                operator: or
+                value:
+                  restricted: restricted
+              3:
+                title: ''
+                operator: or
+                value: {  }
+          reduce_duplicates: false
       style:
         type: table
         options:
@@ -873,9 +1008,11 @@ display:
           row_class: ''
           default_row_class: true
           columns:
+            thumbnail: thumbnail
             name: name
             search_api_rendered_item: name
             aggregated_filenames: aggregated_filenames
+            field_banner_image_restricted: name
             bundle: bundle
             uid_1: uid_1
             changed: changed
@@ -883,6 +1020,11 @@ display:
             search_api_operations: search_api_operations
           default: created
           info:
+            thumbnail:
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             name:
               sortable: true
               default_sort_order: asc
@@ -897,6 +1039,13 @@ display:
               responsive: ''
             aggregated_filenames:
               sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_banner_image_restricted:
+              sortable: false
               default_sort_order: asc
               align: ''
               separator: ''
@@ -966,6 +1115,7 @@ display:
         - user
         - user.group_permissions
       tags:
+        - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
   data_export_1:
     id: data_export_1
@@ -1798,6 +1948,7 @@ display:
           view_modes:
             'entity:media':
               audio: link_with_metadata
+              banner_image: link_with_metadata
               document: link_with_metadata
               image: link_with_metadata
               other: link_with_metadata
@@ -1855,6 +2006,75 @@ display:
           use_highlighting: false
           multi_type: separator
           multi_separator: ', '
+        field_banner_image_restricted:
+          id: field_banner_image_restricted
+          table: search_api_index_media
+          field: field_banner_image_restricted
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_field
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: false
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: list_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+          field_rendering: true
+          fallback_handler: search_api
+          fallback_options:
+            link_to_item: false
+            use_highlighting: false
+            multi_type: separator
+            multi_separator: ', '
         bundle:
           id: bundle
           table: search_api_index_media
@@ -2227,4 +2447,5 @@ display:
         - user
         - user.group_permissions
       tags:
+        - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'

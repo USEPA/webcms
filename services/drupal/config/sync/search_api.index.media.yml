@@ -3,13 +3,14 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.media.field_description
-    - field.storage.media.field_media_tags
-    - field.storage.media.field_publication_number
     - field.storage.media.field_media_audio_file
+    - field.storage.media.field_description
     - field.storage.media.field_media_file
     - field.storage.media.field_media_file_1
     - field.storage.media.field_media_image
+    - field.storage.media.field_publication_number
+    - field.storage.media.field_media_tags
+    - field.storage.media.field_banner_image_restricted
     - search_api.server.localhost
   module:
     - media
@@ -67,6 +68,14 @@ field_settings:
     dependencies:
       module:
         - media
+  field_banner_image_restricted:
+    label: 'Usage restrictions'
+    datasource_id: 'entity:media'
+    property_path: field_banner_image_restricted
+    type: string
+    dependencies:
+      config:
+        - field.storage.media.field_banner_image_restricted
   field_description:
     label: Description
     datasource_id: 'entity:media'
