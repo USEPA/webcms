@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a08c3a17baa6063a5a2f05eb29d919f1",
+    "content-hash": "a6247faf66f0339b0f0e3319f322170d",
     "packages": [
         {
             "name": "algolia/places",
@@ -2406,29 +2406,33 @@
         },
         {
             "name": "drupal/addtocal",
-            "version": "1.1.0",
+            "version": "2.0.0-beta4",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/addtocal.git",
-                "reference": "8.x-1.1"
+                "reference": "8.x-2.0-beta4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/addtocal-8.x-1.1.zip",
-                "reference": "8.x-1.1",
-                "shasum": "a11cb06aef8ad5a15650bc6da10202dd68b91e4a"
+                "url": "https://ftp.drupal.org/files/projects/addtocal-8.x-2.0-beta4.zip",
+                "reference": "8.x-2.0-beta4",
+                "shasum": "07e3a04418e3d702a30912ec2425b40c23ce740a"
             },
             "require": {
-                "drupal/core": "^8 || ^9"
+                "drupal/core": "^8 || ^9",
+                "spatie/calendar-links": "^1.7"
+            },
+            "suggest": {
+                "drupal/token": "Enables addtocal token ui and field tokens."
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-1.1",
-                    "datestamp": "1599145268",
+                    "version": "8.x-2.0-beta4",
+                    "datestamp": "1648740638",
                     "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
+                        "status": "not-covered",
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -2466,10 +2470,11 @@
                     "homepage": "https://www.drupal.org/user/3181097"
                 }
             ],
-            "description": "A field formatter providing a widget for exporting events to various formats.",
+            "description": "Drupal field formatter providing Add to Calendar links.",
             "homepage": "https://www.drupal.org/project/addtocal",
             "support": {
-                "source": "https://git.drupalcode.org/project/addtocal"
+                "source": "https://git.drupalcode.org/project/addtocal",
+                "issues": "https://www.drupal.org/project/issues/addtocal"
             }
         },
         {
@@ -14362,6 +14367,65 @@
             "time": "2021-03-25T23:00:49+00:00"
         },
         {
+            "name": "spatie/calendar-links",
+            "version": "1.8.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/calendar-links.git",
+                "reference": "f632ac06599e9ed6cb60a9f85f30e08c5a384248"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/calendar-links/zipball/f632ac06599e9ed6cb60a9f85f30e08c5a384248",
+                "reference": "f632ac06599e9ed6cb60a9f85f30e08c5a384248",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.13",
+                "phpunit/phpunit": "^9.5",
+                "spatie/phpunit-snapshot-assertions": "^4.2",
+                "vimeo/psalm": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\CalendarLinks\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian De Deyne",
+                    "email": "sebastian@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Generate add to calendar links for Google, iCal and other calendar systems",
+            "homepage": "https://github.com/spatie/calendar-links",
+            "keywords": [
+                "calendar-links",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/calendar-links/issues",
+                "source": "https://github.com/spatie/calendar-links/tree/1.8.2"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2022-12-11T03:02:19+00:00"
+        },
+        {
             "name": "stack/builder",
             "version": "v1.0.6",
             "source": {
@@ -21512,5 +21576,5 @@
         "ext-pdo": "1.0.0",
         "php": "8.0"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
