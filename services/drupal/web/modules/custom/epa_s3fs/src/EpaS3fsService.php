@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_s3fs;
 
-use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\s3fs\S3fsService;
 
 /**
@@ -18,4 +17,5 @@ class EpaS3fsService extends S3fsService {
     module_load_install('epa_s3fs');
     epa_s3fs_fix_table_indexes('s3fs_file_temp');
   }
+
 }

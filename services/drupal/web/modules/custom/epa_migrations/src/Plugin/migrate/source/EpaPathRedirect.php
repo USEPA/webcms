@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\epa_migrations\Plugin\migrate\source;
 
 use Drupal\epa_migrations\EpaIgnoreRowTrait;

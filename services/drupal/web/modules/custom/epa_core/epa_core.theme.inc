@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Link;
 
