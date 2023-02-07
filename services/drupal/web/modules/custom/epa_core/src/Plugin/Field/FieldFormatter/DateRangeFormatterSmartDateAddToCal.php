@@ -1,16 +1,20 @@
 <?php
 namespace Drupal\epa_core\Plugin\Field\FieldFormatter;
 
-use Drupal\addtocal\Form\AddToCalForm;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
+use Spatie\CalendarLinks\Generators\Google;
+use Spatie\CalendarLinks\Generators\Ics;
+use Spatie\CalendarLinks\Generators\WebOffice;
+use Spatie\CalendarLinks\Generators\WebOutlook;
+use Spatie\CalendarLinks\Generators\Yahoo;
+use Spatie\CalendarLinks\Link;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
-* Plugin implementation of the 'Custom' formatter for 'daterange' fields.
-*
-* This formatter renders the data range as plain text, with a fully
-* configurable date format using the PHP date syntax and separator.
+* Plugin implementation of a formatter for 'daterange' fields that works with
+* smartdate fields and displays an AddtoCal widget.
 *
 * @FieldFormatter(
 *   id = "date_range_without_time_smartdate",
@@ -23,14 +27,40 @@ use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRa
 class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatter {
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+
+  /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    $instance->moduleHandler = $container->get('module_handler');
+    $instance->token = $container->get('token');
+    return $instance;
+  }
+
+  /**
    * {@inheritdoc}
    */
   static public function defaultSettings() {
     return [
-        'location' => ['value' => FALSE, 'tokenized' => ''],
-        'description' => ['value' => FALSE, 'tokenized' => ''],
-        'past_events' => FALSE, // The version of the addtocal module we are using doesn't actually implement this setting correctly.
-        'separator' => '-',
+        'event_title' => '',
+        'location' => '',
+        'description' => '',
+        'past_events' => FALSE,
       ] + parent::defaultSettings();
   }
 
@@ -39,12 +69,24 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
    */
   public function settingsSummary() {
     $summary = parent::settingsSummary();
-    $settings = $this->getSettings();
-    $location = $settings['location']['value'] ? $settings['location']['value'] : $this->t("Static Text");
-    $description = $settings['description']['value'] ? $settings['description']['value'] : $this->t("Static Text");
-    $summary[] = $this->t('Location field: %location', ['%location' => $location]);
-    $summary[] = $this->t('Description field: %description', ['%description' => $description]);
-    $summary[] = $this->t('Displays an Add to Calendar button');
+    $field = $this->fieldDefinition;
+
+    $title = $this->getSetting('event_title');
+    $summary[] = $this->t('Event title: %title', ['%title' => $title ?: $this->t('Entity label')]);
+
+    $location = $this->getSetting('location');
+    if ($location) {
+      $summary[] = $this->t('Event location: %location', ['%location' => $location]);
+    }
+
+    $description = $this->getSetting('description');
+    if ($description) {
+      $summary[] = $this->t('Event description: %description', ['%description' => $description]);
+    }
+
+    $past_events = $this->getSetting('past_events') ? 'Yes' : 'No';
+    $summary[] = $this->t('Show the widget for past events: %past_events', ['%past_events' => $past_events]);
+
     return $summary;
   }
 
@@ -53,61 +95,40 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
-    $settings = $this->getSettings();
     $field = $this->fieldDefinition;
-    $location_field_types = ['string', 'text_with_summary', 'address'];
-    $description_field_types = ['string', 'text_long', 'text_with_summary', 'string_long'];
-    $description_options = $location_options = [FALSE => 'None'];
 
-    $entity_field_list = \Drupal::service('entity_field.manager')
-      ->getFieldDefinitions($field->getTargetEntityTypeId(), $field->getTargetBundle());
-    foreach ($entity_field_list as $entity_field) {
-      // Filter out base fields like nid, uuid, revisions, etc.
-      if ($entity_field->getFieldStorageDefinition()->isBaseField() == FALSE) {
-        if (in_array($entity_field->get('field_type'), $location_field_types)) {
-          $location_options[$entity_field->get('field_name')] = $entity_field->getLabel();
-        }
-        if (in_array($entity_field->get('field_type'), $description_field_types)) {
-          $description_options[$entity_field->get('field_name')] = $entity_field->getLabel();
-        }
-      }
-    }
+    $form['event_title'] = [
+      '#title' => $this->t('Event title'),
+      '#type' => 'textfield',
+      '#default_value' => $this->getSetting('event_title'),
+      '#description' => $this->t('Optional - if left empty, the entity label will be used. You can use static text or tokens.'),
+    ];
 
     $form['location'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Location'),
-      '#open' => TRUE,
-    ];
-    $form['location']['value'] = [
-      '#title' => $this->t('Location Field:'),
-      '#type' => 'select',
-      '#options' => $location_options,
-      '#default_value' => isset($settings['location']['value']) ? $settings['location']['value'] : '',
-      '#description' => $this->t('A field to use as the location for calendar events.'),
-    ];
-    $form['location']['tokenized'] = [
-      '#title' => $this->t('Tokenized Location Contents:'),
+      '#title' => $this->t('Event location'),
       '#type' => 'textarea',
-      '#default_value' => isset($settings['location']['tokenized']) ? $settings['location']['tokenized'] : '',
-      '#description' => $this->t('You can insert static text or use tokens (see the token chart below).'),
+      '#default_value' => $this->getSetting('location'),
+      '#description' => $this->t('Optional. You can use static text or tokens.'),
     ];
+
     $form['description'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t('Description'),
-      '#open' => TRUE,
-    ];
-    $form['description']['value'] = [
-      '#title' => $this->t('Description Field:'),
-      '#type' => 'select',
-      '#options' => $description_options,
-      '#default_value' => $this->getSetting('description'),
-      '#description' => $this->t('A field to use as the description for calendar events. <em>The contents used from this field will be truncated to 1024 characters</em>.'),
-    ];
-    $form['description']['tokenized'] = [
-      '#title' => $this->t('Tokenized Description Contents:'),
+      '#title' => $this->t('Event description'),
       '#type' => 'textarea',
-      '#default_value' => isset($settings['description']['tokenized']) ? $settings['description']['tokenized'] : '',
-      '#description' => $this->t('You can insert static text or use tokens (see the token chart below).'),
+      '#default_value' => $this->getSetting('description'),
+      '#description' => $this->t('Optional. You can use static text or tokens.'),
+    ];
+
+    $form['past_events'] = [
+      '#title' => $this->t('Show Add to Cal widget for past events?'),
+      '#type' => 'checkbox',
+      '#default_value' => $this->getSetting('past_events'),
+    ];
+
+    $form['token_tree_link'] = [
+      '#theme' => 'token_tree_link',
+      '#token_types' => [
+        $field->getTargetEntityTypeId(),
+      ],
     ];
 
     return $form;
@@ -124,6 +145,8 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
     $field = $this->fieldDefinition;
     $field_name = $field->get('field_name');
     $settings['field_name'] = $field_name;
+    $elements['#attached']['library'][] = 'addtocal/addtocal';
+    $elements['#cache']['contexts'][] = 'timezone';
 
     foreach ($items as $delta => $item) {
 
@@ -159,28 +182,92 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
         else {
           $elements[$delta] = ['#markup' => \Drupal::service('date.formatter')->format($start_date, 'custom', t($this->getSetting('one_day')), $timezone)];
         }
+
+        // Addtocal code
+        $start_date = DrupalDateTime::createFromTimestamp($item->value, $timezone);
+        $end_date = DrupalDateTime::createFromTimestamp($item->end_value, $timezone);
+
+        $is_all_day = in_array($this->getFieldSetting('datetime_type'), ['date', 'allday']);
+
+        if ($is_all_day) {
+          // A date without time will pick up the current time, set to midnight.
+          $start_date->modify('midnight');
+          $end_date->modify('midnight');
+        }
+        $is_now_before_start_date = new \DateTime('now') < $start_date->getPhpDateTime();
+
+        $token_data = [
+          $field->getTargetEntityTypeId() => $entity,
+        ];
+
+        $title = $this->token->replace($this->getSetting('event_title'), $token_data, ['clear' => TRUE]) ?: $entity->label();
+
+        if ($is_all_day) {
+          $date_diff = $end_date->diff($start_date);
+          // Google calendar all day events count days a little differently:
+          $diff_days = 1 + $date_diff->days;
+          $link = Link::createAllDay($title, $start_date->getPhpDateTime(), $diff_days);
+        }
+        else {
+          $link = Link::create($title, $start_date->getPhpDateTime(), $end_date->getPhpDateTime());
+        }
+
+        $link->address($this->token->replace($this->getSetting('location'), $token_data, ['clear' => TRUE]));
+        $link->description($this->token->replace($this->getSetting('description'), $token_data, ['clear' => TRUE]));
+
+        $element_id = 'addtocal-' . $entity->bundle() . '-' . $field->getName() . '-' . $entity->id() . '--' . $delta;
+
+        $addtocal_access = $this->getSetting('past_events') ? TRUE : $is_now_before_start_date;
+
+        $links = [
+          '#theme' => 'addtocal_links',
+          '#addtocal_link' => $link,
+          '#id' => $element_id,
+          '#attributes' => [],
+          '#button_text' => $this->t('Add to Calendar'),
+          '#button_attributes' => [
+            'aria-label' => $this->t('Open Add to Calendar menu'),
+          ],
+          '#menu_attributes' => [],
+          '#items' => [
+            'google' => [
+              'title' => $this->t('Google'),
+              'aria-label' => $this->t('Add to Google Calendar'),
+              'generator' => new Google(),
+            ],
+            'yahoo' => [
+              'title' => $this->t('Yahoo!'),
+              'aria-label' => $this->t('Add to Yahoo Calendar'),
+              'generator' => new Yahoo(),
+            ],
+            'web_outlook' => [
+              'title' => $this->t('Outlook.com'),
+              'aria-label' => $this->t('Add to Outlook.com Calendar'),
+              'generator' => new WebOutlook(),
+            ],
+            'web_office' => [
+              'title' => $this->t('Office.com'),
+              'aria-label' => $this->t('Add to Office.com Calendar'),
+              'generator' => new WebOffice(),
+            ],
+            'ics' => [
+              'title' => $this->t('iCal / MS Outlook'),
+              'aria-label' => $this->t('Add to iCal / MS Outlook'),
+              'generator' => new Ics(),
+            ],
+          ],
+          '#access' => $addtocal_access,
+        ];
+
+        $context = [
+          'items' => $items,
+          'langcode' => $langcode,
+          'delta' => $delta,
+        ];
+        $this->moduleHandler->alter('addtocal_links', $links, $context);
+
+        $elements[$delta]['addtocal'] = $links;
       }
-
-      // Adding AddtoCal
-      $form = new AddToCalForm($entity, $settings, $delta);
-      $form = \Drupal::formBuilder()->getForm($form);
-
-      // Creating the unix timestamp to be datetime format
-      // to account for timezone for comparison.
-      $event = new DrupalDateTime();
-      $event = $event->createFromTimestamp($start_date, new \DateTimeZone($timezone));
-      $event = $event->getPhpDateTime();
-
-      // Creating datetime object of the current time
-      // to account for timezone for comparison.
-      $now = new DrupalDateTime('', new \DateTimeZone($timezone));
-      $now = $now->getPhpDateTime();
-
-      // Need to verify the date object to see if event is in the past.
-      // if it is in the past DO NOT show AddToCal
-      $form['#access'] =  $now < $event;
-
-      $elements[$delta]['addtocal'] = $form;
     }
     return $elements;
   }
