@@ -9,16 +9,16 @@
  * Implements template_preprocess_input().
  */
 function epa_theme_preprocess_input(&$vars) {
-  $vars['required'] = isset($vars['element']['#required']) ? $vars['element']['#required'] : NULL;
-  $vars['type'] = isset($vars['element']['#attributes']['type']) ? $vars['element']['#attributes']['type'] : NULL;
-  $vars['dropbutton'] = isset($vars['element']['#dropbutton']) ? $vars['element']['#dropbutton'] : NULL;
+  $vars['required'] = $vars['element']['#required'] ?? NULL;
+  $vars['type'] = $vars['element']['#attributes']['type'] ?? NULL;
+  $vars['dropbutton'] = $vars['element']['#dropbutton'] ?? NULL;
 }
 
 /**
  * Implements template_preprocess_fieldset().
  */
 function epa_theme_preprocess_fieldset(&$vars) {
-  $vars['type'] = isset($vars['element']['#type']) ? $vars['element']['#type'] : NULL;
+  $vars['type'] = $vars['element']['#type'] ?? NULL;
 }
 
 /**
@@ -78,7 +78,7 @@ function epa_theme_form_content_moderation_entity_moderation_form_alter(&$form, 
  */
 function epa_theme_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
   // Switch template used for actions wrapper.
-  $form['actions']['#theme_wrappers'] = array('container__no_wrapper');
+  $form['actions']['#theme_wrappers'] = ['container__no_wrapper'];
 }
 
 /**

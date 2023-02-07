@@ -110,4 +110,5 @@ class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssI
       drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.admin.css',
     ];
   }
+
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\epa_core\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -47,11 +48,11 @@ class WebformsMultipleNodes extends ControllerBase {
 
     $list = '';
     foreach ($forms as $form) {
-      $list .= '<strong>Form:</strong> '. $form->toLink()->toString() .' - referenced by:<br />';
-      $node_ids = $db->query("select entity_id from {node__webform} where webform_target_id = '". $form->id() ."';")->fetchCol();
+      $list .= '<strong>Form:</strong> ' . $form->toLink()->toString() . ' - referenced by:<br />';
+      $node_ids = $db->query("select entity_id from {node__webform} where webform_target_id = '" . $form->id() . "';")->fetchCol();
       $nodes = $node_storage->loadMultiple($node_ids);
       foreach ($nodes as $node) {
-        $list .= '&emsp;&emsp;<strong>Node:</strong> '. $node->toLink()->toString() .'<br />';
+        $list .= '&emsp;&emsp;<strong>Node:</strong> ' . $node->toLink()->toString() . '<br />';
       }
       $list .= '<br />';
     }

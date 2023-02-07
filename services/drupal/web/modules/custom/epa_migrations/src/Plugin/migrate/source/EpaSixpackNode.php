@@ -22,7 +22,7 @@ class EpaSixpackNode extends Node {
   protected $batchSize = 1000;
 
   /**
-   * Panel keys
+   * Panel keys.
    *
    * @link https://git.drupalcode.org/project/clean_markup/-/blob/7.x-2.x/modules/clean_markup_panels/plugins/layouts/six_pack/six_pack.inc#L14
    */
@@ -42,7 +42,10 @@ class EpaSixpackNode extends Node {
     return self::limitQuery(parent::query());
   }
 
-  static public function limitQuery(SelectInterface $query) {
+  /**
+   *
+   */
+  public static function limitQuery(SelectInterface $query) {
     // Nodes with six_pack layouts only.
     $query->innerJoin('panelizer_entity', 'pe', 'n.vid = pe.revision_id AND pe.entity_id = n.nid AND pe.entity_type = :type', [':type' => 'node']);
     $query->innerJoin('panels_display', 'pd', 'pe.did = pd.did');
@@ -111,7 +114,7 @@ class EpaSixpackNode extends Node {
       $row->setSourceProperty('last_published', gmdate(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, $last_published));
     }
 
-    // We'll linearize the panels as a single column of paragraphs
+    // We'll linearize the panels as a single column of paragraphs.
     $row->setSourceProperty('layout', 'onecol_page');
 
     // Get the Display ID for the current revision.
@@ -124,19 +127,19 @@ class EpaSixpackNode extends Node {
       ->fetchField();
 
     if (!$did) {
-      // This should not happen
+      // This should not happen.
       return FALSE;
     }
 
     // All available panes for the did.
-    /* @var $all_panes array[] */
+    /** @var array[] $all_panes */
     $all_panes = $this->select('panels_pane', 'pp')
       ->fields('pp')
       ->condition('pp.did', $did)
       ->execute()
       ->fetchAll();
 
-    // Picking each in order is just simpler than usort() and still plenty fast
+    // Picking each in order is just simpler than usort() and still plenty fast.
     $ordered_panes = [];
     foreach (self::SIXPACK_PANEL_KEYS as $region) {
       foreach ($all_panes as $pane) {
@@ -160,4 +163,5 @@ class EpaSixpackNode extends Node {
 
     return parent::prepareRow($row);
   }
+
 }

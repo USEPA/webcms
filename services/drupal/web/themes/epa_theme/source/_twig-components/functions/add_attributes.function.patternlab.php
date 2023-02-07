@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Creates an "add_attributes" function for Pattern Lab that adds attributes
@@ -7,6 +8,9 @@
  * Based on https://github.com/drupal-pattern-lab/add-attributes-twig-extension
  */
 
+/**
+ *
+ */
 function addAddAttributesFunction(\Twig_Environment &$env, $config) {
   $env->addFunction(new Twig_SimpleFunction('add_attributes', function ($context, $additional_attributes = [], $attribute_type = 'attributes') {
 
@@ -38,7 +42,6 @@ function addAddAttributesFunction(\Twig_Environment &$env, $config) {
 
     return implode(' ', $attributes);
 
-
-  }, array('needs_context' => true, 'is_safe' => array('html'))));
+  }, ['needs_context' => TRUE, 'is_safe' => ['html']]));
 
 }
