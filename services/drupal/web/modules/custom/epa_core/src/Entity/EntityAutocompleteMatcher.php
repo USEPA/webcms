@@ -9,6 +9,7 @@ use Drupal\Component\Utility\Tags;
  * Matcher class to get autocompletion results for entity reference.
  */
 class EntityAutocompleteMatcher extends \Drupal\Core\Entity\EntityAutocompleteMatcher {
+
   /**
    * {@inheritDoc}
    */
