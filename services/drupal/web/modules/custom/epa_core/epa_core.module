@@ -280,6 +280,10 @@ function epa_core_token_info() {
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
+      'epa-addtocal-description' => [
+        'name' => t('EPA event description'),
+        'description' => t('Custom EPA event description suitable for Addtocal'),
+      ]
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -323,6 +327,41 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
           $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
+        }
+        break;
+      case 'epa-addtocal-description':
+        if ($type == 'node' && !empty($data['node'])) {
+          $add_to_cal_components = [];
+          $node = $data['node'];
+          if ($node->bundle() == 'event') {
+            $description = $node->get('field_add_to_cal_description')->value;
+            if (empty($description)) {
+              $description = $node->get('field_description')->value;
+            }
+            if ($description) {
+              $add_to_cal_components[] = $description;
+            }
+
+            $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
+            if (!empty($event_type)) {
+              $add_to_cal_components[] = "Event Type: $event_type";
+            }
+            $event_host = $node->get('field_event_host')->value;
+            if (!empty($event_host)) {
+              $add_to_cal_components[] = "Event host: $event_host";
+            }
+            $links_string = '';
+            foreach ($node->field_links as $link) {
+              $url = $link->getUrl();
+              $url->setAbsolute();
+              $title = $link->title;
+              $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
+            }
+            if (!empty($links_string)) {
+              $add_to_cal_components[] = "Links:\n". $links_string;
+            }
+          }
+          $replacements[$original] = implode("\n\n", $add_to_cal_components);
         }
         break;
       case 'contact-us-link':
@@ -399,42 +438,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   }
   return $replacements;
 }
-
-function epa_core_addtocal_alter(array &$overridable_items) {
-//  $overridable_items['override_status'] = TRUE;
-//  $add_to_cal_components = [];
-//  $node = \Drupal::routeMatch()->getParameter('node');
-//  if ($node->bundle() == 'event') {
-//    $description = $node->get('field_add_to_cal_description')->value;
-//    if (empty($description)) {
-//      $description = $node->get('field_description')->value;
-//    }
-//    if ($description) {
-//      $add_to_cal_components[] = $description;
-//    }
-//
-//    $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
-//    if (!empty($event_type)) {
-//      $add_to_cal_components[] = "Event Type: $event_type";
-//    }
-//    $event_host = $node->get('field_event_host')->value;
-//    if (!empty($event_host)) {
-//      $add_to_cal_components[] = "Event host: $event_host";
-//    }
-//    $links_string = '';
-//    foreach ($node->field_links as $link) {
-//      $url = $link->getUrl();
-//      $url->setAbsolute();
-//      $title = $link->title;
-//      $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
-//    }
-//    if (!empty($links_string)) {
-//      $add_to_cal_components[] = "Links:\n". $links_string;
-//    }
-//  }
-//  $overridable_items['description'] = implode("\n\n", $add_to_cal_components);
-}
-
 
 
 /**
