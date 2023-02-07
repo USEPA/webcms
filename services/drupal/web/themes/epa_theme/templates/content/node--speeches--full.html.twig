@@ -1,0 +1,136 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
+{% set header_info %}
+  {% if nav_style == 'sidebar_navigation' %}
+    {% if node.field_wide_template.value %}
+      {% set display_sidenav = false %}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
+    {% else %}
+      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+    {% endif %}
+  {% else %}
+    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+  {% endif %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set admin_info %}
+  {{ region_messages }}
+  {{ content.epa_content_moderation_info_box }}
+{% endset %}
+
+{% set show_admin_info = false %}
+
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set has_footer = false %}
+
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
+{% set related %}
+  <ul>
+    {% if content.field_video|field_value %}
+      <li><a href="#watch">Watch the Event</a></li>
+    {% endif %}
+    {{ content.field_related_information }}
+  </ul>
+{% endset %}
+
+{% set tid = content.field_authors[0]['#paragraph'].field_author.target_id %}
+{% set speaker_image = drupal_field('field_image', 'taxonomy_term', tid) %}
+
+{% set body %}
+  <div class="u-align-right c-speeches__sidebar">
+    {% if content.field_show_image[0]['#markup'] == "Yes" %}
+      {% include '@components/figure/figure.twig' with {
+        'modifier_classes': '',
+        'caption': false,
+        'media': speaker_image,
+      } %}
+    {% endif %}
+    {% if related %}
+      {% include '@components/box/box--related-info/box--related-info.twig' with {
+        'title': {
+          'tag': 'div',
+          'text': 'Related Information',
+        },
+        'content': related,
+      } only %}
+    {% endif %}
+  </div>
+  <h2>{{ content.field_authors }}</h2>
+  <h3>{{ content.field_release|field_value }} <br />{{ content.field_text_location|field_value }}</h3>
+  {{ content.field_paragraphs|field_value }}
+  {% if content.field_video|field_value %}
+    <h2 class="highlight" id="watch">Watch the Event</h2>
+  {% endif %}
+  {{ content.field_video|field_value }}
+{% endset %}
+
+
+{% if display_sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
+    'body': body,
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
+    'body': body,
+    'footer': footer,
+  } %}
+{% endif %}
