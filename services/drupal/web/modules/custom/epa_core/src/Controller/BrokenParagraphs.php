@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\epa_core\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -72,7 +73,7 @@ WHERE nd.status = 1
 
     $list = '';
     foreach ($nodes as $node) {
-      $list .= $node->toLink()->toString() .'<br />';
+      $list .= $node->toLink()->toString() . '<br />';
     }
     return [
       '#markup' => $list,

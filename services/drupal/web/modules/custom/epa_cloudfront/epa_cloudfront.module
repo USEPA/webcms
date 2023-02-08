@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use Drupal\Core\Entity\EntityInterface;
 
 /**
@@ -24,11 +28,10 @@ function epa_cloudfront_entity_update(EntityInterface $entity) {
     $entity_type = $entity->getEntityTypeId();
     if ($entity_type == 'content_moderation_state' &&
       $entity->content_entity_type_id->value == 'node' &&
-      in_array($entity->moderation_state->value,['published','unpublished'])) {
-        if ($moderated_entity = \Drupal::entityTypeManager()->getStorage($entity->content_entity_type_id->value)->loadRevision($entity->content_entity_revision_id->value)) {
-          cloudfront_cache_path_invalidate_entity_update($moderated_entity);
-        }
+      in_array($entity->moderation_state->value, ['published', 'unpublished'])) {
+      if ($moderated_entity = \Drupal::entityTypeManager()->getStorage($entity->content_entity_type_id->value)->loadRevision($entity->content_entity_revision_id->value)) {
+        cloudfront_cache_path_invalidate_entity_update($moderated_entity);
+      }
     }
   }
 }
-
