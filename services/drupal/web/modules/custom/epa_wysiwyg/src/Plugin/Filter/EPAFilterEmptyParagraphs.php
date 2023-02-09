@@ -2,12 +2,12 @@
 
 namespace Drupal\epa_wysiwyg\Plugin\Filter;
 
-use Drupal\filter\Annotation\Filter;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 
 /**
- * Class EPAFilterEmptyParagraphs
+ * Class EPAFilterEmptyParagraphs.
+ *
  * @Filter(
  *   id = "epa_filter_empty_paragraphs",
  *   title = @Translation("Filter empty paragraphs"),

@@ -109,7 +109,7 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->setContentEntityRevision();
     $this->contentEntityRevision->setSyncing(TRUE);
     $revision_log = $this->contentEntityRevision->revision_log->value;
-    if (!$this->contentEntityRevision->isNewRevision() && $this->contentEntityRevision->revision_log->value == '')  {
+    if (!$this->contentEntityRevision->isNewRevision() && $this->contentEntityRevision->revision_log->value == '') {
       // Have to set this in order to avoid having empty log messages set to
       // the value of the current default revision when re-saving non-default revisions.
       // We're fighting code in core's Node::preSaveRevision()
@@ -234,13 +234,13 @@ abstract class EPAModeration implements EPAModerationInterface {
   }
 
   /**
-   * Sets field_last_published value to the current date and time
+   * Sets field_last_published value to the current date and time.
    *
    * @param bool $reset
-   *  Pass TRUE to set field_last_published to null
+   *   Pass TRUE to set field_last_published to null.
    */
   protected function setLastPublishedDate($reset = FALSE) {
-    // Stop if content doesn't have this field
+    // Stop if content doesn't have this field.
     if (!$this->contentEntityRevision->hasField('field_last_published')) {
       return;
     }
