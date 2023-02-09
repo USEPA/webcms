@@ -12,5 +12,28 @@
     caption {
       color: gesso-grayscale(white);
     }
+
+    /* stylelint-disable selector-max-compound-selectors, max-nesting-depth */
+    &:not(.usa-table--unstyled) {
+      thead a,
+      tbody a {
+        color: gesso-color(text, link);
+        -webkit-text-decoration-skip: objects;
+
+        &:visited {
+          color: gesso-color(text, link-visited);
+        }
+
+        &:hover,
+        &:focus {
+          color: gesso-color(text, link-hover);
+        }
+
+        &:active {
+          color: gesso-color(text, link-active);
+        }
+      }
+    }
+    /* stylelint-enable selector-max-compound-selectors, max-nesting-depth */
   }
 }
