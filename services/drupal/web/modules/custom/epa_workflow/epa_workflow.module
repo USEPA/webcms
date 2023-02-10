@@ -244,6 +244,9 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['current']['#value'] = NULL;
 
     $form['new_state']['#required'] = TRUE;
+
+    // Change "Revision Log" label to "Revision notes".
+    $form['revision_log']['#title'] =  t('Revision notes');
   }
 
   if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
