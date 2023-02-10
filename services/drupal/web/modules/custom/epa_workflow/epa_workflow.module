@@ -268,6 +268,11 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       }
     }
   }
+  if (in_array($form_id, ['user_form','user_register_form'])) {
+    // Only show the checkbox that allows setting a user as a debugging user
+    // when on a non-prod environment.
+    $form["field_workflow_debugger"]["#access"] = getenv('WEBCMS_SITE') !== 'prod';
+  }
 }
 
 /**

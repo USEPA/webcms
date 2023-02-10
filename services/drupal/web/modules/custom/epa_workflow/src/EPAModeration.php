@@ -218,6 +218,15 @@ abstract class EPAModeration implements EPAModerationInterface {
     }
     if (in_array($bundle, array_keys($workflow_types))) {
       $review_period = $workflow_types[$bundle];
+
+      // We hard-code the deadline to 2 days out if the user executing this
+      // has the field_workflow_debugger set to TRUE. This is used to help QA
+      // debug workflow and email notifications.
+      $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+      if ($user->field_workflow_debugger->value) {
+        $review_period = 2;
+      }
+
       $date = new DrupalDateTime();
       $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
       $date->add(new \DateInterval("P{$review_period}D"));
