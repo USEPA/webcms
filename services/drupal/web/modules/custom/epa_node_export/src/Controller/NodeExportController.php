@@ -15,13 +15,9 @@ use Drupal\node\NodeInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use ZipArchive;
 
 /**
  * Provides route responses for the archive creation.
@@ -223,12 +219,12 @@ class NodeExportController extends ControllerBase {
 
         $export_uri_filename = $export_uri . '.zip';
         $export_filename = $this->fileSystem->realpath($export_uri_filename);
-        $zip = new ZipArchive();
-        $res = $zip->open($export_filename, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zip = new \ZipArchive();
+        $res = $zip->open($export_filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         if ($res === TRUE) {
-          $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($export_dir),
-            RecursiveIteratorIterator::LEAVES_ONLY
+          $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($export_dir),
+            \RecursiveIteratorIterator::LEAVES_ONLY
           );
 
           foreach ($files as $name => $file) {

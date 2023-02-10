@@ -82,7 +82,7 @@ class EPAPublished extends EPAModeration {
           $date = new DrupalDateTime();
           $date->add(new \DateInterval("P90D"));
 
-          // Set field value
+          // Set field value.
           $node->set('field_notice_sort_date', $date->format('Y-m-d'));
         }
       }

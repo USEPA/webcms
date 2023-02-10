@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements theme_suggestions_taxonomy_term_alter()
  *
  * @param $suggestions

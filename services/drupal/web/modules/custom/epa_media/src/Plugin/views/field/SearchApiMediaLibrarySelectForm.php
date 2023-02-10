@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_media\Plugin\views\field;
 
-
 use Drupal\media_library\Plugin\views\field\MediaLibrarySelectForm;
 use Drupal\search_api\Plugin\views\field\SearchApiFieldTrait;
 
@@ -16,4 +15,5 @@ use Drupal\search_api\Plugin\views\field\SearchApiFieldTrait;
  */
 class SearchApiMediaLibrarySelectForm extends MediaLibrarySelectForm {
   use SearchApiFieldTrait;
+
 }
