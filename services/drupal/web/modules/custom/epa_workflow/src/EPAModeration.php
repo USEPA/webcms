@@ -232,9 +232,12 @@ abstract class EPAModeration implements EPAModerationInterface {
       $date->add(new \DateInterval("P{$review_period}D"));
       $review_deadline = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
       $this->contentEntityRevision->set('field_review_deadline', $review_deadline);
-      if ($bundle == 'public_notice' && !$this->contentEntityRevision->get('field_notice_sort_date')->isEmpty()) {
-        $sort_date = $this->contentEntityRevision->field_notice_sort_date->date;
-        $this->contentEntityRevision->set('field_review_deadline', $sort_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT));
+
+      // If this is a public notice and it has a comment due date then we do not
+      // schedule a review deadline for it. It will get auto-unpublished by the
+      // expiration date field instead.
+      if ($bundle == 'public_notice' && !$this->contentEntityRevision->get('field_comments_due_date')->isEmpty()) {
+        $this->contentEntityRevision->set('field_review_deadline', NULL);
       }
     }
     else {

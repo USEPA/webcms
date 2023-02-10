@@ -70,13 +70,16 @@ class EPAPublished extends EPAModeration {
             $node->set('field_computed_comments_due_date', $due_date);
           }
         }
-        elseif (!$extension_date) {
+        else {
           $node->set('field_computed_comments_due_date', NULL);
         }
 
         // If computed date was set, use it. Otherwise set a date 90 days out.
         if ($computed_date = $node->field_computed_comments_due_date->value) {
           $node->set('field_notice_sort_date', $computed_date);
+
+          //  Schedule the node to be unpublished when it closes for comments.
+          $node->set('field_expiration_date', $computed_date);
         }
         else {
           $date = new DrupalDateTime();
@@ -84,6 +87,7 @@ class EPAPublished extends EPAModeration {
 
           // Set field value.
           $node->set('field_notice_sort_date', $date->format('Y-m-d'));
+          $node->set('field_expiration_date', NULL);
         }
       }
       if ($node->bundle() == 'news_release') {
@@ -101,7 +105,10 @@ class EPAPublished extends EPAModeration {
     if ($this->contentEntityRevision->hasField('field_review_deadline') &&
       $this->contentEntityRevision->hasField('field_expiration_date') &&
       !$this->contentEntityRevision->get('field_expiration_date')->isEmpty() &&
-      $this->contentEntityRevision->field_review_deadline->value > $this->contentEntityRevision->field_expiration_date->value) {
+      (
+        !$this->contentHasFieldValue('field_review_deadline') ||
+        $this->contentEntityRevision->field_review_deadline->value > $this->contentEntityRevision->field_expiration_date->value
+      )) {
       $this->scheduleTransition('field_expiration_date', 'unpublished', TRUE);
     }
 
