@@ -8,6 +8,7 @@ import Drupal from 'drupal';
         'work.epa.gov',
         'intranet.epa.gov',
         'usepa.sharepoint.com',
+        'usepa.servicenowservices.com',
       ];
       function linkIsProtected(linkElement) {
         let external = false;
