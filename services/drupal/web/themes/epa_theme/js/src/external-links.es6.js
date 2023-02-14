@@ -14,6 +14,7 @@ import Drupal from 'drupal';
         'urbanwaters.gov',
         'westcoastcollaborative.org',
         'usepa.sharepoint.com',
+        'usepa.servicenowservices.com',
       ];
       function linkIsExternal(linkElement) {
         let external = true;
