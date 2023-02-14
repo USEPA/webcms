@@ -16,6 +16,20 @@ import Drupal from 'drupal';
         'usepa.sharepoint.com',
         'usepa.servicenowservices.com',
       ];
+
+      const epaSocialMediaLinks = [
+        'https://www.facebook.com/epa',
+        'https://facebook.com/epa',
+        'https://www.instagram.com/epagov',
+        'https://instagram.com/epagov',
+        'https://www.twitter.com/epa',
+        'https://twitter.com/epa',
+        'https://www.youtube.com/user/usepagov',
+        'https://youtube.com/user/usepagov',
+        'https://www.flickr.com/photos/usepagov',
+        'https://flickr.com/photos/usepagov',
+      ];
+
       function linkIsExternal(linkElement) {
         let external = true;
 
@@ -36,6 +50,10 @@ import Drupal from 'drupal';
             external = false;
           }
         });
+
+        if (epaSocialMediaLinks.includes(linkElement.href.toLowerCase())) {
+          external = false;
+        }
 
         return external;
       }
