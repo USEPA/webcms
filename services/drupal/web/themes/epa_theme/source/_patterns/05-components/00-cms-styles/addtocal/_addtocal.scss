@@ -17,10 +17,19 @@
     @extend .usa-button;
     margin-right: 0;
 
+    &:focus {
+      @extend .usa-button, :hover;
+      z-index: 1;
+    }
+
     + div {
       left: auto !important;
       min-width: 159px;
       right: 0;
+    }
+
+    &-link .icon--exit {
+      display: none;
     }
   }
 
