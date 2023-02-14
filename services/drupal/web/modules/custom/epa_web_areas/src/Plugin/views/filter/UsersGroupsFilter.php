@@ -10,7 +10,7 @@ use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Filters nodes based on user's groups
+ * Filters nodes based on user's groups.
  *
  * @ingroup views_filter_handlers
  *
@@ -75,12 +75,13 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
   public function query() {
     if (is_array($this->value) && reset($this->value) == 'groups') {
       $groups = $this->getAllGroupsByUser();
-      if (empty($groups)) $groups = [-1];
+      if (empty($groups)) {
+        $groups = [-1];
+      }
       $this->ensureMyTable();
       $this->query->addWhere($this->options['group'], $this->tableAlias . '.' . $this->realField, $groups, 'IN');
     }
   }
-
 
   /**
    * Gets all Group entity IDs for the currently logged in user.

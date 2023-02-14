@@ -5,7 +5,7 @@
  * Provides the necessary hooks for the block theme suggestions.
  */
 
-use \Drupal\block_content\BlockContentInterface;
+use Drupal\block_content\BlockContentInterface;
 
 /**
  * Implements hook_theme_suggestions_HOOK_alter().
@@ -28,7 +28,7 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
 
     // Search the fixed block of the edited custom block.
     if ($fixed_block = $mapping_handler->getFixedBlock($content['#block_content'])) {
-      $suggestions[] = 'block__fixed__'. $fixed_block->id();
+      $suggestions[] = 'block__fixed__' . $fixed_block->id();
     }
   }
 }
