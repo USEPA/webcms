@@ -78,7 +78,7 @@
 {% set author_names %}
   {% for term in node.field_authors %}
     {% set tid = term.entity.field_author.target_id %}
-    {{ drupal_field('name', 'taxonomy_term', tid, 'author_name') }}
+    {{ drupal_field('name', 'taxonomy_term', tid, 'author_name') }}{% if term.entity.field_position.value is not empty %}, {{ term.entity.field_position.value }}{% endif %}
     {% if not loop.last %}<br />{% endif %}
   {% endfor -%}
 {% endset %}
