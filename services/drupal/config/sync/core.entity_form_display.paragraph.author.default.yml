@@ -5,9 +5,9 @@ dependencies:
   config:
     - field.field.paragraph.author.field_author
     - field.field.paragraph.author.field_biography
+    - field.field.paragraph.author.field_hide_image
     - field.field.paragraph.author.field_office
     - field.field.paragraph.author.field_position
-    - field.field.paragraph.author.field_show_image
     - paragraphs.paragraphs_type.author
   module:
     - inline_entity_form
@@ -43,6 +43,13 @@ content:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
+  field_hide_image:
+    type: boolean_checkbox
+    weight: 1
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   field_office:
     type: string_textfield
     weight: 3
@@ -65,13 +72,6 @@ content:
       maxlength:
         maxlength_js: 240
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
-  field_show_image:
-    type: boolean_checkbox
-    weight: 1
-    region: content
-    settings:
-      display_label: true
-    third_party_settings: {  }
 hidden:
   created: true
   status: true
