@@ -75,18 +75,29 @@
   </ul>
 {% endset %}
 
+{% set author_names %}
+  {% for term in node.field_authors %}
+    {% set tid = term.entity.field_author.target_id %}
+    {{ drupal_field('name', 'taxonomy_term', tid, 'author_name') }}
+    {% if not loop.last %}<br />{% endif %}
+  {% endfor -%}
+{% endset %}
+
 {% set body %}
-  {{ content.field_authors }}
-  {% if related %}
-    {% include '@components/box/box--related-info/box--related-info.twig' with {
-      'modifier_classes': 'u-align-right u-clear-right',
-      'title': {
-        'tag': 'div',
-        'text': 'Related Information',
-      },
-      'content': related,
-    } only %}
-  {% endif %}
+  <div class="u-align-right box-wrap">
+    {{ content.field_authors }}
+    {% if related %}
+      {% include '@components/box/box--related-info/box--related-info.twig' with {
+        'modifier_classes': '',
+        'title': {
+          'tag': 'div',
+          'text': 'Related Information',
+          },
+        'content': related,
+      } only %}
+    {% endif %}
+  </div>
+  <h2>{{ author_names }}</h2>
   <h3>{{ content.field_release|field_value }} <br />{{ content.field_text_location|field_value }}</h3>
   {{ content.field_paragraphs|field_value }}
   {% if content.field_video|field_value %}
