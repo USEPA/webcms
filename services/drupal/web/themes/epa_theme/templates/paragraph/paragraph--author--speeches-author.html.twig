@@ -1,7 +1,7 @@
 {% set tid = paragraph.field_author.target_id %}
 {% set author_image = drupal_field('field_image', 'taxonomy_term', tid) %}
 
-{% if content.field_show_image[0]['#markup'] == "Yes" %}
+{% if content.field_hide_image[0]['#markup'] == "No" %}
   {% if author_image is not empty %}
     {% include '@components/figure/figure.twig' with {
       'modifier_classes': '',
