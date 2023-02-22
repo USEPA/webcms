@@ -481,6 +481,15 @@ function epa_core_entity_delete(EntityInterface $entity) {
 }
 
 /**
+ * Implements hook_node_form_FORM_ID_alter().
+ */
+function epa_core_form_autosave_form_admin_settings_alter(&$form, FormStateInterface $form_state) {
+  if (isset($form["allowed_content_entities"]["webform_submission"])) {
+    unset($form["allowed_content_entities"]["webform_submission"]);
+  }
+}
+
+/**
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
