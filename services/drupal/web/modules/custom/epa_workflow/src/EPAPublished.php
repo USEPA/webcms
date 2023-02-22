@@ -75,18 +75,19 @@ class EPAPublished extends EPAModeration {
         }
 
         // If computed date was set, use it. Otherwise set a date 90 days out.
-        if ($computed_date = $node->field_computed_comments_due_date->value) {
-          $node->set('field_notice_sort_date', $computed_date);
+        if ($computed_date = $node->field_computed_comments_due_date->date) {
+          $node->set('field_notice_sort_date', $computed_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT));
 
+          $expiration_date = new DrupalDateTime($computed_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT). 'T23:59:59', 'America/New_York');
           //  Schedule the node to be unpublished when it closes for comments.
-          $node->set('field_expiration_date', $computed_date);
+          $node->set('field_expiration_date', $expiration_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, ['timezone' => 'UTC']));
         }
         else {
           $date = new DrupalDateTime();
           $date->add(new \DateInterval("P90D"));
 
           // Set field value.
-          $node->set('field_notice_sort_date', $date->format('Y-m-d'));
+          $node->set('field_notice_sort_date', $date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT));
           $node->set('field_expiration_date', NULL);
         }
       }
