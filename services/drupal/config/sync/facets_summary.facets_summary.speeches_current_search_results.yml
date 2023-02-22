@@ -1,0 +1,44 @@
+uuid: 1e419878-bc2e-4ce0-ac30-6f2fb0d6af20
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.speeches_and_remarks
+    - views.view.search_speeches_and_remarks
+  module:
+    - search_api
+id: speeches_current_search_results
+name: 'Current search results'
+facet_source_id: 'search_api:views_page__search_speeches_and_remarks__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '45'
+    settings: {  }
+  reset_facets:
+    processor_id: reset_facets
+    weights:
+      build: '30'
+    settings:
+      link_text: ''
+      position: before
+facets:
+  speeches_person:
+    checked: true
+    label: Person
+    separator: ', '
+    show_count: false
+    weight: -10
+  speeches_subjects:
+    checked: true
+    label: Subject
+    separator: ', '
+    show_count: false
+    weight: -9
+  speeches_year:
+    checked: true
+    label: Year
+    separator: ', '
+    show_count: false
+    weight: -8

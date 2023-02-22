@@ -33,6 +33,7 @@ function epa_theme_theme_suggestions_container_alter(array &$suggestions, array 
     'search_news_releases',
     'search_perspectives',
     'search_public_notices',
+    'search_speeches_and_remarks'
   ];
   if (isset($variables['element']['#name'])) {
     if (in_array($variables['element']['#name'], $exclude_views)) {
