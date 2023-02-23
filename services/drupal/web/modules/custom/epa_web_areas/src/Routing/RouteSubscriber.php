@@ -81,6 +81,7 @@ class RouteSubscriber extends RouteSubscriberBase {
       'view.group_media.page_1',
       'view.group_media_search_api.page_1',
       'view.group_members.page_1',
+      'view.group_paragraphs_library.page_1',
       'view.group_publishers.page_1',
       'view.group_moderated_content.moderated_content',
       'entity.group.menu',
