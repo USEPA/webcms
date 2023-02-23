@@ -582,7 +582,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 
   // Update field_author_names with values from field_authors.
-  if ($node->bundle() == 'perspective') {
+  if (in_array($node->bundle(), ['perspective', 'speeches'])) {
     if (!$node->field_authors->isEmpty()) {
       $author_paragraphs = $node->field_authors->getValue();
       $tids = [];
