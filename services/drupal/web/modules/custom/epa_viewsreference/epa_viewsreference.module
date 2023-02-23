@@ -35,7 +35,7 @@ function epa_viewsreference_field_widget_form_alter(array &$element, FormStateIn
     }
 
     // Make "DESC" be the default sort order for Perspectives and FAQ List.
-    $view_types = ['dynamic_faq_list', 'dynamic_list_perspectives'];
+    $view_types = ['dynamic_faq_list', 'dynamic_list_perspectives', 'dynamic_list_speeches_and_remarks'];
     if (in_array($element["target_id"]["#default_value"], $view_types)) {
       $data = $context['items'][0]->getValue('data');
       $data_values = unserialize($data['data']);
