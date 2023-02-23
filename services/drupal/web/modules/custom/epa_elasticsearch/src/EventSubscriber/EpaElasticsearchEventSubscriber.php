@@ -1,11 +1,16 @@
 <?php
+
 namespace Drupal\epa_elasticsearch\EventSubscriber;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\elasticsearch_connector\Event\BuildSearchParamsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ *
+ */
 class EpaElasticsearchEventSubscriber implements EventSubscriberInterface {
+
   /**
    * {@inheritdoc}
    */
@@ -39,15 +44,17 @@ class EpaElasticsearchEventSubscriber implements EventSubscriberInterface {
               'weight' => 1,
             ],
             [
-              'weight' => 10, // Boost documents released within the last 6
-              // months from between 1.1 and 11. Beyond 6 months documents will
+            // Boost documents released within the last 6.
+              'weight' => 10,
+              // Months from between 1.1 and 11. Beyond 6 months documents will
               // get boosted approximately the same amount,  between 1 and 1.1.
               // This boost will get multiplied by their query score to get
               // the relevance score.
               'gauss' => [
                 'field_release' => [
                   'origin' => $now->format('Y-m-d'),
-                  'scale' => '183d', // 6 months
+            // 6 months
+                  'scale' => '183d',
                   'decay' => 0.1,
                 ],
               ],
@@ -59,4 +66,5 @@ class EpaElasticsearchEventSubscriber implements EventSubscriberInterface {
       $event->setElasticSearchParams($params);
     }
   }
+
 }
