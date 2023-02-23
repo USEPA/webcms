@@ -433,19 +433,6 @@ display:
         options: {  }
       empty: {  }
       sorts:
-        search_api_relevance:
-          id: search_api_relevance
-          table: search_api_index_speeches_and_remarks
-          field: search_api_relevance
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: search_api
-          order: DESC
-          expose:
-            label: ''
-            field_identifier: ''
-          exposed: false
         field_release:
           id: field_release
           table: search_api_index_speeches_and_remarks
@@ -1044,7 +1031,7 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -1052,6 +1039,9 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.speeches_person'
+        - 'config:facets.facet.speeches_subjects'
+        - 'config:facets.facet.speeches_year'
         - 'config:field.storage.node.field_description'
         - 'config:field.storage.node.field_release'
         - 'config:field.storage.paragraph.field_author'
