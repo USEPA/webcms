@@ -7,7 +7,6 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -20,7 +19,6 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\paragraphs\Entity\Paragraph;
-use Drupal\user\Entity\User;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -137,7 +135,7 @@ function epa_workflow_mail_alter(&$message) {
       $message['to'] = 'donotreply@epa.gov';
     }
 
-    // Log here to avoid having to create our own mail service
+    // Log here to avoid having to create our own mail service.
     $logger = \Drupal::logger('epa_workflow');
     $transition = \Drupal::service('content_moderation_notifications.notification_information')->getTransition($message['params']['context']['node']);
     $logger->info('Notification email with subject: %subject was sent to: %to  when the %transition transition was executed on revision %vid', ['%to' => $message['params']['headers']['Bcc'], '%subject' => $message['subject'], '%vid' => $message['params']['context']['node']->getRevisionId(), '%transition' => $transition->label()]);
@@ -219,13 +217,12 @@ function epa_workflow_field_widget_form_alter(array &$element, FormStateInterfac
   $plugin_id = $context['widget']->getPluginId();
 
   if ('moderation_state_default' === $plugin_id && isset($element["state"]["#options"]) && key_exists('draft', $element["state"]["#options"])) {
-    if (!in_array($element["state"]["#default_value"],['draft_needs_review'])) {
+    if (!in_array($element["state"]["#default_value"], ['draft_needs_review'])) {
       $element["state"]["#default_value"] = 'draft';
     }
     $element["#access"] = FALSE;
   }
 }
-
 
 /**
  * Implements hook_form_alter().
@@ -246,10 +243,10 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['new_state']['#required'] = TRUE;
 
     // Change "Revision Log" label to "Revision notes".
-    $form['revision_log']['#title'] =  t('Revision notes');
+    $form['revision_log']['#title'] = t('Revision notes');
   }
 
-  if ((in_array($form_id,['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
+  if ((in_array($form_id, ['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
     _epa_workflow_add_compliance_checkboxes($form);
   }
 
@@ -263,7 +260,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['#attached']['library'][] = 'epa_workflow/revision_list';
     foreach ($form['node_revisions_table'] as $key => $row) {
       // Add some text to the row if the revision is the published rev.
-      if (is_numeric($key) && in_array('is-published',$row['#attributes']['class'])) {
+      if (is_numeric($key) && in_array('is-published', $row['#attributes']['class'])) {
         $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = "<strong>Currently published revision</strong>";
       }
     }
@@ -321,7 +318,6 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
 
   $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
 
-
   $new_state = $form_state->getValue('new_state');
 
   $entity->set('moderation_state', $new_state);
@@ -337,7 +333,6 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
 
   $form_state->setRedirectUrl($entity->toUrl('canonical'));
 }
-
 
 /**
  * Implements hook_entity_view().
@@ -378,7 +373,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     $link_options = [
       'attributes' => [
         'class' => [
-          'button'
+          'button',
         ],
       ],
     ];
@@ -421,7 +416,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
 
   // Want to display the `field_review_deadline` date
   // on the moderation block only on published content
-  // and the `field_review_deadline` has a value
+  // and the `field_review_deadline` has a value.
   $review_deadline = NULL;
   if (isset($entity->field_review_deadline) && !$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
 
@@ -438,7 +433,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     $review_deadline = [
       '#type' => 'item',
       '#title' => t("Review deadline"),
-      '#markup' => $review_deadline_rendered
+      '#markup' => $review_deadline_rendered,
     ];
 
   }
@@ -460,7 +455,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     ];
   }
 
-  // Flag link item for notification opt-in
+  // Flag link item for notification opt-in.
   /** @var \Drupal\flag\Entity\Flag $flag */
   $flag = \Drupal::entityTypeManager()
     ->getStorage('flag')
@@ -473,7 +468,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
   $flag_link = $flag_link_plugin->getAsFlagLink($flag, $entity);
 
   $flag_link_item = [
-    '#markup' => $renderer->render($flag_link)
+    '#markup' => $renderer->render($flag_link),
   ];
 
   $build['epa_content_moderation_info_box'] = [
@@ -506,7 +501,8 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
     ],
     [
       'content_moderation.content' => 'Latest Revisions',
-      'content_moderation.moderated_content' => FALSE, // Hides the task provided by the content moderation module.
+    // Hides the task provided by the content moderation module.
+      'content_moderation.moderated_content' => FALSE,
     ],
   ];
 
@@ -595,7 +591,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
       $node->field_author_names = [];
       foreach ($tids as $tid) {
         $node->field_author_names[] = [
-          'target_id' => $tid
+          'target_id' => $tid,
         ];
       }
     }
@@ -624,15 +620,15 @@ function epa_workflow_node_update(NodeInterface $node) {
     $last_revision->isDefaultRevision(!$node->isPublished());
     $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
     $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
-    $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.',['%vid' => $node->leapfrog]));
+    $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.', ['%vid' => $node->leapfrog]));
     $last_revision->setSyncing(TRUE);
     $last_revision->save();
   }
 }
 
-
 /**
- * Helper function to add compliance checkboxes to some forms
+ * Helper function to add compliance checkboxes to some forms.
+ *
  * @param $form
  */
 function _epa_workflow_add_compliance_checkboxes(&$form) {
@@ -649,16 +645,16 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   );
   $link_external = $link_external->toString();
 
-  // Create a checkbox for 508 compliance agreement
+  // Create a checkbox for 508 compliance agreement.
   $compliance_checkbox = [
     '#type' => 'checkbox',
     '#title' => t('I certify that this page complies with:'),
     '#description' => t('all @508 and @external. ' .
       'This page will be subject to random external site link reviews and Section 508 compliance reviews. ' .
       'Non-compliant pages will be unpublished until remediated.', [
-      '@508' => $link_508,
-      '@external' => $link_external,
-    ]),
+        '@508' => $link_508,
+        '@external' => $link_external,
+      ]),
     '#required' => FALSE,
     '#weight' => -1,
   ];
@@ -671,8 +667,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
   $form['revision_log']['#element_validate'] = ['_epa_workflow_form_validation_revision_log'];
 
   // Add the is-required class to the revision log so it looks required.
-  // $form['revision_log']['#label_attributes']['class'][] = 'is-required';
-
+  // $form['revision_log']['#label_attributes']['class'][] = 'is-required';.
   // Make the element visible when publish is selected on the latest revision.
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form' && isset($form['new_state'])) {
     $compliance_checkbox['#states'] = [
@@ -711,23 +706,22 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
 
 }
 
-
 /**
  * Validation for compliance 508 checkbox.  Must require
  * the checkboxes be ticked when moving content to published.
  */
 function _epa_workflow_form_validation_508($element, FormStateInterface $form_state, $form) {
-  // Block form on latest revision
+  // Block form on latest revision.
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
     $op = $form_state->getValue('new_state');
   }
 
-  // VBO form on content dashboard
+  // VBO form on content dashboard.
   if (isset($form['node_bulk_form'])) {
     $op = $form_state->getValue('action');
   }
 
-  if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published')  {
+  if ($op == 'Publish' || $op == 'published' || $op == 'set_to_published') {
     if (empty($form_state->getValue('workflow_508_compliant'))) {
       $form_state->setError($element, t('508 compliance is required to Publish content.'));
     }
@@ -739,12 +733,12 @@ function _epa_workflow_form_validation_508($element, FormStateInterface $form_st
  * a revision log when moving content to published.
  */
 function _epa_workflow_form_validation_revision_log($element, FormStateInterface $form_state, $form) {
-  // Block form on latest revision
+  // Block form on latest revision.
   if ($form['#form_id'] == 'content_moderation_entity_moderation_form') {
     $op = $form_state->getValue('new_state');
   }
 
-  if (isset($op) && in_array($op, ['Publish','published','set_to_published']))  {
+  if (isset($op) && in_array($op, ['Publish', 'published', 'set_to_published'])) {
     if (empty($form_state->getValue('revision_log'))) {
       $form_state->setError($element, t('Revision log required when publishing content.'));
     }
@@ -808,7 +802,7 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
       }
       // Is in any other draft state.
-      else if ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
+      elseif ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
         $message = '<br>The revision is scheduled to publish on ' . $latest_formatted_date_time . ', but will only do so if this draft is approved. Currently, the draft is NOT approved.';
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
       }
@@ -820,7 +814,7 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
       );
 
       $message = '<br>This content will automatically sunset, and be unpublished, on ' . $current_formatted_date_time . '.';
-      // search for current revision.
+      // Search for current revision.
       foreach ($form['node_revisions_table'] as $delta => $revision) {
         if (isset($revision['#attributes']) && in_array('revision-current', $revision['#attributes']['class'])) {
           $form['node_revisions_table'][$delta]['revision']['#context']['message']['#markup'] .= $message;

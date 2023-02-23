@@ -3,7 +3,6 @@
 namespace Drupal\epa_web_areas\Access;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\group\Access\CalculatedGroupPermissionsItemInterface;
 use Drupal\group\Access\ChainGroupPermissionCalculatorInterface;
 use Drupal\group\Access\GroupPermissionCheckerInterface;
 use Drupal\group\Entity\GroupInterface;
@@ -16,6 +15,9 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
   protected $innerService;
   protected $groupPermissionCalculator;
 
+  /**
+   *
+   */
   public function __construct(GroupPermissionCheckerInterface $inner_service, ChainGroupPermissionCalculatorInterface $permission_calculator) {
     $this->innerService = $inner_service;
     $this->groupPermissionCalculator = $permission_calculator;
@@ -33,7 +35,7 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       return $usual_result;
     }
 
-    // @TODO: If we have to do an additional node type look to refactor this into a single field.
+    // @todo If we have to do an additional node type look to refactor this into a single field.
     $news_release_permissions = [
       'create group_node:news_release entity',
       'update any group_node:news_release entity',
