@@ -58,11 +58,11 @@ $before-after-swipe-button-size: rem(44px);
 
 .before-after-swipe__slider {
   align-items: center;
-  appearance: none;
   background: transparent;
   display: none;
   justify-content: center;
   margin: 0;
+  opacity: 0;
   outline: none;
   transition: all 0.2s;
   z-index: 3;
@@ -81,6 +81,14 @@ $before-after-swipe-button-size: rem(44px);
 
   &::-webkit-slider-thumb {
     @include before-after-swipe__slider-thumb();
+  }
+
+  &::-moz-range-track {
+    min-height: 45px;
+  }
+
+  &::-webkit-slider-runnable-track {
+    min-height: 45px;
   }
 }
 
