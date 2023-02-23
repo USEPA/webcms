@@ -6,16 +6,19 @@ use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 
+/**
+ *
+ */
 trait EpaIgnoreRowTrait {
 
   /**
-   * Note a row as ignored and return false
+   * Note a row as ignored and return false.
    *
-   * @param Row $row
-   *   The source row
+   * @param \Drupal\migrate\Row $row
+   *   The source row.
    *
    * @param string $message
-   *   Optional message to store on the migration mapping
+   *   Optional message to store on the migration mapping.
    *
    * @return false
    */
@@ -34,4 +37,5 @@ trait EpaIgnoreRowTrait {
 
     return FALSE;
   }
+
 }
