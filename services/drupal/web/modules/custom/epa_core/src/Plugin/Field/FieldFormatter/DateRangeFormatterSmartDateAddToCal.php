@@ -166,7 +166,12 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
             $format = $this->getSetting('one_month');
           }
           if (date('d.m.Y', $start_date) === date('d.m.Y', $end_date)) {
-            $format = $this->getSetting('one_day');
+            if ($item->duration == '1439') {
+              $format = $this->getSetting('single_all_day');
+            }
+            else {
+              $format = $this->getSetting('one_day');
+            }
           }
 
           $date_str = \Drupal::service('date.formatter')->format($start_date, 'custom', preg_replace('/\{([a-zA-Z])\}/', '{\\\$1}', t($format)), $timezone);
