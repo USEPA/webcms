@@ -6,7 +6,11 @@ dependencies:
     - search_api.index.speeches_and_remarks
     - views.view.search_speeches_and_remarks
   module:
+    - facets_pretty_paths
     - search_api
+third_party_settings:
+  facets_pretty_paths:
+    coder: default_coder
 id: speeches_year
 name: Year
 weight: 0
@@ -19,10 +23,10 @@ field_identifier: field_release
 query_operator: or
 hard_limit: 0
 exclude: false
-use_hierarchy: false
+use_hierarchy: true
 keep_hierarchy_parents_active: false
 hierarchy:
-  type: taxonomy
+  type: date_items
   config: {  }
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
@@ -55,9 +59,9 @@ processor_configs:
       build: 35
     settings:
       date_display: actual_date
-      granularity: 6
+      granularity: 5
       date_format: ''
-      hierarchy: false
+      hierarchy: true
   hierarchy_processor:
     processor_id: hierarchy_processor
     weights:
