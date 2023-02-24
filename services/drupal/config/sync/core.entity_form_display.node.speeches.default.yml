@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.node.speeches.field_author_names
     - field.field.node.speeches.field_authors
     - field.field.node.speeches.field_channel
     - field.field.node.speeches.field_description
@@ -142,6 +143,16 @@ content:
       label: 'Group name'
       multiple: false
       required: true
+    third_party_settings: {  }
+  field_author_names:
+    type: entity_reference_autocomplete
+    weight: 29
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_authors:
     type: paragraphs
