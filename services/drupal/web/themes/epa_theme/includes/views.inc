@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Implements hook_preprocess_views_view().
  */
 function epa_theme_preprocess_views_view(&$variables) {
@@ -18,8 +22,8 @@ function epa_theme_preprocess_views_view_unformatted(&$variables) {
 }
 
 /**
-* Implements hook_theme_suggestions_container_alter().
-*/
+ * Implements hook_theme_suggestions_container_alter().
+ */
 function epa_theme_theme_suggestions_container_alter(array &$suggestions, array $variables) {
   // A list of view names in which to exclude the container markup.
   // Included views will use container--no-wrapper.html.twig instead of container.html.twig.

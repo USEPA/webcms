@@ -5,7 +5,7 @@ namespace Drupal\epa_web_areas\Plugin\views\filter;
 use Drupal\search_api\Plugin\views\filter\SearchApiFilterTrait;
 
 /**
- * Filters nodes based on user's groups
+ * Filters nodes based on user's groups.
  *
  * @ingroup views_filter_handlers
  *
@@ -13,4 +13,5 @@ use Drupal\search_api\Plugin\views\filter\SearchApiFilterTrait;
  */
 class SearchApiUsersGroupsFilter extends UsersGroupsFilter {
   use SearchApiFilterTrait;
+
 }

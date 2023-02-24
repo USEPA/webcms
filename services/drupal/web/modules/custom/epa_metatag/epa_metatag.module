@@ -12,6 +12,7 @@ use Drupal\Core\Access\AccessResult;
 
 /**
  * Implements hook_page_attachments_alter()
+ *
  * @param array $attachments
  */
 function epa_metatag_page_attachments_alter(array &$attachments) {
@@ -34,7 +35,7 @@ function epa_metatag_entity_field_access($operation, FieldDefinitionInterface $f
   if ($field_definition->getName() == 'field_meta_tags') {
     $allowed_roles = ['administrator', 'system_webmaster', 'system_editor'];
     $matches = array_intersect($account->getRoles(), $allowed_roles);
-    if(empty($matches)) {
+    if (empty($matches)) {
       return AccessResult::forbidden();
     }
   }
