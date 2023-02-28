@@ -14,6 +14,7 @@ dependencies:
     - field.field.node.web_area.field_language
     - field.field.node.web_area.field_last_published
     - field.field.node.web_area.field_meta_tags
+    - field.field.node.web_area.field_owning_office
     - field.field.node.web_area.field_page_head
     - field.field.node.web_area.field_paragraphs
     - field.field.node.web_area.field_publish_date
@@ -91,6 +92,22 @@ third_party_settings:
                 settings: {  }
                 third_party_settings: {  }
             weight: 1
+            additional: {  }
+          a0585d7e-14c7-4ef1-90b0-fd663917d9e0:
+            uuid: a0585d7e-14c7-4ef1-90b0-fd663917d9e0
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_owning_office'
+              label_display: '0'
+              context_mapping:
+                entity: layout_builder.entity
+              formatter:
+                type: entity_reference_label
+                label: above
+                settings:
+                  link: true
+                third_party_settings: {  }
+            weight: 2
             additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
@@ -226,6 +243,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 136
+    region: main
+  field_owning_office:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 137
     region: main
   field_page_head:
     type: basic_string
