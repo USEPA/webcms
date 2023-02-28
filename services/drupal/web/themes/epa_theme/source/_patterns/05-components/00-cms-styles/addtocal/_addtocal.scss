@@ -7,10 +7,8 @@
   float: none;
   margin-bottom: 12px;
   margin-top: 12px;
-  position: relative;
-  width: fit-content;
 
-  @include breakpoint(gesso-breakpoint(tablet)) {
+  @include breakpoint(gesso-breakpoint(mobile-lg)) {
     float: right;
     margin-top: 0;
   }
@@ -24,48 +22,14 @@
       z-index: 1;
     }
 
-    &:focus,
-    &:active {
-      + div {
-        display: block;
-      }
-    }
-
     + div {
-      background: #efefef;
-      border: 1px solid #cdcdcd;
-      border-radius: 4px;
-      display: none;
       left: auto !important;
       min-width: 159px;
-      position: absolute;
       right: 0;
-      z-index: 50;
-
-      &:focus-within {
-        display: block;
-      }
     }
 
-    &-links {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    &-link {
-      a {
-        border-width: 0;
-        color: inherit;
-        display: block;
-        margin: 0;
-        padding: 5px;
-        text-decoration: none;
-      }
-
-      .icon--exit {
-        display: none;
-      }
+    &-link .icon--exit {
+      display: none;
     }
   }
 
