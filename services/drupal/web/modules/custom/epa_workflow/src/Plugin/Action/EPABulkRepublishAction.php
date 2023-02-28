@@ -109,7 +109,7 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE)
   {
-     return $object->access('publish', $account, $return_as_object);
+     return $object->access('update', $account, $return_as_object);
   }
 
 }
