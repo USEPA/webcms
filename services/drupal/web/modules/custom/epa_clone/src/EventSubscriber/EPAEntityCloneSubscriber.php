@@ -45,7 +45,22 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
    *
    */
   public function preClone(EntityCloneEvent $event) {
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $cloned_entity */
     $cloned_entity = $event->getClonedEntity();
+
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $original_entity */
+    $original_entity = $event->getEntity();
+
+    // Clear the machine name field on cloned entities.
+    if ($original_entity->hasField('field_machine_name') && $original_entity->get('field_machine_name')->isEmpty()) {
+      $cloned_entity->set('field_machine_name', '');
+    }
+
+    // Clear the scheduled transition field on cloned entities.
+    if ($original_entity->hasField('field_scheduled_transition') && !$original_entity->get('field_scheduled_transition')->isEmpty()) {
+      $cloned_entity->set('field_scheduled_transition', NULL);
+    }
+
     if ($cloned_entity instanceof Node) {
       foreach ($cloned_entity->getFieldDefinitions() as $field_id => $field_definition) {
         // Clone referenced webforms when a  node is cloned.
@@ -110,11 +125,6 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
         $cloned_entity->setTitle($new_title);
       }
       $original_entity = $event->getEntity();
-
-      // Clear the machine name field on cloned entities.
-      if ($original_entity->hasField('field_machine_name') && !empty($original_entity->get('field_machine_name'))) {
-        $cloned_entity->set('field_machine_name', '');
-      }
 
       // Ensure the new node is assigned to the same group as the old one.
       $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($original_entity);
