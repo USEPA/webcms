@@ -30,5 +30,8 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
     if ($fixed_block = $mapping_handler->getFixedBlock($content['#block_content'])) {
       $suggestions[] = 'block__fixed__' . $fixed_block->id();
     }
+    if (isset($variables['elements']['#configuration']['provider'])) {
+      $suggestions[] = 'block__' . $variables['elements']['#configuration']['provider'];
+    }
   }
 }
