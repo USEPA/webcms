@@ -41,4 +41,50 @@
       margin-bottom: 0;
     }
   }
+
+  .usa-dark-background & {
+    color: gesso-color(text, primary);
+
+    p,
+    span {
+      color: gesso-color(text, primary);
+    }
+
+    a {
+      color: gesso-color(text, link);
+
+      &:visited {
+        color: gesso-color(text, link-visited);
+
+        // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+        span {
+          color: gesso-color(text, link-visited);
+        }
+      }
+
+      &:hover,
+      &:focus {
+        color: gesso-color(text, link-hover);
+
+        // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+        span {
+          color: gesso-color(text, link-hover);
+        }
+      }
+
+      &:active {
+        color: gesso-color(text, link-active);
+
+        // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+        span {
+          color: gesso-color(text, link-active);
+        }
+      }
+
+      // stylelint-disable-next-line selector-max-compound-selectors
+      span {
+        color: gesso-color(text, link);
+      }
+    }
+  }
 }
