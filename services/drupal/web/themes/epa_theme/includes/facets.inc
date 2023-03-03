@@ -9,7 +9,7 @@
  * Implements facets_preprocess_facets_item_list().
  */
 function epa_theme_preprocess_facets_item_list(&$vars) {
-  if(isset($vars['facet'])) {
+  if (isset($vars['facet'])) {
     $vars['facet_id'] = $vars['facet']->id();
     $vars['facet_name'] = $vars['facet']->getName();
     $vars['facet_is_expanded'] = FALSE;
@@ -27,10 +27,10 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
 
   // Add class to facet links.
   foreach ($vars['items'] as &$item) {
-    $item['value']['#url']->setOption('attributes', array(
-      'class' => array('facet'),
+    $item['value']['#url']->setOption('attributes', [
+      'class' => ['facet'],
       'rel' => 'no-follow',
-    ));
+    ]);
   }
 }
 
@@ -40,12 +40,12 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
 function epa_theme_preprocess_facets_summary_item_list(&$vars) {
   // Add class to item links.
   foreach ($vars['items'] as $key => &$item) {
-    $item['value']['#url']->setOption('attributes', array(
-      'class' => array('filters__link'),
+    $item['value']['#url']->setOption('attributes', [
+      'class' => ['filters__link'],
       'rel' => 'no-follow',
-    ));
+    ]);
 
-    // Extract the facet reset link
+    // Extract the facet reset link.
     if (isset($item["value"]["#wrapper_attributes"]["class"][0]) && $item["value"]["#wrapper_attributes"]["class"][0] == 'facet-summary-item--clear') {
       $vars['reset_url'] = $item['value']['#url']->toString();
       unset($vars['items'][$key]);

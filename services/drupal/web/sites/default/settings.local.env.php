@@ -36,6 +36,9 @@ $config['s3fs.settings']['hostname'] = 'minio:9000';
 $config['s3fs.settings']['use_cname'] = TRUE;
 $config['s3fs.settings']['domain'] = 'localhost:8888';
 
+// Minio doesn't support ListObjectVersions
+$config['s3fs.settings']['disable_version_sync'] = TRUE;
+
 // Map twig cache onto shared filesystem to allow drush to clear and write twig cache for local development.
 $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default/files/tmp/cache/twig';
 
@@ -82,3 +85,16 @@ $databases['default']['default'] = array(
   'port' => '3306',
   'prefix' => "",
 );
+
+/**
+ * Locally, we always want this set.
+ *
+ * If we're using mailhog we'll turn on our 'debug' flag so that content
+ * moderation notifications include the user emails in the message body.
+ * The reason for this is because by default content moderation notifications
+ * set the users as BCC so we don't get to see who is being emailed. This
+ * setting will allow us to see that for testing.
+ *
+ * @see \epa_workflow_content_moderation_notification_mail_data_alter()
+ */
+$settings['epa_content_moderation_email_debug'] = TRUE;

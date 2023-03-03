@@ -3,28 +3,25 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.banner_slide.field_banner_image
     - field.field.paragraph.banner_slide.field_image
     - field.field.paragraph.banner_slide.field_text
     - field.field.paragraph.banner_slide.field_title
-    - image.style.thumbnail
     - paragraphs.paragraphs_type.banner_slide
   module:
-    - focal_point
+    - media_library
     - text
 id: paragraph.banner_slide.default
 targetEntityType: paragraph
 bundle: banner_slide
 mode: default
 content:
-  field_image:
-    type: image_focal_point
+  field_banner_image:
+    type: media_library_widget
     weight: 2
     region: content
     settings:
-      progress_indicator: throbber
-      preview_image_style: thumbnail
-      preview_link: true
-      offsets: '50,50'
+      media_types: {  }
     third_party_settings: {  }
   field_text:
     type: text_textarea
@@ -44,4 +41,5 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
+  field_image: true
   status: true

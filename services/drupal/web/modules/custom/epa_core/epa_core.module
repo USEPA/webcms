@@ -5,13 +5,15 @@
  * Contains epa_core.module.
  */
 
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -20,10 +22,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Implements hook_theme().
@@ -36,7 +38,7 @@ function epa_core_theme($existing, $type, $theme, $path) {
         'wrapper' => '',
         'separator' => ' » ',
         'link' => FALSE,
-        'facet_source' => ''
+        'facet_source' => '',
       ],
       'file' => 'epa_core.theme.inc',
     ],
@@ -85,7 +87,7 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
  * - Used to auto generate descriptions and keywords for news releases.
  * - Hide path field.
  * - Hide type field on news releases
- * - Hide type field on commentary
+ * - Hide type field on commentary.
  *
  * @see \Drupal\epa_workflow\EPAPublished::process()
  */
@@ -97,6 +99,9 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $submit_copy['#weight'] = 100;
     $form['revision_information']['submit_copy'] = $submit_copy;
   }
+
+  // Change the "Revision log message" label to say "Revision notes".
+  $form['revision_log']['widget'][0]['value']['#title'] = t("Revision notes");
 
   switch ($form_id) {
     case 'node_news_release_form':
@@ -164,6 +169,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       array_unshift($form['field_keywords']['widget']['target_id']['#element_validate'], 'epa_core_new_release_keywords_validate');
 
       break;
+
     case 'node_commentary_form':
     case 'node_commentary_edit_form':
       $form['field_type']['#access'] = FALSE;
@@ -260,10 +266,10 @@ function epa_core_token_info() {
   $footer_last_updated = [
     'name' => t('Last updated'),
     'description' => t('The current entity\'s latest updated date.'),
-    'type' => 'date'
+    'type' => 'date',
   ];
   $view_argument_1 = [
-    'name' => 'The first argument of the view'
+    'name' => 'The first argument of the view',
   ];
   $term_description = [
     'name' => t('Term description'),
@@ -285,8 +291,8 @@ function epa_core_token_info() {
       'argument-1' => $view_argument_1,
     ],
     'term' => [
-      'term-description' => $term_description
-    ]
+      'term-description' => $term_description,
+    ],
   ];
   return $tokens;
 }
@@ -300,14 +306,14 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
 
   foreach ($tokens as $name => $original) {
 
-    // custom date format handling
-    if (stripos($name, 'footer-last-updated') !== FALSE ) {
+    // Custom date format handling.
+    if (stripos($name, 'footer-last-updated') !== FALSE) {
       $parts = explode(':', $name);
       $defaults = [
         $parts[0],
         'medium',
-        ''
-        ];
+        '',
+      ];
       $parts = array_replace($defaults, $parts);
       $name = $parts[0];
     }
@@ -318,11 +324,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
         }
         break;
+
       case 'contact-us-link':
         $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
-          // load the group's contact form information
+          // Load the group's contact form information.
           $groups = \Drupal::service('epa_web_areas.web_areas_helper')
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
@@ -337,11 +344,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           }
         }
         break;
+
       case 'contact-us-header-link':
         $bubbleable_metadata->addCacheContexts(['url']);
         $node = \Drupal::routeMatch()->getParameter('node');
         if (isset($node)) {
-          // load the group's contact form information
+          // Load the group's contact form information.
           $groups = \Drupal::service('epa_web_areas.web_areas_helper')
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
@@ -350,12 +358,13 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
             if ($url) {
               $link = Link::fromTextAndUrl(t('Contact Us'), $url)->toRenderable();
-              $link['#attributes'] = ['class' => array('header-link')];
+              $link['#attributes'] = ['class' => ['header-link']];
             }
             $replacements[$original] = $url ? render($link) : $original;
           }
         }
         break;
+
       case 'footer-last-updated':
         $node = \Drupal::routeMatch()->getParameter('node');
         $bubbleable_metadata->addCacheContexts(['url']);
@@ -369,6 +378,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $replacements[$original] = '';
         }
         break;
+
       case 'argument-1':
         if ($type == 'view' && !empty($data['view'])) {
           $view = $data['view'];
@@ -378,6 +388,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           }
         }
         break;
+
       case 'term-description':
         if ($type == 'term' && !empty($data['term'])) {
           $config = \Drupal::config('epa_core.settings');
@@ -387,11 +398,48 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $term_description = PlainTextOutput::renderFromHtml($token->replace($term_description, ['term' => $data['term']]));
           $replacements[$original] = $term_description;
         }
-
         break;
     }
   }
   return $replacements;
+}
+
+/**
+ *
+ */
+function epa_core_addtocal_alter(array &$overridable_items) {
+  $overridable_items['override_status'] = TRUE;
+  $add_to_cal_components = [];
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node->bundle() == 'event') {
+    $description = $node->get('field_add_to_cal_description')->value;
+    if (empty($description)) {
+      $description = $node->get('field_description')->value;
+    }
+    if ($description) {
+      $add_to_cal_components[] = $description;
+    }
+
+    $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
+    if (!empty($event_type)) {
+      $add_to_cal_components[] = "Event Type: $event_type";
+    }
+    $event_host = $node->get('field_event_host')->value;
+    if (!empty($event_host)) {
+      $add_to_cal_components[] = "Event host: $event_host";
+    }
+    $links_string = '';
+    foreach ($node->field_links as $link) {
+      $url = $link->getUrl();
+      $url->setAbsolute();
+      $title = $link->title;
+      $links_string .= ($title ? $title . ': ' : '') . $url->toString() . "\n";
+    }
+    if (!empty($links_string)) {
+      $add_to_cal_components[] = "Links:\n" . $links_string;
+    }
+  }
+  $overridable_items['description'] = implode("\n\n", $add_to_cal_components);
 }
 
 /**
@@ -430,6 +478,15 @@ function epa_core_entity_delete(EntityInterface $entity) {
   ];
   \Drupal::logger('epa_core')
     ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
+}
+
+/**
+ * Implements hook_node_form_FORM_ID_alter().
+ */
+function epa_core_form_autosave_form_admin_settings_alter(&$form, FormStateInterface $form_state) {
+  if (isset($form["allowed_content_entities"]["webform_submission"])) {
+    unset($form["allowed_content_entities"]["webform_submission"]);
+  }
 }
 
 /**
@@ -504,7 +561,7 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   // the widget provides by default.
   // The complicated logic here is necessary because the structure of this text
   // differs depending on whether the field has additional descriptive text configured.
-  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
+  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"])) {
     if ((is_array($element["uri"]["#description"])
       && is_array($element["uri"]["#description"]['#items'])
       && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
@@ -540,11 +597,10 @@ function _epa_core_augment_datetime_description(&$field_description) {
   }
 }
 
-
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
-function epa_core_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+function epa_core_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
   $env_lang = getenv('WEBCMS_LANG');
   if (isset($env_lang) && $env_lang === 'es' && $entity_type->id() == 'node' && !empty($fields['field_language'])) {
     $fields['field_language']->setDefaultValue('es');
@@ -560,12 +616,15 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
       case 'public_notice':
         $term_name = "announcements and schedules";
         break;
+
       case 'news_release':
         $term_name = "news release";
         break;
+
       case 'perspective':
         $term_name = "speeches, testimony and transcripts";
         break;
+
       case 'regulation':
         $term_name = "other policies and guidance";
         break;
@@ -648,7 +707,7 @@ function template_preprocess_views_style_epa_core_uswds_collection(&$variables) 
  */
 function epa_core_module_implements_alter(&$implementations, $hook) {
   // Prevent group_content_menu module's form alter from happening.
-  // This prevents the menu settings from being displayed
+  // This prevents the menu settings from being displayed.
   if ($hook === 'form_alter' && isset($implementations['group_content_menu'])) {
     unset($implementations['group_content_menu']);
   }
@@ -672,8 +731,8 @@ function epa_core_entity_type_build(array &$entity_types) {
  * Implements hook_entity_presave().
  */
 function epa_core_node_presave(EntityInterface $node) {
-  if ($node->hasField('field_search_text')){
-    // Render using front-end theme
+  if ($node->hasField('field_search_text')) {
+    // Render using front-end theme.
     $theme_manager = \Drupal::service('theme.manager');
     $active_theme = $theme_manager->getActiveTheme();
     $default_theme_name = \Drupal::config('system.theme')->get('default');
@@ -681,11 +740,11 @@ function epa_core_node_presave(EntityInterface $node) {
     $theme_manager->setActiveTheme($default_theme);
 
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
-    $full_output = $view_builder->view($node,'search_index');
+    $full_output = $view_builder->view($node, 'search_index');
     $node->field_search_text->setValue(strip_tags(\Drupal::service('renderer')
       ->renderPlain($full_output)));
 
-    // Revert to the active theme
+    // Revert to the active theme.
     $theme_manager->setActiveTheme($active_theme);
   }
 }
@@ -694,11 +753,10 @@ function epa_core_node_presave(EntityInterface $node) {
  * Implements HOOK_form_FORM_ID_alter().
  */
 function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
- if (!empty($form["field_search_text_value"])) {
-     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
- }
+  if (!empty($form["field_search_text_value"])) {
+    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+  }
 }
-
 
 /**
  * Implements hook_entity_base_field_info_alter().
@@ -720,8 +778,7 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
 /**
  * Implements hook_entity_field_access().
  */
-function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
-{
+function epa_core_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
   if ($field_definition->getTargetEntityTypeId() == 'user') {
     switch ($field_definition->getName()) {
       case 'status':
@@ -729,6 +786,7 @@ function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefini
           return AccessResult::allowedIfHasPermission($account, 'view group user status field');
         }
         break;
+
       case 'access':
         if ($operation == 'view') {
           return AccessResult::allowedIfHasPermission($account, 'view group user last access field');

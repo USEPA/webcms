@@ -2,8 +2,6 @@
 
 namespace Drupal\epa_migrations;
 
-use DOMDocument;
-
 /**
  * Helpers to reformat/strip inline HTML.
  */
@@ -22,6 +20,7 @@ trait EpaWysiwygTextProcessingTrait {
    *   The content to search and transform inline html.
    * @param string $context
    *   The context the type of paragraph this text will be wrapped in.
+   *
    * @return string
    *   The original wysiwyg_content with transformed inline html.
    */
@@ -120,17 +119,19 @@ trait EpaWysiwygTextProcessingTrait {
               break;
 
             case 'nostyle':
-              $xpath ='//table[contains(concat(" ", @class, " "), " nostyle ")]';
+              $xpath = '//table[contains(concat(" ", @class, " "), " nostyle ")]';
               $old_class = 'nostyle';
               $new_classes = 'usa-table--unstyled';
               $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
+
             case 'tablesorter':
               $xpath = '//table[contains(concat(" ", @class, " "), " tablesorter ")]';
               $old_class = 'tablesorter';
               $new_classes = 'usa-table usa-table--sortable';
               $doc = $this->simpleClassReplacement($doc, $xpath, $old_class, $new_classes);
               break;
+
             case 'highlighted':
               $xpath = '//*[(self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6) and contains(concat(" ", @class, " "), " highlighted ")]';
               $old_class = 'highlighted';
@@ -164,16 +165,16 @@ trait EpaWysiwygTextProcessingTrait {
   }
 
   /**
-   * Safely make replacements within a DOM classname
+   * Safely make replacements within a DOM classname.
    *
    * @param string | string[] $searches
-   *   Classnames needing replacement
+   *   Classnames needing replacement.
    *
    * @param string | string[] $replacements
-   *   Replacement classnames
+   *   Replacement classnames.
    *
    * @param string $classname
-   *   A DOM classname
+   *   A DOM classname.
    *
    * @return string
    *   Replacement classname with replacements made
@@ -190,11 +191,11 @@ trait EpaWysiwygTextProcessingTrait {
       throw new \InvalidArgumentException('$from and $to not the same length');
     }
 
-    // Work with maps so we get unique elements for free
+    // Work with maps so we get unique elements for free.
     $create_map = function ($str) {
       $map = [];
       foreach (preg_split('~\s+~', $str, -1, PREG_SPLIT_NO_EMPTY) as $name) {
-        $map[$name] = true;
+        $map[$name] = TRUE;
       }
       return $map;
     };
@@ -208,7 +209,7 @@ trait EpaWysiwygTextProcessingTrait {
       // If all in search were found, we'll see size of $class_map
       // change by the size of $search_map.
       if (count($class_map) - count($diff) === count($search_map)) {
-        // We just need to re-add the replacement names
+        // We just need to re-add the replacement names.
         $class_map = array_merge(
           $diff,
           $create_map($replacements[$i])
@@ -228,7 +229,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed info boxes.
    */
-  private function transformRelatedInfoBox(DOMDocument $doc) {
+  private function transformRelatedInfoBox(\DOMDocument $doc) {
 
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
@@ -320,7 +321,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with stripped links.
    */
-  private function stripPageTopLinks(DOMDocument $doc) {
+  private function stripPageTopLinks(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -348,7 +349,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with stripped links.
    */
-  private function stripExitEpaLinks(DOMDocument $doc) {
+  private function stripExitEpaLinks(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -377,7 +378,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with stripped disclaimers.
    */
-  private function stripPdfDisclaimers(DOMDocument $doc) {
+  private function stripPdfDisclaimers(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -407,7 +408,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with stripped tab classes.
    */
-  private function stripTabClasses(DOMDocument $doc) {
+  private function stripTabClasses(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -462,7 +463,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with stripped accordion classes.
    */
-  private function transformAccordion(DOMDocument $doc) {
+  private function transformAccordion(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -506,7 +507,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed definitions.
    */
-  private function transformDefinition(DOMDocument $doc) {
+  private function transformDefinition(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -565,7 +566,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with updated classes.
    */
-  private function simpleClassReplacement(DOMDocument $doc, $xpath, $old_class, $new_classes): DOMDocument {
+  private function simpleClassReplacement(\DOMDocument $doc, $xpath, $old_class, $new_classes): \DOMDocument {
     // Create a DOM XPath object for searching the document.
     $xpath_doc = new \DOMXPath($doc);
 
@@ -590,7 +591,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed columns.
    */
-  private function transformColumns(DOMDocument $doc) {
+  private function transformColumns(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -665,7 +666,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed pipeline uls.
    */
-  private function transformPipelineUls(DOMDocument $doc) {
+  private function transformPipelineUls(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -703,7 +704,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed govdelivery forms.
    */
-  private function transformGovDeliveryForm(DOMDocument $doc) {
+  private function transformGovDeliveryForm(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -769,7 +770,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed pullqoute.
    */
-  private function transformPullquote(DOMDocument $doc) {
+  private function transformPullquote(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 
@@ -820,7 +821,7 @@ trait EpaWysiwygTextProcessingTrait {
    * @return \DOMDocument
    *   The document with transformed archive links.
    */
-  private function transformArchiveLink(DOMDocument $doc) {
+  private function transformArchiveLink(\DOMDocument $doc) {
     // Create a DOM XPath object for searching the document.
     $xpath = new \DOMXPath($doc);
 

@@ -54,7 +54,7 @@ TEMPLATE;
   data-entity-uuid="%s"></drupal-inline-media>
 TEMPLATE;
 
-    // Fix these malformed JSON strings
+    // Fix these malformed JSON strings.
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
     $wysiwyg_content = preg_replace_callback($pattern, function ($matches) use ($inline_embed_replacement_template, $inline_embed_pdf_replacement_template, $entityTypeManager, $view_modes, $remove_alignment) {
@@ -148,7 +148,7 @@ TEMPLATE;
    *   wysiwyg_content with the block header removed.
    */
   public function extractBlockHeader($wysiwyg_content) {
-    // Fix these malformed JSON strings
+    // Fix these malformed JSON strings.
     $wysiwyg_content = str_replace('"alt":"\\\\\\"""', '"alt":""', $wysiwyg_content);
 
     $pattern = '~\[\[(.+?"type":"media".+?)\]\]~s';
@@ -163,12 +163,12 @@ TEMPLATE;
      */
 
     if ($split && count($split) === 3) {
-      list( $before, $captured, $after) = $split;
-      if (strpos($captured, '}]]') !== false) {
+      [$before, $captured, $after] = $split;
+      if (strpos($captured, '}]]') !== FALSE) {
         // Well, this is embarrassing. The pattern captured past the first media block's
         // closing }]] and matched "type":"media" in a second block. We're just going to
         // bail because the case we care about starts with a block_header first.
-        // TODO split by the pattern ~(\[\[{|}\]\])~ and use a state machine to process.
+        // @todo split by the pattern ~(\[\[{|}\]\])~ and use a state machine to process.
         return [
           'block_header_url' => NULL,
           'block_header_img' => NULL,
@@ -197,15 +197,15 @@ TEMPLATE;
 
           $url = NULL;
           if (preg_match($p1, $before, $m1) && preg_match($p2, $after, $m2)) {
-            list (, $before, $url) = $m1;
-            list (, $after) = $m2;
+            [, $before, $url] = $m1;
+            [, $after] = $m2;
           }
 
           if ($url !== NULL) {
             $url = $this->normalizeUrl($url);
           }
 
-          // Let's try to remove the surrounding figure div as well
+          // Let's try to remove the surrounding figure div as well.
           $p1 = '~(.*)<div [^>]*\bclass="([^"]+)"[^>]*>\s*~s';
           $class_pattern = '~\bfigure\b~';
           $p2 = '~\s*</div>(.*)~s';
@@ -213,8 +213,8 @@ TEMPLATE;
             && preg_match($class_pattern, $m1[2])
             && preg_match($p2, $after, $m2)
           ) {
-            list (, $before) = $m1;
-            list (, $after) = $m2;
+            [, $before] = $m1;
+            [, $after] = $m2;
           }
 
           return [
@@ -237,14 +237,17 @@ TEMPLATE;
     ];
   }
 
+  /**
+   *
+   */
   protected function normalizeUrl($url) {
     if (preg_match('~^https?:~', $url)) {
       return $url;
     }
 
     if (preg_match('~^//([^/]+)/(.*)~', $url, $matches)) {
-      // Protocol-relative, uncommon but valid
-      list (, $domain, $path) = $matches;
+      // Protocol-relative, uncommon but valid.
+      [, $domain, $path] = $matches;
       return "https://$domain/$path";
     }
 

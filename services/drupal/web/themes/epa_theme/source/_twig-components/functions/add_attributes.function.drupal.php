@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Creates an "add_attributes" function for Drupal that adds attributes
@@ -15,11 +16,11 @@ $function = new Twig_SimpleFunction('add_attributes', function ($context, $addit
     $attributes = new Attribute();
 
     $context_attribute = &$context;
-    foreach(explode('.', $attribute_type) as $segment) {
+    foreach (explode('.', $attribute_type) as $segment) {
       $context_attribute = &$context_attribute[$segment];
     }
 
-    // if attribute doesn't exist, create it
+    // If attribute doesn't exist, create it.
     if (!$context_attribute) {
       $context_attribute = new Attribute();
     }
@@ -58,7 +59,7 @@ $function = new Twig_SimpleFunction('add_attributes', function ($context, $addit
     }
 
     // Set all attributes.
-    foreach($context_attribute as $key => $value) {
+    foreach ($context_attribute as $key => $value) {
       $attributes->setAttribute($key, $value);
       // Remove this attribute from context so it doesn't filter down to child
       // elements.
@@ -68,4 +69,4 @@ $function = new Twig_SimpleFunction('add_attributes', function ($context, $addit
     return $attributes;
   }
 
-}, array('needs_context' => true, 'is_safe' => array('html')));
+}, ['needs_context' => TRUE, 'is_safe' => ['html']]);

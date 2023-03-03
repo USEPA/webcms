@@ -1,0 +1,35 @@
+uuid: 7f728643-5b0f-4e27-a215-951606045e2a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_banner_image
+    - media.type.banner_image
+    - paragraphs.paragraphs_type.banner_slide
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: paragraph.banner_slide.field_banner_image
+field_name: field_banner_image
+entity_type: paragraph
+bundle: banner_slide
+label: 'Banner Image'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      banner_image: banner_image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -11,4 +11,5 @@ class EPABaseModeration extends EPAModeration {
    * {@inheritdoc}
    */
   protected $moderationName = 'base';
+
 }

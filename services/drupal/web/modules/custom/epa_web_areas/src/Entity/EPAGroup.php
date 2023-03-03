@@ -38,12 +38,12 @@ class EPAGroup extends Group {
         && $bundle == 'web_area'
         && $this->get('field_homepage')->isEmpty()
     ) {
-      // Create body paragraph
+      // Create body paragraph.
       $paragraph = Paragraph::create([
         'type' => 'html',
         'field_body' => [
-          'value'  =>  '',
-          'format' => 'filtered_html'
+          'value'  => '',
+          'format' => 'filtered_html',
         ],
       ]);
       $paragraph->save();

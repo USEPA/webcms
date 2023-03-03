@@ -5,8 +5,6 @@ namespace Drupal\epa_wysiwyg\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
-use Drupal\Core\Url;
-use Drupal\Core\Link;
 
 /**
  * Plugin implementation of the 'epa_media_file_link_formatter' formatter.
@@ -35,7 +33,7 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
       $content = [
         '#theme' => 'epa_file_link',
         '#file' => $file,
-        '#link_text' => $media->getName() . ($this->getSetting('show_extension') ? " ($extension)": NULL),
+        '#link_text' => $media->getName() . ($this->getSetting('show_extension') ? " ($extension)" : NULL),
         '#cache' => [
           'tags' => $file->getCacheTags(),
         ],
@@ -93,6 +91,5 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
 
     return $summary;
   }
-
 
 }

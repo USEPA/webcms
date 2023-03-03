@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * @file
+ */
+
+/**
+ *
+ */
 function addLinkFunction(\Twig_Environment &$env, $config) {
   $env->addFunction(new Twig_SimpleFunction(
     'link',
@@ -6,10 +14,11 @@ function addLinkFunction(\Twig_Environment &$env, $config) {
       if (isset($attributes) && isset($attributes['class'])) {
         $classes = join(' ', $attributes['class']);
         return '<a href="' . $url . '" class="' . $classes . '">' . $title . '</a>';
-      } else {
+      }
+      else {
         return '<a href="' . $url . '">' . $title . '</a>';
       }
     },
-    array('is_safe' => array('html'))
+    ['is_safe' => ['html']]
   ));
 }

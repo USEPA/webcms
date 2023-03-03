@@ -133,9 +133,9 @@ display:
           plugin_id: date
           order: ASC
           expose:
-            label: ''
+            label: 'Date - Start'
             field_identifier: field_daterange_value
-          exposed: false
+          exposed: true
           granularity: second
       arguments: {  }
       filters:
@@ -815,6 +815,8 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - 'url.query_args:sort_by'
+        - 'url.query_args:sort_order'
         - user
         - 'user.node_grants:view'
         - user.permissions
@@ -825,6 +827,50 @@ display:
     display_plugin: block
     position: 1
     display_options:
+      sorts:
+        field_daterange_value:
+          id: field_daterange_value
+          table: node__field_daterange
+          field: field_daterange_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: date
+          order: ASC
+          expose:
+            label: 'Event Date'
+            field_identifier: field_daterange_value
+          exposed: true
+          granularity: second
+        field_last_published_value:
+          id: field_last_published_value
+          table: node__field_last_published
+          field: field_last_published_value
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: datetime
+          order: ASC
+          expose:
+            label: 'Publication Date'
+            field_identifier: field_last_published_value
+          exposed: true
+          granularity: second
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: title
+          plugin_id: standard
+          order: ASC
+          expose:
+            label: Title
+            field_identifier: title
+          exposed: true
       style:
         type: epa_core_uswds_collection
         options:
@@ -837,6 +883,7 @@ display:
       defaults:
         style: false
         row: false
+        sorts: false
       display_description: ''
       display_extenders:
         views_ajax_get:
@@ -847,6 +894,8 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - 'url.query_args:sort_by'
+        - 'url.query_args:sort_order'
         - user
         - 'user.node_grants:view'
         - user.permissions

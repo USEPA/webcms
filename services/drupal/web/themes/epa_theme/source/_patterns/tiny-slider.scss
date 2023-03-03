@@ -1,0 +1,192 @@
+// @file
+// Tiny Slider CSS
+
+// Version: 2.9.4
+
+@use 'sass:math';
+
+.tns-outer {
+  padding: 0 !important; // remove padding: clientWidth = width + padding (0) = width
+
+  [hidden] {
+    display: none !important;
+  }
+
+  [aria-controls],
+  [data-action] {
+    cursor: pointer;
+  }
+}
+
+.tns-slider {
+  -webkit-transition: all 0s;
+  -moz-transition: all 0s;
+  transition: all 0s;
+
+  > .tns-item {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+
+.tns-horizontal {
+  &.tns-subpixel {
+    white-space: nowrap;
+
+    > .tns-item {
+      display: inline-block;
+      vertical-align: top;
+      white-space: normal;
+    }
+  }
+
+  &.tns-no-subpixel {
+    &::after {
+      clear: both;
+      content: '';
+      display: table;
+    }
+
+    > .tns-item {
+      float: left;
+    }
+  }
+
+  &.tns-carousel {
+    &.tns-no-subpixel {
+      > .tns-item {
+        margin-right: -100%;
+      }
+    }
+  }
+}
+
+.tns-no-calc {
+  left: 0;
+  position: relative;
+}
+
+.tns-gallery {
+  left: 0;
+  min-height: 1px; // make sure slider container is visible
+  // overflow: hidden;
+  position: relative;
+
+  > .tns-item {
+    left: -100%;
+    position: absolute;
+    -webkit-transition: transform 0s, opacity 0s;
+    -moz-transition: transform 0s, opacity 0s;
+    transition: transform 0s, opacity 0s;
+  }
+
+  > .tns-slide-active {
+    left: auto !important;
+    position: relative;
+  }
+
+  > .tns-moving {
+    -webkit-transition: all 0.25s;
+    -moz-transition: all 0.25s;
+    transition: all 0.25s;
+  }
+}
+
+.tns-autowidth {
+  display: inline-block;
+}
+
+.tns-lazy-img {
+  opacity: 0.6;
+  -moz-transition: opacity 0.6s;
+  -webkit-transition: opacity 0.6s;
+  transition: opacity 0.6s;
+
+  &.tns-complete {
+    opacity: 1;
+  }
+}
+
+.tns-ah {
+  -webkit-transition: height 0s;
+  -moz-transition: height 0s;
+  transition: height 0s;
+}
+
+.tns-ovh {
+  overflow: hidden;
+}
+
+.tns-visually-hidden {
+  left: -10000em;
+  position: absolute;
+}
+
+.tns-transparent {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.tns-fadeIn {
+  filter: alpha(opacity=100);
+  opacity: 1;
+  z-index: 0;
+}
+
+.tns-normal,
+.tns-fadeOut {
+  filter: alpha(opacity=0);
+  opacity: 0;
+  z-index: -1;
+}
+
+// *** Fix a viewport issue in initialization
+.tns-vpfix {
+  white-space: nowrap;
+
+  > div,
+  > li {
+    display: inline-block;
+  }
+}
+
+// *** Detecting browser capability ***
+$width: 310px;
+$height: 10px;
+$count: 70;
+$perpage: 3;
+
+.tns-t {
+  &-subp2 {
+    height: $height;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: $width;
+  }
+
+  &-ct {
+    position: absolute;
+    right: 0;
+    width: math.div(100% * $count, $perpage);
+    width: -webkit-calc(100% * #{$count} / #{$perpage});
+    width: -moz-calc(100% * #{$count} / #{$perpage});
+    width: calc(100% * #{$count} / #{$perpage});
+
+    &::after {
+      clear: both;
+      content: '';
+      display: table;
+    }
+
+    > div {
+      float: left;
+      height: $height;
+      width: math.div(100%, $count);
+      width: -webkit-calc(100% / #{$count});
+      width: -moz-calc(100% / #{$count});
+      width: calc(100% / #{$count});
+    }
+  }
+}

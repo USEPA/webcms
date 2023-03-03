@@ -19,7 +19,7 @@
 {% if content.field_geographic_locations|field_value %}
   {% set more_info = more_info|merge([
     {
-      'text': content.field_geographic_locations|field_value,
+      'text': content.field_geographic_locations|field_value|safe_join(', '),
       'label': content.field_geographic_locations|field_label
     }
   ]) %}

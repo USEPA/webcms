@@ -20,7 +20,7 @@ class EPAUnpublished extends EPAModeration {
   public function process(ContentModerationStateInterface $moderation_entity) {
     parent::process($moderation_entity);
 
-    // Clear out the review deadline
+    // Clear out the review deadline.
     $this->setReviewDeadline(TRUE);
     $this->clearScheduledTransitions();
   }

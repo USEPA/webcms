@@ -29,11 +29,14 @@ function epa_wysiwyg_page_attachments(array &$attachments) {
   $attachments['#attached']['library'][] = 'epa_wysiwyg/epa-new';
 }
 
+/**
+ *
+ */
 function epa_wysiwyg_pathologic_alter(&$url_params, $parts, $settings) {
   // Do not rewrite links to minio container.  This is necessary because
   // Pathologic does not respect ports when matching host names.
   if (isset($parts['port']) && isset($parts['host']) && $parts['port'] === 8888 && $parts['host'] === 'localhost') {
-    $url_params['options']['use_original'] = true;
+    $url_params['options']['use_original'] = TRUE;
   }
 }
 
@@ -124,13 +127,13 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
   // profile is selected.
   $form['attributes']['href_default'] = array_merge($form['attributes']['href'], [
     '#type' => 'linkit',
-    '#description' => t('Start typing to find content.'),
+    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
     '#autocomplete_route_name' => 'linkit.autocomplete',
     '#autocomplete_route_parameters' => [
       'linkit_profile_id' => 'default',
     ],
     "#weight" => -10,
-    '#default_value' => isset($input['href']) ? $input['href'] : '',
+    '#default_value' => $input['href'] ?? '',
     '#states' => [
       'visible' => [
         ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
@@ -145,13 +148,13 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
   // and is disabled and hidden unless the web_area_content profile is selected.
   $form['attributes']['href_web_area_content'] = array_merge($form['attributes']['href'], [
     '#type' => 'linkit',
-    '#description' => t('Start typing to find content.'),
+    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
     '#autocomplete_route_name' => 'linkit.autocomplete',
     '#autocomplete_route_parameters' => [
       'linkit_profile_id' => 'web_area_content',
     ],
     "#weight" => -10,
-    '#default_value' => isset($input['href']) ? $input['href'] : '',
+    '#default_value' => $input['href'] ?? '',
     '#states' => [
       'visible' => [
         ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
@@ -168,7 +171,7 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
         ':input[name="attributes[select-profile]"]' => [
           ['value' => 'web_area_content'],
           'or',
-          ['value' => 'default']
+          ['value' => 'default'],
         ],
       ],
     ],
@@ -177,8 +180,10 @@ function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $f
   array_unshift($form['#validate'], '_epa_wysiwyg_populate_href');
 }
 
-// Custom logic to accommodate the additional href_default and
-// href_web_area_content attributes.
+/**
+ * Custom logic to accommodate the additional href_default and
+ * href_web_area_content attributes.
+ */
 function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state) {
   $href_profile_fields = [
     'href_default',

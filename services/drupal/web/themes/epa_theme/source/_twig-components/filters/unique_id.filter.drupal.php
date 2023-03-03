@@ -1,5 +1,6 @@
 <?php
-/*
+
+/**
  * @file
  * Twig filter to use Drupal's getUniqueId function to create unique HTML IDs.
  */

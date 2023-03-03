@@ -322,6 +322,16 @@ resource "aws_ssm_parameter" "newrelic_license" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "basic_auth" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/basic-auth"
+  type  = "String"
+  value = aws_secretsmanager_secret.basic_auth[each.value.site].arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "hash_salt" {
   for_each = local.sites
 
