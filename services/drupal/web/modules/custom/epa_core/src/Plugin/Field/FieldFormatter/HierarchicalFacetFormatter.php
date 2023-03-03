@@ -6,7 +6,6 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\hierarchical_term_formatter\Plugin\Field\FieldFormatter\HierarchicalFormatter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -57,6 +56,9 @@ class HierarchicalFacetFormatter extends HierarchicalFormatter {
     $this->facetStorage = $facet_storage;
   }
 
+  /**
+   *
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $plugin_id,
@@ -109,7 +111,7 @@ class HierarchicalFacetFormatter extends HierarchicalFormatter {
     /** @var \Drupal\facets\FacetInterface $facet */
     foreach ($this->facetStorage->loadMultiple() as $facet) {
       // Only allow choosing facets that apply to this field.
-      if ($facet->getFieldIdentifier()  == $this->fieldDefinition->getName()) {
+      if ($facet->getFieldIdentifier() == $this->fieldDefinition->getName()) {
         $options[$facet->id()] = $facet->label() . " ({$facet->id()})";
       }
     }
@@ -133,7 +135,7 @@ class HierarchicalFacetFormatter extends HierarchicalFormatter {
     $elements = parent::viewElements($items, $langcode);
 
     foreach ($elements as $delta => $element) {
-      $elements[$delta]['#theme'] ='hierarchical_term_facet_formatter';
+      $elements[$delta]['#theme'] = 'hierarchical_term_facet_formatter';
       $elements[$delta]['#facet_source'] = $this->getSetting('facet_source');
     }
 

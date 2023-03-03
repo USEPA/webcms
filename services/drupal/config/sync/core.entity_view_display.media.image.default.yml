@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_banner_image_restricted
     - field.field.media.image.field_legacy_caption
     - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
@@ -23,19 +24,26 @@ targetEntityType: media
 bundle: image
 mode: default
 content:
+  field_banner_image_restricted:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
   field_legacy_caption:
     type: text_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 3
+    weight: 4
     region: content
   field_legacy_image_alignment:
     type: list_default
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 3
     region: content
   field_media_image:
     type: image
@@ -43,12 +51,12 @@ content:
     settings:
       image_link: ''
       image_style: media_library
+      svg_attributes:
+        width: null
+        height: null
+      svg_render_as_image: true
       image_loading:
         attribute: lazy
-      svg_attributes:
-        width: ''
-        height: ''
-      svg_render_as_image: true
     third_party_settings: {  }
     weight: 1
     region: content

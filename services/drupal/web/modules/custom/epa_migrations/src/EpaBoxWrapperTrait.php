@@ -21,7 +21,7 @@ trait EpaBoxWrapperTrait {
    * @param array $image
    *   The image file id and alt text.
    * @param string $header_url
-   *   The box header URL
+   *   The box header URL.
    *
    * @return paragraph
    *   The saved box paragraph.

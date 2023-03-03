@@ -27,12 +27,10 @@
 
 {% set content -%}
   {% if items %}
-    {%- set attributes = attributes.addClass('facet-list') -%}
-    <ul{{ attributes }}>
-      {%- for item in items -%}
-        <li class="facet-list__item">{{ item.value }}</li>
-      {%- endfor -%}
-    </ul>
+    {% include '@components/facet-list/facet-list.twig' with {
+      'attributes': attributes,
+      'list': items,
+    } %}
   {% endif %}
 
   {% if empty %}
@@ -43,6 +41,7 @@
 {% if content|striptags|trim %}
   {% if facet %}
     {% include '@uswds/_accordion/_accordion-content.twig' with {
+      'attributes': '',
       'accordion_id': 'facets',
       'content_id': facet_id|clean_class,
       'title': facet_name,

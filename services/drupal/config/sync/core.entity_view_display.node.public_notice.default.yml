@@ -23,6 +23,7 @@ dependencies:
     - field.field.node.public_notice.field_last_published
     - field.field.node.public_notice.field_locations_of_prop_actions
     - field.field.node.public_notice.field_machine_name
+    - field.field.node.public_notice.field_meta_tags
     - field.field.node.public_notice.field_notice_sort_date
     - field.field.node.public_notice.field_page_head
     - field.field.node.public_notice.field_permit_number
@@ -39,6 +40,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - metatag
     - text
     - user
 id: node.public_notice.default
@@ -100,6 +102,13 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 100
+    region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
     region: content
   field_permit_number:
     type: string

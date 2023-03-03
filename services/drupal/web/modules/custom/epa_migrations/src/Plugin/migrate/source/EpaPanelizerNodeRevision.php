@@ -31,14 +31,13 @@ class EpaPanelizerNodeRevision extends NodeRevision {
     $query->leftJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->innerJoin('node_revision_epa_states', 'nres', 'nres.vid = nr.vid');
 
-    $query->addField('nres','state');
+    $query->addField('nres', 'state');
     $query->addField('pe', 'did');
     $query->addField('pd', 'layout');
 
     // Only include records where one of the following is true:
     // * Does not use panelizer twocol_page layout unless it is a web area node
     // * Does not use panelizer onecol_page or six_pack layout.
-
     $and = $query->andConditionGroup()
       ->condition('pd.layout', 'twocol_page')
       ->condition('n.type', 'web_area');

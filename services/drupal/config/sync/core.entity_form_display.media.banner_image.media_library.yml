@@ -1,0 +1,42 @@
+uuid: 9814a11a-94fa-49aa-92b2-732e4087cbed
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_form_mode.media.media_library
+    - field.field.media.banner_image.field_banner_image_restricted
+    - field.field.media.banner_image.field_media_image
+    - image.style.thumbnail
+    - media.type.banner_image
+  module:
+    - focal_point
+id: media.banner_image.media_library
+targetEntityType: media
+bundle: banner_image
+mode: media_library
+content:
+  field_banner_image_restricted:
+    type: options_select
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_media_image:
+    type: image_focal_point
+    weight: 0
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+      preview_link: true
+      offsets: '50,50'
+    third_party_settings: {  }
+hidden:
+  created: true
+  entitygroupfield: true
+  langcode: true
+  name: true
+  path: true
+  replace_file: true
+  status: true
+  uid: true

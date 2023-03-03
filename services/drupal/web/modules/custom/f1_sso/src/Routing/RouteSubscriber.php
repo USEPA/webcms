@@ -6,7 +6,11 @@ use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
 use Drupal\Core\Site\Settings;
 
+/**
+ *
+ */
 class RouteSubscriber extends RouteSubscriberBase {
+
   /**
    * {@inheritdoc}
    */
@@ -23,4 +27,5 @@ class RouteSubscriber extends RouteSubscriberBase {
       }
     }
   }
+
 }
