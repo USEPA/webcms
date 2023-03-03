@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_wysiwyg\Controller;
 
-use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Url;
 use Drupal\epa_wysiwyg\Plugin\CKEditorPlugin\EPAAddDefinitions;

@@ -265,7 +265,7 @@ display:
             'entity:node':
               news_release: teaser
       query:
-        type: views_query
+        type: search_api_query
         options:
           bypass_access: false
           skip_access: false
@@ -733,7 +733,7 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -741,10 +741,16 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.news_releases_geographic_locations'
+        - 'config:facets.facet.news_releases_language'
+        - 'config:facets.facet.news_releases_press_office'
+        - 'config:facets.facet.news_releases_subjects'
+        - 'config:facets.facet.news_releases_year'
         - 'config:field.storage.node.field_paragraphs'
         - 'config:field.storage.node.field_press_office'
         - 'config:field.storage.node.field_release'
         - 'config:search_api.index.news_releases'
+        - taxonomy_term_list
   page_1:
     id: page_1
     display_title: Page
@@ -771,7 +777,7 @@ display:
           ajax_get: false
       path: newsreleases/search
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_interface'
         - url
@@ -779,4 +785,10 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.news_releases_geographic_locations'
+        - 'config:facets.facet.news_releases_language'
+        - 'config:facets.facet.news_releases_press_office'
+        - 'config:facets.facet.news_releases_subjects'
+        - 'config:facets.facet.news_releases_year'
         - 'config:search_api.index.news_releases'
+        - taxonomy_term_list

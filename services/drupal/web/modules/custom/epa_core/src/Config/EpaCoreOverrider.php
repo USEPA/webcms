@@ -7,7 +7,9 @@ use Drupal\Core\Config\ConfigFactoryOverrideInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Site\Settings;
 
-
+/**
+ *
+ */
 class EpaCoreOverrider implements ConfigFactoryOverrideInterface {
 
   /**
@@ -44,4 +46,5 @@ class EpaCoreOverrider implements ConfigFactoryOverrideInterface {
   public function createConfigObject($name, $collection = StorageInterface::DEFAULT_COLLECTION) {
     return NULL;
   }
+
 }

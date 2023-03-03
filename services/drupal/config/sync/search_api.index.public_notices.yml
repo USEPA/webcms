@@ -191,13 +191,22 @@ processor_settings:
   add_url: {  }
   aggregated_field: {  }
   entity_status: {  }
+  entity_type: {  }
   html_filter:
     weights:
       preprocess_index: -49
       preprocess_query: -47
-    all_fields: false
+    all_fields: true
     fields:
+      - aggregated_field
+      - body
+      - field_description
+      - field_location_proposed_other
+      - field_location_proposed_other_fulltext
+      - name
+      - name_fulltext
       - title
+      - type
     title: false
     alt: true
     tags:
@@ -210,7 +219,7 @@ processor_settings:
     weights:
       preprocess_index: -20
       preprocess_query: -20
-    all_fields: true
+    all_fields: false
     fields:
       - aggregated_field
       - body
@@ -220,7 +229,6 @@ processor_settings:
       - name
       - name_fulltext
       - title
-      - type
   language_with_fallback: {  }
   rendered_item: {  }
   stemmer:
@@ -320,4 +328,5 @@ tracker_settings:
 options:
   cron_limit: 50
   index_directly: true
+  track_changes_in_references: true
 server: localhost

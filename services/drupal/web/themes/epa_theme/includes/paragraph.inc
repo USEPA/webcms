@@ -28,9 +28,10 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
   $card_style = $parent->field_card_style;
   if (!$card_style->isEmpty()) {
     $style = $card_style->getValue()[0]['value'];
-  } else {
-    $style = false;
   }
-  // If flag is set, pass to card template
+  else {
+    $style = FALSE;
+  }
+  // If flag is set, pass to card template.
   $variables['flag'] = $style == 'flag';
 }

@@ -55,7 +55,7 @@ class EpaFieldablePanelsPaneToParagraph extends EpaPaneToParagraph {
    */
   public function createParagraph($row, $record, $configuration) {
     // Extract either the fpid or vid. Data is stored as 'fpid:%' or 'vid:%'.
-    list($id_type, $id) = explode(':', $record['subtype'], 2);
+    [$id_type, $id] = explode(':', $record['subtype'], 2);
 
     if (isset($id_type) && isset($id)) {
       switch ($id_type) {

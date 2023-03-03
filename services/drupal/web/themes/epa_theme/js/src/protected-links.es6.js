@@ -29,7 +29,7 @@ import Drupal from 'drupal';
 
       externalLinks.forEach(function(el) {
         if (el.hasAttribute('href') && linkIsProtected(el)) {
-          const translatedAccessible = Drupal.t('Link to protected area');
+          const translatedAccessible = Drupal.t('Exit to EPA’s internal site');
           el.insertAdjacentHTML(
             'beforeend',
             `<svg class="icon icon--exit is-spaced-before" role="img"><title>${translatedAccessible}</title><use href="/themes/epa_theme/images/sprite.svg#lock"></use></svg>`

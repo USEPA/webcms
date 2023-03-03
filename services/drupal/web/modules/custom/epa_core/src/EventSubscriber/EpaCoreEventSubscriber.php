@@ -39,7 +39,6 @@ class EpaCoreEventSubscriber implements EventSubscriberInterface {
    */
   protected $response;
 
-
   /**
    * Constructs an EpaCoreEventSubscriber object.
    *

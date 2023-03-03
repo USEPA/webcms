@@ -80,6 +80,10 @@ resource "aws_ecs_task_definition" "drupal_task" {
         "traefik.http.services.${var.site}_${var.lang}.loadbalancer.server.port" = "443"
       }
 
+      secrets = [
+        { name = "WEBCMS_BASIC_AUTH", valueFrom = data.aws_ssm_parameter.basic_auth.value },
+      ]
+
       environment = [
         # See nginx.conf in services/drupal for why this is needed.
         { name = "WEBCMS_DOMAIN", value = var.drupal_hostname },

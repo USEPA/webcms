@@ -2,15 +2,13 @@
 
 namespace Drupal\epa_content_tracker\Logger;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
-use Exception;
 
 /**
- * Class EpaContentTrackerLogger
+ * Class EpaContentTrackerLogger.
+ *
  * @package Drupal\epa_content_tracker\Logger
  * Logs content url aliases to the epa_content_tracker table.
  */
@@ -42,7 +40,8 @@ class EpaContentTrackerLogger {
    * @param $id
    * @param $alias
    * @param $deleted
-   * @param bool $consolidate_aliases Marks all other active (not-flagged-as-deleted) alias records for this entity as deleted
+   * @param bool $consolidate_aliases
+   *   Marks all other active (not-flagged-as-deleted) alias records for this entity as deleted.
    *
    * @return \Drupal\Core\Database\StatementInterface|int|null
    */
@@ -79,44 +78,54 @@ class EpaContentTrackerLogger {
           'entity_id' => $id,
           'alias' => $alias,
           'changed' => time(),
-          'deleted' => $deleted
+          'deleted' => $deleted,
         ])
         ->execute();
 
       return $id;
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $transaction->rollBack();
       watchdog_exception('EpaContentTracker', $e);
     }
     return NULL;
   }
 
+  /**
+   *
+   */
   public function entityIsTracked(EntityInterface $entity) {
-    // Only record changes to document media entities and nodes
+    // Only record changes to document media entities and nodes.
     $entity_type = $entity->getEntityTypeId();
     return ($entity_type === 'node' || ($entity_type === 'media' && $entity->bundle() === 'document'));
   }
 
+  /**
+   *
+   */
   public function update(EntityInterface $entity) {
     if (!$this->entityIsTracked($entity)) {
       return;
     }
 
-    switch($entity->getEntityTypeId()) {
+    switch ($entity->getEntityTypeId()) {
       case 'node':
         $alias = $entity->toUrl()->toString();
         break;
+
       case 'media':
         $alias = $this->getAliasFromMedia($entity);
         break;
     }
 
     if (!empty($alias)) {
-      $this->log($entity->getEntityTypeId(),$entity->id(), $alias, self::UPDATED, TRUE);
+      $this->log($entity->getEntityTypeId(), $entity->id(), $alias, self::UPDATED, TRUE);
     }
   }
 
+  /**
+   *
+   */
   public function delete(EntityInterface $entity) {
     if (!$this->entityIsTracked($entity)) {
       return;
@@ -131,14 +140,14 @@ class EpaContentTrackerLogger {
       return;
     }
 
-    $this->log($entity->getEntityTypeId(), $entity->id(), $original_alias,self::DELETED, TRUE);
+    $this->log($entity->getEntityTypeId(), $entity->id(), $original_alias, self::DELETED, TRUE);
   }
-
 
   /**
    * Determines the the alias for a media entity from its file's URL.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *
    * @return string|null
    */
   public function getAliasFromMedia(EntityInterface $media) {
@@ -154,7 +163,8 @@ class EpaContentTrackerLogger {
    * Determines the alias for a given entity, assuming it exists. Returns FALSE if no
    * alias has been recorded.
    *
-   * @param EntityInterface $entity
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *
    * @return string|bool
    */
   public function getTrackerAliasForEntity(EntityInterface $entity) {
@@ -168,19 +178,22 @@ class EpaContentTrackerLogger {
       ->fetchField();
   }
 
-
-
+  /**
+   *
+   */
   public function mediaUpdate(EntityInterface $media) {
     if (!$this->entityIsTracked($media)) {
       return;
     }
 
-    // Record a delete if this file is private. Otherwise, record an update
+    // Record a delete if this file is private. Otherwise, record an update.
     $current_privacy = $media->field_limit_file_accessibility->value;
     if ($current_privacy) {
       $this->delete($media);
-    } else {
+    }
+    else {
       $this->update($media);
     }
   }
+
 }

@@ -34,6 +34,7 @@ data "aws_iam_policy_document" "drupal_secrets_access" {
       aws_secretsmanager_secret.mail_pass[each.key].arn,
       aws_secretsmanager_secret.saml_sp_key[each.key].arn,
       aws_secretsmanager_secret.newrelic_license[each.value.site].arn,
+      aws_secretsmanager_secret.basic_auth[each.value.site].arn,
     ]
   }
 }

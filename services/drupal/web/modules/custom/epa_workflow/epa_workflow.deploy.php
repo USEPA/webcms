@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ */
+
+/**
  * Sets all nodes with broken type reference from invalid term to be set to
  * “Overviews and Fact Sheets” term (tid 9).
  */
@@ -52,7 +56,8 @@ function epa_workflow_deploy_0001_fix_broken_type_references(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
@@ -104,7 +109,8 @@ function epa_workflow_deploy_0002_fix_nodes_without_type(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 
@@ -117,7 +123,6 @@ function epa_workflow_deploy_0003_fix_nodes_missing_review_deadline(&$sandbox) {
   // Re-saving nodes that have a missing field_review_deadline will trigger
   // the EPAPublished service to set the review deadline based on the Type
   // term the node is set to.
-
   if (!isset($sandbox['total'])) {
     // Query all published nodes that do not have a field_review_deadline value set.
     $result = \Drupal::entityQuery('node')
@@ -158,7 +163,8 @@ function epa_workflow_deploy_0003_fix_nodes_missing_review_deadline(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 
@@ -171,7 +177,7 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
 
   if (!isset($sandbox['total'])) {
     // Query all published nodes that don't have a scheduled transition date, but
-    // do have a review deadline
+    // do have a review deadline.
     $result = \Drupal::entityQuery('node')
       ->condition('status', 1)
       ->notExists('field_scheduled_transition')
@@ -211,7 +217,8 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
@@ -246,7 +253,7 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
           ORDER BY nid ASC
           LIMIT 25;", [
             ':high_water_mark' => $sandbox['high_water_mark'],
-            ':highest_nid' => $sandbox['highest_nid']
+            ':highest_nid' => $sandbox['highest_nid'],
           ])
     ->fetchCol();
 
@@ -273,7 +280,6 @@ function epa_workflow_deploy_0006_populate_perspective_author_names_field(&$sand
 /**
  * Need to migrate the event field `field_date` to a smart date field
  * `field_daterange` to allow for individual items to have selectable timezones
- *
  */
 function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbox) {
 
@@ -288,7 +294,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     )->fetchCol();
 
     $sandbox['total'] = count($results);
-    $sandbox['current_processed']= 0;
+    $sandbox['current_processed'] = 0;
     $sandbox['current_entity_id'] = 0;
     $sandbox['batch_count'] = 0;
 
@@ -301,7 +307,7 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   $batch = 25;
 
-  // Get the next batch of records
+  // Get the next batch of records.
   $query = Drupal::database()->select('node__field_date', 'date');
   $query->addField('date', 'entity_id');
   $query->addField('date', 'revision_id');
@@ -309,9 +315,8 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
   $query->addField('date', 'field_date_end_value');
   $query->addField('date', 'langcode');
   $query->condition('bundle', 'event', '=');
-  $query->range($sandbox['batch_count'] * $batch,   $batch);
+  $query->range($sandbox['batch_count'] * $batch, $batch);
   $records = $query->execute()->fetchAll();
-
 
   $insert = Drupal::database()->insert('node__field_daterange');
   $insert->fields([
@@ -328,18 +333,18 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
 
   foreach ($records as $node_field) {
 
-    // Keeping track of the process of the bach process
+    // Keeping track of the process of the bach process.
     $sandbox['current_entity_id'] = $node_field->entity_id;
     $sandbox['current_processed']++;
 
     $date_start = $node_field->field_date_value;
     $date_end = $node_field->field_date_end_value;
 
-    // Converting datetime to unix timestamp
+    // Converting datetime to unix timestamp.
     $date_start = strtotime($date_start);
     $date_end = strtotime($date_end);
 
-    // divide by 60 to account for minutes
+    // Divide by 60 to account for minutes.
     $duration = ($date_end - $date_start) / 60;
 
     $insert->values([
@@ -356,19 +361,19 @@ function epa_workflow_deploy_0010_migrate_field_data_to_field_daterange(&$sandbo
     $insert->execute();
   }
 
-  // If the number of records is less than 25
+  // If the number of records is less than 25.
   if (count($records) < $batch) {
     $sandbox['#finished'] = 1;
   }
   else {
     $sandbox['#finished'] = ($sandbox['current_processed'] / $sandbox['total']);
-    // Show the progress of the migration
+    // Show the progress of the migration.
     \Drupal::logger('epa_workflow')->notice((int) ($sandbox['current_processed'] / $sandbox['total'] * 100) . '% field_date migration.');
   }
 }
 
 /**
- * Fix bundle and language and TZ for previously migrated daterange values
+ * Fix bundle and language and TZ for previously migrated daterange values.
  */
 function epa_workflow_deploy_0011_fix_daterange_bundle() {
   Drupal::database()->update('node__field_daterange')
@@ -376,7 +381,7 @@ function epa_workflow_deploy_0011_fix_daterange_bundle() {
     ->fields([
       'bundle' => 'event',
       'langcode' => getenv('WEBCMS_LANG'),
-      ])
+    ])
     ->execute();
 
   Drupal::database()->update('node__field_daterange')
@@ -390,7 +395,6 @@ function epa_workflow_deploy_0011_fix_daterange_bundle() {
 /**
  * Need to migrate the revisions for event field `field_date` to a smart date field
  * `field_daterange`
- *
  */
 function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox) {
 
@@ -405,7 +409,7 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
     )->fetchCol();
 
     $sandbox['total'] = count($results);
-    $sandbox['current_processed']= 0;
+    $sandbox['current_processed'] = 0;
     $sandbox['current_vid'] = 0;
 
     \Drupal::logger('epa_workflow')->notice($sandbox['total'] . ' field_date migration.');
@@ -413,9 +417,9 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
 
   $batch = 25;
 
-  // Get the next batch of records
+  // Get the next batch of records.
   $query = Drupal::database()->select('node_revision__field_date', 'date')
-    ->fields('date', ['entity_id', 'revision_id','field_date_value','field_date_end_value','langcode'])
+    ->fields('date', ['entity_id', 'revision_id', 'field_date_value', 'field_date_end_value', 'langcode'])
     ->condition('bundle', 'event', '=')
     ->condition('revision_id', $sandbox['current_vid'], '>')
     ->orderBy('revision_id', 'ASC')
@@ -436,18 +440,18 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
       'field_daterange_timezone',
     ]);
 
-    // Keeping track of the process of the bach process
+    // Keeping track of the process of the bach process.
     $sandbox['current_vid'] = $node_field->revision_id;
     $sandbox['current_processed']++;
 
     $date_start = $node_field->field_date_value;
     $date_end = $node_field->field_date_end_value;
 
-    // Converting datetime to unix timestamp
+    // Converting datetime to unix timestamp.
     $date_start = strtotime($date_start);
     $date_end = strtotime($date_end);
 
-    // divide by 60 to account for minutes
+    // Divide by 60 to account for minutes.
     $duration = ($date_end - $date_start) / 60;
 
     $insert->values([
@@ -474,13 +478,13 @@ function epa_workflow_deploy_0012_migrate_revisions_to_field_daterange(&$sandbox
     }
   }
 
-  // If the number of records is less than 25
+  // If the number of records is less than 25.
   if (count($records) < $batch) {
     $sandbox['#finished'] = 1;
   }
   else {
     $sandbox['#finished'] = ($sandbox['current_processed'] / $sandbox['total']);
-    // Show the progress of the migration
+    // Show the progress of the migration.
     \Drupal::logger('epa_workflow')->notice((int) ($sandbox['current_processed'] / $sandbox['total'] * 100) . '% field_date migration.');
   }
 }

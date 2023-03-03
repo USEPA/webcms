@@ -1,0 +1,23 @@
+diff --git a/src/Plugin/AddToCal/Type/Generic.php b/src/Plugin/AddToCal/Type/Generic.php
+index 755f412..aacd882 100644
+--- a/src/Plugin/AddToCal/Type/Generic.php
++++ b/src/Plugin/AddToCal/Type/Generic.php
+@@ -110,6 +110,9 @@ class Generic extends AddToCalTypeBase {
+     $title = Html::escape($info['title']);
+     $description = str_replace(PHP_EOL, '\n', $info['description']);
+ 
++    // Apple Calendar wants commas escaped in the location field.
++    $location = str_replace(',','\,',$info['location']);
++
+     $ics = <<<ICS
+ BEGIN:VCALENDAR
+ VERSION:2.0
+@@ -121,7 +124,7 @@ DTSTART:{$info['rfc3339']['start']}
+ DTEND:{$info['rfc3339']['end']}
+ SUMMARY:{$title}
+ DESCRIPTION:{$description}
+-LOCATION:{$info['location']}
++LOCATION:{$location}
+ END:VEVENT
+ END:VCALENDAR
+ ICS;

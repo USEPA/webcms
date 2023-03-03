@@ -64,7 +64,6 @@ class EPANotificationInformation extends NotificationInformation {
           $workflow_processes[] = $transition_process;
         }
 
-
         // Find out if we have a config entity that contains this transition.
         $query = $this->entityTypeManager->getStorage('content_moderation_notification')
           ->getQuery()

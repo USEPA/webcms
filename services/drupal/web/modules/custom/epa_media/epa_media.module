@@ -56,18 +56,18 @@ function epa_media_form_editor_media_dialog_alter(array &$form, FormStateInterfa
   $edit_url = Url::fromRoute('entity.media.edit_form', ['media' => $media->id()]);
   $link = Link::fromTextAndUrl('Edit this media item', $edit_url);
 
-  if ($fid = $media->getSource()->getSourceFieldValue($media)){
+  if ($fid = $media->getSource()->getSourceFieldValue($media)) {
 
     // Remote videos don't have a File. Source field value is URL to remote video itself.
     if ($media->bundle() == 'remote_video') {
       $form['file_url'] = [
-        '#markup' => t('<p><strong>Remote Video URL:</strong> %remote_url</p>', ['%remote_url' => $fid])
+        '#markup' => t('<p><strong>Remote Video URL:</strong> %remote_url</p>', ['%remote_url' => $fid]),
       ];
     }
     else {
       $file_url = File::load($fid)->createFileUrl();
       $form['file_url'] = [
-        '#markup' => t('<p><strong>File URL:</strong> %file_url</p>', ['%file_url' => $file_url])
+        '#markup' => t('<p><strong>File URL:</strong> %file_url</p>', ['%file_url' => $file_url]),
       ];
     }
   }
@@ -113,14 +113,13 @@ function epa_media_form_media_form_alter(&$form, FormStateInterface $form_state,
   }
 }
 
-
 /**
  * Implements hook_preprocess_HOOK().
  */
 function epa_media_preprocess_media_library_wrapper(&$variables) {
   // Adds CSS to space the tabs correctly in the media picker since we swapped
   // their positions.
-  $variables['#attached']['library'][] =  'epa_media/swap-picker-tabs';
+  $variables['#attached']['library'][] = 'epa_media/swap-picker-tabs';
 
   if (isset($variables["element"]["menu"]["#links"]) && is_array($variables["element"]["menu"]["#links"])) {
     foreach ($variables["element"]["menu"]["#links"] as $key => $link) {
@@ -136,13 +135,11 @@ function epa_media_preprocess_media_library_wrapper(&$variables) {
 /**
  * Implements hook_preprocess_HOOK().
  */
-function epa_media_preprocess_media_oembed_iframe(&$variables)
-{
+function epa_media_preprocess_media_oembed_iframe(&$variables) {
   if (strpos((string) $variables['media'], 'youtube.com') !== FALSE) {
     $variables['media'] = IFrameMarkup::create(str_replace('youtube.com/', 'youtube-nocookie.com/', $variables['media']));
   }
 }
-
 
 /**
  * Implements hook_file_mimetype_mapping_alter().
@@ -171,6 +168,9 @@ function epa_media_views_data() {
   return $data;
 }
 
+/**
+ *
+ */
 function epa_media_menu_local_actions_alter(&$local_actions) {
   // We're using a non-standard view for the group media list, so we have to do
   // this in order to get the add and relate media buttons at the top of the new view.

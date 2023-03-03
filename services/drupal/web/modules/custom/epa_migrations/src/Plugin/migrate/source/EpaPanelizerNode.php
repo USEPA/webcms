@@ -32,7 +32,7 @@ class EpaPanelizerNode extends Node {
     $query->leftJoin('panels_display', 'pd', 'pe.did = pd.did');
     $query->innerJoin('node_revision_epa_states', 'nres', 'nres.vid = nr.vid');
 
-    $query->addField('nres','state');
+    $query->addField('nres', 'state');
     $query->addField('pe', 'did');
     $query->addField('pd', 'layout');
 

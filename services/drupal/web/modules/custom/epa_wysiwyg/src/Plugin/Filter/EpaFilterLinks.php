@@ -11,7 +11,8 @@ use Drupal\filter\Plugin\FilterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class EpaFilterLinks
+ * Class EpaFilterLinks.
+ *
  * @Filter(
  *   id = "epa_filter_links",
  *   title = @Translation("Replace links of type node/[id] with aliases"),
@@ -68,7 +69,6 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
     );
   }
 
-
   /**
    * Performs the filter processing.
    *
@@ -94,7 +94,7 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
       try {
         $href = $element->getAttribute('href');
 
-        // @todo: improve this to support any type of entity. Will require
+        // @todo improve this to support any type of entity. Will require
         // more intelligently loading routes.
         if (preg_match('/^\/node\/(\d+(?=(#.*)|(\?.*)|$))/', $href, $matches)) {
 
@@ -119,7 +119,8 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
               ->addCacheableDependency($entity);
           }
         }
-      } catch (\Exception $e) {
+      }
+      catch (\Exception $e) {
         watchdog_exception('epa_filter_links', $e);
       }
     }

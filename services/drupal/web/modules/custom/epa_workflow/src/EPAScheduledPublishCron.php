@@ -2,8 +2,6 @@
 
 namespace Drupal\epa_workflow;
 
-use DateTime;
-use DateTimeZone;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityBase;
@@ -56,8 +54,6 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    */
   private $dateTime;
 
-
-
   /**
    * The constructor.
    *
@@ -106,7 +102,7 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
   private function doUpdateFor($entityType) {
     $bundles = $this->entityTypeBundleInfo->getBundleInfo($entityType);
 
-    $datetime_utc = new DateTime('now', new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+    $datetime_utc = new \DateTime('now', new \DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
 
     foreach ($bundles as $bundleName => $value) {
 
@@ -174,9 +170,9 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
       return;
     }
 
-    $datetime_utc = new DateTime('now', new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+    $datetime_utc = new \DateTime('now', new \DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
     foreach ($scheduledValue as $key => $value) {
-      $scheduled_date = new DateTime($value['value'], new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+      $scheduled_date = new \DateTime($value['value'], new \DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
       if ($scheduled_date <= $datetime_utc) {
         unset($scheduledValue[$key]);
         $this->updateEntity($entity, $value['moderation_state'], $scheduledField, $scheduledValue);
@@ -190,10 +186,11 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
    * @param string $dateIso8601
    *
    * @return int
+   *
    * @throws \Exception
    */
   private function getTimestampFromIso8601(string $dateIso8601): int {
-    $datetime = new DateTime($dateIso8601, new DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
+    $datetime = new \DateTime($dateIso8601, new \DateTimeZone(ScheduledPublish::STORAGE_TIMEZONE));
     $datetime->setTimezone(new \DateTimeZone(date_default_timezone_get()));
 
     return $datetime->getTimestamp();

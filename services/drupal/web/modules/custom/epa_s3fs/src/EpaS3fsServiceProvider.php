@@ -4,12 +4,12 @@ namespace Drupal\epa_s3fs;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Defines a service provider for the EPA S3FS module.
  */
 class EpaS3fsServiceProvider extends ServiceProviderBase {
+
   /**
    * {@inheritdoc}
    */
