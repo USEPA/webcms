@@ -1,0 +1,13 @@
+diff --git a/src/Plugin/AddToCal/Type/Generic.php b/src/Plugin/AddToCal/Type/Generic.php
+index aacd882..9fd4e1c 100644
+--- a/src/Plugin/AddToCal/Type/Generic.php
++++ b/src/Plugin/AddToCal/Type/Generic.php
+@@ -108,7 +108,7 @@ class Generic extends AddToCalTypeBase {
+     $uri = $this->fileSystem->tempnam('temporary://', 'ics_');
+ 
+     $title = Html::escape($info['title']);
+-    $description = str_replace(PHP_EOL, '\n', $info['description']);
++    $description = str_replace(PHP_EOL, '\n', str_replace("\r\n", '\n', $info['description']));
+ 
+     // Apple Calendar wants commas escaped in the location field.
+     $location = str_replace(',','\,',$info['location']);

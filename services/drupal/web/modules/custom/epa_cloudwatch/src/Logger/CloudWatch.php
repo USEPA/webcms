@@ -94,6 +94,9 @@ class CloudWatch implements LoggerInterface {
    */
   protected $logStream;
 
+  /**
+   *
+   */
   public function __construct(ConfigFactoryInterface $config_factory, LogMessageParserInterface $parser) {
     $this->config = $config_factory->get('epa_cloudwatch');
     $this->parser = $parser;
@@ -189,13 +192,13 @@ class CloudWatch implements LoggerInterface {
    * @return boolean TRUE if a log stream name could be determined and FALSE otherwise
    */
   protected function setLogStreamFromContainerMetadata() {
-    // First, find the endpoint in the container environment
+    // First, find the endpoint in the container environment.
     $endpoint = getenv('ECS_CONTAINER_METADATA_URI_V4');
     if (empty($endpoint)) {
       return FALSE;
     }
 
-    // Next, load the value from the endpoint
+    // Next, load the value from the endpoint.
     $json = file_get_contents($endpoint);
     if (empty($json)) {
       return FALSE;
@@ -257,7 +260,8 @@ class CloudWatch implements LoggerInterface {
     // Sometimes we get throttled by AWS when pushing logs up to the cloud.
     // This ensures the time we spend waiting on the API doesn't get counted in
     // our New Relic stats since it's not slowness the user experiences.
-    if (extension_loaded('newrelic')) { // Ensure PHP agent is available
+    // Ensure PHP agent is available.
+    if (extension_loaded('newrelic')) {
       newrelic_end_transaction();
     }
     $all_events = self::$log_events;
@@ -265,7 +269,7 @@ class CloudWatch implements LoggerInterface {
       return;
     }
 
-    // The current batch of log events to send to CloudWatch
+    // The current batch of log events to send to CloudWatch.
     $log_events = [];
 
     // Count the size (in bytes) of this batch of events.
@@ -275,10 +279,10 @@ class CloudWatch implements LoggerInterface {
     $batch_start = $all_events[0]['timestamp'];
 
     foreach ($all_events as $event) {
-      // Get the timestamp (in seconds) of the event
+      // Get the timestamp (in seconds) of the event.
       $event_time = $event['timestamp'];
 
-      // Encode the event as a JSON string and calculate the size
+      // Encode the event as a JSON string and calculate the size.
       $message = json_encode($event);
       $event_size = strlen($message) + 26;
 
@@ -302,7 +306,8 @@ class CloudWatch implements LoggerInterface {
         $log_events = [$log_event];
         $batch_size = $event_size;
         $batch_start = $event_time;
-      } else {
+      }
+      else {
         // Otherwise, continue accumulating log events. $batch_size is incremented but
         // not $batch_start, since that holds the earliest (not latest) timestamp.
         $log_events[] = $log_event;
@@ -324,8 +329,10 @@ class CloudWatch implements LoggerInterface {
    * should send to as well as attempt to recover from sequence token issues with the log
    * stream.
    *
-   * @param array $log_events A batch of log events
-   * @param int $tries The number of retry attempts remaining
+   * @param array $log_events
+   *   A batch of log events.
+   * @param int $tries
+   *   The number of retry attempts remaining.
    */
   protected function putLogEvents(array $log_events, $tries = 3) {
     if ($tries <= 0) {
@@ -349,7 +356,8 @@ class CloudWatch implements LoggerInterface {
 
     try {
       $result = $this->client->putLogEvents($args);
-    } catch (CloudWatchLogsException $e) {
+    }
+    catch (CloudWatchLogsException $e) {
       switch ($e->getAwsErrorCode()) {
         // If AWS rejected our sequence token (either because we didn't have one and
         // needed it, or someone else wrote to the log stream before we did), then fetch

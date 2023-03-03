@@ -1,0 +1,69 @@
+// @file
+// Styles for a Hero Slideshow.
+
+@use '../../00-config' as *;
+@use '../../05-components/button/button' as *;
+@use '../../tiny-slider';
+
+.hero-slideshow {
+  margin-bottom: rem(gesso-spacing(3));
+}
+
+.hero-slideshow__list {
+  @include list-clean();
+
+  // Use CSS grid to set equal height slides.
+  @supports (display: grid) {
+    display: grid;
+  }
+}
+
+.hero-slideshow__item {
+  max-width: 100%;
+
+  // Use CSS grid to set equal height slides.
+  @supports (display: grid) {
+    display: flex !important;
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    position: relative !important;
+  }
+
+  .no-js & {
+    &:first-child {
+      z-index: 1;
+    }
+
+    &:not(:first-child) {
+      display: none;
+    }
+  }
+}
+
+.hero-slideshow__nav {
+  display: none;
+  margin-top: rem(gesso-spacing(6)) * -1;
+  min-height: rem(gesso-spacing(6));
+  position: relative;
+
+  .js & {
+    display: block;
+  }
+}
+
+.hero-slideshow__nav-button {
+  @extend .button;
+  background-color: gesso-grayscale('gray-4');
+  margin-right: gesso-spacing(1);
+  width: auto;
+
+  &:hover,
+  &:focus {
+    background-color: gesso-brand(blue, base);
+  }
+
+  &:active,
+  &.tns-nav-active {
+    background-color: gesso-brand(blue, dark);
+  }
+}

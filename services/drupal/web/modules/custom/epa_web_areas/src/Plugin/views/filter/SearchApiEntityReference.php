@@ -15,4 +15,5 @@ use Drupal\views\Plugin\views\filter\EntityReference;
 class SearchApiEntityReference extends EntityReference {
 
   use SearchApiFilterTrait;
+
 }

@@ -22,14 +22,14 @@ class EpaAdminSearchIndex extends QueueWorkerBase {
    */
   public function processItem($data) {
     $lang = getenv('WEBCMS_LANG');
-    // Render using front-end theme
+    // Render using front-end theme.
     $theme_manager = \Drupal::service('theme.manager');
     $active_theme = $theme_manager->getActiveTheme();
     $default_theme_name = \Drupal::config('system.theme')->get('default');
     $default_theme = \Drupal::service('theme.initialization')->getActiveThemeByName($default_theme_name);
     $theme_manager->setActiveTheme($default_theme);
 
-    // Render using privileged user
+    // Render using privileged user.
     $root_user = \Drupal::entityTypeManager()->getStorage('user')->load(1);
     $account_switcher = \Drupal::service('account_switcher');
     $account_switcher->switchTo($root_user);
@@ -65,7 +65,7 @@ class EpaAdminSearchIndex extends QueueWorkerBase {
       $nodeStorage->resetCache([$node->id()]);
     }
 
-    // Revert to the active theme
+    // Revert to the active theme.
     $theme_manager->setActiveTheme($active_theme);
 
     // Switch back to original user.

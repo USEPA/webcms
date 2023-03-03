@@ -164,7 +164,7 @@ class EpaMultivalueField extends DrupalSqlBase {
         // We check against NULL because 0 is an acceptable value for the high
         // water mark.
         if ($high_water !== NULL) {
-          // Note this used to use the conditions API
+          // Note this used to use the conditions API.
           $this->query->where(self::HIGH_WATER_EXPRESSION . " > :hw", [
             'hw' => $high_water,
           ]);

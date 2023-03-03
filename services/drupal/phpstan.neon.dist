@@ -1,0 +1,22 @@
+includes:
+  - phpstan-baseline.neon
+parameters:
+  # https://phpstan.org/config-reference#rule-level
+  level: 4
+
+  # https://phpstan.org/config-reference#phpversion
+  phpVersion: 80000
+
+  # https://phpstan.org/config-reference#inferprivatepropertytypefromconstructor
+  inferPrivatePropertyTypeFromConstructor: true
+
+  # https://phpstan.org/user-guide/ignoring-errors#reporting-unused-ignores
+  reportUnmatchedIgnoredErrors: false
+
+  paths:
+    - web/modules/custom
+    - web/themes/epa_theme
+    - web/themes/epa_seven
+  excludePaths:
+    - web/themes/epa_theme/gesso_helper
+    - web/themes/epa_theme/node_modules
