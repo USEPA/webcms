@@ -1,10 +1,18 @@
 <?php
+
 namespace Drupal\epa_forms;
 
 use Drupal\Component\Utility\Unicode;
 
+/**
+ *
+ */
 class EpaFormsUniquifier {
-  static function uniquifyFormId($id) {
+
+  /**
+   *
+   */
+  public static function uniquifyFormId($id) {
     $maxlength = 32;
     $new_id = Unicode::truncate($id, $maxlength, FALSE);
 
@@ -24,11 +32,15 @@ class EpaFormsUniquifier {
     return $new_id;
   }
 
-  static function getFormIdForNode($entity) {
+  /**
+   *
+   */
+  public static function getFormIdForNode($entity) {
     $title = $entity->label();
     $machine_name = $entity->get('field_machine_name')->getValue();
     $label = !empty($machine_name) ? $machine_name : $title;
     $id = preg_replace('@[^a-z0-9-]+@', '_', strtolower($label));
     return EpaFormsUniquifier::uniquifyFormId($id);
   }
+
 }

@@ -109,7 +109,7 @@ abstract class EPAModeration implements EPAModerationInterface {
     $this->setContentEntityRevision();
     $this->contentEntityRevision->setSyncing(TRUE);
     $revision_log = $this->contentEntityRevision->revision_log->value;
-    if (!$this->contentEntityRevision->isNewRevision() && $this->contentEntityRevision->revision_log->value == '')  {
+    if (!$this->contentEntityRevision->isNewRevision() && $this->contentEntityRevision->revision_log->value == '') {
       // Have to set this in order to avoid having empty log messages set to
       // the value of the current default revision when re-saving non-default revisions.
       // We're fighting code in core's Node::preSaveRevision()
@@ -207,26 +207,38 @@ abstract class EPAModeration implements EPAModerationInterface {
    */
   protected function setReviewDeadline($reset = FALSE) {
     // Stop if content doesn't use a review deadline.
+    $bundle = $this->contentEntityRevision->bundle();
+    $workflow_types = ['page' => 365, 'event' => 90, 'webform' => 90, 'faq' => 365, 'public_notice' => 90, 'regulation' => 365, 'web_area' => 90];
     if (!$this->contentEntityRevision->hasField('field_review_deadline')) {
       return;
     }
-
-    if ($reset) {
+    if (!in_array($bundle, array_keys($workflow_types)) || $reset){
       $this->contentEntityRevision->set('field_review_deadline', NULL);
       return;
     }
+    if (in_array($bundle, array_keys($workflow_types))) {
+      $review_period = $workflow_types[$bundle];
 
-    if (!$this->contentEntityRevision->get('field_type')->isEmpty()
-        && $this->contentEntityRevision->get('field_type')->entity
-        && !$this->contentEntityRevision->get('field_type')->entity->get('field_term_days_til_review')->isEmpty()
-    ) {
-      // Create datetime with appropriate offset.
-      $review_period = $this->contentEntityRevision->field_type->entity->field_term_days_til_review->value;
+      // We hard-code the deadline to 2 days out if the user executing this
+      // has the field_workflow_debugger set to TRUE. This is used to help QA
+      // debug workflow and email notifications.
+      $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+      if ($user->field_workflow_debugger->value) {
+        $review_period = 2;
+      }
+
       $date = new DrupalDateTime();
       $date->setTimeZone(new \DateTimeZone(DateTimeItemInterface::STORAGE_TIMEZONE));
       $date->add(new \DateInterval("P{$review_period}D"));
       $review_deadline = $date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT);
       $this->contentEntityRevision->set('field_review_deadline', $review_deadline);
+
+      // If this is a public notice and it has a comment due date then we do not
+      // schedule a review deadline for it. It will get auto-unpublished by the
+      // expiration date field instead.
+      if ($bundle == 'public_notice' && !$this->contentEntityRevision->get('field_comments_due_date')->isEmpty()) {
+        $this->contentEntityRevision->set('field_review_deadline', NULL);
+      }
     }
     else {
       $this->logger->warning('A review deadline for %title could not be set because an invalid or missing type was defined.', ['%title' => $this->contentEntityRevision->label()]);
@@ -234,13 +246,13 @@ abstract class EPAModeration implements EPAModerationInterface {
   }
 
   /**
-   * Sets field_last_published value to the current date and time
+   * Sets field_last_published value to the current date and time.
    *
    * @param bool $reset
-   *  Pass TRUE to set field_last_published to null
+   *   Pass TRUE to set field_last_published to null.
    */
   protected function setLastPublishedDate($reset = FALSE) {
-    // Stop if content doesn't have this field
+    // Stop if content doesn't have this field.
     if (!$this->contentEntityRevision->hasField('field_last_published')) {
       return;
     }

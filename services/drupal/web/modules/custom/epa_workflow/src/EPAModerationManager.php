@@ -4,7 +4,6 @@ namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\ModerationInformationInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
@@ -56,7 +55,7 @@ class EPAModerationManager {
       $moderation = $this->moderations['base'];
     }
 
-    // @todo: Should consider trying to refactor this to move some of the work
+    // @todo Should consider trying to refactor this to move some of the work
     // done in the process methods to be called in a presave hook. We can probably
     // avoid the additional save here in a lot of cases.
     $moderation->process($moderation_entity);

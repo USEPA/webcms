@@ -62,7 +62,7 @@ class EpaFile extends File {
       return FALSE;
     }
 
-    // filename is just based on the uri
+    // Filename is just based on the uri.
     $row->setSourceProperty('filename', basename($row->getSourceProperty('uri')));
     return TRUE;
   }

@@ -94,9 +94,9 @@ class EpaKeywords extends ProcessPluginBase implements ContainerFactoryPluginInt
     $query = $this->d7Connection->select('taxonomy_index', 'ti')
       ->fields('ti', ['tid']);
     $query->join('taxonomy_term_data', 'td', 'td.tid = ti.tid');
-    $query->fields('td', ['vid','name'])
+    $query->fields('td', ['vid', 'name'])
       ->condition('ti.nid', $nid)
-      ->condition('td.vid', $vids,'IN');
+      ->condition('td.vid', $vids, 'IN');
 
     $terms = $query->execute()
       ->fetchAll();
