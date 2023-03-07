@@ -51,18 +51,18 @@ $before-after-swipe-button-size: rem(44px);
   background: transparent;
   border: 0;
   cursor: pointer;
-  height: 100%;
+  height: $before-after-swipe-button-size;
   outline: 0;
-  width: $before-after-swipe-border-size;
+  width: $before-after-swipe-button-size;
 }
 
 .before-after-swipe__slider {
   align-items: center;
-  appearance: none;
   background: transparent;
   display: none;
   justify-content: center;
   margin: 0;
+  opacity: 0;
   outline: none;
   transition: all 0.2s;
   z-index: 3;
@@ -81,6 +81,14 @@ $before-after-swipe-button-size: rem(44px);
 
   &::-webkit-slider-thumb {
     @include before-after-swipe__slider-thumb();
+  }
+
+  &::-moz-range-track {
+    min-height: $before-after-swipe-button-size;
+  }
+
+  &::-webkit-slider-runnable-track {
+    min-height: $before-after-swipe-button-size;
   }
 }
 
