@@ -33,7 +33,7 @@ class TermSettingsForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Term Default Description'),
       '#default_value' => $config->get('default_description'),
-      '#description' => $this->t('Default description for taxonomy terms.')
+      '#description' => $this->t('Default description for taxonomy terms.'),
     ];
 
     return parent::buildForm($form, $form_state);

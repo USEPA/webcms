@@ -1,12 +1,19 @@
 <?php
 
-use Drupal\node\NodeInterface;
+/**
+ * @file
+ */
+
+use Drupal\group\Entity\Group;
+use Drupal\media\Entity\Media;
 use Drupal\search_api\Entity\Server;
 
-
+/**
+ *
+ */
 function _epa_core_populate_search_index_queue() {
   $queue = \Drupal::queue('epa_search_text_indexer');
-  // Query all current revisions that lack a value in the search text field
+  // Query all current revisions that lack a value in the search text field.
   $current_revs = \Drupal::database()->query(
     "SELECT vid
            FROM {node} n
@@ -28,7 +35,7 @@ function _epa_core_populate_search_index_queue() {
           WHERE nf.revision_id IS NULL")
     ->fetchCol(1);
 
-  // Remove current revs from latest revs
+  // Remove current revs from latest revs.
   $latest_revs = array_diff($latest_revs, $current_revs);
 
   $current_revs = array_fill_keys($current_revs, 'current');
@@ -61,7 +68,7 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
         WHERE description__value IS NULL OR
               description__value = :value OR
               description__value REGEXP :regex', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
-        ->fetchCol();
+      ->fetchCol();
 
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
@@ -97,7 +104,8 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
@@ -124,7 +132,7 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
     'SELECT tid FROM taxonomy_term_field_data
         ORDER BY tid ASC
         LIMIT 500
-        OFFSET '. $sandbox['current'] . ';')
+        OFFSET ' . $sandbox['current'] . ';')
     ->fetchCol();
 
   if (empty($tids)) {
@@ -146,7 +154,8 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
-  } else {
+  }
+  else {
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 }
@@ -159,7 +168,7 @@ function epa_core_deploy_refresh_indexes() {
   _epa_core_refresh_indexes('localhost');
 }
 
-/*
+/**
  * Helper function to refresh all search indexes on a server.
  */
 function _epa_core_refresh_indexes($server_name) {
@@ -167,4 +176,149 @@ function _epa_core_refresh_indexes($server_name) {
   foreach ($localhost->getIndexes() as $index) {
     $index->reindex();
   }
+}
+
+/**
+ * Updating the field definition config for node__field_press_office cardinality
+ * to be 1.
+ */
+function epa_core_deploy_0003_update_node_field_press_office_cardinality() {
+  $manager = \Drupal::entityDefinitionUpdateManager();
+  $storage_definition = $manager->getFieldStorageDefinition('field_press_office', 'node');
+  $storage_definition->setCardinality(1);
+  $manager->updateFieldStorageDefinition($storage_definition);
+}
+
+/**
+ * Moves images on banner slides to banner image field
+ * and creates banner image entity where necessary.
+ */
+function epa_core_deploy_0003_update_banner_slide_images(&$sandbox) {
+  $prefixes = ['paragraph_revision', 'paragraph'];
+
+  $replacements = [
+    ':group_type' => 'web_area-group_node-%',
+    ':value' => 'banner_slide',
+  ];
+
+  if (!isset($sandbox['total'])) {
+    $sandbox['total'] = 0;
+    $sandbox['current'] = 0;
+    $sandbox['images_created'] = 0;
+    // Query all images that are being used with banner slides.
+    foreach ($prefixes as $prefix) {
+      $result = \Drupal::database()->query(
+        'SELECT DISTINCT fi.field_image_target_id
+FROM {' . $prefix . '__field_image} AS fi
+LEFT JOIN {file_managed} AS fm
+    ON fm.fid = fi.field_image_target_id
+LEFT JOIN {' . $prefix . '__field_banner_image} AS pfb
+    ON fi.revision_id = pfb.revision_id
+LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
+    ON fi.revision_id = fbs.field_banner_slides_target_revision_id
+LEFT JOIN {node_revision__field_banner} AS nfb
+    ON nfb.field_banner_target_revision_id = fbs.revision_id
+LEFT JOIN {group_content_field_data} gfd
+    ON gfd.entity_id = nfb.entity_id
+        AND gfd.type LIKE :group_type
+WHERE pfb.revision_id IS NULL
+        AND fi.bundle = :value
+        AND gid IS NOT NULL;', $replacements)->fetchCol();
+
+      $sandbox['total'] += count($result);
+
+    }
+
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' image files associated with banner slides.');
+  }
+
+  foreach ($prefixes as $prefix) {
+
+    $files = \Drupal::database()->query(
+      'SELECT DISTINCT fi.field_image_target_id,
+         fi.field_image_alt,
+         fm.filename,
+         fm.langcode,
+         fi.entity_id,
+         fi.revision_id,
+         gfd.gid
+FROM {' . $prefix . '__field_image} AS fi
+LEFT JOIN {file_managed} AS fm
+    ON fm.fid = fi.field_image_target_id
+LEFT JOIN {' . $prefix . '__field_banner_image} AS pfb
+    ON fi.revision_id = pfb.revision_id
+LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
+    ON fi.revision_id = fbs.field_banner_slides_target_revision_id
+LEFT JOIN {node_revision__field_banner} AS nfb
+    ON nfb.field_banner_target_revision_id = fbs.revision_id
+LEFT JOIN {group_content_field_data} gfd
+    ON gfd.entity_id = nfb.entity_id
+        AND gfd.type LIKE :group_type
+WHERE pfb.revision_id IS NULL
+        AND fi.bundle = :value
+        AND gid IS NOT NULL
+        LIMIT 500;', $replacements)
+      ->fetchAll();
+
+    foreach ($files as $file) {
+      $banner_media = \Drupal::database()->query(
+        'SELECT entity_id
+          FROM media__field_media_image
+          WHERE field_media_image_target_id = ' . $file->field_image_target_id . '
+            AND bundle = :value;', [':value' => 'banner_image'])
+        ->fetchCol();
+
+      if (empty($banner_media)) {
+        $image_media = Media::create([
+          'bundle' => 'banner_image',
+          'uid' => \Drupal::currentUser()->id(),
+          'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
+          'field_media_image' => [
+            'target_id' => $file->field_image_target_id,
+            'alt' => $file->field_image_alt,
+            'title' => $file->filename,
+          ],
+        ]);
+        $image_media->save();
+        $langcode = $image_media->language()->getId();
+        $banner_image_target_id = $image_media->id();
+        if (!empty($file->gid)) {
+          $group = Group::load($file->gid);
+          $group->addContent($image_media, 'group_media:' . $image_media->bundle());
+        }
+        $sandbox['images_created']++;
+      }
+      else {
+        $banner_image_target_id = $banner_media[0];
+        $langcode = $file->langcode;
+        if (empty($langcode)) {
+          $langcode = \Drupal::languageManager()->getDefaultLanguage()->getId();
+        }
+      }
+      $connection = \Drupal::service('database');
+      $result = $connection->insert($prefix . '__field_banner_image')
+        ->fields([
+          'bundle' => 'banner_slide',
+          'deleted' => 0,
+          'entity_id' => $file->entity_id,
+          'revision_id' => $file->revision_id,
+          'langcode' => $langcode,
+          'delta' => 0,
+          'field_banner_image_target_id' => $banner_image_target_id,
+        ])
+        ->execute();
+      $sandbox['current']++;
+    }
+  }
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+    \Drupal::logger('epa_core')->notice('Banner slide image update complete');
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
+
 }

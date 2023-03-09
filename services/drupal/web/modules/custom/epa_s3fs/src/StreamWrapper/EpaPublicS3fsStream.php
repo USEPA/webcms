@@ -63,4 +63,5 @@ class EpaPublicS3fsStream extends PublicS3fsStream {
     }
     return PublicStream::baseUrl() . '/' . UrlHelper::encodePath($path);
   }
+
 }

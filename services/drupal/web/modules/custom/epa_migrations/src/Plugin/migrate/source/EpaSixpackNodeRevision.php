@@ -60,7 +60,7 @@ class EpaSixpackNodeRevision extends NodeRevision {
       $row->setSourceProperty('nres_state', $state_map[$state_data['state']]);
     }
 
-    // We'll linearize the panels as a single column of paragraphs
+    // We'll linearize the panels as a single column of paragraphs.
     $row->setSourceProperty('layout', 'onecol_page');
 
     // Get the Display ID for the current revision.
@@ -71,19 +71,19 @@ class EpaSixpackNodeRevision extends NodeRevision {
       ->fetchField();
 
     if (!$did) {
-      // This should not happen
+      // This should not happen.
       return FALSE;
     }
 
     // All available panes for the did.
-    /* @var $all_panes array[] */
+    /** @var array[] $all_panes */
     $all_panes = $this->select('panels_pane', 'pp')
       ->fields('pp')
       ->condition('pp.did', $did)
       ->execute()
       ->fetchAll();
 
-    // Picking each in order is just simpler than usort() and still plenty fast
+    // Picking each in order is just simpler than usort() and still plenty fast.
     $ordered_panes = [];
     foreach (EpaSixpackNode::SIXPACK_PANEL_KEYS as $region) {
       foreach ($all_panes as $pane) {
