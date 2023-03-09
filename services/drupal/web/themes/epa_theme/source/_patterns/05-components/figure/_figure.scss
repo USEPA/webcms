@@ -25,24 +25,6 @@
     margin-right: auto;
     margin-top: rem(units(3));
   }
-
-  // Tweak styling in WYSIWYG editor.
-  @if $wysiwyg {
-    // stylelint-disable
-    .cke_widget_wrapper:hover & {
-      outline: 2px solid #ffd25c;
-    }
-
-    .cke_widget_wrapper.cke_widget_focused &,
-    .cke_widget_wrapper.cke_widget_editable_focused & {
-      outline: 2px solid #47a4f5;
-    }
-    // stylelint-enable
-
-    .media-library-item__edit {
-      margin-bottom: rem(units(1));
-    }
-  }
 }
 
 .figure__media {
@@ -69,5 +51,22 @@
       position: relative;
       z-index: 1;
     }
+  }
+}
+
+// Tweak styling in WYSIWYG editor.
+@if $wysiwyg {
+  // stylelint-disable-next-line
+  figure.ck-widget {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+  }
+
+  // stylelint-disable-next-line
+  figcaption.ck-editor__editable {
+    background-color: transparent;
+    display: block !important;
+    text-align: left;
   }
 }
