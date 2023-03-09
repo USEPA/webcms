@@ -122,6 +122,8 @@ class WebAreaLinkit extends Plugin {
 
       wasAutocompleteAdded = true;
       newUrlField.fieldView.template.attributes.class.push('form-linkit-autocomplete');
+      // Initially hide our new field.
+      newUrlField.element.style.display = 'none';
 
       // Listen for changes to the dropdown.
       // Show/hide one of the URL fields based on chosen element.
@@ -269,6 +271,5 @@ class WebAreaLinkit extends Plugin {
 }
 
 export default {
-  WebAreaLinkit,
-  EpaWebAreaLinkitCommand
+  WebAreaLinkit
 };
