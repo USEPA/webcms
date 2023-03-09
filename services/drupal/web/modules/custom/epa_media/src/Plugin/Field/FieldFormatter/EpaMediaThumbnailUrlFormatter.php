@@ -60,8 +60,6 @@ class EpaMediaThumbnailUrlFormatter extends MediaThumbnailFormatter {
     $this->imageStyleStorage = $image_style_storage;
   }
 
-
-
   /**
    * {@inheritdoc}
    */
@@ -105,4 +103,5 @@ class EpaMediaThumbnailUrlFormatter extends MediaThumbnailFormatter {
     }
     return $elements;
   }
+
 }

@@ -15,6 +15,7 @@ dependencies:
     - field.field.node.page.field_last_published
     - field.field.node.page.field_machine_name
     - field.field.node.page.field_meta_tags
+    - field.field.node.page.field_owning_office
     - field.field.node.page.field_page_head
     - field.field.node.page.field_paragraphs
     - field.field.node.page.field_paragraphs_1
@@ -76,6 +77,7 @@ third_party_settings:
         - field_publish_date
         - field_expiration_date
         - field_machine_name
+        - field_owning_office
       label: 'Other Metadata'
       region: content
       parent_name: group_additional_fields
@@ -207,6 +209,16 @@ content:
     region: content
     settings:
       sidebar: true
+    third_party_settings: {  }
+  field_owning_office:
+    type: entity_reference_autocomplete_tags
+    weight: 49
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_page_head:
     type: string_textarea
