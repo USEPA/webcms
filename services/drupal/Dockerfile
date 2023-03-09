@@ -176,7 +176,9 @@ RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
     echo "$cert" >> /etc/ca-certificates.conf; \
   done \
-  && update-ca-certificates
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Add the entrypoint logic to configure the New Relic extension
 COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
@@ -208,6 +210,12 @@ COPY status.conf *.map /etc/nginx/conf.d/
 
 # Copy configuration templates
 COPY default.conf /etc/nginx/templates/default.conf.template
+
+# Copy nginx startup script
+COPY scripts/ecs/nginx-entrypoint.sh /webcms-entrypoint
+
+ENTRYPOINT [ "/webcms-entrypoint" ]
+CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
@@ -245,6 +253,16 @@ RUN set -ex \
 
 # Same as nginx: copy the built Drupal filesystem
 COPY --from=drupal /var/www/html /var/www/html
+
+# Copy additional certificates for use by Drupal and bundle them into the system
+# certificates
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate

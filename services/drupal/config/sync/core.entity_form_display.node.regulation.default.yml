@@ -21,6 +21,8 @@ dependencies:
     - field.field.node.regulation.field_last_published
     - field.field.node.regulation.field_legal_authorities
     - field.field.node.regulation.field_machine_name
+    - field.field.node.regulation.field_meta_tags
+    - field.field.node.regulation.field_owning_office
     - field.field.node.regulation.field_page_head
     - field.field.node.regulation.field_publish_date
     - field.field.node.regulation.field_review_deadline
@@ -37,6 +39,7 @@ dependencies:
     - datetime_range
     - entitygroupfield
     - field_group
+    - metatag
     - paragraphs
     - shs
     - text
@@ -48,6 +51,7 @@ third_party_settings:
         - field_publish_date
         - field_expiration_date
         - field_machine_name
+        - field_owning_office
       label: 'Other Metadata'
       region: content
       parent_name: group_additional_fields
@@ -297,6 +301,23 @@ content:
     weight: 48
     region: content
     settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_meta_tags:
+    type: metatag_firehose
+    weight: 50
+    region: content
+    settings:
+      sidebar: true
+    third_party_settings: {  }
+  field_owning_office:
+    type: entity_reference_autocomplete_tags
+    weight: 49
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }

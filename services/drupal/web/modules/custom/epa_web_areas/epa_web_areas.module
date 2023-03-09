@@ -5,6 +5,7 @@
  * Contains epa_web_areas.module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\block\Entity\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
@@ -48,7 +49,7 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
     }
 
-    // Hide group field from users who do not have the permission to reassign content
+    // Hide group field from users who do not have the permission to reassign content.
     if (isset($form['entitygroupfield'])) {
       $user = \Drupal::currentUser();
       $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
@@ -56,6 +57,9 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
   }
 }
 
+/**
+ *
+ */
 function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $account = \Drupal::currentUser();
   if (isset($form['field_allow_news_releases'])) {
@@ -150,7 +154,7 @@ function epa_web_areas_field_widget_form_alter($element, FormStateInterface $for
     // given the entity is added via the group
     // e.g. group/{group_id}/{entity}/add.
     $entity = $form_state->getformObject()->getEntity();
-    if ($entity->id() && $entity instanceOf ContentEntityInterface) {
+    if ($entity->id() && $entity instanceof ContentEntityInterface) {
       $group_contents = GroupContent::loadByEntity($entity);
       foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
@@ -227,7 +231,7 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
             $parts = parse_url($value);
             parse_str($parts['query'], $query);
             if ('media_inline_embed.opener.editor' == $query['media_library_opener_id'] && array_key_exists('document', $query['media_library_allowed_types'])) {
-              // Make document tab appear first
+              // Make document tab appear first.
               array_unshift($query['media_library_allowed_types'], 'document');
               $query['media_library_allowed_types'] = array_unique($query['media_library_allowed_types']);
               $query['media_library_selected_type'] = 'document';
@@ -276,7 +280,7 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
 /**
  * Implements hook_node_presave().
  */
-function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) {
+function epa_web_areas_node_presave(EntityInterface $entity) {
   if ($entity->hasField('field_hublinks') && $entity->id()) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')
       ->getNodeReferencingGroups($entity);
@@ -284,7 +288,7 @@ function epa_web_areas_node_presave(Drupal\Core\Entity\EntityInterface $entity) 
 
     foreach ($groups as $group) {
       $group_hublink = ['target_id' => $group->id()];
-      $the_group = array_filter($hublinks, function($item) use ($group_hublink) {
+      $the_group = array_filter($hublinks, function ($item) use ($group_hublink) {
         return !empty($item['target_id']) && $item['target_id'] == $group_hublink['target_id'];
       });
       if (empty($the_group)) {
@@ -312,25 +316,28 @@ function epa_web_areas_menu_local_actions_alter(&$local_actions) {
   $local_actions['group_content.group_node_relate_page']['appears_on'] = ['entity.group.canonical'];
 }
 
-// Provides dynamic titles for some of our Group-related Page Manager pages
-function epa_web_areas_get_title($group, $page_manager_page_variant = null, $page_manager_page = null) {
+/**
+ * Provides dynamic titles for some of our Group-related Page Manager pages.
+ */
+function epa_web_areas_get_title($group, $page_manager_page_variant = NULL, $page_manager_page = NULL) {
   if (is_string($page_manager_page)) {
     return 'Page Not Found';
   }
   switch ($page_manager_page->id()) {
     case 'group_details':
       return t('Details for %group', ['%group' => $group->label()]);
-      break;
+
+    break;
     case 'group_published_content':
       return t('Published content in %group', ['%group' => $group->label()]);
-      break;
+
+    break;
     case 'group_view':
       return t('Content in %group', ['%group' => $group->label()]);
 
   }
 
 }
-
 
 /**
  * Implements hook_toolbar().
@@ -353,7 +360,6 @@ function epa_web_areas_toolbar() {
   return $items;
 }
 
-
 /**
  * Implements hook_module_implements_alter().
  */
@@ -366,7 +372,7 @@ function epa_web_areas_module_implements_alter(&$implementations, $hook) {
 /**
  * Implements hook_entity_access().
  */
-function epa_web_areas_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account) {
+function epa_web_areas_entity_access(EntityInterface $entity, $operation, AccountInterface $account) {
   if ($entity->getEntityTypeId() == 'node' && $operation == 'clone') {
     $operation = 'update';
   }
@@ -381,6 +387,9 @@ function epa_web_areas_entity_access(\Drupal\Core\Entity\EntityInterface $entity
   return group_entity_access($entity, $operation, $account);
 }
 
+/**
+ *
+ */
 function epa_web_areas_preprocess_node(&$variables) {
   $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($variables['node']);
   $group = reset($groups);
@@ -399,7 +408,23 @@ function epa_web_areas_views_data_alter(array &$data) {
       'title' => t('User\'s groups'),
       'help' => t('Filters on the groups the user is a member of.'),
       'field' => 'gid',
-      'id' => 'epa_web_areas_users_groups'
+      'id' => 'epa_web_areas_users_groups',
     ],
   ];
+
+  $data['search_api_index_media']['users_in_groups'] = [
+    'title' => t('In user\'s groups'),
+    'filter' => [
+      'title' => t('In user\'s groups'),
+      'help' => t('Filters content that belongs to groups the user is a member of.'),
+      'field' => 'gid',
+      'id' => 'epa_search_api_web_areas_users_groups',
+    ],
+  ];
+
+  if (!empty($data["search_api_index_media"]["gid"]["filter"])) {
+    $data["search_api_index_media"]["gid"]["filter"]['field_name'] = 'gid';
+    $data["search_api_index_media"]["gid"]["filter"]['entity_type'] = 'group_content';
+    $data["search_api_index_media"]["gid"]["filter"]['id'] = 'search_api_entity_reference';
+  }
 }

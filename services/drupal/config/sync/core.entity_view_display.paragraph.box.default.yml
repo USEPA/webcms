@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.paragraph.box.field_alignment
     - field.field.paragraph.box.field_header_link
     - field.field.paragraph.box.field_image
     - field.field.paragraph.box.field_link
@@ -22,6 +23,13 @@ targetEntityType: paragraph
 bundle: box
 mode: default
 content:
+  field_alignment:
+    type: list_key
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 7
+    region: content
   field_header_link:
     type: link_separate
     label: hidden
@@ -47,11 +55,11 @@ content:
     type: link_separate
     label: hidden
     settings:
-      trim_length: 80
+      trim_length: null
       url_only: false
       url_plain: false
-      rel: ''
-      target: ''
+      rel: '0'
+      target: '0'
     third_party_settings: {  }
     weight: 6
     region: content

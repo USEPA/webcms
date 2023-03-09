@@ -6,7 +6,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\addtocal\Form\AddToCalForm;
 use Drupal\date_range_formatter\Plugin\Field\FieldFormatter\DateRangeFormatterRangeFormatter;
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList;
 
 /**
  * Plugin implementation of the 'HierarchicalFacetFormatter' formatter.
@@ -25,13 +24,14 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
   /**
    * {@inheritdoc}
    */
-  static public function defaultSettings() {
+  public static function defaultSettings() {
     return [
-        'location' => ['value' => FALSE, 'tokenized' => ''],
-        'description' => ['value' => FALSE, 'tokenized' => ''],
-        'past_events' => FALSE, // The version of the addtocal module we are using doesn't actually implement this setting correctly.
-        'separator' => '-',
-      ] + parent::defaultSettings();
+      'location' => ['value' => FALSE, 'tokenized' => ''],
+      'description' => ['value' => FALSE, 'tokenized' => ''],
+    // The version of the addtocal module we are using doesn't actually implement this setting correctly.
+      'past_events' => FALSE,
+      'separator' => '-',
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -82,13 +82,13 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
       '#title' => $this->t('Location Field:'),
       '#type' => 'select',
       '#options' => $location_options,
-      '#default_value' => isset($settings['location']['value']) ? $settings['location']['value'] : '',
+      '#default_value' => $settings['location']['value'] ?? '',
       '#description' => $this->t('A field to use as the location for calendar events.'),
     ];
     $form['location']['tokenized'] = [
       '#title' => $this->t('Tokenized Location Contents:'),
       '#type' => 'textarea',
-      '#default_value' => isset($settings['location']['tokenized']) ? $settings['location']['tokenized'] : '',
+      '#default_value' => $settings['location']['tokenized'] ?? '',
       '#description' => $this->t('You can insert static text or use tokens (see the token chart below).'),
     ];
     $form['description'] = [
@@ -106,7 +106,7 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
     $form['description']['tokenized'] = [
       '#title' => $this->t('Tokenized Description Contents:'),
       '#type' => 'textarea',
-      '#default_value' => isset($settings['description']['tokenized']) ? $settings['description']['tokenized'] : '',
+      '#default_value' => $settings['description']['tokenized'] ?? '',
       '#description' => $this->t('You can insert static text or use tokens (see the token chart below).'),
     ];
 
@@ -124,14 +124,14 @@ class AddToCalendarFormatter extends DateRangeFormatterRangeFormatter {
     $field_name = $field->get('field_name');
     $settings['field_name'] = $field_name;
 
-    // Hide the form if
+    // Hide the form if.
     foreach ($elements as $delta => $element) {
       $form = new AddToCalForm($entity, $settings, $delta);
       $form = \Drupal::formBuilder()->getForm($form);
 
-      /** @var DateTimeFieldItemList $dates */
+      /** @var \Drupal\datetime\Plugin\Field\FieldType\DateTimeFieldItemList $dates */
       $dates = $entity->get($field_name);
-      // Date range field has different structure
+      // Date range field has different structure.
       if (!empty($dates[$delta]->start_date) && !empty($dates[$delta]->end_date)) {
         $start_date_object = $dates[$delta]->start_date;
       }
