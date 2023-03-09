@@ -33,7 +33,7 @@
 
 {% set admin_info %}
   {{ region_messages }}
-  {{ content.epa_content_moderation_control }}
+  {{ content.epa_content_moderation_info_box }}
 {% endset %}
 
 {% set show_admin_info = false %}
@@ -63,10 +63,12 @@
 
 {% set body %}
   {{ content.field_daterange }}
+  {{ content.field_deadline }}
   {{ content.field_location }}
   {{ content|without(
-    'epa_content_moderation_control',
+    'epa_content_moderation_info_box',
     'field_daterange',
+    'field_deadline',
     'field_location',
     'field_event_cancellation'
   ) }}

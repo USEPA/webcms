@@ -65,16 +65,16 @@ function epa_workflow_uninstall() {
 function epa_workflow_update_9000() {
   // We're not really sure how these orphans got created.  We only have 6 of them.
   //  select *, FROM_UNIXTIME(pifd.created) from paragraphs_item_revision_field_data pifd LEFT JOIN paragraphs_item_revision pi ON pi.revision_id = pifd.revision_id WHERE pi.revision_id IS NULL OR pi.type != pifd.type;
-  //+---------+-------------+--------------+----------+--------+------------+-----------+-------------+---------------------+-------------------+------------------+-------------------------------+------+-------------+------+----------+------------------+-----------------------------+
-  //| id      | revision_id | type         | langcode | status | created    | parent_id | parent_type | parent_field_name   | behavior_settings | default_langcode | revision_translation_affected | id   | revision_id | type | langcode | revision_default | FROM_UNIXTIME(pifd.created) |
+  // +---------+-------------+--------------+----------+--------+------------+-----------+-------------+---------------------+-------------------+------------------+-------------------------------+------+-------------+------+----------+------------------+-----------------------------+
+  // | id      | revision_id | type         | langcode | status | created    | parent_id | parent_type | parent_field_name   | behavior_settings | default_langcode | revision_translation_affected | id   | revision_id | type | langcode | revision_default | FROM_UNIXTIME(pifd.created) |
   //  +---------+-------------+--------------+----------+--------+------------+-----------+-------------+---------------------+-------------------+------------------+-------------------------------+------+-------------+------+----------+------------------+-----------------------------+
-  //| 1090951 |     1847933 | banner_slide | en       |      1 | 1632763188 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-09-27 17:19:48         |
-  //| 1094162 |     1847934 | banner_slide | en       |      1 | 1639416792 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-12-13 17:33:12         |
-  //|  158206 |     1847935 | banner_slide | en       |      1 | 1624109260 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-06-19 13:27:40         |
-  //| 1091753 |     1847936 | banner_slide | en       |      1 | 1634074251 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-10-12 21:30:51         |
-  //|  241866 |     1847937 | banner       | en       |      1 | 1624122642 | 34933     | node        | field_banner        | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-06-19 17:10:42         |
-  //| 1085709 |     1847938 | html         | en       |      1 | 1625770356 | 34933     | node        | field_paragraphs    | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-07-08 18:52:36         |
-  //  +---------+-------------+--------------+----------+--------+------------+-----------+-------------+---------------------+-------------------+------------------+-------------------------------+------+-------------+------+----------+------------------+-----------------------------+
+  // | 1090951 |     1847933 | banner_slide | en       |      1 | 1632763188 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-09-27 17:19:48         |
+  // | 1094162 |     1847934 | banner_slide | en       |      1 | 1639416792 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-12-13 17:33:12         |
+  // |  158206 |     1847935 | banner_slide | en       |      1 | 1624109260 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-06-19 13:27:40         |
+  // | 1091753 |     1847936 | banner_slide | en       |      1 | 1634074251 | 241866    | paragraph   | field_banner_slides | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-10-12 21:30:51         |
+  // |  241866 |     1847937 | banner       | en       |      1 | 1624122642 | 34933     | node        | field_banner        | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-06-19 17:10:42         |
+  // | 1085709 |     1847938 | html         | en       |      1 | 1625770356 | 34933     | node        | field_paragraphs    | a:0:{}            |                1 |                             1 | NULL |        NULL | NULL | NULL     |             NULL | 2021-07-08 18:52:36         |
+  //  +---------+-------------+--------------+----------+--------+------------+-----------+-------------+---------------------+-------------------+------------------+-------------------------------+------+-------------+------+----------+------------------+-----------------------------+.
   \Drupal::database()->query(
     "DELETE {paragraphs_item_revision_field_data} FROM {paragraphs_item_revision_field_data}
     LEFT JOIN {paragraphs_item_revision} ON {paragraphs_item_revision}.revision_id = {paragraphs_item_revision_field_data}.revision_id
@@ -133,7 +133,7 @@ WHERE t2.revision_id IS NOT NULL
         AND t1.field_scheduled_transition_moderation_state = \'published_needs_review\'')->execute();
 
   // Now that we've copied the preferred version of the transition to delta
-  // position 0 delete the additional redundant ones
+  // position 0 delete the additional redundant ones.
   \Drupal::database()->query('DELETE
 FROM {node_revision__field_scheduled_transition}
 WHERE revision_id IN

@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_workflow;
 
-use DateInterval;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 
 /**
@@ -23,7 +22,7 @@ class EPAPublishedNeedsReview extends EPAModeration {
 
     if ($this->contentHasFieldValue('field_review_deadline')) {
       $transition_date = $this->contentEntityRevision->field_review_deadline->date;
-      $transition_date = $transition_date->sub(new DateInterval('P1W'));
+      $transition_date = $transition_date->sub(new \DateInterval('P1W'));
       $this->scheduleTransition($transition_date, 'published_expiring');
     }
     else {

@@ -124,14 +124,16 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
     case 'duplicate':
     case 'delete':
       return AccessResult::forbidden();
-      break;
+
+    break;
 
     // Infer access from node access when viewing or updating.
     case 'view':
     case 'update':
       $node = _epa_forms_get_webform_referencing_node($entity);
       return empty($node) ? AccessResult::neutral() : $node->access($operation, $account, TRUE);
-      break;
+
+    break;
 
     // Custom permissions are provided to view submissions.
     // See epa_forms.group.permissions.yml.
@@ -161,7 +163,7 @@ function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
     ->condition('type', 'webform')
     ->condition('webform', $entity->id());
   $results = $query->execute();
-  // We assume there's only a single node associated with each webform
+  // We assume there's only a single node associated with each webform.
   $nid = reset($results);
   // Get node from webform.
   if (empty($nid)) {
@@ -176,27 +178,26 @@ function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
  * Define custom EPA forms tokens.
  */
 function epa_forms_token_info() {
-  $info['tokens']['site']['web-form-confirmation-message'] = array(
+  $info['tokens']['site']['web-form-confirmation-message'] = [
     'name' => t('Webform: Confirmation message'),
     'description' => t('The default confirmation message for webforms.'),
-  );
+  ];
 
   return $info;
 }
 
-
 /**
  * Implements hook_tokens().
  *
- * Replace tokens with token values
+ * Replace tokens with token values.
  */
 function epa_forms_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata) {
-  $replacements = array();
+  $replacements = [];
 
   if ($type == 'site') {
     foreach ($tokens as $name => $original) {
       switch ($name) {
-        // If the web form confirmation message token is found
+        // If the web form confirmation message token is found.
         case 'web-form-confirmation-message':
           $replacements[$original] = $message = \Drupal::config('webform.settings')->get('settings')['default_confirmation_message'];
           break;

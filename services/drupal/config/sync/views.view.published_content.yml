@@ -119,15 +119,15 @@ display:
           type: string
           settings:
             link_to_entity: true
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -170,11 +170,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: true
-          group_column: target_id
+            link_to_entity: true
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -759,13 +759,12 @@ display:
           columns:
             nid: nid
             title: title
-            gid: gid
+            label: label
             type: type
             moderation_state: moderation_state
             changed: changed
             field_review_deadline: field_review_deadline
             name: name
-            field_body: field_body
           default: changed
           info:
             nid:
@@ -782,7 +781,7 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            gid:
+            label:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -790,7 +789,7 @@ display:
               empty_column: false
               responsive: ''
             type:
-              sortable: false
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
@@ -818,13 +817,6 @@ display:
               empty_column: false
               responsive: priority-low
             name:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            field_body:
               sortable: false
               default_sort_order: asc
               align: ''
@@ -875,6 +867,17 @@ display:
             'group_node:regulation': '0'
             'group_node:webform': '0'
             'group_node:web_area': '0'
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
+          group_type: group
+          admin_label: Group
+          entity_type: group_content
+          entity_field: gid
+          plugin_id: standard
+          required: false
       show_admin_links: false
       header:
         messages:
@@ -925,15 +928,15 @@ display:
           type: string
           settings:
             link_to_entity: true
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -976,11 +979,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: true
-          group_column: target_id
+            link_to_entity: true
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -1259,7 +1262,7 @@ display:
           default_row_class: true
           columns:
             title: title
-            gid: gid
+            label: label
             moderation_state: moderation_state
             field_review_deadline: field_review_deadline
           default: field_review_deadline
@@ -1271,7 +1274,7 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            gid:
+            label:
               sortable: true
               default_sort_order: asc
               align: ''
@@ -1344,7 +1347,9 @@ display:
             value: '<a class="button button--primary" href="admin/content/published?title=&gid=&type=All&uid=&moderation_state%5B%5D=epa_default-published_needs_review&moderation_state%5B%5D=epa_default-published_expiring&moderation_state%5B%5D=epa_default-published_day_til_expire&users_in_groups=groups&order=field_review_deadline&sort=asc">View All</a>'
             format: filtered_html
           tokenize: false
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:
@@ -1449,15 +1454,15 @@ display:
           type: string
           settings:
             link_to_entity: true
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
+        label:
+          id: label
+          table: groups_field_data
+          field: label
+          relationship: gid
           group_type: group
           admin_label: ''
-          entity_type: group_content
-          entity_field: gid
+          entity_type: group
+          entity_field: label
           plugin_id: field
           label: 'Web Area'
           exclude: false
@@ -1500,11 +1505,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: target_id
-          type: entity_reference_label
+          click_sort_column: value
+          type: string
           settings:
-            link: true
-          group_column: target_id
+            link_to_entity: true
+          group_column: value
           group_columns: {  }
           group_rows: true
           delta_limit: 0
