@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - core.entity_form_mode.media.media_library
+    - field.field.media.image.field_banner_image_restricted
     - field.field.media.image.field_legacy_caption
     - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
@@ -20,9 +21,15 @@ targetEntityType: media
 bundle: image
 mode: media_library
 content:
+  field_banner_image_restricted:
+    type: options_select
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
-    weight: 4
+    weight: 5
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -38,7 +45,7 @@ content:
     third_party_settings: {  }
   field_media_tags:
     type: entity_reference_autocomplete
-    weight: 3
+    weight: 4
     region: content
     settings:
       match_operator: CONTAINS
@@ -48,7 +55,7 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 2
+    weight: 3
     region: content
     settings:
       include_locked: true

@@ -15,13 +15,9 @@ use Drupal\node\NodeInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use ZipArchive;
 
 /**
  * Provides route responses for the archive creation.
@@ -206,7 +202,7 @@ class NodeExportController extends ControllerBase {
 
         exec("cd " . dirname($export_dir)
           . " && wget --execute robots=off --restrict-file-names=windows --no-host-directories --timestamping --convert-links --adjust-extension --directory-prefix="
-          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/s3fs-js,/sites,/system,/themes,/sites,/misc -X /themes/epa_theme/pattern-lab "
+          . basename($export_dir) . " --content-on-error --no-verbose --recursive --level=1 --page-requisites -I /core,/libraries,/modules,/s3fs-css,/s3fs-js,/sites,/system,/themes,/sites,/misc -X /themes/epa_theme/pattern-lab,/themes/epa_theme/fonts "
           . $url . ' 2>&1', $wget_output, $wget_status);
 
         // Log the output of wget if we hit an error (non-zero status code).
@@ -223,12 +219,12 @@ class NodeExportController extends ControllerBase {
 
         $export_uri_filename = $export_uri . '.zip';
         $export_filename = $this->fileSystem->realpath($export_uri_filename);
-        $zip = new ZipArchive();
-        $res = $zip->open($export_filename, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $zip = new \ZipArchive();
+        $res = $zip->open($export_filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         if ($res === TRUE) {
-          $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($export_dir),
-            RecursiveIteratorIterator::LEAVES_ONLY
+          $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($export_dir),
+            \RecursiveIteratorIterator::LEAVES_ONLY
           );
 
           foreach ($files as $name => $file) {

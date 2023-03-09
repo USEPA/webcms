@@ -19,8 +19,10 @@ class ViewTimer {
   /**
    * Initiate timing for a views phase.
    *
-   * @param ViewExecutable $view The currently-executing view
-   * @param string $phase The phase ('build', 'execute', and so on)
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
+   * @param string $phase
+   *   The phase ('build', 'execute', and so on)
    */
   private static function startPhase(ViewExecutable $view, $phase) {
     $id = $view->id();
@@ -34,8 +36,10 @@ class ViewTimer {
   /**
    * Mark the end of execution of a views phase.
    *
-   * @param ViewExecutable $view The currently-executing view
-   * @param string $phase The phase ('build', 'execute', and so on)
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
+   * @param string $phase
+   *   The phase ('build', 'execute', and so on)
    */
   private static function stopPhase(ViewExecutable $view, $phase) {
     $id = $view->id();
@@ -51,7 +55,8 @@ class ViewTimer {
   /**
    * Initiate timing for a view.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function start(ViewExecutable $view) {
     self::$timers[$view->id()] = [];
@@ -76,10 +81,11 @@ class ViewTimer {
     // The statsd protocol uses milliseconds, so we have to convert from the seconds that
     // microtime(TRUE) returns.
     foreach ([
-               'view' => 'Drupal.Views.' . $id,
-               'build' => 'Drupal.ViewsBuild.' . $id,
-               'execute' => 'Drupal.ViewsExecute.' . $id,
-               'render' => 'Drupal.ViewsRender.' . $id] as $stage => $timingkey) {
+      'view' => 'Drupal.Views.' . $id,
+      'build' => 'Drupal.ViewsBuild.' . $id,
+      'execute' => 'Drupal.ViewsExecute.' . $id,
+      'render' => 'Drupal.ViewsRender.' . $id,
+    ] as $stage => $timingkey) {
       if (isset($stats[$stage])) {
         $service->timing($timingkey, $stats[$stage] * 1000);
       }
@@ -92,7 +98,8 @@ class ViewTimer {
   /**
    * Marks the start of views' build phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function startBuild(ViewExecutable $view) {
     self::startPhase($view, 'build');
@@ -101,7 +108,8 @@ class ViewTimer {
   /**
    * Marks the end of views' build phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function stopBuild(ViewExecutable $view) {
     self::stopPhase($view, 'build');
@@ -110,7 +118,8 @@ class ViewTimer {
   /**
    * Marks the start of views' execute phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function startExecute(ViewExecutable $view) {
     self::startPhase($view, 'execute');
@@ -119,7 +128,8 @@ class ViewTimer {
   /**
    * Marks the end of views' execute phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function stopExecute(ViewExecutable $view) {
     self::stopPhase($view, 'execute');
@@ -128,7 +138,8 @@ class ViewTimer {
   /**
    * Marks the start of views' render phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function startRender(ViewExecutable $view) {
     self::startPhase($view, 'render');
@@ -137,9 +148,11 @@ class ViewTimer {
   /**
    * Marks the end of views' render phase.
    *
-   * @param ViewExecutable $view The currently-executing view
+   * @param \Drupal\views\ViewExecutable $view
+   *   The currently-executing view.
    */
   public static function stopRender(ViewExecutable $view) {
     self::stopPhase($view, 'render');
   }
+
 }

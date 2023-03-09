@@ -1,18 +1,26 @@
 <?php
+
+/**
+ * @file
+ */
+
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Implements hook_FORM_ID_form_alter
+ * Implements hook_FORM_ID_form_alter.
  *
  * @param $form
- * @param \FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  * @param $form_id
  */
 function epa_clone_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $node = $form_state->getFormObject()->getEntity();
+  /** @var \Drupal\Core\Entity\EntityFormInterface $object */
+  $object = $form_state->getFormObject();
+  $node = $object->getEntity();
   if ($node->bundle() == 'faq') {
     $form['field_question']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
-  } else {
+  }
+  else {
     $form['title']['widget']['#element_validate'] = ['epa_clone_cloned_node_validate'];
   }
 }

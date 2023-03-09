@@ -33,7 +33,7 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
       $options['attributes']['type'] = $file->getMimeType() . '; length=' . $file->getSize();
       $options['attributes']['title'] = $file->getFilename();
       $url = Url::fromUri($file->createFileUrl(FALSE), $options);
-      $link = Link::fromTextAndUrl($media->getName() ." ($extension)", $url)->toString();
+      $link = Link::fromTextAndUrl($media->getName() . " ($extension)", $url)->toString();
 
       $content = [
         '#type' => 'markup',
@@ -51,4 +51,5 @@ class EpaExtensionFileFormatter extends FileFormatterBase {
     }
     return $elements;
   }
+
 }
