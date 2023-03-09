@@ -23,7 +23,9 @@ dependencies:
     - field.field.node.public_notice.field_last_published
     - field.field.node.public_notice.field_locations_of_prop_actions
     - field.field.node.public_notice.field_machine_name
+    - field.field.node.public_notice.field_meta_tags
     - field.field.node.public_notice.field_notice_sort_date
+    - field.field.node.public_notice.field_owning_office
     - field.field.node.public_notice.field_page_head
     - field.field.node.public_notice.field_permit_number
     - field.field.node.public_notice.field_programs_or_statutes
@@ -43,6 +45,7 @@ dependencies:
     - entitygroupfield
     - field_group
     - media_library
+    - metatag
     - paragraphs
     - shs
     - text
@@ -52,8 +55,8 @@ third_party_settings:
       children:
         - field_language
         - field_publish_date
-        - field_expiration_date
         - field_machine_name
+        - field_owning_office
       label: 'Other Metadata'
       region: content
       parent_name: group_additional_fields
@@ -234,12 +237,6 @@ content:
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-  field_expiration_date:
-    type: datetime_default
-    weight: 47
-    region: content
-    settings: {  }
-    third_party_settings: {  }
   field_federal_register_citations:
     type: paragraphs
     weight: 10
@@ -315,6 +312,23 @@ content:
     weight: 48
     region: content
     settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_meta_tags:
+    type: metatag_firehose
+    weight: 23
+    region: content
+    settings:
+      sidebar: true
+    third_party_settings: {  }
+  field_owning_office:
+    type: entity_reference_autocomplete_tags
+    weight: 49
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
       size: 60
       placeholder: ''
     third_party_settings: {  }
@@ -443,6 +457,7 @@ content:
     third_party_settings: {  }
 hidden:
   field_computed_comments_due_date: true
+  field_expiration_date: true
   field_geographic_locations: true
   field_is_searchable_collection: true
   field_last_published: true

@@ -3,8 +3,6 @@
 namespace Drupal\epa_migrations\Plugin\media_migration\file_entity;
 
 use Drupal\media_migration\Plugin\media_migration\file_entity\FileBase;
-use Drupal\Core\Database\Connection;
-use Drupal\migrate\Row;
 
 /**
  * Other media migration plugin for other media.

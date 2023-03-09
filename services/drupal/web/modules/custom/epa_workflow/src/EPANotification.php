@@ -10,7 +10,9 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\flag\FlagService;
 use Drupal\token\TokenEntityMapperInterface;
 
 /**
@@ -42,10 +44,14 @@ class EPANotification extends Notification {
    *   The notification information service.
    * @param \Drupal\token\TokenEntityMapperInterface $token_entity_mappper
    *   The token entity mapper service.
+   * @param \Drupal\Core\Plugin\Context\ContextProviderInterface $context_provider
+   *   The context provider for group.
+   * @param \Drupal\flag\FlagService|null $flag_service
+   *   The flag service.
    */
-  public function __construct(NotificationInterface $notification, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, ModuleHandlerInterface $module_handler, NotificationInformationInterface $notification_information, TokenEntityMapperInterface $token_entity_mappper = NULL) {
+  public function __construct(NotificationInterface $notification, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, ModuleHandlerInterface $module_handler, NotificationInformationInterface $notification_information, TokenEntityMapperInterface $token_entity_mappper = NULL, ContextProviderInterface $context_provider, FlagService $flag_service = NULL) {
     $this->notificationService = $notification;
-    parent::__construct($current_user, $entity_type_manager, $mail_manager, $module_handler, $notification_information, $token_entity_mappper);
+    parent::__construct($current_user, $entity_type_manager, $mail_manager, $module_handler, $notification_information, $token_entity_mappper, $context_provider, $flag_service);
   }
 
   /**

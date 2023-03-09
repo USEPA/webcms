@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 use Drupal\redirect\Entity\Redirect;
 use Drupal\taxonomy\Entity\Term;
 
@@ -9,7 +13,7 @@ use Drupal\taxonomy\Entity\Term;
 function epa_core_install() {
   _epa_core_create_news_release_type_term();
 
-  // Add index
+  // Add index.
   \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
 }
 
@@ -24,7 +28,7 @@ function epa_core_update_8001() {
  * Add an index to node_field_revision table for changed.
  */
 function epa_core_update_8002() {
-  // Add index
+  // Add index.
   \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
 }
 
@@ -44,7 +48,7 @@ WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
   foreach ($redirects as $redirect) {
     // Double-check that there's no query string on the source of this redirect
     // by comparing it to the alias.
-    if($rows[$redirect->id()] == $redirect->getSourcePathWithQuery()) {
+    if ($rows[$redirect->id()] == $redirect->getSourcePathWithQuery()) {
       $redirect->delete();
     }
   }
@@ -73,12 +77,13 @@ function epa_core_update_9002() {
  */
 function epa_core_update_9003() {
   $database = \Drupal::database();
-  foreach (['paragraph__field_body','paragraph_revision__field_body'] as $table)
-  if ($database->schema()->tableExists($table)) {
-    $database->update($table)
-      ->condition('bundle', 'card')
-      ->fields(['field_body_format' => 'restricted_html_no_links'])
-      ->execute();
+  foreach (['paragraph__field_body', 'paragraph_revision__field_body'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      $database->update($table)
+        ->condition('bundle', 'card')
+        ->fields(['field_body_format' => 'restricted_html_no_links'])
+        ->execute();
+    }
   }
 }
 
@@ -92,4 +97,36 @@ function _epa_core_create_news_release_type_term() {
   ]);
   $term->field_term_days_til_review = 730;
   $term->save();
+}
+
+/**
+ * As part of https://forumone.atlassian.net/browse/EPAD8-1962 to set cardinality
+ * of the Press Office field to 1 we will remove records where delta is greater
+ * than the minimum delta value.
+ */
+function epa_core_update_9004() {
+  $database = \Drupal::database();
+  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
+    if ($database->schema()->tableExists($table)) {
+      // UPDATE node__field_press_office as node
+      // LEFT JOIN (SELECT revision_id, MIN(delta) as delta
+      // FROM node__field_press_office GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta
+      // SET node.delta = 0
+      // WHERE min_delta.delta > 0;.
+      $database->query("UPDATE {$table} AS node LEFT JOIN (SELECT revision_id, MIN(delta) AS delta FROM {$table} GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta SET node.delta = 0 WHERE min_delta.delta > 0");
+
+      // Now delete all rows that are greater than that minimum delta.
+      // DELETE FROM {$table} WHERE delta > 0;.
+      $database->delete($table)
+        ->condition('delta', 0, '>')
+        ->execute();
+    }
+  }
+}
+
+/**
+ * No longer needed, but was implemented in earlier development so we need the
+ * update hook to still exist.
+ */
+function epa_core_update_9005() {
 }
