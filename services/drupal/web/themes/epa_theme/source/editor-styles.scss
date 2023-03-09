@@ -1,0 +1,60 @@
+// @file
+// WYSIWYG styles
+
+@use 'sass:meta';
+
+// Configuration
+@use '_patterns/00-config' as * with($wysiwyg: true);
+
+// stylelint-disable
+div.paragraph--view-mode--preview,
+div.ck-content {
+  // stylelint-enable
+  @include typeset();
+  @include meta.load-css('_patterns/01-global');
+  @include meta.load-css('uswds-global');
+  @include meta.load-css('_patterns/02-base', $with: ('wysiwyg': true));
+  @include meta.load-css('usa-accordion');
+  @include meta.load-css('usa-alert');
+  @include meta.load-css('usa-banner');
+  @include meta.load-css('usa-breadcrumb');
+  @include meta.load-css('usa-button-group');
+  @include meta.load-css('usa-button');
+  @include meta.load-css('usa-card');
+  @include meta.load-css('usa-checklist');
+  @include meta.load-css('usa-collection');
+  @include meta.load-css('usa-dark-background');
+  @include meta.load-css('usa-embed-container');
+  @include meta.load-css('usa-footer');
+  @include meta.load-css('usa-form');
+  @include meta.load-css('usa-graphic-list');
+  @include meta.load-css('usa-header');
+  @include meta.load-css('usa-hero');
+  @include meta.load-css('usa-icon-list');
+  @include meta.load-css('usa-icon');
+  @include meta.load-css('usa-identifier');
+  @include meta.load-css('usa-layout-docs');
+  @include meta.load-css('usa-layout-grid');
+  @include meta.load-css('usa-media-block');
+  @include meta.load-css('usa-modal');
+  @include meta.load-css('usa-nav');
+  @include meta.load-css('usa-pagination');
+  @include meta.load-css('usa-process-list');
+  @include meta.load-css('usa-search');
+  @include meta.load-css('usa-section');
+  @include meta.load-css('usa-sidenav');
+  @include meta.load-css('usa-site-alert');
+  @include meta.load-css('usa-skipnav');
+  @include meta.load-css('usa-step-indicator');
+  @include meta.load-css('usa-summary-box');
+  @include meta.load-css('usa-table');
+  @include meta.load-css('usa-tag');
+  @include meta.load-css('usa-tooltip');
+  @include meta.load-css('uswds-form-controls');
+  @include meta.load-css('_patterns/03-uswds');
+  @include meta.load-css('_patterns/04-layouts');
+  @include meta.load-css('_patterns/05-components', $with: ('wysiwyg': true));
+  @include meta.load-css('uswds-utilities');
+  @include meta.load-css('_patterns/utility-classes');
+  @include meta.load-css('_patterns/shame');
+}
