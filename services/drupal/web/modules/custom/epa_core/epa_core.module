@@ -56,13 +56,11 @@ function epa_core_rebuild() {
   \Drupal::state()->set('environment_indicator.current_release', $release);
 }
 
-function epa_core_preprocess_page(&$vars) {
-  if ($node = \Drupal::routeMatch()->getParameter('node')) {
-    $variables['node'] = $node;
-    if ($node->hasField('field_include_jquery')
-    && $node->field_include_jquery) {
-      $vars['page']['#attached']['library'][] = 'core/jquery';
-    }
+function epa_core_preprocess_node(&$variables) {
+  if ($variables['view_mode'] === 'full'
+    && $variables['node']->hasField('field_include_jquery')
+    && $variables['node']->field_include_jquery->value) {
+    $variables['elements']['#attached']['library'][] = 'core/jquery';
   }
 }
 
