@@ -9,6 +9,7 @@ dependencies:
     - field.field.node.perspective.field_description
     - field.field.node.perspective.field_env_laws_regs_and_treaties
     - field.field.node.perspective.field_geographic_locations
+    - field.field.node.perspective.field_include_jquery
     - field.field.node.perspective.field_keywords
     - field.field.node.perspective.field_language
     - field.field.node.perspective.field_last_published
@@ -74,6 +75,7 @@ third_party_settings:
     group_page_javascript:
       children:
         - field_page_head
+        - field_include_jquery
       label: 'Page Javascript'
       region: content
       parent_name: group_additional_fields
@@ -194,6 +196,13 @@ content:
       create_new_items: false
       create_new_levels: false
       force_deepest: false
+    third_party_settings: {  }
+  field_include_jquery:
+    type: boolean_checkbox
+    weight: 27
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete_tags
