@@ -146,7 +146,6 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
       $result = AccessResult::forbidden('Not a valid entity.');
       return $return_as_object ? $result : $result->isAllowed();
     }
-    $object = $this->loadLatestRevision($object);
     // Let content moderation do its job. See content_moderation_entity_access()
     // for more details.
     $access = $object->access('update', $account, TRUE);
