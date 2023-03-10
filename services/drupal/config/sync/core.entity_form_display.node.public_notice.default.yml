@@ -25,6 +25,7 @@ dependencies:
     - field.field.node.public_notice.field_machine_name
     - field.field.node.public_notice.field_meta_tags
     - field.field.node.public_notice.field_notice_sort_date
+    - field.field.node.public_notice.field_owning_office
     - field.field.node.public_notice.field_page_head
     - field.field.node.public_notice.field_permit_number
     - field.field.node.public_notice.field_programs_or_statutes
@@ -55,6 +56,7 @@ third_party_settings:
         - field_language
         - field_publish_date
         - field_machine_name
+        - field_owning_office
       label: 'Other Metadata'
       region: content
       parent_name: group_additional_fields
@@ -319,6 +321,16 @@ content:
     region: content
     settings:
       sidebar: true
+    third_party_settings: {  }
+  field_owning_office:
+    type: entity_reference_autocomplete_tags
+    weight: 49
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_page_head:
     type: string_textarea
