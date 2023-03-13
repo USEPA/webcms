@@ -20,16 +20,9 @@
 {% endif %}
 
 {% set header_info %}
-  {% if nav_style == 'sidebar_navigation' %}
-    {% if node.field_wide_template.value %}
-      {% set display_sidenav = false %}
-      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
-    {% else %}
-      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
-    {% endif %}
-  {% else %}
-    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
-  {% endif %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Speeches and Remarks'|t,
+  } %}
 {% endset %}
 
 {% set contact_link %}
@@ -72,6 +65,7 @@
     {% if content.field_video|field_value %}
       <li><a href="#watch">Watch the Event</a></li>
     {% endif %}
+    {{ speeches_more }}
     {{ content.field_related_information }}
   </ul>
 {% endset %}
@@ -87,16 +81,14 @@
 {% set body %}
   <div class="u-align-right box-wrap">
     {{ content.field_authors }}
-    {% if related %}
-      {% include '@components/box/box--related-info/box--related-info.twig' with {
-        'modifier_classes': '',
-        'title': {
-          'tag': 'div',
-          'text': 'Related Information',
-          },
-        'content': related,
-      } only %}
-    {% endif %}
+    {% include '@components/box/box--related-info/box--related-info.twig' with {
+      'modifier_classes': '',
+      'title': {
+        'tag': 'div',
+        'text': 'Related Information',
+        },
+      'content': related,
+    } only %}
   </div>
   <h2>{{ author_names }}</h2>
   <h3 class="h4">{{ content.field_release|field_value }}<br>{{ content.field_text_location|field_value }}</h3>
