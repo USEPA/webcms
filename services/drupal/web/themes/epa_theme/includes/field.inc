@@ -29,17 +29,4 @@ function epa_theme_preprocess_field(&$variables) {
       ]);
     }
   }
-
-  if ($element['#bundle'] == 'speeches' && $element['#field_name'] == 'field_related_information') {
-    $node = $element['#object'];
-    foreach ($node->entitygroupfield as $group) {
-      array_unshift($variables['items'], [
-        'content' => [
-          '#type' => 'link',
-          '#title' => 'Read more EPA Speeches and Remarks',
-          '#url' => $group->entity->getGroup()->field_homepage->entity->toUrl(),
-        ],
-      ]);
-    }
-  }
 }

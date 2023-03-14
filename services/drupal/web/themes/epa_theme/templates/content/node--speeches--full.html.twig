@@ -61,12 +61,13 @@
 
 {% set related %}
   <ul>
-    {{ content.entitygroupfield }}
-    {% if content.field_video|field_value %}
+    {% if content.entitygroupfield|field_value -%}
+      <li>{{ content.entitygroupfield }}</li>
+    {%- endif -%}
+    {%- if content.field_video|field_value -%}
       <li><a href="#watch">Watch the Event</a></li>
-    {% endif %}
-    {{ speeches_more }}
-    {{ content.field_related_information }}
+    {%- endif -%}
+    {{- content.field_related_information }}
   </ul>
 {% endset %}
 

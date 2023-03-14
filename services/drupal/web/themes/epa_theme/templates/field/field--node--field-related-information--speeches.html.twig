@@ -5,6 +5,8 @@
  */
 #}
 
-{% for item in items %}
-  <li>{{ item.content }}</li>
-{% endfor %}
+{% if items.0.content|render|striptags|trim %}
+  {% for item in items -%}
+    <li>{{ item.content }}</li>
+  {%- endfor %}
+{% endif %}
