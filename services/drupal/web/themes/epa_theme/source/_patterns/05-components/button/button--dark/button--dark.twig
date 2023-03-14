@@ -1,12 +1,10 @@
-{{ attach_library('epa_theme/toggle_admin') }}
-
 {% set classes = [
-  'button--dark js-toggle-admin',
+  'button--dark',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
 {% include '@components/button/button.twig' with {
-  'is_button_tag': true,
-  'text': 'Hide Admin Info',
+  'url': url,
+  'text': text,
   'modifier_classes': classes,
 } %}
