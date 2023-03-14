@@ -3,21 +3,22 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.node.field_authors
-    - field.storage.paragraph.field_author
+    - field.storage.node.field_release
     - field.storage.node.field_description
     - field.storage.node.field_language
+    - field.storage.node.field_publish_date
+    - field.storage.node.field_publisher
+    - field.storage.node.field_authors
+    - field.storage.paragraph.field_author
+    - field.storage.node.field_subjects
     - field.storage.media.field_media_image
     - field.storage.node.field_media_image
-    - field.storage.node.field_publish_date
-    - field.storage.node.field_release
-    - field.storage.node.field_subjects
     - search_api.server.localhost
     - core.entity_view_mode.node.search_index
   module:
+    - node
     - paragraphs
     - media
-    - node
     - search_api
 id: speeches_and_remarks
 name: 'Speeches and Remarks'
@@ -71,6 +72,14 @@ field_settings:
     dependencies:
       config:
         - field.storage.node.field_publish_date
+  field_publisher:
+    label: Publisher
+    datasource_id: 'entity:node'
+    property_path: field_publisher
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_publisher
   field_release:
     label: Date
     datasource_id: 'entity:node'
