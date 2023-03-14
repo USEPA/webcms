@@ -1,0 +1,35 @@
+uuid: 3ff2b274-52e3-4705-ae50-5c9379ab907c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_owning_office
+    - node.type.page
+    - taxonomy.vocabulary.epa_organization
+  module:
+    - custom_add_another
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
+id: node.page.field_owning_office
+field_name: field_owning_office
+entity_type: node
+bundle: page
+label: 'Owning Office'
+description: 'Use this field to indicate the office responsible for creating and updating content on this page.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      epa_organization: epa_organization
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

@@ -253,9 +253,9 @@ display:
       query:
         type: search_api_query
         options:
-          skip_access: 0
-          bypass_access: 0
-          preserve_facet_query_args: 1
+          bypass_access: false
+          skip_access: false
+          preserve_facet_query_args: true
       relationships: {  }
       header:
         result:
@@ -688,7 +688,7 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -696,6 +696,8 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.faqs_topic'
+        - 'config:facets.facet.faqs_webarea'
         - 'config:field.storage.node.body'
         - 'config:field.storage.node.field_hublinks'
         - 'config:field.storage.node.field_last_published'
@@ -727,7 +729,7 @@ display:
           ajax_get: false
       path: faqs/search
     cache_metadata:
-      max-age: -1
+      max-age: 0
       contexts:
         - 'languages:language_interface'
         - url
@@ -735,4 +737,6 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
+        - 'config:facets.facet.faqs_topic'
+        - 'config:facets.facet.faqs_webarea'
         - 'config:search_api.index.frequent_questions'

@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\epa_core\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -46,7 +47,7 @@ class ProblemWebforms extends ControllerBase {
 
     $list = '';
     foreach ($forms as $form) {
-      $list .= $form->toLink()->toString() .'<br />';
+      $list .= $form->toLink()->toString() . '<br />';
     }
     return [
       '#markup' => $list,
