@@ -595,6 +595,34 @@ function _epa_core_augment_datetime_description(&$field_description) {
   }
 }
 
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
+function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  if (!isset($element['#paragraph_type'])) {
+    return;
+  }
+
+  if ($element['#paragraph_type'] == 'card_group') {
+    $dependee_field_name = 'field_card_style';
+    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $field_definition = $context['items']->getFieldDefinition();
+    $paragraph_entity_reference_field_name = $field_definition->getName();
+    $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $paragraph_entity_reference_field_name, $element['#delta'], $dependee_field_name);
+
+    // field_paragraphs[7][subform][field_card_style]
+    // :input[name="field_paragraphs[7][subform][field_card_style]"]
+    $element['subform']['field_title_placement']['#states'] = [
+      'visible' => [
+        $selector => ['value' => 'default']
+      ],
+      'invisible' => [
+        $selector => ['value' => 'flag']
+      ],
+    ];
+  }
+}
+
 
 /**
  * Implements hook_entity_bundle_field_info_alter().
