@@ -4,42 +4,10 @@
 @use '../../00-config' as *;
 
 .layout--epa-section {
-  &.dark {
-    background-color: color('primary-darker');
-
-    /* stylelint-disable selector-max-compound-selectors, max-nesting-depth */
-    .layout__region--main {
-      > h1,
-      > h2,
-      > h3,
-      > h4,
-      > h5,
-      > h6 {
-        // TODO: This should use a theme-able color,
-        // and should probably default to white
-        color: color('accent-cool');
-      }
-
-      > p {
-        color: color($theme-text-reverse-color);
-      }
-
-      > * > a {
-        color: color($theme-link-reverse-color);
-
-        &:hover {
-          color: color($theme-link-reverse-hover-color);
-        }
-
-        &:active {
-          color: color($theme-link-reverse-active-color);
-        }
-      }
-    }
-    /* stylelint-enable selector-max-compound-selectors, max-nesting-depth */
-  }
-  &.light {
-    background-color: color('base-lightest');
+  .usa-section--light,
+  .usa-section--dark {
+    padding-bottom: 2rem;
+    padding-top: 2rem;
   }
 
   .layout__region--main {

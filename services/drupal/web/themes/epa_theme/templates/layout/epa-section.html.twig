@@ -9,17 +9,25 @@
   'layout',
   'layout--' ~ layout.id|clean_class,
   'u-full-width',
-]
+  attributes.hasClass('dark') ? 'usa-section--dark usa-dark-background' : '',
+  attributes.hasClass('light') ? 'usa-section--light' : '',
+]|join(' ')|trim
 %}
-{{ dd(_context) }}
+
+{% set section_content %}
+  {% for region in layout.getRegionNames %}
+    {% if content[region] %}
+      <div {{ region_attributes[region].addClass('layout__region', 'layout__region--' ~ region|clean_class) }}>
+        {{ content[region] }}
+      </div>
+    {% endif %}
+  {% endfor %}
+{% endset %}
+
 {% if content %}
-  <div{{ attributes.addClass(classes) }}>
-    {% for region in layout.getRegionNames %}
-      {% if content[region] %}
-        <div {{ region_attributes[region].addClass('l-constrain', 'layout__region', 'layout__region--' ~ region|clean_class) }}>
-          {{ content[region] }}
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
+  {% include '@layouts/section/section.twig' with {
+    modifier_classes: classes,
+    content: section_content,
+    has_constrain: true,
+  } %}
 {% endif %}
