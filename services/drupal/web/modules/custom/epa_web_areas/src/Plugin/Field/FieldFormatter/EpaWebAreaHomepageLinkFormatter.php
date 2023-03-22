@@ -2,7 +2,6 @@
 
 namespace Drupal\epa_web_areas\Plugin\Field\FieldFormatter;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;

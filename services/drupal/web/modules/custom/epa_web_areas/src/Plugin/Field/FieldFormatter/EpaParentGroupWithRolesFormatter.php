@@ -20,13 +20,16 @@ use Drupal\Core\Field\Plugin\Field\FieldFormatter\EntityReferenceFormatterBase;
  */
 class EpaParentGroupWithRolesFormatter extends EntityReferenceFormatterBase {
 
+  /**
+   *
+   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       $group = $entity->getGroup();
       $user = $entity->getEntity();
-      $groupMembership = \Drupal::service('group.membership_loader')->load($group,$user);
+      $groupMembership = \Drupal::service('group.membership_loader')->load($group, $user);
       $role_names = [];
 
       $roles = $groupMembership->getRoles();
@@ -37,8 +40,8 @@ class EpaParentGroupWithRolesFormatter extends EntityReferenceFormatterBase {
       $eic = !$group->field_editor_in_chief->isEmpty() ? $group->field_editor_in_chief->entity->toLink()->toString() : "none";
 
       $elements[$delta] = [
-        '#markup' => '<div>'. $group->toLink()->toString() .' | <div class="field__label is-inline">Editor in Chief</div><div class="field__content">'. $eic .'</div> | <div class="field__label is-inline">Roles</div><div class="field__content">'. implode(', ', $role_names) .'</div></div>',
-        '#cache' => ['tags' => Cache::mergeTags($entity->getCacheTags(),$group->getCacheTags())],
+        '#markup' => '<div>' . $group->toLink()->toString() . ' | <div class="field__label is-inline">Editor in Chief</div><div class="field__content">' . $eic . '</div> | <div class="field__label is-inline">Roles</div><div class="field__content">' . implode(', ', $role_names) . '</div></div>',
+        '#cache' => ['tags' => Cache::mergeTags($entity->getCacheTags(), $group->getCacheTags())],
       ];
     }
 
