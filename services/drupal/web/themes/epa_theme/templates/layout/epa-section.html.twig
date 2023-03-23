@@ -6,20 +6,15 @@
 #}
 {%
   set classes = [
-  'layout',
-  'layout--' ~ layout.id|clean_class,
-  'u-full-width',
-  attributes.hasClass('dark') ? 'usa-section--dark usa-dark-background' : '',
-  attributes.hasClass('light') ? 'usa-section--light' : '',
-]|join(' ')|trim
+    attributes.hasClass('dark') ? 'usa-section--dark usa-dark-background' : '',
+    attributes.hasClass('light') ? 'usa-section--light' : '',
+  ]|join(' ')|trim
 %}
 
 {% set section_content %}
   {% for region in layout.getRegionNames %}
     {% if content[region] %}
-      <div {{ region_attributes[region].addClass('layout__region', 'layout__region--' ~ region|clean_class) }}>
-        {{ content[region] }}
-      </div>
+      {{ content[region] }}
     {% endif %}
   {% endfor %}
 {% endset %}
