@@ -1,8 +1,10 @@
 // @file
 // Aspect Ratio mixin
 
+@use "sass:math";
+
 @mixin aspect-ratio($width, $height) {
   height: 0;
-  padding-top: ($height / $width) * 100%;
+  padding-top: (math.div($height, $width)) * 100%;
   width: 100%;
 }
