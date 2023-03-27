@@ -50,4 +50,15 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
       $variables['modifier_classes'] .= ' usa-card--media-right';
     }
   }
+
+  if (!$card->get('field_flag_card_alignment')->isEmpty() &&
+    $card->get('field_flag_card_alignment')->value == 'default' &&
+    $style == 'flag' ) {
+    if (!isset($variables['modifier_classes'])) {
+      $variables['modifier_classes'] = 'usa-card--media-left';
+    }
+    else {
+      $variables['modifier_classes'] .= ' usa-card--media-left';
+    }
+  }
 }
