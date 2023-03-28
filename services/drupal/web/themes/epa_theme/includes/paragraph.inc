@@ -38,27 +38,45 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
   // If flag is set, pass to card template.
   $variables['flag'] = $style == 'flag';
 
-  // If the 'flag layout' field is set to right and we've chosen to display as
-  // the flag type, add modifier class to the card.
-  if (!$card->get('field_flag_card_alignment')->isEmpty() &&
-    $card->get('field_flag_card_alignment')->value == 'right' &&
-    $style == 'flag' ) {
-    if (!isset($variables['modifier_classes'])) {
-      $variables['modifier_classes'] = 'usa-card--media-right';
+  // If the 'flag layout' field is set, add modifier classes to the card.
+  if ($style == 'flag') {
+    if ($card->get('field_flag_card_alignment')->isEmpty()) {
+      // Add left/right classes based on paragraph index if alignment isn’t
+      // already set.
+      if($card->index % 2 == 0) {
+        if (!isset($variables['modifier_classes'])) {
+          $variables['modifier_classes'] = 'usa-card--media-left';
+        }
+        else {
+          $variables['modifier_classes'] .= ' usa-card--media-left';
+        }
+      }
+      else{
+        if (!isset($variables['modifier_classes'])) {
+          $variables['modifier_classes'] = 'usa-card--media-right';
+        }
+        else {
+          $variables['modifier_classes'] .= ' usa-card--media-right';
+        }
+      }
     }
     else {
-      $variables['modifier_classes'] .= ' usa-card--media-right';
-    }
-  }
-
-  if (!$card->get('field_flag_card_alignment')->isEmpty() &&
-    $card->get('field_flag_card_alignment')->value == 'default' &&
-    $style == 'flag' ) {
-    if (!isset($variables['modifier_classes'])) {
-      $variables['modifier_classes'] = 'usa-card--media-left';
-    }
-    else {
-      $variables['modifier_classes'] .= ' usa-card--media-left';
+      if ($card->get('field_flag_card_alignment')->value == 'right') {
+        if (!isset($variables['modifier_classes'])) {
+          $variables['modifier_classes'] = 'usa-card--media-right';
+        }
+        else {
+          $variables['modifier_classes'] .= ' usa-card--media-right';
+        }
+      }
+      else {
+        if (!isset($variables['modifier_classes'])) {
+          $variables['modifier_classes'] = 'usa-card--media-left';
+        }
+        else {
+          $variables['modifier_classes'] .= ' usa-card--media-left';
+        }
+      }
     }
   }
 }
