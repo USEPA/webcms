@@ -598,7 +598,31 @@ function _epa_core_augment_datetime_description(&$field_description) {
   }
 }
 
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
+function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  if (!isset($element['#paragraph_type'])) {
+    return;
+  }
 
+  // Show/hide the "Flag alignment" field if the parent card group's 'Card Style'
+  // is set to the 'flag' option.
+  if ($element['#paragraph_type'] == 'card') {
+    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $dependee_field_name = 'field_card_style';
+    // Need to build specific selector to handle multiple card groups.
+    $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $element['#field_parents'][0], $element['#field_parents'][1], $dependee_field_name);
+    $element['subform']['field_flag_card_alignment']['#states']  = [
+      'visible' => [
+        $selector => ['value' => 'flag'],
+      ],
+      'invisible' => [
+        $selector => ['value' => 'default'],
+      ],
+    ];
+  }
+}
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */

@@ -4,12 +4,14 @@ status: true
 dependencies:
   config:
     - field.field.paragraph.card.field_body
+    - field.field.paragraph.card.field_flag_card_alignment
     - field.field.paragraph.card.field_link
     - field.field.paragraph.card.field_media_image
     - field.field.paragraph.card.field_title
     - paragraphs.paragraphs_type.card
   module:
     - link
+    - options
     - text
 id: paragraph.card.default
 targetEntityType: paragraph
@@ -21,7 +23,14 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
-    weight: 2
+    weight: 3
+    region: content
+  field_flag_card_alignment:
+    type: list_key
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
     region: content
   field_link:
     type: link
@@ -33,7 +42,7 @@ content:
       rel: '0'
       target: '0'
     third_party_settings: {  }
-    weight: 3
+    weight: 4
     region: content
   field_media_image:
     type: entity_reference_entity_view
@@ -42,7 +51,7 @@ content:
       view_mode: card
       link: false
     third_party_settings: {  }
-    weight: 0
+    weight: 1
     region: content
   field_title:
     type: string
@@ -50,7 +59,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 1
+    weight: 2
     region: content
 hidden:
   search_api_excerpt: true
