@@ -37,6 +37,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - epa_web_areas
     - link
     - metatag
     - options
@@ -47,6 +48,16 @@ targetEntityType: node
 bundle: speeches
 mode: default
 content:
+  entitygroupfield:
+    type: group_homepage_node_formatter
+    label: above
+    settings:
+      link: '1'
+      link_text: 'Read more EPA Speeches and Remarks'
+      shortname: 0
+    third_party_settings: {  }
+    weight: 28
+    region: content
   field_authors:
     type: entity_reference_revisions_entity_view
     label: above
@@ -290,7 +301,6 @@ content:
     region: content
 hidden:
   content_moderation_control: true
-  entitygroupfield: true
   field_author_names: true
   field_owning_office: true
   langcode: true
