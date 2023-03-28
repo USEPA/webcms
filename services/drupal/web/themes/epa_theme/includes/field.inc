@@ -29,4 +29,11 @@ function epa_theme_preprocess_field(&$variables) {
       ]);
     }
   }
+
+  // Add index to individual paragraphs.
+  if ($variables['field_type'] == 'entity_reference_revisions' && $variables['element']['#items']->getItemDefinition()->getSetting('target_type') == 'paragraph') {
+    foreach ($variables['items'] as $idx => $item) {
+      $variables['items'][$idx]['content']['#paragraph']->index = $idx;
+    }
+  }
 }
