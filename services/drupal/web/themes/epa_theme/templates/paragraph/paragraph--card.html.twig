@@ -28,10 +28,11 @@
 {% set paragraph_parent = paragraph.getParentEntity() %}
 
 {% if paragraph_parent.field_title_placement.0.value == 'header-first' %}
-  {% set title_first = 'usa-card--header-first' %}
+  {% set modifier_classes = (modifier_classes ~ ' usa-card--header-first')|trim %}
 {% endif %}
+
 {% if paragraph_parent.field_image_style.0.value == 'inset' %}
-  {% set media_indent = 'usa-card__media--inset' %}
+  {% set media_modifier_classes = 'usa-card__media--inset' %}
 {% endif %}
 
 {% include '@uswds/card/card.twig' with {
@@ -40,6 +41,6 @@
   'media': content.field_media_image|field_value,
   'button_url': content.field_link[0]['#url'],
   'button_text': paragraph.field_link.title,
-  'modifier_classes': title_first ? title_first : '',
-  'media_modifier_classes': media_indent ? media_indent : '',
+  'modifier_classes': modifier_classes,
+  'media_modifier_classes': media_modifier_classes,
 } %}
