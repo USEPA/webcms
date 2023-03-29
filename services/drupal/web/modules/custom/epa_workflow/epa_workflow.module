@@ -808,7 +808,7 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
       }
       // Is in any other draft state.
       elseif ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
-        $message = '<br>The revision is scheduled to publish on ' . $latest_formatted_date_time . ', but will only do so if this draft is approved. Currently, the draft is NOT approved.';
+        $message = '<br>The revision is scheduled to publish on ' . $latest_formatted_date_time . ', but will only do so if this draft is approved. Currently, the draft is NOT approved. If this date is in the past, please remove the Publish Date in the Other Metadata section of the Edit view for this message to disappear from future drafts.';
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
       }
     }
