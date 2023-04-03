@@ -57,8 +57,11 @@ import Drupal from 'drupal';
 
         return external;
       }
-      const externalLinks = context.querySelectorAll(
-        "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])"
+
+      const externalLinks = once(
+        'externalLinks',
+        "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])",
+        context
       );
       const translate = {
         en: ['Exit', 'Exit EPA’s website'],
