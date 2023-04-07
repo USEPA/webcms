@@ -12,6 +12,7 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
+    - entitygroupfield
     - focal_point
     - text
 id: media.image.default
@@ -19,6 +20,16 @@ targetEntityType: media
 bundle: image
 mode: default
 content:
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 9
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
+    third_party_settings: {  }
   field_banner_image_restricted:
     type: options_select
     weight: 2
@@ -87,7 +98,6 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
-  entitygroupfield: true
   path: true
   status: true
   uid: true
