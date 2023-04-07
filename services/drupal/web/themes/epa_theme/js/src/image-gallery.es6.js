@@ -7,7 +7,7 @@ import { tns } from 'tiny-slider/src/tiny-slider';
 (function(Drupal) {
   Drupal.behaviors.imageGallery = {
     attach(context) {
-      const sliders = context.querySelectorAll('.js-image-gallery');
+      const sliders = once('imageGallery', '.js-image-gallery', context);
       sliders.forEach(slider =>
         tns({
           container: slider.querySelector('.js-image-gallery__container'),
