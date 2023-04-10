@@ -25,6 +25,7 @@ dependencies:
     - field.field.node.event.field_location
     - field.field.node.event.field_machine_name
     - field.field.node.event.field_meta_tags
+    - field.field.node.event.field_owning_office
     - field.field.node.event.field_page_head
     - field.field.node.event.field_paragraphs
     - field.field.node.event.field_publish_date
@@ -53,6 +54,7 @@ third_party_settings:
         - field_publish_date
         - field_expiration_date
         - field_machine_name
+        - field_owning_office
       label: 'Other Metadata'
       region: content
       parent_name: group_additional_fields
@@ -161,11 +163,11 @@ content:
       custom_tz: America/New_York
       allowed_timezones:
         - America/Anchorage
+        - America/Chicago
         - America/Denver
         - America/Halifax
         - America/Los_Angeles
         - America/New_York
-        - America/Winnipeg
         - Pacific/Guam
         - Pacific/Honolulu
         - Pacific/Pago_Pago
@@ -301,6 +303,16 @@ content:
     region: content
     settings:
       sidebar: true
+    third_party_settings: {  }
+  field_owning_office:
+    type: entity_reference_autocomplete_tags
+    weight: 49
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   field_page_head:
     type: string_textarea

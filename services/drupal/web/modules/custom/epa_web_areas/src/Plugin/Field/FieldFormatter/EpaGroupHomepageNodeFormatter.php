@@ -35,15 +35,15 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
    */
   public static function defaultSettings() {
     return [
-        'shortname' => FALSE,
-      ] + parent::defaultSettings();
+      'shortname' => FALSE,
+    ] + parent::defaultSettings();
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getEntitiesToView(EntityReferenceFieldItemListInterface $items, $langcode) {
-    $groups = $this->traitGetEntitiesToView($items,$langcode);
+    $groups = $this->traitGetEntitiesToView($items, $langcode);
     $homepages = [];
 
     foreach ($groups as $delta => $group) {
@@ -147,4 +147,5 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
     $summary[] = $this->getSetting('shortname') ? t('Display short name') : t('Display long name');
     return $summary;
   }
+
 }

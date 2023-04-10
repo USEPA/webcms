@@ -99,7 +99,10 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $submit_copy = $form['actions']['submit'];
     $submit_copy['#group'] = 'revision_information';
     $submit_copy['#weight'] = 100;
-    $form['revision_information']['submit_copy'] = $submit_copy;
+    $form['revision_information']['actions'] = [
+      '#type' => "actions",
+      'submit' => $submit_copy,
+      ];
   }
 
   // Change the "Revision log message" label to say "Revision notes".
@@ -280,6 +283,10 @@ function epa_core_token_info() {
   $tokens['tokens'] = [
     'node' => [
       'machine-name-alias' => $machine_name_token,
+      'epa-addtocal-description' => [
+        'name' => t('EPA event description'),
+        'description' => t('Custom EPA event description suitable for Addtocal'),
+      ]
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -323,6 +330,41 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
           $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
+        }
+        break;
+      case 'epa-addtocal-description':
+        if ($type == 'node' && !empty($data['node'])) {
+          $add_to_cal_components = [];
+          $node = $data['node'];
+          if ($node->bundle() == 'event') {
+            $description = $node->get('field_add_to_cal_description')->value;
+            if (empty($description)) {
+              $description = $node->get('field_description')->value;
+            }
+            if ($description) {
+              $add_to_cal_components[] = $description;
+            }
+
+            $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
+            if (!empty($event_type)) {
+              $add_to_cal_components[] = "Event Type: $event_type";
+            }
+            $event_host = $node->get('field_event_host')->value;
+            if (!empty($event_host)) {
+              $add_to_cal_components[] = "Event host: $event_host";
+            }
+            $links_string = '';
+            foreach ($node->field_links as $link) {
+              $url = $link->getUrl();
+              $url->setAbsolute();
+              $title = $link->title;
+              $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
+            }
+            if (!empty($links_string)) {
+              $add_to_cal_components[] = "Links:\n". $links_string;
+            }
+          }
+          $replacements[$original] = implode("\n\n", $add_to_cal_components);
         }
         break;
       case 'contact-us-link':
@@ -400,42 +442,6 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   return $replacements;
 }
 
-function epa_core_addtocal_alter(array &$overridable_items) {
-  $overridable_items['override_status'] = TRUE;
-  $add_to_cal_components = [];
-  $node = \Drupal::routeMatch()->getParameter('node');
-  if ($node->bundle() == 'event') {
-    $description = $node->get('field_add_to_cal_description')->value;
-    if (empty($description)) {
-      $description = $node->get('field_description')->value;
-    }
-    if ($description) {
-      $add_to_cal_components[] = $description;
-    }
-
-    $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
-    if (!empty($event_type)) {
-      $add_to_cal_components[] = "Event Type: $event_type";
-    }
-    $event_host = $node->get('field_event_host')->value;
-    if (!empty($event_host)) {
-      $add_to_cal_components[] = "Event host: $event_host";
-    }
-    $links_string = '';
-    foreach ($node->field_links as $link) {
-      $url = $link->getUrl();
-      $url->setAbsolute();
-      $title = $link->title;
-      $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
-    }
-    if (!empty($links_string)) {
-      $add_to_cal_components[] = "Links:\n". $links_string;
-    }
-  }
-  $overridable_items['description'] = implode("\n\n", $add_to_cal_components);
-}
-
-
 
 /**
  * Implements hook_entity_revision_delete().
@@ -473,6 +479,15 @@ function epa_core_entity_delete(EntityInterface $entity) {
   ];
   \Drupal::logger('epa_core')
     ->notice(t('@typeid entity deleted. (Entity bundle: @bundle; Entity ID: @id; Entity label: %label)', $t_args));
+}
+
+/**
+ * Implements hook_node_form_FORM_ID_alter().
+ */
+function epa_core_form_autosave_form_admin_settings_alter(&$form, FormStateInterface $form_state) {
+  if (isset($form["allowed_content_entities"]["webform_submission"])) {
+    unset($form["allowed_content_entities"]["webform_submission"]);
+  }
 }
 
 /**
@@ -583,7 +598,31 @@ function _epa_core_augment_datetime_description(&$field_description) {
   }
 }
 
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
+function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\Form\FormStateInterface $form_state, $context) {
+  if (!isset($element['#paragraph_type'])) {
+    return;
+  }
 
+  // Show/hide the "Flag alignment" field if the parent card group's 'Card Style'
+  // is set to the 'flag' option.
+  if ($element['#paragraph_type'] == 'card') {
+    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $dependee_field_name = 'field_card_style';
+    // Need to build specific selector to handle multiple card groups.
+    $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $element['#field_parents'][0], $element['#field_parents'][1], $dependee_field_name);
+    $element['subform']['field_flag_card_alignment']['#states']  = [
+      'visible' => [
+        $selector => ['value' => 'flag'],
+      ],
+      'invisible' => [
+        $selector => ['value' => 'default'],
+      ],
+    ];
+  }
+}
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */

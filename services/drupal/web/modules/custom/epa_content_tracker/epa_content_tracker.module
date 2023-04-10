@@ -50,7 +50,7 @@ function _epa_content_tracker_process_moderated_entity(ContentModerationStateInt
     $env_state = getenv('WEBCMS_ENV_STATE');
     // Have to make special accommodations for migration since nodes will not proceed through the normal workflow.
     if ('published' == $moderated_entity->moderation_state->value ||
-      ($env_state === 'migration' && in_array($moderated_entity->moderation_state->value, ['published','published_day_til_expire','published_expiring','published_needs_review']))) {
+      ($env_state === 'migration' && in_array($moderated_entity->moderation_state->value, ['published', 'published_day_til_expire', 'published_expiring', 'published_needs_review']))) {
       $logger->update($node);
     }
     elseif ('unpublished' == $moderated_entity->moderation_state->value) {
@@ -69,6 +69,7 @@ function epa_content_tracker_entity_delete(EntityInterface $entity) {
 
 /**
  * Implements hook_path_alias_insert().
+ *
  * @param $path
  */
 function epa_content_tracker_path_alias_insert($path) {
@@ -77,6 +78,7 @@ function epa_content_tracker_path_alias_insert($path) {
 
 /**
  * Implements hook_path_alias_update().
+ *
  * @param $path
  */
 function epa_content_tracker_path_alias_update($path) {
@@ -85,6 +87,7 @@ function epa_content_tracker_path_alias_update($path) {
 
 /**
  * Implements hook_path_alias_delete().
+ *
  * @param $path
  */
 function epa_content_tracker_path_alias_delete($path) {
@@ -102,7 +105,7 @@ function _epa_content_tracker_process_path($path) {
   $router = \Drupal::service('router.no_access_checks');
   $result = $router->match($path->getPath());
   if (!empty($result) && $result['_route'] == 'entity.node.canonical') {
-    // Only log changes if the node is published
+    // Only log changes if the node is published.
     $node = $result['node'];
     if (!$node || !$node->isPublished()) {
       return;
@@ -111,8 +114,8 @@ function _epa_content_tracker_process_path($path) {
     // It does not appear that we need to clear the cache to ensure we get
     // correct canonical alias for our nodes, but leaving this here just in case
     // we later discover we do.
-//    $alias_manager = \Drupal::service('path_alias.manager');
-//    $alias_manager->cacheClear($path->getPath());
+    //    $alias_manager = \Drupal::service('path_alias.manager');
+    //    $alias_manager->cacheClear($path->getPath());
     $logger = new EpaContentTrackerLogger();
     // This will ensure the canonical path for this alias is set and re-indexed.
     // Any old paths will be marked as deleted as part of this.
@@ -135,14 +138,13 @@ function epa_content_tracker_media_update(EntityInterface $entity) {
   $logger->mediaUpdate($entity);
 }
 
-
 /**
  * Implements hook_views_data().
  */
 function epa_content_tracker_views_data() {
   $data = [];
 
-  // Expose the epa_content_tracker table to Views
+  // Expose the epa_content_tracker table to Views.
   $data['epa_content_tracker'] = [];
 
   $data['epa_content_tracker']['table'] = [];
@@ -204,7 +206,7 @@ function epa_content_tracker_views_data() {
     'sort' => ['id' => 'date'],
   ];
 
-  // Relationship field for nodes that were changed
+  // Relationship field for nodes that were changed.
   $data['epa_content_tracker']['related_node'] = [
     'title' => t('Affected node'),
     'help' => t('Data for the node that was changed.'),
@@ -216,7 +218,7 @@ function epa_content_tracker_views_data() {
       'id' => 'standard',
       'label' => t('Affected node'),
 
-      // Limit this join only to node entities
+      // Limit this join only to node entities.
       'extra' => [
         0 => [
           'left_field' => 'entity_type',
@@ -237,7 +239,7 @@ function epa_content_tracker_views_data() {
       'id' => 'standard',
       'label' => t('Affected media'),
 
-      // As with the node case above, limit this join to media entities
+      // As with the node case above, limit this join to media entities.
       'extra' => [
         0 => [
           'left_field' => 'entity_type',

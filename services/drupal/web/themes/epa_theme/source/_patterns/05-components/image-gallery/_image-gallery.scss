@@ -3,20 +3,24 @@
 
 @use '../../00-config' as *;
 @use '../../02-base' as *;
-@use 'tiny-slider';
+@use '../../tiny-slider';
 
 $image-gallery-button-size: 44px;
 
 .image-gallery {
   clear: both;
-  margin-bottom: rem(units(3));
+  margin-bottom: rem(units(4));
   margin-left: auto;
   margin-right: auto;
   max-width: rem(640px + $image-gallery-button-size * 2);
   padding: 0 rem($image-gallery-button-size);
   position: relative;
 
-  /* stylelint-disable */
+  * + & {
+    margin-top: rem(gesso-spacing(4));
+  }
+
+  // stylelint-disable
   &.gallery_small,
   &.gallery_small_tall {
     max-width: rem(320px + $image-gallery-button-size * 2);
@@ -26,7 +30,7 @@ $image-gallery-button-size: 44px;
   &.gallery_large_tall {
     max-width: rem(960px + $image-gallery-button-size * 2);
   }
-  /* stylelint-enable */
+  // stylelint-enable
 }
 
 .image-gallery__title {
@@ -77,7 +81,7 @@ $image-gallery-button-size: 44px;
 }
 
 %image-gallery__button {
-  background: gesso-grayscale(white);
+  background: transparent;
   border: 0;
   bottom: 0;
   box-shadow: 0;
@@ -88,6 +92,7 @@ $image-gallery-button-size: 44px;
   top: 0;
   width: rem($image-gallery-button-size);
 
+  &:visited,
   &:hover,
   &:focus,
   &:active {
@@ -108,7 +113,8 @@ $image-gallery-button-size: 44px;
 
 .image-gallery__prev,
 .image-gallery__next {
-  .usa-dark-background & {
+  .usa-dark-background &,
+  .usa-section--dark & {
     background: transparent;
 
     svg {

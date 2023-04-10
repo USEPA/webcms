@@ -6,7 +6,7 @@
 
 .figure {
   display: table;
-  margin-bottom: rem(units(3));
+  margin-bottom: rem(units(4));
   max-width: 100%;
   position: relative;
   table-layout: fixed;
@@ -15,8 +15,14 @@
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
     &.u-align-right {
+      margin-bottom: rem(units(3));
+      margin-top: 0;
       max-width: calc(50% - #{rem(gesso-get-map(gutter-width))});
     }
+  }
+
+  * + & {
+    margin-top: rem(units(4));
   }
 
   &.is-centered {
