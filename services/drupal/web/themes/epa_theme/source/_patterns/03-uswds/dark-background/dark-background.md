@@ -1,7 +1,7 @@
 ---
 el: .usa-dark-background
 title: Dark Background
-state: inreview
+state: complete
 ---
 
 __Variables:__

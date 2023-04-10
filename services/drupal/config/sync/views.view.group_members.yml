@@ -7,6 +7,7 @@ dependencies:
   module:
     - group
     - user
+    - views_autocomplete_filters
 _core:
   default_config_hash: bvwgftWhNrNAdOxAldmuOOJTcKkHDdVubSZQIQ37nvs
 id: group_members
@@ -231,6 +232,73 @@ display:
           entity_field: created
           plugin_id: field
           label: Joined
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: timestamp
+          settings:
+            date_format: short
+            custom_date_format: ''
+            timezone: ''
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        login:
+          id: login
+          table: users_field_data
+          field: login
+          relationship: gc__user
+          group_type: group
+          admin_label: ''
+          entity_type: user
+          entity_field: login
+          plugin_id: field
+          label: 'Last login'
           exclude: false
           alter:
             alter_text: false
@@ -534,7 +602,7 @@ display:
       access:
         type: group_permission
         options:
-          group_permission: 'administer members'
+          group_permission: 'access group_node overview'
       cache:
         type: tag
         options: {  }
@@ -589,7 +657,70 @@ display:
           validate_options: {  }
           break_phrase: false
           not: false
-      filters: {  }
+      filters:
+        group_roles_target_id:
+          id: group_roles_target_id
+          table: group_content__group_roles
+          field: group_roles_target_id
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: views_autocomplete_filters_string
+          operator: '='
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: group_roles_target_id_op
+            label: 'Roles (group_roles)'
+            description: null
+            use_operator: false
+            operator: group_roles_target_id_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: group_roles_target_id
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+            placeholder: null
+            autocomplete_filter: 0
+            autocomplete_min_chars: '0'
+            autocomplete_items: '10'
+            autocomplete_field: ''
+            autocomplete_raw_suggestion: 1
+            autocomplete_raw_dropdown: 1
+            autocomplete_dependent: 0
+          is_grouped: true
+          group_info:
+            label: ''
+            description: ''
+            identifier: group_roles_target_id
+            optional: true
+            widget: select
+            multiple: true
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: 'Can publish'
+                operator: regular_expression
+                value: ^(web_area-administrator|web_area-editor|web_area-approver)$
+              2:
+                title: ''
+                operator: '='
+                value: ''
+              3:
+                title: ''
+                operator: '='
+                value: ''
+      filter_groups:
+        operator: AND
+        groups:
+          1: AND
+          2: OR
       style:
         type: table
         options:
@@ -599,12 +730,14 @@ display:
           columns:
             name: name
             group_roles: group_roles
-            changed: changed
+            status: status
             created: created
             view_group_content: view_group_content
             edit_group_content: edit_group_content
             delete_group_content: delete_group_content
             dropbutton: dropbutton
+            mail: mail
+            login: login
           default: '-1'
           info:
             name:
@@ -619,8 +752,8 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
-            changed:
-              sortable: true
+            status:
+              sortable: false
               default_sort_order: asc
               align: ''
               separator: ''
@@ -656,6 +789,20 @@ display:
               responsive: ''
             dropbutton:
               sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            mail:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            login:
+              sortable: true
               default_sort_order: asc
               align: ''
               separator: ''
@@ -697,7 +844,9 @@ display:
             group_membership: group_membership
       header: {  }
       footer: {  }
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:
@@ -715,7 +864,9 @@ display:
     display_plugin: page
     position: 1
     display_options:
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
       path: group/%group/members
       menu:
         type: tab

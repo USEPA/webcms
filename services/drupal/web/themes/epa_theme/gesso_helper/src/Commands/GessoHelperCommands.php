@@ -89,7 +89,6 @@ class GessoHelperCommands extends DrushCommands implements SiteAliasManagerAware
     $fs = new Filesystem();
     $fs->mirror($gesso_path, $new_path);
 
-
     // Remove Gesso’s helper module from the new theme.
     $this->gessoRecursiveRm(Path::join($new_path, 'gesso_helper'));
 
