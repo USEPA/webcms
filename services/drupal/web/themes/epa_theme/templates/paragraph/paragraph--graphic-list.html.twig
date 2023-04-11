@@ -14,24 +14,22 @@
   ]) %}
 {% endfor %}
 
-<section class="usa-graphic-list usa-section usa-section--dark">
-  <div class="grid-container">
-    {% for block in paragraph_media_blocks %}
-      {% if loop.index0 % 2 == 0 %}
-        <div class="usa-graphic-list__row grid-row grid-gap">
-      {% endif %}
-        {% include '@uswds/graphic-list/graphic-list--item/graphic-list--item.twig' with {
-          'field_title': block.field_title,
-          'field_body': block.field_body,
-          'field_link': block.field_link,
-          'field_media_block_image': {
-				    'src': block.field_media_block_image.src | image_style('small_graphic_list_image'),
-				    'alt': block.field_media_block_image.alt,
-				  },
-        } %}
-      {% if loop.index0 % 2 == 1 or loop.last %}
-        </div>
-      {% endif %}
-    {% endfor %}  
-  </div>
+<section class="usa-graphic-list">
+  {% for block in paragraph_media_blocks %}
+    {% if loop.index0 % 2 == 0 %}
+      <div class="usa-graphic-list__row grid-row grid-gap">
+    {% endif %}
+      {% include '@uswds/graphic-list/graphic-list--item/graphic-list--item.twig' with {
+        'field_title': block.field_title,
+        'field_body': block.field_body,
+        'field_link': block.field_link,
+        'field_media_block_image': {
+			    'src': block.field_media_block_image.src | image_style('small_graphic_list_image'),
+			    'alt': block.field_media_block_image.alt,
+			  },
+      } %}
+    {% if loop.index0 % 2 == 1 or loop.last %}
+      </div>
+    {% endif %}
+  {% endfor %}  
 </section>
