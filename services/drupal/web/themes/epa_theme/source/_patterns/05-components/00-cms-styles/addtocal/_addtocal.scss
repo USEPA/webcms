@@ -1,15 +1,56 @@
 // @file
 // Styles for the Add to Cal module.
+@use 'usa-button' as *;
+@use '../../../00-config' as *;
 
 .addtocal-container {
+  float: none;
+  margin-bottom: 12px;
+  margin-top: 12px;
+
+  @include breakpoint(gesso-breakpoint(mobile-lg)) {
+    float: right;
+    margin-top: 0;
+  }
+
+  .usa-collection__item & {
+    float: none;
+    margin-bottom: 12px;
+    margin-top: 12px;
+    width: fit-content;
+  }
+
   .addtocal {
+    @extend .usa-button;
+    margin-right: 0;
+
+    &:focus {
+      @extend .usa-button, :hover;
+      margin-right: 0;
+      z-index: 1;
+    }
+
     + div {
       left: auto !important;
+      min-width: 159px;
       right: 0;
+      width: 100%;
+    }
+
+    &-link .icon--exit {
+      display: none;
     }
   }
 
   .form-item__label {
+    font-size: 1rem;
+    margin: 0;
+    padding: 3px;
+    text-align: center;
     white-space: nowrap;
+
+    &::before {
+      content: none;
+    }
   }
 }

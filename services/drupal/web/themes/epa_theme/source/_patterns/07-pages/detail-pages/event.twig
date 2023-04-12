@@ -27,16 +27,14 @@
         },
     ],
   } %}
-  {% include '@components/field/field.twig' with {
-    'label': 'Add to Calendar',
-    'label_element': 'h2',
-    'element': 'div',
-    'field_items': [
-        {
-          'content': '<ul><li><a href="#">iCalendar</a></li><li><a href="#">Outlook</a></li><li><a href="#">Google</a></li><li><a href="#">Yahoo</a></li></ul>',
-        },
-    ],
-  } %}
+
+  <div class="addtocal-container">
+    {% include '@components/button/button.twig' with {
+      'text': 'Add to Calendar',
+      'modifier_classes': 'addtocal',
+    } %}
+  </div>  
+  
   {% include '@components/field/field.twig' with {
     'label': 'Registration Deadline',
     'label_element': 'h3',

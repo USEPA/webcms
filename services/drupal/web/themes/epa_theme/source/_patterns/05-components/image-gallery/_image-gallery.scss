@@ -3,7 +3,7 @@
 
 @use '../../00-config' as *;
 @use '../../02-base' as *;
-@use 'tiny-slider';
+@use '../../tiny-slider';
 
 $image-gallery-button-size: 44px;
 
@@ -104,4 +104,15 @@ $image-gallery-button-size: 44px;
 .image-gallery__next {
   @extend %image-gallery__button;
   right: 0;
+}
+
+.image-gallery__prev,
+.image-gallery__next {
+  .usa-dark-background & {
+    background: transparent;
+
+    svg {
+      fill: gesso-grayscale(white);
+    }
+  }
 }
