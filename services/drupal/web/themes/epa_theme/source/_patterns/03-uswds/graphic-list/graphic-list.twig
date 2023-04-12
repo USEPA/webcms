@@ -1,16 +1,22 @@
-<section class="usa-graphic-list">
+{% set classes = [
+  'usa-graphic-list',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
   {% for block in media_blocks %}
     {% if loop.index0 % 2 == 0 %}
       <div class="usa-graphic-list__row grid-row grid-gap">
     {% endif %}
-      {% include '@uswds/graphic-list/graphic-list--item/graphic-list--item.twig' with {
-        'field_title': block.field_title,
-        'field_body': block.field_body,
-        'field_link': block.field_link,
-        'field_media_block_image': block.field_media_block_image,
+      {% include '@uswds/graphic-list/_graphic-list-item.twig' with {
+        'modifier_class': '',
+        'url': block.url,
+        'image': block.image,
+        'title': block.title,
+        'content': block.content,
       } %}
     {% if loop.index0 % 2 == 1 or loop.last %}
       </div>
     {% endif %}
-  {% endfor %}  
-</section>
+  {% endfor %}
+</div>
