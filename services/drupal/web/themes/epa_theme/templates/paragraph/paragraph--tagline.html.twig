@@ -1,4 +1,11 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
 {% include '@components/tagline/tagline.twig' with {
-  'field_heading': content.field_heading|field_value,
-  'field_text': content.field_text|field_value|render,
+  'heading': content.field_heading|field_value|render,
+  'content': content.field_text|field_value|render,
 } only %}
