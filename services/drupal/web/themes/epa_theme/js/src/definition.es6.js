@@ -4,7 +4,7 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.definition = {
     attach(context) {
-      const definitions = once('beforeAfterSwipe', '.js-definition2', context);
+      const definitions = once('definition', '.js-definition', context);
       const now = Date.now();
 
       definitions.forEach((definition, index) => {

@@ -5,7 +5,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.mediaLink = {
     attach(context) {
       const mediaImages = once(
-        'mediaLink',
+        'media-link',
         'a > .figure > .figure__media > img',
         context
       );

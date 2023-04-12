@@ -59,7 +59,7 @@ import Drupal from 'drupal';
       }
 
       const externalLinks = once(
-        'externalLinks',
+        'external-links',
         "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])",
         context
       );
