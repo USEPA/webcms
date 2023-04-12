@@ -6,5 +6,5 @@ state: complete
 
 __Variables:__
 * modifier_classes: [string] Classes to modify the default component styling.
-* field_heading: [string] Tagline title.
-* field_text: [text_long] Tagline text.
+* heading: [string] Tagline heading.
+* content: [text_long] Tagline content.

@@ -1,15 +1,17 @@
 {% set classes = [
-  'tag-list',
+  'tagline',
+  'grid-container',
+  'padding-0',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
-<section class="usa-section grid-container">
-	<div class="grid-row grid-gap">
+<div class="{{ classes }}">
+  <div class="grid-row grid-gap">
     <div class="tablet:grid-col-4">
-      <h2 class="font-heading-xl margin-top-0 tablet:margin-bottom-0">{{ field_heading }}</h2>
+      <h2 class="font-heading-xl margin-top-0 tablet:margin-bottom-0">{{ heading }}</h2>
     </div>
     <div class="tablet:grid-col-8 usa-prose">
-      {{ field_text }}
+      {{ content }}
     </div>
   </div>
-</section>
+</div>
