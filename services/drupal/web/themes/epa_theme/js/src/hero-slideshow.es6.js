@@ -7,7 +7,7 @@ import { tns } from 'tiny-slider/src/tiny-slider';
 (function(Drupal) {
   Drupal.behaviors.heroSlideshow = {
     attach(context) {
-      const sliders = context.querySelectorAll('.js-hero-slideshow');
+      const sliders = once('heroSlideshow', '.js-hero-slideshow', context);
       sliders.forEach(slider => {
         const sliderObject = tns({
           autoplay: true,
