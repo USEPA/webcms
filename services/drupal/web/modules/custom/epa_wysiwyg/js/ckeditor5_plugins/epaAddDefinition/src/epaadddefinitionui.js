@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Plugin } from "ckeditor5/src/core";
 import { ButtonView, Notification } from "ckeditor5/src/ui";
 import icon from "../../../../icons/book.svg";
@@ -6,6 +7,19 @@ import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";
 import lookupTerms from "./lookupterms";
 
 const ERR_UNEXPECTED = "An unexpected error occurred";
+=======
+// @ts-check
+
+import { icons, Plugin } from "ckeditor5/src/core";
+import { ButtonView, Notification } from "ckeditor5/src/ui";
+
+import lookupTerms from "./lookupterms";
+import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";
+import EpaAddDefinitionView from "./epaadddefinitionview";
+
+const ERR_UNEXPECTED = "An unexpected error occurred";
+
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
 const LOCK_ID = "epaAddDefinitions";
 
 export default class EpaAddDefinitionUI extends Plugin {
@@ -27,8 +41,14 @@ export default class EpaAddDefinitionUI extends Plugin {
 
       buttonView.set({
         label: editor.t("Add Definition"),
+<<<<<<< HEAD
         icon,
         tooltip: true,
+=======
+        icon: icons.pencil,
+        tooltip: true,
+        withText: true,
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       });
 
       buttonView
@@ -53,7 +73,11 @@ export default class EpaAddDefinitionUI extends Plugin {
 
   async _execute() {
     const modal = this.modalView;
+<<<<<<< HEAD
     if (modal && !modal.isRendered) {
+=======
+    if (!modal.isRendered) {
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       modal.render();
       document.body.appendChild(modal.element);
     }
@@ -63,6 +87,7 @@ export default class EpaAddDefinitionUI extends Plugin {
     const range = selection.getFirstRange();
 
     // Skip if there's no selection
+<<<<<<< HEAD
     if (!range || (range && range.isCollapsed)) {
       return;
     }
@@ -124,6 +149,23 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     // Skip if there's no meaningful text highlighted
     if (userInput && userInput.trim() === "") {
+=======
+    if (range.isCollapsed) {
+      return;
+    }
+
+    const userInput = Array.from(range.getItems()).reduce((acc, node) => {
+      if (node.is("text") || node.is("textProxy")) {
+        return acc + node.data;
+      }
+
+      // Crash if we found a non-text node in the selection
+      throw new MultipleParagraphError();
+    }, "");
+
+    // Skip if there's no meaningful text highlighted
+    if (userInput.trim() === "") {
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       return;
     }
 
@@ -133,9 +175,12 @@ export default class EpaAddDefinitionUI extends Plugin {
     let lookupResult = null;
 
     try {
+<<<<<<< HEAD
       if (!modal) {
         throw new Error("Modal not initialized");
       }
+=======
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       // Lock the editor as read-only while the user makes selections
       this.editor.enableReadOnlyMode(LOCK_ID);
 
@@ -144,14 +189,34 @@ export default class EpaAddDefinitionUI extends Plugin {
         return;
       }
 
+<<<<<<< HEAD
       const result = lookupResult ? lookupResult.matches : null;
 
       if (!result || result.length === 0) {
+=======
+      // We only support the case where a single term is matched by the whole
+      // input, so we search for that result in the array and fail if we
+      // couldn't find it.
+      //
+      // Two notes:
+      // 1. This has the effect of limiting search results to one hit (i.e., the
+      //    user cannot select a sentence or paragraph like they could in the
+      //    old model).
+      // 2. This will fail if the user's selection includes whitespace on either
+      //    end, since repositioning the `range` variable seems to be beyond
+      //    CKEditor 5's capabilities.
+      const result = lookupResult.matches.find(
+        (match) => match.term === userInput.toLowerCase()
+      );
+
+      if (!result) {
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
         throw new IncompleteDefinitionError(
           `Could not find a term that matches '${userInput}'`
         );
       }
 
+<<<<<<< HEAD
       modal.data = result;
 
       modal.show();
@@ -183,6 +248,16 @@ export default class EpaAddDefinitionUI extends Plugin {
       if (!modal) {
         throw new Error("Modal not initialized");
       }
+=======
+      modal.data = [result];
+      modal.show();
+
+      modalResult = await new Promise((resolve) => {
+        modal.on("cancel", () => resolve(false));
+        modal.on("submit", () => resolve(true));
+      });
+    } finally {
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       this.editor.disableReadOnlyMode(LOCK_ID);
       modal.hide();
     }
@@ -192,6 +267,7 @@ export default class EpaAddDefinitionUI extends Plugin {
       return;
     }
 
+<<<<<<< HEAD
     // This is the array of all the MatchViews for all the terms
     const SelectedArray = modal.listView.views._items;
 
@@ -273,6 +349,17 @@ export default class EpaAddDefinitionUI extends Plugin {
 
       // Clear out the MatchViews so the next query doesn't get confused
       modal.listView.views.clear();
+=======
+    const selected = modal.listView.views.get(0);
+
+    model.change((writer) => {
+      writer.remove(range);
+      writer.insertElement(
+        "epaDefinition",
+        { term: userInput, definition: selected.selected },
+        range.start
+      );
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
     });
   }
 }

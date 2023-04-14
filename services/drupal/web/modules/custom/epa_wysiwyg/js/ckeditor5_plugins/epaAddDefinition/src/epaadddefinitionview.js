@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { icons } from "ckeditor5/src/core";
 import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
 import "./dialog.css";
+=======
+import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
+import { icons } from "ckeditor5/src/core";
+
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
 import MatchListView from "./views/matchlistview";
 
 export default class EpaAddDefinitionView extends View {
@@ -28,6 +34,7 @@ export default class EpaAddDefinitionView extends View {
 
     this.cancelButton.delegate("execute").to(this, "cancel");
 
+<<<<<<< HEAD
     const bind = this.bindTemplate;
 
     this.setTemplate({
@@ -38,6 +45,10 @@ export default class EpaAddDefinitionView extends View {
       attributes: {
         class: "epa-add-def",
       },
+=======
+    this.setTemplate({
+      tag: "dialog",
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       children: [
         {
           tag: "form",

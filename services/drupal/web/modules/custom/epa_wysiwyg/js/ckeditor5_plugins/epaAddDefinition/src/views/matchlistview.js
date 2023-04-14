@@ -1,4 +1,8 @@
 import { View } from "ckeditor5/src/ui";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
 import MatchView from "./matchview";
 import reconcileViews from "./reconcileViews";
 

@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { View, Template } from "ckeditor5/src/ui";
+=======
+import { View } from "ckeditor5/src/ui";
+
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
 import createId from "./createid";
 
 /**
@@ -41,6 +46,7 @@ export default class MatchView extends View {
 
     this.select = h("select", { id: this.selectId });
 
+<<<<<<< HEAD
     this.selectedTextFull = new Template({
       tag: "p",
       attributes: {
@@ -49,6 +55,8 @@ export default class MatchView extends View {
       children: [{ text: bind.to("selected") }],
     });
 
+=======
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
     this.setTemplate({
       tag: "div",
       attributes: {
@@ -58,6 +66,7 @@ export default class MatchView extends View {
         {
           tag: "label",
           attributes: { for: this.selectId },
+<<<<<<< HEAD
           children: [
             { text: "Term: " },
             new Template({
@@ -68,6 +77,11 @@ export default class MatchView extends View {
         },
         this.select,
         this.selectedTextFull,
+=======
+          children: [{ text: "Term: " }, { text: bind.to("term") }],
+        },
+        this.select,
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       ],
       on: {
         [`change@select#${this.selectId}`]: bind.to(() => {
@@ -75,6 +89,10 @@ export default class MatchView extends View {
 
           const selection =
             index === 0 ? "" : this.definitions[index - 1].definition;
+<<<<<<< HEAD
+=======
+          console.log("setting selection to", selection);
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
           this.selected = selection;
         }),
       },
@@ -87,11 +105,16 @@ export default class MatchView extends View {
       options.add(h("option", { value: "" }, ""));
 
       for (const item of data) {
+<<<<<<< HEAD
         const MAX_LENGTH = 125;
         const value = `${item.dictionary} -- ${item.definition}`;
         const truncated = value.substring(0, MAX_LENGTH);
         const label = value.length >= MAX_LENGTH ? truncated + "..." : value;
         options.add(h("option", { value: value }, label));
+=======
+        const label = `${item.definition} (${item.dictionary})`;
+        options.add(h("option", { value: item.definition }, label));
+>>>>>>> 28c9316ee (EPAD8-1930: Add definitions plugin)
       }
     });
   }
