@@ -1,0 +1,10 @@
+{% set classes = [
+  'button--dark',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/button/button.twig' with {
+  'url': url,
+  'text': text,
+  'modifier_classes': classes,
+} %}
