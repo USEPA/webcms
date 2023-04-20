@@ -423,7 +423,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
   // on the moderation block only on published content
   // and the `field_review_deadline` has a value.
   $review_deadline = NULL;
-  if (!$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
+  if (isset($entity->field_review_deadline) && !$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
 
     $review_deadline_render = $entity->field_review_deadline->view([
       'label' => 'hidden',
@@ -583,7 +583,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 
   // Update field_author_names with values from field_authors.
-  if ($node->bundle() == 'perspective') {
+  if (in_array($node->bundle(), ['perspective', 'speeches'])) {
     if (!$node->field_authors->isEmpty()) {
       $author_paragraphs = $node->field_authors->getValue();
       $tids = [];
