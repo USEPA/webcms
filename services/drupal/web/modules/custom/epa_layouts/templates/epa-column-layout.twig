@@ -1,22 +1,18 @@
 {% set columns = 0 %}
-{% set content_first = content.first|render %}
-{% set content_second = content.second|render %}
-{% set content_third = content.third|render %}
-{% set content_fourth = content.fourth|render %}
 
-{% if content_first %}
+{% if content.first %}
   {% set columns = columns + 1 %}
 {% endif %}
 
-{% if content_second %}
+{% if content.second %}
   {% set columns = columns + 1 %}
 {% endif %}
 
-{% if content_third %}
+{% if content.third %}
   {% set columns = columns + 1 %}
 {% endif %}
 
-{% if content_fourth %}
+{% if content.fourth %}
   {% set columns = columns + 1 %}
 {% endif %}
 
@@ -29,25 +25,25 @@
   ]
   %}
   <div{{ attributes.addClass(classes) }}>
-    {% if content_first %}
-      <div{{ region_attributes.first }}>{{ content_first }}</div>
+    {% if content.first %}
+      <div{{ region_attributes.first }}>{{ content.first }}</div>
     {% endif %}
 
-    {% if content_second %}
-      <div{{ region_attributes.second }}>{{ content_second }}</div>
+    {% if content.second %}
+      <div{{ region_attributes.second }}>{{ content.second }}</div>
     {% endif %}
 
-    {% if content_third %}
-      <div{{ region_attributes.third }}>{{ content_third }}</div>
+    {% if content.third %}
+      <div{{ region_attributes.third }}>{{ content.third }}</div>
     {% endif %}
 
-    {% if content_fourth %}
-      <div{{ region_attributes.fourth }}>{{ content_fourth }}</div>
+    {% if content.fourth %}
+      <div{{ region_attributes.fourth }}>{{ content.fourth }}</div>
     {% endif %}
   </div>
 {% else %}
-  {{ content_first }}
-  {{ content_second }}
-  {{ content_third }}
-  {{ content_fourth }}
+  {{ content.first }}
+  {{ content.second }}
+  {{ content.third }}
+  {{ content.fourth }}
 {% endif %}

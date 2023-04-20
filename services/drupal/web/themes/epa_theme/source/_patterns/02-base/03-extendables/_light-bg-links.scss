@@ -1,0 +1,69 @@
+// @file
+// Light Background Links
+
+@use '../../00-config' as *;
+
+// Light background with default link colors.
+%light-bg-link {
+  color: gesso-color(text, link);
+
+  &:link {
+    color: gesso-color(text, link);
+
+    &::after {
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.no-js & {
+        @include svg-background(external-link--blue-base);
+      }
+    }
+  }
+
+  &:visited {
+    color: gesso-color(text, link-visited);
+
+    &::after {
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.no-js & {
+        @include svg-background-important(external-link--purple);
+      }
+    }
+
+    // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+    span {
+      color: gesso-color(text, link-visited);
+    }
+  }
+
+  &:hover,
+  &:focus {
+    color: gesso-color(text, link-hover);
+
+    &::after {
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.no-js & {
+        @include svg-background(external-link--blue-dark);
+      }
+    }
+
+    // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+    span {
+      color: gesso-color(text, link-hover);
+    }
+  }
+
+  &:active {
+    color: gesso-color(text, link-active);
+
+    &::after {
+      // stylelint-disable-next-line selector-no-qualifying-type
+      html.no-js & {
+        @include svg-background(external-link--blue-dark);
+      }
+    }
+
+    // stylelint-disable-next-line selector-max-compound-selectors, max-nesting-depth
+    span {
+      color: gesso-color(text, link-active);
+    }
+  }
+}
