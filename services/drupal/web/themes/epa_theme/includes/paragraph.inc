@@ -40,7 +40,7 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
 
   // If the 'flag layout' field is set, add modifier classes to the card.
   if ($style == 'flag') {
-    if ($card->get('field_flag_card_alignment')->isEmpty()) {
+    if ($card->get('field_flag_card_alignment')->isEmpty() || $card->get('field_flag_card_alignment')->value == 'default') {
       // Add left/right classes based on paragraph index if alignment isn’t
       // already set.
       if($card->index % 2 == 0) {
@@ -69,7 +69,7 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
           $variables['modifier_classes'] .= ' usa-card--media-right';
         }
       }
-      else {
+      elseif($card->get('field_flag_card_alignment')->value == 'left') {
         if (!isset($variables['modifier_classes'])) {
           $variables['modifier_classes'] = 'usa-card--media-left';
         }
