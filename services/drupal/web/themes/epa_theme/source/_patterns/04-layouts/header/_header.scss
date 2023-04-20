@@ -4,8 +4,14 @@
 @use '../../00-config' as *;
 
 .l-header {
+  background: gesso-brand(blue, base);
+  padding-bottom: rem(gesso-spacing(3));
   position: relative;
   z-index: 2;
+
+  @include breakpoint(gesso-breakpoint(desktop)) {
+    padding-bottom: 0;
+  }
 }
 
 .l-header__navbar {
