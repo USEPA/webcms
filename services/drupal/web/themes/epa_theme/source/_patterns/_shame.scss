@@ -3,3 +3,35 @@
 //
 // Deadlines happen, so put your quick fixes here. Hopefully there will be time
 // later to move/re-factor these styles into their proper place.
+@use '00-config' as *;
+
+.diff-header,
+.diff-controls,
+.diff-responsive-table-wrapper {
+  @include layout-constrain();
+}
+
+.diff-header {
+  background: gesso-grayscale(gray-1);
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+  padding-bottom: 2rem;
+  padding-top: 2rem;
+
+  .diff-revision {
+    margin-top: 0;
+  }
+}
+
+.diff-controls {
+  margin-bottom: 1.5rem;
+  margin-top: 1rem;
+
+  &__item + .diff-controls__item {
+    margin-top: 0;
+  }
+}
+
+.diff-responsive-table-wrapper {
+  margin-bottom: 2rem;
+}
