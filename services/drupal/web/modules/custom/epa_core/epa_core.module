@@ -606,6 +606,25 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
     return;
   }
 
+  // Show/hide the "Title Placement" field if 'Card Style' is set to the 'flag' option.
+  if ($element['#paragraph_type'] == 'card_group') {
+    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    $field_definition = $context['items']->getFieldDefinition();
+    $paragraph_entity_reference_field_name = $field_definition->getName();
+    $dependee_field_name = 'field_card_style';
+    // Need to build specific selector to handle multiple card groups.
+    $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $paragraph_entity_reference_field_name, $element['#delta'], $dependee_field_name);
+
+    $element['subform']['field_title_placement']['#states'] = [
+      'visible' => [
+        $selector => ['value' => 'default']
+      ],
+      'invisible' => [
+        $selector => ['value' => 'flag']
+      ],
+    ];
+  }
+
   // Show/hide the "Flag alignment" field if the parent card group's 'Card Style'
   // is set to the 'flag' option.
   if ($element['#paragraph_type'] == 'card') {
@@ -623,6 +642,7 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
     ];
   }
 }
+
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
