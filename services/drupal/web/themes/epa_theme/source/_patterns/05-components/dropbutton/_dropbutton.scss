@@ -3,7 +3,6 @@
 
 @use 'sass:math';
 @use '../../00-config' as *;
-@use 'usa-button' as *;
 
 $dropbutton-toggle-height: rem(44px) !default;
 $dropbutton-toggle-width: 2em !default;
@@ -101,15 +100,10 @@ $dropbutton-toggle-icon-size: rem(12px) !default;
   &:not(:first-child) .dropbutton__button {
     border-top-left-radius: 0;
   }
-
-  > a {
-    @extend .usa-button, :hover;
-  }
 }
 
 // Nested to override default button styles.
-.dropbutton .dropbutton__button,
-.dropbutton__item > a {
+.dropbutton .dropbutton__button {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
   display: block;
