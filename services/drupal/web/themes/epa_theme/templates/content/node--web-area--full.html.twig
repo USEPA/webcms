@@ -57,8 +57,10 @@
 {% set body %}
   {{ content|without(
     'epa_content_moderation_info_box',
-    'field_banner'
+    'field_banner',
+    'field_wide_content'
   ) }}
+  {{ node.field_wide_content|view({type: 'layout_paragraphs', label: 'hidden', settings: {view_mode: 'default'}}) }}
 {% endset %}
 
 {% include '@templates/web-area-homepages/microsite.twig' with {
