@@ -42,5 +42,8 @@ module.exports = {
       "ignoreCase": true,
       "ignoreDeclarationSort": true,
     }],
+  },
+  globals: {
+    "once": true
   }
 };
