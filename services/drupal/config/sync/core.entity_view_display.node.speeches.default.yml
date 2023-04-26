@@ -1,0 +1,307 @@
+uuid: 31d21d06-2a02-4203-8fb2-bf20844e3132
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.speeches.field_author_names
+    - field.field.node.speeches.field_authors
+    - field.field.node.speeches.field_channel
+    - field.field.node.speeches.field_description
+    - field.field.node.speeches.field_env_laws_regs_and_treaties
+    - field.field.node.speeches.field_expiration_date
+    - field.field.node.speeches.field_geographic_locations
+    - field.field.node.speeches.field_hublinks
+    - field.field.node.speeches.field_is_searchable_collection
+    - field.field.node.speeches.field_keywords
+    - field.field.node.speeches.field_language
+    - field.field.node.speeches.field_last_published
+    - field.field.node.speeches.field_machine_name
+    - field.field.node.speeches.field_media_image
+    - field.field.node.speeches.field_meta_tags
+    - field.field.node.speeches.field_owning_office
+    - field.field.node.speeches.field_page_head
+    - field.field.node.speeches.field_paragraphs
+    - field.field.node.speeches.field_publish_date
+    - field.field.node.speeches.field_publisher
+    - field.field.node.speeches.field_related_information
+    - field.field.node.speeches.field_release
+    - field.field.node.speeches.field_review_deadline
+    - field.field.node.speeches.field_scheduled_transition
+    - field.field.node.speeches.field_search_text
+    - field.field.node.speeches.field_subjects
+    - field.field.node.speeches.field_text_location
+    - field.field.node.speeches.field_type
+    - field.field.node.speeches.field_video
+    - field.field.node.speeches.field_wide_template
+    - node.type.speeches
+  module:
+    - datetime
+    - entity_reference_revisions
+    - epa_web_areas
+    - link
+    - metatag
+    - options
+    - scheduled_publish
+    - user
+id: node.speeches.default
+targetEntityType: node
+bundle: speeches
+mode: default
+content:
+  entitygroupfield:
+    type: group_homepage_node_formatter
+    label: above
+    settings:
+      link: '1'
+      link_text: 'Read more EPA Speeches and Remarks'
+      shortname: 0
+    third_party_settings: {  }
+    weight: 28
+    region: content
+  field_authors:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: speeches_author
+      link: ''
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_channel:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 11
+    region: content
+  field_description:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  field_env_laws_regs_and_treaties:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 13
+    region: content
+  field_expiration_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  field_geographic_locations:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 12
+    region: content
+  field_hublinks:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 19
+    region: content
+  field_is_searchable_collection:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 22
+    region: content
+  field_keywords:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_language:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 15
+    region: content
+  field_last_published:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 23
+    region: content
+  field_machine_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_media_image:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_meta_tags:
+    type: metatag_empty_formatter
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 26
+    region: content
+  field_page_head:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 14
+    region: content
+  field_paragraphs:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_publish_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium_no_time
+    third_party_settings: {  }
+    weight: 16
+    region: content
+  field_publisher:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_related_information:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 20
+    region: content
+  field_release:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium_no_time
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_review_deadline:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 21
+    region: content
+  field_scheduled_transition:
+    type: scheduled_publish_generic_formatter
+    label: above
+    settings:
+      date_format: html_datetime
+      text_pattern: '%moderation_state% - %date%'
+    third_party_settings: {  }
+    weight: 24
+    region: content
+  field_search_text:
+    type: basic_string
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 28
+    region: content
+  field_subjects:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_text_location:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_type:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_video:
+    type: entity_reference_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: false
+    third_party_settings: {  }
+    weight: 27
+    region: content
+  field_wide_template:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 25
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  content_moderation_control: true
+  field_author_names: true
+  field_owning_office: true
+  langcode: true
+  search_api_excerpt: true
