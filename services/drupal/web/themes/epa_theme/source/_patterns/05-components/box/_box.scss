@@ -6,23 +6,31 @@
 @use '../external-link/external-link--image/external-link--image' as *;
 
 .box {
-  margin-bottom: rem(units(3));
+  margin-bottom: rem(units(4));
   max-width: 100%;
   overflow: auto;
 
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
     &.u-align-right {
+      margin-bottom: rem(units(3));
+      margin-top: 0;
       width: 33%;
     }
   }
 
   * + & {
-    margin-top: rem(units(2));
+    margin-top: rem(units(4));
   }
 
   &.has-image-header {
     max-width: rem(320px);
+  }
+
+  &.box--speeches {
+    img {
+      width: 100%;
+    }
   }
 }
 
@@ -120,5 +128,16 @@ div.box__title {
       color: gesso-grayscale(white);
       text-decoration: underline;
     }
+  }
+}
+
+.box-wrap {
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    width: 33%;
+  }
+
+  figure,
+  img {
+    width: 100%;
   }
 }

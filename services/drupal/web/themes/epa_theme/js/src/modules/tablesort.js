@@ -1,7 +1,7 @@
 import tablesort from 'tablesort/src/tablesort.js';
 
 export default function() {
-  const tables = document.querySelectorAll('.usa-table--sortable');
+  const tables = once('tables', '.usa-table--sortable');
   tables.forEach(table => {
     tablesort(table);
     table.addEventListener('beforeSort', () => {
@@ -13,7 +13,7 @@ export default function() {
       const selectedHeader = table.querySelector('[aria-sort]');
       if (selectedHeader) {
         const column = selectedHeader.cellIndex;
-        const rows = table.querySelectorAll('tbody tr');
+        const rows = once('rows', 'tbody tr');
         rows.forEach(row =>
           row.cells[column].setAttribute('data-sort-active', 'true')
         );

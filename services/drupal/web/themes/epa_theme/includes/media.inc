@@ -57,6 +57,23 @@ function epa_theme_preprocess_responsive_image(&$vars) {
   if ($vars['responsive_image_style_id'] == 'responsive_box_image') {
     $vars['img_element']['#attributes']['class'][] = 'box__image';
   }
+
+  // Load file by filename
+  // array.
+  if ($file = \Drupal::entityTypeManager()
+    ->getStorage('file')
+    ->loadByProperties(['uri' => $vars['uri']])) {
+    $fid = array_shift($file)->fid->value;
+
+    if ($media = \Drupal::entityTypeManager()
+      ->getStorage('media')
+      ->loadByProperties(['field_media_image' => $fid])) {
+      $media = array_shift($media);
+      if ($media->field_banner_image_restricted->value == 'restricted') {
+        $vars['img_element']['#attributes']['class'][] = 'restricted-img';
+      }
+    }
+  }
 }
 
 /**

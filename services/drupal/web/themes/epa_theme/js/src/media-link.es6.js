@@ -4,8 +4,10 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.mediaLink = {
     attach(context) {
-      const mediaImages = context.querySelectorAll(
-        'a > .figure > .figure__media > img'
+      const mediaImages = once(
+        'mediaLink',
+        'a > .figure > .figure__media > img',
+        context
       );
 
       // Move anchors that wrap the figure to wrap the img instead.

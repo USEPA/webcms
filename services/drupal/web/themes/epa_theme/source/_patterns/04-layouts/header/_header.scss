@@ -4,8 +4,14 @@
 @use '../../00-config' as *;
 
 .l-header {
+  background: gesso-brand(blue, base);
+  padding-bottom: rem(gesso-spacing(3));
   position: relative;
   z-index: 2;
+
+  @include breakpoint(gesso-breakpoint(desktop)) {
+    padding-bottom: 0;
+  }
 }
 
 .l-header__navbar {
@@ -20,13 +26,4 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
-}
-
-.l-header__menu-button {
-  margin-right: 0 !important;
-  width: auto !important;
-
-  @include at-media($theme-header-min-width) {
-    display: none !important;
-  }
 }
