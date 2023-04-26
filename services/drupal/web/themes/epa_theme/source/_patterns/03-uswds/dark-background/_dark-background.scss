@@ -1,8 +1,35 @@
 @use '../../00-config' as *;
 @use '../../02-base/03-extendables' as *;
 
-.usa-section--dark {
-  a {
-    @extend %dark-bg-link;
+.usa-dark-background {
+  color: gesso-grayscale(white);
+
+  table {
+    caption {
+      color: gesso-grayscale(white);
+    }
+
+    // stylelint-disable selector-max-compound-selectors, max-nesting-depth
+    &:not(.usa-table--unstyled) {
+      thead a,
+      tbody a {
+        color: gesso-color(text, link);
+        -webkit-text-decoration-skip: objects;
+
+        &:visited {
+          color: gesso-color(text, link-visited);
+        }
+
+        &:hover,
+        &:focus {
+          color: gesso-color(text, link-hover);
+        }
+
+        &:active {
+          color: gesso-color(text, link-active);
+        }
+      }
+    }
+    // stylelint-enable selector-max-compound-selectors, max-nesting-depth
   }
 }

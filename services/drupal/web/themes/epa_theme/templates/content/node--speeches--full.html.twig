@@ -1,0 +1,130 @@
+{#
+/**
+ * @file
+ * Theme override to display a node.
+ */
+#}
+
+{% set classes = [
+  node.isPromoted() ? 'is-promoted',
+  node.isSticky() ? 'is-sticky',
+  not node.isPublished() ? 'is-unpublished',
+] %}
+
+{% set sidenav = drupal_region('sidebar') %}
+
+{% set display_sidenav = false %}
+
+{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
+  {% set display_sidenav = true %}
+{% endif %}
+
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Speeches and Remarks'|t,
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{% endset %}
+
+{% set admin_info %}
+  {{ region_messages }}
+  {{ content.epa_content_moderation_info_box }}
+{% endset %}
+
+{% set show_admin_info = false %}
+
+{% if admin_info|striptags('<drupal-render-placeholder>')|trim %}
+  {% set show_admin_info = true %}
+{% endif %}
+
+{% set footer %}
+  {{ drupal_entity('block', 'webareafooter', check_access=false) }}
+{% endset %}
+
+{% set has_footer = false %}
+
+{% if footer|striptags('<drupal-render-placeholder>')|trim %}
+  {% set has_footer = true %}
+{% endif %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
+{% set related %}
+  <ul>
+    {% if content.entitygroupfield|field_value -%}
+      <li>{{ content.entitygroupfield }}</li>
+    {%- endif -%}
+    {%- if content.field_video|field_value -%}
+      <li><a href="#watch">Watch the Event</a></li>
+    {%- endif -%}
+    {{- content.field_related_information }}
+  </ul>
+{% endset %}
+
+{% set author_names %}
+  {% for term in node.field_authors -%}
+    {% set tid = term.entity.field_author.target_id %}
+    {{- drupal_field('name', 'taxonomy_term', tid, 'author_name') }}{% if term.entity.field_position.value is not empty %}, {{ term.entity.field_position.value }}{% endif -%}
+    {%- if not loop.last %}<br>{% endif -%}
+  {%- endfor -%}
+{% endset %}
+
+{% set body %}
+  <div class="u-align-right box-wrap">
+    {{ content.field_authors }}
+    {% include '@components/box/box--related-info/box--related-info.twig' with {
+      'modifier_classes': '',
+      'title': {
+        'tag': 'div',
+        'text': 'Related Information',
+        },
+      'content': related,
+    } only %}
+  </div>
+  <h2>{{ author_names }}</h2>
+  <h3 class="h4">{{ content.field_release|field_value }}<br>{{ content.field_text_location|field_value }}</h3>
+  {{ content.field_paragraphs|field_value }}
+  {% if content.field_video|field_value %}
+    <h2 class="highlight u-clear-both" id="watch">Watch the Event</h2>
+  {% endif %}
+  {{ content.field_video|field_value }}
+{% endset %}
+
+
+{% if display_sidenav %}
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'has_sidenav': true,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
+    'body': body,
+    'sidenav': sidenav,
+    'footer': footer,
+  } %}
+{% else %}
+  {% include '@templates/detail-pages/page.twig' with {
+    'has_header': true,
+    'has_footer': has_footer,
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': label,
+    'admin_info': admin_info,
+    'show_admin_info': show_admin_info,
+    'body': body,
+    'footer': footer,
+  } %}
+{% endif %}

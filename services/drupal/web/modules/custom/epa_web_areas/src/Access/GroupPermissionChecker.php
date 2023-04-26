@@ -63,6 +63,21 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       $group->hasField('field_allow_perspectives')) {
       return $group->field_allow_perspectives->value;
     }
+
+    $speeches_permissions = [
+      'create group_node:speeches entity',
+      'update any group_node:speeches entity',
+      'delete any group_node:speeches entity',
+      'delete own group_node:speeches entity',
+      'update any group_node:speeches entity',
+      'update own group_node:speeches entity',
+    ];
+
+    if (in_array($permission, $speeches_permissions) &&
+      $group->hasField('field_allow_speeches')) {
+      return $group->field_allow_speeches->value;
+    }
+
     return $usual_result;
   }
 

@@ -23,6 +23,7 @@ dependencies:
     - field.field.node.web_area.field_scheduled_transition
     - field.field.node.web_area.field_search_text
     - field.field.node.web_area.field_type
+    - field.field.node.web_area.field_wide_content
     - field.field.node.web_area.layout_builder__layout
     - node.type.web_area
   module:
@@ -79,6 +80,38 @@ third_party_settings:
                     token: ''
             weight: 0
             additional: {  }
+          476e0f5c-5396-47dd-9ee0-e7703afbd437:
+            uuid: 476e0f5c-5396-47dd-9ee0-e7703afbd437
+            region: main
+            configuration:
+              id: 'field_block:node:web_area:field_wide_content'
+              label: 'Wide Content'
+              label_display: '0'
+              provider: layout_builder
+              context_mapping:
+                entity: layout_builder.entity
+                view_mode: view_mode
+              formatter:
+                type: layout_paragraphs
+                label: hidden
+                settings:
+                  view_mode: default
+                third_party_settings:
+                  linked_field:
+                    linked: 0
+                    type: field
+                    destination:
+                      field: ''
+                      custom: ''
+                    advanced:
+                      title: ''
+                      target: ''
+                      class: ''
+                      rel: ''
+                      text: ''
+                    token: ''
+            weight: 1
+            additional: {  }
           4908b795-23aa-4ee8-8a52-dce89dfcd636:
             uuid: 4908b795-23aa-4ee8-8a52-dce89dfcd636
             region: main
@@ -92,7 +125,7 @@ third_party_settings:
                 label: above
                 settings: {  }
                 third_party_settings: {  }
-            weight: 1
+            weight: 2
             additional: {  }
         third_party_settings: {  }
   layout_builder_restrictions:
@@ -128,6 +161,7 @@ third_party_settings:
         'Chaos Tools': {  }
         'Content fields':
           - 'field_block:node:web_area:field_paragraphs'
+          - 'field_block:node:web_area:field_wide_content'
         'Custom block types': {  }
         'Custom blocks': {  }
         'EPA Alerts': {  }
@@ -305,6 +339,15 @@ content:
     third_party_settings: {  }
     weight: 106
     region: content
+  field_wide_content:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 136
+    region: main
   links:
     settings: {  }
     third_party_settings: {  }
