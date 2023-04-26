@@ -1,0 +1,96 @@
+uuid: e9340570-1ad0-4fda-92ab-11f561793731
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_authors
+    - node.type.speeches
+    - paragraphs.paragraphs_type.author
+  module:
+    - custom_add_another
+    - entity_reference_revisions
+third_party_settings:
+  custom_add_another:
+    custom_add_another: 'Add new Person'
+    custom_remove: 'Add existing Person'
+id: node.speeches.field_authors
+field_name: field_authors
+entity_type: node
+bundle: speeches
+label: 'Speaker or Presenter'
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      author: author
+    negate: 0
+    target_bundles_drag_drop:
+      applicants_or_respondents:
+        weight: 22
+        enabled: false
+      author:
+        weight: 23
+        enabled: true
+      banner:
+        weight: 24
+        enabled: false
+      banner_slide:
+        weight: 25
+        enabled: false
+      before_after_swipe_component:
+        weight: 26
+        enabled: false
+      box:
+        weight: 27
+        enabled: false
+      card:
+        weight: 28
+        enabled: false
+      card_group:
+        weight: 29
+        enabled: false
+      cfr:
+        weight: 30
+        enabled: false
+      docket:
+        weight: 31
+        enabled: false
+      dynamic_list:
+        weight: 32
+        enabled: false
+      frc:
+        weight: 33
+        enabled: false
+      from_library:
+        weight: 34
+        enabled: false
+      header:
+        weight: 35
+        enabled: false
+      html:
+        weight: 36
+        enabled: false
+      legal_authorities:
+        weight: 37
+        enabled: false
+      link_list:
+        weight: 38
+        enabled: false
+      locations_of_prop_actions:
+        weight: 39
+        enabled: false
+      press_officers:
+        weight: 40
+        enabled: false
+      slide:
+        weight: 41
+        enabled: false
+      slideshow:
+        weight: 42
+        enabled: false
+field_type: entity_reference_revisions
