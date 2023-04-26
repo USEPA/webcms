@@ -423,7 +423,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
   // on the moderation block only on published content
   // and the `field_review_deadline` has a value.
   $review_deadline = NULL;
-  if (!$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
+  if (isset($entity->field_review_deadline) && !$entity->field_review_deadline->isEmpty() && $entity->isPublished()) {
 
     $review_deadline_render = $entity->field_review_deadline->view([
       'label' => 'hidden',
@@ -583,7 +583,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 
   // Update field_author_names with values from field_authors.
-  if ($node->bundle() == 'perspective') {
+  if (in_array($node->bundle(), ['perspective', 'speeches'])) {
     if (!$node->field_authors->isEmpty()) {
       $author_paragraphs = $node->field_authors->getValue();
       $tids = [];
@@ -640,7 +640,7 @@ function _epa_workflow_add_compliance_checkboxes(&$form) {
 
   $link_508 = Link::fromTextAndUrl(
     t('applicable Section 508 requirements'),
-    Url::fromUri('http://intranet.epa.gov/accessibility/checklist.html')
+    Url::fromUri('https://work.epa.gov/accessibility/create-accessible-content')
   );
   $link_508 = $link_508->toString();
 
@@ -803,12 +803,19 @@ function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterfa
 
       // Is in the “Draft, approved” state.
       if ($latest_revision_moderation_state == 'draft_approved') {
-        $message = '<br>The revision will publish on ' . $latest_formatted_date_time . '.';
+        $message = t('<br>The revision will publish on %date.',['%date' => $latest_formatted_date_time]);
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
       }
       // Is in any other draft state.
       elseif ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
-        $message = '<br>The revision is scheduled to publish on ' . $latest_formatted_date_time . ', but will only do so if this draft is approved. Currently, the draft is NOT approved.';
+        // If publish date is in the future give user some guidance.
+        if ($latest_revision->field_publish_date->date->getTimestamp() > time()) {
+          $message = t('<br>The revision is scheduled to publish on %date, but will only do so if this draft is approved. Currently, the draft is NOT approved.', ['%date' => $latest_formatted_date_time]);
+        }
+        // If publish date is in the past indicate the draft will publish immediately.
+        else {
+          $message = t('<br>Since the scheduled publish date has already passed, this draft will publish immediately if it is approved. Remove or change the publish date if you do not wish for that to occur.');
+        }
         $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
       }
     }

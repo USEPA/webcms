@@ -5,7 +5,11 @@ import Drupal from 'drupal';
   Drupal.behaviors.toggleAdmin = {
     attach(context) {
       const toggleButton = context.querySelector('.js-toggle-admin');
-      const adminContent = context.querySelectorAll('.js-toggle-admin-content');
+      const adminContent = once(
+        'toggle-admin',
+        '.js-toggle-admin-content',
+        context
+      );
 
       if (toggleButton !== null) {
         toggleButton.addEventListener('click', event => {

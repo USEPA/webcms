@@ -1,0 +1,111 @@
+uuid: 3b0a5b95-21a1-4365-8956-08b99f304f11
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.speeches.field_author_names
+    - field.field.node.speeches.field_authors
+    - field.field.node.speeches.field_channel
+    - field.field.node.speeches.field_description
+    - field.field.node.speeches.field_env_laws_regs_and_treaties
+    - field.field.node.speeches.field_expiration_date
+    - field.field.node.speeches.field_geographic_locations
+    - field.field.node.speeches.field_hublinks
+    - field.field.node.speeches.field_is_searchable_collection
+    - field.field.node.speeches.field_keywords
+    - field.field.node.speeches.field_language
+    - field.field.node.speeches.field_last_published
+    - field.field.node.speeches.field_machine_name
+    - field.field.node.speeches.field_media_image
+    - field.field.node.speeches.field_meta_tags
+    - field.field.node.speeches.field_owning_office
+    - field.field.node.speeches.field_page_head
+    - field.field.node.speeches.field_paragraphs
+    - field.field.node.speeches.field_publish_date
+    - field.field.node.speeches.field_publisher
+    - field.field.node.speeches.field_related_information
+    - field.field.node.speeches.field_release
+    - field.field.node.speeches.field_review_deadline
+    - field.field.node.speeches.field_scheduled_transition
+    - field.field.node.speeches.field_search_text
+    - field.field.node.speeches.field_subjects
+    - field.field.node.speeches.field_text_location
+    - field.field.node.speeches.field_type
+    - field.field.node.speeches.field_video
+    - field.field.node.speeches.field_wide_template
+    - node.type.speeches
+  module:
+    - datetime
+    - token_formatters
+    - user
+id: node.speeches.teaser
+targetEntityType: node
+bundle: speeches
+mode: teaser
+content:
+  field_authors:
+    type: tokenized_field_formatter
+    label: hidden
+    settings:
+      token_string: '[paragraph:field_author:entity:name]'
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_description:
+    type: basic_string
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_media_image:
+    type: entity_reference_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: true
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_release:
+    type: datetime_default
+    label: hidden
+    settings:
+      timezone_override: ''
+      format_type: medium_no_time
+    third_party_settings: {  }
+    weight: 2
+    region: content
+hidden:
+  content_moderation_control: true
+  entitygroupfield: true
+  field_author_names: true
+  field_channel: true
+  field_env_laws_regs_and_treaties: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_machine_name: true
+  field_meta_tags: true
+  field_owning_office: true
+  field_page_head: true
+  field_paragraphs: true
+  field_publish_date: true
+  field_publisher: true
+  field_related_information: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_search_text: true
+  field_subjects: true
+  field_text_location: true
+  field_type: true
+  field_video: true
+  field_wide_template: true
+  langcode: true
+  links: true
+  search_api_excerpt: true
