@@ -11,12 +11,23 @@ dependencies:
     - field.field.media.document.field_publication_number
     - media.type.document
   module:
+    - entitygroupfield
     - file
 id: media.document.default
 targetEntityType: media
 bundle: document
 mode: default
 content:
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 9
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
+    third_party_settings: {  }
   field_description:
     type: string_textarea
     weight: 4
@@ -86,7 +97,6 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
-  entitygroupfield: true
   path: true
   status: true
   uid: true
