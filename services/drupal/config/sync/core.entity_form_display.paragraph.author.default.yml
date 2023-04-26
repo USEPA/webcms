@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.paragraph.author.field_author
     - field.field.paragraph.author.field_biography
+    - field.field.paragraph.author.field_hide_image
     - field.field.paragraph.author.field_office
     - field.field.paragraph.author.field_position
     - paragraphs.paragraphs_type.author
@@ -24,8 +25,8 @@ content:
     settings:
       form_mode: default
       override_labels: true
-      label_singular: Author
-      label_plural: Authors
+      label_singular: Person
+      label_plural: People
       allow_new: true
       allow_existing: true
       match_operator: CONTAINS
@@ -42,9 +43,16 @@ content:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
+  field_hide_image:
+    type: boolean_checkbox
+    weight: 1
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   field_office:
     type: string_textfield
-    weight: 2
+    weight: 3
     region: content
     settings:
       size: 120
@@ -55,7 +63,7 @@ content:
         maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
   field_position:
     type: string_textfield
-    weight: 1
+    weight: 2
     region: content
     settings:
       size: 60
