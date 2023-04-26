@@ -322,3 +322,19 @@ WHERE pfb.revision_id IS NULL
   \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
 
 }
+
+/**
+ * Ensures that nodes that have existing data in their javascript field get
+ * jQuery added to the page.
+ */
+function epa_core_deploy_set_include_jquery_values() {
+    \Drupal::database()->query(
+      'INSERT INTO node__field_include_jquery (bundle,deleted,entity_id,revision_id,langcode,delta,field_include_jquery_value)
+  SELECT bundle,deleted,entity_id,revision_id,langcode,0,field_page_head_value<>:value
+  FROM node__field_page_head;', [':value' => '']);
+
+    \Drupal::database()->query(
+      'INSERT INTO node_revision__field_include_jquery (bundle,deleted,entity_id,revision_id,langcode,delta,field_include_jquery_value)
+  SELECT bundle,deleted,entity_id,revision_id,langcode,0,field_page_head_value<>:value
+  FROM node_revision__field_page_head;', [':value' => '']);
+}

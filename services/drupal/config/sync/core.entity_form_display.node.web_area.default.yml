@@ -10,6 +10,7 @@ dependencies:
     - field.field.node.web_area.field_env_laws_regs_and_treaties
     - field.field.node.web_area.field_expiration_date
     - field.field.node.web_area.field_geographic_locations
+    - field.field.node.web_area.field_include_jquery
     - field.field.node.web_area.field_keywords
     - field.field.node.web_area.field_language
     - field.field.node.web_area.field_last_published
@@ -76,6 +77,7 @@ third_party_settings:
     group_javascript:
       children:
         - field_page_head
+        - field_include_jquery
       label: 'Page Javascript'
       region: content
       parent_name: group_additional_fields
@@ -178,6 +180,13 @@ content:
       create_new_items: false
       create_new_levels: false
       force_deepest: false
+    third_party_settings: {  }
+  field_include_jquery:
+    type: boolean_checkbox
+    weight: 50
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete_tags

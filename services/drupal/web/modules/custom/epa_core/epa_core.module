@@ -58,6 +58,14 @@ function epa_core_rebuild() {
   \Drupal::state()->set('environment_indicator.current_release', $release);
 }
 
+function epa_core_preprocess_node(&$variables) {
+  if ($variables['view_mode'] === 'full'
+    && $variables['node']->hasField('field_include_jquery')
+    && $variables['node']->field_include_jquery->value) {
+    $variables['elements']['#attached']['library'][] = 'core/jquery';
+  }
+}
+
 /**
  * Implements hook_menu_local_tasks_alter().
  *
@@ -821,8 +829,10 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
 /**
  * Implements hook_entity_field_access().
  */
-function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
-{
+function epa_core_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($operation == 'edit' && $field_definition->getName() === 'field_include_jquery') {
+    return AccessResult::forbiddenIf(!$account->hasPermission('edit include jquery field'))->addCacheContexts(['user.permissions']);
+  }
   if ($field_definition->getTargetEntityTypeId() == 'user') {
     switch ($field_definition->getName()) {
       case 'status':

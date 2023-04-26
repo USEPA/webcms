@@ -17,6 +17,7 @@ dependencies:
     - field.field.node.event.field_expiration_date
     - field.field.node.event.field_geographic_locations
     - field.field.node.event.field_hublinks
+    - field.field.node.event.field_include_jquery
     - field.field.node.event.field_is_searchable_collection
     - field.field.node.event.field_keywords
     - field.field.node.event.field_language
@@ -88,6 +89,7 @@ third_party_settings:
     group_javascript:
       children:
         - field_page_head
+        - field_include_jquery
       label: 'Page Javascript'
       region: content
       parent_name: group_additional_fields
@@ -259,6 +261,13 @@ content:
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_include_jquery:
+    type: boolean_checkbox
+    weight: 50
+    region: content
+    settings:
+      display_label: true
     third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete_tags
