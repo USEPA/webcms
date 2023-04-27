@@ -3,6 +3,8 @@ import { icons } from "ckeditor5/src/core";
 
 import MatchListView from "./views/matchlistview";
 
+import "./dialog.css";
+
 export default class EpaAddDefinitionView extends View {
   constructor(locale) {
     super(locale);
@@ -28,8 +30,16 @@ export default class EpaAddDefinitionView extends View {
 
     this.cancelButton.delegate("execute").to(this, "cancel");
 
+    const bind = this.bindTemplate;
+
     this.setTemplate({
       tag: "dialog",
+      on: {
+        close: bind.to("cancel"),
+      },
+      attributes: {
+        class: "epa-add-def",
+      },
       children: [
         {
           tag: "form",
