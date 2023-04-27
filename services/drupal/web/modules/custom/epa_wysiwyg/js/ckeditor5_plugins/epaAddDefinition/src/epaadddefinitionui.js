@@ -1,11 +1,13 @@
 // @ts-check
 
-import { icons, Plugin } from "ckeditor5/src/core";
+import { Plugin } from "ckeditor5/src/core";
 import { ButtonView, Notification } from "ckeditor5/src/ui";
 
 import lookupTerms from "./lookupterms";
 import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";
 import EpaAddDefinitionView from "./epaadddefinitionview";
+
+import icon from '../../../../icons/book.svg';
 
 const ERR_UNEXPECTED = "An unexpected error occurred";
 
@@ -30,9 +32,8 @@ export default class EpaAddDefinitionUI extends Plugin {
 
       buttonView.set({
         label: editor.t("Add Definition"),
-        icon: icons.pencil,
+        icon,
         tooltip: true,
-        withText: true,
       });
 
       buttonView
