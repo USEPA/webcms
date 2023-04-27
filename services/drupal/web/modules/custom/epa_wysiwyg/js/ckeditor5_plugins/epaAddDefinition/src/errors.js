@@ -8,7 +8,7 @@ export class MultipleParagraphError extends Error {
 export class IncompleteDefinitionError extends Error {
   constructor(...args) {
     super(...args);
-    this._userError = "Can't apply definitions to multiple terms at once";
+    this._userError = "No term definitions were found that exactly match your selected word or phrase";
   }
 }
 
