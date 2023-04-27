@@ -124,8 +124,27 @@ export default class EpaAddDefinitionUI extends Plugin {
       modal.show();
 
       modalResult = await new Promise((resolve) => {
-        modal.on("cancel", () => resolve(false));
-        modal.on("submit", () => resolve(true));
+        let resolved;
+
+        /** @param {boolean} resolution */
+        function createResolve(resolution) {
+          return () => {
+            // The 'close' event will fire regardless of the user accepting the
+            // definition (due to us binding the event to "cancel"), so this
+            // check prevents us from double-resolving the promise.
+            if (resolved) {
+              return;
+            }
+
+            resolve(resolution);
+            resolved = true;
+          };
+        }
+
+        // Whichever of these events fires first wins: the "submit" event will
+        // fire first since, in responding to it, we request a modal close.
+        modal.on("submit", createResolve(true));
+        modal.on("cancel", createResolve(false));
       });
     } finally {
       this.editor.disableReadOnlyMode(LOCK_ID);
