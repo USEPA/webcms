@@ -10,6 +10,7 @@ dependencies:
     - field.field.media.remote_video.field_media_tags
     - media.type.remote_video
   module:
+    - entitygroupfield
     - media
     - path
     - shs
@@ -24,6 +25,16 @@ content:
     weight: 7
     region: content
     settings: {  }
+    third_party_settings: {  }
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 10
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
     third_party_settings: {  }
   field_caption:
     type: text_textarea
@@ -90,7 +101,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 10
+    weight: 11
     region: content
     settings:
       display_label: true
@@ -105,5 +116,4 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden:
-  entitygroupfield: true
+hidden: {  }

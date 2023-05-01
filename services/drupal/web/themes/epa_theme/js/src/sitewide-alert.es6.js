@@ -4,7 +4,7 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.sitewideAlert = {
     attach(context) {
-      const alerts = context.querySelectorAll('.js-sitewide-alert');
+      const alerts = once('sitewide-alert', '.js-sitewide-alert', context);
       const cacheLimitDays = 14;
       const now = Date.now();
       let closedHashes = getClosedAlerts();
