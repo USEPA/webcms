@@ -25,15 +25,15 @@ RUN set -ex \
 
 FROM php:8.1-fpm-alpine AS base
 
-COPY --from=forumone/f1-ext-install f1-ext-install /usr/bin
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base extensions needed for Drupal
 RUN set -ex \
-  && f1-ext-install \
-    builtin:gd \
-    builtin:opcache \
-    builtin:pdo_mysql \
-    builtin:zip \
+  && install-php-extensions \
+    gd \
+    opcache \
+    pdo_mysql \
+    zip \
   # Settings taken from the Docker library's Drupal image
   && { \
     echo 'opcache.memory_consumption=128'; \
@@ -63,7 +63,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu builtin:sockets \
+RUN install-php-extensions apcu sockets \
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached \
@@ -241,15 +241,15 @@ CMD [ "nginx", "-g", "daemon off;" ]
 # and ssh that are inappropriate for a server container image.
 FROM php:8.1-cli-alpine AS drush
 
-COPY --from=forumone/f1-ext-install f1-ext-install /usr/bin
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base PHP extensions for Drupal as well as tools needed for Drush CLI operations
 RUN set -ex \
-  && f1-ext-install \
-    builtin:gd \
-    builtin:opcache \
-    builtin:pdo_mysql \
-    builtin:zip \
+  && install-php-extensions \
+    gd \
+    opcache \
+    pdo_mysql \
+    zip \
   && apk add --no-cache \
     mysql-client \
     openssh \
@@ -278,7 +278,7 @@ COPY --from=memcached-ext \
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu builtin:sockets \
+RUN install-php-extensions apcu sockets \
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached  \
