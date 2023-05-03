@@ -10,7 +10,9 @@ use Drupal\epa_forms\EpaFormsUniquifier;
 use Drupal\node\Entity\Node;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-
+/**
+ *
+ */
 class EPAEntityCloneSubscriber implements EventSubscriberInterface {
 
   /**
@@ -19,7 +21,6 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
-
 
   /**
    * Constructs a new EPAEntityCloneSubscriber object.
@@ -31,14 +32,35 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
     $this->entityTypeManager = $entity_manager;
   }
 
+  /**
+   *
+   */
   public static function getSubscribedEvents() {
     $events[EntityCloneEvents::POST_CLONE][] = ['postClone', -1000];
     $events[EntityCloneEvents::PRE_CLONE][] = ['preClone'];
     return $events;
   }
 
+  /**
+   *
+   */
   public function preClone(EntityCloneEvent $event) {
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $cloned_entity */
     $cloned_entity = $event->getClonedEntity();
+
+    /** @var \Drupal\Core\Entity\FieldableEntityInterface $original_entity */
+    $original_entity = $event->getEntity();
+
+    // Clear the machine name field on cloned entities.
+    if ($original_entity->hasField('field_machine_name') && $original_entity->get('field_machine_name')->isEmpty()) {
+      $cloned_entity->set('field_machine_name', '');
+    }
+
+    // Clear the scheduled transition field on cloned entities.
+    if ($original_entity->hasField('field_scheduled_transition') && !$original_entity->get('field_scheduled_transition')->isEmpty()) {
+      $cloned_entity->set('field_scheduled_transition', NULL);
+    }
+
     if ($cloned_entity instanceof Node) {
       foreach ($cloned_entity->getFieldDefinitions() as $field_id => $field_definition) {
         // Clone referenced webforms when a  node is cloned.
@@ -62,10 +84,10 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
               /** @var \Drupal\entity_clone\EntityClone\EntityCloneInterface $entity_clone_handler */
               $entity_clone_handler = $this->entityTypeManager->getHandler($referenced_entity->getEntityTypeId(), 'entity_clone');
 
-              $properties = array (
+              $properties = [
                 'id' => EpaFormsUniquifier::getFormIdForNode($cloned_entity),
-                'label' => 'Cloned: '. $referenced_entity->label(),
-              );
+                'label' => 'Cloned: ' . $referenced_entity->label(),
+              ];
               $entity_clone_handler->cloneEntity($referenced_entity, $cloned_reference, $properties);
 
               $referenced_entities[] = $cloned_reference->id();
@@ -85,15 +107,15 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
   public function postClone(EntityCloneEvent $event) {
     $cloned_entity = $event->getClonedEntity();
 
-   // Prepend a "Cloned: " signifier to the title of cloned nodes.
-   // Remove the appended " - Cloned" signifier to the title of cloned nodes.
+    // Prepend a "Cloned: " signifier to the title of cloned nodes.
+    // Remove the appended " - Cloned" signifier to the title of cloned nodes.
     if ($cloned_entity instanceof Node) {
       $old_signifier = ' - Cloned';
       $new_signifier = 'Cloned: ';
 
       if ($cloned_entity->bundle() == 'faq') {
         $old = $cloned_entity->field_question->getString();
-        $cloned_entity->field_question->setValue($new_signifier. ' '. $old);
+        $cloned_entity->field_question->setValue($new_signifier . ' ' . $old);
       }
       else {
         $old_pos = strpos($cloned_entity->getTitle(), $old_signifier);
@@ -104,12 +126,7 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
       }
       $original_entity = $event->getEntity();
 
-      // Clear the machine name field on cloned entities
-      if ($original_entity->hasField('field_machine_name') && !empty($original_entity->get('field_machine_name'))) {
-        $cloned_entity->set('field_machine_name', '');
-      }
-
-      // Ensure the new node is assigned to the same group as the old one
+      // Ensure the new node is assigned to the same group as the old one.
       $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($original_entity);
       foreach ($groups as $group) {
         $group->addContent($cloned_entity, 'group_' . $original_entity->getEntityTypeId() . ':' . $original_entity->bundle());
@@ -118,4 +135,5 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
       $cloned_entity->save();
     }
   }
+
 }

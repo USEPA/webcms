@@ -1,4 +1,9 @@
 <?php
+
+/**
+ * @file
+ */
+
 /**
  * Update the mimetype of existing uploaded json files.
  */
@@ -7,7 +12,7 @@ function epa_media_update_9000() {
 }
 
 /**
- * Move all json and xml "Document" media entities to be "Other" media bundle
+ * Move all json and xml "Document" media entities to be "Other" media bundle.
  */
 function epa_media_update_9001(&$sandbox) {
   $database = \Drupal::database();
@@ -28,7 +33,7 @@ function epa_media_update_9001(&$sandbox) {
     return t('No Media entities to be processed.');
   }
 
-  // Update base tables with those media_ids
+  // Update base tables with those media_ids.
   $database
     ->query("UPDATE {media} AS m
       INNER JOIN {media_field_data} AS mfd ON m.mid = mfd.mid

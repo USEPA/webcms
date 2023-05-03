@@ -1,0 +1,90 @@
+uuid: fb36d2d1-59dd-48b8-97ef-2191dca71196
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.banner_image.field_banner_image_restricted
+    - field.field.media.banner_image.field_media_image
+    - image.style.thumbnail
+    - media.type.banner_image
+  module:
+    - entitygroupfield
+    - focal_point
+    - path
+id: media.banner_image.default
+targetEntityType: media
+bundle: banner_image
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 7
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
+    third_party_settings: {  }
+  field_banner_image_restricted:
+    type: options_select
+    weight: 6
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_media_image:
+    type: image_focal_point
+    weight: 1
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+      preview_link: true
+      offsets: '50,50'
+    third_party_settings: {  }
+  langcode:
+    type: language_select
+    weight: 2
+    region: content
+    settings:
+      include_locked: true
+    third_party_settings: {  }
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 8
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 3
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  replace_file: true

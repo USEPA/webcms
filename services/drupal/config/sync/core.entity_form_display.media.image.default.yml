@@ -3,6 +3,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.media.image.field_banner_image_restricted
     - field.field.media.image.field_legacy_caption
     - field.field.media.image.field_legacy_image_alignment
     - field.field.media.image.field_limit_file_accessibility
@@ -11,30 +12,32 @@ dependencies:
     - image.style.thumbnail
     - media.type.image
   module:
+    - entitygroupfield
     - focal_point
-    - text
 id: media.image.default
 targetEntityType: media
 bundle: image
 mode: default
 content:
-  field_legacy_caption:
-    type: text_textarea
-    weight: 7
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 9
     region: content
     settings:
-      rows: 5
-      placeholder: ''
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
     third_party_settings: {  }
-  field_legacy_image_alignment:
+  field_banner_image_restricted:
     type: options_select
-    weight: 6
+    weight: 2
     region: content
     settings: {  }
     third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
-    weight: 5
+    weight: 6
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -50,7 +53,7 @@ content:
     third_party_settings: {  }
   field_media_tags:
     type: entity_reference_autocomplete
-    weight: 4
+    weight: 5
     region: content
     settings:
       match_operator: CONTAINS
@@ -60,7 +63,7 @@ content:
     third_party_settings: {  }
   langcode:
     type: language_select
-    weight: 2
+    weight: 3
     region: content
     settings:
       include_locked: true
@@ -74,13 +77,15 @@ content:
       placeholder: ''
     third_party_settings: {  }
   replace_file:
-    weight: 3
+    weight: 4
     region: content
     settings: {  }
     third_party_settings: {  }
 hidden:
   created: true
   entitygroupfield: true
+  field_legacy_caption: true
+  field_legacy_image_alignment: true
   path: true
   status: true
   uid: true

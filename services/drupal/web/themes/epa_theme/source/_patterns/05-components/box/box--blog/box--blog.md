@@ -1,6 +1,6 @@
 ---
 el: .box--blog
-title: Blog Box
+title: Perspectives Box
 state: complete
 ---
 

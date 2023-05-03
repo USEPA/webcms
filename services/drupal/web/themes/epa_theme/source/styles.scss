@@ -1,5 +1,5 @@
 // @file
-// Main styles
+// All styles
 
 // Configuration
 @use '_patterns/00-config' as *;
@@ -12,8 +12,10 @@
 // USWDS components
 // We pull in everything in 'packages/uswds' except for:
 // - 'uswds-global': pulled in elsewhere.
-// - 'uswds-typography': omitted in favor of Gesso’s base HTML styles.
+// - 'uswds-typography': omitted (except for usa-dark-background) in favor of
+//    Gesso’s base HTML styles.
 // - 'uswds-utilities': pulled in elsewhere.
+@forward 'usa-dark-background';
 @forward 'usa-accordion';
 @forward 'usa-alert';
 @forward 'usa-banner';
@@ -32,6 +34,7 @@
 @forward 'usa-icon-list';
 @forward 'usa-icon';
 @forward 'usa-identifier';
+@forward 'usa-intro';
 @forward 'usa-layout-docs';
 @forward 'usa-layout-grid';
 @forward 'usa-media-block';

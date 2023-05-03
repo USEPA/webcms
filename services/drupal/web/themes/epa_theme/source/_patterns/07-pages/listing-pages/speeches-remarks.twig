@@ -1,0 +1,99 @@
+{% set header_info %}
+  {% include '@components/web-area-title/web-area-title.twig' with {
+    'text': 'Speeches and Remarks',
+  } %}
+{% endset %}
+
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
+{% set search %}
+  <form class="margin-y-3">
+    <div class="form-item form-item--textfield is-inline">
+      <label class="form-item__label u-visually-hidden" for="listing-search">
+        Search
+      </label>
+      <input class="form-item__text" id="listing-search" type="text" size="30" maxlength="128">
+    </div>
+    <button class="button">Search</button>
+  </form>
+{% endset %}
+
+{% set sidebar %}
+  <h2 class="h3">Filter By:</h2>
+  {% include '@uswds/_accordion/accordion.twig' with {
+    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
+    'is_multi_selectable': true,
+    'accordion_id': 'facets',
+    'accordion': [
+      {
+        'title': 'Person',
+        'is_expanded': false,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Alexandra Dapolito Dunn</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Anne L. Austin</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Carrie Vicenta Meadows</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Dana Aunkst</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Douglas Benevento</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Jeanne Briskin</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Paul Kudarauskas</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Scott Mason</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Ted Stanich</span></a></li></ul>',
+      },
+      {
+        'title': 'Year',
+        'is_expanded': true,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">2021</span></a></li><li class="facet-list__item"><a class="facet is-active" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">2020</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">2019</span></a></li></ul>',
+      },
+      {
+        'title': 'Subject',
+        'is_expanded': false,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Administrator</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Agriculture</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Air</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Awards and Recognition</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Climate</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Compliance and Enforcement</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Emergency Response</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Energy</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Environmental Justice</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Faith-based</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Grants</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Hazardous Waste</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">International</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Other News Topics</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Partnerships and Stewardship</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Pesticides and Toxic Chemicals</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Radiation</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Recovery Act</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Research</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Superfund and Brownfields</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Trash and Recycling</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Tribal</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Underground Storage Tanks</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Water</span></a></li></ul><button class="facet-limit is-open"><svg class="icon icon--facet-limit" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#minus-circle"></use></svg>Show less</button>',
+      },
+      {
+        'title': 'Publisher',
+        'is_expanded': false,
+        'content': '<ul class="facet-list"><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Air and Radiation (OAR)</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Awards and Recognition</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Region 01</span></a></li><li class="facet-list__item"><a class="facet" href="#"><svg class="icon facet__icon facet__icon--empty" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#square"></use></svg><svg class="icon facet__icon facet__icon--selected" aria-label="Selected:"><use href="../../../images/sprite.artifact.svg#check-square"></use></svg><span class="facet__content">Research</span></a></li></li></ul><button class="facet-limit is-open"><svg class="icon icon--facet-limit" aria-hidden="true"><use href="../../../images/sprite.artifact.svg#minus-circle"></use></svg>Show less</button>',
+      },
+    ]
+  } %}
+{% endset %}
+
+{% set filters %}
+  {% include '@components/filters/filters.twig' with {
+    'show_filters': true,
+    'list': [
+      {
+        'url': '#',
+        'text': '2020',
+      },
+    ]
+  } %}
+  <h2 class="h5 margin-bottom-5">Displaying 76-90 of 649 results</h2>
+{% endset %}
+
+{% set body %}
+  {% include '@uswds/collection/collection.twig' with {
+    'collection': collection,
+  } %}
+  {% include '@components/pager/pager.twig' with {
+    'current': '6',
+  } %}
+  {% include '@components/rss-feed/rss-feed.twig' with {
+    'link_text': 'Subscribe to the RSS feed for this search',
+  } %}
+{% endset %}
+
+{% set page_content %}
+  {# include page template #}
+  {% include '@templates/listing-pages/listing-page.twig' with {
+    'header_info': header_info,
+    'contact_link': contact_link,
+    'title': page_title,
+    'intro': intro,
+    'search': search,
+    'body': body,
+    'sidebar': sidebar,
+    'footer': footer,
+  } %}
+{% endset %}
+
+{# pass page_content to default page wrapper #}
+{% include '@pages/_page-default.twig' with {
+  'content': page_content,
+} %}

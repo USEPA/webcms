@@ -3,7 +3,6 @@
 namespace Drupal\epa_web_areas\Access;
 
 use Drupal\Core\Session\AccountInterface;
-use Drupal\group\Access\CalculatedGroupPermissionsItemInterface;
 use Drupal\group\Access\ChainGroupPermissionCalculatorInterface;
 use Drupal\group\Access\GroupPermissionCheckerInterface;
 use Drupal\group\Entity\GroupInterface;
@@ -16,6 +15,9 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
   protected $innerService;
   protected $groupPermissionCalculator;
 
+  /**
+   *
+   */
   public function __construct(GroupPermissionCheckerInterface $inner_service, ChainGroupPermissionCalculatorInterface $permission_calculator) {
     $this->innerService = $inner_service;
     $this->groupPermissionCalculator = $permission_calculator;
@@ -33,7 +35,7 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       return $usual_result;
     }
 
-    // @TODO: If we have to do an additional node type look to refactor this into a single field.
+    // @todo If we have to do an additional node type look to refactor this into a single field.
     $news_release_permissions = [
       'create group_node:news_release entity',
       'update any group_node:news_release entity',
@@ -61,6 +63,21 @@ class GroupPermissionChecker implements GroupPermissionCheckerInterface {
       $group->hasField('field_allow_perspectives')) {
       return $group->field_allow_perspectives->value;
     }
+
+    $speeches_permissions = [
+      'create group_node:speeches entity',
+      'update any group_node:speeches entity',
+      'delete any group_node:speeches entity',
+      'delete own group_node:speeches entity',
+      'update any group_node:speeches entity',
+      'update own group_node:speeches entity',
+    ];
+
+    if (in_array($permission, $speeches_permissions) &&
+      $group->hasField('field_allow_speeches')) {
+      return $group->field_allow_speeches->value;
+    }
+
     return $usual_result;
   }
 
