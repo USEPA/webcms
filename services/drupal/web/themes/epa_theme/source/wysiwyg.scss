@@ -2,12 +2,12 @@
 // WYSIWYG styles
 
 // Configuration
-@use '_patterns/00-config' as * with($wysiwyg: true);
+@use '_patterns/00-config' as *;
 @use '_patterns/01-global' as *;
 
 // Base styles
-@forward 'uswds-global';
-@forward '_patterns/02-base';
+@use 'uswds-global' as *;
+@use '_patterns/02-base' as *;
 
 // USWDS components
 // We pull in everything in 'packages/uswds' except for:
@@ -56,21 +56,22 @@
 @forward '_patterns/03-uswds';
 
 // Layouts
-@forward '_patterns/04-layouts';
+@use '_patterns/04-layouts' as *;
 
 // Components
-@forward '_patterns/05-components';
+@use '_patterns/05-components' as *;
 
 // USWDS and Gesso utility classes.
-@forward 'uswds-utilities';
-@forward '_patterns/utility-classes';
+@use 'uswds-utilities' as *;
+@use '_patterns/utility-classes' as *;
 
 // Shame
-@forward '_patterns/shame';
+@use '_patterns/shame' as *;
 
 // stylelint-disable-next-line
 body.cke_editable {
   outline: none !important;
+  padding: rem(10px);
 }
 
 // stylelint-disable-next-line
@@ -94,4 +95,19 @@ body.cke_editable {
 
 a[data-cke-saved-href]::after {
   display: none !important;
+}
+
+// stylelint-disable
+.cke_widget_wrapper:hover {
+  outline: 2px solid #ffd25c;
+}
+
+.cke_widget_wrapper.cke_widget_focused,
+.cke_widget_wrapper.cke_widget_editable_focused {
+  outline: 2px solid #47a4f5;
+}
+// stylelint-enable
+
+.media-library-item__edit {
+  margin-bottom: rem(units(1));
 }

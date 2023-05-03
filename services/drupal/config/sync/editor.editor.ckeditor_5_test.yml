@@ -12,6 +12,7 @@ settings:
   toolbar:
     items:
       - heading
+      - style
       - bold
       - italic
       - '|'
@@ -31,6 +32,8 @@ settings:
       - drupalInlineMedia
       - drupalMedia
       - specialCharacters
+      - paragraphs
+      - ParagraphsEmbed
   plugins:
     ckeditor5_heading:
       enabled_headings:
@@ -39,6 +42,44 @@ settings:
         - heading4
         - heading5
         - heading6
+    ckeditor5_style:
+      styles:
+        -
+          label: 'Pull Quote'
+          element: '<blockquote class="pull-quote">'
+        -
+          label: 'Left Pull Quote'
+          element: '<blockquote class="pull-quote u-align-left">'
+        -
+          label: 'Right Pull Quote'
+          element: '<blockquote class="pull-quote u-align-right">'
+        -
+          label: 'H2 Highlight'
+          element: '<h2 class="highlight">'
+        -
+          label: 'H3 Highlight'
+          element: '<h3 class="highlight">'
+        -
+          label: 'H4 Highlight'
+          element: '<h4 class="highlight">'
+        -
+          label: 'H5 Highlight'
+          element: '<h5 class="highlight">'
+        -
+          label: 'H6 Highlight'
+          element: '<h6 class="highlight">'
+        -
+          label: Code
+          element: '<code class="code">'
+        -
+          label: Mark
+          element: '<mark class="mark">'
+        -
+          label: Small
+          element: '<small class="small">'
+        -
+          label: Warning
+          element: '<span class="warning">'
     ckeditor5_sourceEditing:
       allowed_tags:
         - '<article>'
@@ -72,7 +113,7 @@ settings:
         - '<datalist>'
         - '<svg>'
         - '<title>'
-        - '<a hreflang occurrence id name target rel>'
+        - '<a hreflang occurrence id name target rel class aria-label title>'
         - '<blockquote cite>'
         - '<ol type>'
         - '<ul type>'
@@ -118,6 +159,14 @@ settings:
       startIndex: true
     media_media:
       allow_view_mode_override: true
+    editor_advanced_link_link:
+      enabled_attributes:
+        - aria-label
+        - class
+        - id
+        - rel
+        - target
+        - title
     filter_html_plus_white_list_attributes:
       global_attributes:
         - accesskey
@@ -131,4 +180,7 @@ settings:
         - 'data-*'
         - name
         - hidden
+    linkit_extension:
+      linkit_enabled: true
+      linkit_profile: default
 image_upload: {  }
