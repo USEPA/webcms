@@ -24,6 +24,21 @@ function epa_theme_menu_active_item(&$items) {
 }
 
 /**
+ * Implements theme_preprocess_links__HOOK()
+ *
+ * @param $variables
+ */
+function epa_theme_preprocess_links__dropbutton(&$variables) {
+  if (isset($variables['links'])) {
+    foreach ($variables['links'] as $key => $item) {
+      $variables['links'][$key]['link']['#attributes']['class'][] = 'button';
+      $variables['links'][$key]['link']['#attributes']['class'][] = 'dropbutton__button';
+    }
+  }
+}
+
+
+/**
  * Implements theme_preprocess_menu()
  *
  * @param $vars
