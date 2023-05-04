@@ -8,6 +8,7 @@ dependencies:
     - image.style.thumbnail
     - media.type.banner_image
   module:
+    - entitygroupfield
     - focal_point
     - path
 id: media.banner_image.default
@@ -20,6 +21,16 @@ content:
     weight: 4
     region: content
     settings: {  }
+    third_party_settings: {  }
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 7
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
     third_party_settings: {  }
   field_banner_image_restricted:
     type: options_select
@@ -60,7 +71,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 7
+    weight: 8
     region: content
     settings:
       display_label: true
@@ -76,5 +87,4 @@ content:
       placeholder: ''
     third_party_settings: {  }
 hidden:
-  entitygroupfield: true
   replace_file: true

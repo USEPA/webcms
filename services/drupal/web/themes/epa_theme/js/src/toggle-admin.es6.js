@@ -6,7 +6,7 @@ import Drupal from 'drupal';
     attach(context) {
       const toggleButton = context.querySelector('.js-toggle-admin');
       const adminContent = once(
-        'toggleAdmin',
+        'toggle-admin',
         '.js-toggle-admin-content',
         context
       );
