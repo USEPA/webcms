@@ -4,7 +4,11 @@ import Drupal from 'drupal';
 (function(Drupal) {
   Drupal.behaviors.beforeAfterSwipe = {
     attach(context, settings) {
-      const beforeAfters = context.querySelectorAll('.js-before-after-swipe');
+      const beforeAfters = once(
+        'before-after-swipe',
+        '.js-before-after-swipe',
+        context
+      );
 
       beforeAfters.forEach(beforeAfter => {
         const slider = beforeAfter.querySelector(
