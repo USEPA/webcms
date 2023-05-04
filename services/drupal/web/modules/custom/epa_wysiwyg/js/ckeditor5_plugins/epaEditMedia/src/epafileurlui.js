@@ -2,7 +2,8 @@ import { Plugin } from 'ckeditor5/src/core';
 import { ButtonView } from 'ckeditor5/src/ui';
 // @TODO: Get .gif or .png files working in webpack to then change the icon out.
 import linkIcon from "../../../../icons/simpleBox.svg";
-import {isDrupalMedia} from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
+import { isDrupalMedia } from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
+import { isDrupalInlineMedia } from "../../../../../../contrib/media_inline_embed/js/ckeditor5_plugins/mediaInlineEmbed/src/utils";
 
 export default class EpaFileUrlUI extends Plugin {
   /**
@@ -51,7 +52,7 @@ export default class EpaFileUrlUI extends Plugin {
           'DrupalMediaMetadataRepository'
         );
 
-        if (isDrupalMedia(modelElement)) {
+        if (isDrupalMedia(modelElement) || isDrupalInlineMedia(modelElement)) {
           metadataRepository
             .getMetadata(modelElement)
             .then((metadata) => {
