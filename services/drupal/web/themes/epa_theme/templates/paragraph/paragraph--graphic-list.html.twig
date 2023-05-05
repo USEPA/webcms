@@ -1,0 +1,26 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% set media_blocks = [] %}
+{% for i in content.field_media_block['#items']|keys %}
+  {% set paragraph_id = content.field_media_block[i]['#paragraph'].id.value %}
+  {% set media_blocks = media_blocks|merge([
+    {
+      'url': drupal_field('field_link', 'paragraph', paragraph_id)|without('#theme').0['#url']|render,
+      'image': {
+        'src': drupal_field('field_media_block_image', 'paragraph', paragraph_id)|without('#theme').0['#media'].field_media_image.entity.fileuri|image_style('small_graphic_list_image'),
+        'alt': drupal_field('field_media_block_image', 'paragraph', paragraph_id)|without('#theme').0['#media'].field_media_image.alt,
+      },
+      'title': drupal_field('field_title', 'paragraph', paragraph_id)|without('#theme')|render,
+      'content': drupal_field('field_body', 'paragraph', paragraph_id)|without('#theme')|render,
+    }
+  ]) %}
+{% endfor %}
+
+{% include '@uswds/graphic-list/graphic-list.twig' with {
+  'media_blocks': media_blocks,
+} %}
