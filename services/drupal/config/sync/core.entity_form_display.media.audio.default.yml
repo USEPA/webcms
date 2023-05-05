@@ -12,12 +12,23 @@ dependencies:
     - media.type.audio
   module:
     - duration_field
+    - entitygroupfield
     - file
 id: media.audio.default
 targetEntityType: media
 bundle: audio
 mode: default
 content:
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 9
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
+    third_party_settings: {  }
   field_author:
     type: entity_reference_autocomplete
     weight: 6
@@ -86,7 +97,6 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
-  entitygroupfield: true
   path: true
   status: true
   uid: true

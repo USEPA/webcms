@@ -36,6 +36,7 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
   public static function defaultSettings() {
     return [
       'shortname' => FALSE,
+      'link_text' => '',
     ] + parent::defaultSettings();
   }
 
@@ -77,12 +78,17 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
     $elements = [];
     $output_as_link = $this->getSetting('link');
     $shortname = $this->getSetting('shortname');
+    $link_text = $this->getSetting('link_text');
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $entity) {
       $label = $entity->label();
 
       if ($shortname) {
         $label = $entity->_referringGroup->label();
+      }
+
+      if (!empty($link_text)) {
+        $label = $link_text;
       }
       // If the link is to be displayed and the entity has a uri, display a
       // link.
@@ -136,6 +142,13 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
       '#default_value' => $this->getSetting('shortname'),
     ];
 
+    $elements['link_text'] = [
+      '#title' => t('Provide custom link text'),
+      '#description' => t('Override the label with custom link text.'),
+      '#type' => 'textfield',
+      '#default_value' => $this->getSetting('link_text'),
+    ];
+
     return $elements;
   }
 
@@ -144,7 +157,13 @@ class EpaGroupHomepageNodeFormatter extends EntityReferenceLabelFormatter {
    */
   public function settingsSummary() {
     $summary = parent::settingsSummary();
-    $summary[] = $this->getSetting('shortname') ? t('Display short name') : t('Display long name');
+    $link_text = $this->getSetting('link_text');
+    if (empty($link_text)) {
+      $summary[] = $this->getSetting('shortname') ? t('Display short name') : t('Display long name');
+    }
+    else {
+      $summary[] = t('Link text overridden with %link_text', ['%link_text' => $link_text]);
+    }
     return $summary;
   }
 

@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * Template for a generic layout.
+ */
+#}
+{%
+  set classes = [
+    attributes.hasClass('dark') ? 'usa-section--dark usa-dark-background' : '',
+    attributes.hasClass('light') ? 'usa-section--light' : '',
+  ]|join(' ')|trim
+%}
+
+{% set section_content %}
+  {% for region in layout.getRegionNames %}
+    {% if content[region] %}
+      {{ content[region] }}
+    {% endif %}
+  {% endfor %}
+{% endset %}
+
+{% if content %}
+  {% include '@layouts/section/section.twig' with {
+    modifier_classes: classes,
+    content: section_content,
+    has_constrain: true,
+  } %}
+{% endif %}
