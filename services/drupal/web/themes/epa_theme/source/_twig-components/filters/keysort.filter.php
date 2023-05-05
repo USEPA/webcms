@@ -8,8 +8,8 @@
 /**
  *
  */
-function addKeySortFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('keysort', function ($array) {
+function addKeySortFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('keysort', function ($array) {
     ksort($array);
     return $array;
   }));
