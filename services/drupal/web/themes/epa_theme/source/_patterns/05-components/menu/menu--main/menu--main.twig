@@ -9,7 +9,8 @@
       {# double quotes around class using menu_name needed for interpolation #}
       {% set additional_classes = [
         'menu',
-        "menu--#{menu_name}"
+        "menu--#{menu_name}",
+        'usa-accordion'
       ] %}
       {% if menu_class %}
         {% set additional_classes = additional_classes|merge(menu_class) %}
@@ -69,9 +70,11 @@
           {% if item.below and menu_level == 0 %}
             {% set button_attributes = link_attributes|merge({
               'class': link_attributes['class']|merge([
-                'usa-nav__link'
+                'usa-nav__link',
+                'usa-accordion__button'
               ]),
-              'aria-expanded': 'false'
+              'aria-expanded': 'false',
+              'type': 'button'
             }) %}
             <button {{ create_attribute(button_attributes) }}>
               {{ item.title }}
