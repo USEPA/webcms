@@ -1,0 +1,274 @@
+uuid: 07b6bb86-62ab-431b-a583-9538a2e61ff0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_release
+    - field.storage.node.field_description
+    - field.storage.node.field_language
+    - field.storage.node.field_publish_date
+    - field.storage.node.field_publisher
+    - field.storage.node.field_authors
+    - field.storage.paragraph.field_author
+    - field.storage.node.field_subjects
+    - field.storage.media.field_media_image
+    - field.storage.node.field_media_image
+    - search_api.server.localhost
+    - core.entity_view_mode.node.search_index
+  module:
+    - node
+    - paragraphs
+    - media
+    - search_api
+id: speeches_and_remarks
+name: 'Speeches and Remarks'
+description: ''
+read_only: false
+field_settings:
+  field_author:
+    label: 'Speaker or Presenter » Paragraph » Person'
+    datasource_id: 'entity:node'
+    property_path: 'field_authors:entity:field_author'
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_authors
+        - field.storage.paragraph.field_author
+      module:
+        - paragraphs
+  field_description:
+    label: Description
+    datasource_id: 'entity:node'
+    property_path: field_description
+    type: text
+    boost: 0.2
+    dependencies:
+      config:
+        - field.storage.node.field_description
+  field_language:
+    label: Language
+    datasource_id: 'entity:node'
+    property_path: field_language
+    type: string
+    dependencies:
+      config:
+        - field.storage.node.field_language
+  field_media_image:
+    label: 'Teaser Image » Media » Image'
+    datasource_id: 'entity:node'
+    property_path: 'field_media_image:entity:field_media_image'
+    type: integer
+    dependencies:
+      config:
+        - field.storage.media.field_media_image
+        - field.storage.node.field_media_image
+      module:
+        - media
+  field_publish_date:
+    label: 'Publish Date'
+    datasource_id: 'entity:node'
+    property_path: field_publish_date
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_publish_date
+  field_publisher:
+    label: Publisher
+    datasource_id: 'entity:node'
+    property_path: field_publisher
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_publisher
+  field_release:
+    label: Date
+    datasource_id: 'entity:node'
+    property_path: field_release
+    type: date
+    dependencies:
+      config:
+        - field.storage.node.field_release
+  field_subjects:
+    label: Subjects
+    datasource_id: 'entity:node'
+    property_path: field_subjects
+    type: integer
+    dependencies:
+      config:
+        - field.storage.node.field_subjects
+  rendered_item:
+    label: 'Rendered HTML output'
+    property_path: rendered_item
+    type: text
+    configuration:
+      roles:
+        - anonymous
+      view_mode:
+        'entity:node':
+          speeches: search_index
+  status:
+    label: Published
+    datasource_id: 'entity:node'
+    property_path: status
+    type: boolean
+    dependencies:
+      module:
+        - node
+  title:
+    label: Title
+    datasource_id: 'entity:node'
+    property_path: title
+    type: text
+    boost: !!float 5
+    dependencies:
+      module:
+        - node
+  type:
+    label: 'Content type'
+    datasource_id: 'entity:node'
+    property_path: type
+    type: string
+    dependencies:
+      module:
+        - node
+datasource_settings:
+  'entity:node':
+    bundles:
+      default: false
+      selected:
+        - speeches
+    languages:
+      default: true
+      selected: {  }
+processor_settings:
+  add_url: {  }
+  aggregated_field: {  }
+  entity_status: {  }
+  entity_type: {  }
+  hierarchy:
+    weights:
+      preprocess_index: -47
+    fields:
+      field_author: taxonomy_term-parent
+      field_subjects: taxonomy_term-parent
+  html_filter:
+    weights:
+      preprocess_index: -50
+      preprocess_query: -47
+    all_fields: true
+    fields:
+      - field_description
+      - field_language
+      - rendered_item
+      - title
+      - type
+    title: false
+    alt: true
+    tags:
+      b: 2
+      em: 1
+      h1: 5
+      h2: 3
+      h3: 2
+      strong: 2
+      u: 1
+  ignorecase:
+    weights:
+      preprocess_index: -46
+      preprocess_query: -44
+    all_fields: false
+    fields:
+      - field_description
+      - rendered_item
+      - title
+  language_with_fallback: {  }
+  rendered_item: {  }
+  stemmer:
+    weights:
+      preprocess_index: -42
+      preprocess_query: -41
+    all_fields: true
+    fields:
+      - field_description
+      - rendered_item
+      - title
+    exceptions:
+      mexican: mexic
+      texan: texa
+  stopwords:
+    weights:
+      preprocess_index: -44
+      preprocess_query: -42
+    all_fields: true
+    fields:
+      - field_description
+      - rendered_item
+      - title
+    stopwords:
+      - a
+      - an
+      - and
+      - are
+      - as
+      - at
+      - be
+      - but
+      - by
+      - for
+      - if
+      - in
+      - into
+      - is
+      - it
+      - 'no'
+      - not
+      - of
+      - 'on'
+      - or
+      - s
+      - such
+      - t
+      - that
+      - the
+      - their
+      - then
+      - there
+      - these
+      - they
+      - this
+      - to
+      - was
+      - will
+      - with
+  tokenizer:
+    weights:
+      preprocess_index: -48
+      preprocess_query: -45
+    all_fields: true
+    fields:
+      - field_description
+      - rendered_item
+      - title
+    spaces: '[^[:alnum:]]'
+    ignored: ._-
+    overlap_cjk: 1
+    minimum_word_size: '3'
+  transliteration:
+    weights:
+      preprocess_index: -49
+      preprocess_query: -46
+    all_fields: true
+    fields:
+      - field_description
+      - field_language
+      - rendered_item
+      - title
+      - type
+tracker_settings:
+  default:
+    indexing_order: fifo
+options:
+  cron_limit: 50
+  index_directly: true
+  track_changes_in_references: true
+server: localhost

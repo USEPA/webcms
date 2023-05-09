@@ -6,7 +6,7 @@
  *   to the top.
  */
 export default function(threshold = 200, smoothScroll = true) {
-  const backToTop = document.querySelector('.back-to-top');
+  const backToTop = once('back-to-top', '.back-to-top');
   if (backToTop) {
     if (!isNaN(threshold)) {
       backToTop.setAttribute('aria-hidden', 'true');

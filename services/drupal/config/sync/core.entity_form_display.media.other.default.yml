@@ -8,12 +8,23 @@ dependencies:
     - field.field.media.other.field_media_tags
     - media.type.other
   module:
+    - entitygroupfield
     - file
 id: media.other.default
 targetEntityType: media
 bundle: other
 mode: default
 content:
+  entitygroupfield:
+    type: entitygroupfield_autocomplete_widget
+    weight: 6
+    region: content
+    settings:
+      help_text: ''
+      label: 'Group name'
+      multiple: false
+      required: true
+    third_party_settings: {  }
   field_limit_file_accessibility:
     type: options_buttons
     weight: 5
@@ -57,9 +68,17 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 6
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
 hidden:
   created: true
-  entitygroupfield: true
   path: true
   status: true
-  uid: true
