@@ -20,7 +20,7 @@ index f3e3bde..7821b1e 100644
            if ('data-paragraph-revision-id' in existingValues) {
              url = url + '/' + existingValues['data-paragraph-revision-id']
            }
-+          
++
 +          url = url + '?' + editor.config.DrupalParagraph_openerParameters;
            // Open the Paragraph embed dialog for corresponding EmbedButton.
            Drupal.ckeditor.openDialog(editor, url, existingValues, paragraphSaveCallback, dialogSettings);
@@ -30,9 +30,9 @@ index 01f59ad..d8eef06 100644
 --- a/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
 +++ b/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
 @@ -2,6 +2,7 @@
- 
+
  namespace Drupal\paragraphs_entity_embed\Plugin\CKEditor5Plugin;
- 
+
 +use Drupal\Core\Routing\CurrentRouteMatch;
  use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
  use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
@@ -40,7 +40,7 @@ index 01f59ad..d8eef06 100644
 @@ -17,6 +18,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   */
  class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactoryPluginInterface {
- 
+
 +  /**
 +   * The current route match service.
 +   *
@@ -72,7 +72,7 @@ index 01f59ad..d8eef06 100644
      $this->entityTypeManager = $entity_type_manager;
 +    $this->currentRouteMatch = $current_route_match;
    }
- 
+
    /**
 @@ -66,7 +78,8 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
        $plugin_id,
@@ -83,13 +83,13 @@ index 01f59ad..d8eef06 100644
 +      $container->get('current_route_match')
      );
    }
- 
+
 @@ -96,6 +109,15 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
        ];
      }
- 
+
 +    $opener_parameters = ['entity_type_id' => '', 'entity_bundle' => ''];
-+    foreach ($this->getCurrentRouteMatch()->getParameters()->all() as $parameter) {
++    foreach ($this->currentRouteMatch->getParameters()->all() as $parameter) {
 +      if ($parameter instanceof ContentEntityInterface) {
 +        $opener_parameters['entity_type_id'] = $parameter->getEntityTypeId();
 +        $opener_parameters['entity_bundle'] = $parameter->bundle();
@@ -106,20 +106,20 @@ index 01f59ad..d8eef06 100644
        'previewCsrfToken' => $this->csrfTokenGenerator->get('X-Drupal-EmbedPreview-CSRF-Token'),
 +      'openerParameters' => http_build_query($opener_parameters),
      ];
- 
+
      return $dynamic_plugin_config;
 diff --git a/src/Plugin/CKEditorPlugin/DrupalParagraph.php b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 index 554a753..a9f9b58 100644
 --- a/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 +++ b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 @@ -2,6 +2,7 @@
- 
+
  namespace Drupal\paragraphs_entity_embed\Plugin\CKEditorPlugin;
- 
+
 +use Drupal\Core\Entity\ContentEntityInterface;
  use Drupal\editor\Entity\Editor;
  use Drupal\embed\EmbedCKEditorPluginBase;
- 
+
 @@ -15,6 +16,24 @@ use Drupal\embed\EmbedCKEditorPluginBase;
   * )
   */
@@ -142,7 +142,7 @@ index 554a753..a9f9b58 100644
 +    }
 +    return $this->currentRouteMatch;
 +  }
- 
+
    /**
     * {@inheritdoc}
 @@ -27,11 +46,21 @@ class DrupalParagraph extends EmbedCKEditorPluginBase {
@@ -166,4 +166,4 @@ index 554a753..a9f9b58 100644
 +      'DrupalParagraph_openerParameters' => http_build_query($opener_parameters),
      ];
    }
- 
+
