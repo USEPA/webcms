@@ -1,13 +1,95 @@
-diff --git a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
-index c8173c7..1edbe35 100644
---- a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
-+++ b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
-@@ -109,6 +109,9 @@ export default class ParagraphsEmbedUI extends Plugin {
+diff --git a/js/build/embeddedParagraph.js b/js/build/embeddedParagraph.js
+index 96e2f37..4f769db 100644
+--- a/js/build/embeddedParagraph.js
++++ b/js/build/embeddedParagraph.js
+@@ -51,7 +51,7 @@ module.exports = CKEditor5.dll;
+ /************************************************************************/
+ /******/ 	// The module cache
+ /******/ 	var __webpack_module_cache__ = {};
+-/******/
++/******/ 	
+ /******/ 	// The require function
+ /******/ 	function __webpack_require__(moduleId) {
+ /******/ 		// Check if module is in cache
+@@ -65,14 +65,14 @@ module.exports = CKEditor5.dll;
+ /******/ 			// no module.loaded needed
+ /******/ 			exports: {}
+ /******/ 		};
+-/******/
++/******/ 	
+ /******/ 		// Execute the module function
+ /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+-/******/
++/******/ 	
+ /******/ 		// Return the exports of the module
+ /******/ 		return module.exports;
+ /******/ 	}
+-/******/
++/******/ 	
+ /************************************************************************/
+ /******/ 	/* webpack/runtime/define property getters */
+ /******/ 	(() => {
+@@ -85,12 +85,12 @@ module.exports = CKEditor5.dll;
+ /******/ 			}
+ /******/ 		};
+ /******/ 	})();
+-/******/
++/******/ 	
+ /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+ /******/ 	(() => {
+ /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+ /******/ 	})();
+-/******/
++/******/ 	
+ /************************************************************************/
+ var __webpack_exports__ = {};
+ // This entry need to be wrapped in an IIFE because it need to be in strict mode.
+@@ -497,6 +497,10 @@ class ParagraphsEmbedUI extends delegated_corefrom_dll_reference_CKEditor5.Plugi
+     Object.keys(embed_buttons).forEach((id, index) => {
+       let libraryURL = Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
+ 
++      if (options.hasOwnProperty('openerParameters')) {
++        libraryURL += '?' + options.openerParameters;
++      }
++
+       // Add each button to the toolbar.
+       editor.ui.componentFactory.add(id, (locale) => {
+         let button = embed_buttons[id];
+@@ -553,6 +557,11 @@ class ParagraphsEmbedUI extends delegated_corefrom_dll_reference_CKEditor5.Plugi
          if (paragraph_revision_id) {
            libraryURL += '/' + paragraph_revision_id;
          }
 +
++        if (options.hasOwnProperty('openerParameters')) {
++          libraryURL += '?' + options.openerParameters;
++        }
++
+         // Open a dialog to edit paragraph.
+         Drupal.ckeditor5.openDialog(
+           libraryURL,
+diff --git a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
+index c8173c7..68bc327 100644
+--- a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
++++ b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
+@@ -53,6 +53,10 @@ export default class ParagraphsEmbedUI extends Plugin {
+     Object.keys(embed_buttons).forEach((id, index) => {
+       let libraryURL = Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
+ 
++      if (options.hasOwnProperty('openerParameters')) {
 +        libraryURL += '?' + options.openerParameters;
++      }
++
+       // Add each button to the toolbar.
+       editor.ui.componentFactory.add(id, (locale) => {
+         let button = embed_buttons[id];
+@@ -109,6 +113,11 @@ export default class ParagraphsEmbedUI extends Plugin {
+         if (paragraph_revision_id) {
+           libraryURL += '/' + paragraph_revision_id;
+         }
++
++        if (options.hasOwnProperty('openerParameters')) {
++          libraryURL += '?' + options.openerParameters;
++        }
 +
          // Open a dialog to edit paragraph.
          Drupal.ckeditor5.openDialog(
@@ -20,27 +102,28 @@ index f3e3bde..7821b1e 100644
            if ('data-paragraph-revision-id' in existingValues) {
              url = url + '/' + existingValues['data-paragraph-revision-id']
            }
-+
++          
 +          url = url + '?' + editor.config.DrupalParagraph_openerParameters;
            // Open the Paragraph embed dialog for corresponding EmbedButton.
            Drupal.ckeditor.openDialog(editor, url, existingValues, paragraphSaveCallback, dialogSettings);
          }
 diff --git a/src/Plugin/CKEditor5Plugin/DrupalParagraph.php b/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
-index 01f59ad..d8eef06 100644
+index 01f59ad..dd11212 100644
 --- a/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
 +++ b/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
-@@ -2,6 +2,7 @@
-
+@@ -2,6 +2,8 @@
+ 
  namespace Drupal\paragraphs_entity_embed\Plugin\CKEditor5Plugin;
-
+ 
++use Drupal\Core\Entity\ContentEntityInterface;
 +use Drupal\Core\Routing\CurrentRouteMatch;
  use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
  use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  use Drupal\Core\Url;
-@@ -17,6 +18,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
+@@ -17,6 +19,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   */
  class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactoryPluginInterface {
-
+ 
 +  /**
 +   * The current route match service.
 +   *
@@ -51,7 +134,7 @@ index 01f59ad..d8eef06 100644
    /**
     * The CSRF Token generator.
     *
-@@ -44,17 +52,21 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
+@@ -44,17 +53,21 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
     *   The CSRF Token generator service.
     * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
     *   The Entity Type Manager service.
@@ -72,9 +155,9 @@ index 01f59ad..d8eef06 100644
      $this->entityTypeManager = $entity_type_manager;
 +    $this->currentRouteMatch = $current_route_match;
    }
-
+ 
    /**
-@@ -66,7 +78,8 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
+@@ -66,7 +79,8 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
        $plugin_id,
        $plugin_definition,
        $container->get('csrf_token'),
@@ -83,11 +166,11 @@ index 01f59ad..d8eef06 100644
 +      $container->get('current_route_match')
      );
    }
-
-@@ -96,6 +109,15 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
+ 
+@@ -96,6 +110,15 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
        ];
      }
-
+ 
 +    $opener_parameters = ['entity_type_id' => '', 'entity_bundle' => ''];
 +    foreach ($this->currentRouteMatch->getParameters()->all() as $parameter) {
 +      if ($parameter instanceof ContentEntityInterface) {
@@ -100,26 +183,26 @@ index 01f59ad..d8eef06 100644
      // Add configured embed buttons and pass it to the UI.
      $dynamic_plugin_config['embeddedParagraph'] = [
        'buttons' => $buttons,
-@@ -108,6 +130,7 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
+@@ -108,6 +131,7 @@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactory
          'maxHeight' => 'none',
        ],
        'previewCsrfToken' => $this->csrfTokenGenerator->get('X-Drupal-EmbedPreview-CSRF-Token'),
 +      'openerParameters' => http_build_query($opener_parameters),
      ];
-
+ 
      return $dynamic_plugin_config;
 diff --git a/src/Plugin/CKEditorPlugin/DrupalParagraph.php b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 index 554a753..a9f9b58 100644
 --- a/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 +++ b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
 @@ -2,6 +2,7 @@
-
+ 
  namespace Drupal\paragraphs_entity_embed\Plugin\CKEditorPlugin;
-
+ 
 +use Drupal\Core\Entity\ContentEntityInterface;
  use Drupal\editor\Entity\Editor;
  use Drupal\embed\EmbedCKEditorPluginBase;
-
+ 
 @@ -15,6 +16,24 @@ use Drupal\embed\EmbedCKEditorPluginBase;
   * )
   */
@@ -142,7 +225,7 @@ index 554a753..a9f9b58 100644
 +    }
 +    return $this->currentRouteMatch;
 +  }
-
+ 
    /**
     * {@inheritdoc}
 @@ -27,11 +46,21 @@ class DrupalParagraph extends EmbedCKEditorPluginBase {
@@ -166,4 +249,4 @@ index 554a753..a9f9b58 100644
 +      'DrupalParagraph_openerParameters' => http_build_query($opener_parameters),
      ];
    }
-
+ 
