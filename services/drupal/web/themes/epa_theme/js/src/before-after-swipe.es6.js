@@ -5,7 +5,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.beforeAfterSwipe = {
     attach(context, settings) {
       const beforeAfters = once(
-        'beforeAfterSwipe',
+        'before-after-swipe',
         '.js-before-after-swipe',
         context
       );

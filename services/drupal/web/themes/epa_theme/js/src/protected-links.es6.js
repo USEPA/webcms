@@ -25,7 +25,7 @@ import Drupal from 'drupal';
       }
 
       const externalLinks = once(
-        'protectedLinks',
+        'protected-links',
         "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])",
         context
       );
