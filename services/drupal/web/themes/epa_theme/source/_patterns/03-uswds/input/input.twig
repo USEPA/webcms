@@ -6,7 +6,7 @@
   {% if error_message %}
     <span class="usa-error-message" id="{{ input_id }}-message" role="alert">{{ error_message }}</span>
   {% endif %}
-  {% spaceless %}
+  {% apply spaceless %}
   <input class="usa-input {{ modifier_classes }}"
      id="{{ input_id }}"
      name="{{ input_id }}"
@@ -19,5 +19,5 @@
      {% if input_disabled %} disabled{% endif %}
      {% if input_required %} required aria-required="true"{% endif %}
      {% if input_step %} step="{{ input_step }}"{% endif %}>
-  {% endspaceless %}
+  {% endapply %}
 </div>
