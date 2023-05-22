@@ -161,7 +161,8 @@ function epa_forms_webform_access(EntityInterface $entity, $operation, AccountIn
 function _epa_forms_get_webform_referencing_node(EntityInterface $entity) {
   $query = \Drupal::entityQuery('node')
     ->condition('type', 'webform')
-    ->condition('webform', $entity->id());
+    ->condition('webform', $entity->id())
+    ->accessCheck(TRUE);
   $results = $query->execute();
   // We assume there's only a single node associated with each webform.
   $nid = reset($results);

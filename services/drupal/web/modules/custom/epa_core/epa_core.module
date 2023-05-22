@@ -401,7 +401,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
               $link = Link::fromTextAndUrl(t('Contact Us'), $url)->toRenderable();
               $link['#attributes'] = ['class' => array('header-link')];
             }
-            $replacements[$original] = $url ? render($link) : $original;
+            $replacements[$original] = $url ? \Drupal::service('renderer')->render($link) : $original;
           }
         }
         break;
@@ -673,7 +673,8 @@ function epa_core_default_value_field_type(ContentEntityInterface $entity, Field
         break;
     }
     if (!empty($term_name)) {
-      $term = taxonomy_term_load_multiple_by_name($term_name, 'type');
+      $term = Drupal::entityTypeManager()->getStorage('taxonomy_term')
+        ->loadByProperties(['name' => $term_name, 'vid' => 'type']);
       if (!empty($term)) {
         $term = reset($term);
         return $term->id();
@@ -693,7 +694,8 @@ function epa_core_default_value_field_channel(ContentEntityInterface $entity, Fi
         break;
     }
     if (!empty($term_name)) {
-      $term = taxonomy_term_load_multiple_by_name($term_name, 'channels');
+      $term = Drupal::entityTypeManager()->getStorage('taxonomy_term')
+        ->loadByProperties(['name' => $term_name, 'vid' => 'channels']);
       if (!empty($term)) {
         $term = reset($term);
         return $term->id();
