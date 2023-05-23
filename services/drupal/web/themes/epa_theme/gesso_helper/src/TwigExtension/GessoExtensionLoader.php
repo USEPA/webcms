@@ -52,7 +52,7 @@ class GessoExtensionLoader {
    */
   protected static function getThemePath() {
     $theme = \Drupal::config('system.theme')->get('default');
-    $themeLocation = drupal_get_path('theme', $theme);
+    $themeLocation = \Drupal::service('extension.list.theme')->getPath($theme);
     return DRUPAL_ROOT . '/' . $themeLocation . '/';
   }
 
