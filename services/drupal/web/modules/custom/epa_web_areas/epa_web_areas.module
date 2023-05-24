@@ -209,16 +209,6 @@ function epa_web_areas_form_embedded_paragraphs_paragraphs_entity_embed_form_alt
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- */
-function epa_web_areas_form_embedded_paragraphs_paragraphs_entity_embed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Add a custom submit handler that runs after media is added and saved.
-  if (!empty($form['actions'])) {
-    $form['#submit'][] = 'epa_web_areas_group_media_submit';
-  }
-}
-
-/**
  * Implements hook_editor_js_settings_alter().
  */
 function epa_web_areas_editor_js_settings_alter(&$settings) {
