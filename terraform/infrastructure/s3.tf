@@ -25,6 +25,29 @@ resource "aws_s3_bucket" "uploads" {
     }
   }
 
+  # Optionally replicate to another bucket. The dynamic block here makes
+  # replication optional: if a key is missing for a given site-language pair,
+  # then replication will not be enabled.
+  dynamic "replication_configuration" {
+    for_each = toset(try([var.s3_replication_destination[each.key]], []))
+
+    content {
+      role = var.replication_role
+
+      rules {
+        status = "Enabled"
+
+        delete_marker_replication_status = "Enabled"
+
+        filter {}
+
+        destination {
+          bucket = replication_configuration.value
+        }
+      }
+    }
+  }
+
   tags = var.tags
 }
 
