@@ -23,8 +23,11 @@ import Drupal from 'drupal';
 
         return external;
       }
-      const externalLinks = context.querySelectorAll(
-        "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])"
+
+      const externalLinks = once(
+        'protected-links',
+        "a:not([href=''], [href^='#'], [href^='?'], [href^='/'], [href^='.'], [href^='javascript:'], [href^='mailto:'], [href^='tel:'])",
+        context
       );
 
       externalLinks.forEach(function(el) {
