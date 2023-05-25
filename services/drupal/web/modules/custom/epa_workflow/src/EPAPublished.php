@@ -92,7 +92,8 @@ class EPAPublished extends EPAModeration {
         }
       }
       if ($node->bundle() == 'news_release') {
-        $term = taxonomy_term_load_multiple_by_name('news release', 'type');
+        $term = $this->entityTypeManager->getStorage('taxonomy_term')
+          ->loadByProperties(['name' => 'news release', 'vid' => 'type']);
         if (!empty($term)) {
           $term = reset($term);
           $node->field_type = $term->id();
