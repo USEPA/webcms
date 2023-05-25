@@ -7,8 +7,8 @@
 /**
  *
  */
-function addLinkFunction(\Twig_Environment &$env, $config) {
-  $env->addFunction(new Twig_SimpleFunction(
+function addLinkFunction(\Twig\Environment &$env, $config) {
+  $env->addFunction(new \Twig\TwigFunction(
     'link',
     function ($title, $url, $attributes) {
       if (isset($attributes) && isset($attributes['class'])) {
