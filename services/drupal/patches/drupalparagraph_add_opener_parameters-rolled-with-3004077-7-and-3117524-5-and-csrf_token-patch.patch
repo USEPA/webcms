@@ -1,0 +1,74 @@
+diff --git a/js/plugins/drupalparagraph/plugin.js b/js/plugins/drupalparagraph/plugin.js
+index f90864f..0f06666 100644
+--- a/js/plugins/drupalparagraph/plugin.js
++++ b/js/plugins/drupalparagraph/plugin.js
+@@ -77,6 +77,9 @@
+           if ('data-paragraph-revision-id' in existingValues) {
+             url = url + '/' + existingValues['data-paragraph-revision-id']
+           }
++
++          url = url + "?" + editor.config.DrupalParagraph_openerParameters;
++
+           // Open the Paragraph embed dialog for corresponding EmbedButton.
+           Drupal.ckeditor.openDialog(editor, url, existingValues, paragraphSaveCallback, dialogSettings);
+         }
+diff --git a/src/Plugin/CKEditorPlugin/DrupalParagraph.php b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
+index 249ced2..0540944 100644
+--- a/src/Plugin/CKEditorPlugin/DrupalParagraph.php
++++ b/src/Plugin/CKEditorPlugin/DrupalParagraph.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\paragraphs_entity_embed\Plugin\CKEditorPlugin;
+ 
++use Drupal\Core\Entity\ContentEntityInterface;
+ use Drupal\editor\Entity\Editor;
+ use Drupal\embed\EmbedCKEditorPluginBase;
+ 
+@@ -16,6 +17,25 @@ use Drupal\embed\EmbedCKEditorPluginBase;
+  */
+ class DrupalParagraph extends EmbedCKEditorPluginBase {
+ 
++  /**
++   * The current route match.
++   *
++   * @var \Drupal\Core\Routing\RouteMatchInterface
++   */
++  protected $currentRouteMatch;
++
++  /**
++   * Get the current route match.
++   *
++   * @return \Drupal\Core\Routing\RouteMatchInterface
++   */
++  protected function getCurrentRouteMatch() {
++    if (!$this->currentRouteMatch) {
++      $this->currentRouteMatch = \Drupal::routeMatch();
++    }
++    return $this->currentRouteMatch;
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+@@ -27,11 +47,21 @@ class DrupalParagraph extends EmbedCKEditorPluginBase {
+    * {@inheritdoc}
+    */
+   public function getConfig(Editor $editor) {
++    $opener_parameters = ['entity_type_id' => '', 'entity_bundle' => ''];
++    foreach ($this->getCurrentRouteMatch()->getParameters()->all() as $parameter) {
++      if ($parameter instanceof ContentEntityInterface) {
++        $opener_parameters['entity_type_id'] = $parameter->getEntityTypeId();
++        $opener_parameters['entity_bundle'] = $parameter->bundle();
++        break;
++      }
++    }
++
+     return [
+       'DrupalParagraph_dialogTitleAdd' => t('Insert Paragraph'),
+       'DrupalParagraph_dialogTitleEdit' => t('Edit Paragraph'),
+       'DrupalParagraph_buttons' => $this->getButtons(),
+       'DrupalParagraph_previewCsrfToken' => \Drupal::csrfToken()->get('X-Drupal-EmbedPreview-CSRF-Token'),
++      'DrupalParagraph_openerParameters' => http_build_query($opener_parameters),
+     ];
+   }
+ 
