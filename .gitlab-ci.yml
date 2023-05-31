@@ -67,6 +67,8 @@ default:
 # pipelines.
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+  FAILOVER:
+    description: "Binary variable to reflect if this deployment is supporting a failover"
 
 #Including Gitlab scan templates
 include:
@@ -1284,6 +1286,71 @@ deploy:dev-west:apply-es:
 
 #endregion
 
+
+search-reindex:dev:en:
+  stage: update:en
+  rules:
+    - if: $FAILOVER != "true"
+      when: manual
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+  
+  image:
+    name: node:14-alpine
+    entrypoint: ['']
+
+  # See the comments below for why the npm cache is redirected.
+  script:
+    - cd $CI_PROJECT_DIR/ci
+    - npm ci --production --prefer-offline --cache .npm
+    - node <temp>
+
+  # Per https://docs.gitlab.com/ee/ci/caching/#cache-nodejs-dependencies, GitLab doesn't
+  # support caching outside the project directory, so we have to relocate the .npm cache
+  # directory inside the project root.
+  cache:
+    key: npm-drush
+    paths:
+        - ci/.npm
+
+  resource_group: drush/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
+
+search-reindex:prd:es:
+  stage: update:es
+  rules:
+    - if: $FAILOVER != "true"
+      when: manual
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: es
+    
+  image:
+    name: node:14-alpine
+    entrypoint: ['']
+
+  # See the comments below for why the npm cache is redirected.
+  script:
+    - cd $CI_PROJECT_DIR/ci
+    - npm ci --production --prefer-offline --cache .npm
+    - node <temp>
+
+  # Per https://docs.gitlab.com/ee/ci/caching/#cache-nodejs-dependencies, GitLab doesn't
+  # support caching outside the project directory, so we have to relocate the .npm cache
+  # directory inside the project root.
+  cache:
+    key: npm-drush
+    paths:
+        - ci/.npm
+
+  resource_group: drush/dev-$WEBCMS_LANG
+  environment:
+    name: site/dev-$WEBCMS_LANG
 
 
 
