@@ -16,6 +16,7 @@ const util = require("./util");
 const drushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sapi-c
   drush --debug --uri="$WEBCMS_SITE_URL" sapi-i
+  
 `;
 
 /**
