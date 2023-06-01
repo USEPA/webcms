@@ -7,9 +7,9 @@
 /**
  *
  */
-function addTFilter(\Twig_Environment &$env, $config) {
+function addTFilter(\Twig\Environment &$env, $config) {
   // Drupal translate filter.
-  $env->addFilter(new \Twig_SimpleFilter('t', function ($string) {
+  $env->addFilter(new \Twig\TwigFilter('t', function ($string) {
     return $string;
   }));
 }

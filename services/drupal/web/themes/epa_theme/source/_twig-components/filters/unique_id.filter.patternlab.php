@@ -8,8 +8,8 @@
 /**
  *
  */
-function addUniqueIdFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('unique_id', function ($string) {
+function addUniqueIdFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('unique_id', function ($string) {
     return $string . '--' . uniqid();
   }));
 }

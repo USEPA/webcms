@@ -7,8 +7,8 @@
 /**
  *
  */
-function addPathFunction(\Twig_Environment &$env, $config) {
-  $env->addFunction(new \Twig_SimpleFunction('path', function ($string) {
+function addPathFunction(\Twig\Environment &$env, $config) {
+  $env->addFunction(new \Twig\TwigFunction('path', function ($string) {
     if ($string === '<front>') {
       return '/';
     }

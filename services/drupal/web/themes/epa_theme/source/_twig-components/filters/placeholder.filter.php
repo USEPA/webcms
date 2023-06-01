@@ -7,8 +7,8 @@
 /**
  *
  */
-function addPlaceholderFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('placeholder', function ($string) {
+function addPlaceholderFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('placeholder', function ($string) {
     return $string;
   }));
 }
