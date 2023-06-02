@@ -1,7 +1,6 @@
 import { Plugin } from 'ckeditor5/src/core';
 import { ButtonView } from 'ckeditor5/src/ui';
-// @TODO: Get .gif or .png files working in webpack to then change the icon out.
-import linkIcon from "../../../../icons/simpleBox.svg";
+import linkIcon from "../../../../icons/copy-solid.svg";
 import {isDrupalMedia} from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
 
 export default class EpaFileUrlUI extends Plugin {
