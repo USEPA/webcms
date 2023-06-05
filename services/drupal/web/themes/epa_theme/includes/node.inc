@@ -143,7 +143,7 @@ function epa_theme_preprocess_node__news_release__full(&$variables) {
       default;
     }
 
-    if ($link instanceof Link) {
+    if (isset($link) && $link instanceof Link) {
       $variables['more_link'] = $link->toRenderable();
     }
   }

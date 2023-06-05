@@ -13,6 +13,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
+use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
@@ -198,6 +199,16 @@ function epa_web_areas_form_media_library_add_form_alter(&$form, FormStateInterf
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function epa_web_areas_form_embedded_paragraphs_paragraphs_entity_embed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add a custom submit handler that runs after media is added and saved.
+  if (!empty($form['actions'])) {
+    $form['#submit'][] = 'epa_web_areas_group_media_submit';
+  }
+}
+
+/**
  * Implements hook_editor_js_settings_alter().
  */
 function epa_web_areas_editor_js_settings_alter(&$settings) {
@@ -229,33 +240,131 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
       }
     }
 
+    // Accounts for getting group when using the paragraphs embed plugin.
+    if (empty($group)) {
+      $query = \Drupal::request()->query->all();
+      // CKEditor4 place to look.
+      if (isset($query['opener_parameters']['group'])) {
+        $group_id = $query['opener_parameters']['group'];
+      }
+
+      // CKEditor5 place to look.
+      if (isset($query['group'])) {
+        $group_id = $query['group'];
+      }
+
+      $group = Group::load($group_id);
+    }
+
+
     // If we have a group object, add group id as a query parameter
     // to the opener parameters and rebuild query for media library
     // ckeditor widgets. The MediaLibraryState will preserve the group id.
     if (isset($group)) {
       foreach ($settings['editor']['formats'] as $format => $setting) {
-        foreach ($setting['editorSettings'] as $key => $value) {
-          if (strpos($key, 'MediaLibrary_url')) {
-            $parts = parse_url($value);
-            parse_str($parts['query'], $query);
-            if ('media_inline_embed.opener.editor' == $query['media_library_opener_id'] && array_key_exists('document', $query['media_library_allowed_types'])) {
-              // Make document tab appear first.
-              array_unshift($query['media_library_allowed_types'], 'document');
-              $query['media_library_allowed_types'] = array_unique($query['media_library_allowed_types']);
-              $query['media_library_selected_type'] = 'document';
-            }
-            // Open the table view of the picker by default.
-            $query['views_display_id'] = 'widget_table';
-            $query['media_library_opener_parameters']['group'] = $group->id();
-            $query['hash'] = MediaLibraryState::create($query['media_library_opener_id'], $query['media_library_allowed_types'], $query['media_library_selected_type'], $query['media_library_remaining'], $query['media_library_opener_parameters'])->getHash();
-            $query = http_build_query($query);
-            $url = implode('?', [$parts['path'], $query]);
-            $settings['editor']['formats'][$format]['editorSettings'][$key] = $url;
-          }
+        // Accommodate changes required per editor as settings are different.
+        switch ($setting['editor']) {
+          case 'ckeditor5':
+            _add_ckeditor5_settings($settings, $setting, $group, $format);
+            break;
+          case 'ckeditor':
+            _add_ckeditor4_settings($settings, $setting, $group, $format);
+            break;
         }
       }
     }
   }
+}
+
+/**
+ * Adds CKEditor5 specific settings for adding group ID context to media.
+ *
+ * @param $settings
+ *   The array of settings that will be
+ * @param mixed $setting
+ *   The speicifc setrting
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   The group that we're adding context for.
+ * @param string $format
+ *   The text format machine name.
+ */
+function _add_ckeditor5_settings(&$settings, mixed $setting, GroupInterface $group, string $format): void {
+  foreach ($setting['editorSettings']['config'] as $key => $value) {
+    if ($key == 'drupalMedia') {
+      $url = $value['libraryURL'];
+      $new_url = _media_library_opener_parameters_alter($url, $group);
+      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+    }
+
+    // Add group ID as query parameter for embeddedParagraph plugin.
+    if ($key == 'embeddedParagraph') {
+      $opener_params = $value['openerParameters'];
+      $opener_params .= '&group=' . $group->id();
+      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['openerParameters'] = $opener_params;
+    }
+  }
+}
+
+/**
+ * Adds CKEditor4 specific settings for adding group ID context to media.
+ *
+ * @param $settings
+ *   The array of settings that will be
+ * @param mixed $setting
+ *   The speicifc setrting
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   The group that we're adding context for.
+ * @param string $format
+ *   The text format machine name.
+ */
+function _add_ckeditor4_settings(&$settings, mixed $setting, $group, $format): void {
+  foreach ($setting['editorSettings'] as $key => $value) {
+    if (strpos($key, 'MediaLibrary_url')) {
+      $new_url = _media_library_opener_parameters_alter($value, $group);
+      $settings['editor']['formats'][$format]['editorSettings'][$key] = $new_url;
+    }
+
+    // Add group ID as query parameter for DrupalParagraph entity embed.
+    if ($key == 'DrupalParagraph_openerParameters') {
+      $parts = parse_url($value);
+      parse_str($parts['path'], $query);
+      $query['opener_parameters']['group'] = $group->id();
+      $out = http_build_query($query);
+      $settings['editor']['formats'][$format]['editorSettings'][$key] = $out;
+    }
+  }
+}
+
+/**
+ * Helper method to add the group ID as a media library opener parameter.
+ *
+ * This provides the media library group ID so that we can add the media item to
+ * the correct web area.
+ * @see \epa_web_areas_group_media_submit
+ *
+ * @param string $url
+ *   The current media library url.
+ * @param \Drupal\group\Entity\GroupInterface $group
+ *   The group we're adding as a parameter.
+ *
+ * @return string
+ *   The altered url including the group as a parameter.
+ */
+function _media_library_opener_parameters_alter(string $url, GroupInterface $group) {
+  $parts = parse_url($url);
+  parse_str($parts['query'], $query);
+  if ('media_inline_embed.opener.editor' == $query['media_library_opener_id'] && array_key_exists('document', $query['media_library_allowed_types'])) {
+    // Make document tab appear first.
+    array_unshift($query['media_library_allowed_types'], 'document');
+    $query['media_library_allowed_types'] = array_unique($query['media_library_allowed_types']);
+    $query['media_library_selected_type'] = 'document';
+  }
+  // Open the table view of the picker by default.
+  $query['views_display_id'] = 'widget_table';
+  $query['media_library_opener_parameters']['group'] = $group->id();
+  $query['hash'] = MediaLibraryState::create($query['media_library_opener_id'], $query['media_library_allowed_types'], $query['media_library_selected_type'], $query['media_library_remaining'], $query['media_library_opener_parameters'])->getHash();
+  $query = http_build_query($query);
+  return implode('?', [$parts['path'], $query]);
 }
 
 /**

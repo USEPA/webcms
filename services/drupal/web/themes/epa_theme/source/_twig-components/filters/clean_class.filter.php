@@ -7,8 +7,8 @@
 /**
  *
  */
-function addCleanClassFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('clean_class', function ($string) {
+function addCleanClassFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('clean_class', function ($string) {
     $filters = [
       ' ' => '-',
       '_' => '-',
