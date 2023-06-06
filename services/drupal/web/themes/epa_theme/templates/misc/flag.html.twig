@@ -36,6 +36,6 @@
 {# Set nofollow to prevent search bots from crawling anonymous flag links #}
 {% set attributes = attributes.setAttribute('rel', 'nofollow') %}
 
-{% spaceless %}
+{% apply spaceless %}
   <div class="{{ classes|join(' ') }}"><a{{ attributes }}>{{ title }}</a></div>
-{% endspaceless %}
+{% endapply %}

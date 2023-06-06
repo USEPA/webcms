@@ -7,9 +7,9 @@
 /**
  *
  */
-function addSafeJoinFilter(\Twig_Environment &$env, $config) {
+function addSafeJoinFilter(\Twig\Environment &$env, $config) {
   // Drupal Safe Join filter.
-  $env->addFilter(new \Twig_SimpleFilter('safe_join', function ($string) {
+  $env->addFilter(new \Twig\TwigFilter('safe_join', function ($string) {
     return $string;
   }));
 }

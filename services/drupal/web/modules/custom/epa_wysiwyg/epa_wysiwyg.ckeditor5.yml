@@ -1,0 +1,78 @@
+# If using yml to configure plugins, rename this to {module_name}.ckeditor5.yml.
+# If using annotations, this file can be removed.
+# @see https://www.drupal.org/docs/drupal-apis/plugin-api/annotations-based-plugins
+#   For information on using annotations to define plugins.
+# @see the CKEditor 5 module's README.md for more details regarding plugin
+#   configuration options.
+# cSpell:ignore simplebox demobox
+
+epa_wysiwyg_new_tag:
+  # Use the provider: property for this plugin to depend on another module.
+
+  # Configuration that will be sent to CKEditor 5 JavaScript plugins.
+  ckeditor5:
+    plugins:
+      - epaNew.EpaNewTag
+    # *Additional configuration properties*
+    # config: data sent to the constructor of any CKEditor 5 plugin
+    #   editorPluginName:
+    #     editorPluginProperty: editorPluginValue
+
+  # Configuration that will be used directly by Drupal.
+  drupal:
+    label: EPA New Icon
+    # The library loaded while using the editor.
+    library: epa_wysiwyg/epa-new-tag-ckeditor5
+    # The library loaded when configuring the text format using this plugin.
+    admin_library: epa_wysiwyg/admin.new-icon
+    toolbar_items:
+      # This should match the name of the corresponding plugin exported in the
+      # plugin's index.js.
+      epaNew:
+        label: EPA New Icon
+    # If the plugin does not provide elements, set this as
+    # `elements: false`
+    elements:
+      # Note that it necessary for elements to separately provide both the tag
+      # (f.e. `<h2>`) and the attribute being added to the tag
+      # (f.e. `<h2 class="simple-box-title">`).
+      - <ins>
+      - <ins class="new" data-date>
+    # *Additional configuration properties*
+    # conditions: for setting additional criteria that must be met for the
+    #   plugin to be active.
+    # class: Optional PHP class that makes it possible for the plugin to provide
+    #   dynamic values, or a configuration UI.
+
+
+epa_wysiwyg_editMediaLink:
+  ckeditor5:
+    plugins:
+      - epaEditMedia.EditDrupalMedia
+    config:
+      drupalMedia:
+        toolbar:
+          - '|'
+          - 'EditDrupalMediaButton'
+          - 'CopyFilepathButton'
+          - '|'
+  drupal:
+    label: Edit Media item
+    library: epa_wysiwyg/epa-edit-media-ckeditor5
+    elements: false
+    conditions:
+      plugins:
+        - media_media
+
+epa_wysiwyg_webAreaLinkit:
+  ckeditor5:
+    plugins:
+      - webAreaLinkit.WebAreaLinkit
+  drupal:
+    label: EPA Linkit
+    library: epa_wysiwyg/web-area-linkit-ckeditor5
+    elements: false
+    conditions:
+      plugins:
+        - ckeditor5_link
+        - linkit_extension
