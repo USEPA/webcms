@@ -64,7 +64,7 @@
         {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
       {% endif %}
 
-      {% spaceless %}
+      {% apply spaceless %}
         <li {{ add_attributes(additional_item_attributes) }}>
           {% if item.below and menu_level == 0 %}
             {% set button_attributes = link_attributes|merge({
@@ -81,7 +81,7 @@
             {{ link(item.title, item.url, link_attributes) }}
           {% endif %}
         </li>
-      {% endspaceless %}
+      {% endapply %}
     {% endfor %}
     </ul>
   {% endif %}
