@@ -539,7 +539,7 @@ infrastructure:preproduction:apply:
 #sub-region us-west-2: 
 # These steps deploy into the infra/preproduction-west environment
 # the infra/preproduction-west environment is pointed to the us-west-2 region within the DrupalCloud AWS accounts
-infrastructure:preproduction-west:init:
+.infrastructure:preproduction-west:init:
   extends: .infrastructure
   stage: infrastructure_preprod_west_init
   rules:
@@ -555,7 +555,7 @@ infrastructure:preproduction-west:init:
   environment:
     name: infra/preproduction-west
 
-infrastructure:preproduction-west:validate:
+.infrastructure:preproduction-west:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_west_validate
   rules:
@@ -571,7 +571,7 @@ infrastructure:preproduction-west:validate:
   environment:
     name: infra/preproduction-west
 
-infrastructure:preproduction-west:plan:
+.infrastructure:preproduction-west:plan:
   extends: .infrastructure
   stage: infrastructure_preprod_west_plan
   rules:
@@ -595,7 +595,7 @@ infrastructure:preproduction-west:plan:
     reports:
       terraform: $TF_ROOT/plan.json
 
-infrastructure:preproduction-west:apply:
+.infrastructure:preproduction-west:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_west_apply
   rules:
@@ -889,7 +889,7 @@ deploy:dev:apply-es:
 
 
 #region:  US West 2 deployment
-deploy:dev-west:init:en:
+.deploy:dev-west:init:en:
   extends: .deploy
   stage: deploy:dev-west:init:en
   rules:
@@ -914,7 +914,7 @@ deploy:dev-west:init:en:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
-deploy:dev-west:init:es:
+.deploy:dev-west:init:es:
   extends: .deploy
   stage: deploy:dev-west:init:es
   rules:
@@ -941,7 +941,7 @@ deploy:dev-west:init:es:
 
 
 # Validate syntax and configuration
-deploy:dev-west:validate:en:
+.deploy:dev-west:validate:en:
   extends: .deploy
   stage: deploy:dev-west:validate:en
   rules:
@@ -960,7 +960,7 @@ deploy:dev-west:validate:en:
     - gitlab-terraform validate
 
 # Validate syntax and configuration
-deploy:dev-west:validate:es:
+.deploy:dev-west:validate:es:
   extends: .deploy
   stage: deploy:dev-west:validate:es
   rules:
@@ -977,7 +977,7 @@ deploy:dev-west:validate:es:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
-deploy:dev-west:plan-en:
+.deploy:dev-west:plan-en:
   extends: .deploy
   stage: deploy:dev-west:plan:en
   rules:
@@ -1009,7 +1009,7 @@ deploy:dev-west:plan-en:
     reports:
       terraform: $TF_ROOT/plan.json
 
-deploy:dev-west:plan-es:
+.deploy:dev-west:plan-es:
   extends: .deploy
   stage: deploy:dev-west:plan:es
   rules:
@@ -1044,7 +1044,7 @@ deploy:dev-west:plan-es:
 
 # Perform an apply. Note that this is not always automatic; see the comments above the rules
 # for more.
-deploy:dev-west:apply-en:
+.deploy:dev-west:apply-en:
   extends: .deploy
   stage: deploy:dev-west:apply:en
 
@@ -1095,7 +1095,7 @@ deploy:dev-west:apply-en:
 
     - when: never
 
-deploy:dev-west:apply-es:
+.deploy:dev-west:apply-es:
   extends: .deploy
   stage: deploy:dev-west:apply:es
 
