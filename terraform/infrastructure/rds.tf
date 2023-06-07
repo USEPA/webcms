@@ -72,7 +72,7 @@ resource "aws_rds_cluster" "db" {
 
   engine         = "aurora-mysql"
   engine_mode    = "provisioned"
-  engine_version = "5.7.mysql_aurora.2.10.3"
+  engine_version = "5.7.mysql_aurora.2.11.2"
 
   master_username = "root"
   master_password = random_password.rds_root_password.result
