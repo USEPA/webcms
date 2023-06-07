@@ -11,14 +11,14 @@
     <div class="image-gallery__title">{{ title }}</div>
   {% endif %}
   <div class="image-gallery__controls js-image-gallery__controls">
-    <button class="image-gallery__prev" aria-label="{{ 'Previous Image'|t }}">
+    <button type="button" class="image-gallery__prev" aria-label="{{ 'Previous Image'|t }}">
       {%- include '@components/icon/icon.twig' with {
         'modifier_classes': 'icon--image-gallery-control',
         'is_hidden': true,
         'icon_name': 'chevron-circle-left',
       } -%}
     </button>
-    <button class="image-gallery__next" aria-label="{{ 'Next Image'|t }}">
+    <button type="button" class="image-gallery__next" aria-label="{{ 'Next Image'|t }}">
       {%- include '@components/icon/icon.twig' with {
         'modifier_classes': 'icon--image-gallery-control',
         'is_hidden': true,
@@ -28,7 +28,7 @@
   </div>
   <div class="image-gallery__nav js-image-gallery__nav">
     {%- for image in images -%}
-      <button class="image-gallery__nav-button"></button>
+      <button type="button" class="image-gallery__nav-button"></button>
     {%- endfor -%}
   </div>
   <ul class="image-gallery__list js-image-gallery__container">
