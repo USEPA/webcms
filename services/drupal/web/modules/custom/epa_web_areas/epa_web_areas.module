@@ -253,7 +253,9 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         $group_id = $query['group'];
       }
 
-      $group = Group::load($group_id);
+      if (!empty($group_id)) {
+        $group = Group::load($group_id);
+      }
     }
 
 
