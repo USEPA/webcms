@@ -2,16 +2,16 @@
 import Drupal from 'drupal';
 
 (function(Drupal) {
-  const slideDown = (target, duration = 500) => {
+  const slideDown = (target, duration = 400) => {
     target.style.removeProperty('display');
     let display = window.getComputedStyle(target).display;
-    const height = target.offsetHeight;
 
     if (display === 'none') {
       display = 'block';
     }
 
     target.style.display = display;
+    const height = target.offsetHeight;
     target.style.overflow = 'hidden';
     target.style.height = 0;
     target.style.paddingTop = 0;
@@ -71,11 +71,12 @@ import Drupal from 'drupal';
               );
               jsDomAlert.style.display = 'none';
               jsDomAlert.innerHTML = response.data;
-              slideDown(jsDomAlert);
 
               if (jsDomAlert.nodeType === Node.ELEMENT_NODE) {
                 Drupal.attachBehaviors(jsDomAlert);
               }
+
+              slideDown(jsDomAlert);
             }
           }
         };
