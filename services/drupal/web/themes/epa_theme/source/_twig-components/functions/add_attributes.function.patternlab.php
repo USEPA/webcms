@@ -11,8 +11,8 @@
 /**
  *
  */
-function addAddAttributesFunction(\Twig_Environment &$env, $config) {
-  $env->addFunction(new Twig_SimpleFunction('add_attributes', function ($context, $additional_attributes = [], $attribute_type = 'attributes') {
+function addAddAttributesFunction(\Twig\Environment &$env, $config) {
+  $env->addFunction(new Twig\TwigFunction('add_attributes', function ($context, $additional_attributes = [], $attribute_type = 'attributes') {
 
     $attributes = [];
 
