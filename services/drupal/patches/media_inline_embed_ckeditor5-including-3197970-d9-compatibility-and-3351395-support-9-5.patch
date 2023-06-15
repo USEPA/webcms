@@ -1,7 +1,7 @@
 From 6ab3f7cfebfaf7a6648d994e305e4d51b785cf18 Mon Sep 17 00:00:00 2001
 From: Carson Oldson <coldson@forumone.com>
 Date: Thu, 4 May 2023 14:18:07 -0500
-Subject: [PATCH 1/5] Initial commit for ckeditor5 upgrade.
+Subject: [PATCH 1/7] Initial commit for ckeditor5 upgrade.
 
 ---
  3322512-ckeditor5-3.patch                     | 12216 ++++++++++++++++
@@ -24401,14 +24401,14 @@ index 0000000..0a74dcc
 +  version "0.1.0"
 +  resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
 +  integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
--- 
+--
 GitLab
 
 
 From d9da49506d1c04075845d39e774e630b0cf531ea Mon Sep 17 00:00:00 2001
 From: Carson Oldson <coldson@forumone.com>
 Date: Thu, 4 May 2023 15:20:34 -0500
-Subject: [PATCH 2/5] Adding toolbar and utils file.
+Subject: [PATCH 2/7] Adding toolbar and utils file.
 
 ---
  js/build/mediaInlineEmbed.js                  |   2 +-
@@ -24643,14 +24643,14 @@ index 0000000..ecb2e76
 +  const capitalizedFirst = group[0].toUpperCase() + group.substring(1);
 +  return `drupalElementStyle${capitalizedFirst}`;
 +}
--- 
+--
 GitLab
 
 
 From 93fc5f1e0ef14dfdcb4bddf0820b3a490e3427cc Mon Sep 17 00:00:00 2001
 From: Carson Oldson <coldson@forumone.com>
 Date: Thu, 4 May 2023 15:47:43 -0500
-Subject: [PATCH 3/5] Removing console logs.
+Subject: [PATCH 3/7] Removing console logs.
 
 ---
  js/build/mediaInlineEmbed.js                                   | 2 +-
@@ -24673,21 +24673,21 @@ index 246de3e..63f5c6f 100644
 @@ -11,9 +11,6 @@ export default class DrupalInlineMediaUI extends Plugin {
        return;
      }
- 
+
 -    console.log(options);
 -    console.log(inlineOptions);
 -
      const { libraryURL, openDialog, dialogSettings = {} } = options;
      if (!libraryURL || typeof openDialog !== 'function') {
        return;
--- 
+--
 GitLab
 
 
 From 06579dede157ad836342b2b6c990f46321a372af Mon Sep 17 00:00:00 2001
 From: Carson Oldson <coldson@forumone.com>
 Date: Fri, 5 May 2023 08:22:19 -0500
-Subject: [PATCH 4/5] Adding latest correct icon.
+Subject: [PATCH 4/7] Adding latest correct icon.
 
 ---
  js/build/mediaInlineEmbed.js                                    | 2 +-
@@ -24712,17 +24712,17 @@ index 63f5c6f..d55dafe 100644
  import { ButtonView } from 'ckeditor5/src/ui';
 -import icon from '../../../../../ckeditor5_dev/ckeditor5_plugin_starter_template/icons/simpleBox.svg'
 +import icon from '../../../../icons/code.svg';
- 
+
  export default class DrupalInlineMediaUI extends Plugin {
    init() {
--- 
+--
 GitLab
 
 
 From cb3ed86f33e2fa2a6d1a46ab6278cdd21356f8e4 Mon Sep 17 00:00:00 2001
 From: gustavderdrache <aford@forumone.com>
 Date: Fri, 19 May 2023 16:38:51 -0400
-Subject: [PATCH 5/5] Adding inline style renderer
+Subject: [PATCH 5/7] Adding inline style renderer
 
 ---
  js/build/mediaInlineEmbed.js                  |    2 +-
@@ -25918,7 +25918,7 @@ index d7e15ac..574e29c 100644
 +++ b/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlinemediaediting.js
 @@ -1,6 +1,5 @@
  // @ts-check
- 
+
 -import DrupalMediaEditing from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/drupalmediaediting";
  import InsertDrupalInlineMediaCommand from "./insertdrupalinlinemediacommand";
  import { getPreviewContainer } from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
@@ -25930,7 +25930,7 @@ index 634976d..3b5ebe1 100644
 @@ -1,5 +1,7 @@
  import DrupalInlineMedia from './drupalinlinemedia';
 +import DrupalInlineElementStyle from './drupalinlineelementstyle';
- 
+
  export default {
    DrupalInlineMedia,
 +  DrupalInlineElementStyle,
@@ -25954,7 +25954,7 @@ index 6579c82..fd52269 100644
 @@ -1,7 +1,7 @@
  name: 'Media Inline Embed'
  description: Provides an inline media embed plugin.
--type: module 
+-type: module
 -core: 8.x
 +type: module
 +core_version_requirement: ^8.8 || ^9
@@ -25971,7 +25971,7 @@ index a58c636..396f07f 100644
  function _media_inline_embed_get_embed_info($elements, $bundle) {
 -  $entity_type = $elements['#entity_type'];
    $view_mode = $elements['#view_mode'] == 'full' ? 'default' : $elements['#view_mode'];
- 
+
    // Load display.
 -  $display_id = implode('.', [$entity_type, $bundle, $view_mode]);
 +  $display_id = implode('.', ['media', $bundle, $view_mode]);
@@ -26416,12 +26416,12 @@ index 6a93107..1ad180c 100644
 +++ b/src/Plugin/CKEditor5Plugin/DrupalInlineMedia.php
 @@ -172,15 +172,15 @@ class DrupalInlineMedia extends MediaLibrary implements CKEditor5PluginConfigura
      $items = [];
- 
+
      foreach (array_keys($allowed_view_modes) as $view_mode) {
 -      $items[] = "drupalElementStyle:viewMode:$view_mode";
 +      $items[] = "drupalInlineElementStyle:viewMode:$view_mode";
      }
- 
+
 -    $default_item = 'drupalElementStyle:viewMode:' . $default_view_mode;
 +    $default_item = 'drupalInlineElementStyle:viewMode:' . $default_view_mode;
      if (!empty($allowed_view_modes)) {
@@ -26436,7 +26436,7 @@ index 6a93107..1ad180c 100644
 @@ -241,7 +241,7 @@ class DrupalInlineMedia extends MediaLibrary implements CKEditor5PluginConfigura
      [$element_style_configuration, $toolbar_configuration,
      ] = self::configureViewModes($editor);
- 
+
 -    $dynamic_plugin_config['drupalElementStyles']['viewMode'] = $element_style_configuration;
 +    $dynamic_plugin_config['drupalInlineElementStyles']['viewMode'] = $element_style_configuration;
      if ($this->getConfiguration()['allow_view_mode_override']) {
@@ -26452,7 +26452,7 @@ index 2b45f9b..4debe3a 100644
  use Drupal\media_library\MediaLibraryUiBuilder;
 -use Drupal\media_library\Plugin\CKEditorPlugin\DrupalMediaLibrary;
 +use Drupal\ckeditor\Plugin\CKEditorPlugin\DrupalMediaLibrary;
- 
+
  /**
   * Defines the "drupalinlinemedia" plugin.
 diff --git a/yarn.lock b/yarn.lock
@@ -26460,8 +26460,8 @@ index 0a74dcc..521ef54 100644
 --- a/yarn.lock
 +++ b/yarn.lock
 @@ -3,85 +3,85 @@
- 
- 
+
+
  "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.18.6":
 -  version "7.18.6"
 -  resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.18.6.tgz#3b25d38c89600baa2dcc219edfa88a74eb2c427a"
@@ -26471,7 +26471,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "7.18.6"
    dependencies:
      "@babel/highlight" "^7.18.6"
- 
+
  "@babel/generator@^7.20.7":
 -  version "7.20.7"
 -  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.20.7.tgz#f8ef57c8242665c5929fe2e8d82ba75460187b4a"
@@ -26484,7 +26484,7 @@ index 0a74dcc..521ef54 100644
      "@jridgewell/gen-mapping" "^0.3.2"
 -    jsesc "^2.5.1"
 +    "jsesc" "^2.5.1"
- 
+
  "@babel/helper-environment-visitor@^7.18.9":
 -  version "7.18.9"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-environment-visitor/-/helper-environment-visitor-7.18.9.tgz#0c0cee9b35d2ca190478756865bb3528422f51be"
@@ -26492,7 +26492,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-3r/aACDJ3fhQ/EVgFy0hpj8oHyHpQc+LPtJoY9SzTThAsStm4Ptegq92vqKoE3vD706ZVFWITnMnxucw+S9Ipg=="
 +  "resolved" "https://registry.npmjs.org/@babel/helper-environment-visitor/-/helper-environment-visitor-7.18.9.tgz"
 +  "version" "7.18.9"
- 
+
  "@babel/helper-function-name@^7.19.0":
 -  version "7.19.0"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-function-name/-/helper-function-name-7.19.0.tgz#941574ed5390682e872e52d3f38ce9d1bef4648c"
@@ -26503,7 +26503,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@babel/template" "^7.18.10"
      "@babel/types" "^7.19.0"
- 
+
  "@babel/helper-hoist-variables@^7.18.6":
 -  version "7.18.6"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-hoist-variables/-/helper-hoist-variables-7.18.6.tgz#d4d2c8fb4baeaa5c68b99cc8245c56554f926678"
@@ -26513,7 +26513,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "7.18.6"
    dependencies:
      "@babel/types" "^7.18.6"
- 
+
  "@babel/helper-split-export-declaration@^7.18.6":
 -  version "7.18.6"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-split-export-declaration/-/helper-split-export-declaration-7.18.6.tgz#7367949bc75b20c6d5a5d4a97bba2824ae8ef075"
@@ -26523,7 +26523,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "7.18.6"
    dependencies:
      "@babel/types" "^7.18.6"
- 
+
  "@babel/helper-string-parser@^7.19.4":
 -  version "7.19.4"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-string-parser/-/helper-string-parser-7.19.4.tgz#38d3acb654b4701a9b77fb0615a96f775c3a9e63"
@@ -26531,7 +26531,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-nHtDoQcuqFmwYNYPz3Rah5ph2p8PFeFCsZk9A/48dPc/rGocJ5J3hAAZ7pb76VWX3fZKu+uEr/FhH5jLx7umrw=="
 +  "resolved" "https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.19.4.tgz"
 +  "version" "7.19.4"
- 
+
  "@babel/helper-validator-identifier@^7.18.6", "@babel/helper-validator-identifier@^7.19.1":
 -  version "7.19.1"
 -  resolved "https://registry.yarnpkg.com/@babel/helper-validator-identifier/-/helper-validator-identifier-7.19.1.tgz#7eea834cf32901ffdc1a7ee555e2f9c27e249ca2"
@@ -26539,7 +26539,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-awrNfaMtnHUr653GgGEs++LlAvW6w+DcPrOliSMXWCKo597CwL5Acf/wWdNkf/tfEQE3mjkeD1YOVZOUV/od1w=="
 +  "resolved" "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.19.1.tgz"
 +  "version" "7.19.1"
- 
+
  "@babel/highlight@^7.18.6":
 -  version "7.18.6"
 -  resolved "https://registry.yarnpkg.com/@babel/highlight/-/highlight-7.18.6.tgz#81158601e93e2563795adcbfbdf5d64be3f2ecdf"
@@ -26553,7 +26553,7 @@ index 0a74dcc..521ef54 100644
 -    js-tokens "^4.0.0"
 +    "chalk" "^2.0.0"
 +    "js-tokens" "^4.0.0"
- 
+
  "@babel/parser@^7.18.9", "@babel/parser@^7.20.7":
 -  version "7.20.7"
 -  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.7.tgz#66fe23b3c8569220817d5feb8b9dcdc95bb4f71b"
@@ -26561,7 +26561,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-T3Z9oHybU+0vZlY9CiDSJQTD5ZapcW18ZctFMi0MOAl/4BjFF4ul7NVSARLdbGO5vDqy9eQiGTV0LtKfvCYvcg=="
 +  "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.20.7.tgz"
 +  "version" "7.20.7"
- 
+
  "@babel/template@^7.18.10":
 -  version "7.20.7"
 -  resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.20.7.tgz#a15090c2839a83b02aa996c0b4994005841fd5a8"
@@ -26573,7 +26573,7 @@ index 0a74dcc..521ef54 100644
      "@babel/code-frame" "^7.18.6"
      "@babel/parser" "^7.20.7"
      "@babel/types" "^7.20.7"
- 
+
  "@babel/traverse@^7.18.9":
 -  version "7.20.10"
 -  resolved "https://registry.yarnpkg.com/@babel/traverse/-/traverse-7.20.10.tgz#2bf98239597fcec12f842756f186a9dde6d09230"
@@ -26592,7 +26592,7 @@ index 0a74dcc..521ef54 100644
 -    globals "^11.1.0"
 +    "debug" "^4.1.0"
 +    "globals" "^11.1.0"
- 
+
  "@babel/types@^7.18.6", "@babel/types@^7.19.0", "@babel/types@^7.20.7":
 -  version "7.20.7"
 -  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.20.7.tgz#54ec75e252318423fc07fb644dc6a58a64c09b7f"
@@ -26616,7 +26616,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
 +    "@ckeditor/ckeditor5-widget" "^30.0.0"
 +    "lodash-es" "^4.17.11"
- 
+
  "@ckeditor/ckeditor5-clipboard@^34.1.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-clipboard/-/ckeditor5-clipboard-34.2.0.tgz#ab69636365b0bd95631817fe4f5c3cc22bc6fce3"
@@ -26631,7 +26631,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-widget" "^34.2.0"
 -    lodash-es "^4.17.11"
 +    "lodash-es" "^4.17.11"
- 
+
  "@ckeditor/ckeditor5-clipboard@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-clipboard/-/ckeditor5-clipboard-37.1.0.tgz#93be9d304f680786bc7c2042ca6160758f7b8828"
@@ -26656,7 +26656,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-ui" "^30.0.0"
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-core@^34.1.0", "@ckeditor/ckeditor5-core@^34.2.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-core/-/ckeditor5-core-34.2.0.tgz#4ba72e3407310843a784630c598501ccc42a585b"
@@ -26670,7 +26670,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^34.2.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-core@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-core/-/ckeditor5-core-37.1.0.tgz#c7ecd10cd2f5e11a43a1dab624621c2aea6aed4f"
@@ -26683,7 +26683,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^37.1.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-dev-utils@^30.0.0", "@ckeditor/ckeditor5-dev-utils@^30.5.0":
 -  version "30.5.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-dev-utils/-/ckeditor5-dev-utils-30.5.0.tgz#798291a79183db716b667591a2ccebe6fcb7a7f8"
@@ -26737,7 +26737,7 @@ index 0a74dcc..521ef54 100644
 +    "terser-webpack-plugin" "^4.2.3"
 +    "through2" "^3.0.1"
 +    "ts-loader" "^9.3.0"
- 
+
  "@ckeditor/ckeditor5-dev-webpack-plugin@^30.5.0":
 -  version "30.5.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-dev-webpack-plugin/-/ckeditor5-dev-webpack-plugin-30.5.0.tgz#732033e117ce0b00cb0efaf009495ab767ec47de"
@@ -26763,7 +26763,7 @@ index 0a74dcc..521ef54 100644
 +  dependencies:
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-engine@^34.1.0", "@ckeditor/ckeditor5-engine@^34.2.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-engine/-/ckeditor5-engine-34.2.0.tgz#449376625bad9e8beea9e89e201dd4fb599fc38f"
@@ -26775,7 +26775,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^34.2.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-engine@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-engine/-/ckeditor5-engine-37.1.0.tgz#628cb27102d70974c5d8a0a20dda893f2c76facf"
@@ -26796,7 +26796,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-core" "^30.0.0"
 +    "@ckeditor/ckeditor5-engine" "^30.0.0"
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
- 
+
  "@ckeditor/ckeditor5-enter@^34.1.0", "@ckeditor/ckeditor5-enter@^34.2.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-enter/-/ckeditor5-enter-34.2.0.tgz#6d90a374396ef05ecde7f6cb0fcd6d3ca38e20b1"
@@ -26808,7 +26808,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^34.2.0"
      "@ckeditor/ckeditor5-engine" "^34.2.0"
      "@ckeditor/ckeditor5-utils" "^34.2.0"
- 
+
  "@ckeditor/ckeditor5-enter@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-enter/-/ckeditor5-enter-37.1.0.tgz#4362f2560a3aa34800e9a3ff235772f4e6e5ac8f"
@@ -26820,7 +26820,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^37.1.0"
      "@ckeditor/ckeditor5-engine" "^37.1.0"
      "@ckeditor/ckeditor5-utils" "^37.1.0"
- 
+
  "@ckeditor/ckeditor5-html-support@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-html-support/-/ckeditor5-html-support-37.1.0.tgz#a803c0f9ba6da4d6f210fa3084d73bc785253871"
@@ -26851,7 +26851,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-core" "^30.0.0"
 +    "@ckeditor/ckeditor5-ui" "^30.0.0"
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
- 
+
  "@ckeditor/ckeditor5-paragraph@^34.1.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-paragraph/-/ckeditor5-paragraph-34.2.0.tgz#cf981adb76bf40649ce04358674d2c1262b8753a"
@@ -26863,7 +26863,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^34.2.0"
      "@ckeditor/ckeditor5-ui" "^34.2.0"
      "@ckeditor/ckeditor5-utils" "^34.2.0"
- 
+
  "@ckeditor/ckeditor5-paragraph@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-paragraph/-/ckeditor5-paragraph-37.1.0.tgz#5607ee190a71face08df3a9e57a4e2dca4cf0576"
@@ -26875,7 +26875,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^37.1.0"
      "@ckeditor/ckeditor5-ui" "^37.1.0"
      "@ckeditor/ckeditor5-utils" "^37.1.0"
- 
+
 +"@ckeditor/ckeditor5-select-all@^30.0.0":
 +  "integrity" "sha512-niJmpgPEBP/jT8HY9BPxInYf58Jyd0kWY7+zQ3kJxdM2zqaF1eNmaI9kjsprrKXVMnU8Jpq9n0fLvM3GUbW35Q=="
 +  "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-select-all/-/ckeditor5-select-all-30.0.0.tgz"
@@ -26896,7 +26896,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^34.2.0"
      "@ckeditor/ckeditor5-ui" "^34.2.0"
      "@ckeditor/ckeditor5-utils" "^34.2.0"
- 
+
  "@ckeditor/ckeditor5-select-all@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-select-all/-/ckeditor5-select-all-37.1.0.tgz#1edb6579ef77c72c50ec442dff0e2dd4b089aaa0"
@@ -26908,7 +26908,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^37.1.0"
      "@ckeditor/ckeditor5-ui" "^37.1.0"
      "@ckeditor/ckeditor5-utils" "^37.1.0"
- 
+
 +"@ckeditor/ckeditor5-typing@^30.0.0":
 +  "integrity" "sha512-Ay76oQsvkCaPpfOELYHblbQ8cEtDFRbtHdE+7n4GtZhbWjo89HnAkZZZ3JOzn3TPmAje2JRo+KWhAAk+RiAl8w=="
 +  "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-typing/-/ckeditor5-typing-30.0.0.tgz"
@@ -26932,7 +26932,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^34.2.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-typing@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-typing/-/ckeditor5-typing-37.1.0.tgz#080ad759e4f3869cd86cb797879c7bba3de9c4ad"
@@ -26955,7 +26955,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-core" "^30.0.0"
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-ui@^34.1.0", "@ckeditor/ckeditor5-ui@^34.2.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-ui/-/ckeditor5-ui-34.2.0.tgz#56a0fe2eb87c2e44b6c6d9440e6b6077a244214c"
@@ -26968,7 +26968,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^34.2.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-ui@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-ui/-/ckeditor5-ui-37.1.0.tgz#284b09ea2d3265117004ef493b2ac6852e317c8f"
@@ -26990,7 +26990,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-core" "^30.0.0"
 +    "@ckeditor/ckeditor5-engine" "^30.0.0"
 +    "@ckeditor/ckeditor5-ui" "^30.0.0"
- 
+
  "@ckeditor/ckeditor5-undo@^34.1.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-undo/-/ckeditor5-undo-34.2.0.tgz#7ea368fc46d4f1f663a2e59cba7390bd90b62017"
@@ -27002,7 +27002,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^34.2.0"
      "@ckeditor/ckeditor5-engine" "^34.2.0"
      "@ckeditor/ckeditor5-ui" "^34.2.0"
- 
+
  "@ckeditor/ckeditor5-undo@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-undo/-/ckeditor5-undo-37.1.0.tgz#7d7489934194f5560da1ffa5df597905afaf45e0"
@@ -27014,7 +27014,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^37.1.0"
      "@ckeditor/ckeditor5-engine" "^37.1.0"
      "@ckeditor/ckeditor5-ui" "^37.1.0"
- 
+
 +"@ckeditor/ckeditor5-upload@^30.0.0":
 +  "integrity" "sha512-2s8ZHOpVMHyiCFGy0gwD9DqSbuXW1UjvETIw3nmAd8O6AYi4jhBRuibHRKuumZTU1lskaOjG8UprQkIQBcGi7Q=="
 +  "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-upload/-/ckeditor5-upload-30.0.0.tgz"
@@ -27035,7 +27035,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^34.2.0"
      "@ckeditor/ckeditor5-ui" "^34.2.0"
      "@ckeditor/ckeditor5-utils" "^34.2.0"
- 
+
  "@ckeditor/ckeditor5-upload@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-upload/-/ckeditor5-upload-37.1.0.tgz#a6e425f0d0f8a2725996709def706f6eefe1fd4b"
@@ -27047,7 +27047,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-core" "^37.1.0"
      "@ckeditor/ckeditor5-ui" "^37.1.0"
      "@ckeditor/ckeditor5-utils" "^37.1.0"
- 
+
 +"@ckeditor/ckeditor5-utils@^30.0.0":
 +  "integrity" "sha512-pq4lJdkK/XPwD3ZdSWU/ZRklSMjmfAphp7vRiB0g1PBvsDfcZ4qqJgn6BKHyvx/K21+dMM5r6rFkxFBQnEy/Jg=="
 +  "resolved" "https://registry.npmjs.org/@ckeditor/ckeditor5-utils/-/ckeditor5-utils-30.0.0.tgz"
@@ -27065,7 +27065,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-utils@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-utils/-/ckeditor5-utils-37.1.0.tgz#0d5dda23fa4fc065782ec8529d3c9dc7674b6895"
@@ -27076,7 +27076,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-watchdog@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-watchdog/-/ckeditor5-watchdog-37.1.0.tgz#fb4090876359d3c3ecaab154dd3896f184e9b4a8"
@@ -27100,7 +27100,7 @@ index 0a74dcc..521ef54 100644
 +    "@ckeditor/ckeditor5-ui" "^30.0.0"
 +    "@ckeditor/ckeditor5-utils" "^30.0.0"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-widget@^34.1.0", "@ckeditor/ckeditor5-widget@^34.2.0":
 -  version "34.2.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-widget/-/ckeditor5-widget-34.2.0.tgz#0df140bc4c40287251cf5f5a970f616bdbd470e3"
@@ -27117,7 +27117,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^34.2.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@ckeditor/ckeditor5-widget@^37.1.0":
 -  version "37.1.0"
 -  resolved "https://registry.yarnpkg.com/@ckeditor/ckeditor5-widget/-/ckeditor5-widget-37.1.0.tgz#47eada9af92ea9f4748f9462ded3562c67b8a53a"
@@ -27134,7 +27134,7 @@ index 0a74dcc..521ef54 100644
      "@ckeditor/ckeditor5-utils" "^37.1.0"
 -    lodash-es "^4.17.15"
 +    "lodash-es" "^4.17.15"
- 
+
  "@csstools/selector-specificity@^2.0.0":
 -  version "2.0.2"
 -  resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
@@ -27142,7 +27142,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg=="
 +  "resolved" "https://registry.npmjs.org/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz"
 +  "version" "2.0.2"
- 
+
  "@discoveryjs/json-ext@^0.5.0":
 -  version "0.5.7"
 -  resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -27150,7 +27150,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw=="
 +  "resolved" "https://registry.npmjs.org/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz"
 +  "version" "0.5.7"
- 
+
  "@gar/promisify@^1.0.1":
 -  version "1.1.3"
 -  resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -27158,7 +27158,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw=="
 +  "resolved" "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz"
 +  "version" "1.1.3"
- 
+
  "@jridgewell/gen-mapping@^0.3.0", "@jridgewell/gen-mapping@^0.3.2":
 -  version "0.3.2"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/gen-mapping/-/gen-mapping-0.3.2.tgz#c1aedc61e853f2bb9f5dfe6d4442d3b565b253b9"
@@ -27170,7 +27170,7 @@ index 0a74dcc..521ef54 100644
      "@jridgewell/set-array" "^1.0.1"
      "@jridgewell/sourcemap-codec" "^1.4.10"
      "@jridgewell/trace-mapping" "^0.3.9"
- 
+
  "@jridgewell/resolve-uri@3.1.0":
 -  version "3.1.0"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.0.tgz#2203b118c157721addfe69d47b70465463066d78"
@@ -27178,7 +27178,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w=="
 +  "resolved" "https://registry.npmjs.org/@jridgewell/resolve-uri/-/resolve-uri-3.1.0.tgz"
 +  "version" "3.1.0"
- 
+
  "@jridgewell/set-array@^1.0.1":
 -  version "1.1.2"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/set-array/-/set-array-1.1.2.tgz#7c6cf998d6d20b914c0a55a91ae928ff25965e72"
@@ -27186,7 +27186,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-xnkseuNADM0gt2bs+BvhO0p78Mk762YnZdsuzFV018NoG1Sj1SCQvpSqa7XUaTam5vAGasABV9qXASMKnFMwMw=="
 +  "resolved" "https://registry.npmjs.org/@jridgewell/set-array/-/set-array-1.1.2.tgz"
 +  "version" "1.1.2"
- 
+
  "@jridgewell/source-map@^0.3.2":
 -  version "0.3.2"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/source-map/-/source-map-0.3.2.tgz#f45351aaed4527a298512ec72f81040c998580fb"
@@ -27197,7 +27197,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@jridgewell/gen-mapping" "^0.3.0"
      "@jridgewell/trace-mapping" "^0.3.9"
- 
+
 -"@jridgewell/sourcemap-codec@1.4.14", "@jridgewell/sourcemap-codec@^1.4.10":
 -  version "1.4.14"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.14.tgz#add4c98d341472a289190b424efbdb096991bb24"
@@ -27206,7 +27206,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-XPSJHWmi394fuUuzDnGz1wiKqWfo1yXecHQMRf2l6hztTO+nPru658AyDngaBe7isIxEkRsPR3FZh+s7iVa4Uw=="
 +  "resolved" "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.4.14.tgz"
 +  "version" "1.4.14"
- 
+
  "@jridgewell/trace-mapping@^0.3.14", "@jridgewell/trace-mapping@^0.3.9":
 -  version "0.3.17"
 -  resolved "https://registry.yarnpkg.com/@jridgewell/trace-mapping/-/trace-mapping-0.3.17.tgz#793041277af9073b0951a7fe0f0d8c4c98c36985"
@@ -27217,7 +27217,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@jridgewell/resolve-uri" "3.1.0"
      "@jridgewell/sourcemap-codec" "1.4.14"
- 
+
  "@nodelib/fs.scandir@2.1.5":
 -  version "2.1.5"
 -  resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.5.tgz#7619c2eb21b25483f6d167548b4cfd5a7488c3d5"
@@ -27229,7 +27229,7 @@ index 0a74dcc..521ef54 100644
      "@nodelib/fs.stat" "2.0.5"
 -    run-parallel "^1.1.9"
 +    "run-parallel" "^1.1.9"
- 
+
 -"@nodelib/fs.stat@2.0.5", "@nodelib/fs.stat@^2.0.2":
 -  version "2.0.5"
 -  resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-2.0.5.tgz#5bd262af94e9d25bd1e71b05deed44876a222e8b"
@@ -27238,7 +27238,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-RkhPPp2zrqDAQA/2jNhnztcPAlv64XdhIp7a7454A5ovI7Bukxgt7MX7udwAu3zg1DcpPU0rz3VV1SeaqvY4+A=="
 +  "resolved" "https://registry.npmjs.org/@nodelib/fs.stat/-/fs.stat-2.0.5.tgz"
 +  "version" "2.0.5"
- 
+
  "@nodelib/fs.walk@^1.2.3":
 -  version "1.2.8"
 -  resolved "https://registry.yarnpkg.com/@nodelib/fs.walk/-/fs.walk-1.2.8.tgz#e95737e8bb6746ddedf69c556953494f196fe69a"
@@ -27250,7 +27250,7 @@ index 0a74dcc..521ef54 100644
      "@nodelib/fs.scandir" "2.1.5"
 -    fastq "^1.6.0"
 +    "fastq" "^1.6.0"
- 
+
  "@npmcli/fs@^1.0.0":
 -  version "1.1.1"
 -  resolved "https://registry.yarnpkg.com/@npmcli/fs/-/fs-1.1.1.tgz#72f719fe935e687c56a4faecf3c03d06ba593257"
@@ -27262,7 +27262,7 @@ index 0a74dcc..521ef54 100644
      "@gar/promisify" "^1.0.1"
 -    semver "^7.3.5"
 +    "semver" "^7.3.5"
- 
+
  "@npmcli/move-file@^1.0.1":
 -  version "1.1.2"
 -  resolved "https://registry.yarnpkg.com/@npmcli/move-file/-/move-file-1.1.2.tgz#1a82c3e372f7cae9253eb66d72543d6b8685c674"
@@ -27275,7 +27275,7 @@ index 0a74dcc..521ef54 100644
 -    rimraf "^3.0.2"
 +    "mkdirp" "^1.0.4"
 +    "rimraf" "^3.0.2"
- 
+
  "@trysound/sax@0.2.0":
 -  version "0.2.0"
 -  resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
@@ -27283,7 +27283,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA=="
 +  "resolved" "https://registry.npmjs.org/@trysound/sax/-/sax-0.2.0.tgz"
 +  "version" "0.2.0"
- 
+
  "@types/eslint-scope@^3.7.3":
 -  version "3.7.4"
 -  resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.4.tgz#37fc1223f0786c39627068a12e94d6e6fc61de16"
@@ -27294,7 +27294,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@types/eslint" "*"
      "@types/estree" "*"
- 
+
  "@types/eslint@*":
 -  version "8.4.10"
 -  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.4.10.tgz#19731b9685c19ed1552da7052b6f668ed7eb64bb"
@@ -27305,7 +27305,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@types/estree" "*"
      "@types/json-schema" "*"
- 
+
 -"@types/estree@*":
 -  version "1.0.0"
 -  resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.0.tgz#5fb2e536c1ae9bf35366eed879e827fa59ca41c2"
@@ -27319,7 +27319,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ=="
 +  "resolved" "https://registry.npmjs.org/@types/estree/-/estree-0.0.51.tgz"
 +  "version" "0.0.51"
- 
+
  "@types/glob@^7.1.1":
 -  version "7.2.0"
 -  resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.2.0.tgz#bc1b5bf3aa92f25bd5dd39f35c57361bdce5b2eb"
@@ -27330,7 +27330,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@types/minimatch" "*"
      "@types/node" "*"
- 
+
  "@types/json-schema@*", "@types/json-schema@^7.0.8":
 -  version "7.0.11"
 -  resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
@@ -27338,7 +27338,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ=="
 +  "resolved" "https://registry.npmjs.org/@types/json-schema/-/json-schema-7.0.11.tgz"
 +  "version" "7.0.11"
- 
+
  "@types/minimatch@*":
 -  version "5.1.2"
 -  resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-5.1.2.tgz#07508b45797cb81ec3f273011b054cd0755eddca"
@@ -27346,7 +27346,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA=="
 +  "resolved" "https://registry.npmjs.org/@types/minimatch/-/minimatch-5.1.2.tgz"
 +  "version" "5.1.2"
- 
+
  "@types/node@*":
 -  version "18.11.18"
 -  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz#8dfb97f0da23c2293e554c5a50d61ef134d7697f"
@@ -27354,7 +27354,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA=="
 +  "resolved" "https://registry.npmjs.org/@types/node/-/node-18.11.18.tgz"
 +  "version" "18.11.18"
- 
+
  "@types/parse-json@^4.0.0":
 -  version "4.0.0"
 -  resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
@@ -27362,7 +27362,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA=="
 +  "resolved" "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz"
 +  "version" "4.0.0"
- 
+
  "@webassemblyjs/ast@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.1.tgz#2bfd767eae1a6996f432ff7e8d7fc75679c0b6a7"
@@ -27373,7 +27373,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@webassemblyjs/helper-numbers" "1.11.1"
      "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
- 
+
  "@webassemblyjs/floating-point-hex-parser@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/floating-point-hex-parser/-/floating-point-hex-parser-1.11.1.tgz#f6c61a705f0fd7a6aecaa4e8198f23d9dc179e4f"
@@ -27381,7 +27381,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-iGRfyc5Bq+NnNuX8b5hwBrRjzf0ocrJPI6GWFodBFzmFnyvrQ83SHKhmilCU/8Jv67i4GJZBMhEzltxzcNagtQ=="
 +  "resolved" "https://registry.npmjs.org/@webassemblyjs/floating-point-hex-parser/-/floating-point-hex-parser-1.11.1.tgz"
 +  "version" "1.11.1"
- 
+
  "@webassemblyjs/helper-api-error@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/helper-api-error/-/helper-api-error-1.11.1.tgz#1a63192d8788e5c012800ba6a7a46c705288fd16"
@@ -27389,7 +27389,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-RlhS8CBCXfRUR/cwo2ho9bkheSXG0+NwooXcc3PAILALf2QLdFyj7KGsKRbVc95hZnhnERon4kW/D3SZpp6Tcg=="
 +  "resolved" "https://registry.npmjs.org/@webassemblyjs/helper-api-error/-/helper-api-error-1.11.1.tgz"
 +  "version" "1.11.1"
- 
+
  "@webassemblyjs/helper-buffer@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/helper-buffer/-/helper-buffer-1.11.1.tgz#832a900eb444884cde9a7cad467f81500f5e5ab5"
@@ -27397,7 +27397,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-gwikF65aDNeeXa8JxXa2BAk+REjSyhrNC9ZwdT0f8jc4dQQeDQ7G4m0f2QCLPJiMTTO6wfDmRmj/pW0PsUvIcA=="
 +  "resolved" "https://registry.npmjs.org/@webassemblyjs/helper-buffer/-/helper-buffer-1.11.1.tgz"
 +  "version" "1.11.1"
- 
+
  "@webassemblyjs/helper-numbers@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/helper-numbers/-/helper-numbers-1.11.1.tgz#64d81da219fbbba1e3bd1bfc74f6e8c4e10a62ae"
@@ -27409,7 +27409,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/floating-point-hex-parser" "1.11.1"
      "@webassemblyjs/helper-api-error" "1.11.1"
      "@xtuc/long" "4.2.2"
- 
+
  "@webassemblyjs/helper-wasm-bytecode@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/helper-wasm-bytecode/-/helper-wasm-bytecode-1.11.1.tgz#f328241e41e7b199d0b20c18e88429c4433295e1"
@@ -27417,7 +27417,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-PvpoOGiJwXeTrSf/qfudJhwlvDQxFgelbMqtq52WWiXC6Xgg1IREdngmPN3bs4RoO83PnL/nFrxucXj1+BX62Q=="
 +  "resolved" "https://registry.npmjs.org/@webassemblyjs/helper-wasm-bytecode/-/helper-wasm-bytecode-1.11.1.tgz"
 +  "version" "1.11.1"
- 
+
  "@webassemblyjs/helper-wasm-section@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/helper-wasm-section/-/helper-wasm-section-1.11.1.tgz#21ee065a7b635f319e738f0dd73bfbda281c097a"
@@ -27430,7 +27430,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/helper-buffer" "1.11.1"
 @@ -583,28 +700,28 @@
      "@webassemblyjs/wasm-gen" "1.11.1"
- 
+
  "@webassemblyjs/ieee754@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/ieee754/-/ieee754-1.11.1.tgz#963929e9bbd05709e7e12243a099180812992614"
@@ -27440,7 +27440,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "1.11.1"
    dependencies:
      "@xtuc/ieee754" "^1.2.0"
- 
+
  "@webassemblyjs/leb128@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/leb128/-/leb128-1.11.1.tgz#ce814b45574e93d76bae1fb2644ab9cdd9527aa5"
@@ -27450,7 +27450,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "1.11.1"
    dependencies:
      "@xtuc/long" "4.2.2"
- 
+
  "@webassemblyjs/utf8@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/utf8/-/utf8-1.11.1.tgz#d1f8b764369e7c6e6bae350e854dec9a59f0a3ff"
@@ -27458,7 +27458,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-9kqcxAEdMhiwQkHpkNiorZzqpGrodQQ2IGrHHxCy+Ozng0ofyMA0lTqiLkVs1uzTRejX+/O0EOT7KxqVPuXosQ=="
 +  "resolved" "https://registry.npmjs.org/@webassemblyjs/utf8/-/utf8-1.11.1.tgz"
 +  "version" "1.11.1"
- 
+
  "@webassemblyjs/wasm-edit@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/wasm-edit/-/wasm-edit-1.11.1.tgz#ad206ebf4bf95a058ce9880a8c092c5dec8193d6"
@@ -27471,7 +27471,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/helper-buffer" "1.11.1"
 @@ -616,9 +733,9 @@
      "@webassemblyjs/wast-printer" "1.11.1"
- 
+
  "@webassemblyjs/wasm-gen@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/wasm-gen/-/wasm-gen-1.11.1.tgz#86c5ea304849759b7d88c47a32f4f039ae3c8f76"
@@ -27484,7 +27484,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
 @@ -627,9 +744,9 @@
      "@webassemblyjs/utf8" "1.11.1"
- 
+
  "@webassemblyjs/wasm-opt@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/wasm-opt/-/wasm-opt-1.11.1.tgz#657b4c2202f4cf3b345f8a4c6461c8c2418985f2"
@@ -27497,7 +27497,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/helper-buffer" "1.11.1"
 @@ -637,9 +754,9 @@
      "@webassemblyjs/wasm-parser" "1.11.1"
- 
+
  "@webassemblyjs/wasm-parser@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/wasm-parser/-/wasm-parser-1.11.1.tgz#86ca734534f417e9bd3c67c7a1c75d8be41fb199"
@@ -27510,7 +27510,7 @@ index 0a74dcc..521ef54 100644
      "@webassemblyjs/helper-api-error" "1.11.1"
 @@ -649,225 +766,251 @@
      "@webassemblyjs/utf8" "1.11.1"
- 
+
  "@webassemblyjs/wast-printer@1.11.1":
 -  version "1.11.1"
 -  resolved "https://registry.yarnpkg.com/@webassemblyjs/wast-printer/-/wast-printer-1.11.1.tgz#d0c73beda8eec5426f10ae8ef55cee5e7084c2f0"
@@ -27521,7 +27521,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
      "@webassemblyjs/ast" "1.11.1"
      "@xtuc/long" "4.2.2"
- 
+
  "@webpack-cli/configtest@^1.2.0":
 -  version "1.2.0"
 -  resolved "https://registry.yarnpkg.com/@webpack-cli/configtest/-/configtest-1.2.0.tgz#7b20ce1c12533912c3b217ea68262365fa29a6f5"
@@ -27529,7 +27529,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-4FB8Tj6xyVkyqjj1OaTqCjXYULB9FMkqQ8yGrZjRDrYh0nOE+7Lhs45WioWQQMV+ceFlE368Ukhe6xdvJM9Egg=="
 +  "resolved" "https://registry.npmjs.org/@webpack-cli/configtest/-/configtest-1.2.0.tgz"
 +  "version" "1.2.0"
- 
+
  "@webpack-cli/info@^1.5.0":
 -  version "1.5.0"
 -  resolved "https://registry.yarnpkg.com/@webpack-cli/info/-/info-1.5.0.tgz#6c78c13c5874852d6e2dd17f08a41f3fe4c261b1"
@@ -27540,7 +27540,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    envinfo "^7.7.3"
 +    "envinfo" "^7.7.3"
- 
+
  "@webpack-cli/serve@^1.7.0":
 -  version "1.7.0"
 -  resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-1.7.0.tgz#e1993689ac42d2b16e9194376cfb6753f6254db1"
@@ -27548,7 +27548,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-oxnCNGj88fL+xzV+dacXs44HcDwf1ovs3AuEzvP7mqXw7fQntqIhQ1BRmynh4qEKQSSSRSWVyXRjmTbZIX9V2Q=="
 +  "resolved" "https://registry.npmjs.org/@webpack-cli/serve/-/serve-1.7.0.tgz"
 +  "version" "1.7.0"
- 
+
  "@xtuc/ieee754@^1.2.0":
 -  version "1.2.0"
 -  resolved "https://registry.yarnpkg.com/@xtuc/ieee754/-/ieee754-1.2.0.tgz#eef014a3145ae477a1cbc00cd1e552336dceb790"
@@ -27556,7 +27556,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA=="
 +  "resolved" "https://registry.npmjs.org/@xtuc/ieee754/-/ieee754-1.2.0.tgz"
 +  "version" "1.2.0"
- 
+
  "@xtuc/long@4.2.2":
 -  version "4.2.2"
 -  resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
@@ -27965,7 +27965,7 @@ index 0a74dcc..521ef54 100644
 @@ -883,10 +1026,10 @@ ckeditor5@^37.1.0:
      "@ckeditor/ckeditor5-watchdog" "^37.1.0"
      "@ckeditor/ckeditor5-widget" "^37.1.0"
- 
+
 -ckeditor5@~34.1.0:
 -  version "34.1.0"
 -  resolved "https://registry.yarnpkg.com/ckeditor5/-/ckeditor5-34.1.0.tgz#3bd10c603f877891ee57e210fdd918762e2b865a"
@@ -27980,7 +27980,7 @@ index 0a74dcc..521ef54 100644
 @@ -901,1843 +1044,1848 @@ ckeditor5@~34.1.0:
      "@ckeditor/ckeditor5-utils" "^34.1.0"
      "@ckeditor/ckeditor5-widget" "^34.1.0"
- 
+
 -clean-stack@^2.0.0:
 -  version "2.2.0"
 -  resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
@@ -29253,7 +29253,7 @@ index 0a74dcc..521ef54 100644
 -    supports-color "^7.0.0"
 +    "merge-stream" "^2.0.0"
 +    "supports-color" "^7.0.0"
- 
+
 -jest-worker@^27.4.5:
 -  version "27.5.1"
 -  resolved "https://registry.yarnpkg.com/jest-worker/-/jest-worker-27.5.1.tgz#8d146f0900e8973b106b6f73cc1e9a8cb86f8db0"
@@ -29622,7 +29622,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "1.2.4"
 +  dependencies:
 +    "minipass" "^3.0.0"
- 
+
 -minipass@^3.0.0, minipass@^3.1.1:
 -  version "3.3.6"
 -  resolved "https://registry.yarnpkg.com/minipass/-/minipass-3.3.6.tgz#7bba384db3a1520d18c9c0e5251c3444e95dd94a"
@@ -29635,7 +29635,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "3.3.6"
 +  dependencies:
 +    "yallist" "^4.0.0"
- 
+
 -minipass@^4.0.0:
 -  version "4.0.0"
 -  resolved "https://registry.yarnpkg.com/minipass/-/minipass-4.0.0.tgz#7cebb0f9fa7d56f0c5b17853cbe28838a8dbbd3b"
@@ -29647,7 +29647,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    yallist "^4.0.0"
 +    "yallist" "^4.0.0"
- 
+
 -minizlib@^2.1.1:
 -  version "2.1.2"
 -  resolved "https://registry.yarnpkg.com/minizlib/-/minizlib-2.1.2.tgz#e90d3466ba209b932451508a11ce3d3632145931"
@@ -29661,7 +29661,7 @@ index 0a74dcc..521ef54 100644
 -    yallist "^4.0.0"
 +    "minipass" "^3.0.0"
 +    "yallist" "^4.0.0"
- 
+
 -mkdirp@^1.0.3, mkdirp@^1.0.4:
 -  version "1.0.4"
 -  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
@@ -29670,7 +29670,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw=="
 +  "resolved" "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
 +  "version" "1.0.4"
- 
+
 -ms@2.1.2:
 -  version "2.1.2"
 -  resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
@@ -29679,7 +29679,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w=="
 +  "resolved" "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
 +  "version" "2.1.2"
- 
+
 -nanoid@^3.3.4:
 -  version "3.3.4"
 -  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
@@ -29688,7 +29688,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw=="
 +  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.4.tgz"
 +  "version" "3.3.4"
- 
+
 -neo-async@^2.6.2:
 -  version "2.6.2"
 -  resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
@@ -29697,7 +29697,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw=="
 +  "resolved" "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
 +  "version" "2.6.2"
- 
+
 -node-releases@^2.0.6:
 -  version "2.0.8"
 -  resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.8.tgz#0f349cdc8fcfa39a92ac0be9bc48b7706292b9ae"
@@ -29706,7 +29706,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-dFSmB8fFHEH/s81Xi+Y/15DQY6VHW81nXRj86EMSL3lmuTmK1e+aT4wrFCkTbm+gSwkw4KpX+rT/pMM2c1mF+A=="
 +  "resolved" "https://registry.npmjs.org/node-releases/-/node-releases-2.0.8.tgz"
 +  "version" "2.0.8"
- 
+
 -normalize-url@^6.0.1:
 -  version "6.1.0"
 -  resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
@@ -29715,7 +29715,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A=="
 +  "resolved" "https://registry.npmjs.org/normalize-url/-/normalize-url-6.1.0.tgz"
 +  "version" "6.1.0"
- 
+
 -nth-check@^2.0.1:
 -  version "2.1.1"
 -  resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-2.1.1.tgz#c9eab428effce36cd6b92c924bdb000ef1f1ed1d"
@@ -29727,7 +29727,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    boolbase "^1.0.0"
 +    "boolbase" "^1.0.0"
- 
+
 -once@^1.3.0:
 -  version "1.4.0"
 -  resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
@@ -29739,7 +29739,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    wrappy "1"
 +    "wrappy" "1"
- 
+
 -onetime@^5.1.0:
 -  version "5.1.2"
 -  resolved "https://registry.yarnpkg.com/onetime/-/onetime-5.1.2.tgz#d0e96ebb56b07476df1dd9c4806e5237985ca45e"
@@ -29751,7 +29751,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    mimic-fn "^2.1.0"
 +    "mimic-fn" "^2.1.0"
- 
+
 -optionator@^0.8.1:
 -  version "0.8.3"
 -  resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.8.3.tgz#84fa1d036fe9d3c7e21d99884b601167ec8fb495"
@@ -29773,7 +29773,7 @@ index 0a74dcc..521ef54 100644
 +    "prelude-ls" "~1.1.2"
 +    "type-check" "~0.3.2"
 +    "word-wrap" "~1.2.3"
- 
+
 -p-limit@^2.2.0:
 -  version "2.3.0"
 -  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-2.3.0.tgz#3dd33c647a214fdfffd835933eb086da0dc21db1"
@@ -29785,7 +29785,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    p-try "^2.0.0"
 +    "p-try" "^2.0.0"
- 
+
 -p-limit@^3.0.2:
 -  version "3.1.0"
 -  resolved "https://registry.yarnpkg.com/p-limit/-/p-limit-3.1.0.tgz#e1daccbe78d0d1388ca18c64fea38e3e57e3706b"
@@ -29797,7 +29797,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    yocto-queue "^0.1.0"
 +    "yocto-queue" "^0.1.0"
- 
+
 -p-locate@^4.1.0:
 -  version "4.1.0"
 -  resolved "https://registry.yarnpkg.com/p-locate/-/p-locate-4.1.0.tgz#a3428bb7088b3a60292f66919278b7c297ad4f07"
@@ -29809,7 +29809,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    p-limit "^2.2.0"
 +    "p-limit" "^2.2.0"
- 
+
 -p-map@^3.0.0:
 -  version "3.0.0"
 -  resolved "https://registry.yarnpkg.com/p-map/-/p-map-3.0.0.tgz#d704d9af8a2ba684e2600d9a215983d4141a979d"
@@ -29821,7 +29821,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    aggregate-error "^3.0.0"
 +    "aggregate-error" "^3.0.0"
- 
+
 -p-map@^4.0.0:
 -  version "4.0.0"
 -  resolved "https://registry.yarnpkg.com/p-map/-/p-map-4.0.0.tgz#bb2f95a5eda2ec168ec9274e06a747c3e2904d2b"
@@ -29833,7 +29833,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    aggregate-error "^3.0.0"
 +    "aggregate-error" "^3.0.0"
- 
+
 -p-try@^2.0.0:
 -  version "2.2.0"
 -  resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
@@ -29842,7 +29842,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ=="
 +  "resolved" "https://registry.npmjs.org/p-try/-/p-try-2.2.0.tgz"
 +  "version" "2.2.0"
- 
+
 -parent-module@^1.0.0:
 -  version "1.0.1"
 -  resolved "https://registry.yarnpkg.com/parent-module/-/parent-module-1.0.1.tgz#691d2709e78c79fae3a156622452d00762caaaa2"
@@ -29854,7 +29854,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    callsites "^3.0.0"
 +    "callsites" "^3.0.0"
- 
+
 -parse-json@^5.0.0:
 -  version "5.2.0"
 -  resolved "https://registry.yarnpkg.com/parse-json/-/parse-json-5.2.0.tgz#c76fc66dee54231c962b22bcc8a72cf2f99753cd"
@@ -30255,7 +30255,7 @@ index 0a74dcc..521ef54 100644
      "@csstools/selector-specificity" "^2.0.0"
 -    postcss-selector-parser "^6.0.10"
 +    "postcss-selector-parser" "^6.0.10"
- 
+
 -postcss-normalize-charset@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-charset/-/postcss-normalize-charset-5.1.0.tgz#9302de0b29094b52c259e9b2cf8dc0879879f0ed"
@@ -30264,7 +30264,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-mSgUJ+pd/ldRGVx26p2wz9dNZ7ji6Pn8VWBajMXFf8jk7vUoSrZ2lt/wZR7DtlZYKesmZI680qjr2CeFF2fbUg=="
 +  "resolved" "https://registry.npmjs.org/postcss-normalize-charset/-/postcss-normalize-charset-5.1.0.tgz"
 +  "version" "5.1.0"
- 
+
 -postcss-normalize-display-values@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-display-values/-/postcss-normalize-display-values-5.1.0.tgz#72abbae58081960e9edd7200fcf21ab8325c3da8"
@@ -30276,7 +30276,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-positions@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-positions/-/postcss-normalize-positions-5.1.1.tgz#ef97279d894087b59325b45c47f1e863daefbb92"
@@ -30288,7 +30288,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-repeat-style@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-repeat-style/-/postcss-normalize-repeat-style-5.1.1.tgz#e9eb96805204f4766df66fd09ed2e13545420fb2"
@@ -30300,7 +30300,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-string@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-string/-/postcss-normalize-string-5.1.0.tgz#411961169e07308c82c1f8c55f3e8a337757e228"
@@ -30312,7 +30312,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-timing-functions@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-timing-functions/-/postcss-normalize-timing-functions-5.1.0.tgz#d5614410f8f0b2388e9f240aa6011ba6f52dafbb"
@@ -30324,7 +30324,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-unicode@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-unicode/-/postcss-normalize-unicode-5.1.1.tgz#f67297fca3fea7f17e0d2caa40769afc487aa030"
@@ -30338,7 +30338,7 @@ index 0a74dcc..521ef54 100644
 -    postcss-value-parser "^4.2.0"
 +    "browserslist" "^4.21.4"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-url@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-url/-/postcss-normalize-url-5.1.0.tgz#ed9d88ca82e21abef99f743457d3729a042adcdc"
@@ -30352,7 +30352,7 @@ index 0a74dcc..521ef54 100644
 -    postcss-value-parser "^4.2.0"
 +    "normalize-url" "^6.0.1"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-normalize-whitespace@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-normalize-whitespace/-/postcss-normalize-whitespace-5.1.1.tgz#08a1a0d1ffa17a7cc6efe1e6c9da969cc4493cfa"
@@ -30364,7 +30364,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-ordered-values@^5.1.3:
 -  version "5.1.3"
 -  resolved "https://registry.yarnpkg.com/postcss-ordered-values/-/postcss-ordered-values-5.1.3.tgz#b6fd2bd10f937b23d86bc829c69e7732ce76ea38"
@@ -30378,7 +30378,7 @@ index 0a74dcc..521ef54 100644
 -    postcss-value-parser "^4.2.0"
 +    "cssnano-utils" "^3.1.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-reduce-initial@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-reduce-initial/-/postcss-reduce-initial-5.1.1.tgz#c18b7dfb88aee24b1f8e4936541c29adbd35224e"
@@ -30392,7 +30392,7 @@ index 0a74dcc..521ef54 100644
 -    caniuse-api "^3.0.0"
 +    "browserslist" "^4.21.4"
 +    "caniuse-api" "^3.0.0"
- 
+
 -postcss-reduce-transforms@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-reduce-transforms/-/postcss-reduce-transforms-5.1.0.tgz#333b70e7758b802f3dd0ddfe98bb1ccfef96b6e9"
@@ -30404,7 +30404,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-value-parser "^4.2.0"
 +    "postcss-value-parser" "^4.2.0"
- 
+
 -postcss-selector-parser@^6.0.10, postcss-selector-parser@^6.0.4, postcss-selector-parser@^6.0.5, postcss-selector-parser@^6.0.9:
 -  version "6.0.11"
 -  resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.11.tgz#2e41dc39b7ad74046e1615185185cd0b17d0c8dc"
@@ -30418,7 +30418,7 @@ index 0a74dcc..521ef54 100644
 -    util-deprecate "^1.0.2"
 +    "cssesc" "^3.0.0"
 +    "util-deprecate" "^1.0.2"
- 
+
 -postcss-simple-vars@^7.0.0:
 -  version "7.0.1"
 -  resolved "https://registry.yarnpkg.com/postcss-simple-vars/-/postcss-simple-vars-7.0.1.tgz#836b3097a54dcd13dbd3c36a5dbdd512fad2954c"
@@ -30427,7 +30427,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-5GLLXaS8qmzHMOjVxqkk1TZPf1jMqesiI7qLhnlyERalG0sMbHIbJqrcnrpmZdKCLglHnRHoEBB61RtGTsj++A=="
 +  "resolved" "https://registry.npmjs.org/postcss-simple-vars/-/postcss-simple-vars-7.0.1.tgz"
 +  "version" "7.0.1"
- 
+
 -postcss-svgo@^5.1.0:
 -  version "5.1.0"
 -  resolved "https://registry.yarnpkg.com/postcss-svgo/-/postcss-svgo-5.1.0.tgz#0a317400ced789f233a28826e77523f15857d80d"
@@ -30441,7 +30441,7 @@ index 0a74dcc..521ef54 100644
 -    svgo "^2.7.0"
 +    "postcss-value-parser" "^4.2.0"
 +    "svgo" "^2.7.0"
- 
+
 -postcss-unique-selectors@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/postcss-unique-selectors/-/postcss-unique-selectors-5.1.1.tgz#a9f273d1eacd09e9aa6088f4b0507b18b1b541b6"
@@ -30453,7 +30453,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    postcss-selector-parser "^6.0.5"
 +    "postcss-selector-parser" "^6.0.5"
- 
+
 -postcss-value-parser@^4.0.0, postcss-value-parser@^4.2.0:
 -  version "4.2.0"
 -  resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz#723c09920836ba6d3e5af019f92bc0971c02e514"
@@ -30462,7 +30462,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-1NNCs6uurfkVbeXG4S8JFT9t19m45ICnif8zWLd5oPSZ50QnwMfK+H3jv408d4jw/7Bttv5axS5IiHoLaVNHeQ=="
 +  "resolved" "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
 +  "version" "4.2.0"
- 
+
 -postcss@^8.4.12:
 -  version "8.4.20"
 -  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.20.tgz#64c52f509644cecad8567e949f4081d98349dc56"
@@ -30478,7 +30478,7 @@ index 0a74dcc..521ef54 100644
 +    "nanoid" "^3.3.4"
 +    "picocolors" "^1.0.0"
 +    "source-map-js" "^1.0.2"
- 
+
 -prelude-ls@~1.1.2:
 -  version "1.1.2"
 -  resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
@@ -30487,7 +30487,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-ESF23V4SKG6lVSGZgYNpbsiaAkdab6ZgOxe52p7+Kid3W3u3bxR4Vfd/o21dmN7jSt0IwgZ4v5MUd26FEtXE9w=="
 +  "resolved" "https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.1.2.tgz"
 +  "version" "1.1.2"
- 
+
 -promise-inflight@^1.0.1:
 -  version "1.0.1"
 -  resolved "https://registry.yarnpkg.com/promise-inflight/-/promise-inflight-1.0.1.tgz#98472870bf228132fcbdd868129bad12c3c029e3"
@@ -30496,7 +30496,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-6zWPyEOFaQBJYcGMHBKTKJ3u6TBsnMFOIZSa6ce1e/ZrrsOlnHRHbabMjLiBYKp+n44X9eUI6VUPaukCXHuG4g=="
 +  "resolved" "https://registry.npmjs.org/promise-inflight/-/promise-inflight-1.0.1.tgz"
 +  "version" "1.0.1"
- 
+
 -punycode@^2.1.0:
 -  version "2.1.1"
 -  resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
@@ -30505,7 +30505,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A=="
 +  "resolved" "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz"
 +  "version" "2.1.1"
- 
+
 -queue-microtask@^1.2.2:
 -  version "1.2.3"
 -  resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
@@ -30514,7 +30514,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A=="
 +  "resolved" "https://registry.npmjs.org/queue-microtask/-/queue-microtask-1.2.3.tgz"
 +  "version" "1.2.3"
- 
+
 -randombytes@^2.1.0:
 -  version "2.1.0"
 -  resolved "https://registry.yarnpkg.com/randombytes/-/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"
@@ -30526,7 +30526,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    safe-buffer "^5.1.0"
 +    "safe-buffer" "^5.1.0"
- 
+
 -raw-loader@^4.0.1, raw-loader@^4.0.2:
 -  version "4.0.2"
 -  resolved "https://registry.yarnpkg.com/raw-loader/-/raw-loader-4.0.2.tgz#1aac6b7d1ad1501e66efdac1522c73e59a584eb6"
@@ -30540,7 +30540,7 @@ index 0a74dcc..521ef54 100644
 -    schema-utils "^3.0.0"
 +    "loader-utils" "^2.0.0"
 +    "schema-utils" "^3.0.0"
- 
+
 -read-cache@^1.0.0:
 -  version "1.0.0"
 -  resolved "https://registry.yarnpkg.com/read-cache/-/read-cache-1.0.0.tgz#e664ef31161166c9751cdbe8dbcf86b5fb58f774"
@@ -30552,7 +30552,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    pify "^2.3.0"
 +    "pify" "^2.3.0"
- 
+
  "readable-stream@2 || 3":
 -  version "3.6.0"
 -  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-3.6.0.tgz#337bbda3adc0706bd3e024426a286d4b4b2c9198"
@@ -30567,7 +30567,7 @@ index 0a74dcc..521ef54 100644
 +    "inherits" "^2.0.3"
 +    "string_decoder" "^1.1.1"
 +    "util-deprecate" "^1.0.1"
- 
+
 -rechoir@^0.6.2:
 -  version "0.6.2"
 -  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
@@ -30579,7 +30579,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    resolve "^1.1.6"
 +    "resolve" "^1.1.6"
- 
+
 -rechoir@^0.7.0:
 -  version "0.7.1"
 -  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.7.1.tgz#9478a96a1ca135b5e88fc027f03ee92d6c645686"
@@ -30591,7 +30591,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    resolve "^1.9.0"
 +    "resolve" "^1.9.0"
- 
+
 -resolve-cwd@^3.0.0:
 -  version "3.0.0"
 -  resolved "https://registry.yarnpkg.com/resolve-cwd/-/resolve-cwd-3.0.0.tgz#0f0075f1bb2544766cf73ba6a6e2adfebcb13f2d"
@@ -30603,7 +30603,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    resolve-from "^5.0.0"
 +    "resolve-from" "^5.0.0"
- 
+
 -resolve-from@^4.0.0:
 -  version "4.0.0"
 -  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
@@ -30612,7 +30612,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g=="
 +  "resolved" "https://registry.npmjs.org/resolve-from/-/resolve-from-4.0.0.tgz"
 +  "version" "4.0.0"
- 
+
 -resolve-from@^5.0.0:
 -  version "5.0.0"
 -  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-5.0.0.tgz#c35225843df8f776df21c57557bc087e9dfdfc69"
@@ -30621,7 +30621,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw=="
 +  "resolved" "https://registry.npmjs.org/resolve-from/-/resolve-from-5.0.0.tgz"
 +  "version" "5.0.0"
- 
+
 -resolve@^1.1.6, resolve@^1.1.7, resolve@^1.9.0:
 -  version "1.22.1"
 -  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.1.tgz#27cb2ebb53f91abb49470a928bba7558066ac177"
@@ -30637,7 +30637,7 @@ index 0a74dcc..521ef54 100644
 +    "is-core-module" "^2.9.0"
 +    "path-parse" "^1.0.7"
 +    "supports-preserve-symlinks-flag" "^1.0.0"
- 
+
 -restore-cursor@^3.1.0:
 -  version "3.1.0"
 -  resolved "https://registry.yarnpkg.com/restore-cursor/-/restore-cursor-3.1.0.tgz#39f67c54b3a7a58cea5236d95cf0034239631f7e"
@@ -30651,7 +30651,7 @@ index 0a74dcc..521ef54 100644
 -    signal-exit "^3.0.2"
 +    "onetime" "^5.1.0"
 +    "signal-exit" "^3.0.2"
- 
+
 -reusify@^1.0.4:
 -  version "1.0.4"
 -  resolved "https://registry.yarnpkg.com/reusify/-/reusify-1.0.4.tgz#90da382b1e126efc02146e90845a88db12925d76"
@@ -30660,7 +30660,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw=="
 +  "resolved" "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
 +  "version" "1.0.4"
- 
+
 -rimraf@^3.0.0, rimraf@^3.0.2:
 -  version "3.0.2"
 -  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
@@ -30672,7 +30672,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    glob "^7.1.3"
 +    "glob" "^7.1.3"
- 
+
 -run-parallel@^1.1.9:
 -  version "1.2.0"
 -  resolved "https://registry.yarnpkg.com/run-parallel/-/run-parallel-1.2.0.tgz#66d1368da7bdf921eb9d95bd1a9229e7f21a43ee"
@@ -30684,7 +30684,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    queue-microtask "^1.2.2"
 +    "queue-microtask" "^1.2.2"
- 
+
 -safe-buffer@^5.1.0, safe-buffer@~5.2.0:
 -  version "5.2.1"
 -  resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
@@ -30693,7 +30693,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ=="
 +  "resolved" "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.2.1.tgz"
 +  "version" "5.2.1"
- 
+
 -schema-utils@^3.0.0, schema-utils@^3.1.0, schema-utils@^3.1.1:
 -  version "3.1.1"
 -  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-3.1.1.tgz#bc74c4b6b6995c1d88f76a8b77bea7219e0c8281"
@@ -30708,7 +30708,7 @@ index 0a74dcc..521ef54 100644
 -    ajv-keywords "^3.5.2"
 +    "ajv" "^6.12.5"
 +    "ajv-keywords" "^3.5.2"
- 
+
 -semver@^6.0.0:
 -  version "6.3.0"
 -  resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
@@ -30731,7 +30731,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "7.3.8"
 +  dependencies:
 +    "lru-cache" "^6.0.0"
- 
+
 -serialize-javascript@^5.0.1:
 -  version "5.0.1"
 -  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-5.0.1.tgz#7886ec848049a462467a97d3d918ebb2aaf934f4"
@@ -30744,7 +30744,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "5.0.1"
 +  dependencies:
 +    "randombytes" "^2.1.0"
- 
+
 -serialize-javascript@^6.0.0:
 -  version "6.0.0"
 -  resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-6.0.0.tgz#efae5d88f45d7924141da8b5c3a7a7e663fefeb8"
@@ -30784,7 +30784,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "2.0.0"
 +  dependencies:
 +    "shebang-regex" "^3.0.0"
- 
+
 -shebang-regex@^3.0.0:
 -  version "3.0.0"
 -  resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
@@ -30810,7 +30810,7 @@ index 0a74dcc..521ef54 100644
 +    "glob" "^7.0.0"
 +    "interpret" "^1.0.0"
 +    "rechoir" "^0.6.2"
- 
+
 -signal-exit@^3.0.2:
 -  version "3.0.7"
 -  resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
@@ -30819,7 +30819,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ=="
 +  "resolved" "https://registry.npmjs.org/signal-exit/-/signal-exit-3.0.7.tgz"
 +  "version" "3.0.7"
- 
+
 -slash@^3.0.0:
 -  version "3.0.0"
 -  resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
@@ -30828,7 +30828,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q=="
 +  "resolved" "https://registry.npmjs.org/slash/-/slash-3.0.0.tgz"
 +  "version" "3.0.0"
- 
+
 -source-list-map@^2.0.0, source-list-map@^2.0.1:
 -  version "2.0.1"
 -  resolved "https://registry.yarnpkg.com/source-list-map/-/source-list-map-2.0.1.tgz#3993bd873bfc48479cca9ea3a547835c7c154b34"
@@ -30837,7 +30837,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-qnQ7gVMxGNxsiL4lEuJwe/To8UnK7fAnmbGEEH8RpLouuKbeEm0lhbQVFIrNSuB+G7tVrAlVsZgETT5nljf+Iw=="
 +  "resolved" "https://registry.npmjs.org/source-list-map/-/source-list-map-2.0.1.tgz"
 +  "version" "2.0.1"
- 
+
 -source-map-js@^1.0.2:
 -  version "1.0.2"
 -  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
@@ -30846,7 +30846,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw=="
 +  "resolved" "https://registry.npmjs.org/source-map-js/-/source-map-js-1.0.2.tgz"
 +  "version" "1.0.2"
- 
+
 -source-map-support@~0.5.20:
 -  version "0.5.21"
 -  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.21.tgz#04fe7c7f9e1ed2d662233c28cb2b35b9f63f6e4f"
@@ -30860,7 +30860,7 @@ index 0a74dcc..521ef54 100644
 -    source-map "^0.6.0"
 +    "buffer-from" "^1.0.0"
 +    "source-map" "^0.6.0"
- 
+
 -source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.1:
 -  version "0.6.1"
 -  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
@@ -30869,7 +30869,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
 +  "resolved" "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
 +  "version" "0.6.1"
- 
+
 -ssri@^8.0.1:
 -  version "8.0.1"
 -  resolved "https://registry.yarnpkg.com/ssri/-/ssri-8.0.1.tgz#638e4e439e2ffbd2cd289776d5ca457c4f51a2af"
@@ -30881,7 +30881,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    minipass "^3.1.1"
 +    "minipass" "^3.1.1"
- 
+
 -stable@^0.1.8:
 -  version "0.1.8"
 -  resolved "https://registry.yarnpkg.com/stable/-/stable-0.1.8.tgz#836eb3c8382fe2936feaf544631017ce7d47a3cf"
@@ -30890,7 +30890,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-ji9qxRnOVfcuLDySj9qzhGSEFVobyt1kIOSkj1qZzYLzq7Tos/oUUWvotUPQLlrsidqsK6tBH89Bc9kL5zHA6w=="
 +  "resolved" "https://registry.npmjs.org/stable/-/stable-0.1.8.tgz"
 +  "version" "0.1.8"
- 
+
 -string_decoder@^1.1.1:
 -  version "1.3.0"
 -  resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.3.0.tgz#42f114594a46cf1a8e30b0a84f56c78c3edac21e"
@@ -30902,7 +30902,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    safe-buffer "~5.2.0"
 +    "safe-buffer" "~5.2.0"
- 
+
 -style-loader@^2.0.0:
 -  version "2.0.0"
 -  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-2.0.0.tgz#9669602fd4690740eaaec137799a03addbbc393c"
@@ -30916,7 +30916,7 @@ index 0a74dcc..521ef54 100644
 -    schema-utils "^3.0.0"
 +    "loader-utils" "^2.0.0"
 +    "schema-utils" "^3.0.0"
- 
+
 -stylehacks@^5.1.1:
 -  version "5.1.1"
 -  resolved "https://registry.yarnpkg.com/stylehacks/-/stylehacks-5.1.1.tgz#7934a34eb59d7152149fa69d6e9e56f2fc34bcc9"
@@ -30930,7 +30930,7 @@ index 0a74dcc..521ef54 100644
 -    postcss-selector-parser "^6.0.4"
 +    "browserslist" "^4.21.4"
 +    "postcss-selector-parser" "^6.0.4"
- 
+
 -sugarss@^4.0.1:
 -  version "4.0.1"
 -  resolved "https://registry.yarnpkg.com/sugarss/-/sugarss-4.0.1.tgz#128a783ed71ee0fc3b489ce1f7d5a89bc1e24383"
@@ -30980,7 +30980,7 @@ index 0a74dcc..521ef54 100644
 +  "version" "8.1.1"
 +  dependencies:
 +    "has-flag" "^4.0.0"
- 
+
 -supports-preserve-symlinks-flag@^1.0.0:
 -  version "1.0.0"
 -  resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
@@ -30989,7 +30989,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w=="
 +  "resolved" "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
 +  "version" "1.0.0"
- 
+
 -svgo@^2.7.0:
 -  version "2.8.0"
 -  resolved "https://registry.yarnpkg.com/svgo/-/svgo-2.8.0.tgz#4ff80cce6710dc2795f0c7c74101e6764cfccd24"
@@ -31096,7 +31096,7 @@ index 0a74dcc..521ef54 100644
 +    "schema-utils" "^3.1.1"
 +    "serialize-javascript" "^6.0.0"
 +    "terser" "^5.14.1"
- 
+
 -terser@^5.14.1, terser@^5.3.4:
 -  version "5.16.1"
 -  resolved "https://registry.yarnpkg.com/terser/-/terser-5.16.1.tgz#5af3bc3d0f24241c7fb2024199d5c461a1075880"
@@ -31113,7 +31113,7 @@ index 0a74dcc..521ef54 100644
 +    "acorn" "^8.5.0"
 +    "commander" "^2.20.0"
 +    "source-map-support" "~0.5.20"
- 
+
 -through2@^3.0.1:
 -  version "3.0.2"
 -  resolved "https://registry.yarnpkg.com/through2/-/through2-3.0.2.tgz#99f88931cfc761ec7678b41d5d7336b5b6a07bf4"
@@ -31127,7 +31127,7 @@ index 0a74dcc..521ef54 100644
 -    readable-stream "2 || 3"
 +    "inherits" "^2.0.4"
 +    "readable-stream" "2 || 3"
- 
+
 -to-fast-properties@^2.0.0:
 -  version "2.0.0"
 -  resolved "https://registry.yarnpkg.com/to-fast-properties/-/to-fast-properties-2.0.0.tgz#dc5e698cbd079265bc73e0377681a4e4e83f616e"
@@ -31136,7 +31136,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-/OaKK0xYrs3DmxRYqL/yDc+FxFUVYhDlXMhRmv3z915w2HF1tnN1omB354j8VUGO/hbRzyD6Y3sA7v7GS/ceog=="
 +  "resolved" "https://registry.npmjs.org/to-fast-properties/-/to-fast-properties-2.0.0.tgz"
 +  "version" "2.0.0"
- 
+
 -to-regex-range@^5.0.1:
 -  version "5.0.1"
 -  resolved "https://registry.yarnpkg.com/to-regex-range/-/to-regex-range-5.0.1.tgz#1648c44aae7c8d988a326018ed72f5b4dd0392e4"
@@ -31148,7 +31148,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    is-number "^7.0.0"
 +    "is-number" "^7.0.0"
- 
+
 -ts-loader@^9.3.0:
 -  version "9.4.2"
 -  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-9.4.2.tgz#80a45eee92dd5170b900b3d00abcfa14949aeb78"
@@ -31166,7 +31166,7 @@ index 0a74dcc..521ef54 100644
 +    "enhanced-resolve" "^5.0.0"
 +    "micromatch" "^4.0.0"
 +    "semver" "^7.3.4"
- 
+
 -type-check@~0.3.2:
 -  version "0.3.2"
 -  resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"
@@ -31183,7 +31183,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw=="
 +  "resolved" "https://registry.npmjs.org/typescript/-/typescript-5.0.4.tgz"
 +  "version" "5.0.4"
- 
+
 -unique-filename@^1.1.1:
 -  version "1.1.1"
 -  resolved "https://registry.yarnpkg.com/unique-filename/-/unique-filename-1.1.1.tgz#1d69769369ada0583103a1e6ae87681b56573230"
@@ -31195,7 +31195,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    unique-slug "^2.0.0"
 +    "unique-slug" "^2.0.0"
- 
+
 -unique-slug@^2.0.0:
 -  version "2.0.2"
 -  resolved "https://registry.yarnpkg.com/unique-slug/-/unique-slug-2.0.2.tgz#baabce91083fc64e945b0f3ad613e264f7cd4e6c"
@@ -31207,7 +31207,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    imurmurhash "^0.1.4"
 +    "imurmurhash" "^0.1.4"
- 
+
 -universalify@^0.1.0:
 -  version "0.1.2"
 -  resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
@@ -31216,7 +31216,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg=="
 +  "resolved" "https://registry.npmjs.org/universalify/-/universalify-0.1.2.tgz"
 +  "version" "0.1.2"
- 
+
 -update-browserslist-db@^1.0.9:
 -  version "1.0.10"
 -  resolved "https://registry.yarnpkg.com/update-browserslist-db/-/update-browserslist-db-1.0.10.tgz#0f54b876545726f17d00cd9a2561e6dade943ff3"
@@ -31230,7 +31230,7 @@ index 0a74dcc..521ef54 100644
 -    picocolors "^1.0.0"
 +    "escalade" "^3.1.1"
 +    "picocolors" "^1.0.0"
- 
+
 -uri-js@^4.2.2:
 -  version "4.4.1"
 -  resolved "https://registry.yarnpkg.com/uri-js/-/uri-js-4.4.1.tgz#9b1a52595225859e55f669d928f88c6c57f2a77e"
@@ -31242,7 +31242,7 @@ index 0a74dcc..521ef54 100644
    dependencies:
 -    punycode "^2.1.0"
 +    "punycode" "^2.1.0"
- 
+
 -util-deprecate@^1.0.1, util-deprecate@^1.0.2:
 -  version "1.0.2"
 -  resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -31251,7 +31251,7 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="
 +  "resolved" "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz"
 +  "version" "1.0.2"
- 
+
 -watchpack@^2.4.0:
 -  version "2.4.0"
 -  resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-2.4.0.tgz#fa33032374962c78113f93c7f2fb4c54c9862a5d"
@@ -31265,7 +31265,7 @@ index 0a74dcc..521ef54 100644
 -    graceful-fs "^4.1.2"
 +    "glob-to-regexp" "^0.4.1"
 +    "graceful-fs" "^4.1.2"
- 
+
 -webpack-cli@^4.4.0:
 -  version "4.10.0"
 -  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-4.10.0.tgz#37c1d69c8d85214c5a65e589378f53aec64dab31"
@@ -31481,6 +31481,342 @@ index 0a74dcc..521ef54 100644
 +  "integrity" "sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q=="
 +  "resolved" "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
 +  "version" "0.1.0"
--- 
+--
+GitLab
+
+
+From 631af1e1122e50dd5fb3a5b56cf4d9fe9abfef8f Mon Sep 17 00:00:00 2001
+From: gustavderdrache <aford@forumone.com>
+Date: Wed, 14 Jun 2023 10:14:11 -0400
+Subject: [PATCH 6/7] (finally) fix double-render bug
+
+---
+ js/build/mediaInlineEmbed.js                  |  2 +-
+ .../drupalinlineelementstyleui.js             |  4 +-
+ .../src/drupalinlinemediaediting.js           | 72 ++++++++-----------
+ .../mediaInlineEmbed/src/utils.js             |  2 +-
+ media_inline_embed.module                     | 15 ++++
+ src/Plugin/Filter/MediaInlineEmbed.php        | 12 ++++
+ templates/media-embed-error--inline.html.twig | 20 ++++++
+ 7 files changed, 81 insertions(+), 46 deletions(-)
+ create mode 100644 templates/media-embed-error--inline.html.twig
+
+diff --git a/js/build/mediaInlineEmbed.js b/js/build/mediaInlineEmbed.js
+index 1c138f8..bd5ea4e 100644
+--- a/js/build/mediaInlineEmbed.js
++++ b/js/build/mediaInlineEmbed.js
+@@ -1 +1 @@
+-!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.CKEditor5=t():(e.CKEditor5=e.CKEditor5||{},e.CKEditor5.mediaInlineEmbed=t())}(self,(()=>(()=>{var e={"ckeditor5/src/core.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/core.js")},"ckeditor5/src/ui.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/ui.js")},"ckeditor5/src/utils.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/utils.js")},"ckeditor5/src/widget.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/widget.js")},"dll-reference CKEditor5.dll":e=>{"use strict";e.exports=CKEditor5.dll}},t={};function i(n){var r=t[n];if(void 0!==r)return r.exports;var l=t[n]={exports:{}};return e[n](l,l.exports,i),l.exports}i.d=(e,t)=>{for(var n in t)i.o(t,n)&&!i.o(e,n)&&Object.defineProperty(e,n,{enumerable:!0,get:t[n]})},i.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);var n={};return(()=>{"use strict";i.d(n,{default:()=>U});var e=i("ckeditor5/src/core.js"),t=i("ckeditor5/src/widget.js");function r(e){for(const t of e){if(t.hasAttribute("data-drupal-media-preview"))return t;if(t.childCount){const e=r(t.getChildren());if(e)return e}}return null}function l(e){return`drupalElementStyle${e[0].toUpperCase()+e.substring(1)}`}class a extends e.Command{execute(e){const t=this.editor.plugins.get("DrupalInlineMediaEditing"),i=Object.entries(t.attrs).reduce(((e,[t,i])=>(e[i]=t,e)),{}),n=Object.keys(e).reduce(((t,n)=>(i[n]&&(t[i[n]]=e[n]),t)),{});if(this.editor.plugins.has("DrupalElementStyleEditing")){const t=this.editor.plugins.get("DrupalElementStyleEditing"),{normalizedStyles:i}=t;for(const r of Object.keys(i))for(const i of t.normalizedStyles[r])if(e[i.attributeName]&&i.attributeValue===e[i.attributeName]){const e=l(r);n[e]=i.name}}this.editor.model.change((e=>{this.editor.model.insertContent(function(e,t){return e.createElement("drupalInlineMedia",t)}(e,n))}))}refresh(){const e=this.editor.model,t=e.document.selection,i=e.schema.findAllowedParent(t.getFirstPosition(),"drupalInlineMedia");this.isEnabled=null!==i}}class o extends e.Plugin{static get requires(){return[t.Widget]}constructor(e){super(e),this.attrs={drupalMediaAlt:"alt",drupalMediaEntityType:"data-entity-type",drupalMediaEntityUuid:"data-entity-uuid"},this.converterAttributes=["drupalMediaEntityUuid","drupalElementStyleViewMode","drupalMediaEntityType","drupalMediaAlt"]}init(){const e=this.editor.config.get("drupalMedia");if(!e)return;this._previewLocks=new WeakSet;const{previewURL:t,themeError:i}=e;this.previewUrl=t,this.labelError=Drupal.t("Preview failed"),this.themeError=i||`\n      <p>${Drupal.t("An error occurred while trying to preview the media. Please save your work and reload this page.")}<p>\n    `,this._defineSchema(),this._defineConverters(),this.editor.commands.add("insertDrupalInlineMedia",new a(this.editor))}_defineSchema(){this.editor.model.schema.register("drupalInlineMedia",{allowWhere:"$block",isObject:!0,isContent:!0,isBlock:!0,allowAttributes:Object.keys(this.attrs)}),this.editor.editing.view.domConverter.blockElements.push("drupal-inline-media")}_defineConverters(){const e=this.editor.conversion,i=this.editor.plugins.get("DrupalMediaMetadataRepository");e.for("upcast").elementToElement({view:{name:"drupal-inline-media"},model:"drupalInlineMedia"}).add((e=>{e.on("element:drupal-inline-media",((e,t)=>{const[n]=t.modelRange.getItems();i.getMetadata(n).then((e=>{n&&(this.upcastDrupalMediaIsImage(n),this.editor.model.enqueueChange({isUndoable:!1},(t=>{t.setAttribute("drupalMediaType",e.type,n)})))})).catch((e=>{console.warn(e.toString())}))}),{priority:"lowest"})})),e.for("dataDowncast").elementToElement({model:"drupalInlineMedia",view:{name:"drupal-inline-media"}}),e.for("editingDowncast").elementToElement({model:"drupalInlineMedia",view:(e,{writer:i})=>{const n=i.createContainerElement("figure",{class:"drupal-inline-media"});if(!this.previewUrl){const e=i.createRawElement("div",{"data-drupal-inline-media-preview":"unavailable"});i.insert(i.createPositionAt(n,0),e)}return i.setCustomProperty("drupalInlineMedia",!0,n),(0,t.toWidget)(n,i,{label:Drupal.t("Inline Media widget")})}}).add((e=>{const t=(e,t,i)=>{const n=i.writer,l=t.item,a=i.mapper.toViewElement(t.item);let o=r(a.getChildren());if(o){if("ready"!==o.getAttribute("data-drupal-inline-media-preview"))return;n.setAttribute("data-drupal-inline-media-preview","loading",o)}else o=n.createRawElement("div",{"data-drupal-inline-media-preview":"loading"}),n.insert(n.createPositionAt(a,0),o);if(!this._previewLocks.has(l)){this._previewLocks.add(l);const e=()=>this._previewLocks.delete(l);this._fetchPreview(l).then((({label:e,preview:t})=>{o&&this.editor.editing.view.change((i=>{const n=i.createRawElement("div",{"data-drupal-inline-media-preview":"ready","aria-label":e},(e=>{e.innerHTML=t}));i.insert(i.createPositionBefore(o),n),i.remove(o)}))})).then(e,e)}};return this.converterAttributes.forEach((i=>{e.on(`attribute:${i}:drupalInlineMedia`,t)})),e})),Object.keys(this.attrs).forEach((t=>{const i={model:{key:t,name:"drupalInlineMedia"},view:{name:"drupal-inline-media",key:this.attrs[t]}};e.for("dataDowncast").attributeToAttribute(i),e.for("upcast").attributeToAttribute(i)}))}async _fetchPreview(e){const t=new URLSearchParams({text:this._renderElement(e),uuid:e.getAttribute("drupalMediaEntityUuid")}),i=await fetch(`${this.previewUrl}?${t}`,{headers:{"X-Drupal-MediaPreview-CSRF-Token":this.editor.config.get("drupalMedia").previewCsrfToken}});return i.ok?{label:i.headers.get("drupal-media-label"),preview:await i.text()}:{label:this.labelError,preview:this.themeError}}_renderElement(e){const t=this.editor.model.change((t=>{const i=t.createDocumentFragment(),n=t.cloneElement(e,!1);return["linkHref"].forEach((e=>{t.removeAttribute(e,n)})),t.append(n,i),i}));return this.editor.data.stringify(t)}static get pluginName(){return"DrupalInlineMediaEditing"}}function s(e,t,i){if(t.attributes)for(const[n,r]of Object.entries(t.attributes))e.setAttribute(n,r,i);t.styles&&e.setStyle(t.styles,i),t.classes&&e.addClass(t.classes,i)}function d(e,t,i){if(!i.consumable.consume(t.item,e.name))return;const n=i.mapper.toViewElement(t.item);s(i.writer,t.attributeNewValue,n)}class u extends e.Plugin{constructor(e){if(super(e),!e.plugins.has("GeneralHtmlSupport"))return;e.plugins.has("DataFilter")&&e.plugins.has("DataSchema")||console.error("DataFilter and DataSchema plugins are required for Drupal Media to integrate with General HTML Support plugin.");const{schema:t}=e.model,{conversion:i}=e,n=this.editor.plugins.get("DataFilter");this.editor.plugins.get("DataSchema").registerBlockElement({model:"drupalInlineMedia",view:"drupal-inline-media"}),n.on("register:drupal-inline-media",((e,r)=>{"drupalInlineMedia"===r.model&&(t.extend("drupalInlineMedia",{allowAttributes:["htmlLinkAttributes","htmlAttributes"]}),i.for("upcast").add(function(e){return t=>{t.on("element:drupal-inline-media",((t,i,n)=>{function r(t,r){const l=e.processViewAttributes(t,n);l&&n.writer.setAttribute(r,l,i.modelRange)}const l=i.viewItem,a=l.parent;r(l,"htmlAttributes"),a.is("element","a")&&r(a,"htmlLinkAttributes")}),{priority:"low"})}}(n)),i.for("editingDowncast").add((e=>{e.on("attribute:linkHref:drupalInlineMedia",((e,t,i)=>{if(!i.consumable.consume(t.item,"attribute:htmlLinkAttributes:drupalInlineMedia"))return;const n=i.mapper.toViewElement(t.item),r=function(e,t,i){const n=e.createRangeOn(t);for(const{item:e}of n.getWalker())if(e.is("element",i))return e}(i.writer,n,"a");s(i.writer,t.item.getAttribute("htmlLinkAttributes"),r)}),{priority:"low"})})),i.for("dataDowncast").add((e=>{e.on("attribute:linkHref:drupalInlineMedia",((e,t,i)=>{if(!i.consumable.consume(t.item,"attribute:htmlLinkAttributes:drupalInlineMedia"))return;const n=i.mapper.toViewElement(t.item).parent;s(i.writer,t.item.getAttribute("htmlLinkAttributes"),n)}),{priority:"low"}),e.on("attribute:htmlAttributes:drupalInlineMedia",d,{priority:"low"})})),e.stop())}))}static get pluginName(){return"DrupalInlineMediaGeneralHtmlSupport"}}var c=i("ckeditor5/src/ui.js");class m extends e.Plugin{init(){const e=this.editor,t=this.editor.config.get("drupalMedia"),i=this.editor.config.get("drupalInlineMedia");if(!t||!i)return;const{libraryURL:n,openDialog:r,dialogSettings:l={}}=t;n&&"function"==typeof r&&e.ui.componentFactory.add("drupalInlineMedia",(t=>{const n=e.commands.get("insertDrupalInlineMedia"),a=new c.ButtonView(t);return a.set({label:e.t("Insert inline media from Media Library"),icon:'<svg viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg"><path d="m392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3l89.3 89.4-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-89.4-89.3 89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',tooltip:!0}),a.bind("isOn","isEnabled").to(n,"value","isEnabled"),this.listenTo(a,"execute",(()=>{r(i.libraryURL,(({attributes:t})=>{e.execute("insertDrupalInlineMedia",t)}),l)})),a}))}}function p(e){return(0,t.isWidget)(e)&&!!e.getCustomProperty("drupalInlineMedia")}function g(e){const t=typeof e;return null!=e&&("object"===t||"function"===t)}function f(e){return`drupalElementStyle${e[0].toUpperCase()+e.substring(1)}`}class h extends e.Plugin{static get requires(){return[t.WidgetToolbarRepository]}static get pluginName(){return"DrupalInlineMediaToolbar"}afterInit(){const{editor:e}=this;var i;e.plugins.get(t.WidgetToolbarRepository).register("drupalInlineMedia",{ariaLabel:Drupal.t("Drupal Inline Media toolbar"),items:(i=e.config.get("drupalInlineMedia.toolbar"),i.map((e=>g(e)?e.name:e))||[]),getRelatedElement:e=>function(e){const t=e.getSelectedElement();if(t&&p(t))return t;let i=e.getFirstPosition().parent;for(;i;){if(i.is("element")&&p(i))return i;i=i.parent}return null}(e)})}}class b extends e.Plugin{static get requires(){return[o,u,m,h]}}var y=i("ckeditor5/src/utils.js");const{objectFullWidth:w,objectInline:E,objectLeft:I,objectRight:k,objectCenter:v,objectBlockLeft:D,objectBlockRight:S}=e.icons,M={inline:{name:"inline",title:"In line",icon:E,modelElements:["imageInline"],isDefault:!0},alignLeft:{name:"alignLeft",title:"Left aligned image",icon:I,modelElements:["imageBlock","imageInline"],className:"image-style-align-left"},alignBlockLeft:{name:"alignBlockLeft",title:"Left aligned image",icon:D,modelElements:["imageBlock"],className:"image-style-block-align-left"},alignCenter:{name:"alignCenter",title:"Centered image",icon:v,modelElements:["imageBlock"],className:"image-style-align-center"},alignRight:{name:"alignRight",title:"Right aligned image",icon:k,modelElements:["imageBlock","imageInline"],className:"image-style-align-right"},alignBlockRight:{name:"alignBlockRight",title:"Right aligned image",icon:S,modelElements:["imageBlock"],className:"image-style-block-align-right"},block:{name:"block",title:"Centered image",icon:v,modelElements:["imageBlock"],isDefault:!0},side:{name:"side",title:"Side image",icon:k,modelElements:["imageBlock"],className:"image-style-side"}},A={full:w,left:D,right:S,center:v,inlineLeft:I,inlineRight:k,inline:E},x=[{name:"imageStyle:wrapText",title:"Wrap text",defaultItem:"imageStyle:alignLeft",items:["imageStyle:alignLeft","imageStyle:alignRight"]},{name:"imageStyle:breakText",title:"Break text",defaultItem:"imageStyle:block",items:["imageStyle:alignBlockLeft","imageStyle:block","imageStyle:alignBlockRight"]}];function C(e){(0,y.logWarning)("image-style-configuration-definition-invalid",e)}const L={normalizeStyles:function(e){return(e.configuredStyles.options||[]).map((e=>function(e){e="string"==typeof e?M[e]?{...M[e]}:{name:e}:function(e,t){const i={...t};for(const n in e)Object.prototype.hasOwnProperty.call(t,n)||(i[n]=e[n]);return i}(M[e.name],e);"string"==typeof e.icon&&(e.icon=A[e.icon]||e.icon);return e}(e))).filter((t=>function(e,{isBlockPluginLoaded:t,isInlinePluginLoaded:i}){const{modelElements:n,name:r}=e;if(!(n&&n.length&&r))return C({style:e}),!1;{const r=[t?"imageBlock":null,i?"imageInline":null];if(!n.some((e=>r.includes(e))))return(0,y.logWarning)("image-style-missing-dependency",{style:e,missingPlugins:n.map((e=>"imageBlock"===e?"ImageBlockEditing":"ImageInlineEditing"))}),!1}return!0}(t,e)))},getDefaultStylesConfiguration:function(e,t){return e&&t?{options:["inline","alignLeft","alignRight","alignCenter","alignBlockLeft","alignBlockRight","block","side"]}:e?{options:["block","side"]}:t?{options:["inline","alignLeft","alignRight"]}:{}},getDefaultDropdownDefinitions:function(e){return e.has("ImageBlockEditing")&&e.has("ImageInlineEditing")?[...x]:[]},warnInvalidStyle:C,DEFAULT_OPTIONS:M,DEFAULT_ICONS:A,DEFAULT_DROPDOWN_DEFINITIONS:x};function O(e,t,i){for(const n of t)if(i.checkAttribute(e,n))return!0;return!1}function j(e,t,i){const n=e.getSelectedElement();if(n&&O(n,i,t))return n;let{parent:r}=e.getFirstPosition();for(;r;){if(r.is("element")&&O(r,i,t))return r;r=r.parent}return null}class B extends e.Command{constructor(e,t){super(e),this.styles={},Object.keys(t).forEach((e=>{this.styles[e]=new Map(t[e].map((e=>[e.name,e])))})),this.modelAttributes=[];for(const e of Object.keys(t)){const t=f(e);this.modelAttributes.push(t)}}refresh(){const{editor:e}=this,t=j(e.model.document.selection,e.model.schema,this.modelAttributes);this.isEnabled=!!t,this.isEnabled?this.value=this.getValue(t):this.value=!1}getValue(e){const t={};return Object.keys(this.styles).forEach((i=>{const n=f(i);if(e.hasAttribute(n))t[i]=e.getAttribute(n);else for(const[,e]of this.styles[i])e.isDefault&&(t[i]=e.name)})),t}execute(e={}){const{editor:{model:t}}=this,{value:i,group:n}=e,r=f(n);t.change((e=>{const l=j(t.document.selection,t.schema,this.modelAttributes);!i||this.styles[n].get(i).isDefault?e.removeAttribute(r,l):e.setAttribute(r,i,l)}))}}function T(e,t){for(const i of t)if(i.name===e)return i}class P extends e.Plugin{init(){const{editor:t}=this,i=t.config.get("drupalInlineElementStyles");this.normalizedStyles={},Object.keys(i).forEach((t=>{this.normalizedStyles[t]=i[t].map((t=>("string"==typeof t.icon&&e.icons[t.icon]&&(t.icon=e.icons[t.icon]),t.name&&(t.name=`${t.name}`),t))).filter((e=>e.isDefault||e.attributeName&&e.attributeValue?e.modelElements&&Array.isArray(e.modelElements)?!!e.name||(console.warn("drupalInlineElementStyles options must include a name."),!1):(console.warn("drupalInlineElementStyles options must include an array of supported modelElements."),!1):(console.warn(`${e.attributeValue} drupalInlineElementStyles options must include attributeName and attributeValue.`),!1)))})),this._setupConversion(),t.commands.add("drupalInlineElementStyle",new B(t,this.normalizedStyles))}_setupConversion(){const{editor:e}=this,{schema:t}=e.model;Object.keys(this.normalizedStyles).forEach((i=>{const n=f(i),r=(l=this.normalizedStyles[i],(e,t,i)=>{if(!i.consumable.consume(t.item,e.name))return;const n=T(t.attributeNewValue,l),r=T(t.attributeOldValue,l),a=i.mapper.toViewElement(t.item),o=i.writer;r&&("class"===r.attributeName?o.removeClass(r.attributeValue,a):o.removeAttribute(r.attributeName,a)),n&&("class"===n.attributeName?o.addClass(n.attributeValue,a):n.isDefault||o.setAttribute(n.attributeName,n.attributeValue,a))});var l;const a=function(e,t){const i=e.filter((e=>!e.isDefault));return(e,n,r)=>{if(!n.modelRange)return;const l=n.viewItem,a=(0,y.first)(n.modelRange.getItems());if(a&&r.schema.checkAttribute(a,t))for(const e of i)if("class"===e.attributeName)r.consumable.consume(l,{classes:e.attributeValue})&&r.writer.setAttribute(t,e.name,a);else if(r.consumable.consume(l,{attributes:[e.attributeName]}))for(const e of i)e.attributeValue===l.getAttribute(e.attributeName)&&r.writer.setAttribute(t,e.name,a)}}(this.normalizedStyles[i],n);e.editing.downcastDispatcher.on(`attribute:${n}`,r),e.data.downcastDispatcher.on(`attribute:${n}`,r);[...new Set(this.normalizedStyles[i].map((e=>e.modelElements)).flat())].forEach((e=>{t.extend(e,{allowAttributes:n})})),e.data.upcastDispatcher.on("element",a,{priority:"low"})}))}static get pluginName(){return"DrupalInlineElementStyleEditing"}}const R=e=>e,V=(e,t)=>(e?`${e}: `:"")+t;function N(e,t){return`drupalInlineElementStyle:${t}:${e}`}class _ extends e.Plugin{static get requires(){return[P]}init(){const{plugins:e}=this.editor,t=this.editor.config.get("drupalInlineMedia.toolbar")||[],i=e.get("DrupalInlineElementStyleEditing").normalizedStyles;Object.keys(i).forEach((e=>{i[e].forEach((t=>{this._createButton(t,e,i[e])}))}));t.filter(g).filter((e=>{const t=[];if(!e.display)return console.warn("dropdown configuration must include a display key specifying either listDropdown or splitButton."),!1;e.items.includes(e.defaultItem)||console.warn("defaultItem must be part of items in the dropdown configuration.");for(const i of e.items){const e=i.split(":")[1];t.push(e)}return!!t.every((e=>e===t[0]))||(console.warn("dropdown configuration should only contain buttons from one group."),!1)})).forEach((e=>{if(e.items.length>=2){const t=e.name.split(":")[1];switch(e.display){case"splitButton":this._createDropdown(e,i[t]);break;case"listDropdown":this._createListDropdown(e,i[t])}}}))}updateOptionVisibility(e,t,i,n){const{selection:r}=this.editor.model.document,l={};l[n]=e;const a=r?r.getSelectedElement():j(r,this.editor.model.schema,l),o=e.filter((function(e){for(const[t,i]of(0,y.toMap)(e.modelAttributes))if(a&&a.hasAttribute(t))return i.includes(a.getAttribute(t));return!0}));i.hasOwnProperty("model")?o.includes(t)?i.model.set({class:""}):i.model.set({class:"ck-hidden"}):o.includes(t)?i.set({class:""}):i.set({class:"ck-hidden"})}_createDropdown(e,t){const i=this.editor.ui.componentFactory;i.add(e.name,(n=>{let r;const{defaultItem:l,items:a,title:o}=e,s=a.filter((e=>{const i=e.split(":")[1];return t.find((({name:t})=>N(t,i)===e))})).map((e=>{const t=i.create(e);return e===l&&(r=t),t}));a.length!==s.length&&L.warnInvalidStyle({dropdown:e});const d=(0,c.createDropdown)(n,c.SplitButtonView),u=d.buttonView;return(0,c.addToolbarToDropdown)(d,s),u.set({label:V(o,r.label),class:null,tooltip:!0}),u.bind("icon").toMany(s,"isOn",((...e)=>{const t=e.findIndex(R);return t<0?r.icon:s[t].icon})),u.bind("label").toMany(s,"isOn",((...e)=>{const t=e.findIndex(R);return V(o,t<0?r.label:s[t].label)})),u.bind("isOn").toMany(s,"isOn",((...e)=>e.some(R))),u.bind("class").toMany(s,"isOn",((...e)=>e.some(R)?"ck-splitbutton_flatten":null)),u.on("execute",(()=>{s.some((({isOn:e})=>e))?d.isOpen=!d.isOpen:r.fire("execute")})),d.bind("isEnabled").toMany(s,"isEnabled",((...e)=>e.some(R))),d}))}_createButton(e,t,i){const n=e.name;this.editor.ui.componentFactory.add(N(n,t),(r=>{const l=this.editor.commands.get("drupalElementStyle"),a=new c.ButtonView(r);return a.set({label:e.title,icon:e.icon,tooltip:!0,isToggleable:!0}),a.bind("isEnabled").to(l,"isEnabled"),a.bind("isOn").to(l,"value",(e=>e&&e[t]===n)),a.on("execute",this._executeCommand.bind(this,n,t)),this.listenTo(this.editor.ui,"update",(()=>{this.updateOptionVisibility(i,e,a,t)})),a}))}getDropdownListItemDefinitions(e,t,i){const n=new y.Collection;return e.forEach((t=>{const r={type:"button",model:new c.Model({group:i,commandValue:t.name,label:t.title,withText:!0,class:""})};n.add(r),this.listenTo(this.editor.ui,"update",(()=>{this.updateOptionVisibility(e,t,r,i)}))})),n}_createListDropdown(e,t){const i=this.editor.ui.componentFactory;i.add(e.name,(n=>{let r;const{defaultItem:l,items:a,title:o,defaultText:s}=e,d=e.name.split(":")[1],u=a.filter((e=>t.find((({name:t})=>N(t,d)===e)))).map((e=>{const t=i.create(e);return e===l&&(r=t),t}));a.length!==u.length&&L.warnInvalidStyle({dropdown:e});const m=(0,c.createDropdown)(n,c.DropdownButtonView),p=m.buttonView;p.set({label:V(o,r.label),class:null,tooltip:s,withText:!0});const g=this.editor.commands.get("drupalInlineElementStyle");return p.bind("label").to(g,"value",(e=>{if(e&&e[d])for(const i of t)if(i.name===e[d])return i.title;return s})),m.bind("isOn").to(g),m.bind("isEnabled").to(this),(0,c.addListToDropdown)(m,this.getDropdownListItemDefinitions(t,g,d)),this.listenTo(m,"execute",(e=>{this._executeCommand(e.source.commandValue,e.source.group)})),m}))}_executeCommand(e,t){this.editor.execute("drupalElementStyle",{value:e,group:t}),this.editor.editing.view.focus()}static get pluginName(){return"DrupalInlineElementStyleUi"}}class F extends e.Plugin{static get requires(){return[P,_]}static get pluginName(){return"DrupalInlineElementStyle"}}const U={DrupalInlineMedia:b,DrupalInlineElementStyle:F}})(),n=n.default})()));
+\ No newline at end of file
++!function(e,t){"object"==typeof exports&&"object"==typeof module?module.exports=t():"function"==typeof define&&define.amd?define([],t):"object"==typeof exports?exports.CKEditor5=t():(e.CKEditor5=e.CKEditor5||{},e.CKEditor5.mediaInlineEmbed=t())}(self,(()=>(()=>{var e={"ckeditor5/src/core.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/core.js")},"ckeditor5/src/ui.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/ui.js")},"ckeditor5/src/utils.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/utils.js")},"ckeditor5/src/widget.js":(e,t,i)=>{e.exports=i("dll-reference CKEditor5.dll")("./src/widget.js")},"dll-reference CKEditor5.dll":e=>{"use strict";e.exports=CKEditor5.dll}},t={};function i(n){var r=t[n];if(void 0!==r)return r.exports;var l=t[n]={exports:{}};return e[n](l,l.exports,i),l.exports}i.d=(e,t)=>{for(var n in t)i.o(t,n)&&!i.o(e,n)&&Object.defineProperty(e,n,{enumerable:!0,get:t[n]})},i.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);var n={};return(()=>{"use strict";i.d(n,{default:()=>U});var e=i("ckeditor5/src/core.js"),t=i("ckeditor5/src/widget.js");function r(e){for(const t of e){if(t.hasAttribute("data-drupal-inline-media-preview"))return t;if(t.childCount){const e=r(t.getChildren());if(e)return e}}return null}function l(e){return`drupalElementStyle${e[0].toUpperCase()+e.substring(1)}`}class a extends e.Command{execute(e){const t=this.editor.plugins.get("DrupalInlineMediaEditing"),i=Object.entries(t.attrs).reduce(((e,[t,i])=>(e[i]=t,e)),{}),n=Object.keys(e).reduce(((t,n)=>(i[n]&&(t[i[n]]=e[n]),t)),{});if(this.editor.plugins.has("DrupalElementStyleEditing")){const t=this.editor.plugins.get("DrupalElementStyleEditing"),{normalizedStyles:i}=t;for(const r of Object.keys(i))for(const i of t.normalizedStyles[r])if(e[i.attributeName]&&i.attributeValue===e[i.attributeName]){const e=l(r);n[e]=i.name}}this.editor.model.change((e=>{this.editor.model.insertContent(function(e,t){return e.createElement("drupalInlineMedia",t)}(e,n))}))}refresh(){const e=this.editor.model,t=e.document.selection,i=e.schema.findAllowedParent(t.getFirstPosition(),"drupalInlineMedia");this.isEnabled=null!==i}}class o extends e.Plugin{static get requires(){return[t.Widget]}constructor(e){super(e),this.attrs={drupalMediaAlt:"alt",drupalMediaEntityType:"data-entity-type",drupalMediaEntityUuid:"data-entity-uuid"},this.converterAttributes=["drupalMediaEntityUuid","drupalElementStyleViewMode","drupalMediaEntityType","drupalMediaAlt"]}init(){const e=this.editor.config.get("drupalMedia");if(!e)return;const{previewURL:t,themeError:i}=e;this.previewUrl=t,this.labelError=Drupal.t("Preview failed"),this.themeError=i||`\n      <p>${Drupal.t("An error occurred while trying to preview the media. Please save your work and reload this page.")}<p>\n    `,this._defineSchema(),this._defineConverters(),this.editor.commands.add("insertDrupalInlineMedia",new a(this.editor))}_defineSchema(){this.editor.model.schema.register("drupalInlineMedia",{allowWhere:"$block",isObject:!0,isContent:!0,isBlock:!0,allowAttributes:Object.keys(this.attrs)}),this.editor.editing.view.domConverter.blockElements.push("drupal-inline-media")}_defineConverters(){const e=this.editor.conversion,i=this.editor.plugins.get("DrupalMediaMetadataRepository");e.for("upcast").elementToElement({view:{name:"drupal-inline-media"},model:"drupalInlineMedia"}).add((e=>{e.on("element:drupal-inline-media",((e,t)=>{const[n]=t.modelRange.getItems();i.getMetadata(n).then((e=>{n&&(this.upcastDrupalMediaIsImage(n),this.editor.model.enqueueChange({isUndoable:!1},(t=>{t.setAttribute("drupalMediaType",e.type,n)})))})).catch((e=>{console.warn(e.toString())}))}),{priority:"lowest"})})),e.for("dataDowncast").elementToElement({model:"drupalInlineMedia",view:{name:"drupal-inline-media"}}),e.for("editingDowncast").elementToElement({model:"drupalInlineMedia",view:(e,{writer:i})=>{const n=i.createContainerElement("figure",{class:"drupal-inline-media"});if(!this.previewUrl){const e=i.createRawElement("div",{"data-drupal-inline-media-preview":"unavailable"});i.insert(i.createPositionAt(n,0),e)}return i.setCustomProperty("drupalInlineMedia",!0,n),(0,t.toWidget)(n,i,{label:Drupal.t("Inline Media widget")})}}).add((e=>{const t=(e,t,i)=>{const n=i.writer,l=t.item,a=i.mapper.toViewElement(t.item);let o=r(a.getChildren());if(o){if("ready"!==o.getAttribute("data-drupal-inline-media-preview"))return;n.setAttribute("data-drupal-inline-media-preview","loading",o)}else o=n.createRawElement("div",{"data-drupal-inline-media-preview":"loading"}),n.insert(n.createPositionAt(a,0),o);this._fetchPreview(l).then((({label:e,preview:t})=>{o&&this.editor.editing.view.change((i=>{const n=i.createRawElement("div",{"data-drupal-inline-media-preview":"ready","aria-label":e},(e=>{e.innerHTML=t}));i.insert(i.createPositionBefore(o),n),i.remove(o)}))}))};return this.converterAttributes.forEach((i=>{e.on(`attribute:${i}:drupalInlineMedia`,t)})),e})),Object.keys(this.attrs).forEach((t=>{const i={model:{key:t,name:"drupalInlineMedia"},view:{name:"drupal-inline-media",key:this.attrs[t]}};e.for("dataDowncast").attributeToAttribute(i),e.for("upcast").attributeToAttribute(i)}))}async _fetchPreview(e){const t=new URLSearchParams({text:this._renderElement(e),uuid:e.getAttribute("drupalMediaEntityUuid")}),i=await fetch(`${this.previewUrl}?${t}`,{headers:{"X-Drupal-MediaPreview-CSRF-Token":this.editor.config.get("drupalMedia").previewCsrfToken}});return i.ok?{label:i.headers.get("drupal-media-label"),preview:await i.text()}:{label:this.labelError,preview:this.themeError}}_renderElement(e){const t=this.editor.model.change((t=>{const i=t.createDocumentFragment(),n=t.cloneElement(e,!1);return["linkHref"].forEach((e=>{t.removeAttribute(e,n)})),t.append(n,i),i}));return this.editor.data.stringify(t)}static get pluginName(){return"DrupalInlineMediaEditing"}}function s(e,t,i){if(t.attributes)for(const[n,r]of Object.entries(t.attributes))e.setAttribute(n,r,i);t.styles&&e.setStyle(t.styles,i),t.classes&&e.addClass(t.classes,i)}function d(e,t,i){if(!i.consumable.consume(t.item,e.name))return;const n=i.mapper.toViewElement(t.item);s(i.writer,t.attributeNewValue,n)}class u extends e.Plugin{constructor(e){if(super(e),!e.plugins.has("GeneralHtmlSupport"))return;e.plugins.has("DataFilter")&&e.plugins.has("DataSchema")||console.error("DataFilter and DataSchema plugins are required for Drupal Media to integrate with General HTML Support plugin.");const{schema:t}=e.model,{conversion:i}=e,n=this.editor.plugins.get("DataFilter");this.editor.plugins.get("DataSchema").registerBlockElement({model:"drupalInlineMedia",view:"drupal-inline-media"}),n.on("register:drupal-inline-media",((e,r)=>{"drupalInlineMedia"===r.model&&(t.extend("drupalInlineMedia",{allowAttributes:["htmlLinkAttributes","htmlAttributes"]}),i.for("upcast").add(function(e){return t=>{t.on("element:drupal-inline-media",((t,i,n)=>{function r(t,r){const l=e.processViewAttributes(t,n);l&&n.writer.setAttribute(r,l,i.modelRange)}const l=i.viewItem,a=l.parent;r(l,"htmlAttributes"),a.is("element","a")&&r(a,"htmlLinkAttributes")}),{priority:"low"})}}(n)),i.for("editingDowncast").add((e=>{e.on("attribute:linkHref:drupalInlineMedia",((e,t,i)=>{if(!i.consumable.consume(t.item,"attribute:htmlLinkAttributes:drupalInlineMedia"))return;const n=i.mapper.toViewElement(t.item),r=function(e,t,i){const n=e.createRangeOn(t);for(const{item:e}of n.getWalker())if(e.is("element",i))return e}(i.writer,n,"a");s(i.writer,t.item.getAttribute("htmlLinkAttributes"),r)}),{priority:"low"})})),i.for("dataDowncast").add((e=>{e.on("attribute:linkHref:drupalInlineMedia",((e,t,i)=>{if(!i.consumable.consume(t.item,"attribute:htmlLinkAttributes:drupalInlineMedia"))return;const n=i.mapper.toViewElement(t.item).parent;s(i.writer,t.item.getAttribute("htmlLinkAttributes"),n)}),{priority:"low"}),e.on("attribute:htmlAttributes:drupalInlineMedia",d,{priority:"low"})})),e.stop())}))}static get pluginName(){return"DrupalInlineMediaGeneralHtmlSupport"}}var c=i("ckeditor5/src/ui.js");class m extends e.Plugin{init(){const e=this.editor,t=this.editor.config.get("drupalMedia"),i=this.editor.config.get("drupalInlineMedia");if(!t||!i)return;const{libraryURL:n,openDialog:r,dialogSettings:l={}}=t;n&&"function"==typeof r&&e.ui.componentFactory.add("drupalInlineMedia",(t=>{const n=e.commands.get("insertDrupalInlineMedia"),a=new c.ButtonView(t);return a.set({label:e.t("Insert inline media from Media Library"),icon:'<svg viewBox="0 0 640 512" xmlns="http://www.w3.org/2000/svg"><path d="m392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3l89.3 89.4-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-89.4-89.3 89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z"/></svg>',tooltip:!0}),a.bind("isOn","isEnabled").to(n,"value","isEnabled"),this.listenTo(a,"execute",(()=>{r(i.libraryURL,(({attributes:t})=>{e.execute("insertDrupalInlineMedia",t)}),l)})),a}))}}function p(e){return(0,t.isWidget)(e)&&!!e.getCustomProperty("drupalInlineMedia")}function g(e){const t=typeof e;return null!=e&&("object"===t||"function"===t)}function f(e){return`drupalElementStyle${e[0].toUpperCase()+e.substring(1)}`}class h extends e.Plugin{static get requires(){return[t.WidgetToolbarRepository]}static get pluginName(){return"DrupalInlineMediaToolbar"}afterInit(){const{editor:e}=this;var i;e.plugins.get(t.WidgetToolbarRepository).register("drupalInlineMedia",{ariaLabel:Drupal.t("Drupal Inline Media toolbar"),items:(i=e.config.get("drupalInlineMedia.toolbar"),i.map((e=>g(e)?e.name:e))||[]),getRelatedElement:e=>function(e){const t=e.getSelectedElement();if(t&&p(t))return t;let i=e.getFirstPosition().parent;for(;i;){if(i.is("element")&&p(i))return i;i=i.parent}return null}(e)})}}class b extends e.Plugin{static get requires(){return[o,u,m,h]}}var y=i("ckeditor5/src/utils.js");const{objectFullWidth:w,objectInline:E,objectLeft:I,objectRight:k,objectCenter:v,objectBlockLeft:D,objectBlockRight:S}=e.icons,M={inline:{name:"inline",title:"In line",icon:E,modelElements:["imageInline"],isDefault:!0},alignLeft:{name:"alignLeft",title:"Left aligned image",icon:I,modelElements:["imageBlock","imageInline"],className:"image-style-align-left"},alignBlockLeft:{name:"alignBlockLeft",title:"Left aligned image",icon:D,modelElements:["imageBlock"],className:"image-style-block-align-left"},alignCenter:{name:"alignCenter",title:"Centered image",icon:v,modelElements:["imageBlock"],className:"image-style-align-center"},alignRight:{name:"alignRight",title:"Right aligned image",icon:k,modelElements:["imageBlock","imageInline"],className:"image-style-align-right"},alignBlockRight:{name:"alignBlockRight",title:"Right aligned image",icon:S,modelElements:["imageBlock"],className:"image-style-block-align-right"},block:{name:"block",title:"Centered image",icon:v,modelElements:["imageBlock"],isDefault:!0},side:{name:"side",title:"Side image",icon:k,modelElements:["imageBlock"],className:"image-style-side"}},A={full:w,left:D,right:S,center:v,inlineLeft:I,inlineRight:k,inline:E},x=[{name:"imageStyle:wrapText",title:"Wrap text",defaultItem:"imageStyle:alignLeft",items:["imageStyle:alignLeft","imageStyle:alignRight"]},{name:"imageStyle:breakText",title:"Break text",defaultItem:"imageStyle:block",items:["imageStyle:alignBlockLeft","imageStyle:block","imageStyle:alignBlockRight"]}];function C(e){(0,y.logWarning)("image-style-configuration-definition-invalid",e)}const O={normalizeStyles:function(e){return(e.configuredStyles.options||[]).map((e=>function(e){e="string"==typeof e?M[e]?{...M[e]}:{name:e}:function(e,t){const i={...t};for(const n in e)Object.prototype.hasOwnProperty.call(t,n)||(i[n]=e[n]);return i}(M[e.name],e);"string"==typeof e.icon&&(e.icon=A[e.icon]||e.icon);return e}(e))).filter((t=>function(e,{isBlockPluginLoaded:t,isInlinePluginLoaded:i}){const{modelElements:n,name:r}=e;if(!(n&&n.length&&r))return C({style:e}),!1;{const r=[t?"imageBlock":null,i?"imageInline":null];if(!n.some((e=>r.includes(e))))return(0,y.logWarning)("image-style-missing-dependency",{style:e,missingPlugins:n.map((e=>"imageBlock"===e?"ImageBlockEditing":"ImageInlineEditing"))}),!1}return!0}(t,e)))},getDefaultStylesConfiguration:function(e,t){return e&&t?{options:["inline","alignLeft","alignRight","alignCenter","alignBlockLeft","alignBlockRight","block","side"]}:e?{options:["block","side"]}:t?{options:["inline","alignLeft","alignRight"]}:{}},getDefaultDropdownDefinitions:function(e){return e.has("ImageBlockEditing")&&e.has("ImageInlineEditing")?[...x]:[]},warnInvalidStyle:C,DEFAULT_OPTIONS:M,DEFAULT_ICONS:A,DEFAULT_DROPDOWN_DEFINITIONS:x};function j(e,t,i){for(const n of t)if(i.checkAttribute(e,n))return!0;return!1}function L(e,t,i){const n=e.getSelectedElement();if(n&&j(n,i,t))return n;let{parent:r}=e.getFirstPosition();for(;r;){if(r.is("element")&&j(r,i,t))return r;r=r.parent}return null}class B extends e.Command{constructor(e,t){super(e),this.styles={},Object.keys(t).forEach((e=>{this.styles[e]=new Map(t[e].map((e=>[e.name,e])))})),this.modelAttributes=[];for(const e of Object.keys(t)){const t=f(e);this.modelAttributes.push(t)}}refresh(){const{editor:e}=this,t=L(e.model.document.selection,e.model.schema,this.modelAttributes);this.isEnabled=!!t,this.isEnabled?this.value=this.getValue(t):this.value=!1}getValue(e){const t={};return Object.keys(this.styles).forEach((i=>{const n=f(i);if(e.hasAttribute(n))t[i]=e.getAttribute(n);else for(const[,e]of this.styles[i])e.isDefault&&(t[i]=e.name)})),t}execute(e={}){const{editor:{model:t}}=this,{value:i,group:n}=e,r=f(n);t.change((e=>{const l=L(t.document.selection,t.schema,this.modelAttributes);!i||this.styles[n].get(i).isDefault?e.removeAttribute(r,l):e.setAttribute(r,i,l)}))}}function T(e,t){for(const i of t)if(i.name===e)return i}class P extends e.Plugin{init(){const{editor:t}=this,i=t.config.get("drupalInlineElementStyles");this.normalizedStyles={},Object.keys(i).forEach((t=>{this.normalizedStyles[t]=i[t].map((t=>("string"==typeof t.icon&&e.icons[t.icon]&&(t.icon=e.icons[t.icon]),t.name&&(t.name=`${t.name}`),t))).filter((e=>e.isDefault||e.attributeName&&e.attributeValue?e.modelElements&&Array.isArray(e.modelElements)?!!e.name||(console.warn("drupalInlineElementStyles options must include a name."),!1):(console.warn("drupalInlineElementStyles options must include an array of supported modelElements."),!1):(console.warn(`${e.attributeValue} drupalInlineElementStyles options must include attributeName and attributeValue.`),!1)))})),this._setupConversion(),t.commands.add("drupalInlineElementStyle",new B(t,this.normalizedStyles))}_setupConversion(){const{editor:e}=this,{schema:t}=e.model;Object.keys(this.normalizedStyles).forEach((i=>{const n=f(i),r=(l=this.normalizedStyles[i],(e,t,i)=>{if(!i.consumable.consume(t.item,e.name))return;const n=T(t.attributeNewValue,l),r=T(t.attributeOldValue,l),a=i.mapper.toViewElement(t.item),o=i.writer;r&&("class"===r.attributeName?o.removeClass(r.attributeValue,a):o.removeAttribute(r.attributeName,a)),n&&("class"===n.attributeName?o.addClass(n.attributeValue,a):n.isDefault||o.setAttribute(n.attributeName,n.attributeValue,a))});var l;const a=function(e,t){const i=e.filter((e=>!e.isDefault));return(e,n,r)=>{if(!n.modelRange)return;const l=n.viewItem,a=(0,y.first)(n.modelRange.getItems());if(a&&r.schema.checkAttribute(a,t))for(const e of i)if("class"===e.attributeName)r.consumable.consume(l,{classes:e.attributeValue})&&r.writer.setAttribute(t,e.name,a);else if(r.consumable.consume(l,{attributes:[e.attributeName]}))for(const e of i)e.attributeValue===l.getAttribute(e.attributeName)&&r.writer.setAttribute(t,e.name,a)}}(this.normalizedStyles[i],n);e.editing.downcastDispatcher.on(`attribute:${n}`,r),e.data.downcastDispatcher.on(`attribute:${n}`,r);[...new Set(this.normalizedStyles[i].map((e=>e.modelElements)).flat())].forEach((e=>{t.extend(e,{allowAttributes:n})})),e.data.upcastDispatcher.on("element",a,{priority:"low"})}))}static get pluginName(){return"DrupalInlineElementStyleEditing"}}const R=e=>e,V=(e,t)=>(e?`${e}: `:"")+t;function N(e,t){return`drupalInlineElementStyle:${t}:${e}`}class _ extends e.Plugin{static get requires(){return[P]}init(){const{plugins:e}=this.editor,t=this.editor.config.get("drupalInlineMedia.toolbar")||[],i=e.get("DrupalInlineElementStyleEditing").normalizedStyles;Object.keys(i).forEach((e=>{i[e].forEach((t=>{this._createButton(t,e,i[e])}))}));t.filter(g).filter((e=>{const t=[];if(!e.display)return console.warn("dropdown configuration must include a display key specifying either listDropdown or splitButton."),!1;e.items.includes(e.defaultItem)||console.warn("defaultItem must be part of items in the dropdown configuration.");for(const i of e.items){const e=i.split(":")[1];t.push(e)}return!!t.every((e=>e===t[0]))||(console.warn("dropdown configuration should only contain buttons from one group."),!1)})).forEach((e=>{if(e.items.length>=2){const t=e.name.split(":")[1];switch(e.display){case"splitButton":this._createDropdown(e,i[t]);break;case"listDropdown":this._createListDropdown(e,i[t])}}}))}updateOptionVisibility(e,t,i,n){const{selection:r}=this.editor.model.document,l={};l[n]=e;const a=r?r.getSelectedElement():L(r,this.editor.model.schema,l),o=e.filter((function(e){for(const[t,i]of(0,y.toMap)(e.modelAttributes))if(a&&a.hasAttribute(t))return i.includes(a.getAttribute(t));return!0}));i.hasOwnProperty("model")?o.includes(t)?i.model.set({class:""}):i.model.set({class:"ck-hidden"}):o.includes(t)?i.set({class:""}):i.set({class:"ck-hidden"})}_createDropdown(e,t){const i=this.editor.ui.componentFactory;i.add(e.name,(n=>{let r;const{defaultItem:l,items:a,title:o}=e,s=a.filter((e=>{const i=e.split(":")[1];return t.find((({name:t})=>N(t,i)===e))})).map((e=>{const t=i.create(e);return e===l&&(r=t),t}));a.length!==s.length&&O.warnInvalidStyle({dropdown:e});const d=(0,c.createDropdown)(n,c.SplitButtonView),u=d.buttonView;return(0,c.addToolbarToDropdown)(d,s),u.set({label:V(o,r.label),class:null,tooltip:!0}),u.bind("icon").toMany(s,"isOn",((...e)=>{const t=e.findIndex(R);return t<0?r.icon:s[t].icon})),u.bind("label").toMany(s,"isOn",((...e)=>{const t=e.findIndex(R);return V(o,t<0?r.label:s[t].label)})),u.bind("isOn").toMany(s,"isOn",((...e)=>e.some(R))),u.bind("class").toMany(s,"isOn",((...e)=>e.some(R)?"ck-splitbutton_flatten":null)),u.on("execute",(()=>{s.some((({isOn:e})=>e))?d.isOpen=!d.isOpen:r.fire("execute")})),d.bind("isEnabled").toMany(s,"isEnabled",((...e)=>e.some(R))),d}))}_createButton(e,t,i){const n=e.name;this.editor.ui.componentFactory.add(N(n,t),(r=>{const l=this.editor.commands.get("drupalInlineElementStyle"),a=new c.ButtonView(r);return a.set({label:e.title,icon:e.icon,tooltip:!0,isToggleable:!0}),a.bind("isEnabled").to(l,"isEnabled"),a.bind("isOn").to(l,"value",(e=>e&&e[t]===n)),a.on("execute",this._executeCommand.bind(this,n,t)),this.listenTo(this.editor.ui,"update",(()=>{this.updateOptionVisibility(i,e,a,t)})),a}))}getDropdownListItemDefinitions(e,t,i){const n=new y.Collection;return e.forEach((t=>{const r={type:"button",model:new c.Model({group:i,commandValue:t.name,label:t.title,withText:!0,class:""})};n.add(r),this.listenTo(this.editor.ui,"update",(()=>{this.updateOptionVisibility(e,t,r,i)}))})),n}_createListDropdown(e,t){const i=this.editor.ui.componentFactory;i.add(e.name,(n=>{let r;const{defaultItem:l,items:a,title:o,defaultText:s}=e,d=e.name.split(":")[1],u=a.filter((e=>t.find((({name:t})=>N(t,d)===e)))).map((e=>{const t=i.create(e);return e===l&&(r=t),t}));a.length!==u.length&&O.warnInvalidStyle({dropdown:e});const m=(0,c.createDropdown)(n,c.DropdownButtonView),p=m.buttonView;p.set({label:V(o,r.label),class:null,tooltip:s,withText:!0});const g=this.editor.commands.get("drupalInlineElementStyle");return p.bind("label").to(g,"value",(e=>{if(e&&e[d])for(const i of t)if(i.name===e[d])return i.title;return s})),m.bind("isOn").to(g),m.bind("isEnabled").to(this),(0,c.addListToDropdown)(m,this.getDropdownListItemDefinitions(t,g,d)),this.listenTo(m,"execute",(e=>{this._executeCommand(e.source.commandValue,e.source.group)})),m}))}_executeCommand(e,t){this.editor.execute("drupalInlineElementStyle",{value:e,group:t}),this.editor.editing.view.focus()}static get pluginName(){return"DrupalInlineElementStyleUi"}}class F extends e.Plugin{static get requires(){return[P,_]}static get pluginName(){return"DrupalInlineElementStyle"}}const U={DrupalInlineMedia:b,DrupalInlineElementStyle:F}})(),n=n.default})()));
+\ No newline at end of file
+diff --git a/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlineelementstyle/drupalinlineelementstyleui.js b/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlineelementstyle/drupalinlineelementstyleui.js
+index b17a621..5b8afa1 100644
+--- a/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlineelementstyle/drupalinlineelementstyleui.js
++++ b/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlineelementstyle/drupalinlineelementstyleui.js
+@@ -379,7 +379,7 @@ export default class DrupalInlineElementStyleUi extends Plugin {
+     this.editor.ui.componentFactory.add(
+       getUIComponentName(buttonName, group),
+       (locale) => {
+-        const command = this.editor.commands.get('drupalElementStyle');
++        const command = this.editor.commands.get('drupalInlineElementStyle');
+         const view = new ButtonView(locale);
+
+         view.set({
+@@ -539,7 +539,7 @@ export default class DrupalInlineElementStyleUi extends Plugin {
+    * @private
+    */
+   _executeCommand(name, group) {
+-    this.editor.execute('drupalElementStyle', {
++    this.editor.execute('drupalInlineElementStyle', {
+       value: name,
+       group,
+     });
+diff --git a/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlinemediaediting.js b/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlinemediaediting.js
+index 574e29c..848095e 100644
+--- a/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlinemediaediting.js
++++ b/js/ckeditor5_plugins/mediaInlineEmbed/src/drupalinlinemediaediting.js
+@@ -38,9 +38,6 @@ export default class DrupalInlineMediaEditing extends Plugin {
+       return;
+     }
+
+-    // Used to prevent double-fetching of previews of the same model element
+-    this._previewLocks = new WeakSet();
+-
+     const { previewURL, themeError } = options;
+     this.previewUrl = previewURL;
+     this.labelError = Drupal.t("Preview failed");
+@@ -211,45 +208,36 @@ export default class DrupalInlineMediaEditing extends Plugin {
+             viewWriter.insert(viewWriter.createPositionAt(container, 0), media);
+           }
+
+-          // If a preview isn't already being fetched and rendered, fetch it and perform the view conversion asynchronously.
+-          if (!this._previewLocks.has(modelElement)) {
+-            this._previewLocks.add(modelElement);
+-
+-            const reset = () => this._previewLocks.delete(modelElement);
+-
+-            this._fetchPreview(modelElement)
+-              .then(({ label, preview }) => {
+-                if (!media) {
+-                  // Nothing to do if associated preview wrapped no longer exist.
+-                  return;
+-                }
+-                // CKEditor 5 doesn't support async view conversion. Therefore, once
+-                // the promise is fulfilled, the editing view needs to be modified
+-                // manually.
+-                this.editor.editing.view.change((writer) => {
+-                  const mediaPreview = writer.createRawElement(
+-                    "div",
+-                    {
+-                      "data-drupal-inline-media-preview": "ready",
+-                      "aria-label": label,
+-                    },
+-                    (domElement) => {
+-                      domElement.innerHTML = preview;
+-                    }
+-                  );
+-                  // Insert the new preview before the previous preview element to
+-                  // ensure that the location remains same even if it is wrapped
+-                  // with another element.
+-                  writer.insert(
+-                    writer.createPositionBefore(media),
+-                    mediaPreview
+-                  );
+-                  writer.remove(media);
+-                });
+-              })
+-              // Release the "lock" on either success or failure of the above
+-              .then(reset, reset);
+-          }
++          this._fetchPreview(modelElement)
++            .then(({ label, preview }) => {
++              if (!media) {
++                // Nothing to do if associated preview wrapped no longer exist.
++                return;
++              }
++              // CKEditor 5 doesn't support async view conversion. Therefore, once
++              // the promise is fulfilled, the editing view needs to be modified
++              // manually.
++              this.editor.editing.view.change((writer) => {
++                const mediaPreview = writer.createRawElement(
++                  "div",
++                  {
++                    "data-drupal-inline-media-preview": "ready",
++                    "aria-label": label,
++                  },
++                  (domElement) => {
++                    domElement.innerHTML = preview;
++                  }
++                );
++                // Insert the new preview before the previous preview element to
++                // ensure that the location remains same even if it is wrapped
++                // with another element.
++                writer.insert(
++                  writer.createPositionBefore(media),
++                  mediaPreview
++                );
++                writer.remove(media);
++              });
++            });
+         };
+
+         // List all attributes that should trigger re-rendering of the
+diff --git a/js/ckeditor5_plugins/mediaInlineEmbed/src/utils.js b/js/ckeditor5_plugins/mediaInlineEmbed/src/utils.js
+index ecb2e76..3c89f26 100644
+--- a/js/ckeditor5_plugins/mediaInlineEmbed/src/utils.js
++++ b/js/ckeditor5_plugins/mediaInlineEmbed/src/utils.js
+@@ -108,7 +108,7 @@ export function isObject(value) {
+ export function getPreviewContainer(children) {
+   // eslint-disable-next-line no-restricted-syntax
+   for (const child of children) {
+-    if (child.hasAttribute('data-drupal-media-preview')) {
++    if (child.hasAttribute('data-drupal-inline-media-preview')) {
+       return child;
+     }
+
+diff --git a/media_inline_embed.module b/media_inline_embed.module
+index 396f07f..77d0c6f 100644
+--- a/media_inline_embed.module
++++ b/media_inline_embed.module
+@@ -23,9 +23,21 @@ function media_inline_embed_theme($existing, $type, $theme, $path) {
+       'path' => $path . '/templates',
+       'base hook' => 'field',
+     ],
++    'media_embed_error__inline' => [
++      'template' => 'media-embed-error--inline',
++      'path' => $path .'/templates',
++      'base hook' => 'media-embed-error',
++    ],
+   ];
+ }
+
++/**
++ * Implements hook_theme_registry_alter().
++ */
++function media_inline_embed_theme_registry_alter(&$theme_registry) {
++  $theme_registry['media_embed_error']['variables']['inline'] = FALSE;
++}
++
+ /**
+  * Implements hook_theme_suggestions_alter().
+  */
+@@ -68,6 +80,9 @@ function media_inline_embed_theme_suggestions_alter(array &$suggestions, array $
+         $suggestions[] = 'field__inline_embed__' . $elements['#entity_type'] . '__' . $elements['#field_name'] . '__' . $elements['#bundle'];
+       }
+       break;
++    case 'media_embed_error':
++      $suggestions[] = 'media_embed_error__' . ($variables['inline'] ? 'inline' : 'block');
++      break;
+   }
+ }
+
+diff --git a/src/Plugin/Filter/MediaInlineEmbed.php b/src/Plugin/Filter/MediaInlineEmbed.php
+index 1bd8e0f..d9aa64e 100644
+--- a/src/Plugin/Filter/MediaInlineEmbed.php
++++ b/src/Plugin/Filter/MediaInlineEmbed.php
+@@ -101,4 +101,16 @@ class MediaInlineEmbed extends MediaEmbed {
+     return $result;
+   }
+
++  /**
++   * Builds the render array for the indicator when media cannot be loaded.
++   *
++   * @return array
++   *   A render array.
++   */
++  protected function renderMissingMediaIndicator() {
++    $output = parent::renderMissingMediaIndicator();
++    $output['#inline'] = TRUE;
++    return $output;
++  }
++
+ }
+diff --git a/templates/media-embed-error--inline.html.twig b/templates/media-embed-error--inline.html.twig
+new file mode 100644
+index 0000000..d2f7388
+--- /dev/null
++++ b/templates/media-embed-error--inline.html.twig
+@@ -0,0 +1,20 @@
++{#
++/**
++ * @file
++ * Default theme implementation for a missing inline media error.
++ *
++ * Available variables
++ * - message: The message text.
++ * - attributes: HTML attributes for the containing element.
++ *
++ * When a response from the back end can't be returned, a related error message
++ * is displayed from JavaScript.
++ *
++ * @see Drupal.theme.mediaEmbedPreviewError
++ *
++ * @ingroup themeable
++ */
++#}
++<span{{ attributes }}>
++  {{ message }}
++</span>
+--
+GitLab
+
+
+From 43c3fe7b57490d7d554b0732a529cb644f85e430 Mon Sep 17 00:00:00 2001
+From: Carson Oldson <coldson@forumone.com>
+Date: Thu, 15 Jun 2023 12:45:13 -0500
+Subject: [PATCH 7/7] Removing code from other patch.
+
+---
+ media_inline_embed.module                     | 15 --------------
+ src/Plugin/Filter/MediaInlineEmbed.php        | 12 -----------
+ templates/media-embed-error--inline.html.twig | 20 -------------------
+ 3 files changed, 47 deletions(-)
+ delete mode 100644 templates/media-embed-error--inline.html.twig
+
+diff --git a/media_inline_embed.module b/media_inline_embed.module
+index 77d0c6f..396f07f 100644
+--- a/media_inline_embed.module
++++ b/media_inline_embed.module
+@@ -23,21 +23,9 @@ function media_inline_embed_theme($existing, $type, $theme, $path) {
+       'path' => $path . '/templates',
+       'base hook' => 'field',
+     ],
+-    'media_embed_error__inline' => [
+-      'template' => 'media-embed-error--inline',
+-      'path' => $path .'/templates',
+-      'base hook' => 'media-embed-error',
+-    ],
+   ];
+ }
+
+-/**
+- * Implements hook_theme_registry_alter().
+- */
+-function media_inline_embed_theme_registry_alter(&$theme_registry) {
+-  $theme_registry['media_embed_error']['variables']['inline'] = FALSE;
+-}
+-
+ /**
+  * Implements hook_theme_suggestions_alter().
+  */
+@@ -80,9 +68,6 @@ function media_inline_embed_theme_suggestions_alter(array &$suggestions, array $
+         $suggestions[] = 'field__inline_embed__' . $elements['#entity_type'] . '__' . $elements['#field_name'] . '__' . $elements['#bundle'];
+       }
+       break;
+-    case 'media_embed_error':
+-      $suggestions[] = 'media_embed_error__' . ($variables['inline'] ? 'inline' : 'block');
+-      break;
+   }
+ }
+
+diff --git a/src/Plugin/Filter/MediaInlineEmbed.php b/src/Plugin/Filter/MediaInlineEmbed.php
+index d9aa64e..1bd8e0f 100644
+--- a/src/Plugin/Filter/MediaInlineEmbed.php
++++ b/src/Plugin/Filter/MediaInlineEmbed.php
+@@ -101,16 +101,4 @@ class MediaInlineEmbed extends MediaEmbed {
+     return $result;
+   }
+
+-  /**
+-   * Builds the render array for the indicator when media cannot be loaded.
+-   *
+-   * @return array
+-   *   A render array.
+-   */
+-  protected function renderMissingMediaIndicator() {
+-    $output = parent::renderMissingMediaIndicator();
+-    $output['#inline'] = TRUE;
+-    return $output;
+-  }
+-
+ }
+diff --git a/templates/media-embed-error--inline.html.twig b/templates/media-embed-error--inline.html.twig
+deleted file mode 100644
+index d2f7388..0000000
+--- a/templates/media-embed-error--inline.html.twig
++++ /dev/null
+@@ -1,20 +0,0 @@
+-{#
+-/**
+- * @file
+- * Default theme implementation for a missing inline media error.
+- *
+- * Available variables
+- * - message: The message text.
+- * - attributes: HTML attributes for the containing element.
+- *
+- * When a response from the back end can't be returned, a related error message
+- * is displayed from JavaScript.
+- *
+- * @see Drupal.theme.mediaEmbedPreviewError
+- *
+- * @ingroup themeable
+- */
+-#}
+-<span{{ attributes }}>
+-  {{ message }}
+-</span>
+--
 GitLab
 
