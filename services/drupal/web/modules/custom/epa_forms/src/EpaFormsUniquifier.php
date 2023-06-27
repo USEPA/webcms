@@ -37,7 +37,8 @@ class EpaFormsUniquifier {
    */
   public static function getFormIdForNode($entity) {
     $title = $entity->label();
-    $machine_name = $entity->get('field_machine_name')->getValue();
+    $machine_name = '';
+    if ($entity->hasField('field_machine_name')) $machine_name = $entity->field_machine_name->value;
     $label = !empty($machine_name) ? $machine_name : $title;
     $id = preg_replace('@[^a-z0-9-]+@', '_', strtolower($label));
     return EpaFormsUniquifier::uniquifyFormId($id);
