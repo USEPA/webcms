@@ -6,7 +6,7 @@
   {% if error_message %}
     <span class="usa-error-message" id="{{ textarea_id }}-message" role="alert">{{ error_message }}</span>
   {% endif %}
-  {% spaceless %}
+  {% apply spaceless %}
     <textarea aria-describedby="{{ textarea_id }}-message"
       id="{{ textarea_id }}"
       name="{{ textarea_id }}"
@@ -15,5 +15,5 @@
       {% if textarea_required %} required{% endif %}
       {% if textarea_rows %} rows="{{ textarea_rows }}"{% endif %}
       {% if textarea_cols %} cols="{{ textarea_cols }}"{% endif %}></textarea>
-  {% endspaceless %}
+  {% endapply %}
 </div>
