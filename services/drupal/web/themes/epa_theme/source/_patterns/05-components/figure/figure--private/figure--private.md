@@ -1,6 +1,6 @@
 ---
-el: .figure
-title: Figure
+el: .figure--private
+title: Private Media Figure
 state: complete
 ---
 

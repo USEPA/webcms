@@ -1,0 +1,25 @@
+@use '../../../00-config' as *;
+
+.figure--is-private .figure__media {
+  position: relative;
+
+  &::before {
+    background-color: rgba(color($theme-color-warning), 0.5);
+    bottom: 0;
+    content: '';
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .figure__media--private-icon {
+    background-color: color($theme-color-warning);
+    height: 25px;
+    left: 0;
+    padding: rem(5px);
+    position: absolute;
+    top: 0;
+    width: 25px;
+  }
+}

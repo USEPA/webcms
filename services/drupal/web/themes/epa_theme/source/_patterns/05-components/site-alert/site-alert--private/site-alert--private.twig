@@ -1,0 +1,13 @@
+{% set classes = [
+  'usa-site-alert--private',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/site-alert/site-alert.twig' with {
+  'modifier_classes': classes,
+  'show_close': show_close,
+  'hash': hash,
+  'label': 'Private Media'|t,
+  'content': content,
+  'heading': heading,
+} %}
