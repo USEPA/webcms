@@ -1,0 +1,224 @@
+diff --git a/src/Generators/Ics.php b/src/Generators/Ics.php
+index b738974..bd910a7 100644
+--- a/src/Generators/Ics.php
++++ b/src/Generators/Ics.php
+@@ -2,74 +2,57 @@
+ 
+ namespace Spatie\CalendarLinks\Generators;
+ 
+-use Spatie\CalendarLinks\Generator;
++use Sabre\VObject\Component;
+ use Spatie\CalendarLinks\Link;
++use Sabre\VObject\TimeZoneUtil;
++use Spatie\CalendarLinks\Generator;
++use Sabre\VObject\Component\VCalendar;
+ 
+ /**
+  * @see https://icalendar.org/RFC-Specifications/iCalendar-RFC-5545/
+  */
+ class Ics implements Generator
+ {
+-    /** @var string {@see https://www.php.net/manual/en/function.date.php} */
+-    protected $dateFormat = 'Ymd';
+-    /** @var string */
+-    protected $dateTimeFormat = 'Ymd\THis\Z';
+-
+-    /** @var array<non-empty-string, non-empty-string> */
+-    protected $options = [];
+-
+-    /**
+-     * @param array<non-empty-string, non-empty-string> $options
+-     */
+-    public function __construct(array $options = [])
+-    {
+-        $this->options = $options;
+-    }
+-
+-    /** {@inheritDoc} */
+     public function generate(Link $link): string
+     {
+-        $url = [
+-            'BEGIN:VCALENDAR',
+-            'VERSION:2.0', // @see https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.4
+-            'PRODID:Spatie calendar-links', // @see https://datatracker.ietf.org/doc/html/rfc5545#section-3.7.3
+-            'BEGIN:VEVENT',
+-            'UID:'.($this->options['UID'] ?? $this->generateEventUid($link)),
+-            'SUMMARY:'.$this->escapeString($link->title),
+-        ];
++        $timeZones = [];
+ 
+-        $dateTimeFormat = $link->allDay ? $this->dateFormat : $this->dateTimeFormat;
++        $vcalendar = new VCalendar();
++        $vevent = $vcalendar->createComponent('VEVENT', [
++            'UID' => $this->generateEventUid($link),
++            'SUMMARY' => $link->title,
++        ]);
++        $vcalendar->add($vevent);
+ 
+         if ($link->allDay) {
+-            $url[] = 'DTSTAMP:'.gmdate($dateTimeFormat, $link->from->getTimestamp());
+-            $url[] = 'DTSTART:'.gmdate($dateTimeFormat, $link->from->getTimestamp());
+-            $url[] = 'DURATION:P'.(max(1, $link->from->diff($link->to)->days)).'D';
++            $vevent->add('DTSTART', $link->from);
++            $vevent->add('DURATION:P1D');
++            $timeZones[$link->from->getTimezone()->getName()] = $link->from->getTimezone();
+         } else {
+-            $url[] = 'DTSTAMP:'.gmdate($dateTimeFormat, $link->from->getTimestamp());
+-            $url[] = 'DTSTART:'.gmdate($dateTimeFormat, $link->from->getTimestamp());
+-            $url[] = 'DTEND:'.gmdate($dateTimeFormat, $link->to->getTimestamp());
++            $vevent->add('DTSTART', $link->from);
++            $timeZones[$link->from->getTimezone()->getName()] = $link->from->getTimezone();
++
++            $vevent->add('DTEND', $link->to);
++            $timeZones[$link->to->getTimezone()->getName()] = $link->to->getTimezone();
+         }
+ 
+         if ($link->description) {
+-            $url[] = 'DESCRIPTION:'.$this->escapeString(strip_tags($link->description));
++            $vevent->add('DESCRIPTION', $link->description);
+         }
++
+         if ($link->address) {
+-            $url[] = 'LOCATION:'.$this->escapeString($link->address);
++            $vevent->add('LOCATION', $link->address);
+         }
+ 
+-        if (isset($this->options['URL'])) {
+-            $url[] = 'URL;VALUE=URI:'.$this->options['URL'];
+-        }
++        $this->addVTimezoneComponents($vcalendar, $timeZones, $link->from, $link->to);
+ 
+-        $url[] = 'END:VEVENT';
+-        $url[] = 'END:VCALENDAR';
++        // Remove non-wanted component
++        $vcalendar->remove('PRODID');
++        $vevent->remove('DTSTAMP');
+ 
+-        return $this->buildLink($url);
+-    }
++        $redirectLink = str_replace("\r\n", '%0d%0a', $vcalendar->serialize());
+ 
+-    protected function buildLink(array $propertiesAndComponents): string
+-    {
+-        return 'data:text/calendar;charset=utf8;base64,'.base64_encode(implode("\r\n", $propertiesAndComponents));
++        return 'data:text/calendar;charset=utf8,'.$redirectLink;
+     }
+ 
+     /** @see https://tools.ietf.org/html/rfc5545.html#section-3.3.11 */
+@@ -81,12 +64,109 @@ protected function escapeString(string $field): string
+     /** @see https://tools.ietf.org/html/rfc5545#section-3.8.4.7 */
+     protected function generateEventUid(Link $link): string
+     {
+-        return md5(sprintf(
+-            '%s%s%s%s',
+-            $link->from->format(\DateTimeInterface::ATOM),
+-            $link->to->format(\DateTimeInterface::ATOM),
+-            $link->title,
+-            $link->address
+-        ));
++        return md5($link->from->format(\DateTime::ATOM).$link->to->format(\DateTime::ATOM).$link->title.$link->address);
++    }
++
++    protected function addVTimezoneComponents(VCalendar $vcalendar, array $timeZones, \DateTime $from, \DateTime $to)
++    {
++        foreach ($timeZones as $timeZone) {
++            /* @var \DateTimeZone $timeZone */
++            if ($timeZone->getName() !== 'UTC') {
++                $vcalendar->add(
++                    $this->generateVTimeZoneComponent(
++                        $vcalendar,
++                        $timeZone,
++                        $from->getTimestamp(),
++                        $to->getTimestamp()
++                    )
++                );
++            }
++        }
++    }
++
++    /**
++     * Returns a VTIMEZONE component for a Olson timezone identifier
++     * with daylight transitions covering the given date range.
++     *
++     * Kinldy inspired from https://gist.github.com/thomascube/47ff7d530244c669825736b10877a200
++     * and https://stackoverflow.com/a/25971680
++     *
++     * @param VCalendar $vcalendar
++     * @param \DateTimeZone $timeZone Timezone
++     * @param int $from Unix timestamp with first date/time in this timezone
++     * @param int $to Unix timestap with last date/time in this timezone
++     *
++     * @return Component A Sabre\VObject\Component object representing a VTIMEZONE definition
++     */
++    protected function generateVTimeZoneComponent(VCalendar $vcalendar, \DateTimeZone $timeZone, int $from = 0, int $to = 0)
++    {
++        if (! $from) {
++            $from = time();
++        }
++        if (! $to) {
++            $to = $from;
++        }
++
++        // get all transitions for one year back/ahead
++        $year = 86400 * 360;
++        $transitions = $timeZone->getTransitions($from - $year, $to + $year);
++
++        $vTimeZone = $vcalendar->createComponent('VTIMEZONE');
++        $vTimeZone->TZID = $timeZone->getName();
++
++        $std = null;
++        $dst = null;
++        foreach ($transitions as $i => $trans) {
++            $component = null;
++
++            if ($i === 0) {
++                // remember the offset for the next TZOFFSETFROM value
++                $tzfrom = $trans['offset'] / 3600;
++            }
++
++            // daylight saving time definition
++            if ($trans['isdst']) {
++                $t_dst = $trans['ts'];
++                $dst = $vcalendar->createComponent('DAYLIGHT');
++                $component = $dst;
++            } // standard time definition
++            else {
++                $t_std = $trans['ts'];
++                $std = $vcalendar->createComponent('STANDARD');
++                $component = $std;
++            }
++
++            if ($component) {
++                $dt = new \DateTime($trans['time']);
++                $offset = $trans['offset'] / 3600;
++
++                $component->DTSTART = $dt->format('Ymd\THis');
++                $component->TZOFFSETFROM = sprintf('%s%02d%02d', $tzfrom >= 0 ? '+' : '', floor($tzfrom),
++                    ($tzfrom - floor($tzfrom)) * 60);
++                $component->TZOFFSETTO = sprintf('%s%02d%02d', $offset >= 0 ? '+' : '', floor($offset),
++                    ($offset - floor($offset)) * 60);
++
++                // add abbreviated timezone name if available
++                if (! empty($trans['abbr'])) {
++                    $component->TZNAME = $trans['abbr'];
++                }
++
++                $tzfrom = $offset;
++                $vTimeZone->add($component);
++            }
++
++            // we covered the entire date range
++            if ($std && $dst && min($t_std, $t_dst) < $from && max($t_std, $t_dst) > $to) {
++                break;
++            }
++        }
++
++        // add X-MICROSOFT-CDO-TZID if available
++        $microsoftExchangeMap = array_flip(TimeZoneUtil::$microsoftExchangeMap);
++        if (array_key_exists($timeZone->getName(), $microsoftExchangeMap)) {
++            $vTimeZone->add('X-MICROSOFT-CDO-TZID', $microsoftExchangeMap[$timeZone->getName()]);
++        }
++
++        return $vTimeZone;
+     }
+ }
