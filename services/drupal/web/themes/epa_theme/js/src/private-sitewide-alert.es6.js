@@ -1,4 +1,4 @@
-// Sitewide Alert script
+// Private Sitewide Alert script
 import Drupal from 'drupal';
 
 (function(Drupal) {
