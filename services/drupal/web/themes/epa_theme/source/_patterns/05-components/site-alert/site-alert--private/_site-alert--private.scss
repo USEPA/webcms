@@ -1,0 +1,51 @@
+// @file
+// Styles for a Private Sitewide Alert.
+@use '../../../00-config' as *;
+
+.usa-site-alert--private {
+  background-color: color($theme-color-warning);
+  bottom: 0;
+  display: none;
+  left: 0;
+  position: fixed;
+  right: 0;
+  width: 100%;
+
+  .usa-alert {
+    @include add-alert-icon(
+      announcement,
+      $theme-color-base-darkest,
+      $theme-color-warning
+    );
+
+    background-color: color($theme-color-warning);
+
+    &::before {
+      left: rem(24px);
+    }
+
+    a,
+    .usa-alert__close {
+      color: gesso-color(text, link-hover);
+
+      &:visited,
+      &:hover,
+      &:focus {
+        color: gesso-color(text, on-light);
+      }
+    }
+
+    &__body {
+      flex-wrap: wrap;
+      padding-left: rem(68px);
+    }
+
+    &__heading {
+      width: 100%;
+    }
+
+    &__text {
+      width: calc(100% - 100px);
+    }
+  }
+}

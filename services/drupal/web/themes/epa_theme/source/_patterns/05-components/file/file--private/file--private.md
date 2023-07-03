@@ -1,6 +1,6 @@
 ---
-el: .file
-title: File
+el: .file--private
+title: Private File
 state: complete
 ---
 

@@ -3,9 +3,15 @@
 
 @use '../../00-config/00-functions' as *;
 
-// .document {}
+.document {
+  position: relative;
 
-.document__meta {
-  color: gesso-color(text, secondary);
-  font-size: font-size(body, 2xs);
+  &__meta {
+    color: gesso-color(text, secondary);
+    font-size: font-size(body, 2xs);
+  }
+
+  > .file--is-private {
+    position: static;
+  }
 }
