@@ -11,18 +11,14 @@
   right: 0;
   width: 100%;
 
+  .pattern-lab-content & {
+    display: block;
+    position: static;
+  }
+
   .usa-alert {
-    @include add-alert-icon(
-      announcement,
-      $theme-color-base-darkest,
-      $theme-color-warning
-    );
-
     background-color: color($theme-color-warning);
-
-    &::before {
-      left: rem(24px);
-    }
+    border-left: 0;
 
     a,
     .usa-alert__close {
@@ -35,16 +31,22 @@
       }
     }
 
-    &__body {
+    .usa-alert__body {
+      @include add-alert-icon(
+        announcement,
+        $theme-color-base-darkest,
+        $theme-color-warning
+      );
+
       flex-wrap: wrap;
       padding-left: rem(68px);
     }
 
-    &__heading {
+    .usa-alert__heading {
       width: 100%;
     }
 
-    &__text {
+    .usa-alert__text {
       width: calc(100% - 100px);
     }
   }

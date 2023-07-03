@@ -1,4 +1,11 @@
-<span class="document">
+{% set classes = [
+  'document',
+  access ? 'file--is-' ~ access,
+  access == 'private' ? 'js-media-private',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<span class="{{ classes }}">
   {% if pattern_lab %}
     {% include '@components/file/file.twig' with {
       file: {
@@ -6,11 +13,12 @@
         name: 'File name',
         extension: 'pdf',
       },
-      access: access,
+      access: false,
     } %}
   {% else %}
     {{ file }}
   {% endif %}
+
   <span class="document__meta">({{ filesize -}}
     {%- if date or publication_number -%}
     , {{ date }}{% if date and publication_number %}, {% endif %}{{ publication_number }}
@@ -19,4 +27,13 @@
       <br />{{ description }}
     {% endif %}
   </span>
+
+  {% if access == 'private' %}
+    {%- include '@components/icon/icon.twig' with {
+      'icon_name': 'announcement',
+      'modifier_classes': 'file__media--private-icon',
+      'is_demo': false,
+      'label': 'This file is marked as private and will not be visible to users. To make the file public, update the media entity.',
+    } -%}
+  {% endif %}
 </span>
