@@ -32,6 +32,33 @@
     margin-top: rem(units(3));
   }
 
+  &.is-private {
+    .figure__media {
+      position: relative;
+
+      &::before {
+        background-color: rgba(color($theme-color-warning), 0.5);
+        bottom: 0;
+        content: '';
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1;
+      }
+
+      .figure__private-icon {
+        background-color: color($theme-color-warning);
+        height: rem(25px);
+        left: 0;
+        padding: rem(5px);
+        position: absolute;
+        top: 0;
+        width: rem(25px);
+      }
+    }
+  }
+
   // Tweak styling in WYSIWYG editor.
   @if $wysiwyg {
     // stylelint-disable
