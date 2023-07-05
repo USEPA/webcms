@@ -7,8 +7,8 @@
 /**
  *
  */
-function addAttachLibraryFunction(\Twig_Environment &$env, $config) {
-  $env->addFunction(new \Twig_SimpleFunction('attach_library', function ($string) {
+function addAttachLibraryFunction(\Twig\Environment &$env, $config) {
+  $env->addFunction(new \Twig\TwigFunction('attach_library', function ($string) {
     return;
   }));
 }

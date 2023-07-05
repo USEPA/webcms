@@ -72,7 +72,7 @@ function epa_theme_preprocess_menu_local_tasks(&$variables) {
 
       // Check if the tab should be shown by rendering the original.
       $link = \Drupal::service('renderer')->render($variables[$type][$key]);
-      if (!$link) {
+      if (empty((string) $link)) {
         unset($tabs[$key]);
       }
     }

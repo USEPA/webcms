@@ -64,7 +64,7 @@ class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssI
   public function getFile() {
     // Make sure that the path to the plugin.js matches the file structure of
     // the CKEditor plugin you are implementing.
-    return drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/plugin.js';
+    return \Drupal::service('extension.list.module')->getPath('epa_wysiwyg') . '/js/plugins/epaAddDefinitions/plugin.js';
   }
 
   /**
@@ -107,7 +107,7 @@ class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssI
    */
   public function getCssFiles(Editor $editor) {
     return [
-      drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.admin.css',
+      \Drupal::service('extension.list.module')->getPath('epa_wysiwyg') . '/js/plugins/epaAddDefinitions/epaAddDefinitions.admin.css',
     ];
   }
 
