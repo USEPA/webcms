@@ -37,6 +37,10 @@ function epa_theme_preprocess_filter_caption(&$vars) {
     foreach (['data-view-mode' => 'view_mode', 'data-align' => 'align'] as $attribute => $var) {
       $vars[$var] = $node->getAttribute($attribute);
     }
+
+    if ($media->hasField('field_limit_file_accessibility')) {
+      $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
+    }
   }
   $vars['node'] = FilteredMarkup::create(Html::serialize($dom));
 }
