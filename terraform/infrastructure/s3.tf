@@ -164,7 +164,7 @@ resource "aws_s3_bucket_policy" "elb_logs_delivery" {
   count = var.lb_logging_bucket == null ? 1 : 0
 
   bucket = aws_s3_bucket.elb_logs[0].bucket
-  policy = data.aws_iam_policy_document.elb_logs_access.json
+  policy = data.aws_iam_policy_document.elb_logs_access[0].json
 }
 
 #endregion
