@@ -85,6 +85,8 @@ resource "aws_s3_bucket_policy" "uploads_policy" {
 #region Load balancer logs
 
 resource "aws_s3_bucket" "elb_logs" {
+  count = var.lb_logging_bucket == null ? 1 : 0
+
   bucket_prefix = "webcms-${var.environment}-elb-logs-"
 
   server_side_encryption_configuration {
@@ -100,7 +102,9 @@ resource "aws_s3_bucket" "elb_logs" {
 
 # Don't allow any public access to the ELB logging bucket
 resource "aws_s3_bucket_public_access_block" "elb_logs" {
-  bucket = aws_s3_bucket.elb_logs.bucket
+  count = var.lb_logging_bucket == null ? 1 : 0
+
+  bucket = aws_s3_bucket.elb_logs[0].bucket
 
   block_public_acls       = true
   block_public_policy     = true
@@ -109,13 +113,15 @@ resource "aws_s3_bucket_public_access_block" "elb_logs" {
 }
 
 data "aws_iam_policy_document" "elb_logs_access" {
+  count = var.lb_logging_bucket == null ? 1 : 0
+
   version = "2012-10-17"
 
   statement {
     sid       = "rootDelivery"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.elb_logs.arn}/AWSLogs/*"]
+    resources = ["${aws_s3_bucket.elb_logs[0].arn}/AWSLogs/*"]
 
     principals {
       type        = "AWS"
@@ -127,7 +133,7 @@ data "aws_iam_policy_document" "elb_logs_access" {
     sid       = "elbDelivery"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.elb_logs.arn}/AWSLogs/*"]
+    resources = ["${aws_s3_bucket.elb_logs[0].arn}/AWSLogs/*"]
 
     principals {
       type        = "Service"
@@ -145,7 +151,7 @@ data "aws_iam_policy_document" "elb_logs_access" {
     sid       = "aclAccess"
     effect    = "Allow"
     actions   = ["s3:GetBucketAcl"]
-    resources = [aws_s3_bucket.elb_logs.arn]
+    resources = [aws_s3_bucket.elb_logs[0].arn]
 
     principals {
       type        = "Service"
@@ -155,7 +161,9 @@ data "aws_iam_policy_document" "elb_logs_access" {
 }
 
 resource "aws_s3_bucket_policy" "elb_logs_delivery" {
-  bucket = aws_s3_bucket.elb_logs.bucket
+  count = var.lb_logging_bucket == null ? 1 : 0
+
+  bucket = aws_s3_bucket.elb_logs[0].bucket
   policy = data.aws_iam_policy_document.elb_logs_access.json
 }
 
