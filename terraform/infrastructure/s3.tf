@@ -160,33 +160,3 @@ resource "aws_s3_bucket_policy" "elb_logs_delivery" {
 }
 
 #endregion
-
-#region DB backups
-
-# Create a bucket to house DB backups
-resource "aws_s3_bucket" "backups" {
-  bucket_prefix = "webcms-${var.environment}-backups-"
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
-  tags = var.tags
-}
-
-# As with the ELB logs bucket, this bucket is fully private. No public access should be
-# permitted.
-resource "aws_s3_bucket_public_access_block" "backups" {
-  bucket = aws_s3_bucket.backups.bucket
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-#endregion
