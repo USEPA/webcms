@@ -22,12 +22,16 @@
     attributes.hasClass('align-right') ? 'u-align-right',
   ]|join(' ')|trim %}
 
+  {% if media_accessibility == 'private' %}
+    {% set is_private = true %}
+  {% endif %}
+
   {{ title_suffix.contextual_links }}
 
   {% include '@components/figure/figure.twig' with {
     'is_demo': false,
     'modifier_classes': classes,
     'media': content,
-    'access': media_accessibility,
+    'is_private': is_private,
   } %}
 {% endif %}

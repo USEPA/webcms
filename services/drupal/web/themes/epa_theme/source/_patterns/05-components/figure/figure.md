@@ -9,4 +9,4 @@ __Variables:__
 * modifier_classes: [string] Classes to modify the default component styling.
 * media: [string] Media content, usually an image, audio, or video.
 * caption: [string] Caption for the figure.
-* access: [string] The accessibility of the image.
+* is_private: [boolean] Whether the media is private.

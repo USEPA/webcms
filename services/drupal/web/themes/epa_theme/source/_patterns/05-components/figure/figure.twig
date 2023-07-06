@@ -2,24 +2,26 @@
 
 {% set classes = [
   'figure',
-  access ? 'figure--is-' ~ access,
-  access == 'private' ? 'js-media-private',
+  is_private ? 'is-private js-media-private',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
-<figure class="{{ classes }}">
-  <div class="figure__media">
-    {{ media }}
+{% set media_content %}
+  {{ media }}
 
-    {% if access == 'private' %}
-      {%- include '@components/icon/icon.twig' with {
-        'icon_name': 'announcement',
-        'modifier_classes': 'figure__media--private-icon',
-        'is_demo': false,
-        'label': 'This file is marked as private and will not be visible to users. To make the file public, update the media entity.',
-      } -%}
-    {% endif %}
-  </div>
+  {% if is_private %}
+    {%- include '@components/icon/icon.twig' with {
+      'icon_name': 'announcement',
+      'modifier_classes': 'figure__private-icon',
+      'is_demo': false,
+      'label': 'This file is marked as private and will not be visible to users. To make the file public, update the media entity.',
+    } -%}
+  {% endif %}
+{% endset %}
+
+<figure class="{{ classes }}">
+  <div class="figure__media">{{ media_content }}</div>
+
   {% if caption is defined %}
     <figcaption class="figure__caption">{{ caption }}</figcaption>
   {% endif %}
@@ -27,19 +29,19 @@
 
 {% if is_demo %}
   <figure class="{{ classes }} is-centered">
-    <div class="figure__media">{{ media }}</div>
+    <div class="figure__media">{{ media_content }}</div>
     {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Centered: </strong>{{ caption }}</figcaption>
     {% endif %}
   </figure>
   <figure class="{{ classes }} u-align-left">
-    <div class="figure__media">{{ media }}</div>
+    <div class="figure__media">{{ media_content }}</div>
     {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Left aligned: </strong>{{ caption }}</figcaption>
     {% endif %}
   </figure>
   <figure class="{{ classes }} u-align-right">
-    <div class="figure__media">{{ media }}</div>
+    <div class="figure__media">{{ media_content }}</div>
     {% if caption is defined %}
       <figcaption class="figure__caption"><strong>Right aligned: </strong>{{ caption }}</figcaption>
     {% endif %}

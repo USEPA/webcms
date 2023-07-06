@@ -1,7 +1,6 @@
 {% set classes = [
   'file',
-  access ? 'file--is-' ~ access,
-  access == 'private' ? 'js-media-private',
+  is_private ? 'is-private js-media-private',
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
@@ -12,17 +11,20 @@
 
 <a href="{{ url }}" class="{{ classes }}">
   {%- include '@components/icon/icon.twig' with {
-    'modifier_classes': 'icon--file is-spaced-after',
+    'modifier_classes': 'file__icon is-spaced-after',
     'is_hidden': true,
     'icon_name': icon,
   } -%}
   {{- link_text -}}
-  {% if access == 'private' %}
-    {%- include '@components/icon/icon.twig' with {
-      'icon_name': 'announcement',
-      'modifier_classes': 'file__media--private-icon',
-      'is_demo': false,
-      'label': 'This file is marked as private and will not be visible to users. To make the file public, update the media entity.',
-    } -%}
-  {% endif %}
+
+  {%- if is_private -%}
+    <span class="file__private-icon">
+      {%- include '@components/icon/icon.twig' with {
+        'icon_name': 'announcement',
+        'modifier_classes': 'file__icon',
+        'is_demo': false,
+        'label': 'This file is marked as private and will not be visible to users. To make the file public, update the media entity.',
+      } -%}
+    </span>
+  {%- endif -%}
 </a>
