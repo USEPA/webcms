@@ -71,12 +71,6 @@
       text: 'Back to top'|t,
       top_element: body_id,
     } %}
-    {% include '@components/site-alert/site-alert--private/site-alert--private.twig' with {
-      'content': '<p>These files will not be available to your users. To correct, please update each file to be public.</p>'|raw|t,
-      'heading': 'This page contains <span id="js-private-media-count"></span> media files that are marked private.'|raw|t,
-      'show_close': true,
-      'hash': head_title.title|replace({' ':'_'})|lower,
-    } %}
     <js-bottom-placeholder token="{{ placeholder_token|raw }}">
     {{ page_js|raw }}
   </body>

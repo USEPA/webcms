@@ -5,24 +5,33 @@ import Drupal from 'drupal';
   Drupal.behaviors.sitewideAlertPrivate = {
     attach(context) {
       const privateMedia = document.getElementsByClassName('js-media-private');
+      const privateMediaCount = privateMedia.length;
 
-      if (privateMedia.length > 0) {
-        const privateMediaAlert = document.getElementsByClassName(
-          'usa-site-alert--private'
-        );
-        const privateMediaAlertCount = document.getElementById(
-          'js-private-media-count'
-        );
+      if (privateMediaCount > 0) {
+        const nodeHTML = document.querySelector('body');
+        const dataAlert = document.title.replace(/\s+/g, '-').toLowerCase();
 
-        if (privateMediaAlert.length === 0) {
-          return;
-        }
+        const privateMediaAlert = `<div class="usa-site-alert usa-site-alert--has-heading usa-site-alert--private js-sitewide-alert" data-alert="${dataAlert}">
+          <div class="usa-alert">
+            <div class="usa-alert__body">
+              <div class="u-visually-hidden">Notice</div>
+              <div class="usa-alert__content">
+                <h3 class="usa-alert__heading">This page contains <span id="js-private-media-count">${privateMediaCount}</span> media files that are marked private.</h3>
+                <div class="usa-alert__text">
+                  <p>These files will not be available to your users. To correct, please do this... lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempot incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+                </div>
+              </div>
+            <button type="button" class="usa-alert__close js-sitewide-alert__close">
+              Close
+              <svg class="icon icon--sitewide-alert-close is-spaced-before" aria-hidden="true" role="img">
+                <title>Notice</title>
+                <use href="/themes/epa_theme/images/sprite.artifact.svg#close"></use>
+              </svg> </button>
+            </div>
+          </div>
+        </div>`;
 
-        privateMediaAlertCount.innerHTML = privateMedia.length;
-
-        for (let a = 0; a < privateMediaAlert.length; a++) {
-          privateMediaAlert[a].style.display = 'block';
-        }
+        nodeHTML.innerHTML = nodeHTML.innerHTML + privateMediaAlert;
       }
     },
   };
