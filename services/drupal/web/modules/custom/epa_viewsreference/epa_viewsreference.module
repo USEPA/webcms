@@ -44,8 +44,6 @@ function epa_viewsreference_field_widget_form_alter(array &$element, FormStateIn
     // Hide the control that allows users to expose filters on dynamic lists.
     if (isset($element["options"]["exposed_filters"]["vr_exposed_filters_visible"])) {
       $element["options"]["exposed_filters"]["vr_exposed_filters_visible"]['#access'] = FALSE;
-      // Force value to be 0 so that the exposed form is not displayed when ajax is called as we never want to allow the exposed form to be displayed.
-      $element["options"]["exposed_filters"]["vr_exposed_filters_visible"]['#value'] = 0;
     }
 
     // Make "DESC" be the default sort order for Perspectives and FAQ List.
