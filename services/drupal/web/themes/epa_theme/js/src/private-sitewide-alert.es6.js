@@ -21,12 +21,6 @@ import Drupal from 'drupal';
                   <p>These files will not be available to your users. To correct, please do this... lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempot incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
                 </div>
               </div>
-            <button type="button" class="usa-alert__close js-sitewide-alert__close">
-              Close
-              <svg class="icon icon--sitewide-alert-close is-spaced-before" aria-hidden="true" role="img">
-                <title>Notice</title>
-                <use href="/themes/epa_theme/images/sprite.artifact.svg#close"></use>
-              </svg> </button>
             </div>
           </div>
         </div>`;
