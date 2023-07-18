@@ -10,11 +10,18 @@ import Drupal from 'drupal';
         'clu-in.org',
         'energystar.gov',
         'relocatefeds.gov',
-        'urbanwaterpartners.gov',
         'urbanwaters.gov',
         'westcoastcollaborative.org',
         'usepa.sharepoint.com',
         'usepa.servicenowservices.com',
+        'epaoig.gov',
+        'fedcenter.gov',
+        'foiaonline.gov',
+        'frtr.gov',
+        'glnpo.gov',
+        'greengov.gov',
+        'sustainability.gov',
+        'glri.us',
       ];
 
       const epaSocialMediaLinks = [
@@ -28,6 +35,8 @@ import Drupal from 'drupal';
         'https://youtube.com/user/usepagov',
         'https://www.flickr.com/photos/usepagov',
         'https://flickr.com/photos/usepagov',
+        'https://www.linkedin.com/company/us-epa/',
+        'https://linkedin.com/company/us-epa/',
       ];
 
       function linkIsExternal(linkElement) {
