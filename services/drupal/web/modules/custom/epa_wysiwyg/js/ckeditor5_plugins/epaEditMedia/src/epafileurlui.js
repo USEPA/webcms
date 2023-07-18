@@ -1,7 +1,8 @@
 import { Plugin } from 'ckeditor5/src/core';
 import { ButtonView } from 'ckeditor5/src/ui';
+import { isDrupalMedia } from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
+import { isDrupalInlineMedia } from "../../../../../../contrib/media_inline_embed/js/ckeditor5_plugins/mediaInlineEmbed/src/utils";
 import linkIcon from "../../../../icons/copy-solid.svg";
-import {isDrupalMedia} from "../../../../../../../core/modules/ckeditor5/js/ckeditor5_plugins/drupalMedia/src/utils";
 
 export default class EpaFileUrlUI extends Plugin {
   /**
@@ -50,7 +51,7 @@ export default class EpaFileUrlUI extends Plugin {
           'DrupalMediaMetadataRepository'
         );
 
-        if (isDrupalMedia(modelElement)) {
+        if (isDrupalMedia(modelElement) || isDrupalInlineMedia(modelElement)) {
           metadataRepository
             .getMetadata(modelElement)
             .then((metadata) => {
