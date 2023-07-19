@@ -14,6 +14,7 @@ __Variables:__
 * image_src: [string] Image source of the collection image.
 * image_alt: [string] Al attribute for collection image.
 * url: [string] URL of collection item.
+* attributes: [string] HTML attributes of collection item.
 * heading: [string] Heading of collection item.
 * heading_element: [string] HTML element for heading.
 * subtitle: [string] Subtitle of collection item.
