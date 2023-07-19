@@ -72,6 +72,7 @@ function epa_workflow_deploy_0002_fix_nodes_without_type(&$sandbox) {
     $result = \Drupal::entityQuery('node')
       ->condition('status', 1)
       ->notExists('field_type')
+      ->accessCheck(TRUE)
       ->execute();
 
     $sandbox['total'] = count($result);
@@ -86,6 +87,7 @@ function epa_workflow_deploy_0002_fix_nodes_without_type(&$sandbox) {
     ->condition('status', 1)
     ->notExists('field_type')
     ->range(0, $batch_size)
+    ->accessCheck(TRUE)
     ->execute();
 
   if (empty($nids)) {
@@ -128,6 +130,7 @@ function epa_workflow_deploy_0003_fix_nodes_missing_review_deadline(&$sandbox) {
     $result = \Drupal::entityQuery('node')
       ->condition('status', 1)
       ->notExists('field_review_deadline')
+      ->accessCheck(TRUE)
       ->execute();
 
     $sandbox['total'] = count($result);
@@ -142,6 +145,7 @@ function epa_workflow_deploy_0003_fix_nodes_missing_review_deadline(&$sandbox) {
     ->condition('status', 1)
     ->notExists('field_review_deadline')
     ->range(0, $batch_size)
+    ->accessCheck(TRUE)
     ->execute();
 
   if (empty($nids)) {
@@ -181,6 +185,7 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
     $result = \Drupal::entityQuery('node')
       ->condition('status', 1)
       ->notExists('field_scheduled_transition')
+      ->accessCheck(TRUE)
       ->execute();
 
     $sandbox['total'] = count($result);
@@ -193,6 +198,7 @@ function epa_workflow_deploy_0004_fix_nodes_missing_transition_date(&$sandbox) {
     ->condition('status', 1)
     ->notExists('field_scheduled_transition')
     ->range(0, $batch_size)
+    ->accessCheck(TRUE)
     ->execute();
 
   if (empty($nids)) {

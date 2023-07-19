@@ -43,7 +43,7 @@ class EPANew extends CKEditorPluginBase {
   public function getFile() {
     // Make sure that the path to the plugin.js matches the file structure of
     // the CKEditor plugin you are implementing.
-    return drupal_get_path('module', 'epa_wysiwyg') . '/js/plugins/epaNew/plugin.js';
+    return \Drupal::service('extension.list.module')->getPath('epa_wysiwyg') . '/js/plugins/epaNew/plugin.js';
   }
 
   /**

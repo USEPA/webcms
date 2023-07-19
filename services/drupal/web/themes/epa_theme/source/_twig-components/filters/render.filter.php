@@ -7,9 +7,9 @@
 /**
  *
  */
-function addRenderFilter(\Twig_Environment &$env, $config) {
+function addRenderFilter(\Twig\Environment &$env, $config) {
   // Drupal Render filter.
-  $env->addFilter(new \Twig_SimpleFilter('render', function ($string) {
+  $env->addFilter(new \Twig\TwigFilter('render', function ($string) {
     return $string;
   }));
 }

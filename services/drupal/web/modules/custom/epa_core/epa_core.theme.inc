@@ -21,7 +21,7 @@ function template_preprocess_hierarchical_term_facet_formatter(array &$variables
       $url = Drupal::service('facets.utility.url_generator')->getUrl([$variables['facet_source'] => [$term->id()]]);
       $link = Link::fromTextAndUrl($term->getName(), $url);
       $link = $link->toRenderable();
-      $terms[] = render($link);
+      $terms[] = \Drupal::service('renderer')->render($link);
     }
     else {
       $terms[] = $term->getName();

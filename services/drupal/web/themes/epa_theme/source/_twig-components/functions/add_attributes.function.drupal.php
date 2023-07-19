@@ -10,7 +10,7 @@
 
 use Drupal\Core\Template\Attribute;
 
-$function = new Twig_SimpleFunction('add_attributes', function ($context, $additional_attributes = [], $attribute_type = 'attributes') {
+$function = new \Twig\TwigFunction('add_attributes', function ($context, $additional_attributes = [], $attribute_type = 'attributes') {
 
   if (class_exists('Drupal')) {
     $attributes = new Attribute();

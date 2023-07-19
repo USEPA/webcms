@@ -7,7 +7,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\samlauth\Event\SamlauthEvents;
 use Drupal\samlauth\Event\SamlauthUserSyncEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use \Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,10 +52,10 @@ class EpaCoreEventSubscriber implements EventSubscriberInterface {
   /**
    * Executes actions on the request event.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   Event Response Object.
    */
-  public function onKernelRequest(GetResponseEvent $event) {
+  public function onKernelRequest(RequestEvent $event) {
     $this->request = $event->getRequest();
 
     // Execute necessary functions.
