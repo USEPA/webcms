@@ -27,8 +27,9 @@
   'label': 'Selected:'|t,
   'icon_name': 'check-square',
 } -%}
+
 <span class="facet__content">
-  {{- value -}}
+  {{- value|raw -}}
   {%- if show_count -%}
     <span class="facet__count">
       <span class="u-visually-hidden">Total results: </span>{{- count -}}</span>
