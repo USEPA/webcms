@@ -1,4 +1,4 @@
-FROM forumone/drupal8:8.0 AS memcached-ext
+FROM php:8.1-fpm-alpine AS memcached-ext
 
 # Set working directory to /tmp
 WORKDIR /tmp
@@ -23,7 +23,27 @@ RUN set -ex \
   && make \
   && make install
 
-FROM forumone/drupal8:8.0 AS base
+FROM php:8.1-fpm-alpine AS base
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+# Install base extensions needed for Drupal
+RUN set -ex \
+  && install-php-extensions \
+    gd \
+    opcache \
+    pdo_mysql \
+    zip \
+  # Settings taken from the Docker library's Drupal image
+  && { \
+    echo 'opcache.memory_consumption=128'; \
+    echo 'opcache.interned_strings_buffer=8'; \
+    echo 'opcache.max_accelerated_files=4000'; \
+    echo 'opcache.revalidate_freq=60'; \
+    echo 'opcache.fast_shutdown=1'; \
+  } > /usr/local/etc/php/conf.d/opcache-recommended.ini
+
+WORKDIR /var/www/html
 
 # Download and install the New Relic APM extension. Note that, unlike in the docs, we do
 # not configure the extension here. That must happen at runtime since the license keys
@@ -37,13 +57,13 @@ RUN set -ex \
 
 # Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/igbinary.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu builtin:sockets \
+RUN install-php-extensions apcu sockets \
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached \
@@ -219,7 +239,28 @@ CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM forumone/drupal8-cli:8.0 AS drush
+FROM php:8.1-cli-alpine AS drush
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
+# Install base PHP extensions for Drupal as well as tools needed for Drush CLI operations
+RUN set -ex \
+  && install-php-extensions \
+    gd \
+    opcache \
+    pdo_mysql \
+    zip \
+  && apk add --no-cache \
+    mysql-client \
+    openssh \
+    rsync \
+    bash \
+  && { \
+    echo 'memory_limit=-1'; \
+  } > /usr/local/etc/php/php-cli.ini
+
+ENV PATH=${PATH}:/var/www/html/vendor/bin
+WORKDIR /var/www/html
 
 # Download and install New Relic
 RUN set -ex \
@@ -231,13 +272,13 @@ RUN set -ex \
 
 # Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/igbinary.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20200930/
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/memcached.so \
+  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/
 RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
-RUN f1-ext-install pecl:apcu builtin:sockets \
+RUN install-php-extensions apcu sockets \
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached  \

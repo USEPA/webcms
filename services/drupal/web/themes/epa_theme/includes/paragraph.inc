@@ -26,7 +26,7 @@ function epa_theme_preprocess_paragraph__slideshow(&$variables) {
 function epa_theme_preprocess_paragraph__card(&$variables) {
   /** @var \Drupal\paragraphs\Entity\Paragraph $card */
   $card = $variables['paragraph'];
-  /** @var \Drupal\Core\Entity\ContentEntityInterface $parent */
+  /** @var \Drupal\Core\Entity\ContentEntityBase $parent */
   $parent = $card->_referringItem->getEntity();
   $card_style = $parent->field_card_style;
   if (!$card_style->isEmpty()) {
