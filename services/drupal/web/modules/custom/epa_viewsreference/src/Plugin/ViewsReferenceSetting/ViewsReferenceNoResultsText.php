@@ -35,8 +35,8 @@ class ViewsReferenceNoResultsText extends PluginBase implements ViewsReferenceSe
 
     $form_field['no_results_text'] = [
       '#type' => 'text_format',
-      '#format' => 'filtered_html',
-      '#allowed_formats' => ['filtered_html'],
+      '#format' => 'restricted_html',
+      '#allowed_formats' => ['restricted_html'],
       '#default_value' => $current_values['no_results_text']['value'] ?? NULL,
       '#description' => $this->t('If supplied, this text will overwrite the default no results text that is shown.'),
     ];
