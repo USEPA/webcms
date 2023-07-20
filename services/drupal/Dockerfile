@@ -49,7 +49,7 @@ WORKDIR /var/www/html
 # not configure the extension here. That must happen at runtime since the license keys
 # and application names are environment-dependent.
 RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.9.0.324 \
+  && NEW_RELIC_AGENT_VERSION=10.11.0.3 \
   && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
   && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
@@ -264,7 +264,7 @@ WORKDIR /var/www/html
 
 # Download and install New Relic
 RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.9.0.324 \
+  && NEW_RELIC_AGENT_VERSION=10.11.0.3 \
   && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
   && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
