@@ -4,7 +4,6 @@ namespace Drupal\epa_viewsreference\Plugin\ViewsReferenceSetting;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\views\Plugin\ViewsHandlerManager;
 use Drupal\views\ViewExecutable;
 use Drupal\viewsreference\Plugin\ViewsReferenceSettingInterface;
 
@@ -38,7 +37,7 @@ class ViewsReferenceNoResultsText extends PluginBase implements ViewsReferenceSe
       '#type' => 'text_format',
       '#format' => 'filtered_html',
       '#allowed_formats' => ['filtered_html'],
-      '#default_value' => $current_values['no_results_text'] ?? NULL,
+      '#default_value' => $current_values['no_results_text']['value'] ?? NULL,
       '#description' => $this->t('If supplied, this text will overwrite the default no results text that is shown.'),
     ];
   }
@@ -47,7 +46,7 @@ class ViewsReferenceNoResultsText extends PluginBase implements ViewsReferenceSe
    * {@inheritdoc}
    */
   public function alterView(ViewExecutable $view, $value) {
-    if (empty($value['no_results_text'])) {
+    if (empty($value['no_results_text']['value'])) {
       return;
     }
 
@@ -55,7 +54,7 @@ class ViewsReferenceNoResultsText extends PluginBase implements ViewsReferenceSe
     $empty = $view->display_handler->getHandlers('empty');
     if (!empty($empty)) {
       $empty = reset($empty);
-      $empty->options['content']['value'] = $value['no_results_text'];
+      $empty->options['content']['value'] = $value['no_results_text']['value'];
       $view->setHandler($view->current_display, 'empty', $empty->pluginDefinition['id'], $empty->options);
     }
 
