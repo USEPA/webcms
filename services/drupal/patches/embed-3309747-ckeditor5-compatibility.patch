@@ -1,0 +1,53 @@
+diff --git a/composer.json b/composer.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..3da6f1533a08bc044599660f2a121d6a35ce63d7
+--- /dev/null
++++ b/composer.json
+@@ -0,0 +1,7 @@
++{
++  "name": "drupal/embed",
++  "type": "drupal-module",
++  "license": "GPL-2.0-or-later",
++  "minimum-stability": "stable",
++  "require": {}
++}
+diff --git a/src/Access/EmbedButtonEditorAccessCheck.php b/src/Access/EmbedButtonEditorAccessCheck.php
+index 01463b6ce716500a5980ac8146c5a7f07860eda6..6415109b8273fbd563287fa7af1d022120a87876 100644
+--- a/src/Access/EmbedButtonEditorAccessCheck.php
++++ b/src/Access/EmbedButtonEditorAccessCheck.php
+@@ -78,20 +78,29 @@ class EmbedButtonEditorAccessCheck implements AccessInterface {
+    *   currently only capable of detecting buttons used by CKEditor.
+    */
+   protected function checkButtonEditorAccess(EmbedButtonInterface $embed_button, EditorInterface $editor) {
+-    if ($editor->getEditor() !== 'ckeditor') {
++    if (!in_array($editor->getEditor(), ['ckeditor', 'ckeditor5'])) {
+       throw new HttpException(500, 'Currently, only CKEditor is supported.');
+     }
+
+     $has_button = FALSE;
+     $settings = $editor->getSettings();
+-    foreach ($settings['toolbar']['rows'] as $row) {
+-      foreach ($row as $group) {
+-        if (in_array($embed_button->id(), $group['items'])) {
+-          $has_button = TRUE;
+-          break 2;
++    if ($editor->getEditor() === 'ckeditor') {
++      foreach ($settings['toolbar']['rows'] as $row) {
++        foreach ($row as $group) {
++          if (in_array($embed_button->id(), $group['items'])) {
++            $has_button = TRUE;
++            break 2;
++          }
+         }
+       }
+     }
++    elseif ($editor->getEditor() === 'ckeditor5') {
++      // The schema for CKEditor5 has changed, therefore we need to check for
++      // the toolbar items differently.
++      if ($settings['toolbar']['items'] && in_array($embed_button->id(), $settings['toolbar']['items'])) {
++        $has_button = TRUE;
++      }
++    }
+
+     return AccessResult::allowedIf($has_button)
+       ->addCacheableDependency($embed_button)

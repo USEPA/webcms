@@ -78,6 +78,26 @@ variable "db_instance_count" {
 
 #endregion
 
+#region S3
+# cf. s3.tf
+
+variable "s3_replication_role" {
+  description = "Role used for S3 object replication"
+  type        = string
+
+  # Allow null default; this is only required if replication is being used
+  default = null
+}
+
+variable "s3_replication_destination" {
+  description = "A map of site names (e.g., dev-en) to replication destination bucket ARNs"
+  type        = map(string)
+
+  default = {}
+}
+
+#endregion
+
 #region Elasticsearch
 # cf. search.tf
 

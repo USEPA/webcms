@@ -1,11 +1,11 @@
 <nav class="usa-nav" role="navigation" aria-label="{{ label }}">
   {% if is_extended %}<div class="usa-nav__inner">{% endif %}
-  <button class="usa-nav__close">{{ 'Close'|t }}</button>
+  <button type="button" class="usa-nav__close">{{ 'Close'|t }}</button>
   {% block content %}
     {% set prefix = is_extended ? "extended" : "basic" %}
     <ul class="usa-nav__primary usa-accordion">
       <li class="usa-nav__primary-item">
-        <button class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-one">
+        <button type="button" class="usa-accordion__button usa-nav__link usa-current" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-one">
           <span>Current section</span>
         </button>
         <ul id="{{ prefix }}-nav-section-one" class="usa-nav__submenu">
@@ -21,7 +21,7 @@
         </ul>
       </li>
       <li class="usa-nav__primary-item">
-        <button class="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-two">
+        <button type="button" class="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="{{ prefix }}-nav-section-two">
           <span>Section</span>
         </button>
         <ul id="{{ prefix }}-nav-section-two" class="usa-nav__submenu">

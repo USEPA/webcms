@@ -1,0 +1,28 @@
+{% set classes = [
+  'usa-media-block',
+  'tablet:grid-col',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ classes }}">
+  {% if url -%}
+    <a aria-hidden="true" tabindex="-1" href="{{ url }}">
+  {%- endif -%}
+
+  <img class="usa-media-block__img" src="{{ image.src }}" alt="{{ image.alt }}">
+
+  {%- if url -%}
+    </a>
+  {%- endif %}
+
+  <div class="usa-media-block__body">
+    <h2 class="usa-graphic-list__heading">
+      {% if url %}
+        <a href="{{ url }}">{{ title }}</a>
+      {% else %}
+        {{ title }}
+      {% endif %}
+    </h2>
+    {{ content }}
+  </div>
+</div>
