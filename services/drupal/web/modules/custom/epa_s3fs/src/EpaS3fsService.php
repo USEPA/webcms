@@ -14,7 +14,7 @@ class EpaS3fsService extends S3fsService {
    */
   public function setupTempTable() {
     parent::setupTempTable();
-    module_load_install('epa_s3fs');
+    \Drupal::moduleHandler()->loadInclude('epa_s3fs', 'install');
     epa_s3fs_fix_table_indexes('s3fs_file_temp');
   }
 

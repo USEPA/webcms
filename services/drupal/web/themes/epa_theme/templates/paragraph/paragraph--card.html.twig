@@ -25,13 +25,11 @@
  */
 #}
 
-{% set paragraph_parent = paragraph.getParentEntity() %}
-
-{% if paragraph_parent.field_title_placement.0.value == 'header-first' %}
+{% if title_placement == 'header-first' %}
   {% set modifier_classes = (modifier_classes ~ ' usa-card--header-first')|trim %}
 {% endif %}
 
-{% if paragraph_parent.field_image_style.0.value == 'inset' %}
+{% if image_placement_style == 'inset' %}
   {% set media_modifier_classes = 'usa-card__media--inset' %}
 {% endif %}
 

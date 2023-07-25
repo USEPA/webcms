@@ -31,7 +31,7 @@ class EPAMediaS3fsSubscriber extends Fast404ExceptionHtmlSubscriber {
     $new_path = preg_replace('/^\/sites\/.*\/files\/(.*)/i', 'public://$1', $path, -1, $count);
 
     if ($count) {
-      $response = new TrustedRedirectResponse(file_create_url($new_path));
+      $response = \Drupal::service('file_url_generator')->generateAbsoluteString($new_path);
       $event->setResponse($response);
     }
   }

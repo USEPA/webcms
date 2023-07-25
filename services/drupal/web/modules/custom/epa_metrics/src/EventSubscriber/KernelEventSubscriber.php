@@ -6,8 +6,8 @@ use Liuggio\StatsdClient\Sender\SocketSender;
 use Liuggio\StatsdClient\Service\StatsdService;
 use Liuggio\StatsdClient\StatsdClient;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 
 /**
  *
@@ -30,7 +30,7 @@ class KernelEventSubscriber implements EventSubscriberInterface {
   /**
    *
    */
-  public function onKernelTerminate(PostResponseEvent $event) {
+  public function onKernelTerminate(TerminateEvent $event) {
     // Record the amount of time we spent in PHP.
     $duration = microtime(TRUE) - $_SERVER['REQUEST_TIME_FLOAT'];
     $this->service->timing('Drupal.RequestTime', $duration * 1000);
