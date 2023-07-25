@@ -3,6 +3,8 @@
 namespace Drupal\epa_wysiwyg\Controller;
 
 use Drupal\ckeditor5\Controller\CKEditor5MediaController;
+use Drupal\file\Plugin\Field\FieldType\FileItem;
+use Drupal\media\MediaInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use function GuzzleHttp\json_decode;
@@ -24,9 +26,9 @@ class EpaWysiwygCKEditor5MediaController extends CKEditor5MediaController {
     $data['edit_url'] = $media->toUrl('edit-form')->toString();
 
     // Adding file URL to image source metadata.
-    $image_field = $this->getMediaImageSourceFieldName($media);
-    if ($image_field) {
-      $file_id = $media->{$image_field}->target_id;
+    $file_field = $this->getMediaSourceFieldName($media);
+    if ($file_field) {
+      $file_id = $media->{$file_field}->target_id;
       if ($file_id) {
         $file = $this->entityTypeManager()
           ->getStorage('file')
@@ -38,6 +40,26 @@ class EpaWysiwygCKEditor5MediaController extends CKEditor5MediaController {
     $response->setData($data);
 
     return $response;
+  }
+
+  /**
+   * Gets the name of a media item's source field.
+   *
+   * @param \Drupal\media\MediaInterface $media
+   *   The media item being embedded.
+   *
+   * @return string|null
+   *   The name of the source field configured for the media item, or
+   *   NULL if the source field is not an image field.
+   */
+  protected function getMediaSourceFieldName(MediaInterface $media) {
+    $field_definition = $media->getSource()
+      ->getSourceFieldDefinition($media->bundle->entity);
+    $item_class = $field_definition->getItemDefinition()->getClass();
+    if (is_a($item_class, FileItem::class, TRUE)) {
+      return $field_definition->getName();
+    }
+    return NULL;
   }
 
 }

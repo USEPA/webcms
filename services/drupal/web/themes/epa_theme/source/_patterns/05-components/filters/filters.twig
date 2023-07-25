@@ -4,7 +4,7 @@
 ]|join(' ')|trim %}
 
 {% if show_filters %}
-  {% spaceless %}
+  {% apply spaceless %}
   <div class="{{ classes }}" aria-live="polite" aria-atomic="true">
     <h2 class="u-visually-hidden">Active filters:</h2>
     <ul class="filters__list">
@@ -30,5 +30,5 @@
       <a class="filters__remove" href="{{ reset_url }}" rel="nofollow">{{ 'Remove all filters'|t }}</a>
     {% endif %}
   </div>
-  {% endspaceless %}
+  {% endapply %}
 {% endif %}

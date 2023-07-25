@@ -1,0 +1,12 @@
+diff --git a/src/Plugin/ViewsReferenceSetting/ViewsReferenceExposedFilters.php b/src/Plugin/ViewsReferenceSetting/ViewsReferenceExposedFilters.php
+index 5ddcf51..2041a72 100644
+--- a/src/Plugin/ViewsReferenceSetting/ViewsReferenceExposedFilters.php
++++ b/src/Plugin/ViewsReferenceSetting/ViewsReferenceExposedFilters.php
+@@ -144,6 +144,7 @@ class ViewsReferenceExposedFilters extends PluginBase implements ViewsReferenceS
+     $vrExposedFiltersVisible = FALSE;
+     if (isset($values['vr_exposed_filters_visible'])) {
+       $vrExposedFiltersVisible = $values['vr_exposed_filters_visible'];
++      $vrExposedFiltersVisible = filter_var($vrExposedFiltersVisible, FILTER_VALIDATE_BOOLEAN);
+       unset($values['vr_exposed_filters_visible']);
+     }
+ 
