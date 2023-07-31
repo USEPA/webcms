@@ -149,7 +149,7 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:3-node-v12-php-8.0 AS gesso
+FROM forumone/gesso:3-node-v16-php-8.0 AS gesso
 
 WORKDIR /app
 
