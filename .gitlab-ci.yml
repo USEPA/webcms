@@ -57,6 +57,7 @@ stages:
   
   #Add "test" stage for Gitlab Scanners
   - test
+  - image_scan
 
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
@@ -73,6 +74,7 @@ include:
   - template: Jobs/SAST.gitlab-ci.yml
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml
   - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - remote: 'https://gitlab.com/prismacloud-public/shift-left/extension/-/raw/master/.pcs.gitlab-ci.yml'
 
 #region Templates
 
@@ -1351,4 +1353,24 @@ Artifacts:
       - ./terraform/database
       - ./terraform/infrastructure
       - ./terraform/webcms
+
+prisma_cloud_compute_scan:
+  stage: image_scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+    parallel:
+      matrix:
+        - WEBCMS_TARGET: [drupal, nginx, drush]
+          WEBCMS_SITE: [dev]
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v22.12/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR 
 
