@@ -338,3 +338,63 @@ function epa_core_deploy_set_include_jquery_values() {
   SELECT bundle,deleted,entity_id,revision_id,langcode,0,field_page_head_value<>:value
   FROM node_revision__field_page_head;', [':value' => '']);
 }
+
+/**
+ * Setting default values for field_image_style, field_title_placement, and field_flag_card_alignment
+ */
+function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
+  $image_style_tables = ['paragraph__field_image_style', 'paragraph_revision__field_image_style'];
+  $title_placement_tables = ['paragraph__field_title_placement', 'paragraph_revision__field_title_placement'];
+  $flag_card_alignment_tables = ['paragraph__field_flag_card_alignment', 'paragraph_revision__field_flag_card_alignment'];
+  $database = \Drupal::database();
+  $missing_image_styles = $database->query("SELECT p.id, p.revision_id FROM paragraphs_item_field_data AS p LEFT JOIN paragraph__field_image_style AS i ON p.id = i.entity_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
+  foreach ($image_style_tables as $table) {
+    if ($database->schema()->tableExists($table)) {
+      foreach($missing_image_styles as $card_group) {
+        $database->insert($table)->fields([
+          'bundle' => 'card_group',
+          'deleted' => 0,
+          'entity_id' => $card_group->id,
+          'revision_id' => $card_group->revision_id,
+          'langcode' => 'en',
+          'delta' => 0,
+          'field_image_style_value' => 'exdent'
+        ])->execute();
+      }
+    }
+  }
+
+  $missing_title_placement = $database->query("SELECT p.id, p.revision_id FROM paragraphs_item_field_data AS p LEFT JOIN paragraph__field_title_placement AS i ON p.id = i.entity_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
+  foreach ($title_placement_tables as $table) {
+    if ($database->schema()->tableExists($table)) {
+      foreach($missing_title_placement as $card_group) {
+        $database->insert($table)->fields([
+          'bundle' => 'card_group',
+          'deleted' => 0,
+          'entity_id' => $card_group->id,
+          'revision_id' => $card_group->revision_id,
+          'langcode' => 'en',
+          'delta' => 0,
+          'field_title_placement_value' => 'media-first'
+        ])->execute();
+      }
+    }
+  }
+
+  $missing_flag_alignment = $database->query("SELECT p.id, p.revision_id FROM paragraphs_item_field_data AS p LEFT JOIN paragraph__field_flag_card_alignment AS i ON p.id = i.entity_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
+  foreach ($flag_card_alignment_tables as $table) {
+    if ($database->schema()->tableExists($table)) {
+      foreach ($missing_flag_alignment as $card) {
+        $database->insert($table)->fields([
+          'bundle' => 'card',
+          'deleted' => 0,
+          'entity_id' => $card->id,
+          'revision_id' => $card->revision_id,
+          'langcode' => 'en',
+          'delta' => 0,
+          'field_flag_card_alignment_value' => 'default'
+        ])->execute();
+      }
+    }
+  }
+}
