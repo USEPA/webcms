@@ -413,10 +413,11 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     Url::fromRoute(
       'entity.node.revision',
       ['node' => $entity->id(), 'node_revision' => $latest_vid],
-      ['attributes' => [
-        'title' => t('Copy this URL')],
-        'data-thing' => 'boom',
-        'class' => ['revision-link']
+      [
+        'attributes' => [
+          'title' => t('Copy this URL'),
+          'class' => ['revision-link']
+        ],
       ]
     ),
   )->toRenderable();
