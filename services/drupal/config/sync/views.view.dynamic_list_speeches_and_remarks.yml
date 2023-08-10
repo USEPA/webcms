@@ -11,6 +11,7 @@ dependencies:
   module:
     - datetime
     - epa_core
+    - group
     - node
     - options
     - taxonomy
@@ -186,6 +187,68 @@ display:
           hierarchy: false
           limit: true
           error_message: true
+        gid:
+          id: gid
+          table: group_content_field_data
+          field: gid
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          entity_type: group_content
+          entity_field: gid
+          plugin_id: entity_reference
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: gid_op
+            label: 'Web Area'
+            description: ''
+            use_operator: false
+            operator: gid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: gid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+              beta_tester: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          handler: 'default:group'
+          widget: autocomplete
+          handler_settings:
+            target_bundles:
+              web_area: web_area
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            auto_create_bundle: ''
         field_release_value:
           id: field_release_value
           table: node__field_release
@@ -468,7 +531,28 @@ display:
           distinct: true
           replica: false
           query_tags: {  }
-      relationships: {  }
+      relationships:
+        group_content:
+          id: group_content
+          table: node_field_data
+          field: group_content
+          relationship: none
+          group_type: group
+          admin_label: 'Content group content'
+          entity_type: node
+          plugin_id: group_content_to_entity_reverse
+          required: true
+          group_content_plugins:
+            'group_node:event': '0'
+            'group_node:faq': '0'
+            'group_node:news_release': '0'
+            'group_node:page': '0'
+            'group_node:perspective': '0'
+            'group_node:public_notice': '0'
+            'group_node:regulation': '0'
+            'group_node:speeches': '0'
+            'group_node:webform': '0'
+            'group_node:web_area': '0'
       header: {  }
       footer: {  }
       display_extenders:
