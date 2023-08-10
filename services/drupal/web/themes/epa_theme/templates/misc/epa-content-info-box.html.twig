@@ -18,6 +18,17 @@
     } %}
   {% endif %}
 
+  {% if vid %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': vid['#title'],
+      'field_items': [{ content: vid['#markup'] }],
+    } %}
+  {% endif %}
+
   {% if revision_author %}
     {% include '@components/field/field.twig' with {
       'element': 'div',
