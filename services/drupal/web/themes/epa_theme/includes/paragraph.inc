@@ -26,7 +26,7 @@ function epa_theme_preprocess_paragraph__slideshow(&$variables) {
 function epa_theme_preprocess_paragraph__card(&$variables) {
   /** @var \Drupal\paragraphs\Entity\Paragraph $card */
   $card = $variables['paragraph'];
-  /** @var \Drupal\Core\Entity\ContentEntityInterface $parent */
+  /** @var \Drupal\Core\Entity\ContentEntityBase $parent */
   $parent = $card->_referringItem->getEntity();
   $card_style = $parent->field_card_style;
   if (!$card_style->isEmpty()) {
@@ -35,6 +35,7 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
   else {
     $style = FALSE;
   }
+
   // If flag is set, pass to card template.
   $variables['flag'] = $style == 'flag';
 
@@ -78,5 +79,13 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
         }
       }
     }
+  }
+
+  if ($parent->hasField('field_title_placement')) {
+    $variables['title_placement'] = $parent->get('field_title_placement')->value;
+  }
+
+  if ($parent->hasField('field_image_style')) {
+    $variables['image_placement_style'] = $parent->get('field_image_style')->value;
   }
 }

@@ -8,8 +8,8 @@
 /**
  *
  */
-function addCreateAttributeFunction(\Twig_Environment &$env, $config) {
-  $function = new Twig_SimpleFunction(
+function addCreateAttributeFunction(\Twig\Environment &$env, $config) {
+  $function = new \Twig\TwigFunction(
     'create_attribute',
     function ($attributes = []) {
       foreach ($attributes as $key => $value) {
