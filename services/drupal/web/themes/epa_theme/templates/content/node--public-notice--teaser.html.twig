@@ -5,6 +5,13 @@
  */
 #}
 
+{% if node.field_language.value %}
+  {% set attributes = attributes.setAttribute('lang', node.field_language.value) %}
+  {% if node.field_language.value == 'ar' %}
+    {% set attributes = attributes.setAttribute('dir', 'rtl') %}
+  {% endif %}
+{% endif %}
+
 {% set more_info = [] %}
 
 {% if content.field_computed_comments_due_date|field_value %}

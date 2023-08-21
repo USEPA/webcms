@@ -7,8 +7,8 @@
 /**
  *
  */
-function addFormatDateFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('format_date', function ($string) {
+function addFormatDateFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('format_date', function ($string) {
     return $string;
   }));
 }

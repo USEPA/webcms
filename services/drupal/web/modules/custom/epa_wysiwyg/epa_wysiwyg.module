@@ -16,7 +16,7 @@ use Drupal\Core\Url;
 function epa_wysiwyg_library_info_alter(&$libraries, $extension) {
   // Add CKEditor overrides JS file to CKEditor library.
   if ($extension == 'ckeditor' && isset($libraries['drupal.ckeditor'])) {
-    $module_path = drupal_get_path('module', 'epa_wysiwyg');
+    $module_path = \Drupal::service('extension.list.module')->getPath('epa_wysiwyg');
     $js_path = "/$module_path/js/ckeditor-overrides.js";
     $libraries['drupal.ckeditor']['js'][$js_path] = [];
   }

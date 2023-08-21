@@ -1,0 +1,16 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+
+{% include '@uswds/graphic-list/_graphic-list-item.twig' with {
+  'url' : content.field_link.0['#url']|render,
+  'image': {
+    'src': content.field_media_block_image.0['#media'].field_media_image.entity.fileuri|image_style('small_graphic_list_image'),
+    'alt': content.field_media_block_image.0['#media'].field_media_image.alt,
+  },
+  'title': content.field_title|field_value|render,
+  'content': content.field_body|field_value|render,
+} %}

@@ -103,7 +103,7 @@ steps:
                       --cache \
                       --cache-repo="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-cache" \
                       --skip-unused-stages \
-                      --snapshotMode=redo \
+                      --snapshot-mode=redo \
                       --use-new-run \
                       --build-arg GIT_TAG="$BUILDKITE_TAG" \
                       --build-arg GIT_COMMIT="$BUILDKITE_COMMIT" \
@@ -134,7 +134,7 @@ steps:
                     echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
                     /kaniko/executor \
                       --context=/workspace/services/metrics \
-                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
+                      --no-push
 
   # Perform a Terraform formatting check. See the terraform-fmt.sh script for more details
   # on what is executed in this step.

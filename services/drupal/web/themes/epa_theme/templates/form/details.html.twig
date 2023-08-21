@@ -25,7 +25,7 @@
 {% endset %}
 
 {% set details_content %}
-  {% include '@uswds/_accordion/_accordion-content.twig' with {
+  {% include '@uswds/accordion/_accordion-content.twig' with {
     'content': detail_content,
     'content_id': '0',
     'title': title is not empty ? title : 'Details'|t,
@@ -33,7 +33,7 @@
   } %}
 {% endset %}
 
-{% include '@uswds/_accordion/accordion.twig' with {
+{% include '@uswds/accordion/accordion.twig' with {
   'accordion_content': details_content,
   'modifier_classes': 'usa-accordion--bordered form-item',
 } %}

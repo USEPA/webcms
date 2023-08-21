@@ -7,9 +7,9 @@
 /**
  *
  */
-function addUrlFunction(\Twig_Environment &$env, $config) {
+function addUrlFunction(\Twig\Environment &$env, $config) {
   // https://www.drupal.org/node/2486991
-  $env->addFunction(new \Twig_SimpleFunction('url', function ($string) {
+  $env->addFunction(new \Twig\TwigFunction('url', function ($string) {
     return '#';
   }));
 }

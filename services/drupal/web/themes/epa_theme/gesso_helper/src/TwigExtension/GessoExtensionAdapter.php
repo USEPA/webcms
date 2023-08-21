@@ -2,10 +2,12 @@
 
 namespace Drupal\gesso_helper\TwigExtension;
 
+use Twig\Extension\AbstractExtension;
+
 /**
  * Load custom twig functions from Pattern Lab.
  */
-class GessoExtensionAdapter extends \Twig_Extension {
+class GessoExtensionAdapter extends AbstractExtension {
 
   /**
    * GessoExtensionAdapter constructor.
