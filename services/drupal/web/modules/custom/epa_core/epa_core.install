@@ -157,3 +157,11 @@ function epa_core_update_9006() {
       ->execute();
   }
 }
+
+/**
+ * Disabling gcontent_moderation module (submodule of Groups from old patch) so
+ * that we can enable the separate contrib module.
+ */
+function epa_core_update_9007() {
+  \Drupal::database()->truncate('cache_container');
+}
