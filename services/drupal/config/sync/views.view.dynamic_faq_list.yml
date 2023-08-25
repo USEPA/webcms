@@ -121,7 +121,20 @@ display:
         type: custom_tag
         options:
           custom_tag: 'node_list:faq'
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: 'There are no results at this time.'
+            format: filtered_html
+          tokenize: false
       sorts:
         field_last_published_value:
           id: field_last_published_value
