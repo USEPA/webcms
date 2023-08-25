@@ -30,6 +30,7 @@
     {% include '@components/facet-list/facet-list.twig' with {
       'attributes': attributes,
       'list': items,
+      'modifier_classes': facet_id|clean_class,
     } %}
   {% endif %}
 
@@ -40,7 +41,7 @@
 
 {% if content|striptags|trim %}
   {% if facet %}
-    {% include '@uswds/_accordion/_accordion-content.twig' with {
+    {% include '@uswds/accordion/_accordion-content.twig' with {
       'attributes': '',
       'accordion_id': 'facets',
       'content_id': facet_id|clean_class,
