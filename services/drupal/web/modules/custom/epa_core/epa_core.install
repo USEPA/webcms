@@ -157,3 +157,30 @@ function epa_core_update_9006() {
       ->execute();
   }
 }
+
+/**
+ * Sets all field_language values to set correct chinese language keys
+ */
+function epa_core_update_9007() {
+  $database = \Drupal::database();
+  $tables = [
+    'node__field_language',
+    'node_revision__field_language',
+  ];
+
+  foreach ($tables as $table) {
+    $database->update($table)
+      ->fields([
+        'field_language_value' => 'zh-hans'
+      ])
+      ->condition('field_language_value', 'zh_Hans')
+      ->execute();
+
+    $database->update($table)
+      ->fields([
+        'field_language_value' => 'zh-hant'
+      ])
+      ->condition('field_language_value', 'zh_Hant')
+      ->execute();
+  }
+}
