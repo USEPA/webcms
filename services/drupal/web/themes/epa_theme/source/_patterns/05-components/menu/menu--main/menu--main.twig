@@ -1,8 +1,8 @@
 {% import _self as menus %}
 
-{{ menus.menu_links(main_items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class) }}
+{{ menus.menu_links(main_items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
 
-{% macro menu_links(main_items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class) %}
+{% macro menu_links(main_items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) %}
   {% import _self as menus %}
   {% if main_items %}
     {% if menu_level == 0 %}
@@ -78,6 +78,12 @@
             }) %}
             <button {{ create_attribute(button_attributes) }}>
               {{ item.title }}
+              {% include '@components/icon/icon.twig' with {
+                'modifier_classes': 'menu__link-icon',
+                'is_hidden': true,
+                'icon_name': 'angle',
+                'epa_theme_image_path': epa_theme_image_path,
+              } %}
             </button>
             {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
           {% else %}
