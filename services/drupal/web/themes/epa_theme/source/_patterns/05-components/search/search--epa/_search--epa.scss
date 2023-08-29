@@ -1,8 +1,75 @@
 // @file
 // Styles for EPA search.
 
+@use '../../../00-config' as *;
+@use '../../button' as *;
+
 .usa-search--epa {
+  [role='search'] {
+    @include breakpoint-max(gesso-breakpoint(tablet)) {
+      display: block;
+    }
+  }
+
   .usa-input {
     max-width: 100%;
+
+    @include breakpoint-max(gesso-breakpoint(mobile-lg)) {
+      border: 1px solid gesso-grayscale(gray-3);
+      border-radius: 0.25rem;
+      margin-bottom: rem(gesso-spacing(1));
+    }
+
+    @include breakpoint(gesso-breakpoint(tablet-lg)) {
+      &:focus {
+        outline-color: gesso-grayscale(white);
+      }
+    }
+  }
+
+  [type='submit'] {
+    outline-offset: 0 !important;
+
+    @include breakpoint-max(gesso-breakpoint(mobile-lg)) {
+      border-radius: 0.25rem;
+      display: block;
+      width: 100%;
+    }
+
+    @include breakpoint(gesso-breakpoint(tablet-lg)) {
+      background-color: gesso-color(button, dark, background);
+      color: gesso-color(button, dark, text);
+
+      &:hover,
+      &:focus {
+        background-color: gesso-color(button, dark, background-hover);
+        color: gesso-color(button, dark, text-hover);
+        outline-color: gesso-grayscale(white);
+      }
+
+      &:active {
+        background-color: gesso-color(button, dark, background-active);
+        color: gesso-color(button, dark, text-active);
+      }
+    }
+  }
+
+  .usa-search__submit-icon {
+    display: inline-block;
+    height: 1em;
+    top: -1px;
+    width: 1em;
+
+    @include breakpoint-max(gesso-breakpoint(mobile-lg)) {
+      display: none;
+    }
+  }
+
+  .usa-search__submit-text {
+    display: inline-block;
+
+    @include breakpoint(gesso-breakpoint(mobile-lg)) {
+      display: none;
+    }
   }
 }

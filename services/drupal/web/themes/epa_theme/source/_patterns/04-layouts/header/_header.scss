@@ -5,13 +5,8 @@
 
 .l-header {
   background: gesso-brand(blue, base);
-  padding-bottom: rem(gesso-spacing(3));
   position: relative;
   z-index: 2;
-
-  @include breakpoint(gesso-breakpoint(desktop)) {
-    padding-bottom: 0;
-  }
 }
 
 .l-header__navbar {
@@ -25,5 +20,36 @@
 .l-header__branding {
   align-items: center;
   display: flex;
+  gap: rem(gesso-spacing(2));
   justify-content: space-between;
+  padding: rem(gesso-spacing('05')) 0;
+
+  @include at-media($theme-header-min-width) {
+    padding: rem(gesso-spacing(205)) 0;
+  }
+}
+
+.l-header__menu-button {
+  border-radius: 0.25rem;
+  height: rem(38px);
+
+  &:focus {
+    outline-color: gesso-grayscale(white) !important;
+    outline-offset: 3px !important;
+    outline-width: 2px !important;
+  }
+}
+
+.l-header__search {
+  background: gesso-grayscale(gray-1);
+  margin: 0 rem(gesso-site-margins(mobile) * -1);
+  padding: rem(gesso-spacing(2)) rem(gesso-site-margins(mobile));
+  transition-duration: 1ms;
+
+  @include at-media($theme-header-min-width) {
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
 }
