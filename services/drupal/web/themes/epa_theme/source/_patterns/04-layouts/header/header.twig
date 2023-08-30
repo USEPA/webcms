@@ -1,8 +1,26 @@
-<header class="l-header">
+<header class="l-header js-header-search">
   <div class="usa-overlay"></div>
   <div class="l-constrain">
     <div class="l-header__navbar">
       <div class="l-header__branding">
+        <button
+          type="button"
+          class="l-header__search-button"
+          aria-controls="header-search-drawer"
+          aria-expanded="false"
+          aria-label="{{ 'Open search drawer'|t }}"
+        >
+          {% include '@components/icon/icon.twig' with {
+            'modifier_classes': 'l-header__search-button-icon-open',
+            'is_hidden': true,
+            'icon_name': 'magnifying-glass',
+          } %}
+          {% include '@components/icon/icon.twig' with {
+            'modifier_classes': 'l-header__search-button-icon-close',
+            'is_hidden': true,
+            'icon_name': 'xmark',
+          } %}
+        </button>
         {% block logo %}
           {% include '@layouts/_sample-content/sample-content.twig' with {
             'content': 'Logo',
@@ -10,7 +28,7 @@
         {% endblock %}
         <button type="button" class="usa-menu-btn usa-button--outline usa-button--inverse l-header__menu-button">{{ 'Menu'|t }}</button>
       </div>
-      <div class="l-header__search">
+      <div class="l-header__search" id="header-search-drawer">
         {% block search %}
           {% include '@layouts/_sample-content/sample-content.twig' with {
             'content': 'Search',
