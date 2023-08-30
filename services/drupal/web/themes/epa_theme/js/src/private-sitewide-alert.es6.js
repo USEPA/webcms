@@ -18,7 +18,7 @@ import Drupal from 'drupal';
               <div class="usa-alert__content">
                 <h3 class="usa-alert__heading">This page contains <span id="js-private-media-count">${privateMediaCount}</span> media files that are marked private.</h3>
                 <div class="usa-alert__text">
-                  <p>These files will not be available to your users. To correct, please do this... lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempot incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+                  <p>These files have been marked private and will not be available to anonymous readers. To make these files public, please read this page, <a href="https://www.epa.gov/webcmstraining/sensitive-private-vs-public-files">Sensitive (Private) vs Public Files</a>.</p>
                 </div>
               </div>
             </div>
