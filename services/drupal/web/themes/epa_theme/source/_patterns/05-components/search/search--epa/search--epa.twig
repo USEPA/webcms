@@ -9,11 +9,13 @@
   <div role="search">
     <label class="usa-sr-only" for="search-box">{{ 'Search'|t }}</label>
     <input class="usa-input" id="search-box" type="search" name="querytext" placeholder="{{ 'Search EPA.gov'|t }}">
-    <button class="button button--dark" type="submit">
-      <img
-        src="{{ epa_theme_image_path }}usa-icons-bg/search--white.svg"
-        class="usa-search__submit-icon"
-        alt="{{ 'Search'|t }}" />
+    <button class="button" type="submit" aria-label="{{ 'Search'|t }}">
+      {% include '@components/icon/icon.twig' with {
+        'is_hidden': true,
+        'modifier_classes': 'usa-search__submit-icon',
+        'icon_name': 'magnifying-glass',
+      } %}
+      <span class="usa-search__submit-text">{{ 'Search'|t }}</span>
     </button>
     <input type="hidden" name="areaname" value="">
     <input type="hidden" name="areacontacts" value="">

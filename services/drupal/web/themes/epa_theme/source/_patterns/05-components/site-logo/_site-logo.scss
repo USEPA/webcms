@@ -4,18 +4,17 @@
 @use 'sass:math';
 @use '../../00-config' as *;
 
-$logo-height: 147px;
-$logo-width: 1060px;
+$logo-height: 154.7px;
+$logo-main-width: 454.1px;
+$logo-text-width: 595.4px;
 
 .site-logo {
   color: gesso-brand(blue, base);
   display: block;
-  margin: rem(gesso-spacing(2)) rem(gesso-spacing(2)) rem(gesso-spacing(2))
-    rem(gesso-spacing(1) * -1);
+  margin: 0 rem(gesso-spacing('05') * -1);
   max-width: 100%;
-  min-width: rem(200px);
-  padding: rem(gesso-spacing(1));
-  width: rem(362px);
+  padding: rem(gesso-spacing('05'));
+  width: rem(120px);
 
   &:visited {
     color: gesso-brand(blue, base);
@@ -24,6 +23,16 @@ $logo-width: 1060px;
   &:hover,
   &:focus {
     color: gesso-brand(blue, dark);
+  }
+
+  &:focus {
+    outline-color: gesso-grayscale(white);
+    outline-offset: 0;
+    outline-width: 2px;
+  }
+
+  @include at-media($theme-header-min-width) {
+    width: rem(362px);
   }
 
   @media print {
@@ -35,13 +44,38 @@ $logo-width: 1060px;
 
 .site-logo__image {
   display: block;
-  padding-bottom: math.div($logo-height, $logo-width) * 100%;
+  padding-bottom: math.div($logo-height, $logo-main-width) * 100%;
   position: relative;
   width: 100%;
+
+  @include at-media($theme-header-min-width) {
+    display: flex;
+    gap: rem(3px);
+    padding: 0;
+  }
 }
 
-.site-logo__svg {
+%site-logo__svg {
   fill: gesso-grayscale(white);
   height: 100%;
+}
+
+.site-logo__svg-main {
+  @extend %site-logo__svg;
   position: absolute;
+
+  @include at-media($theme-header-min-width) {
+    position: relative;
+    width: rem($logo-main-width);
+  }
+}
+
+.site-logo__svg-text {
+  @extend %site-logo__svg;
+  display: none;
+
+  @include at-media($theme-header-min-width) {
+    display: block;
+    width: rem($logo-text-width);
+  }
 }
