@@ -18,12 +18,15 @@
   ]) %}
 {% endif %}
 
-<div class="event--list-item">
-  {% include '@uswds/collection/_collection-item.twig' with {
-    'url': url,
-    'heading': label,
-    'more_info' : more_info
-  } %}
+{% include '@uswds/collection/_collection-item.twig' with {
+  'url': url,
+  'heading': label,
+  'more_info' : more_info
+} %}
 
-  {% set catch_cache = content|render %}
-</div>
+{# @todo: modify me to remove add to cal button #}
+{{ content|without(
+  'field_daterange',
+  'field_location'
+) }}
+{% set catch_cache = content|render %}
