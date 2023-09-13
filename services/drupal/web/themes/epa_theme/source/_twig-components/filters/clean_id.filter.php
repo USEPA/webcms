@@ -7,8 +7,8 @@
 /**
  *
  */
-function addCleanIdFilter(\Twig_Environment &$env, $config) {
-  $env->addFilter(new \Twig_SimpleFilter('clean_id', function ($string) {
+function addCleanIdFilter(\Twig\Environment &$env, $config) {
+  $env->addFilter(new \Twig\TwigFilter('clean_id', function ($string) {
     return $string;
   }));
 }

@@ -3,7 +3,7 @@
   modifier_classes ? modifier_classes,
 ]|join(' ')|trim %}
 
-{% spaceless %}
+{% apply spaceless %}
   <a class="{{ classes }}" href="{{ url }}">
     {%- include '@components/icon/icon.twig' with {
       'modifier_classes': 'facet__icon facet__icon--empty',
@@ -26,4 +26,4 @@
       {%- endif -%}
     </span>
   </a>
-{% endspaceless %}
+{% endapply %}

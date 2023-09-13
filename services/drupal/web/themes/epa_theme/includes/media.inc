@@ -14,6 +14,7 @@ use Drupal\filter\Render\FilteredMarkup;
 function epa_theme_preprocess_filter_caption(&$vars) {
   $dom = Html::load($vars['node']);
   foreach ($dom->getElementsByTagName('drupal-media') as $node) {
+    /** @var \DOMElement */
     $new_node = $node->cloneNode(TRUE);
 
     if ($media = \Drupal::entityTypeManager()->getStorage('media')->loadByProperties(['uuid' => $node->getAttribute('data-entity-uuid')])) {
@@ -46,7 +47,7 @@ function epa_theme_preprocess_filter_caption(&$vars) {
 function epa_theme_preprocess_media(&$vars) {
   $vars['has_caption'] = isset($vars['attributes']['data-caption']);
   $media = $vars['media'];
-  $vars['filesize'] = format_size($media->getSource()->getMetadata($media, 'filesize'));
+  $vars['filesize'] = format_size($media->getSource()->getMetadata($media, 'filesize'), NULL, 1);
 }
 
 /**
