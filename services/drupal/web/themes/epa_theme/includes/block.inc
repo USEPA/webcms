@@ -6,7 +6,7 @@
  */
 
 use Drupal\block_content\BlockContentInterface;
-use Drupal\group\Entity\Group;
+use Drupal\Core\Link;
 
 /**
  * Implements hook_theme_suggestions_HOOK_alter().
@@ -39,14 +39,15 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
 
 /**
  * Implements hook_preprocess_HOOK().
+ *
+ * The first item of the Web Area Menu is a link back to the Web Area 'Homepage'.
+ * This makes the first menu link the block's title and removes it from the list.
  */
 function epa_theme_preprocess_block__webareamenu(&$variables) {
-  /** @var \Drupal\group\Cache\Context\RouteGroupCacheContext $cache_group_route_context */
-  $cache_group_route_context = \Drupal::service('cache_context.route.group');
-  /** @var \Drupal\epa_web_areas\Entity\EPAGroup $candidate */
-  $group = $cache_group_route_context->getBestCandidate();
-
-  if ($group instanceof Group) {
-    $variables['label'] = $group->label() . t(' Home');
+  if (!empty($variables['content']['#items'])) {
+    $first_link = reset($variables['content']['#items']);
+    $new_link = Link::fromTextAndUrl($first_link['title'], $first_link['url']);
+    $variables['label'] = $new_link->toRenderable();
+    unset($variables['content']['#items'][$first_link['original_link']->getPluginId()]);
   }
 }
