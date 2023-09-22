@@ -25,12 +25,16 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
     }
   }
 
-  // Add class to facet links.
   foreach ($vars['items'] as &$item) {
+    // Add class to facet links.
     $item['value']['#url']->setOption('attributes', [
       'class' => ['facet'],
       'rel' => 'no-follow',
     ]);
+
+    // format value to be html
+    $formatted_value = new \Twig\Markup( $item['value']['#title']['#value'], 'UTF-8' );
+    $item['value']['#title']['#value'] = $formatted_value;
   }
 }
 
@@ -50,5 +54,11 @@ function epa_theme_preprocess_facets_summary_item_list(&$vars) {
       $vars['reset_url'] = $item['value']['#url']->toString();
       unset($vars['items'][$key]);
     }
+  }
+
+  // format value to be html
+  foreach($vars['items'] as &$item) {
+    $formatted_value = new \Twig\Markup( $item['value']['#title']['#value'], 'UTF-8' );
+    $item['value']['#title']['#value'] = $formatted_value;
   }
 }

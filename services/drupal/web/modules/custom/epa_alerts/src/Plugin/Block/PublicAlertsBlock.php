@@ -28,7 +28,6 @@ class PublicAlertsBlock extends BlockBase {
     // views_ajax_get module doesn't get an opportunity to attach it dynamically.
     $build['#attached']['drupalSettings']['viewsAjaxGet']['public_alerts'] = 'public_alerts';
 
-    $build['#attached']['library'][] = 'epa_alerts/epaAlerts';
     $build['#attached']['drupalSettings']['epaAlerts']['context'] = 'public';
 
     return $build;
