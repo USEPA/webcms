@@ -9,4 +9,17 @@ export default function() {
       button.setAttribute('aria-controls', id);
     }
   });
+  const sideNavTrigger = document.getElementById('menu--sidenav__menu-button');
+  const sideNavMenu = document.querySelector('.menu--sidenav');
+  const overlay = document.getElementsByClassName('usa-overlay');
+  sideNavTrigger.addEventListener(
+    'click',
+    function() {
+      sideNavMenu.classList.toggle('is-visible');
+      for (const item of overlay) {
+        item.classList.toggle('is-visible');
+      }
+    },
+    false
+  );
 }

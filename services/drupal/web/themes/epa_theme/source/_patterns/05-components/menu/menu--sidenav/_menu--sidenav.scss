@@ -7,6 +7,26 @@
 .menu--sidenav {
   @extend .usa-sidenav;
 
+  @include at-media-max($theme-header-min-width) {
+    @include u-pin("right");
+    @include u-pin("y");
+    position: fixed;
+    background: color("white");
+    border-right: 0;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    margin-bottom: 0;
+    padding: 0;
+    width: 18rem;
+    z-index: z-index(500);
+
+    &.is-visible {
+      animation: slidein-left 0.3s ease-in-out;
+      display: flex;
+    }
+  }
+
   .menu__item {
     @extend .usa-sidenav__item;
   }
@@ -48,17 +68,19 @@
   }
 
   .menu__link-icon {
-    font-size: 1em;
+    color: gesso-grayscale(black);
+    font-size: 0.8em;
     top: -1px;
     transform: rotate(-180deg);
     transition: transform gesso-duration(standard) gesso-easing(ease-out);
-
-    @include at-media($theme-header-min-width) {
-      font-size: 1.1em;
-    }
   }
 
   .menu__subnav {
     @extend .usa-sidenav__sublist;
+    align-items: center;
+
+    .menu__subnav {
+      font-size: rem(14px);
+    }
   }
 }

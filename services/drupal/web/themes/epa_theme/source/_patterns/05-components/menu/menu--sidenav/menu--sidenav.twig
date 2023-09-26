@@ -1,5 +1,15 @@
 {% import _self as menus %}
 
+<button type="button" class="usa-button usa-button--outline menu--sidenav__menu-button" id="menu--sidenav__menu-button">
+	{% include '@uswds/icon/icon.twig' with {
+    'modifier_classes': 'menu--sidenav__menu-icon',
+    'is_hidden': true,
+    'icon_name': 'menu',
+    'label': 'Open Sidenav Menu',
+    'epa_theme_image_path': epa_theme_image_path
+  } %}
+</button>
+
 {{ menus.menu_links(items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
 
 {% macro menu_links(items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) %}
