@@ -1,6 +1,6 @@
 @use '../../../00-config' as *;
 
-.webareamenu {
+.block__web-area-menu {
   @include at-media-max($theme-header-min-width) {
     align-items: center;
     background-color: color('base-lightest');
@@ -39,16 +39,31 @@
   }
 
   //.menu--sidenav__menu-button {
-  .menu--sidenav .menu-button {
+  .web-area-menu__button {
     display: none;
 
     @include at-media-max($theme-header-min-width) {
       box-shadow: none;
       display: block;
       font-size: 2rem;
+      height: rem(32px);
       margin-bottom: rem(15px);
       order: 1;
       padding: 0;
+    }
+
+    .menu-button--close {
+      display: none;
+    }
+
+    &.is-open {
+      .menu-button--close {
+        display: block;
+      }
+
+      .menu-button--open {
+        display: none;
+      }
     }
   }
 }

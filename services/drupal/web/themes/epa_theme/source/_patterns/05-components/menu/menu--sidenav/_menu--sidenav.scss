@@ -24,17 +24,26 @@
     &.is-visible {
       animation: slidein-left 0.3s ease-in-out;
       display: flex;
+      margin-bottom: 0;
     }
   }
 
   .menu__item {
     @extend .usa-sidenav__item;
+
+    &.has-subnav {
+      align-items: stretch;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
   }
 
   .menu__link {
     background-color: transparent;
     background-image: none;
     color: gesso-color(text, link) !important;
+    font-weight: normal;
 
     &:hover,
     &:focus {
@@ -53,16 +62,30 @@
     &.is-active-trail {
       @extend .usa-current;
       background-color: color('base-lightest');
+      font-weight: bold;
     }
 
     &.has-subnav {
+      align-items: center;
       display: flex;
-      gap: rem(gesso-spacing('05'));
       justify-content: space-between;
-      padding: gesso-spacing(2) gesso-spacing(3);
+      padding-left: gesso-spacing(3);
+      padding-right: gesso-spacing(3);
+      width: calc(100% - 62px);
 
       &[aria-expanded='true'] > .menu__link-icon {
         transform: rotate(0deg);
+      }
+    }
+
+    &.usa-accordion__button {
+      padding-bottom: 0.5rem;
+      padding-top: 0.5rem;
+      width: rem(62px);
+
+      &.is-active::after,
+      &.is-active-trail::after {
+        content: none;
       }
     }
   }
@@ -78,6 +101,7 @@
   .menu__subnav {
     @extend .usa-sidenav__sublist;
     align-items: center;
+    width: 100%;
 
     .menu__subnav {
       font-size: rem(14px);

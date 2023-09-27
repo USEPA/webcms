@@ -1,15 +1,21 @@
 {% import _self as menus %}
 
-<button type="button" class="usa-button usa-button--outline menu--sidenav__menu-button" id="menu--sidenav__menu-button">
+<button type="button" class="usa-button usa-button--outline web-area-menu__button" id="web-area-menu__button" aria-label="{{ 'toggle the side navigation menu'|t }}">
 	{% include '@uswds/icon/icon.twig' with {
-    'modifier_classes': 'menu--sidenav__menu-icon',
+    'modifier_classes': 'menu-button--open',
     'is_hidden': true,
     'icon_name': 'menu',
     'label': 'Open Sidenav Menu',
     'epa_theme_image_path': epa_theme_image_path
   } %}
+  {% include '@uswds/icon/icon.twig' with {
+    'modifier_classes': 'menu-button--close',
+    'is_hidden': true,
+    'icon_name': 'close',
+    'label': 'Close Sidenav Menu',
+    'epa_theme_image_path': epa_theme_image_path
+  } %}
 </button>
-
 {{ menus.menu_links(items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
 
 {% macro menu_links(items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) %}
@@ -34,7 +40,7 @@
       <ul class="menu menu__subnav">
     {% endif %}
     {% for item in items %}
-
+    	{% set aria_expanded = 'false' %}
       {% set item_classes = ['menu__item'] %}
       {% if menu_level == 0 and menu_class_prefix %}
         {% set item_classes = item_classes|merge([menu_class_prefix ~ '-item']) %}
@@ -51,14 +57,11 @@
       {% if item.in_active_trail %}
         {% set item_classes = item_classes|merge(['is-active-trail']) %}
         {% set link_classes = link_classes|merge(['is-active-trail']) %}
+        {% set aria_expanded = 'true' %}
       {% endif %}
       {% if item.is_collapsed %}
         {% set item_classes = item_classes|merge(['is-collapsed']) %}
         {% set link_classes = link_classes|merge(['is-collapsed']) %}
-      {% endif %}
-      {% if item.is_expanded %}
-        {% set item_classes = item_classes|merge(['is-expanded']) %}
-        {% set link_classes = link_classes|merge(['is-expanded']) %}
       {% endif %}
       {% if item['original_link'].options.attributes.class %}
         {% set original_link_class = item['original_link'].options.attributes.class %}
@@ -88,19 +91,19 @@
                 'usa-nav__link',
                 'usa-accordion__button'
               ]),
-              'aria-expanded': 'false',
+              'aria-expanded': aria_expanded,
               'type': 'button'
             }) %}
+            {{ link(item.title, item.url, link_attributes) }}
             <button {{ create_attribute(button_attributes) }}>
-              {{ item.title }}
               {% include '@components/icon/icon.twig' with {
                 'modifier_classes': 'menu__link-icon',
                 'is_hidden': true,
                 'icon_name': 'angle',
-                'epa_theme_image_path': epa_theme_image_path,
+                'epa_theme_image_path': epa_theme_image_path
               } %}
             </button>
-            {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
+            {{ menus.menu_links(item.below, attributes, menu_level + 1, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
           {% else %}
             {{ link(item.title, item.url, link_attributes) }}
           {% endif %}
