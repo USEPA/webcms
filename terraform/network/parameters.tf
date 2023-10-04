@@ -87,14 +87,6 @@ resource "aws_ssm_parameter" "drupal_security_group" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "traefik_security_group" {
-  name  = "/webcms/${var.environment}/security-groups/traefik"
-  type  = "String"
-  value = aws_security_group.traefik.id
-
-  tags = var.tags
-}
-
 resource "aws_ssm_parameter" "alb_security_group" {
   name  = "/webcms/${var.environment}/security-groups/alb"
   type  = "String"
