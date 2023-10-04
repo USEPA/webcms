@@ -55,6 +55,17 @@ resource "aws_security_group" "alb" {
   })
 }
 
+resource "aws_security_group" "traefik" {
+  name        = "webcms-${var.environment}-traefik"
+  description = "Security group for the Traefik reverse proxy"
+
+  vpc_id = aws_vpc.vpc.id
+
+  tags = merge(var.tags, {
+    Name = "WebCMS Traefik (${var.environment})"
+  })
+}
+
 resource "aws_security_group" "drupal" {
   name        = "webcms-${var.environment}-drupal"
   description = "Security group for Drupal/Drush containers"
@@ -177,7 +188,88 @@ resource "aws_security_group_rule" "public_alb_https_ingress" {
 
 #endregion
 
+#region Traefik
+
+# Allow outbound HTTPS egress for Traefik. This is necessary in order to allow pulling
+# Docker images on Fargate.
+resource "aws_security_group_rule" "traefik_https_egress" {
+  description = "Allows outbound HTTPS (needed to pull Docker images)"
+
+  security_group_id = aws_security_group.traefik.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  cidr_blocks = ["0.0.0.0/0"]
+}
+
+# Allow incoming traffic from public subnets. AWS network load balancers (NLBs) do not
+# support security groups, so we need to be more permissive here. In a more hardened
+# environment, these could be restricted to the exact internal IPs of the NLB.
+#
+# We allow two ports:
+# * 80, for HTTP traffic. This is unencrypted traffic from the public internet, and we use
+#   it to allow nginx to upgrade to HTTPS.
+# * 443, for decrypted HTTPS traffic. The NLB handles TLS termination for us, but we use
+#   this port anyway for the mnemonic convention.
+resource "aws_security_group_rule" "public_traefik_http_ingress" {
+  description = "Allows incoming HTTP traffic from public subnets"
+
+  security_group_id = aws_security_group.traefik.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 80
+  to_port   = 80
+
+  cidr_blocks = aws_subnet.public[*].cidr_block
+}
+
+resource "aws_security_group_rule" "public_traefik_https_ingress" {
+  description = "Allows incoming HTTPS traffic from public subnets"
+
+  security_group_id = aws_security_group.traefik.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  cidr_blocks = aws_subnet.public[*].cidr_block
+}
+
+#endregion
+
 #region Drupal
+
+# Allow traffic on port 443 from Traefik to Drupal
+resource "aws_security_group_rule" "drupal_traefik_ingress" {
+  description = "Allows Drupal to receive traffic from Traefik"
+
+  security_group_id = aws_security_group.drupal.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.traefik.id
+}
+
+resource "aws_security_group_rule" "traefik_drupal_egress" {
+  description = "Allows Traefik to send traffic to Drupal"
+
+  security_group_id = aws_security_group.traefik.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 443
+  to_port   = 443
+
+  source_security_group_id = aws_security_group.drupal.id
+}
 
 # Allow traffic on port 443 from the ALB to Drupal
 resource "aws_security_group_rule" "drupal_alb_ingress" {
