@@ -3,9 +3,29 @@
 
 @use '../../00-config/00-functions' as *;
 
-// .document {}
+.document {
+  &.is-private {
+    background-color: rgba(color($theme-color-warning), 0.5);
+    padding-left: 0.125em;
+
+    .file.is-private {
+      background-color: transparent;
+
+      .file__private-icon {
+        display: none;
+      }
+    }
+  }
+}
 
 .document__meta {
   color: gesso-color(text, secondary);
   font-size: font-size(body, 2xs);
+}
+
+.document__private-icon {
+  background-color: color($theme-color-warning);
+  color: color($theme-color-base-darkest);
+  margin-left: 0.125em;
+  padding: 0 0.125em;
 }
