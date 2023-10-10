@@ -1,21 +1,5 @@
 {% import _self as menus %}
 
-<button type="button" class="usa-button usa-button--outline web-area-menu__button" id="web-area-menu__button" aria-label="{{ 'toggle the side navigation menu'|t }}">
-	{% include '@uswds/icon/icon.twig' with {
-    'modifier_classes': 'menu-button--open',
-    'is_hidden': true,
-    'icon_name': 'menu',
-    'label': 'Open Sidenav Menu',
-    'epa_theme_image_path': epa_theme_image_path
-  } %}
-  {% include '@uswds/icon/icon.twig' with {
-    'modifier_classes': 'menu-button--close',
-    'is_hidden': true,
-    'icon_name': 'close',
-    'label': 'Close Sidenav Menu',
-    'epa_theme_image_path': epa_theme_image_path
-  } %}
-</button>
 {{ menus.menu_links(items, attributes, 0, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
 
 {% macro menu_links(items, attributes, menu_level, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) %}
@@ -25,8 +9,7 @@
       {# double quotes around class using menu_name needed for interpolation #}
       {% set additional_classes = [
         'menu',
-        "menu--#{menu_name}",
-        'menu--accordion'
+        "menu--#{menu_name}"
       ] %}
       {% if menu_class %}
         {% set additional_classes = additional_classes|merge(menu_class) %}
@@ -34,7 +17,7 @@
       {% set additional_attributes = {
         'class': additional_classes
       } %}
-      <ul {{ add_attributes(additional_attributes) }} data-allow-multiple>
+      <ul {{ add_attributes(additional_attributes) }}>
     {% else %}
       <ul class="menu menu__subnav">
     {% endif %}
@@ -52,7 +35,6 @@
       {% if item.below %}
         {% set item_classes = item_classes|merge(['has-subnav', 'usa-accordion', 'usa-accordion--multiselectable']) %}
         {% set link_classes = link_classes|merge(['has-subnav']) %}
-        {% set link_attributes = link_attributes|merge({'data-allow-multiple': 'true'}) %}
       {% endif %}
       {% if item.in_active_trail %}
         {% set item_classes = item_classes|merge(['is-active-trail']) %}
@@ -81,6 +63,10 @@
 
       {% if item.current %}
         {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
+      {% endif %}
+
+      {% if item.below %}
+        {% set additional_item_attributes = additional_item_attributes|merge({'data-allow-multiple': 'true'}) %}
       {% endif %}
 
       {% apply spaceless %}
