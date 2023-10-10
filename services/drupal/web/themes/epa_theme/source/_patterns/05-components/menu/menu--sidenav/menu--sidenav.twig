@@ -26,8 +26,7 @@
       {% set additional_classes = [
         'menu',
         "menu--#{menu_name}",
-        'menu--accordion',
-        'usa-accordion'
+        'menu--accordion'
       ] %}
       {% if menu_class %}
         {% set additional_classes = additional_classes|merge(menu_class) %}
@@ -35,7 +34,7 @@
       {% set additional_attributes = {
         'class': additional_classes
       } %}
-      <ul {{ add_attributes(additional_attributes) }}>
+      <ul {{ add_attributes(additional_attributes) }} data-allow-multiple>
     {% else %}
       <ul class="menu menu__subnav">
     {% endif %}
@@ -51,8 +50,9 @@
       {% endif %}
 
       {% if item.below %}
-        {% set item_classes = item_classes|merge(['has-subnav']) %}
+        {% set item_classes = item_classes|merge(['has-subnav', 'usa-accordion', 'usa-accordion--multiselectable']) %}
         {% set link_classes = link_classes|merge(['has-subnav']) %}
+        {% set link_attributes = link_attributes|merge({'data-allow-multiple': 'true'}) %}
       {% endif %}
       {% if item.in_active_trail %}
         {% set item_classes = item_classes|merge(['is-active-trail']) %}
