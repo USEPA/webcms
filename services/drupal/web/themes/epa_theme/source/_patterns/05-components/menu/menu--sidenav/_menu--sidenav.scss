@@ -107,3 +107,18 @@
     }
   }
 }
+
+.menu-subnav-overlay {
+  @include u-pin("all");
+  position: fixed;
+  background: color("black-transparent-70");
+  opacity: opacity(0);
+  transition: opacity $project-easing;
+  visibility: hidden;
+  z-index: z-index(400);
+
+  &.is-visible {
+    opacity: opacity(100);
+    visibility: visible;
+  }
+}
