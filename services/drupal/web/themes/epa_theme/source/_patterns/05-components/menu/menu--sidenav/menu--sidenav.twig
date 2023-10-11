@@ -9,7 +9,8 @@
       {# double quotes around class using menu_name needed for interpolation #}
       {% set additional_classes = [
         'menu',
-        "menu--#{menu_name}"
+        "menu--#{menu_name}",
+        'menu--accordion'
       ] %}
       {% if menu_class %}
         {% set additional_classes = additional_classes|merge(menu_class) %}
@@ -32,7 +33,7 @@
         {% set link_classes = link_classes|merge(link_class) %}
       {% endif %}
 
-      {% if item.below %}
+      {% if item.below and menu_level < 2 %}
         {% set item_classes = item_classes|merge(['has-subnav', 'usa-accordion', 'usa-accordion--multiselectable']) %}
         {% set link_classes = link_classes|merge(['has-subnav']) %}
       {% endif %}
@@ -65,13 +66,13 @@
         {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
       {% endif %}
 
-      {% if item.below %}
+      {% if item.below and menu_level < 2 %}
         {% set additional_item_attributes = additional_item_attributes|merge({'data-allow-multiple': 'true'}) %}
       {% endif %}
 
       {% apply spaceless %}
         <li {{ add_attributes(additional_item_attributes) }}>
-          {% if item.below %}
+          {% if item.below and menu_level < 2 %}
             {% set button_attributes = link_attributes|merge({
               'class': link_attributes['class']|merge([
                 'usa-nav__link',
