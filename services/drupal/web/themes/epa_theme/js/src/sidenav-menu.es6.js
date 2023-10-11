@@ -5,8 +5,9 @@ import Drupal from 'drupal';
   Drupal.behaviors.sidenavMenu = {
     attach(context) {
       const sideNavTrigger = context.getElementById('web-area-menu__button');
-      const sideNavMenu = context.querySelector('.menu--sidenav');
-      const sideNavOverlay = context.querySelector('.menu-subnav-overlay');
+      const sideNavMenu = context.querySelector('.menu--sidenav-nav');
+      const sideNavOverlay = context.querySelector('.menu-sidenav__overlay');
+      const sideNavClose = context.querySelector('.menu-sidenav__close');
 
       function toggleVisiblity() {
         sideNavMenu.classList.toggle('is-visible');
@@ -14,8 +15,9 @@ import Drupal from 'drupal';
         sideNavTrigger.classList.toggle('is-open');
       }
 
-      sideNavTrigger.addEventListener('click', toggleVisiblity);
-      sideNavOverlay.addEventListener('click', toggleVisiblity);
+      [sideNavTrigger, sideNavOverlay, sideNavClose].forEach(elem => {
+        elem.addEventListener('click', toggleVisiblity);
+      });
 
       const subNavMenus = context.querySelectorAll(
         '.menu--sidenav .menu__subnav'
