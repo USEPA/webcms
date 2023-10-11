@@ -16,6 +16,17 @@ import Drupal from 'drupal';
 
       sideNavTrigger.addEventListener('click', toggleVisiblity);
       sideNavOverlay.addEventListener('click', toggleVisiblity);
+
+      const subNavMenus = context.querySelectorAll(
+        '.menu--sidenav .menu__subnav'
+      );
+
+      subNavMenus.forEach((subNav, index) => {
+        const subId = `sub-menu-${index}`;
+        const subBtnSib = subNav.previousElementSibling;
+        subNav.setAttribute('id', subId);
+        subBtnSib.setAttribute('aria-controls', subId);
+      });
     },
   };
 })(Drupal);
