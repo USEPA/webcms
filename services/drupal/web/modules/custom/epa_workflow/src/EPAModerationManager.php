@@ -59,8 +59,10 @@ class EPAModerationManager {
     // done in the process methods to be called in a presave hook. We can probably
     // avoid the additional save here in a lot of cases.
     $moderation->process($moderation_entity);
-    // @todo Should we be saving the moderation entity here? This is causing duplicate events to fire
-//    $moderation->save();
+    // @todo Look to alter the moderation state with an additional property so that
+    // we can key off that in the DANSE event subscriber as this is causing duplicate
+    // events to be created, however, this breaks the moderation processes.
+    $moderation->save();
     $moderation->logTransition();
   }
 
