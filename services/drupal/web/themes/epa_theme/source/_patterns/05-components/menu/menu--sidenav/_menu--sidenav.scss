@@ -126,10 +126,15 @@
 }
 
 .menu-sidenav__close {
-  background: transparent;
-  border: none;
-  font-size: rem(gesso-spacing(4));
-  height: 3rem;
-  margin-left: auto;
-  width: 3rem;
+  display: none;
+
+  @include at-media-max($theme-header-min-width) {
+    background: transparent;
+    border: none;
+    display: block;
+    font-size: rem(gesso-spacing(4));
+    height: 3rem;
+    margin-left: auto;
+    width: 3rem;
+  }
 }
