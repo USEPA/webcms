@@ -1,0 +1,15 @@
+diff --git a/src/Form/AccessUnpublishedForm.php b/src/Form/AccessUnpublishedForm.php
+index 33174ef..956ec46 100644
+--- a/src/Form/AccessUnpublishedForm.php
++++ b/src/Form/AccessUnpublishedForm.php
+@@ -164,9 +164,8 @@ class AccessUnpublishedForm implements ContainerInjectionInterface {
+    */
+   public static function getDurationOptions() {
+     $dateFormatter = \Drupal::service('date.formatter');
+-    $period = [86400, 172800, 345600, 604800, 1209600];
++    $period = [86400, 172800, 345600];
+     $period = array_map([$dateFormatter, 'formatInterval'], array_combine($period, $period));
+-    $period[-1] = t('Unlimited');
+     return $period;
+   }
+ 
