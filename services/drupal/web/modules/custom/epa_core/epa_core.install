@@ -159,17 +159,9 @@ function epa_core_update_9006() {
 }
 
 /**
- * Disabling gcontent_moderation module (submodule of Groups from old patch) so
- * that we can enable the separate contrib module.
- */
-function epa_core_update_9007() {
-  \Drupal::database()->truncate('cache_container');
-}
-
-/**
  * Sets all field_language values to set correct chinese language keys
  */
-function epa_core_update_9008() {
+function epa_core_update_9007() {
   $database = \Drupal::database();
   $tables = [
     'node__field_language',
@@ -191,4 +183,12 @@ function epa_core_update_9008() {
       ->condition('field_language_value', 'zh_Hant')
       ->execute();
   }
+}
+
+/**
+ * Disabling gcontent_moderation module (submodule of Groups from old patch) so
+ * that we can enable the separate contrib module.
+ */
+function epa_core_update_9008() {
+  \Drupal::database()->truncate('cache_container');
 }
