@@ -44,7 +44,11 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
  * set the block title to be a link to the web area's homepage node.
  */
 function epa_theme_preprocess_block__webareamenu(&$variables) {
-  if (isset($variables['elements']['#contextual_links']['group_menu']['route_parameters']['group']) && !empty($variables['elements']['#contextual_links']['group_menu']['route_parameters']['group'])) {
+  // Ensure we have a group ID and items in the menu before proceeding.
+  if (
+    !empty($variables['elements']['#contextual_links']['group_menu']['route_parameters']['group']) &&
+    !empty($variables['content']['#items'])
+  ) {
     $group_id = $variables['elements']['#contextual_links']['group_menu']['route_parameters']['group'];
     /** @var \Drupal\group\Entity\GroupInterface $group */
     $group = \Drupal::entityTypeManager()
@@ -53,10 +57,11 @@ function epa_theme_preprocess_block__webareamenu(&$variables) {
 
     // 'Title' property is labeled as 'short name'.
     $short_name = $group->get('label')->value;
+
     // Set the short name as the block's label.
     $variables['label'] = $short_name;
 
-    // Now load up the web area's set homepage node and get the url for that to
+    // Now get the web area's set homepage node and get the url for that to
     // use as link URL.
     /** @var \Drupal\node\NodeInterface $homepage_node */
     $homepage_node = $group->get('field_homepage')->entity;
