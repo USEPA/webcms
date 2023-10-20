@@ -322,3 +322,62 @@ WHERE pfb.revision_id IS NULL
   \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
 
 }
+
+/**
+ * Setting default values for field_image_style, field_title_placement, and field_flag_card_alignment
+ */
+function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
+  $database = \Drupal::database();
+  $prefixes = [
+    'paragraph__' => 'paragraphs_item',
+    'paragraph_revision__' => 'paragraphs_item_revision'
+  ];
+  foreach ($prefixes as $table_prefix => $item_table) {
+    $item_table = $item_table . '_field_data';
+
+    // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
+    $field_table = $table_prefix . 'field_image_style';
+    $missing_image_styles_paragraphs = $database->query("SELECT p.id, p.revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
+    foreach ($missing_image_styles_paragraphs as $paragraph) {
+      $database->insert($field_table)->fields([
+        'bundle' => 'card_group',
+        'deleted' => 0,
+        'entity_id' => $paragraph->id,
+        'revision_id' => $paragraph->revision_id,
+        'langcode' => 'en',
+        'delta' => 0,
+        'field_image_style_value' => 'exdent'
+      ])->execute();
+    }
+
+    // Update all card_group paragraph revision and non-revision items to set field_title_placement if a value is not already set.
+    $field_table = $table_prefix . 'field_title_placement';
+    $missing_title_placement_paragraphs = $database->query("SELECT p.id, p.revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
+    foreach ($missing_title_placement_paragraphs as $paragraph) {
+      $database->insert($field_table)->fields([
+        'bundle' => 'card_group',
+        'deleted' => 0,
+        'entity_id' => $paragraph->id,
+        'revision_id' => $paragraph->revision_id,
+        'langcode' => 'en',
+        'delta' => 0,
+        'field_title_placement_value' => 'media-first'
+      ])->execute();
+    }
+
+    // Update all card paragraph revision and non-revision items to set field_flag_card_alignment if a value is not already set.
+    $field_table = $table_prefix . 'field_flag_card_alignment';
+    $missing_flag_alignment_paragraphs = $database->query("SELECT p.id, p.revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
+    foreach ($missing_flag_alignment_paragraphs as $paragraph) {
+      $database->insert($field_table)->fields([
+        'bundle' => 'card',
+        'deleted' => 0,
+        'entity_id' => $paragraph->id,
+        'revision_id' => $paragraph->revision_id,
+        'langcode' => 'en',
+        'delta' => 0,
+        'field_flag_card_alignment_value' => 'default'
+      ])->execute();
+    }
+  }
+}
