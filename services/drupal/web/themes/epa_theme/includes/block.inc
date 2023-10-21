@@ -60,6 +60,7 @@ function epa_theme_preprocess_block__webareamenu(&$variables) {
 
     // Set the short name as the block's label.
     $variables['label'] = $short_name;
+    $variables['label_display'] = 1;
 
     // Now get the web area's set homepage node and get the url for that to
     // use as link URL.
