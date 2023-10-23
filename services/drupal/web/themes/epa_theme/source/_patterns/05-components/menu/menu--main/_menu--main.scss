@@ -146,23 +146,32 @@
     @include at-media($theme-header-min-width) {
       box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.1);
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       position: absolute;
       width: auto;
       z-index: 1;
 
       &.is-wide {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
 
         // stylelint-disable-next-line
         .menu__item:first-child {
-          grid-column: 1 / span 3;
+          grid-column: 1 / span 4;
         }
       }
 
       // stylelint-disable-next-line selector-no-qualifying-type
       html:not(.no-js) &[hidden] {
         display: none;
+      }
+
+      .usa-header--extended & {
+        padding: 0 2rem;
+
+        &::before,
+        &::after {
+          background-color: gesso-grayscale(white);
+        }
       }
     }
 
@@ -176,12 +185,11 @@
         border: 0;
         display: grid;
         grid-template-columns: 1fr;
-        width: 12rem;
       }
 
       // First menu item is for section overview page.
       &:first-child {
-        grid-column: 1 / span 2;
+        grid-column: 1 / span 3;
         width: auto;
 
         // stylelint-disable-next-line
