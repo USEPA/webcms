@@ -33,11 +33,8 @@
       {% endif %}
 
       {% if item.below %}
-        {% set item_classes = item_classes|merge(['has-subnav']) %}
+        {% set item_classes = item_classes|merge(['has-subnav', 'usa-accordion']) %}
         {% set link_classes = link_classes|merge(['has-subnav']) %}
-      {% endif %}
-      {% if item.below and menu_level == 0 %}
-        {% set item_classes = item_classes|merge(['usa-accordion', 'usa-accordion--multiselectable', 'is-accordion']) %}
       {% endif %}
       {% if item.in_active_trail %}
         {% set item_classes = item_classes|merge(['is-active-trail']) %}
@@ -68,40 +65,34 @@
         {% set link_attributes = link_attributes|merge({'aria-current': 'page'}) %}
       {% endif %}
 
-      {% if item.below and menu_level == 0 %}
+      {% if item.below %}
         {% set additional_item_attributes = additional_item_attributes|merge({'data-allow-multiple': 'true'}) %}
       {% endif %}
 
       {% apply spaceless %}
         <li {{ add_attributes(additional_item_attributes) }}>
           {% if item.below %}
-            {% if menu_level == 0 %}
-              {% set link_attributes = link_attributes|merge({
-                'class': link_attributes['class']|merge(['is-accordion'])
-              }) %}
-              {% set button_attributes = link_attributes|merge({
-                'class': link_attributes['class']|merge([
-                  'usa-nav__link',
-                  'usa-accordion__button'
-                ]),
-                'aria-expanded': aria_expanded,
-                'type': 'button'
-              }) %}
-            {% endif %}
+            {% set button_attributes = link_attributes|merge({
+              'class': link_attributes['class']|merge([
+                'usa-accordion__button'
+              ]),
+              'aria-expanded': aria_expanded,
+              'type': 'button'
+            }) %}
 
             {{ link(item.title, item.url, link_attributes) }}
 
-            {% if menu_level == 0 %}
-              <button {{ create_attribute(button_attributes) }}>
-                {% include '@components/icon/icon.twig' with {
-                  'modifier_classes': 'menu__link-icon',
-                  'is_hidden': true,
-                  'icon_name': 'angle',
-                  'epa_theme_image_path': epa_theme_image_path
-                } %}
-              </button>
-            {% endif %}  
+            <button {{ create_attribute(button_attributes) }}>
+              {% include '@components/icon/icon.twig' with {
+                'modifier_classes': 'menu__link-icon',
+                'is_hidden': true,
+                'icon_name': 'angle',
+                'epa_theme_image_path': epa_theme_image_path
+              } %}
+            </button>
+
             {{ menus.menu_links(item.below, attributes, menu_level + 1, menu_name, menu_class, menu_class_prefix, link_class, epa_theme_image_path) }}
+
           {% else %}
             {{ link(item.title, item.url, link_attributes) }}
           {% endif %}
