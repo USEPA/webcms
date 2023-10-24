@@ -10,7 +10,7 @@
   .menu__item {
     @extend .usa-sidenav__item;
 
-    &.is-accordion{
+    &.has-subnav {
       align-items: stretch;
       display: flex;
       flex-wrap: wrap;
@@ -44,17 +44,17 @@
       font-weight: bold;
     }
 
-    &.is-accordion {
+    &.has-subnav {
       align-items: center;
       display: flex;
       justify-content: space-between;
       padding-left: gesso-spacing(2);
       padding-right: gesso-spacing(2);
       width: calc(100% - 62px);
-    }
 
-    &[aria-expanded='true'] > .menu__link-icon {
-      transform: rotate(0deg);
+      &[aria-expanded='true'] > .menu__link-icon {
+        transform: rotate(0deg);
+      }
     }
 
     &.usa-accordion__button {
