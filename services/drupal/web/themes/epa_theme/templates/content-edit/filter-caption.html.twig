@@ -21,6 +21,10 @@
   align == 'right' ? 'u-align-right',
 ]|join(' ')|trim %}
 
+{% if media_accessibility == 'private' %}
+  {% set is_private = true %}
+{% endif %}
+
 {{ title_suffix.contextual_links }}
 
 {% include '@components/figure/figure.twig' with {
@@ -28,4 +32,5 @@
   'modifier_classes': classes,
   'media': node,
   'caption': caption,
+  'is_private': is_private,
 } %}

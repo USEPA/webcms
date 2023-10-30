@@ -12,6 +12,7 @@ dependencies:
     - core.entity_view_mode.media.thumbnail
   module:
     - editor
+    - entity_embed
     - epa_wysiwyg
     - linkit
     - media
@@ -27,13 +28,13 @@ filters:
     id: filter_htmlcorrector
     provider: filter
     status: false
-    weight: -40
+    weight: -39
     settings: {  }
   filter_html:
     id: filter_html
     provider: filter
     status: true
-    weight: -48
+    weight: -49
     settings:
       allowed_html: '<* accesskey aria-* class id role style tabindex title data data-* name hidden><a href hreflang occurrence id name target rel> <article> <div> <pre> <br> <p> <blockquote cite> <hr> <figure> <figcaption> <ol reversed start type> <ul type> <li> <dl> <dt> <dd> <address> <hgroup> <h2> <h3> <h4> <h5> <h6> <em> <i> <strong> <b> <small> <s> <section> <span> <sub> <sup> <mark> <abbr !title> <q cite> <cite> <ins data-date> <del cite datetime> <dfn> <time datetime pubdate> <var> <samp> <code> <kbd> <wbr> <bdo dir> <bdi> <ruby> <rt> <rp> <table summary width height> <colgroup span> <col span> <caption> <tbody> <thead> <tfoot> <tr> <th colspan headers height rowspan scope width> <td colspan headers rowspan scope width height> <details open> <summary> <form action method> <fieldset disabled form name> <legend> <label for form> <input checked size type value disabled placeholder required readonly autocomplete autofocus> <textarea rows cols disabled placeholder required readonly autocomplete autofocus> <meter min max low high optimum form value> <select multiple size> <optgroup disabled label> <option value> <output for form name> <button type value> <datalist> <keygen autofocus challenge disabled form keytype name> <progress max value> <img alt crossorigin height longdesc src width usemap data-caption data-align> <embed height src type width> <object form height name type usemap width> <param name value> <iframe allowfullscreen height name sandbox scrolling seamless src srcdoc width> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas height width> <map name> <area alt coords href hreflang media rel shape target type> <drupal-media data-caption data-align data-entity-type data-entity-uuid alt><drupal-inline-media data-entity-type data-entity-uuid><drupal-paragraph data-embed-button data-entity-label data-paragraph-id drupal-paragraph data-paragraph-revision-id><svg><use href><title>'
       filter_html_help: true
@@ -59,7 +60,7 @@ filters:
     id: linkit
     provider: linkit
     status: false
-    weight: -49
+    weight: -40
     settings:
       title: true
   media_inline_embed:
@@ -81,44 +82,44 @@ filters:
     id: filter_caption
     provider: filter
     status: true
-    weight: -47
+    weight: -48
     settings: {  }
   editor_file_reference:
     id: editor_file_reference
     provider: editor
     status: false
-    weight: -37
+    weight: -36
     settings: {  }
   filter_html_image_secure:
     id: filter_html_image_secure
     provider: filter
     status: false
-    weight: -35
+    weight: -34
     settings: {  }
   filter_url:
     id: filter_url
     provider: filter
     status: false
-    weight: -39
+    weight: -38
     settings:
       filter_url_length: 72
   filter_autop:
     id: filter_autop
     provider: filter
     status: false
-    weight: -36
+    weight: -35
     settings: {  }
   filter_align:
     id: filter_align
     provider: filter
     status: true
-    weight: -46
+    weight: -47
     settings: {  }
   filter_html_escape:
     id: filter_html_escape
     provider: filter
     status: false
-    weight: -38
+    weight: -37
     settings: {  }
   token_filter:
     id: token_filter
@@ -137,7 +138,7 @@ filters:
     id: filter_pathologic
     provider: pathologic
     status: true
-    weight: -41
+    weight: -46
     settings:
       settings_source: global
       local_settings:
@@ -153,5 +154,11 @@ filters:
     id: paragraphs_entity_embed
     provider: paragraphs_entity_embed
     status: true
-    weight: 0
+    weight: -41
+    settings: {  }
+  entity_embed:
+    id: entity_embed
+    provider: entity_embed
+    status: false
+    weight: -33
     settings: {  }
