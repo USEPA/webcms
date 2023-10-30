@@ -38,7 +38,9 @@ function epa_media_entity_access(EntityInterface $entity, $operation, AccountInt
       // nodes in our case, and the entity ID. We don't have contextual info here
       // to determine if we're looking at the node so we're going to attempt to load
       // the access token just by the value, then check if the token is still valid.
-      return _check_access_token($token);
+      return _is_access_token_valid($token) ?
+        AccessResult::neutral() :
+        AccessResult::forbidden();
     }
     else if ($referer_url = \Drupal::request()->headers->get('referer')) {
       // Individual file requests don't contain the hash key, so we have to
@@ -47,7 +49,9 @@ function epa_media_entity_access(EntityInterface $entity, $operation, AccountInt
       $referer_url_parsed = UrlHelper::parse($referer_url);
       if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
         $token = $referer_url_parsed['query'][$config->get('hash_key')];
-        return _check_access_token($token);
+        return _is_access_token_valid($token) ?
+          AccessResult::neutral() :
+          AccessResult::forbidden();
       }
     }
 
@@ -62,16 +66,15 @@ function epa_media_entity_access(EntityInterface $entity, $operation, AccountInt
 }
 
 /**
- * Custom access check to lookup if access_unpublished token exists and is valid.
+ * Custom function to check if access token is valid.
  *
  * @param string $token
- *  The access_unpublished token.
+ *   The access_unpublished token.
  *
- * @return \Drupal\Core\Access\AccessResultForbidden|\Drupal\Core\Access\AccessResultNeutral|void
- * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
- * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @return bool
+ *   TRUE if the token is valid, FALSE otherwise.
  */
-function _check_access_token(string $token) {
+function _is_access_token_valid(string $token) {
   $tokens = \Drupal::entityTypeManager()
     ->getStorage('access_token')
     ->loadByProperties([
@@ -80,13 +83,11 @@ function _check_access_token(string $token) {
 
   if ($tokens) {
     $tokenEntity = reset($tokens);
-    if (!$tokenEntity->isExpired()) {
-      return AccessResult::neutral();
-    }
-    return AccessResult::forbidden();
+    return !$tokenEntity->isExpired();
   }
-}
 
+  return FALSE;
+}
 
 /**
  * Preprocess function that suppresses broken media for unauthenticated users.
@@ -232,4 +233,35 @@ function epa_media_menu_local_actions_alter(&$local_actions) {
   // this in order to get the add and relate media buttons at the top of the new view.
   $local_actions['group_content.group_media_add_page']['appears_on'] = ['view.group_media_search_api.page_1'];
   $local_actions['group_content.group_media_relate_page']['appears_on'] = ['view.group_media_search_api.page_1'];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_build_defaults_alter() for media items.
+ *
+ * Adds a custom boolean field value to denote if the media item is private or not if it has the field_limit_file_accessibility.
+ * Additionally, sets this custom value to FALSE if an access_unpublished token is detected and valid.
+ */
+function epa_media_media_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode) {
+  if ($entity->hasField('field_limit_file_accessibility')) {
+    $entity->is_private = filter_var($entity->field_limit_file_accessibility->value, FILTER_VALIDATE_BOOLEAN);
+
+    /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
+    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+    if ($token = $tokenGetter->getToken()) {
+      if (_is_access_token_valid($token)) {
+        $entity->is_private = FALSE;
+      }
+    } else if ($referer_url = \Drupal::request()->headers->get('referer')) {
+      // Individual file requests don't contain the hash key, so we have to
+      // check the referer instead.
+      $config = \Drupal::config('access_unpublished.settings');
+      $referer_url_parsed = UrlHelper::parse($referer_url);
+      if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
+        $token = $referer_url_parsed['query'][$config->get('hash_key')];
+        if (_is_access_token_valid($token)) {
+          $entity->is_private = FALSE;
+        }
+      }
+    }
+  }
 }
