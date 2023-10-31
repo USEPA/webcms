@@ -26,6 +26,25 @@ function epa_theme_preprocess_filter_caption(&$vars) {
       }
 
       if ($media->hasField('field_limit_file_accessibility')) {
+        /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
+        $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+        if ($token = $tokenGetter->getToken()) {
+          if (_is_access_token_valid($token)) {
+            $media->field_limit_file_accessibility->value = FALSE;
+          }
+        } else if ($referer_url = \Drupal::request()->headers->get('referer')) {
+          // Individual file requests don't contain the hash key, so we have to
+          // check the referer instead.
+          $config = \Drupal::config('access_unpublished.settings');
+          $referer_url_parsed = UrlHelper::parse($referer_url);
+          if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
+            $token = $referer_url_parsed['query'][$config->get('hash_key')];
+            if (_is_access_token_valid($token)) {
+              $media->field_limit_file_accessibility->value = FALSE;
+            }
+          }
+        }
+
         $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
       }
     }
