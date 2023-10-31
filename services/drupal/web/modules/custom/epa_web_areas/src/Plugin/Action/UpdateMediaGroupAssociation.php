@@ -141,6 +141,7 @@ class UpdateMediaGroupAssociation extends ConfigurableActionBase implements Cont
         $group_content->save();
       }
     } else {
+      // @TODO: Build plugin type correctly and test.
       $group_content = GroupContent::create([
         'type' => 'web_area-group_media-',
         'uid' => 0,
