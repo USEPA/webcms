@@ -238,18 +238,18 @@ function epa_media_menu_local_actions_alter(&$local_actions) {
 /**
  * Implements hook_ENTITY_TYPE_build_defaults_alter() for media items.
  *
- * Adds a custom boolean field value to denote if the media item is private or not if it has the field_limit_file_accessibility.
- * Additionally, sets this custom value to FALSE if an access_unpublished token is detected and valid.
+ * Alters the field_limit_file_accessbibility value based on whether an
+ * access_unpublished token is detected and valid in the URL.
  */
 function epa_media_media_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode) {
   if ($entity->hasField('field_limit_file_accessibility')) {
-    $entity->is_private = filter_var($entity->field_limit_file_accessibility->value, FILTER_VALIDATE_BOOLEAN);
+    $entity->field_limit_file_accessibility->value = filter_var($entity->field_limit_file_accessibility->value, FILTER_VALIDATE_BOOLEAN);
 
     /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
     $tokenGetter = \Drupal::service('access_unpublished.token_getter');
     if ($token = $tokenGetter->getToken()) {
       if (_is_access_token_valid($token)) {
-        $entity->is_private = FALSE;
+        $entity->field_limit_file_accessibility->value = FALSE;
       }
     } else if ($referer_url = \Drupal::request()->headers->get('referer')) {
       // Individual file requests don't contain the hash key, so we have to
@@ -259,7 +259,7 @@ function epa_media_media_build_defaults_alter(array &$build, EntityInterface $en
       if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
         $token = $referer_url_parsed['query'][$config->get('hash_key')];
         if (_is_access_token_valid($token)) {
-          $entity->is_private = FALSE;
+          $entity->field_limit_file_accessibility->value = FALSE;
         }
       }
     }
