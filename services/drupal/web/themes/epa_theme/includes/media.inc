@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\filter\Render\FilteredMarkup;
 
 /**
@@ -24,6 +25,7 @@ function epa_theme_preprocess_filter_caption(&$vars) {
       if ($vars['bundle'] == 'remote_video') {
         $vars['bundle'] = 'video';
       }
+
 
       if ($media->hasField('field_limit_file_accessibility')) {
         /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
