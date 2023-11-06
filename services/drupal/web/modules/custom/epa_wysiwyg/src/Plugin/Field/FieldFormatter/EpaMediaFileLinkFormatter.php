@@ -25,6 +25,7 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    /** @var \Drupal\media\Entity\Media $media */
     $media = $items->getEntity();
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
@@ -39,6 +40,10 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
         ],
       ];
 
+      if ($media->hasField('field_limit_file_accessibility')) {
+        $content['#media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
+      }
+
       // Pass field item attributes to the theme function.
       if (isset($item->_attributes)) {
         $content += ['#attributes' => []];
@@ -47,6 +52,7 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
         // formatter output and should not be rendered in the field template.
         unset($item->_attributes);
       }
+
       $elements[$delta] = $content;
     }
     return $elements;
