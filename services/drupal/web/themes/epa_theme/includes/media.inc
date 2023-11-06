@@ -24,6 +24,10 @@ function epa_theme_preprocess_filter_caption(&$vars) {
       if ($vars['bundle'] == 'remote_video') {
         $vars['bundle'] = 'video';
       }
+
+      if ($media->hasField('field_limit_file_accessibility')) {
+        $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
+      }
     }
 
     // Re-insert the caption attribute into the media tag so that it is available
@@ -48,6 +52,9 @@ function epa_theme_preprocess_media(&$vars) {
   $vars['has_caption'] = isset($vars['attributes']['data-caption']);
   $media = $vars['media'];
   $vars['filesize'] = format_size($media->getSource()->getMetadata($media, 'filesize'), NULL, 1);
+  if ($media->hasField('field_limit_file_accessibility')) {
+    $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
+  }
 }
 
 /**

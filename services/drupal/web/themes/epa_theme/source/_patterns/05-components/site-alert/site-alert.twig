@@ -1,6 +1,6 @@
 {% set classes = [
   'usa-site-alert',
-  'usa-site-alert--slim',
+  heading ? 'usa-site-alert--has-heading' : 'usa-site-alert--slim',
   modifier_classes ? modifier_classes,
   show_close ? 'js-sitewide-alert',
   show_close ? 'u-hidden',
@@ -13,9 +13,16 @@
         <div class="u-visually-hidden">{{ label }}</div>
       {%- endif -%}
 
-      <div class="usa-alert__text">
-        {{ content }}
+      <div class="usa-alert__content">
+        {% if heading %}
+          <h3 class="usa-alert__heading">{{ heading }}</h3>
+        {% endif %}
+
+        <div class="usa-alert__text">
+          {{ content }}
+        </div>
       </div>
+
       {% if show_close %}
         <button type="button" class="usa-alert__close js-sitewide-alert__close">
           {{ 'Close'|t }}
