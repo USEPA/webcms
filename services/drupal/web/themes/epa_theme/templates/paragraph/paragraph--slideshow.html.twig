@@ -8,10 +8,15 @@
 {% set images = [] %}
 
 {% for slide in slides %}
+  {% if slide.media_accessibility == 'private' %}
+    {% set is_private = true %}
+{% endif %}
+
   {% set images = images|merge([
     {
       'caption': slide.caption|view({label: 'hidden', settings: {}}),
       'media': slide.media|view({type: 'entity_reference_entity_view', label: 'hidden', settings: {view_mode: paragraph.field_slideshow_style.value}}),
+      'is_private': is_private,
     }
   ]) %}
 {% endfor %}
