@@ -10,3 +10,4 @@ __Variables:__
 * images: [array] List of images. Each item is an object containing:
   * caption: [string] Caption for the image.
   * media: [string] Rendered image tag.
+  * access: [string] The accessibility of the image.
