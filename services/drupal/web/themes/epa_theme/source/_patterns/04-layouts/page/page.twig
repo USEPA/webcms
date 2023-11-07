@@ -4,8 +4,14 @@
   has_footer ? 'has-footer',
 ]|join(' ')|trim %}
 
+
+{% set constrain_classes = [
+  'l-constrain',
+  is_narrow ? 'l-constrain--small'
+]|join(' ')|trim %}
+
 <div class="{{ classes }}">
-  <div class="l-constrain">
+  <div class="{{ constrain_classes }}">
 
     {% if has_header %}
       <div class="l-page__header">
