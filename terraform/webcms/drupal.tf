@@ -258,8 +258,10 @@ resource "aws_appautoscaling_target" "drupal" {
   service_namespace  = "ecs"
 }
 
-# We define an autoscaling policy to track high CPU usage. When CPU is above this threshold, ECS
-# will add more Drupal tasks until
+# We define an autoscaling policy to track high CPU usage. When CPU is above
+# this threshold, ECS will add more Drupal tasks until utilization averages out
+# to around 40%, and if CPU is below this threshold, ECS will reduce the task
+# count.
 resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
   name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-cpu"
   policy_type = "TargetTrackingScaling"
@@ -270,6 +272,33 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
 
   target_tracking_scaling_policy_configuration {
     target_value = 40
+
+    scale_in_cooldown  = 5 * 60
+    scale_out_cooldown = 60
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
+
+# In addition to the above policy, we ask ECS to add capacity when individual
+# tasks have to handle more than a few hundred requests in an average timespan.
+#
+# Note that ECS is required to respect both policies: if one policy indicates
+# scaling out, then ECS will scale out. If all policies indicate scaling in,
+# then ECS will scale in.
+resource "aws_appautoscaling_policy" "drupal_autoscaling_requests" {
+  name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-cpu"
+  policy_type = "TargetTrackingScaling"
+
+  resource_id        = aws_appautoscaling_target.drupal.id
+  scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.drupal.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    # Ask ECS to average around 100 requests/target
+    target_value = 100
 
     scale_in_cooldown  = 5 * 60
     scale_out_cooldown = 60
