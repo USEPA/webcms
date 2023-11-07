@@ -74,7 +74,6 @@ variable "drupal_min_capacity" {
 variable "drupal_schedule_min_capacity" {
   description = "When using scheduled scaling, the elevated minimum number of Drupal tasks to run during working hours"
   type        = number
-  nullable    = true
   default     = null
 }
 
