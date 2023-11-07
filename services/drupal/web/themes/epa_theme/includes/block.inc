@@ -40,14 +40,41 @@ function epa_theme_theme_suggestions_block_alter(array &$suggestions, array $var
 /**
  * Implements hook_preprocess_HOOK().
  *
- * The first item of the Web Area Menu is a link back to the Web Area 'Homepage'.
- * This makes the first menu link the block's title and removes it from the list.
+ * Load up the group short name and use it as the label for the menu block. Also
+ * set the block title to be a link to the web area's homepage node.
  */
 function epa_theme_preprocess_block__webareamenu(&$variables) {
-  if (!empty($variables['content']['#items'])) {
-    $first_link = reset($variables['content']['#items']);
-    $new_link = Link::fromTextAndUrl($first_link['title'], $first_link['url']);
-    $variables['label'] = $new_link->toRenderable();
-    unset($variables['content']['#items'][$first_link['original_link']->getPluginId()]);
+  // Ensure we have a group ID and items in the menu before proceeding.
+  if (
+    !empty($variables['elements']['#contextual_links']['group_menu']['route_parameters']['group']) &&
+    !empty($variables['content']['#items'])
+  ) {
+    $group_id = $variables['elements']['#contextual_links']['group_menu']['route_parameters']['group'];
+    /** @var \Drupal\group\Entity\GroupInterface $group */
+    $group = \Drupal::entityTypeManager()
+      ->getStorage('group')
+      ->load($group_id);
+
+    // 'Title' property is labeled as 'short name'.
+    $short_name = $group->get('label')->value;
+
+    // Set the short name as the block's label.
+    $variables['label'] = $short_name;
+    $variables['label_display'] = 1;
+
+    // Now get the web area's set homepage node and get the url for that to
+    // use as link URL.
+    /** @var \Drupal\node\NodeInterface $homepage_node */
+    $homepage_node = $group->get('field_homepage')->entity;
+    if (!$homepage_node) {
+      return;
+    }
+
+    if ($homepage_node->isPublished()) {
+      $homepage_url = $homepage_node->toUrl();
+      $homepage_link = Link::fromTextAndUrl($short_name, $homepage_url);
+      $variables['label'] = $homepage_link->toRenderable();
+    }
+
   }
 }
