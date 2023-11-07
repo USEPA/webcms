@@ -140,16 +140,18 @@ class UpdateMediaGroupAssociation extends ConfigurableActionBase implements Cont
         $group_content->get('gid')->setValue($this->configuration['updated_group']);
         $group_content->save();
       }
-    } else {
-      // @TODO: Build plugin type correctly and test.
-      $group_content = GroupContent::create([
-        'type' => 'web_area-group_media-',
+    }
+    else {
+      // Means it was never associated with a group
+      // @TODO: Build this out and build plugin type correctly
+      GroupContent::create([
+        'type' => 'web_area-group_media-' . $media->bundle(),
         'uid' => 0,
         'gid' => $this->configuration['updated_group'],
         'entity_id' => $media->id(),
         'label' => $media->name(),
-      ]);
-      $group_content->save();
+      ])->save();
+
     }
   }
 

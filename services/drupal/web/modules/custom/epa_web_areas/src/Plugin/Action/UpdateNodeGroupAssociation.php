@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Provides the 'Update Group Association' action.
  *
  * @Action(
- *   id = "epa_web_areas_update_group_association",
+ *   id = "epa_web_areas_update_node_group_association",
  *   label = @Translation("Change Web Area association of nodes"),
  *   type = "node",
  *   category = @Translation("Custom")
@@ -144,6 +144,16 @@ class UpdateNodeGroupAssociation extends ConfigurableActionBase implements Conta
     else {
       // Means it was never associated with a group
       // @TODO: Build this out and build plugin type correctly
+      GroupContent::create([
+        'type' => 'web_area-group_node-' . $node->bundle(),
+        'uid' => 0,
+        'gid' => $this->configuration['updated_group'],
+        'entity_id' => $node->id(),
+        'label' => $node->getTitle(),
+        'entity_type' => 'node',
+        'group_type' => 'web_area',
+      ])
+      ->save();
     }
   }
 
