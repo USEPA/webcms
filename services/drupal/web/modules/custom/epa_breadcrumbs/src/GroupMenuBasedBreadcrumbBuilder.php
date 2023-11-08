@@ -179,6 +179,10 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
     $node_object = $route_match->getParameters()->get('node');
 
+    if ($node_object == NULL) {
+      return FALSE;
+    }
+
     // Make sure menus are selected, and breadcrumb text strings, are displayed
     // in the content rather than the (default) interface language:
     $this->contentLanguage = $this->languageManager
