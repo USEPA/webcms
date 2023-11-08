@@ -28,32 +28,4 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class UpdateNodeGroupAssociation extends UpdateGroupAssociationBase {
 
-//  /**
-//   * {@inheritdoc}
-//   * @todo: refactor this to not be unique per entity "type". We should be able to get the "type" based on the Group Content plugin, but ran out of time.
-//   */
-//  public function execute($entity = NULL) {
-//    // Get the GroupContent from the node and update it using the new group from the 'updated_group' configuration.
-//    $group_contents = GroupContent::loadByEntity($entity);
-//    if ($group_contents) {
-//      foreach ($group_contents as $group_content) {
-//        $group_content->get('gid')->setValue($this->configuration['updated_group']);
-//        $group_content->save();
-//      }
-//    }
-//    else {
-//      // @TODO: Build this out and build plugin type correctly
-//      GroupContent::create([
-//        'type' => 'web_area-group_node-' . $entity->bundle(),
-//        'uid' => 0,
-//        'gid' => $this->configuration['updated_group'],
-//        'entity_id' => $entity->id(),
-//        'label' => $entity->getTitle(),
-//        'entity_type' => 'node',
-//        'group_type' => 'web_area',
-//      ])
-//      ->save();
-//    }
-//  }
-
 }
