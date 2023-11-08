@@ -206,9 +206,9 @@ const build = (isProduction = true) => {
   return series(
     buildConfig,
     parallel(
-      //task('bundleScripts'),
-      //buildImages,
-      //task('compileStyles'),
+      task('bundleScripts'),
+      buildImages,
+      task('compileStyles'),
       buildPatterns
     )
   );
