@@ -34,19 +34,12 @@
 
   {% if has_footer %}
     <div class="l-page__footer">
-      <div class="l-constrain">
+      <div class="{{ constrain_classes }}">
         {% block footer %}
           {% include '@layouts/_sample-content/sample-content.twig' with {
             'content': 'Page Footer',
           } %}
         {% endblock %}
-        <div class="l-page__footer-contact-last">
-          {% block contact %}
-            {% include '@layouts/_sample-content/sample-content.twig' with {
-              'content': 'Contact Link',
-            } %}
-          {% endblock %}
-        </div>
       </div>
     </div>
   {% endif %}

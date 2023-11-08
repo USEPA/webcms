@@ -58,6 +58,28 @@
       flex-wrap: wrap;
     }
   }
+
+  .page-has-sidebar &,
+  .page-no-sidebar & {
+    background-color: gesso-grayscale(white);
+    margin-top: 0;
+    padding-bottom: rem(gesso-spacing(6));
+
+    .l-constain,
+    .block {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.l-page__footer-contact {
+  .page-has-sidebar & {
+    display: none;
+  }
+
+  .page-no-sidebar & {
+    width: 100%;
+  }
 }
 
 .l-page__footer-last-updated {
@@ -69,6 +91,18 @@
   @include at-media($theme-site-margins-breakpoint) {
     margin-left: 1rem;
     margin-top: 0;
+  }
+
+  .page-has-sidebar & {
+    @include breakpoint(gesso-breakpoint(sidebar)) {
+      margin-left: calc(25% + 2.5rem);
+    }
+  }
+
+  .page-no-sidebar & {
+    margin-left: 0;
+    margin-top: rem(gesso-spacing(1));
+    width: 100%;
   }
 }
 
