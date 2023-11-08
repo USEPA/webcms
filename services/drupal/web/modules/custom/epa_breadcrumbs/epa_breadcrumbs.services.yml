@@ -1,0 +1,9 @@
+services:
+  epa_breadcrumbs.breadcrumb.default:
+    class: Drupal\epa_breadcrumbs\GroupMenuBasedBreadcrumbBuilder
+    arguments: [ '@config.factory', '@menu.active_trail', '@plugin.manager.menu.link', '@router.admin_context', '@title_resolver', '@request_stack', '@language_manager', '@entity_type.manager', '@cache.menu', '@lock' ]
+    tags:
+      # Following example set by menu_breadcrumb module:
+      # The priority must be higher than core taxonomy builder (priority: 1002)
+      # see https://www.drupal.org/node/1495510
+      - { name: breadcrumb_builder, priority: 1020 }
