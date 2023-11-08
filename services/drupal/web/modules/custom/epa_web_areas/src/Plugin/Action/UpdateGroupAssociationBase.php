@@ -106,9 +106,8 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
   /**
    * {@inheritdoc}
    */
-  public function access($media, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    /** @var \Drupal\media\MediaInterface $media */
-    $access = $media->access('update', $account, TRUE);
+  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+    $access = $object->access('update', $account, TRUE);
     return $return_as_object ? $access : $access->isAllowed();
   }
 
