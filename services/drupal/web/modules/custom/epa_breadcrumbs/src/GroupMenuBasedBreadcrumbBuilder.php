@@ -185,10 +185,6 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
 
     // Get the group from the current node.
-    if(empty($group_content)) {
-      return FALSE;
-    }
-
     $group_content = GroupContent::loadByEntity($node_object);
 
     if (!empty($group_content)) {
