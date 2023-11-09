@@ -30,6 +30,11 @@
       <li class="breadcrumb__item">
         {% if item.url %}
           <a class="breadcrumb__link" href="{{ item.url }}">{{ item.text }}</a>
+          {%- include '@components/icon/icon.twig' with {
+            'icon_name': 'angle',
+            'modifier_classes': 'breadcrumb__divider',
+            'is_hidden': true,
+          } -%}
         {% else %}
           <span aria-current="page">
             {{ item.text }}
