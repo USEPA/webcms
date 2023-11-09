@@ -20,9 +20,7 @@
 {% endif %}
 
 {% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Perspectives'|t,
-  } %}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}
