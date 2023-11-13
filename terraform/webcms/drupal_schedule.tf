@@ -8,8 +8,8 @@ resource "aws_appautoscaling_scheduled_action" "drupal_scale_out" {
   scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
 
-  # Schedule expression: at 7:30 AM, Monday-Friday, US Eastern time zone
-  schedule = "cron(30 7 * * MON-FRI *)"
+  # Schedule expression: at 6:00 AM, Monday-Friday, US Eastern time zone
+  schedule = "cron(0 6 * * MON-FRI *)"
   timezone = "America/New_York"
 
   scalable_target_action {
@@ -29,8 +29,8 @@ resource "aws_appautoscaling_scheduled_action" "drupal_scale_in" {
   scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
   service_namespace  = aws_appautoscaling_target.drupal.service_namespace
 
-  # Schedule expression: at 7:30 PM, Monday-Friday, US Eastern time zone
-  schedule = "cron(30 19 * * MON-FRI *)"
+  # Schedule expression: at 5:00 PM, Monday-Friday, US Eastern time zone
+  schedule = "cron(0 17 * * MON-FRI *)"
   timezone = "America/New_York"
 
   scalable_target_action {
