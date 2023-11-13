@@ -298,13 +298,13 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_requests" {
 
   target_tracking_scaling_policy_configuration {
     # Ask ECS to average around 100 requests/target
-    target_value = 100
+    target_value = 150
 
     scale_in_cooldown  = 5 * 60
     scale_out_cooldown = 60
 
     predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+      predefined_metric_type = "ALBRequestCountPerTarget"
     }
   }
 }
