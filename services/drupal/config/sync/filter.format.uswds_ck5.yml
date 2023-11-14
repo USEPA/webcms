@@ -1,0 +1,122 @@
+uuid: 0ff35875-1720-4ac1-8bba-3f1fb6f36592
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.link_with_description
+    - core.entity_view_mode.media.link_with_metadata
+  module:
+    - ckeditor5_embedded_content
+    - entity_embed
+    - media
+    - media_inline_embed
+    - paragraphs_entity_embed
+    - token_filter
+    - uswds_ckeditor_integration
+_core:
+  default_config_hash: WDYiYPe1uae4h__eoKFOU6pohsAx16y4iWRooSWU55s
+name: 'USWDS Ck5'
+format: uswds_ck5
+weight: -10
+filters:
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: true
+    weight: -10
+    settings:
+      allowed_html: '<a id target rel class="ck-anchor usa-button usa-button-gray usa-button-outline usa-button-outline-inverse usa-button-big usa-button-secondary" name href> <br> <p> <h2> <h3> <h4 class> <h5> <h6> <div class id data-* aria-live> <button class type aria-expanded aria-controls> <strong> <em> <code> <sub> <sup> <blockquote> <ul> <ol reversed start> <li> <hr> <table class> <tr> <td rowspan colspan data-label data-sort-value> <th rowspan colspan scope data-label data-sortable role> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-align> <embedded-content data-plugin-config data-plugin-id> <abbr title> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode> <drupal-paragraph data-embed-button data-entity-label data-paragraph-id data-paragraph-revision-id> <drupal-entity alt title data-align data-caption data-entity-embed-display data-entity-embed-display-settings data-view-mode data-entity-uuid data-langcode data-embed-button="node paragraphs" data-entity-type><* >'
+      filter_html_help: true
+      filter_html_nofollow: false
+  filter_url:
+    id: filter_url
+    provider: filter
+    status: true
+    weight: 0
+    settings:
+      filter_url_length: 72
+  filter_htmlcorrector:
+    id: filter_htmlcorrector
+    provider: filter
+    status: true
+    weight: 10
+    settings: {  }
+  ckeditor5_embedded_content:
+    id: ckeditor5_embedded_content
+    provider: ckeditor5_embedded_content
+    status: true
+    weight: 100
+    settings: {  }
+  media_inline_embed:
+    id: media_inline_embed
+    provider: media_inline_embed
+    status: true
+    weight: 100
+    settings:
+      default_view_mode: link_with_metadata
+      allowed_media_types:
+        audio: audio
+        document: document
+        image: image
+        other: other
+      allowed_view_modes:
+        link_with_description: link_with_description
+        link_with_metadata: link_with_metadata
+  token_filter:
+    id: token_filter
+    provider: token_filter
+    status: false
+    weight: 0
+    settings:
+      replace_empty: '0'
+  media_embed:
+    id: media_embed
+    provider: media
+    status: true
+    weight: 100
+    settings:
+      default_view_mode: link_with_metadata
+      allowed_view_modes:
+        link_with_description: link_with_description
+        link_with_metadata: link_with_metadata
+      allowed_media_types:
+        audio: audio
+        document: document
+        image: image
+        other: other
+  filter_table_attributes:
+    id: filter_table_attributes
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
+  filter_uswds_table_sortable:
+    id: filter_uswds_table_sortable
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
+  filter_image_lazy_load:
+    id: filter_image_lazy_load
+    provider: filter
+    status: true
+    weight: 15
+    settings: {  }
+  entity_embed:
+    id: entity_embed
+    provider: entity_embed
+    status: true
+    weight: 100
+    settings: {  }
+  filter_align:
+    id: filter_align
+    provider: filter
+    status: true
+    weight: 0
+    settings: {  }
+  paragraphs_entity_embed:
+    id: paragraphs_entity_embed
+    provider: paragraphs_entity_embed
+    status: true
+    weight: 0
+    settings: {  }
