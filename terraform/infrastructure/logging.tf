@@ -61,13 +61,6 @@ resource "aws_cloudwatch_log_group" "fpm_metrics" {
   tags = var.tags
 }
 
-# Log group for the Traefik router
-resource "aws_cloudwatch_log_group" "traefik" {
-  name = "/webcms/${var.environment}/traefik"
-
-  tags = var.tags
-}
-
 # Log group for any Terraform runs performed inside the ECS cluster
 resource "aws_cloudwatch_log_group" "terraform" {
   name = "/webcms/${var.environment}/terraform"

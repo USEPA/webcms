@@ -19,7 +19,7 @@
     - [Email Variables](#email-variables)
       - [Sensitive Values](#sensitive-values-1)
     - [SAML Variables](#saml-variables)
-      - [Sensitive Values](#sensitive-values-3)
+      - [Sensitive Values](#sensitive-values-2)
   - [Parameter Store](#parameter-store)
 - [Resources](#resources)
   - [Drupal](#drupal)
@@ -166,8 +166,6 @@ As with the infrastructure and database modules, this module assumes that certai
 - From the ALB we need some ARNs:
   - `/webcms/${var.environment}/alb/listener`: The ARN of the ALB listener responsible for handling connections.
 - For Drupal, we load some identifiers for IAM, S3, and the ALB:
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-rule`: The name of the EventBridge rule governing cron invocations.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-role`: The ARN of the EventBridge cron IAM role.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-task`: The ECS task role for Drupal and Drush. This is the run-time IAM role used by the WebCMS and has access to, e.g., S3 and Elasticssearch.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/iam-execution`: The ECS execution role for Drupal and Drush. This role is used internally by Fargate to launch tasks and thus has access to ECR and Secrets Manager.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/drupal/s3-bucket`: The name of the S3 bucket to store uploaded content.

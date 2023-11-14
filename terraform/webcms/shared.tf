@@ -52,18 +52,6 @@ data "aws_ssm_parameter" "elasticsearch_endpoint" {
   name = "/webcms/${var.environment}/endpoints/elasticsearch"
 }
 
-#region Cron
-
-data "aws_ssm_parameter" "cron_event_rule" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-rule"
-}
-
-data "aws_ssm_parameter" "cron_event_role" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-role"
-}
-
-#endregion
-
 #region Drupal-specific
 
 data "aws_ssm_parameter" "drupal_iam_task" {
