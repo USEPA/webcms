@@ -2,6 +2,7 @@
 
 namespace Drupal\epa_web_areas\Plugin\Action;
 
+use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -107,8 +108,25 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    * {@inheritdoc}
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    $access = $object->access('update', $account, TRUE);
-    return $return_as_object ? $access : $access->isAllowed();
+    // Check if the object we're updating has a group associated with it, i.e GroupContent entity.
+    $group_contents = GroupContent::loadByEntity($object);
+    $allowed_roles = [
+      'administrator',
+      'system_webmaster',
+    ];
+    if ($group_contents) {
+      $access = $object->access('update', $account, TRUE);
+      return $return_as_object ? $access : $access->isAllowed();
+    }
+    else if (array_intersect($account->getRoles(), $allowed_roles)) {
+      // Means the object is not currently associated with a Group.
+      // Per logic of https://forumone.atlassian.net/browse/EPAD8-2249 only
+      // admins and system_webmaster users should have this access to this
+      $access = $object->access('update', $account, TRUE);
+      return $return_as_object ? $access : $access->isAllowed();
+    }
+
+    return $return_as_object ? new AccessResultForbidden("Your account does not have access to change web area association on content without a web area.") : FALSE;
   }
 
   /**
