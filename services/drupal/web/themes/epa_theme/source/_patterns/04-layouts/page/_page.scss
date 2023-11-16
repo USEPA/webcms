@@ -65,9 +65,27 @@
     margin-top: 0;
     padding-bottom: rem(gesso-spacing(6));
 
-    .l-constain,
+    .l-constrain,
     .block {
       flex-wrap: wrap;
+    }
+  }
+
+  .page-no-sidebar & {
+    .l-constrain,
+    .block {
+      display: flex;
+      padding-top: rem(gesso-spacing(3));
+      position: relative;
+
+      &::before {
+        background-color: gesso-grayscale(gray-3);
+        content: '';
+        height: 1px;
+        position: absolute;
+        top: 0;
+        width: measure(5);
+      }
     }
   }
 }
@@ -86,7 +104,6 @@
   font-size: font-size(body, 3xs);
   line-height: gesso-line-height(2);
   margin-top: 1rem;
-  text-transform: uppercase;
 
   @include at-media($theme-site-margins-breakpoint) {
     margin-left: 1rem;
