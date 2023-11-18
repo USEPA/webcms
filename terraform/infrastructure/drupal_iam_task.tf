@@ -117,6 +117,34 @@ resource "aws_iam_role_policy_attachment" "drupal_publish_metrics" {
   policy_arn = aws_iam_policy.drupal_publish_metrics.arn
 }
 
+# EPA-2906_Terraform-changes-for-CloudFront-Invalidation-privilege-en-es
+data "aws_iam_policy_document" "cloudfront_permissions" {
+  version = "2012-10-17"
+
+  statement {
+    sid       = "cloudfrontPermissions"
+    effect    = "Allow"
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = ["arn:aws:cloudfront::687001500421:distribution/*"]
+  }
+}
+
+resource "aws_iam_policy" "cloudfront_permissions" {
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-cloudfrontPermissions"
+  description = "Contains Cloudfront permissions"
+
+  policy = data.aws_iam_policy_document.cloudfront_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "cloudfront_permissions" {
+  for_each = local.sites
+
+  role       = aws_iam_role.drupal_task[each.key].name
+  policy_arn = aws_iam_policy.cloudfront_permissions.arn
+}
+# end EPA-2906_Terraform-changes-for-CloudFront-Invalidation-privilege-en-esw
+
+
 # Grant the Drupal container permissions to Cloudwatch to create a log stream
 # and publish log events.
 data "aws_iam_policy_document" "drupal_put_logs" {
