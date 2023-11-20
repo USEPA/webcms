@@ -32,6 +32,10 @@ data "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #region ALB
 
+data "aws_ssm_parameter" "alb_arn" {
+  name = "/webcms/${var.environment}/alb/arn"
+}
+
 data "aws_ssm_parameter" "alb_listener" {
   name = "/webcms/${var.environment}/alb/listener"
 }
