@@ -86,6 +86,16 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
     $cacheability = CacheableMetadata::createFromObject($cacheability)
       ->merge($node_canonical_local_tasks['cacheability']);
   }
+
+  // If the access_unpublished module is enabled and we have an active token using, disable the local tasks.
+  if (\Drupal::moduleHandler()->moduleExists('access_unpublished')) {
+    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+    if ($token = $tokenGetter->getToken()) {
+      if (_is_access_token_valid($token)) {
+        unset($local_tasks['tabs']);
+      }
+    }
+  }
 }
 
 /**
