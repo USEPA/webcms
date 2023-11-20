@@ -8,6 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\GroupMembershipLoaderInterface;
@@ -126,7 +127,8 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
       return $return_as_object ? $access : $access->isAllowed();
     }
 
-    return $return_as_object ? new AccessResultForbidden("Your account does not have access to change web area association on content without a web area.") : FALSE;
+    $message = new TranslatableMarkup('Your account does not have access to add a web area association to this content. Contact Web_CMS_Support@epa.gov for help.');
+    return $return_as_object ? new AccessResultForbidden($message->render()) : FALSE;
   }
 
   /**
