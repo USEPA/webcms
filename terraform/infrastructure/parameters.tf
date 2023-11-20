@@ -67,47 +67,6 @@ resource "aws_ssm_parameter" "elasticsearch_endpoint" {
 
 #endregion
 
-#region Cron
-
-resource "aws_ssm_parameter" "cron_event_rule_per_site" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-rule"
-  type  = "String"
-  value = aws_cloudwatch_event_rule.cron_per_site[each.value.site].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "cron_event_role_per_site" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cron/event-role"
-  type  = "String"
-  value = aws_iam_role.events.arn
-
-  tags = var.tags
-}
-
-# Keep the legacy parameters for compatibility with existing deployments
-resource "aws_ssm_parameter" "cron_event_rule" {
-  name  = "/webcms/${var.environment}/cron/event-rule"
-  type  = "String"
-  value = aws_cloudwatch_event_rule.cron.name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "cron_event_role" {
-  name  = "/webcms/${var.environment}/cron/event-role"
-  type  = "String"
-  value = aws_iam_role.events.arn
-
-  tags = var.tags
-}
-
-#endregion
-
 #region Drupal-specific
 
 resource "aws_ssm_parameter" "drupal_iam_task" {
@@ -358,26 +317,6 @@ resource "aws_ssm_parameter" "saml_sp_key" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/saml-sp-key"
   type  = "String"
   value = aws_secretsmanager_secret.saml_sp_key[each.key].arn
-
-  tags = var.tags
-}
-
-#endregion
-
-#region Terraform configuration
-
-resource "aws_ssm_parameter" "terraform_state" {
-  name  = "/webcms/${var.environment}/terraform/state"
-  type  = "String"
-  value = aws_s3_bucket.tfstate.bucket
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "terraform_locks" {
-  name  = "/webcms/${var.environment}/terraform/locks"
-  type  = "String"
-  value = aws_dynamodb_table.terraform_locks.arn
 
   tags = var.tags
 }
