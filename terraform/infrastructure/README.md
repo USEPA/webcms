@@ -16,8 +16,6 @@
   - [WebCMS Support](#webcms-support)
   - [ECR Mirrors](#ecr-mirrors)
   - [Routing](#routing)
-  - [Terraform Resources](#terraform-resources)
-- [Module Outputs](#module-outputs)
 - [How to Run](#how-to-run)
 - [Post-Run Steps](#post-run-steps)
   - [Initialize the Database](#initialize-the-database)
@@ -92,7 +90,6 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
   4. `/webcms/${var.environment}/security-groups/memcached`: The security group for the ElastiCache cluster
   4. `/webcms/${var.environment}/security-groups/alb`: The security group for the ALB
   5. `/webcms/${var.environment}/security-groups/drupal`: The security group for the Drupal ECS tasks
-  6. `/webcms/${var.environment}/security-groups/traefik`: The security group for the Traefik router
   7. `/webcms/${var.environment}/security-groups/terraform-database`: The security group for the database initialization task
 
 ## Resources
@@ -131,19 +128,6 @@ The simplest way to meet these requirements is to simply copy images from the Do
 
 We are in the process of migrating from Traefik to an ALB. In order to ease migration, both the legacy Traefik service and the new ALB are deployed by this module. The Traefik resources will be removed in a later update.
 
-### Terraform Resources
-
-This module creates some resources to support running Terraform against this infrastructure's resources. In particular, this supports the [database initialization](../database) and [WebCMS](../webcms) modules. We create an S3 bucket using encryption at rest and a DynamoDB table for locks.
-
-## Module Outputs
-
-This module's [outputs](outputs.tf) can be categorized as follows:
-
-* Database initialization outputs
-  * `terraform_db_ecr`: The ECR URL of the initialization task's repository. Use this to build and tag the initialization task's container.
-  * `terraform_db_task`: The name of the initialization task's family. Used in the ECS RunTask API.
-  * `terraform_db_awsvpc`: An object representing the AWSVPC network configuration. This is also used by the RunTask API and is required for Fargate-based tasks; see [`networkConfiguration`](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-networkConfiguration) in the API documentation and [Fargate task networking](https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-task-networking.html) in the ECS documentation for more.
-
 ## How to Run
 
 This module can be run in any environment that has permission to modify the relevant AWS account's infrastructrure resources.
@@ -152,7 +136,7 @@ This module can be run in any environment that has permission to modify the rele
 
 ### Initialize the Database
 
-Before proceeding with deploying Drupal, be sure to read the database module's [docmentation](../database) in order to create the users (and their credentials) for Drupal.
+Before proceeding with deploying Drupal, be sure that users, databases, grants, and passwords have been set up appropriately for the environment.
 
 ### Populate Secrets
 
