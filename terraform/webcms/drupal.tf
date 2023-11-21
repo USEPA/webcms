@@ -247,35 +247,3 @@ resource "aws_ecs_service" "drupal" {
 
   tags = var.tags
 }
-
-# Define the Drupal service as an autoscaling target. Effectively, this configuration
-# asks AWS to monitor the desired count of Drupal service replicas.
-resource "aws_appautoscaling_target" "drupal" {
-  min_capacity       = var.drupal_min_capacity
-  max_capacity       = var.drupal_max_capacity
-  resource_id        = "service/${data.aws_ssm_parameter.ecs_cluster_name.value}/${aws_ecs_service.drupal.name}"
-  scalable_dimension = "ecs:service:DesiredCount"
-  service_namespace  = "ecs"
-}
-
-# We define an autoscaling policy to track high CPU usage. When CPU is above this threshold, ECS
-# will add more Drupal tasks until
-resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
-  name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-cpu"
-  policy_type = "TargetTrackingScaling"
-
-  resource_id        = aws_appautoscaling_target.drupal.id
-  scalable_dimension = aws_appautoscaling_target.drupal.scalable_dimension
-  service_namespace  = aws_appautoscaling_target.drupal.service_namespace
-
-  target_tracking_scaling_policy_configuration {
-    target_value = 40
-
-    scale_in_cooldown  = 5 * 60
-    scale_out_cooldown = 60
-
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
-    }
-  }
-}
