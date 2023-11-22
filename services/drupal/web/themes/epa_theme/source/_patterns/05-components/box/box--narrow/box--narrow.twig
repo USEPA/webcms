@@ -1,0 +1,28 @@
+{% set classes = [
+  'box--narrow',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% include '@components/box/box.twig' with {
+  'modifier_classes': classes,
+  'title': title,
+  'image': image,
+  'content': content,
+  'footer': footer,
+} %}
+
+{% if is_demo %}
+  {% set demo_classes = [
+    'box--multipurpose',
+    'box--narrow',
+    modifier_classes ? modifier_classes,
+  ]|join(' ')|trim %}
+  
+  {% include '@components/box/box.twig' with {
+    'modifier_classes': demo_classes,
+    'title': title,
+    'image': image,
+    'content': content,
+    'footer': footer,
+  } %}
+{% endif %}
