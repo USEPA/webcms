@@ -46,6 +46,13 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    */
   protected $messenger;
 
+  /**
+   * The target group entity we're wanting to switch to.
+   *
+   * @var \Drupal\group\Entity\GroupInterface
+   */
+  protected $targetGroup;
+
 
   /**
    * {@inheritDoc}
@@ -123,6 +130,7 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     $this->configuration['updated_group'] = $form_state->getValue('updated_group');
+    $this->targetGroup = Group::load($this->configuration['updated_group']);
   }
 
   /**
@@ -134,8 +142,6 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
     // $object is not allowed based on config.
     if ($config->get($object->getEntityTypeId()) && !in_array($object->bundle(), $config->get($object->getEntityTypeId()))) {
       $this->context['denied'][] = $object->getTitle();
-      // If it's not in the array of our configuration we do not allow it.
-//      return $return_as_object ? new AccessResultForbidden('You cannot update the Web Area association for ' . $object->bundle() . '. Contact Web_CMS_Support@epa.gov for help.') : FALSE;
       return $return_as_object ? new AccessResultForbidden() : FALSE;
     }
 
@@ -143,35 +149,19 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
     // they are only allowed if enabled on the specific Web Area.
     // If the $object is one of those three bundles we need to check that
     // bundle is allowed on the target Group selected in the VBO form.
-    $special_types = [
-      'news_release',
-      'perspective',
-      'speeches',
-    ];
-    if ($object->getEntityTypeId() == 'node' && in_array($object->bundle(), $special_types)) {
-      $group = Group::load($this->configuration['updated_group']);
-      if (!$this->groupAllowsBundle($object->bundle())) {
-        $this->context['special_denied'][] = $object->getTitle();
-        return $return_as_object ? new AccessResultForbidden() : FALSE;
-      }
+    $special_types = ['news_release', 'perspective', 'speeches'];
+    if ($object->getEntityTypeId() == 'node' && in_array($object->bundle(), $special_types) && !$this->groupAllowsBundle($object->bundle())) {
+      $this->context['special_denied'][] = $object->getTitle();
+      return $return_as_object ? new AccessResultForbidden() : FALSE;
     }
 
     // Check if the object we're updating has a group associated with it, i.e GroupContent entity.
     // If it does not then we need to check if the current user is an admin or system_webmaster as those
-    // are the only users to allow associated 'orphaned' contnet with a new Web Area.
+    // are the only users to allow associated 'orphaned' content with a new Web Area.
     $group_contents = GroupContent::loadByEntity($object);
-    $allowed_roles = [
-      'administrator',
-      'system_webmaster',
-    ];
-    if ($group_contents) {
-      $access = $object->access('update', $account, TRUE);
-      return $return_as_object ? $access : $access->isAllowed();
-    }
-    else if (array_intersect($account->getRoles(), $allowed_roles)) {
-      // Means the object is not currently associated with a Group.
-      // Per logic of https://forumone.atlassian.net/browse/EPAD8-2249 only
-      // admins and system_webmaster users should have this access to this
+    $allowed_roles = ['administrator', 'system_webmaster'];
+
+    if ($group_contents || array_intersect($account->getRoles(), $allowed_roles)) {
       $access = $object->access('update', $account, TRUE);
       return $return_as_object ? $access : $access->isAllowed();
     }
@@ -184,57 +174,35 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    * {@inheritDoc}
    */
   public function executeMultiple(array $entities) {
-    foreach ($entities as $entity) {
-      $this->execute($entity);
+    parent::executeMultiple($entities);
+    $this->processMessages('denied', 'Unable to move @items as you do not have access to these nodes.');
+    $this->processMessages('special_denied', 'Unable to move @items as the @group Web Area does not allow creating these nodes.');
+    $this->processMessages('success', 'Successfully moved @items to the new @group Web Area. Review the menu links from the previously associated Web Area.');
+  }
+
+  /**
+   * Process messages for a specific context key.
+   *
+   * @param string $key
+   *   The key in $this->context to process.
+   * @param string $message
+   *   The message to display when processing messages.
+   */
+  public function processMessages($key, $message) {
+    if (isset($this->context[$key]) && !empty($this->context[$key])) {
+      $items = implode(', ', $this->context[$key]);
+      $items_message = rtrim($items, ', ');
+
+      if (count($this->context[$key]) > 5) {
+        $items_message .= ' and more...';
+      }
+
+      // @todo: See if we can set a property with the loaded group.
+      $group = Group::load($this->configuration['updated_group'])->label();
+
+      $message = str_replace(['@items', '@group'], [$items_message, $group], $message);
+      $this->messenger->addError($message);
     }
-
-    if (isset($this->context['denied']) && !empty($this->context['denied'])) {
-      $denied_message = 'Denied: Unable to move ';
-      for ($i = 0; $i < count($this->context['denied']); $i++) {
-        $denied_message .= $this->context['denied'][$i] . ', ';
-      }
-      $denied_message = trim($denied_message);
-
-      if (count($this->context['denied']) > 5) {
-        $denied_message .= ' and more...';
-      }
-
-      $denied_message .= ' as you do not have access to these nodes.';
-
-      $this->messenger->addError($denied_message);
-    }
-
-    if (isset($this->context['special_denied']) && !empty($this->context['special_denied'])) {
-      $group = Group::load($this->configuration['updated_group']);
-      $special_denied_message = 'Denied: Unable to move ';
-      for ($i = 0; $i < count($this->context['special_denied']); $i++) {
-        $special_denied_message .= $this->context['special_denied'][$i] . ', ';
-      }
-      $special_denied_message = trim($special_denied_message);
-
-      if (count($this->context['special_denied']) > 5) {
-        $special_denied_message .= ' and more... ';
-      }
-      $special_denied_message = trim($special_denied_message);
-      $special_denied_message .= " as the {$group->label()} Web Area does not allow creating these nodes.";
-      $this->messenger->addError($special_denied_message);
-    }
-
-    if (isset($this->context['success']) && !empty($this->context['success'])) {
-      $success_message = 'Successfully moved ';
-      for ($i = 0; $i < count($this->context['success']); $i++) {
-        $success_message .= $this->context['success'][$i] . ', ';
-      }
-
-      if (count($this->context['success']) > 5) {
-        $success_message .= ' and more...';
-      }
-      $success_message = trim($success_message);
-
-      $success_message .= " to the new {$this->context['target_group']->label()} Web Area. Review the menu links from the previously associated Web Area.";
-      $this->messenger->addStatus($success_message);
-    }
-
   }
 
 
