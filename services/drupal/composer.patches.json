@@ -15,7 +15,6 @@
       "Don't run trimmed text through Xss::filter()": "https://www.drupal.org/files/issues/2019-12-10/drupal-core-2922569-9.patch",
       "#3047022 - Properly handle block_content access control for revisions": "https://www.drupal.org/files/issues/2021-02-11/3047022-56.patch",
       "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2023-03-23/3109289-68.patch",
-      "Fixes inability to edit block in Layout Builder on a revision that has been reverted": "https://www.drupal.org/files/issues/2021-01-27/3053881-42.patch",
       "Views RSS feeds have validation issues": "https://www.drupal.org/files/issues/2022-11-28/1337894-37.patch",
       "Do not crash when an entity is missing from a views relationship (this may need to be just papering over an underlying problem)": "https://www.drupal.org/files/issues/2020-09-08/get_cache_tags_null-3169694-2.patch",
       "Validation for views datetime filter": "patches/views-exposed-datetime-validation-2.patch",
@@ -43,7 +42,8 @@
       "Add support for svgs in image fields": "https://www.drupal.org/files/issues/2022-06-23/drupal-responsive_image_svg_support-2957924-11.patch",
       "Reset media library pagination when interacting with exposed filters": "https://www.drupal.org/files/issues/2022-09-08/drupal-media_library_reset_pagination-3308719-3.patch",
       "Revision tokens for content entities": "https://www.drupal.org/files/issues/2920310-04.patch",
-      "Improve format_size to support a precision parameter" : "https://www.drupal.org/files/issues/2019-01-08/2837979-format_size_precision-09.patch"
+      "Improve format_size to support a precision parameter" : "https://www.drupal.org/files/issues/2019-01-08/2837979-format_size_precision-09.patch",
+      "PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)": "https://www.drupal.org/files/issues/2023-06-12/3049332-82.diff"
     },
     "drupal/autologout": {
       "Logout Message not rendering markup" : "patches/logout-message-not-rendering-markup.patch"
@@ -64,6 +64,9 @@
     },
     "drupal/groupmedia": {
       "Display media bundles in alpha order": "https://www.drupal.org/files/issues/2020-10-20/groupmedia-order_bundles-3178034-3.patch"
+    },
+    "drupal/layout_builder_iframe_modal": {
+      "Uncaught exception 'TypeError' with message 'Drupal\\layout_builder_iframe_modal\\IframeModalHelper::isModalRoute(): Argument #1 ($route_name) must be of type string, null given.": "https://git.drupalcode.org/project/layout_builder_iframe_modal/-/merge_requests/6.diff"
     },
     "drupal/addtocal": {
       "Drupal 10 compatibility fixes": "https://www.drupal.org/files/issues/2023-04-21/drupal-10-compatibility-v2.patch"
@@ -204,7 +207,8 @@
       "Fix paragraphs embed modal styles": "patches/adjusted-css-for-modal.patch"
     },
     "drupal/linked_field": {
-      "Generate relative links rather than absolute": "https://www.drupal.org/files/issues/2020-05-22/linked_field-relative-destination-url-3139179-1-D8.patch"
+      "Generate relative links rather than absolute": "https://www.drupal.org/files/issues/2020-05-22/linked_field-relative-destination-url-3139179-1-D8.patch",
+      "Fixes issue with misconfigured layout_builder block": "patches/add-logic-to-resolve-broken-value.patch"
     },
     "drupal/diff": {
       "Patch diff interface to get language to match core patches in these issues: 3252521, 2899719, and 3252540": "patches/diff-patch-revision-language-to-match-3252521-2899719-3252540-2.patch",

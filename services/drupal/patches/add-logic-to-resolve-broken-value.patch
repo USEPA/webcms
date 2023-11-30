@@ -1,0 +1,15 @@
+diff --git a/src/LinkedFieldManager.php b/src/LinkedFieldManager.php
+index 3669c91..fec92e8 100644
+--- a/src/LinkedFieldManager.php
++++ b/src/LinkedFieldManager.php
+@@ -142,6 +142,10 @@ class LinkedFieldManager implements LinkedFieldManagerInterface {
+     $uri = '';
+ 
+     if ($type == 'field') {
++      // Adding check here to return out in case of misconfigured saving.
++      if (empty($value['field']) && empty($value['custom'])) {
++        return FALSE;
++      }
+       /** @var \Drupal\Core\Field\FieldItemListInterface $field_items */
+       $field_items = $context['entity']->get($value);
+ 
