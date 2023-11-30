@@ -20,6 +20,14 @@ resource "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #region ALB
 
+resource "aws_ssm_parameter" "alb_arn" {
+  name  = "/webcms/${var.environment}/alb/arn"
+  type  = "String"
+  value = aws_lb.app_load_balancer.arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "alb_listener" {
   name  = "/webcms/${var.environment}/alb/listener"
   type  = "String"
