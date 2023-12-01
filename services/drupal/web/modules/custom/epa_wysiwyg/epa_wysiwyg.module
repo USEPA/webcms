@@ -7,6 +7,7 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
+use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 
@@ -208,5 +209,19 @@ function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state
       }
     }
 
+  }
+}
+
+function epa_wysiwyg_ckeditor5_plugin_info_alter(array &$plugin_definitions) {
+  $color_palette =[
+      ['color' => 'hsl(4, 90%, 58%)', 'label' => 'Red'],
+      ['color' => 'hsl(291, 64%, 42%)', 'label' => 'Purple'],
+    ];
+  if (assert($plugin_definitions['ckeditor5_table_properties'] instanceof CKEditor5PluginDefinition)) {
+    $table_property_plugin_definition = $plugin_definitions['ckeditor5_table_properties']
+      ->toArray();
+    $table_property_plugin_definition['ckeditor5']['config']['table']['tableCellProperties']['backgroundColors'] = $color_palette;
+    $table_property_plugin_definition['ckeditor5']['config']['table']['tableProperties']['backgroundColors'] = $color_palette;
+    $plugin_definitions['ckeditor5_table_properties'] = new CKEditor5PluginDefinition($table_property_plugin_definition);
   }
 }
