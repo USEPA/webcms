@@ -44,6 +44,10 @@ function epa_theme_preprocess_facets_item_list(&$vars) {
 function epa_theme_preprocess_facets_summary_item_list(&$vars) {
   // Add class to item links.
   foreach ($vars['items'] as $key => &$item) {
+    if (!isset($item['value']['#url'])) {
+      continue;
+    }
+
     $item['value']['#url']->setOption('attributes', [
       'class' => ['filters__link'],
       'rel' => 'no-follow',
