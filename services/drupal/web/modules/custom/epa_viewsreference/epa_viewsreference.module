@@ -7,7 +7,7 @@
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  *
  * Currently there appears to be a bug with how ajax is submitting data back to
  * the ViewsReferenceExposedFilters plugin that is causing the normally boolean
@@ -16,7 +16,7 @@ use Drupal\Core\Form\FormStateInterface;
  * This causes issues as the plugin is expecting this to be a boolean value
  * @see \Drupal\viewsreference_filter\Plugin\ViewsReferenceSetting\ViewsReferenceExposedFilters::alterView()
  */
-function epa_viewsreference_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_viewsreference_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
   $plugin_id = $context['widget']->getPluginId();
 
   if ($plugin_id === 'viewsreference_select') {
