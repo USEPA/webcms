@@ -71,6 +71,12 @@ variable "drupal_min_capacity" {
   default     = 1
 }
 
+variable "drupal_schedule_min_capacity" {
+  description = "When using scheduled scaling, the elevated minimum number of Drupal tasks to run during working hours"
+  type        = number
+  default     = null
+}
+
 variable "drupal_max_capacity" {
   description = "Maximum number of Drupal tasks to run in the cluster"
   type        = number
