@@ -53,6 +53,12 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    */
   protected $targetGroup;
 
+  const DENIED = 'denied';
+
+  const SUCCESS = 'success';
+
+  const SPECIAL_DENIED = 'special_denied';
+
 
   /**
    * {@inheritDoc}
@@ -175,9 +181,9 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
    */
   public function executeMultiple(array $entities) {
     parent::executeMultiple($entities);
-    $this->processMessages('denied', 'Unable to move @items as you do not have access to these nodes.');
-    $this->processMessages('special_denied', 'Unable to move @items as the @group Web Area does not allow creating these nodes.');
-    $this->processMessages('success', 'Successfully moved @items to the new @group Web Area. Review the menu links from the previously associated Web Area.');
+    $this->processMessages(UpdateGroupAssociationBase::DENIED, 'Unable to move @items as you do not have access to these nodes.');
+    $this->processMessages(UpdateGroupAssociationBase::SPECIAL_DENIED, 'Unable to move @items as the @group Web Area does not allow creating these nodes.');
+    $this->processMessages(UpdateGroupAssociationBase::SUCCESS, 'Successfully moved @items to the new @group Web Area. Review the menu links from the previously associated Web Area.');
   }
 
   /**
@@ -201,7 +207,18 @@ abstract class UpdateGroupAssociationBase extends ConfigurableActionBase impleme
       $group = Group::load($this->configuration['updated_group'])->label();
 
       $message = str_replace(['@items', '@group'], [$items_message, $group], $message);
-      $this->messenger->addError($message);
+
+      // Based on message type display error or success message.
+      switch ($key) {
+        case UpdateGroupAssociationBase::DENIED:
+        case UpdateGroupAssociationBase::SPECIAL_DENIED:
+          $this->messenger->addError($message);
+          break;
+        case UpdateGroupAssociationBase::SUCCESS:
+          $this->messenger->addStatus($message);
+          break;
+      }
+
     }
   }
 
