@@ -58,10 +58,6 @@ data "aws_ssm_parameter" "alb_security_group" {
   name = "/webcms/${var.environment}/security-groups/alb"
 }
 
-data "aws_ssm_parameter" "traefik_security_group" {
-  name = "/webcms/${var.environment}/security-groups/traefik"
-}
-
 data "aws_ssm_parameter" "terraform_database_security_group" {
   name = "/webcms/${var.environment}/security-groups/terraform-database"
 }
