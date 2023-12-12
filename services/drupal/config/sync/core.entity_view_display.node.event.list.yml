@@ -1,9 +1,10 @@
-uuid: d05f7e32-a75c-458e-94c5-0d160e8656e7
+uuid: 184c57f5-8e48-4fc7-97dd-850ec30698e1
 langcode: en
 status: true
 dependencies:
   config:
-    - core.entity_view_mode.node.teaser
+    - address_formatter.options.city_state
+    - core.entity_view_mode.node.list
     - field.field.node.event.field_add_to_cal_description
     - field.field.node.event.field_channel
     - field.field.node.event.field_date
@@ -36,16 +37,22 @@ dependencies:
     - field.field.node.event.field_type
     - node.type.event
   module:
+    - address_formatter
     - epa_core
+    - layout_builder
     - user
-id: node.event.teaser
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.event.list
 targetEntityType: node
 bundle: event
-mode: teaser
+mode: list
 content:
   field_daterange:
     type: date_range_without_time_smartdate
-    label: inline
+    label: hidden
     settings:
       timezone_override: ''
       single: 'F j, Y'
@@ -64,10 +71,11 @@ content:
     third_party_settings: {  }
     weight: 0
     region: content
-  field_description:
-    type: basic_string
+  field_location:
+    type: address_html
     label: hidden
-    settings: {  }
+    settings:
+      options: city_state
     third_party_settings: {  }
     weight: 1
     region: content
@@ -78,6 +86,7 @@ hidden:
   field_channel: true
   field_date: true
   field_deadline: true
+  field_description: true
   field_display_arcgis_map: true
   field_env_laws_regs_and_treaties: true
   field_event_cancellation: true
@@ -91,7 +100,6 @@ hidden:
   field_language: true
   field_last_published: true
   field_links: true
-  field_location: true
   field_machine_name: true
   field_meta_tags: true
   field_owning_office: true

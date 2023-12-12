@@ -157,20 +157,3 @@ variable "cache_instance_count" {
 }
 
 #endregion
-
-#region Traefik
-# cf. traefik_service.tf
-
-variable "traefik_min_capacity" {
-  description = "Minimum number of Traefik tasks to run"
-  type        = number
-  default     = 2
-}
-
-variable "traefik_max_capacity" {
-  description = "Maximum number of Traefik tasks to run"
-  type        = number
-  default     = 5
-}
-
-#endregion
