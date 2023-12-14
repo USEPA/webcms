@@ -32,6 +32,10 @@ data "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #region ALB
 
+data "aws_ssm_parameter" "alb_arn" {
+  name = "/webcms/${var.environment}/alb/arn"
+}
+
 data "aws_ssm_parameter" "alb_listener" {
   name = "/webcms/${var.environment}/alb/listener"
 }
@@ -51,18 +55,6 @@ data "aws_ssm_parameter" "rds_proxy_endpoint" {
 data "aws_ssm_parameter" "elasticsearch_endpoint" {
   name = "/webcms/${var.environment}/endpoints/elasticsearch"
 }
-
-#region Cron
-
-data "aws_ssm_parameter" "cron_event_rule" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-rule"
-}
-
-data "aws_ssm_parameter" "cron_event_role" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/cron/event-role"
-}
-
-#endregion
 
 #region Drupal-specific
 

@@ -54,13 +54,6 @@ resource "aws_ecr_repository" "cloudwatch_agent_mirror" {
   tags = var.tags
 }
 
-# This mirrors docker.io/traefik:<version>
-resource "aws_ecr_repository" "traefik_mirror" {
-  name = "webcms-${var.environment}-traefik"
-
-  tags = var.tags
-}
-
 # This mirrors docker.io/newrelic/php-daemon
 resource "aws_ecr_repository" "newrelic_daemon_mirror" {
   name = "webcms-${var.environment}-newrelic-daemon"

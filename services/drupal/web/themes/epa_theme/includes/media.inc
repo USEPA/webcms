@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\filter\Render\FilteredMarkup;
 
 /**
@@ -25,7 +26,27 @@ function epa_theme_preprocess_filter_caption(&$vars) {
         $vars['bundle'] = 'video';
       }
 
+
       if ($media->hasField('field_limit_file_accessibility')) {
+        /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
+        $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+        if ($token = $tokenGetter->getToken()) {
+          if (_is_access_token_valid($token)) {
+            $media->field_limit_file_accessibility->value = FALSE;
+          }
+        } else if ($referer_url = \Drupal::request()->headers->get('referer')) {
+          // Individual file requests don't contain the hash key, so we have to
+          // check the referer instead.
+          $config = \Drupal::config('access_unpublished.settings');
+          $referer_url_parsed = UrlHelper::parse($referer_url);
+          if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
+            $token = $referer_url_parsed['query'][$config->get('hash_key')];
+            if (_is_access_token_valid($token)) {
+              $media->field_limit_file_accessibility->value = FALSE;
+            }
+          }
+        }
+
         $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
       }
     }
@@ -50,6 +71,7 @@ function epa_theme_preprocess_filter_caption(&$vars) {
  */
 function epa_theme_preprocess_media(&$vars) {
   $vars['has_caption'] = isset($vars['attributes']['data-caption']);
+  /** @var \Drupal\media\Entity\Media $media */
   $media = $vars['media'];
   $vars['filesize'] = format_size($media->getSource()->getMetadata($media, 'filesize'), NULL, 1);
   if ($media->hasField('field_limit_file_accessibility')) {
