@@ -4,8 +4,14 @@
   has_footer ? 'has-footer',
 ]|join(' ')|trim %}
 
+
+{% set constrain_classes = [
+  'l-constrain',
+  is_narrow ? 'l-constrain--small'
+]|join(' ')|trim %}
+
 <div class="{{ classes }}">
-  <div class="l-constrain">
+  <div class="{{ constrain_classes }}">
 
     {% if has_header %}
       <div class="l-page__header">
@@ -13,13 +19,6 @@
           {% block info %}
             {% include '@layouts/_sample-content/sample-content.twig' with {
               'content': 'Section Information',
-            } %}
-          {% endblock %}
-        </div>
-        <div class="l-page__header-last">
-          {% block contact %}
-            {% include '@layouts/_sample-content/sample-content.twig' with {
-              'content': 'Contact Link',
             } %}
           {% endblock %}
         </div>
@@ -35,7 +34,7 @@
 
   {% if has_footer %}
     <div class="l-page__footer">
-      <div class="l-constrain">
+      <div class="{{ constrain_classes }}">
         {% block footer %}
           {% include '@layouts/_sample-content/sample-content.twig' with {
             'content': 'Page Footer',

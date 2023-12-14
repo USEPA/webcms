@@ -5,12 +5,6 @@
  */
 #}
 
-{% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Speeches and Remarks'|t,
-  } %}
-{% endset %}
-
 {% set contact_link %}
   {{ drupal_entity('block', 'webareaheader', check_access=false) }}
 {% endset %}
@@ -72,7 +66,6 @@
 {% include '@templates/listing-pages/listing-page.twig' with {
   'has_header': true,
   'has_sidenav': true,
-  'header_info': header_info,
   'contact_link': contact_link,
   'title': view.title,
   'contextual_links': title_suffix.contextual_links,

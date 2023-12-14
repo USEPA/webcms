@@ -5,7 +5,7 @@
 
 {% set accordion_id = 'accordion'|unique_id %}
 
-<div class="{{ classes }}"{% if is_multi_selectable %} aria-multiselectable="true"{% endif %}>
+<div class="{{ classes }}"{% if is_multi_selectable %} data-allow-multiple{% endif %}>
   {% if pattern_lab %}
     {% for item in accordion %}
       {% include '@uswds/accordion/_accordion-content.twig' with {

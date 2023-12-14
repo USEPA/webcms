@@ -24,16 +24,19 @@
     {% if node.field_wide_template.value %}
       {% set display_sidenav = false %}
       {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
+      {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
     {% else %}
       {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+      {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
     {% endif %}
   {% else %}
-    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
+    {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
   {% endif %}
 {% endset %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{#  {{ drupal_entity('block', 'webareaheader', check_access=false) }}#}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}
@@ -92,5 +95,6 @@
     'show_admin_info': show_admin_info,
     'body': content|without('epa_content_moderation_info_box', 'field_question'),
     'footer': footer,
+    'is_narrow': true,
   } %}
 {% endif %}
