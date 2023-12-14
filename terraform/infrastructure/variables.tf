@@ -76,12 +76,22 @@ variable "db_instance_count" {
   type        = number
 }
 
+#variable "proxy_target_endpoint" {
+#  description = "Name of the endpoint the proxy connects to"
+#  type = string
+#}
+
+variable "regional_cluster_endpoint" {
+  description = "Endpoint of the regional cluster this instance will connect to"
+  type = string
+}
+
 #endregion
 
 #region S3
 # cf. s3.tf
 
-variable "s3_replication_role" {
+variable "replication_role" {
   description = "Role used for S3 object replication"
   type        = string
 
