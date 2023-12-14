@@ -260,6 +260,9 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
         continue;
       }
 
+      // Add cacahbility dependency to the group itself in  case
+      $breadcrumb->addCacheableDependency($this->group);
+
       $links[] = Link::fromTextAndUrl($plugin->getTitle(), $plugin->getUrlObject());
       $breadcrumb->addCacheableDependency($plugin);
       // In the last line, MenuLinkContent plugin is not providing cache tags.
@@ -276,9 +279,12 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     // Create a breadcrumb for the Web Area's homepage if it's published.
     /** @var \Drupal\node\Entity\Node $web_area_home */
     $web_area_home = $this->group->get('field_homepage')->entity;
-    if ($web_area_home->isPublished()) {
-      $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
-      array_unshift($links, $web_area_home_link);
+    if ($web_area_home) {
+      $breadcrumb->addCacheableDependency($web_area_home);
+      if ($web_area_home->isPublished()) {
+        $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
+        array_unshift($links, $web_area_home_link);
+      }
     }
 
     // Create a breadcrumb for <front>.
