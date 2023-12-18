@@ -260,7 +260,7 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
         continue;
       }
 
-      // Add cacahbility dependency to the group itself in  case
+      // Add cacahbility dependency to the group itself.
       $breadcrumb->addCacheableDependency($this->group);
 
       $links[] = Link::fromTextAndUrl($plugin->getTitle(), $plugin->getUrlObject());
