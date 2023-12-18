@@ -1,5 +1,5 @@
 ---
-el: .usa-accordion[aria-multiselectable="true"]
+el: .usa-accordion[data-allow-multiple]
 title: Multi Selectable Accordion
 state: complete
 ---
