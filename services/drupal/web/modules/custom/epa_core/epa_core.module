@@ -543,9 +543,9 @@ function epa_core_node_view_alter(array &$build, EntityInterface $entity, Entity
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  */
-function epa_core_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_core_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
   $plugin_id = $context['widget']->getPluginId();
   // If the field is a datetime or daterange field, then add a note to the
   // field's description indicating that times must be entered according to the
@@ -554,34 +554,34 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   if (strpos($plugin_id, 'datetime_') !== FALSE || strpos($plugin_id, 'daterange') !== FALSE) {
     $field_name = $context['items']->getName();
     if ($field_name == 'created') {
-      _epa_core_augment_datetime_description($element['value']['#description']);
+      _epa_core_augment_datetime_description($element['widget'][0]['value']['#description']);
     }
     else {
-      if (empty($element['#description'])) {
-        $element['#description'] = '';
+      if (empty($element['widget'][0]['#description'])) {
+        $element['widget'][0]['#description'] = '';
       }
-      _epa_core_augment_datetime_description($element['#description']);
+      _epa_core_augment_datetime_description($element['widget'][0]['#description']);
     }
   }
 
-  if ($plugin_id == 'smartdate_timezone' && isset($element['timezone']['#options'])) {
-    unset($element['timezone']['#options']['']);
+  if ($plugin_id == 'smartdate_timezone' && isset($element['widget'][0]['timezone']['#options'])) {
+    unset($element['widget'][0]['timezone']['#options']['']);
   }
 
   // If a link field only supports external links remove the confusing help text
   // the widget provides by default.
   // The complicated logic here is necessary because the structure of this text
   // differs depending on whether the field has additional descriptive text configured.
-  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
-    if ((is_array($element["uri"]["#description"])
-      && is_array($element["uri"]["#description"]['#items'])
-      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
-    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
-      if (isset($element["#description"])) {
-        $element["uri"]["#description"] = $element["#description"];
+  if ($plugin_id == 'link_default' && isset($element['widget'][0]["uri"]["#description"]))  {
+    if ((is_array($element['widget'][0]["uri"]["#description"])
+      && is_array($element['widget'][0]["uri"]["#description"]['#items'])
+      && $element['widget'][0]["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
+    || is_a($element['widget'][0]["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
+      if (isset($element['widget'][0]["#description"])) {
+        $element['widget'][0]["uri"]["#description"] = $element['widget'][0]["#description"];
       }
       else {
-        unset($element["uri"]["#description"]);
+        unset($element['widget'][0]["uri"]["#description"]);
       }
     }
   }
