@@ -40,6 +40,12 @@ function epa_theme_preprocess_html(&$vars, $hook) {
       $vars['page_js'] = $node->field_page_head->value;
     }
   }
+
+  // Add class to 404 page
+  $status = \Drupal::requestStack()->getCurrentRequest()->attributes->get('exception');
+  if($status && $status->getStatusCode() == '404') {
+    $vars['attributes']['class'][] = 'page-is-404';
+  }
 }
 
 /**
