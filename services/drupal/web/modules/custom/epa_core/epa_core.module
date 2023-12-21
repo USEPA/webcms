@@ -82,10 +82,10 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
       ->merge($node_canonical_local_tasks['cacheability']);
   }
 
-  if (\Drupal::moduleHandler()->moduleExists('access_unpublished')) {
-    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+  if (\Drupal::moduleHandler()->moduleExists('access_unpublished') && \Drupal::currentUser()->isAnonymous()) {
     // If the access_unpublished module is enabled and the user is anonymous, disable all local tasks.
-    if ($token = $tokenGetter->getToken() && \Drupal::currentUser()->isAnonymous()) {
+    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+    if ($token = $tokenGetter->getToken()) {
       if (_is_access_token_valid($token)) {
         unset($local_tasks['tabs']);
       }
