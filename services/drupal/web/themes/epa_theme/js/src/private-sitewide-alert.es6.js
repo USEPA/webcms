@@ -8,7 +8,7 @@ import Drupal from 'drupal';
       const privateMediaCount = privateMedia.length;
 
       if (privateMediaCount > 0) {
-        const nodeHTML = document.querySelector('body');
+        const nodeHTML = context.querySelector('body');
         const dataAlert = document.title.replace(/\s+/g, '-').toLowerCase();
 
         const privateMediaAlert = `<div class="usa-site-alert usa-site-alert--has-heading usa-site-alert--private js-sitewide-alert" data-alert="${dataAlert}">
