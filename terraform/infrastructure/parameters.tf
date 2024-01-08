@@ -60,7 +60,7 @@ resource "aws_ssm_parameter" "elasticache_node_endpoints" {
 resource "aws_ssm_parameter" "rds_proxy_endpoint" {
   name  = "/webcms/${var.environment}/endpoints/rds-proxy"
   type  = "String"
-  value = aws_db_proxy.proxy.endpoint
+  value = var.regional_cluster_endpoint
 
   tags = var.tags
 }
