@@ -10,7 +10,7 @@ __Variables:__
 * has_footer: [boolean] Whether the page has footer content.
 
 __Blocks:__
-* info: Twig block for web area or hublinks.
+* info: Twig block for web area.
 * contact: Twig block for contact info.
 * content: Twig block for content.
 * footer: Twig block for footer content.
