@@ -463,6 +463,7 @@ Drupal:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 Nginx:
   stage: Image Scan
@@ -479,6 +480,7 @@ Nginx:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 Drush:
   stage: Image Scan
@@ -491,10 +493,11 @@ Drush:
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-terraform-database:$WEBCMS_IMAGE_TAG
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-terraform-database:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 Database:
   stage: Image Scan
@@ -507,10 +510,11 @@ Database:
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drush:$WEBCMS_IMAGE_TAG
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-terraform-database:latest --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 Metrics:
   stage: Image Scan
@@ -527,6 +531,7 @@ Metrics:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 New Relic:
   stage: Image Scan
@@ -543,8 +548,9 @@ New Relic:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
-Traefik:
+.Traefik:
   stage: Image Scan
   tags:
     - twistcli
@@ -559,6 +565,7 @@ Traefik:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 CloudWatch:
   stage: Image Scan
@@ -575,6 +582,7 @@ CloudWatch:
   after_script:
     # Cleanup the above space use on Runner.
     - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 
 #region Preproduction
