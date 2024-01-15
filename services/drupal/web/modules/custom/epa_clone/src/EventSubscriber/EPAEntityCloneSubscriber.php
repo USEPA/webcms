@@ -61,6 +61,16 @@ class EPAEntityCloneSubscriber implements EventSubscriberInterface {
       $cloned_entity->set('field_scheduled_transition', NULL);
     }
 
+    // Clear the expiration date (sunset) field on cloned entities.
+    if ($original_entity->hasField('field_expiration_date') && !$original_entity->get('field_expiration_date')->isEmpty()) {
+      $cloned_entity->set('field_expiration_date', NULL);
+    }
+
+    // Clear the publish date field on cloned entities.
+    if ($original_entity->hasField('field_publish_date') && !$original_entity->get('field_publish_date')->isEmpty()) {
+      $cloned_entity->set('field_publish_date', NULL);
+    }
+
     if ($cloned_entity instanceof Node) {
       foreach ($cloned_entity->getFieldDefinitions() as $field_id => $field_definition) {
         // Clone referenced webforms when a  node is cloned.
