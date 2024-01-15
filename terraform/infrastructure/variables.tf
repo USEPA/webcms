@@ -83,7 +83,7 @@ variable "db_instance_count" {
 
 variable "regional_cluster_endpoint" {
   description = "Endpoint of the regional cluster this instance will connect to"
-  type = string
+  type        = string
 }
 
 #endregion
