@@ -91,7 +91,7 @@ variable "regional_cluster_endpoint" {
 #region S3
 # cf. s3.tf
 
-variable "replication_role" {
+variable "s3_replication_role" {
   description = "Role used for S3 object replication"
   type        = string
 
