@@ -77,8 +77,6 @@ Note: this has only been tested on ddev 1.19 and above.
 
 15. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin`
 
-16. Access the app at https://epa.ddev.site
-
 
 # Testing migrations
 
