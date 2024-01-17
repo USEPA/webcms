@@ -63,3 +63,10 @@ services:
     parent: epa_workflow.default_moderation
     tags:
       - { name: epa_workflow_moderation_manager }
+  epa_workflow.content_moderation_event_subscriber:
+    public: false
+    class: Drupal\epa_workflow\EventSubscriber\EPAContentModerationEventSubscriber
+    decorates: danse_content_moderation.event_subscriber
+    arguments: ['@plugin.manager.danse.plugin']
+    tags:
+      - { name: event_subscriber }

@@ -55,9 +55,7 @@ class EPAModerationManager {
       $moderation = $this->moderations['base'];
     }
 
-    // @todo Should consider trying to refactor this to move some of the work
-    // done in the process methods to be called in a presave hook. We can probably
-    // avoid the additional save here in a lot of cases.
+    $moderation_entity->setSyncing(TRUE);
     $moderation->process($moderation_entity);
     $moderation->save();
     $moderation->logTransition();
