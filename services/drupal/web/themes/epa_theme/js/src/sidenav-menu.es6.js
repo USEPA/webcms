@@ -9,19 +9,41 @@ import Drupal from 'drupal';
         const sideNavTrigger = context.querySelector('.web-area-menu__button');
         const sideNavOverlay = context.querySelector('.menu-sidenav__overlay');
         const blockWebArea = context.getElementById('block-webareamenu');
-
-        const focusable = Array.from(
-          blockWebArea.querySelectorAll(
-            'button, [href], input, select, textarea'
-          )
-        ).filter(item => item.tabIndex !== -1 && item.hidden !== true);
-        const numberFocusElements = focusable.length;
-        const firstFocusableElement = focusable[0];
-        const lastFocusableElement = focusable[numberFocusElements - 1];
+        let focusable;
+        let numberFocusElements;
+        let firstFocusableElement;
+        let lastFocusableElement;
+        let priorLastElement;
 
         function toggleVisiblity() {
           sideNavMenu.classList.toggle('is-visible');
           sideNavTrigger.classList.toggle('is-open');
+
+          if (!focusable) {
+            focusable = Array.from(
+              blockWebArea.querySelectorAll(
+                'button, [href], input, select, textarea'
+              )
+            ).filter(item => item.tabIndex !== -1 && item.hidden !== true);
+            numberFocusElements = focusable.length;
+            firstFocusableElement = focusable[0];
+            lastFocusableElement = focusable[numberFocusElements - 1];
+
+            const lastFocusParent = lastFocusableElement.closest('ul');
+
+            if (getComputedStyle(lastFocusParent).display === 'none') {
+              priorLastElement = lastFocusableElement;
+              lastFocusableElement = lastFocusParent.previousElementSibling;
+            }
+          }
+
+          if (lastFocusableElement) {
+            lastFocusableElement.addEventListener('click', function() {
+              const swap = lastFocusableElement;
+              lastFocusableElement = priorLastElement;
+              priorLastElement = swap;
+            });
+          }
         }
 
         [sideNavOverlay, sideNavTrigger].forEach(elem => {
