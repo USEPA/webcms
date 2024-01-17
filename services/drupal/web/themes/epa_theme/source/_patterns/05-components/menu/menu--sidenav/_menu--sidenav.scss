@@ -99,7 +99,7 @@
     border-right: 0;
     display: none;
     flex-direction: column;
-    height: calc(100% - 170px);
+    height: auto;
     left: 0;
     margin-bottom: 0;
     overflow-y: auto;
@@ -119,16 +119,25 @@
   }
 }
 
+.menu-sidenav__overlay {
+  @include u-pin("all");
+  position: fixed;
+  background: color("black-transparent-70");
+  opacity: opacity(0);
+  transition: opacity $project-easing;
+  visibility: hidden;
+  z-index: 1;
+
+  &.is-visible {
+    opacity: opacity(100);
+    visibility: visible;
+  }
+}
+
 .menu-sidenav__contact {
   margin: gesso-spacing(4) 0;
 
   @include at-media-max($theme-header-min-width) {
     display: none;
-  }
-}
-
-.js-menu-sidenav--active {
-  @include at-media-max($theme-header-min-width) {
-    overflow: hidden;
   }
 }

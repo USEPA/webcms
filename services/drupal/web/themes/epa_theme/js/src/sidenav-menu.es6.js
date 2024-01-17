@@ -5,17 +5,19 @@ import Drupal from 'drupal';
   Drupal.behaviors.sidenavMenu = {
     attach(context) {
       once('sidenav-menu', 'html').forEach(() => {
-        const pageBody = document.body;
         const sideNavMenu = context.querySelector('.menu--sidenav-nav');
+        const sideNavOverlay = context.querySelector('.menu-sidenav__overlay');
         const sideNavTrigger = context.querySelector('.web-area-menu__button');
 
         function toggleVisiblity() {
-          pageBody.classList.toggle('usa-js-mobile-nav--active');
           sideNavMenu.classList.toggle('is-visible');
           sideNavTrigger.classList.toggle('is-open');
+          sideNavOverlay.classList.toggle('is-visible');
         }
 
-        sideNavTrigger.addEventListener('click', toggleVisiblity);
+        [sideNavOverlay, sideNavTrigger].forEach(elem => {
+          elem.addEventListener('click', toggleVisiblity);
+        });
 
         const subNavMenus = context.querySelectorAll(
           '.menu--sidenav .menu__subnav'
