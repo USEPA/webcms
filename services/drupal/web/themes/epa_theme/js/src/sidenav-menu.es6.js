@@ -5,6 +5,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.sidenavMenu = {
     attach(context) {
       once('sidenav-menu', 'html').forEach(() => {
+        const pageBody = document.body;
         const sideNavMenu = context.querySelector('.menu--sidenav-nav');
         const sideNavTrigger = context.querySelector('.web-area-menu__button');
         const sideNavOverlay = context.querySelector('.menu-sidenav__overlay');
@@ -16,8 +17,10 @@ import Drupal from 'drupal';
         let priorLastElement;
 
         function toggleVisiblity() {
+          pageBody.classList.toggle('menu-sidenav--active');
           sideNavMenu.classList.toggle('is-visible');
           sideNavTrigger.classList.toggle('is-open');
+          sideNavOverlay.classList.toggle('is-visible');
 
           if (!focusable) {
             focusable = Array.from(
