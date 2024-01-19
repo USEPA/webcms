@@ -32,7 +32,7 @@ resource "aws_s3_bucket" "uploads" {
     for_each = toset(try([var.s3_replication_destination[each.key]], []))
 
     content {
-      role = var.replication_role
+      role = var.s3_replication_role
 
       rules {
         status = "Enabled"

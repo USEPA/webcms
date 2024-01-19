@@ -15,8 +15,13 @@
  */
 #}
 
+{% if media_accessibility == 'private' %}
+  {% set is_private = true %}
+{% endif %}
+
 {% include '@components/file/file.twig' with {
   'url': url,
   'link_text': link_text,
-  'icon': 'file'
+  'icon': 'file',
+  'is_private': is_private,
 } %}

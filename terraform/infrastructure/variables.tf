@@ -76,6 +76,16 @@ variable "db_instance_count" {
   type        = number
 }
 
+#variable "proxy_target_endpoint" {
+#  description = "Name of the endpoint the proxy connects to"
+#  type = string
+#}
+
+variable "regional_cluster_endpoint" {
+  description = "Endpoint of the regional cluster this instance will connect to"
+  type        = string
+}
+
 #endregion
 
 #region S3
@@ -144,23 +154,6 @@ variable "cache_instance_type" {
 variable "cache_instance_count" {
   description = "Number of ElastiCache nodes in this cluster"
   type        = number
-}
-
-#endregion
-
-#region Traefik
-# cf. traefik_service.tf
-
-variable "traefik_min_capacity" {
-  description = "Minimum number of Traefik tasks to run"
-  type        = number
-  default     = 2
-}
-
-variable "traefik_max_capacity" {
-  description = "Maximum number of Traefik tasks to run"
-  type        = number
-  default     = 5
 }
 
 #endregion

@@ -4,7 +4,7 @@
 resource "aws_iam_role" "drupal_task" {
   for_each = local.sites
 
-  name        = "${var.iam_prefix}-${var.environment}-${each.key}-DrupalTask"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-${each.key}-DrupalTask"
   description = "WebCMS task-level role"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "drupal_s3_access" {
 resource "aws_iam_policy" "drupal_s3_access" {
   for_each = local.sites
 
-  name        = "${var.iam_prefix}-${var.environment}-${each.key}-DrupalS3Access"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-${each.key}-DrupalS3Access"
   description = "Grants read/write access to the ${each.key} S3 bucket"
 
   policy = data.aws_iam_policy_document.drupal_s3_access[each.key].json
@@ -79,7 +79,7 @@ data "aws_iam_policy_document" "drupal_es_access" {
 }
 
 resource "aws_iam_policy" "drupal_es_access" {
-  name        = "WebCMS-${var.environment}-ElasticsearchAccess"
+  name        = "WebCMS-${var.aws_region}-${var.environment}-ElasticsearchAccess"
   description = "Grants read/write access to Elasticsearch"
 
   policy = data.aws_iam_policy_document.drupal_es_access.json
@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "drupal_publish_metrics" {
 }
 
 resource "aws_iam_policy" "drupal_publish_metrics" {
-  name        = "${var.iam_prefix}-${var.environment}-PublishMetrics"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-PublishMetrics"
   description = "Permits publishing CloudWatch metrics"
 
   policy = data.aws_iam_policy_document.drupal_publish_metrics.json
@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "drupal_put_logs" {
 }
 
 resource "aws_iam_policy" "drupal_put_logs" {
-  name        = "${var.iam_prefix}-${var.environment}-LogsPublish"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-LogsPublish"
   description = "Permits publishing CloudWatch log events"
 
   policy = data.aws_iam_policy_document.drupal_put_logs.json
