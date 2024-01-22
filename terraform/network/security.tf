@@ -100,32 +100,6 @@ resource "aws_security_group" "terraform_database" {
 # Drupal prevent us from performing in-app connection pooling, so we rely on the proxy's
 # ability to pool connections and mitigate transient connection issues during failover.
 
-resource "aws_security_group_rule" "database_proxy_ingress" {
-  description = "Allows RDS to receive traffic from proxies"
-
-  security_group_id = aws_security_group.database.id
-
-  type      = "ingress"
-  protocol  = "tcp"
-  from_port = 3306
-  to_port   = 3306
-
-  source_security_group_id = aws_security_group.proxy.id
-}
-
-resource "aws_security_group_rule" "proxy_database_egress" {
-  description = "Allows proxies to send traffic to RDS"
-
-  security_group_id = aws_security_group.proxy.id
-
-  type      = "egress"
-  protocol  = "tcp"
-  from_port = 3306
-  to_port   = 3306
-
-  source_security_group_id = aws_security_group.database.id
-}
-
 resource "aws_security_group_rule" "database_terraform_ingress" {
   description = "Allows RDS to receive traffic from Terraform tasks"
 
@@ -323,6 +297,32 @@ resource "aws_security_group_rule" "alb_drupal_health_egress" {
   to_port   = 8080
 
   source_security_group_id = aws_security_group.drupal.id
+}
+
+resource "aws_security_group_rule" "database_drupal_ingress" {
+  description = "Allows RDS to receive traffic from Drupal"
+
+  security_group_id = aws_security_group.database.id
+
+  type      = "ingress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.drupal.id
+}
+
+resource "aws_security_group_rule" "drupal_database_egress" {
+  description = "Allows Drupal to send traffic to RDS"
+
+  security_group_id = aws_security_group.drupal.id
+
+  type      = "egress"
+  protocol  = "tcp"
+  from_port = 3306
+  to_port   = 3306
+
+  source_security_group_id = aws_security_group.database.id
 }
 
 # For Drupal, we allow arbitrary outbound for three ports:
