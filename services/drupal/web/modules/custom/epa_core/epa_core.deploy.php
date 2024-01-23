@@ -337,7 +337,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
 
     // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
     $field_table = $table_prefix . 'field_image_style';
-    $missing_image_styles_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
+    $missing_image_styles_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
     foreach ($missing_image_styles_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
@@ -361,7 +361,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
 
     // Update all card_group paragraph revision and non-revision items to set field_title_placement if a value is not already set.
     $field_table = $table_prefix . 'field_title_placement';
-    $missing_title_placement_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
+    $missing_title_placement_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
     foreach ($missing_title_placement_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
@@ -386,7 +386,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
 
     // Update all card paragraph revision and non-revision items to set field_flag_card_alignment if a value is not already set.
     $field_table = $table_prefix . 'field_flag_card_alignment';
-    $missing_flag_alignment_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
+    $missing_flag_alignment_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
     foreach ($missing_flag_alignment_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
