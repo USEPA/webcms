@@ -33,7 +33,9 @@ function epa_theme_preprocess_node(&$variables) {
 function epa_theme_preprocess_node__full(&$variables) {
   /** @var \Drupal\node\Entity\Node $node */
   $node = $variables['node'];
-  _add_webarea_contact_link($node, $variables);
+  if (!isset($variables['webarea_contact_link'])) {
+    _add_webarea_contact_link($node, $variables);
+  }
 }
 
 /**
@@ -215,8 +217,9 @@ function _add_webarea_contact_link($entity, &$variables) {
     $group = $group_content->getGroup();
     /** @var \Drupal\node\Entity\Node[] $webform */
     $webform = $group->get('field_contact_us_form')->referencedEntities();
-    if (!empty($webform)) {
-      $webform = reset($webform);
+    $webform = reset($webform);
+    // Only apply the variable if the link isn't to itself.
+    if ($webform && ($entity->id() !== $webform->id()) && $entity->bundle() !== $webform->bundle()) {
       $variables['webarea_contact_link'] = $webform->toLink()->toRenderable();
     }
   }
