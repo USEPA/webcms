@@ -20,6 +20,8 @@ function epa_theme_preprocess_node(&$variables) {
     // Array of regions to add to node template.
     $allowed_regions = ['messages'];
     _add_regions_to_node($allowed_regions, $variables);
+    $node = $variables['node'];
+    _add_webarea_contact_link($node, $variables);
   }
 }
 
