@@ -64,7 +64,7 @@ import Drupal from 'drupal';
             );
             const noResultsNew = responseHTMLNew.querySelector('.view__empty');
 
-            if (noResultsNew === null) {
+            if (noResultsNew === null && response.data !== '') {
               const jsDomAlert = document.querySelector(
                 `.js-view-dom-id-epa-alerts--${alertContext}`,
                 context
