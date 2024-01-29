@@ -25,6 +25,9 @@ RUN set -ex \
 
 FROM php:8.1-fpm-alpine AS base
 
+# Bump system packages
+RUN apk upgrade
+
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base extensions needed for Drupal
@@ -222,6 +225,9 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
 
+# Bump system packages
+RUN apk upgrade
+
 # Copy the Drupal filesystem into this image
 COPY --from=drupal /var/www/html /var/www/html
 
@@ -240,6 +246,9 @@ CMD [ "nginx", "-g", "daemon off;" ]
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
 FROM php:8.1-cli-alpine AS drush
+
+# Bump system packages
+RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
