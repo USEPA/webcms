@@ -1,0 +1,14 @@
+diff --git a/src/Plugin/Danse/ContentModeration.php b/src/Plugin/Danse/ContentModeration.php
+index 989ce0d92a42b05a4de45075a0b65fc0e419e2cd..613d0b8603e6a862db58d1b1b282137df9fce542 100644
+--- a/src/Plugin/Danse/ContentModeration.php
++++ b/src/Plugin/Danse/ContentModeration.php
+@@ -75,7 +75,8 @@ class ContentModeration extends PluginBase {
+     $revision = \Drupal::entityTypeManager()->getStorage($parent_entity_type)->loadRevision($parent_rev_id);
+
+     $label = $revision->label() . ' transitioned to ' . $topic;
+-    return $this->createEvent($topic, $label, $payload);
++    $revision_payload = new Payload($revision);
++    return $this->createEvent($topic, $label, $revision_payload);
+   }
+
+ }
