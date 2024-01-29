@@ -16,6 +16,7 @@ use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
@@ -27,7 +28,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * {@inheritdoc}
  */
 class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
-  use \Drupal\Core\StringTranslation\StringTranslationTrait;
+  use StringTranslationTrait;
 
   /**
    * The configuration object generator.
@@ -204,16 +205,16 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $menu = reset($menus);
     $menu_id = GroupContentMenuInterface::MENU_PREFIX . $menu->id();
 
-    $menus = $this->entityTypeManager
-      ->getStorage('group_content_menu')
-      ->loadByProperties(['id' => $menu_id]);
+    if ($menu_id) {
+      $this->menuTrail = [];
+      $trail_ids = $this->menuActiveTrail->getActiveTrailIds($menu_id);
 
-    $trail_ids = $this->menuActiveTrail->getActiveTrailIds($menu_id);
+      $trail_ids = array_filter($trail_ids);
+      if ($trail_ids) {
+        $this->menuTrail = $trail_ids;
+      }
 
-    $trail_ids = array_filter($trail_ids);
-    if ($trail_ids) {
       $this->menuName = $menu_id;
-      $this->menuTrail = $trail_ids;
       $this->group = $group;
       return TRUE;
     }
@@ -260,7 +261,7 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
         continue;
       }
 
-      // Add cacahbility dependency to the group itself.
+      // Add cachability dependency to the group itself.
       $breadcrumb->addCacheableDependency($this->group);
 
       $links[] = Link::fromTextAndUrl($plugin->getTitle(), $plugin->getUrlObject());
