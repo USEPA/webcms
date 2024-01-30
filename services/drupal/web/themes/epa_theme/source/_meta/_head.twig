@@ -1,3 +1,11 @@
+{% set location_root = '../../../../../' %}
+{% set location_theme = '../../../' %}
+
+{%- if standalone_template %}
+  {% set location_root = 'https://www.epa.gov/' %}
+  {% set location_theme = 'https://www.epa.gov/themes/epa_theme/' %}
+{% endif -%}
+
 <!DOCTYPE html>
 <html class="no-js pattern-lab-content {{ html_class }}" lang="en" dir="ltr">
 <head>
@@ -8,103 +16,74 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <title>{{ page_title }} | {{ site_name }}</title>
 
-  {% if not standalone_template %}
-    <link rel="icon" type="image/x-icon" href="/themes/epa_theme/images/favicon.ico">
-    <meta name="msapplication-TileColor" content="#FFFFFF">
-    <meta name="msapplication-TileImage" content="/themes/epa_theme/images/favicon-144.png">
-    <meta name="application-name" content="{{ site_name }}">
-    <meta name="msapplication-config" content="/themes/epa_theme/images/ieconfig.xml">
-    <link rel="apple-touch-icon-precomposed" sizes="196x196" href="/themes/epa_theme/images/favicon-196.png">
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="/themes/epa_theme/images/favicon-152.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/themes/epa_theme/images/favicon-144.png">
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="/themes/epa_theme/images/favicon-120.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/themes/epa_theme/images/favicon-114.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/themes/epa_theme/images/favicon-72.png">
-    <link rel="apple-touch-icon-precomposed" href="/themes/epa_theme/images/favicon-180.png">
-    <link rel="icon" href="/themes/epa_theme/images/favicon-32.png" sizes="32x32">
-    <link rel="preload" href="/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-regular-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-bold-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-italic-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="/themes/epa_theme/fonts/merriweather/Latin-Merriweather-Bold.woff2" as="font" crossorigin="anonymous">
-    <link rel="stylesheet" href="../../../css/styles.css?{{ cacheBuster }}" media="all">
-    <link rel="stylesheet" href="../../../css-lib/colorbox.min.css?{{ cacheBuster }}" media="all">
-    <link rel="stylesheet" href="../../../css/pattern-lab.css?{{ cacheBuster }}" media="all">
-  {% else %}
-    {# Custom Standalone template head #}
-    <link rel="canonical" href="https://archive.epa.gov/">
-    <link rel="shortlink" href="https://archive.epa.gov/">
-    <meta name="description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
-    <meta name="keywords" content="EPA, archive, web">
-    <meta property="DC.title" content="{{ page_title }}">
-    <meta property="DC.description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
-    <meta property="DC.Subject.epachannel" content="Learn the Issues">
-    <meta property="DC.type" content="Overviews and Factsheets">
-    <meta property="DC.date.created" content="2021-12-06">
-    <meta property="DC.date.modified" content="2021-12-06">
-    <meta property="DC.date.reviewed" content="2022-12-06">
-    <meta property="DC.creator" content="US EPA,OA">
-    <meta property="DC.language" content="en">
-    <meta property="WebArea" content="Archive">
-    <meta property="ContentType" content="Basic page">
-    <meta property="og:site_name" content="US EPA">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://archive.epa.gov">
-    <meta property="og:title" content="{{ page_title }} | {{ site_name }}">
-    <meta property="og:description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
-    <meta property="og:image" content="https://www.epa.gov/sites/all/themes/epa/img/epa-standard-og.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:updated_time" content="2021-12-06">
-    <meta property="og:image:alt" content="U.S. Environmental Protection Agency">
-    <meta property="og:country_name" content="United States of America">
-    <meta property="article:published_time" content="2021-12-06T00:00:00-05:00">
-    <meta property="article:modified_time" content="2021-12-06">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image:alt" content="U.S. Environmental Protection Agency">
-    <meta name="twitter:image:height" content="600">
-    <meta name="twitter:image:width" content="1200">
-    <meta name="twitter:image" content="https://www.epa.gov/sites/all/themes/epa/img/epa-standard-twitter.jpg">
-    <link rel="icon" type="image/x-icon" href="https://www.epa.gov/themes/epa_theme/images/favicon.ico">
-    <meta name="msapplication-TileColor" content="#FFFFFF">
-    <meta name="msapplication-TileImage" content="https://www.epa.gov/themes/epa_theme/images/favicon-144.png">
-    <meta name="application-name" content="{{ site_name }}">
-    <meta name="msapplication-config" content="https://www.epa.gov/themes/epa_theme/images/ieconfig.xml">
-    <link rel="apple-touch-icon-precomposed" sizes="196x196" href="https://www.epa.gov/themes/epa_theme/images/favicon-196.png">
-    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://www.epa.gov/themes/epa_theme/images/favicon-152.png">
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://www.epa.gov/themes/epa_theme/images/favicon-144.png">
-    <link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://www.epa.gov/themes/epa_theme/images/favicon-120.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://www.epa.gov/themes/epa_theme/images/favicon-114.png">
-    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://www.epa.gov/themes/epa_theme/images/favicon-72.png">
-    <link rel="apple-touch-icon-precomposed" href="https://www.epa.gov/themes/epa_theme/images/favicon-180.png">
-    <link rel="icon" href="https://www.epa.gov/themes/epa_theme/images/favicon-32.png" sizes="32x32">
-    <link rel="preload" href="https://www.epa.gov/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-regular-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="https://www.epa.gov/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-bold-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="https://www.epa.gov/themes/epa_theme/fonts/source-sans-pro/sourcesanspro-italic-webfont.woff2" as="font" crossorigin="anonymous">
-    <link rel="preload" href="https://www.epa.gov/themes/epa_theme/fonts/merriweather/Latin-Merriweather-Bold.woff2" as="font" crossorigin="anonymous">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/ajax-progress.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/autocomplete-loading.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/js.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/sticky-header.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/system-status-counter.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/system-status-report-counters.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/system-status-report-general-info.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/tabledrag.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/tablesort.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/system/components/tree-child.module.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/filter/filter.caption.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/core/themes/stable/css/media/filter.caption.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/modules/contrib/paragraphs/css/paragraphs.unpublished.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/themes/epa_theme/css/styles.css">
-    <link rel="stylesheet" media="all" href="https://www.epa.gov/themes/epa_theme/css-lib/colorbox.min.css">
+  {% if standalone_template %}
+  <!-- START: The following can be tweaked or removed. -->
+  <link rel="canonical" href="https://archive.epa.gov/">
+  <link rel="shortlink" href="https://archive.epa.gov/">
+  <meta name="description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
+  <meta name="keywords" content="EPA, archive, web">
+  <meta property="DC.title" content="{{ page_title }}">
+  <meta property="DC.description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
+  <meta property="DC.Subject.epachannel" content="Learn the Issues">
+  <meta property="DC.type" content="Overviews and Factsheets">
+  <meta property="DC.date.created" content="2023-12-04">
+  <meta property="DC.date.modified" content="2023-12-04">
+  <meta property="DC.date.reviewed" content="2023-12-04">
+  <meta property="DC.creator" content="US EPA,OA">
+  <meta property="DC.language" content="en">
+  <meta property="WebArea" content="Archive">
+  <meta property="ContentType" content="Basic page">
+  <meta property="og:site_name" content="US EPA">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://archive.epa.gov">
+  <meta property="og:title" content="{{ page_title }} | {{ site_name }}">
+  <meta property="og:description" content="This page provides access to older pages that the EPA has deemed historically relevant but no longer updated.">
+  <meta property="og:image" content="https://www.epa.gov/system/files/images/2022-03/epa-standard-twitter.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:updated_time" content="2023-12-04">
+  <meta property="og:image:alt" content="U.S. Environmental Protection Agency">
+  <meta property="og:country_name" content="United States of America">
+  <meta property="article:published_time" content="2023-12-04T00:00:00-05:00">
+  <meta property="article:modified_time" content="2023-12-04">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image:alt" content="U.S. Environmental Protection Agency">
+  <meta name="twitter:image:height" content="600">
+  <meta name="twitter:image:width" content="1200">
+  <meta name="twitter:image" content="https://www.epa.gov/system/files/images/2022-03/epa-standard-twitter.jpg">
+  <!-- END: The above can be tweaked or removed. -->
+  {% endif %}
 
+  <link rel="icon" type="image/x-icon" href="{{ location_theme }}images/favicon.ico">
+  <meta name="msapplication-TileColor" content="#FFFFFF">
+  <meta name="msapplication-TileImage" content="{{ location_theme }}images/favicon-144.png">
+  <meta name="application-name" content="{{ site_name }}">
+  <meta name="msapplication-config" content="{{ location_theme }}images/ieconfig.xml">
+  <link rel="apple-touch-icon-precomposed" sizes="196x196" href="{{ location_theme }}images/favicon-196.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="{{ location_theme }}images/favicon-152.png">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ location_theme }}images/favicon-144.png">
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="{{ location_theme }}images/favicon-120.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{{ location_theme }}images/favicon-114.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{{ location_theme }}images/favicon-72.png">
+  <link rel="apple-touch-icon-precomposed" href="{{ location_theme }}images/favicon-180.png">
+  <link rel="icon" href="{{ location_theme }}images/favicon-32.png" sizes="32x32">
+  <link rel="preload" href="{{ location_theme }}fonts/source-sans-pro/sourcesanspro-regular-webfont.woff2" as="font" crossorigin="anonymous">
+  <link rel="preload" href="{{ location_theme }}fonts/source-sans-pro/sourcesanspro-bold-webfont.woff2" as="font" crossorigin="anonymous">
+  <link rel="preload" href="{{ location_theme }}fonts/source-sans-pro/sourcesanspro-italic-webfont.woff2" as="font" crossorigin="anonymous">
+  <link rel="preload" href="{{ location_theme }}fonts/merriweather/Latin-Merriweather-Bold.woff2" as="font" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ location_theme }}css/styles.css?{{ cacheBuster }}" media="all">
+
+  {% if not standalone_template %}
+    <link rel="stylesheet" href="{{ location_theme }}css/pattern-lab.css?{{ cacheBuster }}" media="all">
+
+    <!-- Begin Pattern Lab (Required for Pattern Lab to run properly) -->
+    {{ patternLabHead | raw }}
+    <!-- End Pattern Lab -->
+  {% else %}
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-L8ZB');</script>
     <!-- End Google Tag Manager -->
   {% endif %}
-
-  <!-- Begin Pattern Lab (Required for Pattern Lab to run properly) -->
-  {{ patternLabHead | raw }}
-  <!-- End Pattern Lab -->
 
 </head>
 <body class="{{ body_class }}" id="#top">
