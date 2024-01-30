@@ -72,20 +72,16 @@ export function getArrayOfScrolls(numRows) {
   const numScrolls = numRows / 15;
   for (let x = 0; x < numScrolls; x += 1) {
     const per = x * (100 / numScrolls);
-    // cy.task('log',numRows+' per: '+per)
     arr.push(per);
   }
   arr.push(100);
-  // cy.task('log','arr: '+arr)
   return arr;
 }
 
 export function countOccurencesInString(text, splitText) {
-  // cy.task('log', `first: ${text.indexOf(splitText)}`)
   const count = text.split(splitText).length;
   return count - 1;
 }
-
 
 export function findStringInArray(arr, substr) {
   let returnValue = false;
@@ -107,31 +103,7 @@ export function loginToDrupal(userNum) {
   });
 }
 
-export function logout(logoutMethod) {
-  switch (logoutMethod) {
-  case 'manage':
-    cy.get('body').then((pageBody) => {
-      if (pageBody.find('.toolbar-menu-administration').find('a:contains("Tools")').length === 0) {
-        cy.get('a:contains("Manage")', {timeout: 120000}).click();
-      }
-    }).then(() => {
-      cy.get('.toolbar-tray').contains('a', 'Tools').first().click({force: true});
-      cy.get('.toolbar-tray').contains('a', 'Logout').first().click({force: true});
-    });
-    break;
-  default:
-    cy.get('body').then((pageBody) => {
-      if (pageBody.find('.toolbar-tray').find('a:contains("Log out")').length === 0) {
-        cy.get('.toolbar-icon-user', {timeout: 120000}).click();
-      }
-    }).then(() => {
-      cy.get('.toolbar-tray').contains('a', 'Log out').click();
-    });
-    break;
-  }
-}
-
-export function loginToDrupalOld(userNum) {
+export function loginToDrupalUser(userNum) {
   cy.visit('/user').then(() => {
     cy.get('body').then((pageBody) => {
       if (pageBody.find('button:contains("Login with User")').length > 0) {
@@ -172,6 +144,29 @@ export function enterCredentials(userNum) {
     });
 }
 
+export function logout(logoutMethod) {
+  switch (logoutMethod) {
+  case 'manage':
+    cy.get('body').then((pageBody) => {
+      if (pageBody.find('.toolbar-menu-administration').find('a:contains("Tools")').length === 0) {
+        cy.get('a:contains("Manage")', {timeout: 120000}).click();
+      }
+    }).then(() => {
+      cy.get('.toolbar-tray').contains('a', 'Tools').first().click({force: true});
+      cy.get('.toolbar-tray').contains('a', 'Logout').first().click({force: true});
+    });
+    break;
+  default:
+    cy.get('body').then((pageBody) => {
+      if (pageBody.find('.logout').length === 0) {
+        cy.get('.toolbar-icon-user', {timeout: 120000}).click();
+      }
+    }).then(() => {
+      cy.get('.logout').find('a').click();
+    });
+    break;
+  }
+}
 
 //* **********************************New Content methods*************************************************** */
 
@@ -301,6 +296,7 @@ export function setPageFields(currentItem) {
               if (currentField.fieldType === 'dialog') {
                 cy.get('body').then(() => {
                   cy.wrap(currentSection).find(currentField.fieldName).eq(currentField.fieldIndex).click();
+                  // eslint-disable-next-line cypress/no-unnecessary-waiting
                   cy.wait(2000);
                 }).then(() => {
                   setupDialog(currentField, currentField.dialogId);
@@ -325,6 +321,7 @@ export function setPageFields(currentItem) {
               if (currentField.fieldType === 'dialog') {
                 cy.get('body').then(() => {
                   cy.wrap(currentPageSection).find(currentField.fieldName).eq(currentField.fieldIndex).click();
+                  // eslint-disable-next-line cypress/no-unnecessary-waiting
                   cy.wait(2000);
                 }).then(() => {
                   setupDialog(currentField, currentField.dialogId);
@@ -363,7 +360,8 @@ export function setFieldValue(currentElement, currentField) {
       break;
     case 'button':
     case 'radio':
-      cy.wrap(currentItem).click({force: true});
+      cy.wrap(currentItem, {timeout: 60000}).click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(1000);
       break;
     case 'iframe':
@@ -392,14 +390,12 @@ export function setFieldValue(currentElement, currentField) {
     case 'autocomplete':
       cy.get('body').then(() => {
         cy.wrap(currentItem).type(currentField.fieldValue);
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(1000);
       }).then(() => {
         cy.get('.ui-autocomplete:visible').find('a').first().click();
       });
-
-
       break;
-
     case 'date':
     case 'time':
     case 'datetime':
@@ -411,7 +407,6 @@ export function setFieldValue(currentElement, currentField) {
       }).then(() => {
         cy.wrap(currentItem).type(currentField.fieldValue);
       });
-
       break;
     }
   });
@@ -529,6 +524,7 @@ export function selectTextInElement(currentElement, formatObject) {
     cy.wrap(currentElement).find('.cke_wysiwyg_frame').then((currentIframe) => {
       cy.wrap(currentIframe.contents()).find('body').then((currentObject) => {
         cy.wrap(currentObject).setSelection(formatObject.startSelection, formatObject.endSelection);
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(1000);
       });
     });
@@ -579,6 +575,7 @@ export function setFormatting(currentObject, formatObject) {
       cy.get('body').then(() => {
         cy.wrap(currentObject).find('.cke_toolbox').find(`a:contains("${formatObject.formatType}")`).click();
       }).then(() => {
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(3000);
       }).then(() => {
         cy.get('body').then((pageBody) => {
@@ -647,7 +644,9 @@ export function setDialogElement(currentObject, currentSetting) {
     cy.wrap(currentObject).find(`a:contains("${currentSetting.fieldName}"):visible`).click();
     break;
   case 'click':
-    cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).click().wait(2000);
+    cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).click();
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
     break;
   default:
     cy.get('body').then(() => {
