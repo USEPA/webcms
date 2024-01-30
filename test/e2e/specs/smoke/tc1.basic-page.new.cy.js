@@ -181,12 +181,8 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Latest Revisions")').click();
     }).then(() => {
-      cy.get('.views-table').find('tbody').find('a').each((currentLink) => {
-        if (currentLink.text().toLowerCase() === pageTitle.toLowerCase()) {
-          cy.wrap(currentLink).click();
-          return false;
-        }
-      });
+      cy.get('.views-table').find('tbody').find('a:contains("pageTitle")').first()
+        .click();
     }).then(() => {
       verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
