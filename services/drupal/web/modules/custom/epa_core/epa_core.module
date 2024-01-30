@@ -560,7 +560,13 @@ function epa_core_field_widget_complete_form_alter(array &$element, FormStateInt
       if (empty($element['widget'][0]['#description'])) {
         $element['widget'][0]['#description'] = '';
       }
-      _epa_core_augment_datetime_description($element['widget'][0]['#description']);
+
+      // Adjust the description if the field is a datetime field vs. just a date field.
+      /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
+      $items = $context['items'];
+      if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
+        _epa_core_augment_datetime_description($element['widget'][0]['#description']);
+      }
     }
   }
 
