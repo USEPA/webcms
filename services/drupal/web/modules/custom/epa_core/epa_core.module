@@ -669,6 +669,36 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
       ],
     ];
   }
+  if ($element['#paragraph_type'] == 'locations_of_prop_actions') {
+    $terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties([
+        'name' => 'Other',
+        'vid' => 'geographic_locations',
+      ]);
+
+    if (!empty($terms)) {
+      // If multiple terms are found with the same name, this will take the first one.
+      $term = reset($terms);
+      $term_id = $term->id();
+
+      /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+      $field_definition = $context['items']->getFieldDefinition();
+      $paragraph_entity_reference_field_name = $field_definition->getName();
+      $dependee_field_name = 'field_state_or_territory';
+      // Need to build specific selector to handle multiple card groups.
+      $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $paragraph_entity_reference_field_name, $element['#delta'], $dependee_field_name);
+
+      $element['subform']['field_location_proposed_other']['#states'] = [
+        'visible' => [
+          $selector => ['value' => $term_id]
+        ],
+        'invisible' => [
+          $selector => ['!value' => $term_id]
+        ],
+      ];
+    }
+  }
 }
 
 /**
