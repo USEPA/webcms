@@ -197,21 +197,55 @@ describe(formatFile.testCaseName, () => {
     });
   });
 
+  it('Delete a Revision', () => {
+    cy.get('body').then(() => {
+      cy.get('.diff-revisions').find('tbody').find('tr:contains("Unpublish a published page")').should('exist');
+    }).then(() => {
+      cy.get('.diff-revisions').find('tbody').find('tr:contains("Unpublish a published page")').first()
+        .find('.dropbutton-toggle')
+        .first()
+        .find('button')
+        .first()
+        .click();
+      cy.get('a:contains("Delete"):visible').first().click();
+    }).then(() => {
+      cy.get('.form-actions').find('[value="Delete"]').should('have.length.gte', 1);
+      cy.get('.form-actions').find('[value="Delete"]').click();
+    })
+      .then(() => {
+        cy.get('.button-group').find('a:contains("Revisions")').click();
+      })
+      .then(() => {
+        cy.get('.diff-revisions').find('tbody').find('tr:contains("Unpublish a published page")').should('not.exist');
+      });
+  });
+
+
   it('Bulk Publish', () => {
     cy.get('body').then(() => {
-      cy.get('.block').find('a:contains("Group Dashboard")').click();
+      cy.get('nav').find('a:contains("My Web Areas")').first().click();
+      cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
+    }).then(() => {
+      cy.get('[id="edit-moderation-state-1"]').select('Draft');
+      cy.get('[value=Filter]').click();
     }).then(() => {
       cy.get('tr:contains("Revisions Test")').first().find('input').first()
         .check();
       cy.get('tr:contains("Bulk Publish Test")').first().find('input').first()
         .check();
-    }).then(() => {
-      cy.get('.form-type-select:contains("Action")').find('select').select('Set to Published');
-      cy.get('.js-form-item-workflow-508-compliant').find('input').check();
-      cy.get('[value="Apply to selected items"]').first().click();
     })
       .then(() => {
+        cy.get('.form-type-select:contains("Action")').find('select').select('Set to Published');
+        cy.get('.js-form-item-workflow-508-compliant').find('input').check();
+        cy.get('[value="Apply to selected items"]').first().click();
+      })
+      .then(() => {
         cy.get('.messages').should('contain.text', 'Set to Published was applied to 2 items.');
+        cy.get('[value=Reset]').click();
+      })
+      .then(() => {
+        cy.get('nav').find('a:contains("My Web Areas")').first().click();
+        cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
         cy.get('tbody').find('tr:contains("Revisions Test")').first().find('.views-field-moderation-state')
           .should('contain.text', 'Published');
         cy.get('tbody').find('tr:contains("Revisions Test")').first().find('.views-field-moderation-state-1')
@@ -223,12 +257,3 @@ describe(formatFile.testCaseName, () => {
       });
   });
 });
-
-
-/*
-
-"Delete a web area node or revisions as a non-super user (use one of the ""test#_drupal"" accounts).
-NOTE: web area home page is what we're talking about here; not a child page in a web area.
-
-
-*/
