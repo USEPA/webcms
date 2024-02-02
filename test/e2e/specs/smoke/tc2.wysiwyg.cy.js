@@ -5,7 +5,7 @@ import {
 
 const formatFile = require('../../fixtures/wysiwyg.json');
 
-// TODO: Add this back to JSON file when definitions is working.  currently does not bring up data 
+// TODO: Add this back to JSON file when definitions is working.  currently does not bring up data
 /*
 
           {

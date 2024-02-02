@@ -44,7 +44,7 @@ describe('TC1 - Basic Page: SuperUser', () => {
     });
 
     it(`${currentItem.section} - ${currentItem.itemName} - Remove the section`, () => {
-      removePageSection(currentItem, 0);
+      removePageSection(currentItem);
     });
   });
 

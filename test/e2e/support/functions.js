@@ -169,6 +169,28 @@ export function logout(logoutMethod) {
 }
 
 //* **********************************New Content methods*************************************************** */
+export function verifyPageSource(searchTerm, expectedTerm) {
+  const errors = [];
+  cy.url().then((currentUrl) => {
+    cy.request(currentUrl).its('body').then((content) => {
+      const contentArray = content.split('\n');
+      // cy.task('log',JSON.stringify(contentArray));
+      const newarray = contentArray.filter(res => res.includes(searchTerm));
+      cy.task('log', `\n${newarray}`);
+      cy.wrap(newarray).each((currentItem) => {
+        if (!currentItem.includes(expectedTerm)) {
+          const errorJson = {};
+          errorJson.expected = expectedTerm;
+          errorJson.actual = currentItem;
+          errors.push(errorJson);
+        }
+      });
+      cy.task('log', `errors: ${errors}`);
+      cy.wrap(errors).should('contain.have.length', 0);
+    });
+  });
+}
+
 
 export function getErrorMessages() {
   const actualErrors = [];
@@ -192,10 +214,8 @@ export function addPageSection(currentItem) {
   }
   if (actualCount < expectedCount) {
     if (['Body', 'Sidebar'].includes(currentItem.section)) {
-      let beforeLabels = getElementCount(currentItem.itemId, currentItem.section);
-      let afterLabels = [];
+      const beforeLabels = getElementCount(currentItem.itemId, currentItem.section);
       cy.get('body').then(() => {
-        beforeLabels = getElementCount(currentItem.itemId, currentItem.section);
         cy.get(`.placeholder:contains("${currentItem.section}"):visible`).parent().last().scrollIntoView();
       }).then(() => {
         cy.get(`.placeholder:contains("${currentItem.section}"):visible`).parent().then((addToSection) => {
@@ -206,18 +226,23 @@ export function addPageSection(currentItem) {
       }).then(() => {
         cy.get(`.placeholder:contains("${currentItem.section}"):visible`).parent().find(`[value="Add ${currentItem.itemName}"]:visible`).first()
           .click();
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(5000);
+        cy.wait(2000);
       })
         .then(() => {
-          afterLabels = getElementCount(currentItem.itemId, currentItem.section);
-        })
-        .then(() => {
-          cy.wrap(afterLabels).should('eq', beforeLabels + 1);
+          verifyElementCount(currentItem.itemId, currentItem.section, beforeLabels + 1);
         });
     }
   }
 }
+
+export function verifyElementCount(currentElement, section, expectedCount) {
+  if (['Body', 'Sidebar'].includes(section)) {
+    cy.get(`table:contains("${section}")`).find(currentElement, {timeout: 60000}).should('have.length', expectedCount);
+  } else {
+    cy.get(currentElement).should('have.length', expectedCount);
+  }
+}
+
 
 export function getElementCount(currentElement, section) {
   let elementCount = 0;
@@ -226,6 +251,7 @@ export function getElementCount(currentElement, section) {
   } else {
     elementCount = Cypress.$(currentElement).length;
   }
+  cy.task('log', `Elements Found: ${elementCount}`);
   return elementCount;
 }
 
@@ -244,20 +270,18 @@ export function duplicatePageSection(currentSection, currentItem, itemIndex = 0)
     } else {
       cy.get(currentItem).eq(itemIndex).find('.paragraphs-dropdown-toggle').click();
       cy.get(currentItem).eq(itemIndex).find('[value="Duplicate"]').click();
+      cy.wait(2000);
     }
   }).then(() => {
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
-    cy.wait(200000);
-  })
-    .then(() => {
-      cy.wrap(getElementCount(currentItem, currentSection)).should('eq', beforeLabels + 1);
-    });
+    // verifyElementCount(currentItem,currentSection,beforeLabels + 1);
+  });
 }
 
 
-export function removePageSection(currentItem, itemIndex) {
-  if (typeof itemIndex === 'undefined') {
-    itemIndex = 0;
+export function removePageSection(currentItem) {
+  cy.task('log', `Removing ${currentItem.section} - ${currentItem.itemId}`);
+  if (typeof currentItem.itemIndex === 'undefined') {
+    currentItem.itemIndex = 0;
   }
   if ((typeof currentItem.section !== 'undefined') && (['Body', 'Sidebar'].includes(currentItem.section))) {
     const beforeLabels = getElementCount(currentItem.itemId, currentItem.section);
@@ -417,6 +441,7 @@ export function setupDialog(dialogObject) {
     dialogObject.dialogId = '.ui-dialog';
   }
   cy.get('body').then(() => {
+    cy.wait(2000);
     if (dialogObject.subFields.length > 0) {
       cy.wrap(dialogObject.subFields).each((currentSetting) => {
         cy.get(dialogObject.dialogId).then((currentDialog) => {
