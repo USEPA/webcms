@@ -333,78 +333,117 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     'paragraph_revision__' => 'paragraphs_item_revision'
   ];
   foreach ($prefixes as $table_prefix => $item_table) {
+    // It seems there is some issue that there are multiple revisions of the same paragraph in the same table
+    // Going to delete those records first
     $item_table = $item_table . '_field_data';
 
-    // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
     $field_table = $table_prefix . 'field_image_style';
-    $missing_image_styles_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+
+    // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
+    $missing_image_styles_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.id = i.entity_id AND p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
     foreach ($missing_image_styles_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card_group',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
-          'field_image_style_value' => 'exdent'
-        ])->execute();
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card_group',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_image_style_value' => 'exdent'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
       }
       else {
         // Record does exist but is null, run update instead.
-        $database->update($field_table)->fields([
-          'field_image_style_value' => 'exdent'
-        ])->execute();
+        try {
+          $database->update($field_table)->fields([
+            'field_image_style_value' => 'exdent'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+
       }
     }
 
     // Update all card_group paragraph revision and non-revision items to set field_title_placement if a value is not already set.
     $field_table = $table_prefix . 'field_title_placement';
-    $missing_title_placement_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+
+    $missing_title_placement_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
     foreach ($missing_title_placement_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card_group',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
-          'field_title_placement_value' => 'media-first'
-        ])->execute();
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card_group',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_title_placement_value' => 'media-first'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
       }
       else {
         // Record does exist but is null, run update.
-        $database->update($field_table)->fields([
-          'field_title_placement_value' => 'media-first'
-        ])->execute();
+        try {
+          $database->update($field_table)->fields([
+            'field_title_placement_value' => 'media-first'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
       }
 
     }
 
     // Update all card paragraph revision and non-revision items to set field_flag_card_alignment if a value is not already set.
     $field_table = $table_prefix . 'field_flag_card_alignment';
-    $missing_flag_alignment_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+    $missing_flag_alignment_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
     foreach ($missing_flag_alignment_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_flag_card_alignment_value' => 'default'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
+      }
+    else {
+      // Record does exist but is null, run update.
+      try {
+        $database->update($field_table)->fields([
           'field_flag_card_alignment_value' => 'default'
         ])->execute();
       }
-    else {
-        // Record does exist but is null, run update.
-      $database->update($field_table)->fields([
-        'field_flag_card_alignment_value' => 'default'
-      ])->execute();
+      catch (\Exception $e) {
+        \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+      }
+
       }
     }
   }

@@ -165,7 +165,7 @@ content:
     third_party_settings: {  }
   field_compliance:
     type: text_textarea
-    weight: 11
+    weight: 12
     region: content
     settings:
       rows: 5
@@ -252,16 +252,6 @@ content:
       create_new_levels: false
       force_deepest: false
     third_party_settings: {  }
-  field_hublinks:
-    type: entity_reference_autocomplete
-    weight: 12
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete_tags
     weight: 11
@@ -306,10 +296,11 @@ content:
     third_party_settings: {  }
   field_meta_tags:
     type: metatag_firehose
-    weight: 50
+    weight: 21
     region: content
     settings:
       sidebar: true
+      use_details: true
     third_party_settings: {  }
   field_owning_office:
     type: entity_reference_autocomplete_tags
@@ -383,7 +374,7 @@ content:
       display_label: true
     third_party_settings: {  }
   simple_sitemap:
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -425,6 +416,7 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
+  field_hublinks: true
   field_is_searchable_collection: true
   field_last_published: true
   field_review_deadline: true
