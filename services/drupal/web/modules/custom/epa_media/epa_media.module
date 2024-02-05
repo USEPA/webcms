@@ -168,7 +168,12 @@ function epa_media_form_media_form_alter(&$form, FormStateInterface $form_state,
       }
     }
   }
+  if (isset($form['replace_file']['keep_original_filename']['#description'])) {
+    $form['replace_file']['keep_original_filename']['#description'] = "<ul><li>If checked, the system will use the original filename and replace the file’s contents. The file’s web address (aka URL) will remain the same. You might not see the updated content of overwritten files immediately because they can be externally cached.</li>
+    <li>If unchecked, the system will use the filename of the replacement file and create a new file. The file’s web address (aka URL) will be updated. The original file may be deleted if it is not referenced elsewhere in the WebCMS.</li></ul>";
+  }
 }
+
 
 /**
  * Implements hook_preprocess_HOOK().
