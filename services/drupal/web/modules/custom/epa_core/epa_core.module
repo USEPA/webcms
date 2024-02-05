@@ -520,6 +520,12 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       $form["owner_uid"]["#size"] = "60";
     }
   }
+// Hide "Exclude - Cloned" option in the entity clone form
+  if ($form_id === 'entity_clone_form') {
+      if (isset($form['no_suffix'])) {
+        $form['no_suffix']['#access'] = FALSE;
+      }
+  }
 }
 
 /**
