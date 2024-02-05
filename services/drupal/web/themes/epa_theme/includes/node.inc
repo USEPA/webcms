@@ -219,7 +219,7 @@ function _add_webarea_contact_link($entity, &$variables) {
     $webform = $group->get('field_contact_us_form')->referencedEntities();
     $webform = reset($webform);
     // Only apply the variable if the link isn't to itself.
-    if ($webform && ($entity->id() !== $webform->id()) && $entity->bundle() !== $webform->bundle()) {
+    if ($webform && ($entity->id() !== $webform->id())) {
       $variables['webarea_contact_link'] = $webform->toLink()->toRenderable();
     }
   }
