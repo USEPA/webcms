@@ -25,6 +25,9 @@ RUN set -ex \
 
 FROM php:8.1-fpm-alpine AS base
 
+# Bump system packages
+RUN apk upgrade
+
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base extensions needed for Drupal
@@ -49,7 +52,7 @@ WORKDIR /var/www/html
 # not configure the extension here. That must happen at runtime since the license keys
 # and application names are environment-dependent.
 RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.15.0.4 \
+  && NEW_RELIC_AGENT_VERSION="$(curl -s https://download.newrelic.com/php_agent/release/ | awk -F- '/linux-musl/ { print $3 }')" \
   && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
   && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
@@ -222,6 +225,9 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 # as well as its configuration file.
 FROM nginx:mainline-alpine AS nginx
 
+# Bump system packages
+RUN apk upgrade
+
 # Copy the Drupal filesystem into this image
 COPY --from=drupal /var/www/html /var/www/html
 
@@ -240,6 +246,9 @@ CMD [ "nginx", "-g", "daemon off;" ]
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
 FROM php:8.1-cli-alpine AS drush
+
+# Bump system packages
+RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
@@ -264,7 +273,8 @@ WORKDIR /var/www/html
 
 # Download and install New Relic
 RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.15.0.4 \
+  # Discover the latest version dynamically
+  && NEW_RELIC_AGENT_VERSION="$(curl -s https://download.newrelic.com/php_agent/release/ | awk -F- '/linux-musl/ { print $3 }')" \
   && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
   && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
   && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
