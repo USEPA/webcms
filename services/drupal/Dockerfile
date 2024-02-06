@@ -28,7 +28,7 @@ FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS base
 # Bump system packages
 RUN apk upgrade
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=public.ecr.aws/docker/library/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base extensions needed for Drupal
 RUN set -ex \
@@ -250,7 +250,7 @@ FROM public.ecr.aws/docker/library/php:8.1-cli-alpine AS drush
 # Bump system packages
 RUN apk upgrade
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+COPY --from=public.ecr.aws/docker/library/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base PHP extensions for Drupal as well as tools needed for Drush CLI operations
 RUN set -ex \
