@@ -193,6 +193,11 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     case 'node_commentary_edit_form':
       $form['field_type']['#access'] = FALSE;
       break;
+
+    case 'node_public_notice_edit_form':
+      // Custom validation to check proposed location.
+      $form['#validate'][] = 'epa_core_location_proposed_other_validate';
+      break;
   }
 }
 
@@ -701,6 +706,30 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
   }
 }
 
+/**
+ * Custom validation for Public Notices to check proposed location.
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *
+ * @return void
+ */
+function epa_core_location_proposed_other_validate (&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $paragraphs = $form_state->getValue(['field_locations_of_prop_actions']);
+  if (!empty($paragraphs)) {
+    foreach ($paragraphs as $paragraph) {
+      if (isset($paragraph['subform']['field_state_or_territory'])) { // 'subform' contains the fields of the paragraph
+        $trigger_field_value = $paragraph['subform']['field_state_or_territory'][0]['target_id'];
+        $term = Term::load($trigger_field_value);
+        $term_name = $term->getName();
+      }
+    }
+  }
+  // Check if Other is selected.
+  if ($term_name == 'Other') {
+    $form_state->setErrorByName('field_locations_of_prop_actions', t('Please enter other location of proposed actions'));
+  }
+
+}
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
