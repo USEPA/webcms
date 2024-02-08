@@ -169,6 +169,17 @@ export function logout(logoutMethod) {
 }
 
 //* **********************************New Content methods*************************************************** */
+export function navigateToWebArea(webArea) {
+  cy.get('nav').find('a:contains("My Web Areas")').first().click();
+  cy.get('.block:contains("My Web Areas")').find(`a:contains("${webArea}"):visible`).first().click();
+}
+
+export function addContent(contentType) {
+  cy.contains('a', 'Add new content').click();
+  cy.get('.admin-list').contains('a', contentType).click();
+  cy.get('.page-title').should('contain.text', `Add Web Area: Group node (${contentType})`);
+}
+
 export function verifyPageSource(searchTerm, expectedTerm) {
   const errors = [];
   cy.url().then((currentUrl) => {
@@ -186,7 +197,7 @@ export function verifyPageSource(searchTerm, expectedTerm) {
         }
       });
       cy.task('log', `errors: ${errors}`);
-      cy.wrap(errors).should('contain.have.length', 0);
+      cy.wrap(errors).should('have.length', 0);
     });
   });
 }
@@ -226,6 +237,7 @@ export function addPageSection(currentItem) {
       }).then(() => {
         cy.get(`.placeholder:contains("${currentItem.section}"):visible`).parent().find(`[value="Add ${currentItem.itemName}"]:visible`).first()
           .click();
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
         cy.wait(2000);
       })
         .then(() => {
@@ -256,25 +268,25 @@ export function getElementCount(currentElement, section) {
 }
 
 export function duplicatePageSection(currentSection, currentItem, itemIndex = 0) {
-  let beforeLabels = 0;
-  cy.get('body').then(() => {
-    beforeLabels = getElementCount(currentItem, currentSection);
-  }).then(() => {
-    if ((typeof currentSection !== 'undefined') && (['Body', 'Sidebar'].includes(currentSection))) {
+  if ((typeof currentSection !== 'undefined') && (['Body', 'Sidebar'].includes(currentSection))) {
+    let beforeLabels = 0;
+    cy.get('body').then(() => {
+      beforeLabels = getElementCount(currentItem, currentSection);
+    }).then(() => {
       cy.get(`.field-label:contains("${currentSection}")`).parents('table').find(currentItem).eq(itemIndex)
         .find('.paragraphs-dropdown-toggle')
         .click();
+    }).then(() => {
       cy.get(`.field-label:contains("${currentSection}")`).parents('table').find(currentItem).eq(itemIndex)
         .find('[value="Duplicate"]')
         .click();
-    } else {
-      cy.get(currentItem).eq(itemIndex).find('.paragraphs-dropdown-toggle').click();
-      cy.get(currentItem).eq(itemIndex).find('[value="Duplicate"]').click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(2000);
-    }
-  }).then(() => {
-    // verifyElementCount(currentItem,currentSection,beforeLabels + 1);
-  });
+    })
+      .then(() => {
+        verifyElementCount(currentItem, currentSection, beforeLabels + 1);
+      });
+  }
 }
 
 
@@ -361,6 +373,47 @@ export function setPageFields(currentItem) {
   }
 }
 
+export function addWebformElements(webformElements) {
+  cy.get('body').then(() => {
+    cy.wrap(webformElements).each((currentElement) => {
+      cy.get('a:contains("Add element")').click();
+      cy.get(`tr:contains("${currentElement.elementType}")`).first().find('a:contains("Add element")').click();
+      setWebformFields(currentElement);
+    });
+  }).then(() => {
+    cy.get('[value="Save elements"]').click();
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(2000);
+  });
+}
+
+export function setWebformFields(webformFields) {
+  cy.wrap(webformFields.elementDetails).each((currentTab) => {
+    cy.get('body').then(() => {
+      cy.get('.webform-tabs-item-list').find(`a:contains("${currentTab.tabName}")`).click();
+    }).then(() => {
+      cy.wrap(currentTab.sections).each((currentSection) => {
+        let currentElement = currentTab.tabId;
+        if ((typeof currentSection.sectionId !== 'undefined') && (currentSection.sectionId.length !== 0)) {
+          currentElement = currentSection.sectionId;
+          cy.get(currentSection.sectionId).click();
+        }
+        cy.wrap(currentSection.fields).each((currentField) => {
+          if (typeof currentField.fieldIndex === 'undefined') {
+            currentField.fieldIndex = 0;
+          }
+          cy.get(currentElement).then((fieldElement) => {
+            setFieldValue(fieldElement, currentField);
+          });
+        });
+      });
+    }).then(() => {
+      cy.get('[id=drupal-off-canvas]').find('[data-drupal-selector=edit-submit]').click();
+      cy.get(`tr:contains("${webformFields.elementName}")`).should('exist');
+    });
+  });
+}
+
 export function setFieldValue(currentElement, currentField) {
   cy.wrap(currentElement).find(currentField.fieldName).eq(currentField.fieldIndex).then((currentItem) => {
     switch (currentField.fieldType) {
@@ -430,6 +483,8 @@ export function setFieldValue(currentElement, currentField) {
         cy.wrap(currentItem).click();
       }).then(() => {
         cy.wrap(currentItem).type(currentField.fieldValue);
+        // eslint-disable-next-line cypress/no-unnecessary-waiting
+        cy.wait(2000);
       });
       break;
     }
@@ -441,6 +496,7 @@ export function setupDialog(dialogObject) {
     dialogObject.dialogId = '.ui-dialog';
   }
   cy.get('body').then(() => {
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000);
     if (dialogObject.subFields.length > 0) {
       cy.wrap(dialogObject.subFields).each((currentSetting) => {

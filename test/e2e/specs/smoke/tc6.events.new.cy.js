@@ -6,8 +6,6 @@ import {
 
 const formatFile = require('../../fixtures/eventsNew.json');
 
-let pageTitle = 'old news';
-
 describe('TC6 - Events', () => {
   Cypress.on('uncaught:exception', (_err, _runnable) => false);
   before(() => {
@@ -16,7 +14,6 @@ describe('TC6 - Events', () => {
 
   beforeEach(() => {
     cy.preserveAllCookiesOnce();
-    cy.wrap(pageTitle).as('pageTitle');
   });
 
   it(`Add New ${formatFile.contentType}`, () => {
@@ -49,21 +46,13 @@ describe('TC6 - Events', () => {
 
   it('Duplicate HTML Section', () => {
     duplicatePageSection('Body', '.paragraph-type--html', 0);
-    cy.wait(2000);
   });
 
   it('Save after entering all required information', () => {
     cy.get('body').then(() => {
-      cy.get('.field--name-title').find('input').then((titleField) => {
-        // pageTitle = titleField.val().trim();
-        pageTitle = 'This is a test event title';
-        cy.wrap(pageTitle).as('pageTitle');
-      });
+      cy.get('[data-drupal-selector="edit-actions"]').find('input').first().click({force: true});
     }).then(() => {
-      cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
-        .click({force: true});
-    }).then(() => {
-      cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${pageTitle} has been created.`);
+      cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been created.`);
     });
   });
 
@@ -81,6 +70,7 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("View"):visible').first().click();
     }).then(() => {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(2000);
       verifyPageElements(formatFile.expected);
     });
@@ -92,7 +82,6 @@ describe('TC6 - Events', () => {
     verifyPageSource('DC.date.reviewed', getTodayDate('yyyy-MM-dd'), (60000 * 60 * 24 * 90));
   });
 
-
   it(`Edit ${formatFile.contentType}`, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Edit"):visible').first().click();
@@ -103,7 +92,7 @@ describe('TC6 - Events', () => {
     }).then(() => {
       cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
         .click();
-      cy.get('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${pageTitle} has been updated.`);
+      cy.get('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been updated.`);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
@@ -133,8 +122,8 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Group Dashboard"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Published');
     });
   });
 
@@ -142,17 +131,17 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Published Content"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
     });
   });
 
   it('Clone the page', () => {
     cy.get('body').then(() => {
-      cy.get(`a:contains("${pageTitle}"):visible`).first().click();
+      cy.get(`a:contains("${formatFile.pageTitle}"):visible`).first().click();
       cy.get('a:contains("Clone"):visible').first().click();
       cy.get('[value="Clone"]').first().click();
     }).then(() => {
-      cy.get('.usa-alert__text').should('contain.text', `The entity ${pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', `The entity ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'of type node was cloned.');
       cy.get('.field--tight:contains("Moderation state")').should('contain.text', 'Draft');
       verifyPageElements(formatFile.expected);
@@ -174,8 +163,8 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Group Dashboard"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Draft');
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Draft');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Draft');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Draft');
     });
   });
 
@@ -183,7 +172,7 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Published Content"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).should('not.exist');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).should('not.exist');
     });
   });
 
@@ -191,7 +180,8 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Latest Revisions")').click();
     }).then(() => {
-      cy.get('.views-table').find('tbody').find(`a:contains("${pageTitle}")`).click();
+      cy.get('.views-table').find('tbody').find(`a:contains("${formatFile.pageTitle}")`).first()
+        .click();
     }).then(() => {
       verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
@@ -202,11 +192,11 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('nav').find('a:contains("My Web Areas")').first().click();
       cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
-      cy.get(`a:contains("Cloned: ${pageTitle}"):visible`).first().click();
+      cy.get(`a:contains("Cloned: ${formatFile.pageTitle}"):visible`).first().click();
       cy.get('a:contains("Delete"):visible').first().click();
       cy.get('[value="Delete"]').first().click();
     }).then(() => {
-      cy.get('.usa-alert__text').should('contain.text', `The Event Cloned: ${pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', `The Event Cloned: ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'has been deleted.');
     });
   });
@@ -215,11 +205,11 @@ describe('TC6 - Events', () => {
     cy.get('body').then(() => {
       cy.get('nav').find('a:contains("My Web Areas")').first().click();
       cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
-      cy.get(`a:contains("${pageTitle}"):visible`).first().click();
+      cy.get(`a:contains("${formatFile.pageTitle}"):visible`).first().click();
       cy.get('a:contains("Delete"):visible').first().click();
       cy.get('[value="Delete"]').first().click();
     }).then(() => {
-      cy.get('.usa-alert__text').should('contain.text', `The Event ${pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', `The Event ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'has been deleted.');
     });
   });
