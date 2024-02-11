@@ -10,11 +10,16 @@ import Drupal from 'drupal';
         const sideNavTrigger = context.querySelector('.web-area-menu__button');
         const sideNavOverlay = context.querySelector('.menu-sidenav__overlay');
         const blockWebArea = context.getElementById('block-webareamenu');
+        const sideNavContact = context.getElementById('menu-sidenav__contact');
         let focusable;
         let numberFocusElements;
         let firstFocusableElement;
         let lastFocusableElement;
         let priorLastElement;
+
+        const sideNavContactClone = sideNavContact.cloneNode(true);
+        sideNavContactClone.classList.add('-mobile');
+        sideNavMenu.append(sideNavContactClone);
 
         function toggleVisiblity() {
           pageBody.classList.toggle('menu-sidenav--active');
