@@ -8,7 +8,13 @@
 .box {
   margin-bottom: rem(units(4));
   max-width: 100%;
-  overflow: auto;
+  overflow: visible;
+
+  &:before,
+  &:after {
+    clear: both;
+    content: '';
+  }
 
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
