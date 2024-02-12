@@ -48,22 +48,6 @@ resource "aws_ecs_task_definition" "drush_task" {
         }
       }
     },
-
-    # Attach the New Relic PHP daemon
-    {
-      name  = "newrelic"
-      image = "${data.aws_ssm_parameter.ecr_newrelic.value}:latest"
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.newrelic_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "newrelic"
-        }
-      }
-    },
   ])
 
   tags = var.tags
