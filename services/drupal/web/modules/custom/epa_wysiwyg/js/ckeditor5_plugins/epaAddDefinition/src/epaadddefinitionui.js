@@ -63,11 +63,8 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     const model = this.editor.model;
     const selection = model.document.selection;
-    console.log({ selection });
+
     const range = selection.getFirstRange();
-    // console.log('range: ', range);
-    // range.end.offset gives the index at which the selection ends _within_ the parent node
-    // console.log('getRanges()', selection.getRanges());
 
     // Skip if there's no selection
     if (range && range.isCollapsed) {
@@ -89,23 +86,18 @@ export default class EpaAddDefinitionUI extends Plugin {
       return;
     }
 
-    const userInputList = userInput && userInput
-      .replaceAll(/[?!.]+/g, "")
-      .split(" ")
-      .filter((word) => word !== " " && word !== "")
-      .join(", ");
-    // console.log('📠', userInputList);
-
-    // the start and end Position for each word the use highlighted (this will be used to generate the Range)
-    const words = userInputList.split(", ");
-    const positions = [];
+    const words = userInput.split(" ");
+    const wordMaps = [];
     words.forEach(word => {
       const index = userInput.indexOf(word);
-      const startPosition = model.createPositionAt(model.document.getRoot(), index);
-      const endPosition = model.createPositionAt(model.document.getRoot(), index + word.length);
-      positions.push({start: startPosition, end: endPosition});
+      const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
+      const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + word.length);
+      const wordRange = model.createRange(startPosition, endPosition);
+      wordMaps.push({term: word.replaceAll(/[?!.]+/g, ""), start: startPosition, end: endPosition, range: wordRange});
     });
-    console.log('positions: ', positions);
+    // console.log('wordMaps: ', wordMaps);
+
+    const wordList = wordMaps.map(word => word.term).join(", ");
 
     let modalResult = null;
 
@@ -119,20 +111,14 @@ export default class EpaAddDefinitionUI extends Plugin {
       // Lock the editor as read-only while the user makes selections
       this.editor.enableReadOnlyMode(LOCK_ID);
 
-      if (userInputList) {
-        lookupResult = await lookupTerms(userInputList);
+      if (wordList) {
+        lookupResult = await lookupTerms(wordList);
         if (lookupResult === null) {
           return;
         }
       }
 
-      // const result = lookupResult.matches.find(
-      //   (match) => match.term === userInput.toLowerCase()
-      // );
-
-      // what if we just change it to this?
       const result = lookupResult ? lookupResult.matches : null;
-      // That works!  Except, now the markup is applied to the entire selection, not just the individual words.
 
       if (!result) {
         throw new IncompleteDefinitionError(
@@ -141,7 +127,7 @@ export default class EpaAddDefinitionUI extends Plugin {
       }
 
       modal.data = result;
-      // now instead of returning one set of results as an array, we return the entire array of results, so we don't need to wrap it in an array anymore
+
       modal.show();
 
       modalResult = await new Promise((resolve) => {
@@ -180,32 +166,29 @@ export default class EpaAddDefinitionUI extends Plugin {
       return;
     }
 
-    const selected = modal.listView.views.get(0);
-
     // This is the array of all the MatchViews for all the terms
-    console.log('SelectedArray', modal.listView.views._items)
-    // So, we need to loop through the SelectedArray, and apply the model.change() block for each one.
-    // How do we get range for each one?
-    // Option 1. Use a Marker Collection. Hmmmm....
-    // Option 2. Compare each term to the original string (userInput) and find the range for each one relative to that.
-
-    console.log('selected: ', selected);
+    const SelectedArray = modal.listView.views._items;
+    console.log('SelectedArray: ', SelectedArray);
 
     // this only happens after a definition is selected and _confirmed_ by clicking the green check mark button
-    if (range && selected) {
-      // selected.definitions is an array of the definitions for only the *first* term in the list
-      // selected.selected is the definition that was selected
+    if (SelectedArray) {
       model.change((writer) => {
-        // TODO: this block will need to be modified too, since term should not be userInput, but an individual word/term from the userInputList (`SelectedArray[i].term`), and definition should be one of the definitions (`SelectedArray[i].selected`).  In both of these, `i` is the index of the term in the userInputList
-        // TODO: call this block once for each term in the userInputList. Find the definition that matches the term
-        writer.remove(range);
-        // TODO: range will need to be evaluated differently.  Maybe we can use createRange https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_model-Model.html#function-createRange
-        // but we still need to pass it Positions.  We can get those from createPosition()
-        writer.insertElement(
-          "epaDefinition",
-          { term: userInput, definition: selected.selected },
-          range.start
-        );
+
+        for (const i in SelectedArray) {
+          // console.log('selection: ', SelectedArray[i]);
+          if (SelectedArray[i].selected) {
+            const wordMapMatch = wordMaps.find(word => word.term === SelectedArray[i].term);
+            // console.log('wordMapMatch: ', wordMapMatch);
+            const wordRange = wordMapMatch.range;
+            writer.remove(wordRange);
+            writer.insertElement(
+              "epaDefinition",
+              { term: SelectedArray[i].term, definition: SelectedArray[i].selected },
+              wordRange.start,
+            );
+          }
+        }
+
       });
     }
   }

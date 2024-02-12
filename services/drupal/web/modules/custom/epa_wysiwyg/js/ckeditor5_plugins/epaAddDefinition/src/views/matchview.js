@@ -35,7 +35,6 @@ export default class MatchView extends View {
     this.set("term", "");
     this.set("definitions", []);
     this.set("selected", "");
-    // TODO: maybe add the positions or range for the item here?
 
     const bind = this.bindTemplate;
 
