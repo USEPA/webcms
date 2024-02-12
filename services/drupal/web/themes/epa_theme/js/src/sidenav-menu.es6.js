@@ -70,7 +70,10 @@ import Drupal from 'drupal';
         });
 
         blockWebArea.addEventListener('keydown', event => {
-          if (event.key === 'Tab') {
+          if (
+            event.key === 'Tab' &&
+            sideNavMenu.classList.contains('is-visible')
+          ) {
             if (
               event.shiftKey &&
               document.activeElement === firstFocusableElement
