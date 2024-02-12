@@ -520,6 +520,12 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       $form["owner_uid"]["#size"] = "60";
     }
   }
+// Hide "Exclude - Cloned" option in the entity clone form
+  if ($form_id === 'entity_clone_form') {
+      if (isset($form['no_suffix'])) {
+        $form['no_suffix']['#access'] = FALSE;
+      }
+  }
 }
 
 /**
@@ -560,7 +566,13 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
       if (empty($element['#description'])) {
         $element['#description'] = '';
       }
-      _epa_core_augment_datetime_description($element['#description']);
+
+      // Adjust the description if the field is a datetime field vs. just a date field.
+      /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
+      $items = $context['items'];
+      if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
+        _epa_core_augment_datetime_description($element['#description']);
+      }
     }
   }
 
