@@ -38,11 +38,6 @@ steps:
       - docker tag amazon/cloudwatch-agent ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch
       - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-aws-cloudwatch
 
-      # New Relic PHP daemon (for APM)
-      - docker pull newrelic/php-daemon
-      - docker tag newrelic/php-daemon ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-newrelic-daemon
-      - docker push ${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-newrelic-daemon
-
     concurrency_group: $BUILDKITE_PIPELINE_SLUG/mirror-$BUILDKITE_BRANCH
     concurrency: 1
 
