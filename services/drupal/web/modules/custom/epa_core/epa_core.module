@@ -196,7 +196,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
 
     case 'node_public_notice_edit_form':
       // Custom validation to check proposed location.
-      $form['#validate'][] = 'epa_core_location_proposed_other_validate';
+      $form['#validate'][] = 'epa_core_location_proposed_other_form_validate';
       break;
   }
 }
@@ -713,22 +713,22 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
  *
  * @return void
  */
-function epa_core_location_proposed_other_validate (&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function epa_core_location_proposed_other_form_validate (&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   $paragraphs = $form_state->getValue(['field_locations_of_prop_actions']);
   if (!empty($paragraphs)) {
     foreach ($paragraphs as $paragraph) {
-      if (isset($paragraph['subform']['field_state_or_territory'])) { // 'subform' contains the fields of the paragraph
+      if (isset($paragraph['subform']['field_state_or_territory'])) {
         $trigger_field_value = $paragraph['subform']['field_state_or_territory'][0]['target_id'];
         $term = Term::load($trigger_field_value);
         $term_name = $term->getName();
+        $locations_of_prop_actions = $paragraph['subform']['field_location_proposed_other'][0]['value'];
+        // Check if Other is selected.
+        if ($term_name == 'Other' && empty($locations_of_prop_actions)) {
+          $form_state->setErrorByName('field_location_proposed_other', t('Please enter other location of proposed actions'));
+        }
       }
     }
   }
-  // Check if Other is selected.
-  if ($term_name == 'Other') {
-    $form_state->setErrorByName('field_locations_of_prop_actions', t('Please enter other location of proposed actions'));
-  }
-
 }
 /**
  * Implements hook_entity_bundle_field_info_alter().
