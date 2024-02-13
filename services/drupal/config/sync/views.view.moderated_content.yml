@@ -3168,41 +3168,83 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        uid_1:
-          id: uid_1
-          table: users_field_data
-          field: uid
-          relationship: uid
+        latest_revision:
+          id: latest_revision
+          table: node_revision
+          field: latest_revision
+          relationship: none
           group_type: group
           admin_label: ''
-          entity_type: user
-          entity_field: uid
+          entity_type: node
+          plugin_id: latest_revision
+          operator: '='
+          value: ''
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+        revision_uid:
+          id: revision_uid
+          table: node_revision
+          field: revision_uid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: revision_uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: uid_1_op
-            label: Author
-            description: ' '
+            operator_id: revision_uid_op
+            label: 'Last Updated By'
+            description: ''
             use_operator: false
-            operator: uid_1_op
+            operator: revision_uid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_1
+            identifier: revision_uid
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -3374,83 +3416,41 @@ display:
             group_items: {  }
           entity_type: group_content
           plugin_id: epa_web_areas_users_groups
-        latest_revision:
-          id: latest_revision
-          table: node_revision
-          field: latest_revision
-          relationship: none
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
           group_type: group
           admin_label: ''
-          entity_type: node
-          plugin_id: latest_revision
-          operator: '='
-          value: ''
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        revision_uid:
-          id: revision_uid
-          table: node_revision
-          field: revision_uid
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: revision_uid
+          entity_type: user
+          entity_field: uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: revision_uid_op
-            label: 'Last Updated By'
-            description: ''
+            operator_id: uid_1_op
+            label: Author
+            description: ' '
             use_operator: false
-            operator: revision_uid_op
+            operator: uid_1_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: revision_uid
+            identifier: uid_1
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
-              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
-              menu_admin: '0'
               administrator: '0'
-              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -4538,40 +4538,42 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        uid_1:
-          id: uid_1
-          table: users_field_data
-          field: uid
-          relationship: uid
+        revision_uid:
+          id: revision_uid
+          table: node_revision
+          field: revision_uid
+          relationship: none
           group_type: group
           admin_label: ''
-          entity_type: user
-          entity_field: uid
+          entity_type: node
+          entity_field: revision_uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: uid_1_op
-            label: Author
-            description: ' '
+            operator_id: revision_uid_op
+            label: 'Last Updated By'
+            description: ''
             use_operator: false
-            operator: uid_1_op
+            operator: revision_uid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_1
+            identifier: revision_uid
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
             reduce: false
           is_grouped: false
@@ -4783,6 +4785,54 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          entity_type: user
+          entity_field: uid
+          plugin_id: user_name
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_1_op
+            label: Author
+            description: ' '
+            use_operator: false
+            operator: uid_1_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
         moderation_state:
           id: moderation_state
           table: node_field_revision
@@ -4859,56 +4909,6 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        revision_uid:
-          id: revision_uid
-          table: node_revision
-          field: revision_uid
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: revision_uid
-          plugin_id: user_name
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: revision_uid_op
-            label: 'Last Updated By'
-            description: ''
-            use_operator: false
-            operator: revision_uid_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: revision_uid
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
