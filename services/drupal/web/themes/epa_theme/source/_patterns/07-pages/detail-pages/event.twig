@@ -1,9 +1,21 @@
 {% set header_info %}
-  {% include '@components/hublinks/hublinks.twig' with {
-    'links': [
+  {% include '@components/breadcrumb/breadcrumb.twig' with {
+    'hide_title': true,
+    'breadcrumb': [
       {
-        'url': '#',
-        'text': 'Environmental Economics',
+        'url': '#0',
+        'text': 'Home',
+      },
+      {
+        'url': '#1',
+        'text': 'Level One',
+      },
+      {
+        'url': '#2',
+        'text': 'Level Two',
+      },
+      {
+        'text': 'Current item',
       },
     ],
   } %}
@@ -93,6 +105,7 @@
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
+    'is_narrow': true,
   } %}
 {% endset %}
 

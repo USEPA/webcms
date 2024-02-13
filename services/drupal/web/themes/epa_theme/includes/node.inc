@@ -5,6 +5,7 @@
  */
 
 use Drupal\Core\Link;
+use Drupal\group\Entity\GroupContent;
 
 /**
  * Implements hook_preprocess_node().
@@ -19,6 +20,21 @@ function epa_theme_preprocess_node(&$variables) {
     // Array of regions to add to node template.
     $allowed_regions = ['messages'];
     _add_regions_to_node($allowed_regions, $variables);
+    $node = $variables['node'];
+    _add_webarea_contact_link($node, $variables);
+  }
+}
+
+/**
+ * Implements hook_preprocess_node__VIEW_MODE().
+ *
+ * Retrieves the node's Group's referenced webform and adds it as a variable.
+ */
+function epa_theme_preprocess_node__full(&$variables) {
+  /** @var \Drupal\node\Entity\Node $node */
+  $node = $variables['node'];
+  if (!isset($variables['webarea_contact_link'])) {
+    _add_webarea_contact_link($node, $variables);
   }
 }
 
@@ -28,6 +44,7 @@ function epa_theme_preprocess_node(&$variables) {
 function epa_theme_preprocess_node__news_release__full(&$variables) {
   /** @var \Drupal\node\NodeInterface $node */
   $node = $variables['node'];
+  _add_webarea_contact_link($node, $variables);
 
   $language = $node->get('field_language')->value;
 
@@ -178,5 +195,32 @@ function _add_regions_to_node($allowed_regions, &$variables) {
       }
     }
     $variables['region_' . $region] = $build;
+  }
+}
+
+/**
+ * Custom function to add Web Area contact link to node templates.
+ *
+ * @param $entity
+ *   The node to get the Group contact link for.
+ * @param $variables
+ *   The node render array variables.
+ *
+ * @return void
+ * @throws \Drupal\Core\Entity\EntityMalformedException
+ */
+function _add_webarea_contact_link($entity, &$variables) {
+  $group_contents = GroupContent::loadByEntity($entity);
+  if (!empty($group_contents)) {
+    /** @var \Drupal\group\Entity\GroupContent $group_content */
+    $group_content = reset($group_contents);
+    $group = $group_content->getGroup();
+    /** @var \Drupal\node\Entity\Node[] $webform */
+    $webform = $group->get('field_contact_us_form')->referencedEntities();
+    $webform = reset($webform);
+    // Only apply the variable if the link isn't to itself.
+    if ($webform && ($entity->id() !== $webform->id())) {
+      $variables['webarea_contact_link'] = $webform->toLink()->toRenderable();
+    }
   }
 }

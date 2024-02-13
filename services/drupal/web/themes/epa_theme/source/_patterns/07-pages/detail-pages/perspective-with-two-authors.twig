@@ -1,6 +1,23 @@
 {% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Perspectives',
+  {% include '@components/breadcrumb/breadcrumb.twig' with {
+    'hide_title': true,
+    'breadcrumb': [
+      {
+        'url': '#0',
+        'text': 'Home',
+      },
+      {
+        'url': '#1',
+        'text': 'Level One',
+      },
+      {
+        'url': '#2',
+        'text': 'Level Two',
+      },
+      {
+        'text': 'Current item',
+      },
+    ],
   } %}
 {% endset %}
 
@@ -60,7 +77,7 @@
   } only %}
 
   {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 font-sans-3xs',
+    'modifier_classes': 'margin-y-4 font-sans-3xs box--editors-note',
     'content': editor_note,
   } only %}
 {% endset %}
@@ -71,6 +88,7 @@
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
+    'is_narrow': true,
   } %}
 {% endset %}
 

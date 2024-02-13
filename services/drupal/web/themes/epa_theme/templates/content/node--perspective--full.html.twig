@@ -20,13 +20,12 @@
 {% endif %}
 
 {% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Perspectives'|t,
-  } %}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{#  {{ drupal_entity('block', 'webareaheader', check_access=false) }}#}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}
@@ -85,5 +84,6 @@
     'show_admin_info': show_admin_info,
     'body': content|without('epa_content_moderation_info_box'),
     'footer': footer,
+    'is_narrow': true,
   } %}
 {% endif %}
