@@ -88,12 +88,19 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     const words = userInput.split(" ");
     const wordMaps = [];
-    words.forEach(word => {
-      const index = userInput.indexOf(word);
-      const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
-      const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + word.length);
-      const wordRange = model.createRange(startPosition, endPosition);
-      wordMaps.push({term: word.replaceAll(/[?!.]+/g, ""), start: startPosition, end: endPosition, range: wordRange});
+    model.change((writer) => {
+      words.forEach(word => {
+        const index = userInput.indexOf(word);
+        const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
+        const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + word.length);
+        const wordRange = model.createRange(startPosition, endPosition);
+        const marker = writer.addMarker(`${index}: ${word}`, { range: wordRange, usingOperation: true });
+        wordMaps.push({
+          term: word.replaceAll(/[?!.]+/g, ""),
+          range: wordRange,
+          marker: marker,
+        });
+      });
     });
     // console.log('wordMaps: ', wordMaps);
 
@@ -179,7 +186,7 @@ export default class EpaAddDefinitionUI extends Plugin {
           if (SelectedArray[i].selected) {
             const wordMapMatch = wordMaps.find(word => word.term === SelectedArray[i].term);
             // console.log('wordMapMatch: ', wordMapMatch);
-            const wordRange = wordMapMatch.range;
+            const wordRange = wordMapMatch.marker.getRange();
             writer.remove(wordRange);
             writer.insertElement(
               "epaDefinition",
