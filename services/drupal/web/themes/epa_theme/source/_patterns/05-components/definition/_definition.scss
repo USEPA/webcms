@@ -38,17 +38,20 @@
   font-size: font-size(body, xs);
   margin-top: rem(-3px);
   max-width: rem(960px);
-  min-width: rem(320px);
   padding: gesso-spacing(2);
   position: absolute;
   z-index: 1;
 
-  a:not(.usa-button, .button) {
-    @extend %dark-bg-link;
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    min-width: rem(320px);
+
+    .l-sidebar__sidebar & {
+      min-width: rem(150px);
+    }
   }
 
-  .l-sidebar__sidebar & {
-    min-width: rem(150px);
+  a:not(.usa-button, .button) {
+    @extend %dark-bg-link;
   }
 }
 
