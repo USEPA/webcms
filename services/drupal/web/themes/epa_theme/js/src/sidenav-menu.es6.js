@@ -18,8 +18,11 @@ import Drupal from 'drupal';
         let priorLastElement;
 
         const sideNavContactClone = sideNavContact.cloneNode(true);
-        sideNavContactClone.classList.add('-mobile');
-        sideNavMenu.append(sideNavContactClone);
+
+        if (sideNavContactClone !== null) {
+          sideNavContactClone.classList.add('-mobile');
+          sideNavMenu.append(sideNavContactClone);
+        }
 
         function toggleVisiblity() {
           pageBody.classList.toggle('menu-sidenav--active');
