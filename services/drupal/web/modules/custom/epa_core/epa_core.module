@@ -823,6 +823,18 @@ function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) 
  if (!empty($form["field_search_text_value"])) {
      $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
  }
+
+ // @TODO: Figure out the other form ids ($form['#id'])
+ $views_exposed_forms = [
+   'views-exposed-form-moderated-content-moderated-content',
+   'views-exposed-form-moderated-content-page-1',
+ ];
+
+ if (in_array($form['#id'], $views_exposed_forms)) {
+   if ($form['revision_uid']['#description']) {
+     unset($form['revision_uid']['#description']);
+   }
+ }
 }
 
 /**
