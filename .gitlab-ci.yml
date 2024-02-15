@@ -427,7 +427,7 @@ copy:cloudwatch:dev:
     WEBCMS_SITE: dev
 
 # Mirror the New Relic PHP daemon
-copy:newrelic:dev:
+.copy:newrelic:dev:
   extends: .kaniko
   stage: copy
   rules:
@@ -533,7 +533,7 @@ Metrics:
     - rm -rf $CI_PROJECT_DIR
   allow_failure: true
 
-New Relic:
+.New Relic:
   stage: Image Scan
   tags:
     - twistcli
