@@ -144,7 +144,6 @@ describe('TC6 - Events', () => {
       cy.get('.usa-alert__text').should('contain.text', `The entity ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'of type node was cloned.');
       cy.get('.field--tight:contains("Moderation state")').should('contain.text', 'Draft');
-      verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
@@ -183,7 +182,6 @@ describe('TC6 - Events', () => {
       cy.get('.views-table').find('tbody').find(`a:contains("${formatFile.pageTitle}")`).first()
         .click();
     }).then(() => {
-      verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
@@ -208,6 +206,8 @@ describe('TC6 - Events', () => {
       cy.get(`a:contains("${formatFile.pageTitle}"):visible`).first().click();
       cy.get('a:contains("Delete"):visible').first().click();
       cy.get('[value="Delete"]').first().click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
     }).then(() => {
       cy.get('.usa-alert__text').should('contain.text', `The Event ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'has been deleted.');

@@ -92,8 +92,17 @@ export function findStringInArray(arr, substr) {
 }
 
 //* ***********************************Login methods********** */
-export function loginToDrupal(userNum) {
-  cy.visit('/saml/login').then(() => {
+export function loginToDrupal(userNum, userType = 'saml') {
+  cy.get('body').then(() => {
+    switch (userType) {
+    case 'user':
+      cy.visit('/user');
+      break;
+    default:
+      cy.visit('/saml/login');
+      break;
+    }
+  }).then(() => {
     cy.get('body').then((pageBody) => {
       if (pageBody.find('button:contains("Login with User")').length > 0) {
         cy.wrap(pageBody).find('button:contains("Login with User")').click();
@@ -102,19 +111,6 @@ export function loginToDrupal(userNum) {
     });
   });
 }
-
-export function loginToDrupalUser(userNum) {
-  cy.visit('/user').then(() => {
-    cy.get('body').then((pageBody) => {
-      if (pageBody.find('button:contains("Login with User")').length > 0) {
-        cy.wrap(pageBody).find('button:contains("Login with User")').click();
-      }
-
-      enterCredentials(userNum);
-    });
-  });
-}
-
 
 export function enterCredentials(userNum) {
   let server = 'stg';
@@ -331,7 +327,7 @@ export function setPageFields(currentItem) {
               }
               if (currentField.fieldType === 'dialog') {
                 cy.get('body').then(() => {
-                  cy.wrap(currentSection).find(currentField.fieldName).eq(currentField.fieldIndex).click();
+                  cy.wrap(currentSection).find(currentField.fieldId).eq(currentField.fieldIndex).click();
                   // eslint-disable-next-line cypress/no-unnecessary-waiting
                   cy.wait(2000);
                 }).then(() => {
@@ -356,7 +352,7 @@ export function setPageFields(currentItem) {
               }
               if (currentField.fieldType === 'dialog') {
                 cy.get('body').then(() => {
-                  cy.wrap(currentPageSection).find(currentField.fieldName).eq(currentField.fieldIndex).click();
+                  cy.wrap(currentPageSection).find(currentField.fieldId).eq(currentField.fieldIndex).click();
                   // eslint-disable-next-line cypress/no-unnecessary-waiting
                   cy.wait(2000);
                 }).then(() => {
@@ -373,12 +369,49 @@ export function setPageFields(currentItem) {
   }
 }
 
-export function addWebformElements(webformElements) {
+export function editWebformElements(webformElements) {
   cy.get('body').then(() => {
     cy.wrap(webformElements).each((currentElement) => {
-      cy.get('a:contains("Add element")').click();
-      cy.get(`tr:contains("${currentElement.elementType}")`).first().find('a:contains("Add element")').click();
-      setWebformFields(currentElement);
+      cy.get('body').then(() => {
+        switch (currentElement.elementAction) {
+        case 'edit':
+          cy.get(`tr:contains("${currentElement.elementName}")`).first().find('.dropbutton-toggle').click();
+          cy.get(`tr:contains("${currentElement.elementName}")`).first().find(`.${currentElement.elementAction}:visible`).find('a')
+            .click();
+          break;
+        case 'require':
+          cy.get(`tr:contains("${currentElement.elementName}")`).first().find('label:contains("Required")').parents('.form-type-checkbox')
+            .then((currentRequired) => {
+              if (currentElement.elementValue) {
+                cy.wrap(currentRequired).find('input').check();
+              } else {
+                cy.wrap(currentRequired).find('input').uncheck();
+              }
+            });
+          break;
+        default:
+          cy.get('body').then(() => {
+            cy.get('a:contains("Add element")').click();
+            // eslint-disable-next-line cypress/no-unnecessary-waiting
+            cy.wait(1000);
+          }).then(() => {
+            cy.get('.ui-dialog:visible').find('.webform-form-filter-text').click();
+          }).then(() => {
+            cy.get('.ui-dialog:visible').find('.webform-form-filter-text').clear();
+          })
+            .then(() => {
+              cy.get('.ui-dialog:visible').find('.webform-form-filter-text').type(currentElement.elementType);
+            })
+            .then(() => {
+              cy.get('.ui-dialog:visible').find(`tr:contains("${currentElement.elementType}")`).first().find('a:contains("Add element")')
+                .click();
+            })
+            .then(() => {
+            });
+          break;
+        }
+        setWebformFields(currentElement);
+      });
     });
   }).then(() => {
     cy.get('[value="Save elements"]').click();
@@ -386,6 +419,7 @@ export function addWebformElements(webformElements) {
     cy.wait(2000);
   });
 }
+
 
 export function setWebformFields(webformFields) {
   cy.wrap(webformFields.elementDetails).each((currentTab) => {
@@ -414,8 +448,19 @@ export function setWebformFields(webformFields) {
   });
 }
 
+export function verifyTableSearch(verifyFields) {
+  cy.wrap(verifyFields).each((currentVerify) => {
+    cy.get('.views-table').find('tbody').find('tr:visible').each((currentRow) => {
+      cy.wrap(currentRow).find(currentVerify.fieldId).should('contain.text', currentVerify.fieldValue);
+    });
+  });
+}
+
 export function setFieldValue(currentElement, currentField) {
-  cy.wrap(currentElement).find(currentField.fieldName).eq(currentField.fieldIndex).then((currentItem) => {
+  if (typeof currentField.fieldIndex === 'undefined') {
+    currentField.fieldIndex = 0;
+  }
+  cy.wrap(currentElement).find(currentField.fieldId).eq(currentField.fieldIndex).then((currentItem) => {
     switch (currentField.fieldType) {
     case 'select':
       cy.wrap(currentItem).select(currentField.fieldValue);
@@ -442,7 +487,7 @@ export function setFieldValue(currentElement, currentField) {
       cy.wait(1000);
       break;
     case 'iframe':
-      cy.wrap(currentItem).then((currentIframe) => {
+      cy.wrap(currentElement).find(currentField.fieldId).eq(currentField.fieldIndex).then((currentIframe) => {
         cy.wrap(currentIframe.contents()).find('body').type(`${currentField.fieldValue}{enter}`);
       });
       break;
@@ -480,11 +525,15 @@ export function setFieldValue(currentElement, currentField) {
       break;
     default:
       cy.get('body').then(() => {
-        cy.wrap(currentItem).click();
+        cy.wrap(currentItem, {timeout: 60000}).click();
       }).then(() => {
-        cy.wrap(currentItem).type(currentField.fieldValue);
-        // eslint-disable-next-line cypress/no-unnecessary-waiting
-        cy.wait(2000);
+        cy.wrap(currentItem).clear();
+      }).then(() => {
+        if (currentField.fieldValue.length > 0) {
+          cy.wrap(currentItem).type(currentField.fieldValue);
+          // eslint-disable-next-line cypress/no-unnecessary-waiting
+          cy.wait(2000);
+        }
       });
       break;
     }
@@ -538,12 +587,12 @@ export function getPageFields(currentItem) {
           if (currentIndex === currentElement.itemIndex) {
             switch (currentField.fieldType) {
             case 'select':
-              cy.wrap(currentElement).parents('tr').find(currentField.fieldName).eq(currentField.fieldIndex)
+              cy.wrap(currentElement).parents('tr').find(currentField.fieldId).eq(currentField.fieldIndex)
                 .should('have.prop', 'selectedIndex', currentField.fieldDefault);
               break;
             case 'checkbox':
               if (currentField.fieldValue) {
-                cy.wrap(currentElement).parents('tr').find(`.form-type-checkbox:contains("${currentField.fieldName}")`).find('input')
+                cy.wrap(currentElement).parents('tr').find(`.form-type-checkbox:contains("${currentField.fieldId}")`).find('input')
                   .eq(currentField.fieldIndex)
                   .should('have.prop', 'checked', currentField.fieldDefault);
               }
@@ -554,7 +603,7 @@ export function getPageFields(currentItem) {
               });
               break;
             default:
-              cy.wrap(currentElement).parents('tr').find(currentField.fieldName).eq(currentField.fieldIndex)
+              cy.wrap(currentElement).parents('tr').find(currentField.fieldId).eq(currentField.fieldIndex)
                 .should('have.value', currentField.fieldDefault);
               break;
             }
@@ -577,17 +626,26 @@ export function verifyPageElements(expectedItems) {
       cy.get(currentItem.section).then((currentSection) => {
         const foundItems = currentSection.find(currentItem.itemId).length;
         if (foundItems !== parseInt(currentItem.expectedCount, 10)) {
-          currentItem.error = `expected count:${currentItem.expectedCount} - actual count: ${foundItems}`;
-          errors.push(currentItem);
+          currentItem.error = `${currentItem.itemId} (${currentItem.itemIndex}) expected count:${currentItem.expectedCount} - actual count: ${foundItems}`;
+          errors.push(currentItem.error);
         }
         if (typeof currentItem.expectedProperties !== 'undefined') {
           cy.wrap(currentItem.expectedProperties).each((currentExpectedProperty) => {
+            if (typeof currentExpectedProperty.exists === 'undefined') {
+              currentExpectedProperty.exists = true;
+            }
             const actualPropertyValue = currentSection.find(currentItem.itemId)
               .prop(currentExpectedProperty.expectedPropertyName);
-            if ((typeof actualPropertyValue === 'undefined') ||
-            (!actualPropertyValue.toLowerCase().includes(currentExpectedProperty.expectedPropertyValue.toLowerCase()))) {
-              currentItem.error = `property: ${currentExpectedProperty.expectedPropertyName} - expected: ${currentExpectedProperty.expectedPropertyValue} - actual: ${actualPropertyValue}`;
-              errors.push(currentItem);
+            if (!currentExpectedProperty.exists) {
+              if ((typeof actualPropertyValue === 'undefined') ||
+              (actualPropertyValue.toLowerCase().includes(currentExpectedProperty.expectedPropertyValue.toLowerCase()))) {
+                currentItem.error = `${currentItem.itemId} (${currentItem.itemIndex}) property: ${currentExpectedProperty.expectedPropertyName} - expected: ${currentExpectedProperty.expectedPropertyValue} - actual: ${actualPropertyValue}`;
+                errors.push(currentItem.error);
+              }
+            } else if ((typeof actualPropertyValue === 'undefined') ||
+              (!actualPropertyValue.toLowerCase().includes(currentExpectedProperty.expectedPropertyValue.toLowerCase()))) {
+              currentItem.error = `${currentItem.itemId} (${currentItem.itemIndex}) property: ${currentExpectedProperty.expectedPropertyName} - expected: ${currentExpectedProperty.expectedPropertyValue} - actual: ${actualPropertyValue}`;
+              errors.push(currentItem.error);
             }
           });
         }
@@ -707,35 +765,32 @@ export function setDialogElement(currentObject, currentSetting) {
   }
   switch (currentSetting.fieldType) {
   case 'select':
-    cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).select(currentSetting.fieldValue);
+    cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).select(currentSetting.fieldValue);
     break;
   case 'checkbox':
     if (currentSetting.fieldValue) {
-      cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).check();
+      cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).check();
     } else {
-      cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).uncheck();
+      cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).uncheck();
     }
     break;
   case 'media library item':
-    cy.wrap(currentObject).find(`.media-library-item:contains("${currentSetting.fieldName}")`).eq(currentSetting.fieldIndex).find('input')
+    cy.wrap(currentObject).find(`.media-library-item:contains("${currentSetting.fieldId}")`).eq(currentSetting.fieldIndex).find('input')
       .first()
       .click();
     break;
-  case 'link':
-    cy.wrap(currentObject).find(`a:contains("${currentSetting.fieldName}"):visible`).click();
-    break;
   case 'click':
-    cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).click();
+    cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).click();
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000);
     break;
   default:
     cy.get('body').then(() => {
-      cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).click();
+      cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).click();
     }).then(() => {
-      cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).clear();
+      cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).clear();
     }).then(() => {
-      cy.wrap(currentObject).find(currentSetting.fieldName).eq(currentSetting.fieldIndex).type(currentSetting.fieldValue);
+      cy.wrap(currentObject).find(currentSetting.fieldId).eq(currentSetting.fieldIndex).type(currentSetting.fieldValue);
     });
     break;
   }
@@ -746,7 +801,7 @@ export function verifyFormatting(currentObject, formatSetting) {
     formatSetting.expectedCount = 1;
   }
   if (formatSetting.formatType.toLowerCase().includes('special')) {
-    cy.wrap(currentObject).find(`p:contains("${formatSetting.fields[0].fieldName}")`).should('have.length', formatSetting.expectedCount);
+    cy.wrap(currentObject).find(`p:contains("${formatSetting.fields[0].fieldId}")`).should('have.length', formatSetting.expectedCount);
   } else if (typeof formatSetting.expectedText === 'undefined') {
     if (typeof formatSetting.expectedClass !== 'undefined') {
       cy.wrap(currentObject).find(`.${formatSetting.expectedClass}`).should('have.length', formatSetting.expectedCount);

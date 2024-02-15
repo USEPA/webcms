@@ -45,7 +45,6 @@ describe('TC6 - Events - errors', () => {
               errors.push(currentError);
             }
           });
-          // cy.task('log', `errors: ${JSON.stringify(errors)}`);
           cy.wrap(errors).should('have.length', 0);
           cy.wrap(getErrorMessages()).should('have.length', currentItem.errors.length);
         });
