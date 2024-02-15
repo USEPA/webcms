@@ -1,6 +1,6 @@
 import {
   addPageSection,
-  loginToDrupal, setFormatting, setPageFields, verifyFormatting, verifyPageElements,
+  loginToDrupal, setFormatting, setPageFields, verifyPageElements,
 } from '../../support/functions';
 
 const formatFile = require('../../fixtures/wysiwyg.json');
@@ -16,7 +16,7 @@ const formatFile = require('../../fixtures/wysiwyg.json');
             "fields":
             [
               {
-                "fieldName": "Filter by Dictionary", "fieldValue": "", "fieldType": "select"
+                "fieldId": "Filter by Dictionary", "fieldValue": "", "fieldType": "select"
               }
             ]
           },

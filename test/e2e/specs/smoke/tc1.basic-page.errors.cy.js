@@ -62,7 +62,7 @@ describe('TC1 - Basic Page: SuperUser', () => {
         itemIndex: 0,
         fields: [
           {
-            fieldName: 'iframe', fieldType: 'iframe', fieldValue: 'first html in body section', fieldDefault: '',
+            fieldId: 'iframe', fieldType: 'iframe', fieldValue: 'first html in body section', fieldDefault: '',
           },
         ],
       },
@@ -72,7 +72,7 @@ describe('TC1 - Basic Page: SuperUser', () => {
         itemName: 'Channel',
         fields: [
           {
-            fieldName: '.form-type-checkbox:contains("About EPA")', fieldValue: true, fieldType: 'checkbox', fieldDefault: false,
+            fieldId: '.form-type-checkbox:contains("About EPA")', fieldValue: true, fieldType: 'checkbox', fieldDefault: false,
           },
         ],
       },
