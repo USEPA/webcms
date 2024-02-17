@@ -24,7 +24,6 @@ const ENDPOINT = "https://termlookup.epa.gov/termlookup/v1/terms";
  * @param {string} text
  * @returns {Promise<LookupResult>}
  */
-// this endpoint seems to already accept a comma-separated list of terms and return an array of definitions for each word that has matches, so we don't need to do anything else here
 
 async function lookupTerms(text) {
   const body = new URLSearchParams();

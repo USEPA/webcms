@@ -1,14 +1,11 @@
 import { Plugin } from "ckeditor5/src/core";
 import { ButtonView, Notification } from "ckeditor5/src/ui";
-
 import lookupTerms from "./lookupterms";
 import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";
 import EpaAddDefinitionView from "./epaadddefinitionview";
-
 import icon from '../../../../icons/book.svg';
 
 const ERR_UNEXPECTED = "An unexpected error occurred";
-
 const LOCK_ID = "epaAddDefinitions";
 
 export default class EpaAddDefinitionUI extends Plugin {
@@ -63,7 +60,6 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     const model = this.editor.model;
     const selection = model.document.selection;
-
     const range = selection.getFirstRange();
 
     // Skip if there's no selection
@@ -73,10 +69,8 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     const userInput = range && Array.from(range.getItems()).reduce((acc, node) => {
       if (node.is("$text") || node.is("$textProxy")) {
-        // console.log({ node });
         return acc + node.data;
       }
-
       // Crash if we found a non-text node in the selection
       throw new MultipleParagraphError();
     }, "");
@@ -85,26 +79,6 @@ export default class EpaAddDefinitionUI extends Plugin {
     if (userInput && userInput.trim() === "") {
       return;
     }
-
-    const words = userInput.split(" ");
-    const wordMaps = [];
-    model.change((writer) => {
-      words.forEach(word => {
-        const index = userInput.indexOf(word);
-        const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
-        const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + word.length);
-        const wordRange = model.createRange(startPosition, endPosition);
-        const marker = writer.addMarker(`${index}: ${word}`, { range: wordRange, usingOperation: true });
-        wordMaps.push({
-          term: word.replaceAll(/[?!.]+/g, ""),
-          range: wordRange,
-          marker: marker,
-        });
-      });
-    });
-    // console.log('wordMaps: ', wordMaps);
-
-    const wordList = wordMaps.map(word => word.term).join(", ");
 
     let modalResult = null;
 
@@ -118,12 +92,10 @@ export default class EpaAddDefinitionUI extends Plugin {
       // Lock the editor as read-only while the user makes selections
       this.editor.enableReadOnlyMode(LOCK_ID);
 
-      if (wordList) {
-        lookupResult = await lookupTerms(wordList);
+        lookupResult = await lookupTerms(userInput);
         if (lookupResult === null) {
           return;
         }
-      }
 
       const result = lookupResult ? lookupResult.matches : null;
 
@@ -175,22 +147,40 @@ export default class EpaAddDefinitionUI extends Plugin {
 
     // This is the array of all the MatchViews for all the terms
     const SelectedArray = modal.listView.views._items;
-    console.log('SelectedArray: ', SelectedArray);
+
+    // Iterate over the selected items and create and store a marker for each one
+    const wordMaps = [];
+    model.change((writer) => {
+      modal.data.forEach(obj => {
+        const index = obj.index[0];
+        const term = obj.term;
+        const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
+        const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + term.length);
+        const wordRange = model.createRange(startPosition, endPosition);
+        const marker = writer.addMarker(`${index}: ${term}`, { range: wordRange, usingOperation: true });
+        wordMaps.push({
+          term: term,
+          range: wordRange,
+          marker: marker,
+        });
+      });
+    });
 
     // this only happens after a definition is selected and _confirmed_ by clicking the green check mark button
     if (SelectedArray) {
       model.change((writer) => {
 
         for (const i in SelectedArray) {
-          // console.log('selection: ', SelectedArray[i]);
           if (SelectedArray[i].selected) {
             const wordMapMatch = wordMaps.find(word => word.term === SelectedArray[i].term);
-            // console.log('wordMapMatch: ', wordMapMatch);
             const wordRange = wordMapMatch.marker.getRange();
             writer.remove(wordRange);
             writer.insertElement(
               "epaDefinition",
-              { term: SelectedArray[i].term, definition: SelectedArray[i].selected },
+              {
+                term: SelectedArray[i].term,
+                definition: SelectedArray[i].selected
+              },
               wordRange.start,
             );
           }
@@ -198,5 +188,13 @@ export default class EpaAddDefinitionUI extends Plugin {
 
       });
     }
+
+    // Clean up all the markers
+    model.change((writer) => {
+      wordMaps.forEach(obj => {
+        writer.removeMarker(obj.marker);
+      });
+    });
+
   }
 }
