@@ -526,6 +526,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
  * @see \epa_workflow_form_alter()
  */
 function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
+  // @todo: Review if we will need this logic for later.
   // Level 0 links are tabs and level 1 are subtabs.
   $override_link_titles = [
     [
@@ -558,6 +559,12 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
   if (isset($data['tabs'][0]['entity.node.edit_form'])) {
     unset($data['tabs'][0]['entity.node.edit_form']);
   }
+  
+  // If we're on a node route AND the user has 'use_epa_node_tabs' hide all the tabs
+  if (\Drupal::routeMatch()->getParameter('node') && \Drupal::currentUser()->hasPermission('use_epa_node_tabs')) {
+    unset($data['tabs']);
+  }
+
 }
 
 /**
@@ -889,4 +896,21 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
       ],
     ],
   ];
+}
+
+/**Implements hook_page_top() */
+function epa_workflow_page_top(array &$page_top) {
+  // Load our custom block
+  $machine_name = 'epa_node_tabs';
+
+  $block = \Drupal::service('plugin.manager.block')
+  ->createInstance($machine_name, []);
+
+  // Render block
+  if (!empty($block)) {
+
+      // Add to page top
+    $page_top['epa_node_tabs'] = $block->build();
+  }
+  
 }
