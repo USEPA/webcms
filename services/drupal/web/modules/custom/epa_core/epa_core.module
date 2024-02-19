@@ -841,9 +841,6 @@ function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form
   $query_plugin = $view->getQuery();
   // Make sure the view is based on Search API and has the "Preserve facets"
   // option enabled, and that the Facets module is installed.
-  $preserve_facets1 = !empty($query_plugin->options['preserve_facet_query_args']);
-  $preserve_facets2 = $query_plugin instanceof SearchApiQuery;
-  $preserve_facets3 = \Drupal::moduleHandler()->moduleExists('facets');
   $preserve_facets = !empty($query_plugin->options['preserve_facet_query_args'])
     && $query_plugin instanceof SearchApiQuery
     && \Drupal::moduleHandler()->moduleExists('facets');
@@ -859,9 +856,6 @@ function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form
       return;
     }
     if ('facets_pretty_paths' == $facet_source->getUrlProcessorName()) {
-      /* @var $prettyPathsActiveFiltersService \Drupal\facets_pretty_paths\PrettyPathsActiveFilters */
-      $prettyPathsActiveFiltersService = \Drupal::service('facets_pretty_paths.active_filters');
-      $prettyPathsActiveFilters = $prettyPathsActiveFiltersService->getActiveFilters($facet_source_id);
       $form['#action'] = NULL;
     }
   }
