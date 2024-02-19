@@ -42,7 +42,7 @@ function epa_core_theme($existing, $type, $theme, $path) {
         'wrapper' => '',
         'separator' => ' » ',
         'link' => FALSE,
-        'facet_source' => '',
+        'facet_source' => ''
       ],
       'file' => 'epa_core.theme.inc',
     ],
@@ -63,8 +63,7 @@ function epa_core_rebuild() {
 /**
  * Implements hook_menu_local_tasks_alter().
  *
- * Code borrowed from
- * https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
+ * Code borrowed from https://www.drupal.org/project/drupal/issues/2885278#comment-13349245
  */
 function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
   if ($route_name === 'entity.node.revision') {
@@ -85,9 +84,7 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
       ->merge($node_canonical_local_tasks['cacheability']);
   }
 
-  if (\Drupal::moduleHandler()
-      ->moduleExists('access_unpublished') && \Drupal::currentUser()
-      ->isAnonymous()) {
+  if (\Drupal::moduleHandler()->moduleExists('access_unpublished') && \Drupal::currentUser()->isAnonymous()) {
     // If the access_unpublished module is enabled and the user is anonymous, disable all local tasks.
     $tokenGetter = \Drupal::service('access_unpublished.token_getter');
     if ($token = $tokenGetter->getToken()) {
@@ -180,8 +177,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Add in the default autocomplete validators since they aren't
       // initially set on the form and setting our custom validation handler
       // will prevent them from being set at all.
-      $autocomplete_info = \Drupal::service('element_info')
-        ->getInfo('entity_autocomplete');
+      $autocomplete_info = \Drupal::service('element_info')->getInfo('entity_autocomplete');
       $form['field_keywords']['widget']['target_id']['#element_validate'] = $autocomplete_info['#element_validate'];
 
       $form['field_type']['#access'] = FALSE;
@@ -286,10 +282,10 @@ function epa_core_token_info() {
   $footer_last_updated = [
     'name' => t('Last updated'),
     'description' => t('The current entity\'s latest updated date.'),
-    'type' => 'date',
+    'type' => 'date'
   ];
   $view_argument_1 = [
-    'name' => 'The first argument of the view',
+    'name' => 'The first argument of the view'
   ];
   $term_description = [
     'name' => t('Term description'),
@@ -302,7 +298,7 @@ function epa_core_token_info() {
       'epa-addtocal-description' => [
         'name' => t('EPA event description'),
         'description' => t('Custom EPA event description suitable for Addtocal'),
-      ],
+      ]
     ],
     'group' => [
       'machine-name-alias' => $machine_name_token,
@@ -331,12 +327,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
   foreach ($tokens as $name => $original) {
 
     // custom date format handling
-    if (stripos($name, 'footer-last-updated') !== FALSE) {
+    if (stripos($name, 'footer-last-updated') !== FALSE ) {
       $parts = explode(':', $name);
       $defaults = [
         $parts[0],
         'medium',
-        '',
+        ''
       ];
       $parts = array_replace($defaults, $parts);
       $name = $parts[0];
@@ -345,8 +341,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
     switch ($name) {
       case 'machine-name-alias':
         if (($type == 'node' && !empty($data['node'])) || ($type == 'group' && !empty($data['group']))) {
-          $replacements[$original] = \Drupal::service('epa_core.helper')
-            ->getEntityMachineNameAlias($data[$type]);
+          $replacements[$original] = \Drupal::service('epa_core.helper')->getEntityMachineNameAlias($data[$type]);
         }
         break;
       case 'epa-addtocal-description':
@@ -362,8 +357,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
               $add_to_cal_components[] = $description;
             }
 
-            $event_type = Term::load($node->get('field_event_type')->target_id)
-              ->getName();
+            $event_type = Term::load($node->get('field_event_type')->target_id)->getName();
             if (!empty($event_type)) {
               $add_to_cal_components[] = t("Event Type: @event_type", ['@event_type' => $event_type]);
             }
@@ -376,10 +370,10 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
               $url = $link->getUrl();
               $url->setAbsolute();
               $title = $link->title;
-              $links_string .= ($title ? $title . ': ' : '') . $url->toString() . "\n";
+              $links_string .= ($title ? $title .': ':''). $url->toString() ."\n";
             }
             if (!empty($links_string)) {
-              $add_to_cal_components[] = t("Links:\n @links", ['@links' => $links_string]);
+              $add_to_cal_components[] = t("Links:\n @links",['@links'=> $links_string]);
             }
           }
           $replacements[$original] = implode("\n\n", $add_to_cal_components);
@@ -416,12 +410,10 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             $contact_form = $group->field_contact_us_form->target_id;
             $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form]) : NULL;
             if ($url) {
-              $link = Link::fromTextAndUrl(t('Contact Us'), $url)
-                ->toRenderable();
-              $link['#attributes'] = ['class' => ['header-link']];
+              $link = Link::fromTextAndUrl(t('Contact Us'), $url)->toRenderable();
+              $link['#attributes'] = ['class' => array('header-link')];
             }
-            $replacements[$original] = $url ? \Drupal::service('renderer')
-              ->render($link) : $original;
+            $replacements[$original] = $url ? \Drupal::service('renderer')->render($link) : $original;
           }
         }
         break;
@@ -432,10 +424,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
           $bubbleable_metadata->addCacheableDependency($node);
         }
         if (isset($node) && !$node->field_last_published->isEmpty()) {
-          $replacements[$original] = t('Last updated on @date', [
-            '@date' => \Drupal::service('date.formatter')
-              ->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2]),
-          ]);
+          $replacements[$original] = t('Last updated on @date', ['@date' => \Drupal::service('date.formatter')->format($node->field_last_published->date->getTimestamp(), $parts[1], $parts[2])]);
         }
         else {
           $replacements[$original] = '';
@@ -556,8 +545,7 @@ function epa_core_node_view_alter(array &$build, EntityInterface $entity, Entity
     // to Comment" field is empty, there is no header on the comment box since
     // the field is not rendered.
     if ($entity->hasField('field_how_to_comment')) {
-      $build['how_to_comment_header']['#markup'] = $entity->field_how_to_comment->getFieldDefinition()
-        ->getLabel();
+      $build['how_to_comment_header']['#markup'] = $entity->field_how_to_comment->getFieldDefinition()->getLabel();
     }
   }
 }
@@ -584,8 +572,7 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
       // Adjust the description if the field is a datetime field vs. just a date field.
       /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
       $items = $context['items'];
-      if ($items->getFieldDefinition()
-          ->getSetting('datetime_type') === 'datetime') {
+      if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
         _epa_core_augment_datetime_description($element['#description']);
       }
     }
@@ -599,7 +586,7 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   // the widget provides by default.
   // The complicated logic here is necessary because the structure of this text
   // differs depending on whether the field has additional descriptive text configured.
-  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"])) {
+  if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
     if ((is_array($element["uri"]["#description"])
         && is_array($element["uri"]["#description"]['#items'])
         && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
@@ -654,10 +641,10 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
 
     $element['subform']['field_title_placement']['#states'] = [
       'visible' => [
-        $selector => ['value' => 'default'],
+        $selector => ['value' => 'default']
       ],
       'invisible' => [
-        $selector => ['value' => 'flag'],
+        $selector => ['value' => 'flag']
       ],
     ];
   }
@@ -669,7 +656,7 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
     $dependee_field_name = 'field_card_style';
     // Need to build specific selector to handle multiple card groups.
     $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $element['#field_parents'][0], $element['#field_parents'][1], $dependee_field_name);
-    $element['subform']['field_flag_card_alignment']['#states'] = [
+    $element['subform']['field_flag_card_alignment']['#states']  = [
       'visible' => [
         $selector => ['value' => 'flag'],
       ],
@@ -760,8 +747,7 @@ function epa_core_preprocess_form_element(array &$variables) {
   $field_types = [
     'checkbox',
   ];
-  if (\Drupal::service('router.admin_context')
-      ->isAdminRoute() && !in_array($variables['element']['#type'], $field_types)) {
+  if (\Drupal::service('router.admin_context')->isAdminRoute() && !in_array($variables['element']['#type'], $field_types)) {
     $variables['description_display'] = 'before';
   }
 }
@@ -769,8 +755,7 @@ function epa_core_preprocess_form_element(array &$variables) {
 use Drupal\Core\Template\Attribute;
 
 /**
- * Prepares variables for views-style-epa-core-uswds-collection.html.twig
- * template.
+ * Prepares variables for views-style-epa-core-uswds-collection.html.twig template.
  */
 function template_preprocess_views_style_epa_core_uswds_collection(&$variables) {
 
@@ -815,17 +800,16 @@ function epa_core_entity_type_build(array &$entity_types) {
  * Implements hook_entity_presave().
  */
 function epa_core_node_presave(EntityInterface $node) {
-  if ($node->hasField('field_search_text')) {
+  if ($node->hasField('field_search_text')){
     // Render using front-end theme
     $theme_manager = \Drupal::service('theme.manager');
     $active_theme = $theme_manager->getActiveTheme();
     $default_theme_name = \Drupal::config('system.theme')->get('default');
-    $default_theme = \Drupal::service('theme.initialization')
-      ->getActiveThemeByName($default_theme_name);
+    $default_theme = \Drupal::service('theme.initialization')->getActiveThemeByName($default_theme_name);
     $theme_manager->setActiveTheme($default_theme);
 
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
-    $full_output = $view_builder->view($node, 'search_index');
+    $full_output = $view_builder->view($node,'search_index');
     $node->field_search_text->setValue(strip_tags(\Drupal::service('renderer')
       ->renderPlain($full_output)));
 
@@ -903,7 +887,8 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
 /**
  * Implements hook_entity_field_access().
  */
-function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL) {
+function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
+{
   if ($field_definition->getTargetEntityTypeId() == 'user') {
     switch ($field_definition->getName()) {
       case 'status':
