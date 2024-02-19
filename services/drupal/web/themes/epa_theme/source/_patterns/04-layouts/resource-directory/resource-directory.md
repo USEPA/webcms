@@ -1,6 +1,7 @@
 ---
 title: Resource Directory Layout
 state: complete
+hidden: true
 ---
 
 __Variables:__

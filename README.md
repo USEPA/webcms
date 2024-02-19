@@ -67,7 +67,9 @@ Note: this has only been tested on ddev 1.19 and above.
 
 12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-13. Access the app at https://epa.ddev.site
+13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin` 
+
+14.  Access the app at https://epa.ddev.site
 
 # Testing migrations
 

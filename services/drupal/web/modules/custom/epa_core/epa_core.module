@@ -82,8 +82,8 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
       ->merge($node_canonical_local_tasks['cacheability']);
   }
 
-  // If the access_unpublished module is enabled and we have an active token using, disable the local tasks.
-  if (\Drupal::moduleHandler()->moduleExists('access_unpublished')) {
+  if (\Drupal::moduleHandler()->moduleExists('access_unpublished') && \Drupal::currentUser()->isAnonymous()) {
+    // If the access_unpublished module is enabled and the user is anonymous, disable all local tasks.
     $tokenGetter = \Drupal::service('access_unpublished.token_getter');
     if ($token = $tokenGetter->getToken()) {
       if (_is_access_token_valid($token)) {
@@ -519,6 +519,12 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
     if ($storage["views_bulk_operations"]["action_id"] === 'node_assign_owner_action' && isset($form["owner_uid"])) {
       $form["owner_uid"]["#size"] = "60";
     }
+  }
+// Hide "Exclude - Cloned" option in the entity clone form
+  if ($form_id === 'entity_clone_form') {
+      if (isset($form['no_suffix'])) {
+        $form['no_suffix']['#access'] = FALSE;
+      }
   }
 }
 

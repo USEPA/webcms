@@ -20,6 +20,7 @@ dependencies:
     - paragraphs_entity_embed
     - pathologic
     - token_filter
+    - uswds_ckeditor_integration
 name: 'CKEditor 5 test'
 format: ckeditor_5_test
 weight: 0
@@ -36,7 +37,7 @@ filters:
     status: true
     weight: -49
     settings:
-      allowed_html: '<a id target rel class name hreflang occurrence aria-label title href data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <table class="usa-table usa-table--striped usa-table--unstyled usa-table--borderless usa-table--stacked usa-table--stacked-header" summary width height> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <blockquote class="pull-quote u-align-left u-align-right" cite> <code class="code"> <mark class="mark"> <small class="small"> <span class="warning"> <article> <div> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <section> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <th headers scope width height rowspan colspan> <td headers scope width height rowspan colspan> <details open> <form action method> <fieldset disabled="disabled" form name> <label for form> <input checked="checked" size type value disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus> <textarea rows cols disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus> <meter min max low high optimum form value> <select multiple="multiple" size> <optgroup disabled="disabled" label> <option value> <output for form name> <button type value> <keygen autofocus challenge disabled="disabled" form keytype name> <progress max value> <embed src type width height> <object form name type usemap width height> <param name value> <iframe allowfullscreen name sandbox scrolling seamless src srcdoc width height> <video autoplay buffered controls crossorigin loop muted played preload poster src width height> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas width height> <map name> <area alt coords href hreflang media rel shape target type> <drupal-paragraph data-embed-button data-entity-label data-paragraph-id drupal-paragraph data-paragraph-revision-id> <use href> <img alt crossorigin longdesc src usemap data-caption data-align width height data-entity-type data-entity-uuid> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-caption data-align> <abbr title> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode> <drupal-entity alt title data-align data-caption data-entity-embed-display data-entity-embed-display-settings data-view-mode data-entity-uuid data-langcode data-embed-button="node paragraphs" data-entity-type><* accesskey id class role aria-* tabindex title data data-* name hidden>'
+      allowed_html: '<a id target rel class name hreflang occurrence aria-label title href data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <table class summary width height> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <blockquote class="pull-quote u-align-left u-align-right" cite> <code class="code"> <mark class="mark"> <small class="small"> <span class="warning"> <article> <div class="usa-table-container--scrollable usa-sr-only usa-table__announcement-region" aria-live> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <section> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <th headers scope width height rowspan colspan data-label data-sortable role> <td headers scope width height rowspan colspan data-label data-sort-value> <details open> <form action method> <fieldset disabled="disabled" form name> <label for form> <input checked="checked" size type value disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus> <textarea rows cols disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus> <meter min max low high optimum form value> <select multiple="multiple" size> <optgroup disabled="disabled" label> <option value> <output for form name> <button type value> <keygen autofocus challenge disabled="disabled" form keytype name> <progress max value> <embed src type width height> <object form name type usemap width height> <param name value> <iframe allowfullscreen name sandbox scrolling seamless src srcdoc width height> <video autoplay buffered controls crossorigin loop muted played preload poster src width height> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas width height> <map name> <area alt coords href hreflang media rel shape target type> <drupal-paragraph data-embed-button data-entity-label data-paragraph-id drupal-paragraph data-paragraph-revision-id> <use href> <img alt crossorigin longdesc src usemap data-caption data-align width height data-entity-type data-entity-uuid> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-caption data-align> <abbr title> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode> <drupal-entity alt title data-align data-caption data-entity-embed-display data-entity-embed-display-settings data-view-mode data-entity-uuid data-langcode data-embed-button="node paragraphs" data-entity-type><* accesskey id class role aria-* tabindex title data data-* name hidden>'
       filter_html_help: true
       filter_html_nofollow: false
   media_embed:
@@ -167,4 +168,16 @@ filters:
     provider: filter
     status: true
     weight: -36
+    settings: {  }
+  filter_table_attributes:
+    id: filter_table_attributes
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
+  filter_uswds_table_sortable:
+    id: filter_uswds_table_sortable
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
     settings: {  }
