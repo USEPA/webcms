@@ -54,13 +54,6 @@ resource "aws_ecr_repository" "cloudwatch_agent_mirror" {
   tags = var.tags
 }
 
-# This mirrors docker.io/newrelic/php-daemon
-resource "aws_ecr_repository" "newrelic_daemon_mirror" {
-  name = "webcms-${var.environment}-newrelic-daemon"
-
-  tags = var.tags
-}
-
 # Finally, we create a cache repository for Kaniko-based builds. This repository has some
 # lifecycle policies that aggressively expire images in order to avoid an arbitrarily large
 # cache from building up (see below).
