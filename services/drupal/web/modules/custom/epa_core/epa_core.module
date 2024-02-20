@@ -702,7 +702,19 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
           $selector => ['value' => $term_id]
         ],
         'invisible' => [
-          $selector => ['!value' => $term_id]
+          $selector => [
+            ['!value' => $term_id],
+            'or',
+            ['value' => 'empty']
+          ]
+        ],
+      ];
+
+      // To add the asterisk to the actual text field wwe need to target the textfield itself.
+      // @link https://www.drupal.org/forum/support/module-development-and-code-questions/2016-11-23/field-states-api-required-hidden-fields#comment-12881635
+      $element["subform"]["field_location_proposed_other"]["widget"][0]["value"]['#states'] = [
+        'required' => [
+          $selector => ['value' => $term_id]
         ],
       ];
     }
@@ -716,7 +728,7 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
  *
  * @return void
  */
-function epa_core_location_proposed_other_form_validate (&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function epa_core_location_proposed_other_form_validate(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   $paragraphs = $form_state->getValue(['field_locations_of_prop_actions']);
   if (!empty($paragraphs)) {
     foreach ($paragraphs as $paragraph) {
