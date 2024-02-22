@@ -13,8 +13,15 @@ use Drupal\Core\Template\Attribute;
  */
 function epa_theme_preprocess_paragraph__slideshow(&$variables) {
   $slides = $variables['content']['field_slides'];
-
   foreach (Element::children($slides) as $key) {
+    // If media item is private and user is anonymous we should remove it from display.
+    /** @var \Drupal\media\MediaInterface $media_item */
+    $media_item = $slides[$key]['#paragraph']->field_slide_image->entity;
+    if (\Drupal::currentUser()->isAnonymous() &&
+      $media_item->get('field_limit_file_accessibility')->value == 1
+    ) {
+        continue;
+    }
     $variables['slides'][$key]['caption'] = $slides[$key]['#paragraph']->field_caption;
     $variables['slides'][$key]['media'] = $slides[$key]['#paragraph']->field_slide_image;
   }
