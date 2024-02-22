@@ -18,9 +18,11 @@ function epa_theme_preprocess_paragraph__slideshow(&$variables) {
     /** @var \Drupal\media\MediaInterface $media_item */
     $media_item = $slides[$key]['#paragraph']->field_slide_image->entity;
     if (\Drupal::currentUser()->isAnonymous() &&
-      $media_item->get('field_limit_file_accessibility')->value == 1
+      $media_item->hasField('field_limit_file_accessibility')
     ) {
+      if ($media_item->get('field_limit_file_accessibility')->value == 1) {
         continue;
+      }
     }
     $variables['slides'][$key]['caption'] = $slides[$key]['#paragraph']->field_caption;
     $variables['slides'][$key]['media'] = $slides[$key]['#paragraph']->field_slide_image;
