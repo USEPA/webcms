@@ -181,7 +181,6 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license`: The ARN of the New Relic license key.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key`: The ARN of the private key for Drupal's SAML certificate.
 
