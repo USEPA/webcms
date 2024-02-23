@@ -903,22 +903,52 @@ function epa_core_node_presave(EntityInterface $node) {
  * search results page it will lose any facets which have been already selected.
  * This adds hidden fields for each facet so their values are retained.
  */
-function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
- if (!empty($form["field_search_text_value"])) {
-     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
- }
-
- // @TODO: Figure out the other form ids ($form['#id'])
- $views_exposed_forms = [
-  'views-exposed-form-moderated-content-page-1',
-  'views-exposed-form-group-moderated-content-block-1',
-];
-
-if (in_array($form['#id'], $views_exposed_forms)) {
-  if ($form['revision_uid']['#description']) {
-    unset($form['revision_uid']['#description']);
+function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state) {
+  if (!empty($form["field_search_text_value"])) {
+    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
   }
-}
+  // Retrieve the view object and the query plugin.
+  $storage = $form_state->getStorage();
+  if (!isset($storage['view'])) {
+    return;
+  }
+  $view = $storage['view'];
+  if (!($view instanceof ViewExecutable)) {
+    return;
+  }
+  $query_plugin = $view->getQuery();
+  // Make sure the view is based on Search API and has the "Preserve facets"
+  // option enabled, and that the Facets module is installed.
+  $preserve_facets = !empty($query_plugin->options['preserve_facet_query_args'])
+    && $query_plugin instanceof SearchApiQuery
+    && \Drupal::moduleHandler()->moduleExists('facets');
+  if ($preserve_facets) {
+    // Retrieve the facet source.
+    $query = $query_plugin->getSearchApiQuery();
+    $display_id = $query->getSearchId(FALSE);
+    $facet_source_id = str_replace(':', '__', 'search_api:' . $display_id);
+    $facet_source = \Drupal::entityTypeManager()
+      ->getStorage('facets_facet_source')
+      ->load($facet_source_id);
+    if (!$facet_source) {
+      return;
+    }
+    if ('facets_pretty_paths' == $facet_source->getUrlProcessorName()) {
+      $form['#action'] = NULL;
+    }
+  }
+
+   // @TODO: Figure out the other form ids ($form['#id'])
+   $views_exposed_forms = [
+     'views-exposed-form-moderated-content-moderated-content',
+     'views-exposed-form-moderated-content-page-1',
+   ];
+
+  if (in_array($form['#id'], $views_exposed_forms)) {
+    if ($form['revision_uid']['#description']) {
+      unset($form['revision_uid']['#description']);
+    }
+  }
 }
 
 /**
