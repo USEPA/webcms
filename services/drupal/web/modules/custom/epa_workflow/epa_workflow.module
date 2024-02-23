@@ -526,6 +526,12 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
  * @see \epa_workflow_form_alter()
  */
 function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
+  // If we're on a node route AND the user has 'use_epa_node_tabs' hide all the tabs
+  if (\Drupal::routeMatch()->getParameter('node') && \Drupal::currentUser()->hasPermission('use_epa_node_tabs')) {
+    unset($data['tabs']);
+    return;
+  }
+
   // @todo: Review if we will need this logic for later.
   // Level 0 links are tabs and level 1 are subtabs.
   $override_link_titles = [
@@ -559,12 +565,6 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
   if (isset($data['tabs'][0]['entity.node.edit_form'])) {
     unset($data['tabs'][0]['entity.node.edit_form']);
   }
-  
-  // If we're on a node route AND the user has 'use_epa_node_tabs' hide all the tabs
-  if (\Drupal::routeMatch()->getParameter('node') && \Drupal::currentUser()->hasPermission('use_epa_node_tabs')) {
-    unset($data['tabs']);
-  }
-
 }
 
 /**
@@ -576,6 +576,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 
   $storage = \Drupal::entityTypeManager()->getStorage('node');
+  /** @var \Drupal\node\Entity\Node $original */
   $original = $node->original;
   if ($original) {
     $default_revision_id = $original->get('vid')->value;
@@ -882,6 +883,7 @@ function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateI
  * Implements hook_theme().
  */
 function epa_workflow_theme($existing, $type, $theme, $path) {
+  // @todo: Evaluate and remove the content_info_box given we won't use this after
   return [
     'epa_content_info_box' => [
       'variables' => [
@@ -895,22 +897,36 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
         'content_moderation_form' => NULL,
       ],
     ],
+    'epa_node_tabs' => [
+      'variables' => [
+        'tabs' => [],
+      ],
+    ],
+    'epa_node_tab_item' => [
+      'variables' => [
+        'title' => NULL,
+        'url' => NULL,
+        'icon' => NULL,
+        'is_active' => FALSE,
+        'children' => [],
+      ],
+    ],
   ];
 }
 
 /**Implements hook_page_top() */
 function epa_workflow_page_top(array &$page_top) {
-  // Load our custom block
-  $machine_name = 'epa_node_tabs';
-
-  $block = \Drupal::service('plugin.manager.block')
-  ->createInstance($machine_name, []);
-
-  // Render block
-  if (!empty($block)) {
-
+  // Only add this block if we're on a node route.
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    // Load our custom block
+    $machine_name = 'epa_node_tabs';
+    /** @var Drupal\Core\Block\BlockBase $block */
+    $block = \Drupal::service('plugin.manager.block')
+      ->createInstance($machine_name, []);
+    $block->setContextValue('node', $node);
+    if (!empty($block)) {
       // Add to page top
-    $page_top['epa_node_tabs'] = $block->build();
+      $page_top['epa_node_tabs'] = $block->build();
+    }
   }
-  
 }
