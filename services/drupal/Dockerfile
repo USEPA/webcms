@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine AS memcached-ext
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS memcached-ext
 
 # Set working directory to /tmp
 WORKDIR /tmp
@@ -23,7 +23,7 @@ RUN set -ex \
   && make \
   && make install
 
-FROM php:8.1-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -117,7 +117,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM composer:2 AS deps
+FROM public.ecr.aws/docker/library/composer:2 AS deps
 
 WORKDIR /app
 
@@ -207,7 +207,7 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
-FROM nginx:mainline-alpine AS nginx
+FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
 
 # Bump system packages
 RUN apk upgrade
@@ -229,7 +229,7 @@ CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM php:8.1-cli-alpine AS drush
+FROM public.ecr.aws/docker/library/php:8.1-cli-alpine AS drush
 
 # Bump system packages
 RUN apk upgrade
