@@ -21,6 +21,7 @@ import Drupal from 'drupal';
 
         if (sideNavContactClone !== null) {
           sideNavContactClone.classList.add('-mobile');
+          sideNavContactClone.id = 'menu-sidenav__contact-mobile';
           sideNavMenu.append(sideNavContactClone);
         }
 
