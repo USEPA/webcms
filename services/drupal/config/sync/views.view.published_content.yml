@@ -2135,7 +2135,7 @@ display:
           exposed: true
           expose:
             operator_id: field_publisher_target_id_op
-            label: Office
+            label: Publisher
             description: ''
             use_operator: false
             operator: field_publisher_target_id_op
@@ -2148,7 +2148,6 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
-              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
@@ -2156,7 +2155,6 @@ display:
               system_webmaster: '0'
               menu_admin: '0'
               administrator: '0'
-              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -2231,6 +2229,58 @@ display:
           hierarchy: false
           limit: true
           error_message: true
+        moderation_state:
+          id: moderation_state
+          table: node_field_data
+          field: moderation_state
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          plugin_id: moderation_state_filter
+          operator: in
+          value:
+            epa_default-published: epa_default-published
+            epa_default-published_needs_review: epa_default-published_needs_review
+            epa_default-published_expiring: epa_default-published_expiring
+            epa_default-published_day_til_expire: epa_default-published_day_til_expire
+          group: 1
+          exposed: true
+          expose:
+            operator_id: moderation_state_op
+            label: 'Moderation state'
+            description: ''
+            use_operator: false
+            operator: moderation_state_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: moderation_state
+            required: false
+            remember: false
+            multiple: true
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+            reduce: true
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
         status_1:
           id: status_1
           table: node_field_data
@@ -2474,58 +2524,6 @@ display:
               menu_admin: '0'
               administrator: '0'
             reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        moderation_state:
-          id: moderation_state
-          table: node_field_data
-          field: moderation_state
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: moderation_state_filter
-          operator: in
-          value:
-            epa_default-published: epa_default-published
-            epa_default-published_needs_review: epa_default-published_needs_review
-            epa_default-published_expiring: epa_default-published_expiring
-            epa_default-published_day_til_expire: epa_default-published_day_til_expire
-          group: 1
-          exposed: true
-          expose:
-            operator_id: moderation_state_op
-            label: 'Moderation state'
-            description: ''
-            use_operator: false
-            operator: moderation_state_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: moderation_state
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: true
           is_grouped: false
           group_info:
             label: ''
