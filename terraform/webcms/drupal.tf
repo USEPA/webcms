@@ -121,41 +121,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
       }
     },
 
-    # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
-    # the epa_metrics module for what we export to the agent.
-    {
-      name  = "cloudwatch"
-      image = "${data.aws_ssm_parameter.ecr_cloudwatch.value}:latest"
-
-      # The agent reads its JSON-formatted configuration from the environment in containers
-      environment = [
-        {
-          name = "CW_CONFIG_CONTENT"
-          # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
-          value = jsonencode({
-            metrics = {
-              namespace = "WebCMS",
-              metrics_collected = {
-                statsd = {
-                  service_address = ":8125"
-                },
-              },
-            },
-          }),
-        },
-      ],
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.agent_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "cloudwatch"
-        }
-      }
-    },
-
     # Report FPM metrics to CloudWatch using the custom metrics container. See the
     # services/metrics directory for more.
     {
@@ -174,22 +139,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
           awslogs-group         = data.aws_ssm_parameter.fpm_metrics_log_group.value
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "fpm-metrics"
-        }
-      }
-    },
-
-    # Attach the New Relic PHP daemon
-    {
-      name  = "newrelic"
-      image = "${data.aws_ssm_parameter.ecr_newrelic.value}:latest"
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.newrelic_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "newrelic"
         }
       }
     },
