@@ -182,7 +182,9 @@ content:
         custom
       show_extra: true
       hide_date: false
+      separator: to
       add_abbreviations: before
+      allday: true
     third_party_settings: {  }
   field_deadline:
     type: datetime_default
@@ -222,7 +224,7 @@ content:
     third_party_settings: {  }
   field_event_host:
     type: string_textfield
-    weight: 11
+    weight: 12
     region: content
     settings:
       size: 60
@@ -249,16 +251,6 @@ content:
       create_new_items: false
       create_new_levels: false
       force_deepest: false
-    third_party_settings: {  }
-  field_hublinks:
-    type: entity_reference_autocomplete
-    weight: 12
-    region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
     third_party_settings: {  }
   field_keywords:
     type: entity_reference_autocomplete_tags
@@ -300,10 +292,11 @@ content:
     third_party_settings: {  }
   field_meta_tags:
     type: metatag_firehose
-    weight: 50
+    weight: 21
     region: content
     settings:
       sidebar: true
+      use_details: true
     third_party_settings: {  }
   field_owning_office:
     type: entity_reference_autocomplete_tags
@@ -379,7 +372,7 @@ content:
       display_label: true
     third_party_settings: {  }
   simple_sitemap:
-    weight: 10
+    weight: 11
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -423,6 +416,7 @@ content:
 hidden:
   field_date: true
   field_display_arcgis_map: true
+  field_hublinks: true
   field_is_searchable_collection: true
   field_last_published: true
   field_review_deadline: true

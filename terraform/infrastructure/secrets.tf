@@ -93,45 +93,12 @@ resource "aws_secretsmanager_secret" "saml_sp_key" {
 
 #endregion
 
-#region New Relic
-
-# Unlike the other secrets, we assume the New Relic license key is differentiated only by
-# site, not by site+lang.
-resource "aws_secretsmanager_secret" "newrelic_license" {
-  for_each = toset(var.sites)
-
-  name        = "/webcms/${var.environment}/${each.value}/newrelic-license"
-  description = "New Relic license key"
-
-  recovery_window_in_days = 0
-
-  tags = var.tags
-}
-
-# In order to avoid breaking existing deployments, we create an empty license key by
-# default. This value is ignored by Terraform when changed, but we need it to exist or
-# else ECS will fail to deploy it.
-resource "aws_secretsmanager_secret_version" "newrelic_license" {
-  for_each = toset(var.sites)
-
-  secret_id = aws_secretsmanager_secret.newrelic_license[each.value].id
-
-  secret_string = "."
-
-  lifecycle {
-    ignore_changes = [secret_string, version_stages]
-  }
-}
-
-#endregion
-
 #region Basic Authentication
 
 # Create an optional secret to store basic authentication credentials. This is
 # used to, e.g., block access to preproduction sites by bots/crawlers.
 #
-# Note that, like the newrelic_license secret, this is a per-site secret, not a
-# per-language secret.
+# Note that this is a per-site secret, not a per-language secret.
 resource "aws_secretsmanager_secret" "basic_auth" {
   for_each = toset(var.sites)
 
@@ -143,8 +110,7 @@ resource "aws_secretsmanager_secret" "basic_auth" {
   tags = var.tags
 }
 
-# Create an empty/default set of basic auth credentials. Like the
-# newrelic_license secret version resource above, this exists solely to
+# Create an empty/default set of basic auth credentials. This exists solely to
 # prepopulate the secret with a value to prevent ECS deployments from breaking.
 resource "aws_secretsmanager_secret_version" "basic_auth" {
   for_each = toset(var.sites)

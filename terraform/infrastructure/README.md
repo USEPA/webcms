@@ -20,7 +20,6 @@
 - [Post-Run Steps](#post-run-steps)
   - [Initialize the Database](#initialize-the-database)
   - [Populate Secrets](#populate-secrets)
-  - [Mirror Images](#mirror-images)
 - [Known Issues](#known-issues)
 
 ## About
@@ -146,20 +145,6 @@ There are a number of sensitive values that must be populated by an administrato
 1. The Drupal hash salt must be generated and saved in `/webcms/${var.environment}/${site}/${lang}/drupal-hash-salt`. This value **must** differ between site/language combinations in order to prevent one-time tokens such as password resets from being reused. Use a secure random number generator such as the `openssl rand` utility to generate a large number of bytes (at least 32).
 2. For email, the SMTP password must be saved in the secret `/webcms/${var.environment}/${site}/${lang}/mail-password`.
 3. An x509 certificate and private key will need to be generated for each Drupal site and language. The private key needs to be set in `/webcms/${var.environment}/${site}/${lang}/saml-sp-key`.
-
-### Mirror Images
-
-The [ECR mirrors](#ecr-mirrors) need to be populated in order to bring the [Amazon CloudWatch Agent](https://hub.docker.com/r/amazon/cloudwatch-agent) into the AWS perimeter.
-
-These steps should suffice to mirror the image from the Docker Hub to ECR. Remember to [authenticate with ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/registry_auth.html#registry-auth-token) prior to running the `docker push` commands.
-
-```sh
-docker pull amazon/cloudwatch-agent:latest
-docker tag amazon/cloudwatch-agent:latest <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
-docker push <account>.dkr.ecr.<region>.amazonaws.com/webcms-<environment>-aws-cloudwatch:latest
-```
-
-In order to capture updates to these images, these pull/push steps should be run on an automated schedule.
 
 ## Known Issues
 
