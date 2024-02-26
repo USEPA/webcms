@@ -34,15 +34,6 @@ resource "aws_cloudwatch_log_group" "drupal" {
   tags = var.tags
 }
 
-# Log group for the CloudWatch agent
-resource "aws_cloudwatch_log_group" "agent" {
-  for_each = local.sites
-
-  name = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/cloudwatch-agent"
-
-  tags = var.tags
-}
-
 # Log group for the FPM metrics helper
 resource "aws_cloudwatch_log_group" "fpm_metrics" {
   for_each = local.sites
