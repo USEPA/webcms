@@ -173,7 +173,6 @@ As with the infrastructure and database modules, this module assumes that certai
 - Log group identifiers are also read from Parameter Store:
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/nginx`: The name of the log group for Drupal's nginx container.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drush`: The name of the log group for Drush runs.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drupal`: The name of the log group for Drupal application logs.
@@ -188,7 +187,7 @@ As with the infrastructure and database modules, this module assumes that certai
 
 ### Drupal
 
-This module creates an ECS task definition and service for running the WebCMS. This task includes a pair of containers, nginx and PHP-FPM, that handle incoming web traffic. In addition, a Cloudwatch agent container runs in order to ingest metric data pushed from Drupal (see the epa_metrics module). Finally, a fourth container runs a basic Alpine image that gathers PHP-FPM metrics every 60 seconds and publishes them to CloudWatch.
+This module creates an ECS task definition and service for running the WebCMS. This task includes a pair of containers, nginx and PHP-FPM, that handle incoming web traffic. In addition, a third container runs a basic Alpine image that gathers PHP-FPM metrics every 60 seconds and publishes them to CloudWatch.
 
 An autoscaling policy is attached to the Drupal service that tracks 60% CPU utilization. Scale-out is more aggressive than scale-in by a factor of five. We enforce slow scale in due to the relatively slow warm-up time of the Drupal containers; a long cooldown smooths out spiky traffic patterns and keeps containers from exhibiting thrashing-like behavior as opcache warms up.
 
