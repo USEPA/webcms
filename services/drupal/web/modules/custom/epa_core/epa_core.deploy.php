@@ -7,6 +7,8 @@
 use Drupal\group\Entity\Group;
 use Drupal\media\Entity\Media;
 use Drupal\search_api\Entity\Server;
+use Drupal\flag\Entity\Flag;
+use Drupal\user\Entity\User;
 
 /**
  *
@@ -47,6 +49,7 @@ function _epa_core_populate_search_index_queue() {
   foreach ($revisions as $vid => $type) {
     $queue->createItem(['vid' => $vid, 'type' => $type]);
   }
+
 }
 
 /**
@@ -447,4 +450,96 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
       }
     }
   }
+}
+
+/**
+ * Setting notification_opt_in flag for node author, author of the latest
+ * revision, or author of the current revision
+ */
+function epa_core_deploy_0007_set_watch_flag (&$sandbox) {
+  $deb = "here";
+  if (!isset($sandbox['total'])) {
+    // Get all nodes.
+    $nodes = \Drupal::database()->query(
+      "SELECT vid FROM {node} n WHERE n.nid=190769")->fetchCol();
+
+    $sandbox['total'] = count($nodes);
+    $sandbox['current'] = 0;
+    \Drupal::logger('epa_core')
+      ->notice('Queueing ' . count($nodes) . ' nodes to be updated with notification_opt_in flag');
+  }
+
+  // Query 500 at a time for batch.
+  $nodes = \Drupal::database()->query(
+    "SELECT nid FROM {node} n WHERE n.nid=190769 ORDER BY n.nid ASC LIMIT 500
+        OFFSET " . $sandbox['current'] . ";")->fetchCol();
+
+  foreach ($nodes as $vid => $type) {
+
+    _epa_core_flag_revision(['vid' => $vid, 'type' => $type]);
+    $sandbox['current']++;
+  }
+
+  $latest_revs = \Drupal::database()->query(
+    "SELECT n.nid, n.vid as vid
+          FROM {node_revision} n
+          INNER JOIN
+              (SELECT nid,
+                   max(vid) AS latest_vid
+              FROM {node_revision}
+              GROUP BY  nid) nr_latest
+              ON n.vid = nr_latest.latest_vid
+              WHERE n.nid=190769 ORDER BY n.nid ASC LIMIT 500
+        OFFSET " . $sandbox['current'] . ";")
+    ->fetchCol(1);
+
+  // Remove current revs from latest revs.
+  $latest_revs = array_diff($latest_revs, $current_revs);
+
+  $current_revs = array_fill_keys($current_revs, 'current');
+  $latest_revs = array_fill_keys($latest_revs, 'latest');
+  $revisions = $current_revs + $latest_revs;
+
+
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' nodes updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+function _epa_core_flag_revision($data) {
+  $flag_service = \Drupal::service('flag');
+  $flag = Flag::load('notification_opt_in');
+
+  $vid = $data['vid'];
+  $type = $data['type'];
+  if ($node = node_revision_load($vid)) {
+    if ($type == 'current') {
+      $uid = $node->getOwnerId();
+      $revision_uid = $node->getRevisionUserId();
+      if ($revision_uid != $uid) {
+        $revision_user = User::load($uid);
+        if (!$flag_service->getFlagging($flag, $node, $revision_user)) {
+          $flag_service->flag($flag, $node, $revision_user);
+        }
+      }
+    }
+    elseif ($type == 'latest') {
+      $uid = $node->getRevisionUserId();
+    }
+    else {
+      return;
+    }
+    $user = User::load($uid);
+    // Example for flagging by node owner; extend logic as needed.
+    if (!$flag_service->getFlagging($flag, $node, $user)) {
+      $flag_service->flag($flag, $node, $user);
+    }
+  }
+
 }
