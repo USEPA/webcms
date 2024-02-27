@@ -939,41 +939,44 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        uid_1:
-          id: uid_1
-          table: users_field_data
-          field: uid
-          relationship: uid
+        revision_uid:
+          id: revision_uid
+          table: node_revision
+          field: revision_uid
+          relationship: none
           group_type: group
-          admin_label: ''
-          entity_type: user
-          entity_field: uid
+          admin_label: 'Last updated by'
+          entity_type: node
+          entity_field: revision_uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: uid_1_op
-            label: Author
-            description: ' '
+            operator_id: revision_uid_op
+            label: 'Last Updated By'
+            description: ''
             use_operator: false
-            operator: uid_1_op
+            operator: revision_uid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid_1
+            identifier: revision_uid
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -1278,29 +1281,29 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        revision_uid:
-          id: revision_uid
-          table: node_revision
-          field: revision_uid
-          relationship: none
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
           group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: revision_uid
+          admin_label: Author
+          entity_type: user
+          entity_field: uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: revision_uid_op
-            label: 'Last Updated By'
-            description: ''
+            operator_id: uid_1_op
+            label: Author
+            description: ' '
             use_operator: false
-            operator: revision_uid_op
+            operator: uid_1_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: revision_uid
+            identifier: uid_1
             required: false
             remember: false
             multiple: false
@@ -1315,6 +1318,7 @@ display:
               system_webmaster: '0'
               menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -2260,610 +2264,12 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-      filters:
-        title:
-          id: title
-          table: node_field_revision
-          field: title
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: title
-          plugin_id: string
-          operator: contains
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: title_op
-            label: Title
-            description: ''
-            use_operator: false
-            operator: title_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: title
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              administrator: '0'
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        field_search_text_value:
-          id: field_search_text_value
-          table: node_revision__field_search_text
-          field: field_search_text_value
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: views_autocomplete_filters_string
-          operator: contains
-          value: ''
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_search_text_value_op
-            label: 'Contains text'
-            description: ''
-            use_operator: false
-            operator: field_search_text_value_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: field_search_text_value
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              paragraphs_library_contributor: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            placeholder: ''
-            autocomplete_filter: 0
-            autocomplete_min_chars: '0'
-            autocomplete_items: '10'
-            autocomplete_field: ''
-            autocomplete_raw_suggestion: 1
-            autocomplete_raw_dropdown: 1
-            autocomplete_dependent: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        gid:
-          id: gid
-          table: group_content_field_data
-          field: gid
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          entity_type: group_content
-          entity_field: gid
-          plugin_id: entity_reference
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: gid_op
-            label: 'Web Area'
-            description: ''
-            use_operator: false
-            operator: gid_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: gid
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: false
-          handler: 'default:group'
-          widget: autocomplete
-          handler_settings:
-            target_bundles:
-              web_area: web_area
-            sort:
-              field: _none
-              direction: ASC
-            auto_create: false
-            auto_create_bundle: ''
-        type:
-          id: type
-          table: node_field_revision
-          field: type
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: type
-          plugin_id: bundle
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: type_op
-            label: Type
-            description: ''
-            use_operator: false
-            operator: type_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: type
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        uid_1:
-          id: uid_1
-          table: users_field_data
-          field: uid
-          relationship: uid
-          group_type: group
-          admin_label: ''
-          entity_type: user
-          entity_field: uid
-          plugin_id: user_name
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: uid_1_op
-            label: Author
-            description: ' '
-            use_operator: false
-            operator: uid_1_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_1
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        field_publisher_target_id:
-          id: field_publisher_target_id
-          table: group__field_publisher
-          field: field_publisher_target_id
-          relationship: gid
-          group_type: group
-          admin_label: ''
-          plugin_id: taxonomy_index_tid
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_publisher_target_id_op
-            label: Publisher
-            description: ''
-            use_operator: false
-            operator: field_publisher_target_id_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: field_publisher_target_id
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: false
-          vid: epa_organization
-          type: textfield
-          hierarchy: false
-          limit: true
-          error_message: true
-        field_owning_office_target_id:
-          id: field_owning_office_target_id
-          table: node_revision__field_owning_office
-          field: field_owning_office_target_id
-          relationship: none
-          group_type: group
-          admin_label: ''
-          plugin_id: taxonomy_index_tid
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: field_owning_office_target_id_op
-            label: 'Owning Office'
-            description: ''
-            use_operator: false
-            operator: field_owning_office_target_id_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: field_owning_office_target_id
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              paragraphs_library_contributor: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-              beta_tester: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: false
-          vid: epa_organization
-          type: textfield
-          hierarchy: false
-          limit: true
-          error_message: true
-        moderation_state:
-          id: moderation_state
-          table: node_field_revision
-          field: moderation_state
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: moderation_state_filter
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: moderation_state_op
-            label: 'Latest revision moderation state'
-            description: ''
-            use_operator: false
-            operator: moderation_state_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: moderation_state
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        moderation_state_1:
-          id: moderation_state_1
-          table: node_field_data
-          field: moderation_state
-          relationship: nid
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: moderation_state_filter
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: moderation_state_1_op
-            label: 'Current revision moderation state'
-            description: ''
-            use_operator: false
-            operator: moderation_state_1_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: moderation_state_1
-            required: false
-            remember: false
-            multiple: true
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        users_in_groups:
-          id: users_in_groups
-          table: group_content_field_data
-          field: users_in_groups
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          operator: in
-          value: null
-          group: 1
-          exposed: true
-          expose:
-            operator_id: users_in_groups_op
-            label: 'Web area filter'
-            description: ''
-            use_operator: 0
-            operator: users_in_groups_op
-            operator_limit_selection: 0
-            operator_list: {  }
-            identifier: users_in_groups
-            required: 0
-            remember: 0
-            multiple: 0
-            remember_roles:
-              authenticated: authenticated
-              anonymous: 0
-              layout_editor: 0
-              alerts_manager: 0
-              block_manager: 0
-              system_editor: 0
-              system_webmaster: 0
-              menu_admin: 0
-              administrator: 0
-            reduce: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: 0
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: group_content
-          plugin_id: epa_web_areas_users_groups
-        latest_revision:
-          id: latest_revision
-          table: node_revision
-          field: latest_revision
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: latest_revision
-          operator: '='
-          value: ''
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        revision_uid:
-          id: revision_uid
-          table: node_revision
-          field: revision_uid
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: revision_uid
-          plugin_id: user_name
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: revision_uid_op
-            label: 'Last Updated By'
-            description: ''
-            use_operator: false
-            operator: revision_uid_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: revision_uid
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              paragraphs_library_contributor: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-      filter_groups:
-        operator: AND
-        groups:
-          1: AND
       defaults:
         title: false
         pager: false
         fields: true
-        filters: false
-        filter_groups: false
+        filters: true
+        filter_groups: true
         header: false
       display_description: ''
       header:

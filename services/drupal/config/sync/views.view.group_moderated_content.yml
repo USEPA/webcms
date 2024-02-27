@@ -883,41 +883,44 @@ display:
           hierarchy: false
           limit: true
           error_message: true
-        uid:
-          id: uid
-          table: users_field_data
-          field: uid
-          relationship: uid
+        revision_uid:
+          id: revision_uid
+          table: node_revision
+          field: revision_uid
+          relationship: none
           group_type: group
-          admin_label: ''
-          entity_type: user
-          entity_field: uid
+          admin_label: 'Last updated by'
+          entity_type: node
+          entity_field: revision_uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: uid_op
-            label: Author
-            description: ' '
+            operator_id: revision_uid_op
+            label: 'Last Updated By'
+            description: ''
             use_operator: false
-            operator: uid_op
+            operator: revision_uid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: uid
+            identifier: revision_uid
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -1066,29 +1069,29 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        revision_uid:
-          id: revision_uid
-          table: node_revision
-          field: revision_uid
-          relationship: none
+        uid:
+          id: uid
+          table: users_field_data
+          field: uid
+          relationship: uid
           group_type: group
-          admin_label: ''
-          entity_type: node
-          entity_field: revision_uid
+          admin_label: Author
+          entity_type: user
+          entity_field: uid
           plugin_id: user_name
           operator: in
           value: {  }
           group: 1
           exposed: true
           expose:
-            operator_id: revision_uid_op
-            label: 'Last Updated By'
-            description: ''
+            operator_id: uid_op
+            label: Author
+            description: ' '
             use_operator: false
-            operator: revision_uid_op
+            operator: uid_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: revision_uid
+            identifier: uid
             required: false
             remember: false
             multiple: false
