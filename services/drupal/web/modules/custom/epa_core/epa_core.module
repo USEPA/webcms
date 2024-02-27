@@ -20,6 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\link\LinkItemInterface;
 use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
@@ -582,19 +583,12 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
 
   // If a link field only supports external links remove the confusing help text
   // the widget provides by default.
-  // The complicated logic here is necessary because the structure of this text
-  // differs depending on whether the field has additional descriptive text configured.
   if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
-    if ((is_array($element["uri"]["#description"])
-      && is_array($element["uri"]["#description"]['#items'])
-      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
-    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
-      if (isset($element["#description"])) {
-        $element["uri"]["#description"] = $element["#description"];
-      }
-      else {
-        unset($element["uri"]["#description"]);
-      }
+    if ($element["uri"]["#link_type"] == LinkItemInterface::LINK_EXTERNAL) {
+      $element["uri"]["#description"] = $element["#description"];
+    }
+    else {
+      unset($element["uri"]["#description"]);
     }
   }
 }
