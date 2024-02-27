@@ -777,6 +777,45 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+        latest_revision:
+          id: latest_revision
+          table: node_revision
+          field: latest_revision
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          plugin_id: latest_revision
+          operator: '='
+          value: ''
+          group: 1
+          exposed: false
+          expose:
+            operator_id: ''
+            label: ''
+            description: ''
+            use_operator: false
+            operator: ''
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: ''
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
         field_search_text_value:
           id: field_search_text_value
           table: node_revision__field_search_text
@@ -996,7 +1035,7 @@ display:
           field: field_publisher_target_id
           relationship: gid
           group_type: group
-          admin_label: ''
+          admin_label: Office
           plugin_id: taxonomy_index_tid
           operator: or
           value: {  }
@@ -1004,7 +1043,7 @@ display:
           exposed: true
           expose:
             operator_id: field_publisher_target_id_op
-            label: Publisher
+            label: Office
             description: ''
             use_operator: false
             operator: field_publisher_target_id_op
@@ -1017,6 +1056,7 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
@@ -1024,6 +1064,7 @@ display:
               system_webmaster: '0'
               menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -1098,6 +1139,107 @@ display:
           hierarchy: false
           limit: true
           error_message: true
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: 'Web area filter'
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: users_in_groups_op
+            label: 'Web area filter'
+            description: ''
+            use_operator: 0
+            operator: users_in_groups_op
+            operator_limit_selection: 0
+            operator_list: {  }
+            identifier: users_in_groups
+            required: 0
+            remember: 0
+            multiple: 0
+            remember_roles:
+              authenticated: authenticated
+              anonymous: 0
+              paragraphs_library_contributor: 0
+              layout_editor: 0
+              alerts_manager: 0
+              block_manager: 0
+              system_editor: 0
+              system_webmaster: 0
+              menu_admin: 0
+              administrator: 0
+              beta_tester: 0
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: 0
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: Author
+          entity_type: user
+          entity_field: uid
+          plugin_id: user_name
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_1_op
+            label: Author
+            description: ' '
+            use_operator: false
+            operator: uid_1_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+              beta_tester: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
         moderation_state:
           id: moderation_state
           table: node_field_revision
@@ -1181,144 +1323,6 @@ display:
               system_webmaster: '0'
               menu_admin: '0'
               administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        users_in_groups:
-          id: users_in_groups
-          table: group_content_field_data
-          field: users_in_groups
-          relationship: group_content
-          group_type: group
-          admin_label: ''
-          operator: in
-          value: null
-          group: 1
-          exposed: true
-          expose:
-            operator_id: users_in_groups_op
-            label: 'Web area filter'
-            description: ''
-            use_operator: 0
-            operator: users_in_groups_op
-            operator_limit_selection: 0
-            operator_list: {  }
-            identifier: users_in_groups
-            required: 0
-            remember: 0
-            multiple: 0
-            remember_roles:
-              authenticated: authenticated
-              anonymous: 0
-              layout_editor: 0
-              alerts_manager: 0
-              block_manager: 0
-              system_editor: 0
-              system_webmaster: 0
-              menu_admin: 0
-              administrator: 0
-            reduce: 0
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: 0
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          entity_type: group_content
-          plugin_id: epa_web_areas_users_groups
-        latest_revision:
-          id: latest_revision
-          table: node_revision
-          field: latest_revision
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: node
-          plugin_id: latest_revision
-          operator: '='
-          value: ''
-          group: 1
-          exposed: false
-          expose:
-            operator_id: ''
-            label: ''
-            description: ''
-            use_operator: false
-            operator: ''
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: ''
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-        uid_1:
-          id: uid_1
-          table: users_field_data
-          field: uid
-          relationship: uid
-          group_type: group
-          admin_label: Author
-          entity_type: user
-          entity_field: uid
-          plugin_id: user_name
-          operator: in
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: uid_1_op
-            label: Author
-            description: ' '
-            use_operator: false
-            operator: uid_1_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid_1
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              paragraphs_library_contributor: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              menu_admin: '0'
-              administrator: '0'
-              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
