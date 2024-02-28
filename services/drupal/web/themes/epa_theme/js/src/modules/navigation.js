@@ -22,7 +22,7 @@ export default function () {
     let lastFocusableElementMM;
     let priorLastElementMM;
 
-    mobileMenuButton.addEventListener('click', function() {
+    mobileMenuButton.addEventListener('click', function () {
       if (!focusableMM) {
         focusableMM = Array.from(
           mobileMenuNav.querySelectorAll(
@@ -42,7 +42,7 @@ export default function () {
       }
 
       if (lastFocusableElementMM) {
-        lastFocusableElementMM.addEventListener('click', function() {
+        lastFocusableElementMM.addEventListener('click', function () {
           const swapMM = lastFocusableElementMM;
           lastFocusableElementMM = priorLastElementMM;
           priorLastElementMM = swapMM;
