@@ -25,12 +25,11 @@
   {% set is_private = true %}
 {% endif %}
 
-{{ title_suffix.contextual_links }}
-
 {% include '@components/figure/figure.twig' with {
   'is_demo': false,
   'modifier_classes': classes,
   'media': node,
   'caption': caption,
   'is_private': is_private,
+  'contextual': title_suffix.contextual_links,
 } %}
