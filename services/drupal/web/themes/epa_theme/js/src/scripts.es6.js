@@ -10,7 +10,7 @@ import backToTop from './modules/_back-to-top.es6';
 import setScrollbarProperty from './modules/scrollbar-property.es6';
 import 'svgxuse';
 
-(function() {
+(function () {
   'use strict';
 
   // Generic function that runs on window resize.

@@ -1,7 +1,7 @@
 // Protected Links script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.protectedLinks = {
     attach(context, settings) {
       const allowedDomains = [
@@ -30,7 +30,7 @@ import Drupal from 'drupal';
         context
       );
 
-      externalLinks.forEach(function(el) {
+      externalLinks.forEach(function (el) {
         if (el.hasAttribute('href') && linkIsProtected(el)) {
           const translatedAccessible = Drupal.t('Exit to EPA’s internal site');
           el.insertAdjacentHTML(

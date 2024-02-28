@@ -1,7 +1,7 @@
 // Toggle Admin script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.toggleAdmin = {
     attach(context) {
       const toggleButton = context.querySelector('.js-toggle-admin');

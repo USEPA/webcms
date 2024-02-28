@@ -1,7 +1,7 @@
 // External Links script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.externalLinks = {
     attach(context, settings) {
       const allowedDomains = [
@@ -90,7 +90,7 @@ import Drupal from 'drupal';
         tl: ['Lumabas', 'Lumabas sa EPA website'],
         vi: ['Thoát ra', 'Thoát ra khỏi trang web EPA'],
       };
-      externalLinks.forEach(function(el) {
+      externalLinks.forEach(function (el) {
         if (el.hasAttribute('href') && linkIsExternal(el)) {
           let translatedAccessible = Drupal.t('Exit EPA’s Website');
           const article = el.closest('article[lang]');

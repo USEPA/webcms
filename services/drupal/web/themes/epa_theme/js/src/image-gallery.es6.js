@@ -4,7 +4,7 @@
 import Drupal from 'drupal';
 import { tns } from 'tiny-slider/src/tiny-slider';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.imageGallery = {
     attach(context) {
       const sliders = once('image-gallery', '.js-image-gallery', context);

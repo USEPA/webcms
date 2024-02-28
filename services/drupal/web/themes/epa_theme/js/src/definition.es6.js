@@ -1,7 +1,7 @@
 // Definition script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.definition = {
     attach(context) {
       const definitions = once('definition', '.js-definition', context);

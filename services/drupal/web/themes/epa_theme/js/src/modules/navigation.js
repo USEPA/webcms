@@ -1,4 +1,4 @@
-export default function() {
+export default function () {
   const subnav = once('navigation', '.menu--main .menu__subnav');
   subnav.forEach((menu, index) => {
     menu.setAttribute('hidden', true);

@@ -1,7 +1,7 @@
 // Media embed with link
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.mediaLink = {
     attach(context) {
       const mediaImages = once(

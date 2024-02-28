@@ -1,4 +1,5 @@
 const TerserJsPlugin = require('terser-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const glob = require('glob');
 const path = require('path');
 
@@ -23,10 +24,7 @@ module.exports = mode => {
       },
       minimizer: [
         new TerserJsPlugin({
-          sourceMap: true,
-          terserOptions: {
-            comments: false,
-          },
+          extractComments: false,
         }),
       ],
     },
@@ -47,12 +45,6 @@ module.exports = mode => {
                 configFile: path.resolve(__dirname, 'babel.config.json'),
               },
             },
-            {
-              loader: 'eslint-loader',
-              options: {
-                configFile: path.resolve(__dirname, '.eslintrc.js'),
-              },
-            },
           ],
         },
         {
@@ -69,6 +61,11 @@ module.exports = mode => {
         },
       ],
     },
+    plugins: [
+      new ESLintPlugin({
+        overrideConfigFile: path.resolve(__dirname, '.eslintrc.js'),
+      }),
+    ],
     externals: {
       jquery: 'jQuery',
       drupal: 'Drupal',

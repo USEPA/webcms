@@ -4,7 +4,7 @@
 import Drupal from 'drupal';
 import { tns } from 'tiny-slider/src/tiny-slider';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.heroSlideshow = {
     attach(context) {
       const sliders = once('hero-slideshow', '.js-hero-slideshow', context);
@@ -23,7 +23,7 @@ import { tns } from 'tiny-slider/src/tiny-slider';
         });
 
         // Stop autoplay after it has looped once through all slides.
-        sliderObject.events.on('transitionEnd', function() {
+        sliderObject.events.on('transitionEnd', function () {
           const sliderInfo = sliderObject.getInfo();
           if (sliderInfo.displayIndex === 1) {
             sliderInfo.container.dataset.sliderNoAutoplay = true;
@@ -32,13 +32,13 @@ import { tns } from 'tiny-slider/src/tiny-slider';
         });
 
         // Pause autoplay when focus moves into slider.
-        slider.addEventListener('focusin', function() {
+        slider.addEventListener('focusin', function () {
           sliderObject.pause();
         });
 
         // Restart autoplay when moving focus out of slider if still within
         // first loop.
-        slider.addEventListener('focusout', function() {
+        slider.addEventListener('focusout', function () {
           const sliderInfo = sliderObject.getInfo();
           if (!sliderInfo.container.dataset.sliderNoAutoplay) {
             sliderObject.play();
