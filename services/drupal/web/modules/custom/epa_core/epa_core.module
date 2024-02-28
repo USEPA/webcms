@@ -12,7 +12,6 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -21,7 +20,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\link\LinkItemInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -932,13 +930,14 @@ function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form
     }
   }
 
-   // @TODO: Figure out the other form ids ($form['#id'])
-   $views_exposed_forms = [
-     'views-exposed-form-moderated-content-moderated-content',
-     'views-exposed-form-moderated-content-page-1',
-   ];
+  $views_exposed_forms = [
+    'views-exposed-form-moderated-content-moderated-content',
+    'views-exposed-form-moderated-content-page-1',
+    'views-exposed-form-group-moderated-content-block-1',
+    'views-exposed-form-group-nodes-block-1',
+  ];
 
-  if (in_array($form['#id'], $views_exposed_forms)) {
+  if (in_array($form['#id'], $views_exposed_forms) && isset($form['revision_uid'])) {
     if ($form['revision_uid']['#description']) {
       unset($form['revision_uid']['#description']);
     }
