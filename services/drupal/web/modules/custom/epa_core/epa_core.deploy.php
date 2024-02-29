@@ -525,7 +525,7 @@ function _epa_core_set_notification_opt_in_flag($data) {
   $flag_id = 'notification_opt_in';
   if ($data->nid) {
     if ($data->uid) {
-      if (!_epa_core_get_flag($flag_id, $data->nid, $data->uid)) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
         $flagging = \Drupal::entityTypeManager()
           ->getStorage('flagging')
           ->create([
@@ -539,7 +539,7 @@ function _epa_core_set_notification_opt_in_flag($data) {
       }
     }
     if ($data->revision_uid) {
-      if (!_epa_core_get_flag($flag_id, $data->nid, $data->revision_uid)) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
         $flagging = \Drupal::entityTypeManager()
           ->getStorage('flagging')
           ->create([
@@ -553,7 +553,7 @@ function _epa_core_set_notification_opt_in_flag($data) {
       }
     }
     if ($data->latest_uid) {
-      if (!_epa_core_get_flag($flag_id, $data->nid, $data->latest_uid)) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
         $flagging = \Drupal::entityTypeManager()
           ->getStorage('flagging')
           ->create([
@@ -578,7 +578,7 @@ function _epa_core_set_notification_opt_in_flag($data) {
  *
  * @return array
  */
-function _epa_core_get_flag($flag_id, $entity_id, $uid) {
+function _epa_core_get_notification_opt_in_flag($flag_id, $entity_id, $uid) {
   $current_flag = \Drupal::database()->query(
     "SELECT *
             FROM {flagging}
