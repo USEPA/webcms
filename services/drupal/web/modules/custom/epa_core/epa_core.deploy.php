@@ -7,8 +7,6 @@
 use Drupal\group\Entity\Group;
 use Drupal\media\Entity\Media;
 use Drupal\search_api\Entity\Server;
-use Drupal\flag\Entity\Flag;
-use Drupal\user\Entity\User;
 
 /**
  *
@@ -478,12 +476,24 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
  * Setting notification_opt_in flag for node author, author of the latest
  * revision, or author of the current revision
  */
-function epa_core_deploy_00111_set_watch_flag(&$sandbox) {
-  $deb = "here";
+function epa_core_deploy_0005_set_watch_flag(&$sandbox) {
   if (!isset($sandbox['total'])) {
     // Get all nodes.
     $nodes = \Drupal::database()->query(
-      "SELECT vid FROM {node} n WHERE n.nid=190769")->fetchCol();
+      "SELECT node.nid,
+         latest.revision_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid);")
+      ->fetchAll();
 
     $sandbox['total'] = count($nodes);
     $sandbox['current'] = 0;
@@ -493,58 +503,26 @@ function epa_core_deploy_00111_set_watch_flag(&$sandbox) {
 
   // Query 500 at a time for batch.
   $nodes = \Drupal::database()->query(
-    "SELECT nid FROM {node} n ORDER BY n.nid ASC LIMIT 500
-        OFFSET " . $sandbox['current'] . ";")->fetchCol();
+    "SELECT node.nid,
+         latest.revision_uid as latest_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid) LIMIT 500
+        OFFSET " . $sandbox['current'] . ";")
+    ->fetchAll();
 
-  foreach ($nodes as $nid) {
-    // Get current revision
-//    $current_rev = \Drupal::database()->query(
-//      "SELECT revision_uid, max(vid)
-//              FROM {node_revision}
-//              WHERE nid=" . $nid . " AND revision_default=1;")
-//      ->fetchCol();
-
-    $current_rev = \Drupal::database()->query(
-      "SELECT n.nid, n.vid as vid
-          FROM {node_revision} n
-          INNER JOIN
-              (SELECT nid,
-                   max(vid) AS latest_vid
-              FROM {node_revision}
-              GROUP BY  nid) nr_latest
-              ON n.vid = nr_latest.latest_vid
-          WHERE n.nid=" . $nid . " AND revision_default=1;")
-      ->fetchCol(1);
-
-    if ($current_vid = array_pop($current_rev)) {
-      _epa_core_flag_revision($current_vid);
-    }
-    // Get latest revision
-    $latest_rev = \Drupal::database()->query(
-      "SELECT n.nid, n.vid as vid
-          FROM {node_revision} n
-          INNER JOIN
-              (SELECT nid,
-                   max(vid) AS latest_vid
-              FROM {node_revision}
-              GROUP BY  nid) nr_latest
-              ON n.vid = nr_latest.latest_vid
-          WHERE n.nid=" . $nid . " AND revision_default=0;")
-      ->fetchCol(1);
-    if ($latest_vid = array_pop($latest_rev)) {
-      _epa_core_flag_revision($latest_vid);
-    }
+  foreach ($nodes as $data) {
+    _epa_core_set_notification_opt_in_flag($data);
     $sandbox['current']++;
   }
-
-
-  // Remove current revs from latest revs.
-  //  $latest_revs = array_diff($latest_revs, $current_revs);
-  //
-  //  $current_revs = array_fill_keys($current_revs, 'current');
-  //  $latest_revs = array_fill_keys($latest_revs, 'latest');
-  //  $revisions = $current_revs + $latest_revs;
-
 
   \Drupal::logger('epa_core')->notice($sandbox['current'] . ' nodes updated.');
 
@@ -556,24 +534,79 @@ function epa_core_deploy_00111_set_watch_flag(&$sandbox) {
   }
 }
 
-function _epa_core_flag_revision($vid) {
-  $flag_service = \Drupal::service('flag');
-  $flag = Flag::load('notification_opt_in');
-
-  if ($node = node_revision_load($vid)) {
-    $uid = $node->getOwnerId();
-    $revision_uid = $node->getRevisionUserId();
-    if ($revision_uid != $uid) {
-      // Set flag for revision owner.
-      $revision_user = User::load($revision_uid);
-      if (!$flag_service->getFlagging($flag, $node, $revision_user, \Drupal::request()->getSession()->getId())) {
-        $flag_service->flag($flag, $node, $revision_user);
+/**
+ * Sets flag for node owner, current and latest revision owner for an entity.
+ *
+ * @param $data
+ *
+ * @return void
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _epa_core_set_notification_opt_in_flag($data) {
+  $flag_id = 'notification_opt_in';
+  if ($data->nid) {
+    if ($data->uid) {
+      if (!_epa_core_get_flag($flag_id, $data->nid, $data->uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
       }
     }
-    // Set flag for node owner.
-    $user = User::load($uid);
-    if (!$flag_service->getFlagging($flag, $node, $user, \Drupal::request()->getSession()->getId())) {
-      $flag_service->flag($flag, $node, $user);
+    if ($data->revision_uid) {
+      if (!_epa_core_get_flag($flag_id, $data->nid, $data->revision_uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->revision_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
+      }
+    }
+    if ($data->latest_uid) {
+      if (!_epa_core_get_flag($flag_id, $data->nid, $data->latest_uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->latest_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
+      }
     }
   }
+}
+
+/**
+ * Check if user is already flagged to entity.
+ *
+ * @param $flag_id
+ * @param $entity_id
+ * @param $uid
+ *
+ * @return array
+ */
+function _epa_core_get_flag($flag_id, $entity_id, $uid) {
+  $current_flag = \Drupal::database()->query(
+    "SELECT *
+            FROM {flagging}
+            WHERE uid=" . $uid . "
+            AND flag_id='" . $flag_id . "'
+            AND entity_id=" . $entity_id . ";")->fetchAll();
+  return $current_flag;
 }
