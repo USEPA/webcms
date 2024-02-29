@@ -3,6 +3,7 @@
 namespace Drupal\epa_workflow\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -11,6 +12,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\Icons;
 use Drupal\node\NodeInterface;
+use Drupal\node\Plugin\views\filter\Access;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use \Drupal\Core\Routing\RouteMatchInterface;
@@ -85,12 +87,10 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     // Check if we are on a node first
     if (!$this->routeMatch->getParameter('node')) {
       // Not on a node, exit early.
-      return [];
+      return AccessResultForbidden::forbidden();
     }
 
-    $condition = $account->hasPermission('use_epa_node_tabs');
-    return AccessResult::allowedIf($condition);
-
+    return AccessResultForbidden::allowedIfHasPermission($account, 'use_epa_node_tabs');
   }
 
   /**
@@ -106,7 +106,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
    */
   public function build() {
     $cacheability = new CacheableMetadata();
-    $cacheability->addCacheContexts(['route']);
+    $cacheability->addCacheContexts(['route', 'user']);
     // @todo: Eventually remove me. This just outputs the local tasks as we normally would.
     $build['content'] = $this->pluginManagerMenuLocalTask->getTasksBuild($this->routeMatch->getRouteName(), $cacheability);
 
