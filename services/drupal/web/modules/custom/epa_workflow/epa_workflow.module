@@ -914,7 +914,9 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
   ];
 }
 
-/**Implements hook_page_top() */
+/**
+ * Implements hook_page_top()
+ */
 function epa_workflow_page_top(array &$page_top) {
   // Only add this block if we're on a node route.
   if ($node = \Drupal::routeMatch()->getParameter('node')) {
@@ -923,10 +925,12 @@ function epa_workflow_page_top(array &$page_top) {
     /** @var Drupal\Core\Block\BlockBase $block */
     $block = \Drupal::service('plugin.manager.block')
       ->createInstance($machine_name, []);
-    $block->setContextValue('node', $node);
     if (!empty($block)) {
-      // Add to page top
-      $page_top['epa_node_tabs'] = $block->build();
+      if ($block->access(\Drupal::currentUser())) {
+        // Add to page top
+        $block->setContextValue('node', $node);
+        $page_top['epa_node_tabs'] = $block->build();
+      }
     }
   }
 }
