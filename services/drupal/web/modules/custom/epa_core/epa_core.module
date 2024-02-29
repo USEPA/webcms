@@ -113,7 +113,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $form['revision_information']['actions'] = [
       '#type' => "actions",
       'submit' => $submit_copy,
-      ];
+    ];
   }
 
   // Change the "Revision log message" label to say "Revision notes".
@@ -332,7 +332,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         $parts[0],
         'medium',
         ''
-        ];
+      ];
       $parts = array_replace($defaults, $parts);
       $name = $parts[0];
     }
@@ -521,11 +521,11 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       $form["owner_uid"]["#size"] = "60";
     }
   }
-// Hide "Exclude - Cloned" option in the entity clone form
+  // Hide "Exclude - Cloned" option in the entity clone form
   if ($form_id === 'entity_clone_form') {
-      if (isset($form['no_suffix'])) {
-        $form['no_suffix']['#access'] = FALSE;
-      }
+    if (isset($form['no_suffix'])) {
+      $form['no_suffix']['#access'] = FALSE;
+    }
   }
 }
 
@@ -587,9 +587,9 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   // differs depending on whether the field has additional descriptive text configured.
   if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
     if ((is_array($element["uri"]["#description"])
-      && is_array($element["uri"]["#description"]['#items'])
-      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
-    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
+        && is_array($element["uri"]["#description"]['#items'])
+        && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
+      || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
       if (isset($element["#description"])) {
         $element["uri"]["#description"] = $element["#description"];
       }
@@ -837,9 +837,9 @@ function epa_core_node_update(EntityInterface $node) {
  * Implements HOOK_form_FORM_ID_alter().
  */
 function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
- if (!empty($form["field_search_text_value"])) {
-     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
- }
+  if (!empty($form["field_search_text_value"])) {
+    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+  }
 }
 
 /**
@@ -880,5 +880,3 @@ function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefini
   }
   return AccessResult::neutral();
 }
-
-

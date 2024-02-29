@@ -42,13 +42,11 @@ function _epa_core_populate_search_index_queue() {
   $latest_revs = array_fill_keys($latest_revs, 'latest');
   $revisions = $current_revs + $latest_revs;
 
-  \Drupal::logger('epa_core')
-    ->notice('Queueing ' . count($revisions) . ' revisions that need to have their search text field populated');
+  \Drupal::logger('epa_core')->notice('Queueing ' . count($revisions) . ' revisions that need to have their search text field populated');
 
   foreach ($revisions as $vid => $type) {
     $queue->createItem(['vid' => $vid, 'type' => $type]);
   }
-
 }
 
 /**
@@ -69,17 +67,13 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
       'SELECT tid FROM taxonomy_term_field_data
         WHERE description__value IS NULL OR
               description__value = :value OR
-              description__value REGEXP :regex', [
-      ':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.',
-      ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$',
-    ])
+              description__value REGEXP :regex', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
       ->fetchCol();
 
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
 
-    \Drupal::logger('epa_core')
-      ->notice($sandbox['total'] . ' terms with outdated descriptions.');
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' terms with outdated descriptions.');
   }
 
   // Query 500 at a time for batch.
@@ -88,10 +82,7 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
         WHERE description__value IS NULL OR
               description__value = :value OR
               description__value REGEXP :regex
-            LIMIT 500;', [
-    ':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.',
-    ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$',
-  ])
+            LIMIT 500;', [':value' => 'This page shows all of the pages at epa.gov that are tagged with [term:name] at this time.', ':regex' => '^<p>This page shows all of the pages at epa\\.gov that are tagged with \\[term:name\\] at this time\\.<\\/p>[[:space:]]*$'])
     ->fetchCol();
 
   if (empty($tids)) {
@@ -104,16 +95,12 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
     ->loadMultiple($tids);
 
   foreach ($terms as $term) {
-    $term->set('description', [
-      'value' => '[term:term-description]',
-      'format' => 'filtered_html',
-    ]);
+    $term->set('description', ['value' => '[term:term-description]', 'format' => 'filtered_html']);
     $term->save();
     $sandbox['current']++;
   }
 
-  \Drupal::logger('epa_core')
-    ->notice($sandbox['current'] . ' terms descriptions updated.');
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' terms descriptions updated.');
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
@@ -124,8 +111,8 @@ function epa_core_deploy_0001_update_term_descriptions(&$sandbox) {
 }
 
 /**
- * Explicitly sets each taxonomy term to have its path set by pathauto then
- * re-saves terms to ensure they get the latest generated path.
+ * Explicitly sets each taxonomy term to have its path set by pathauto then re-saves
+ * terms to ensure they get the latest generated path.
  */
 function epa_core_deploy_0002_update_term_path(&$sandbox) {
   if (!isset($sandbox['total'])) {
@@ -137,8 +124,7 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
     $sandbox['total'] = count($result);
     $sandbox['current'] = 0;
 
-    \Drupal::logger('epa_core')
-      ->notice($sandbox['total'] . ' term paths to be updated.');
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' term paths to be updated.');
   }
 
   // Query 500 at a time for batch.
@@ -164,8 +150,7 @@ function epa_core_deploy_0002_update_term_path(&$sandbox) {
     $sandbox['current']++;
   }
 
-  \Drupal::logger('epa_core')
-    ->notice($sandbox['current'] . ' term paths updated.');
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' term paths updated.');
 
   if ($sandbox['current'] >= $sandbox['total']) {
     $sandbox['#finished'] = 1;
@@ -244,8 +229,7 @@ WHERE pfb.revision_id IS NULL
 
     }
 
-    \Drupal::logger('epa_core')
-      ->notice($sandbox['total'] . ' image files associated with banner slides.');
+    \Drupal::logger('epa_core')->notice($sandbox['total'] . ' image files associated with banner slides.');
   }
 
   foreach ($prefixes as $prefix) {
@@ -288,9 +272,7 @@ WHERE pfb.revision_id IS NULL
         $image_media = Media::create([
           'bundle' => 'banner_image',
           'uid' => \Drupal::currentUser()->id(),
-          'langcode' => \Drupal::languageManager()
-            ->getDefaultLanguage()
-            ->getId(),
+          'langcode' => \Drupal::languageManager()->getDefaultLanguage()->getId(),
           'field_media_image' => [
             'target_id' => $file->field_image_target_id,
             'alt' => $file->field_image_alt,
@@ -337,20 +319,18 @@ WHERE pfb.revision_id IS NULL
     $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
   }
 
-  \Drupal::logger('epa_core')
-    ->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' images processed / ' . $sandbox['images_created'] . ' banner images created.');
 
 }
 
 /**
- * Setting default values for field_image_style, field_title_placement, and
- * field_flag_card_alignment
+ * Setting default values for field_image_style, field_title_placement, and field_flag_card_alignment
  */
 function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
   $database = \Drupal::database();
   $prefixes = [
     'paragraph__' => 'paragraphs_item',
-    'paragraph_revision__' => 'paragraphs_item_revision',
+    'paragraph_revision__' => 'paragraphs_item_revision'
   ];
   foreach ($prefixes as $table_prefix => $item_table) {
     // It seems there is some issue that there are multiple revisions of the same paragraph in the same table
@@ -361,8 +341,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
 
     // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
-    $missing_image_styles_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.id = i.entity_id AND p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")
-      ->fetchAll();
+    $missing_image_styles_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.id = i.entity_id AND p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
     foreach ($missing_image_styles_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
@@ -374,22 +353,22 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
             'revision_id' => $paragraph->revision_id,
             'langcode' => 'en',
             'delta' => 0,
-            'field_image_style_value' => 'exdent',
+            'field_image_style_value' => 'exdent'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
         }
       }
       else {
         // Record does exist but is null, run update instead.
         try {
           $database->update($field_table)->fields([
-            'field_image_style_value' => 'exdent',
+            'field_image_style_value' => 'exdent'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
         }
 
       }
@@ -399,8 +378,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     $field_table = $table_prefix . 'field_title_placement';
     $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
 
-    $missing_title_placement_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")
-      ->fetchAll();
+    $missing_title_placement_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
     foreach ($missing_title_placement_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
@@ -412,22 +390,22 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
             'revision_id' => $paragraph->revision_id,
             'langcode' => 'en',
             'delta' => 0,
-            'field_title_placement_value' => 'media-first',
+            'field_title_placement_value' => 'media-first'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
         }
       }
       else {
         // Record does exist but is null, run update.
         try {
           $database->update($field_table)->fields([
-            'field_title_placement_value' => 'media-first',
+            'field_title_placement_value' => 'media-first'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
         }
       }
 
@@ -436,8 +414,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     // Update all card paragraph revision and non-revision items to set field_flag_card_alignment if a value is not already set.
     $field_table = $table_prefix . 'field_flag_card_alignment';
     $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
-    $missing_flag_alignment_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")
-      ->fetchAll();
+    $missing_flag_alignment_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
     foreach ($missing_flag_alignment_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
@@ -449,22 +426,22 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
             'revision_id' => $paragraph->revision_id,
             'langcode' => 'en',
             'delta' => 0,
-            'field_flag_card_alignment_value' => 'default',
+            'field_flag_card_alignment_value' => 'default'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
         }
       }
       else {
         // Record does exist but is null, run update.
         try {
           $database->update($field_table)->fields([
-            'field_flag_card_alignment_value' => 'default',
+            'field_flag_card_alignment_value' => 'default'
           ])->execute();
-        } catch (\Exception $e) {
-          \Drupal::logger('epa_core')
-            ->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
         }
 
       }
