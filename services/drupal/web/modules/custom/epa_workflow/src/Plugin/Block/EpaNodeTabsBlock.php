@@ -3,14 +3,17 @@
 namespace Drupal\epa_workflow\Plugin\Block;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\Icons;
+use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\node\Plugin\views\filter\Access;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -101,7 +104,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
    * tasks for a given route. We then create our own 'tabs' that use the tasks
    * information to build out our own 'tabs' array.
    *
-   * We also are now conditionally hiding the local tasks on all node pages.
+   * We still rely on customizations to the local tasks via hook_menu_local_tasks_alter()
    * @see \epa_workflow_menu_local_tasks_alter()
    */
   public function build() {
@@ -114,12 +117,25 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     $node = $this->getContextValue('node');
 
     $tabs = [];
-    $tabs[] = $this->initializeViewLivePage($node);
+    $route_name = $this->routeMatch->getRouteName();
+    // This gets all the local tasks after the hook_menu_local_tasks_alter() has been ran.
+    $tasks = $this->pluginManagerMenuLocalTask->getLocalTasks($route_name);
 
-    $tasks_build = $this->pluginManagerMenuLocalTask->getTasksBuild($this->routeMatch->getRouteName(), $cacheability);
     $page_options = $this->initializePageOptions();
-    foreach ($tasks_build[0] as $task_key => $tab) {
+    foreach ($tasks['tabs'] as $task_key => $tab) {
       switch ($task_key) {
+        case 'entity.node.canonical':
+          $loaded_node = Node::load($node->id());
+          if (!$loaded_node->isPublished()) {
+              $tab['#link']['url'] = new Url('<none>');
+          }
+          $tabs[] = $this->createTabItem(
+            'View live page',
+            $tab,
+            Icons::LIVE,
+            -90,
+          );
+          break;
         case 'entity.node.edit_form':
           $tabs[] = $this->createTabItem(
             $this->t('Edit latest draft'),
@@ -129,6 +145,14 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           );
           break;
         case 'content_moderation.workflows:node.latest_version_tab':
+          // Access to the latest_version tab is not always allowed based on the workflow
+          // state of the node. If that's the case we need to modify it so that we
+          // can still show it.
+          if ($tab['#access'] instanceof AccessResultForbidden) {
+            $tab['#link']['url'] = new Url('<none>');
+            $tab['#access'] = new AccessResultAllowed();
+          }
+
           $tabs[] = $this->createTabItem(
             $this->t('View latest draft'),
             $tab,
@@ -145,12 +169,13 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           );
           break;
         default:
-          // Any other remaining items should become children of 'Page Options' item.
+          // Any other remaining items should become children of 'Page Options'
           $this->addChildToPageOptions($page_options, $tab);
           break;
       }
     }
 
+    // After we've built the tabs lets remove the items that the user has access to.
     usort($page_options['#children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
 
     // Finally adds the $page_options tabs to the rest of the tabs array.
@@ -229,27 +254,4 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
       '#weight' => $tab['#weight'],
     ];
   }
-
-
-  /**
-   * Initializes the "View Live Page" node tab.
-   *
-   * @param NodeInterface $node
-   *   The node in question.
-   * @return array
-   *   The render array for an epa_node_tab_item
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   */
-  private function initializeViewLivePage(NodeInterface $node) {
-    return [
-      '#theme' => 'epa_node_tab_item',
-      '#title' => $this->t('View Live Page'),
-      '#url' => ($node->isDefaultRevision() && $node->isPublished()) ? $node->toUrl() : new Url('<none>'),
-      '#icon' => 'live',
-      '#is_active' => FALSE, // @todo: Determine active route
-      '#weight' => -90,
-      '#access' => TRUE,
-    ];
-  }
-
 }
