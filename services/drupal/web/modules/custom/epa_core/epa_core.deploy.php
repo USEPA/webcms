@@ -453,7 +453,7 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
  * Setting notification_opt_in flag for node author, author of the latest
  * revision, or author of the current revision
  */
-function epa_core_deploy_0005_set_watch_flag(&$sandbox) {
+function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
   if (!isset($sandbox['total'])) {
     // Get all nodes.
     $nodes = \Drupal::database()->query(
@@ -522,48 +522,40 @@ WHERE latest.vid IN
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function _epa_core_set_notification_opt_in_flag($data) {
+  $database = \Drupal::database();
   $flag_id = 'notification_opt_in';
   if ($data->nid) {
     if ($data->uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
-        $flagging = \Drupal::entityTypeManager()
-          ->getStorage('flagging')
-          ->create([
-            'uid' => $data->uid,
-            'flag_id' => $flag_id,
-            'entity_id' => $data->nid,
-            'entity_type' => 'node',
-            'global' => 0,
-          ]);
-        $flagging->save();
+        $database->insert('flagging')->fields([
+          'uid' => $data->uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();
       }
     }
     if ($data->revision_uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
-        $flagging = \Drupal::entityTypeManager()
-          ->getStorage('flagging')
-          ->create([
-            'uid' => $data->revision_uid,
-            'flag_id' => $flag_id,
-            'entity_id' => $data->nid,
-            'entity_type' => 'node',
-            'global' => 0,
-          ]);
-        $flagging->save();
+        $database->insert('flagging')->fields([
+          'uid' => $data->revision_uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();
       }
     }
     if ($data->latest_uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
-        $flagging = \Drupal::entityTypeManager()
-          ->getStorage('flagging')
-          ->create([
-            'uid' => $data->latest_uid,
-            'flag_id' => $flag_id,
-            'entity_id' => $data->nid,
-            'entity_type' => 'node',
-            'global' => 0,
-          ]);
-        $flagging->save();
+        $database->insert('flagging')->fields([
+          'uid' => $data->latest_uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();
       }
     }
   }
