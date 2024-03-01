@@ -38,12 +38,10 @@ We call a macro which calls itself to render the full tree.
     <ul>
   {% endif %}
   {% for item in tabs %}
-    <li{{ item.attributes }}>
       {{ item }} {# this is the epa-node-tab-item #}
       {% if item['#children'] %}
         {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
       {% endif %}
-    </li>
   {% endfor %}
   </ul>
   {% endif %}
