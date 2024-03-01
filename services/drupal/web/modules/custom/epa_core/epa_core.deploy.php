@@ -324,22 +324,6 @@ WHERE pfb.revision_id IS NULL
 }
 
 /**
- * Ensures that nodes that have existing data in their javascript field get
- * jQuery added to the page.
- */
-function epa_core_deploy_set_include_jquery_values() {
-    \Drupal::database()->query(
-      'INSERT INTO node__field_include_jquery (bundle,deleted,entity_id,revision_id,langcode,delta,field_include_jquery_value)
-  SELECT bundle,deleted,entity_id,revision_id,langcode,0,field_page_head_value<>:value
-  FROM node__field_page_head;', [':value' => '']);
-
-    \Drupal::database()->query(
-      'INSERT INTO node_revision__field_include_jquery (bundle,deleted,entity_id,revision_id,langcode,delta,field_include_jquery_value)
-  SELECT bundle,deleted,entity_id,revision_id,langcode,0,field_page_head_value<>:value
-  FROM node_revision__field_page_head;', [':value' => '']);
-}
-
-/**
  * Setting default values for field_image_style, field_title_placement, and field_flag_card_alignment
  */
 function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
@@ -349,79 +333,249 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     'paragraph_revision__' => 'paragraphs_item_revision'
   ];
   foreach ($prefixes as $table_prefix => $item_table) {
+    // It seems there is some issue that there are multiple revisions of the same paragraph in the same table
+    // Going to delete those records first
     $item_table = $item_table . '_field_data';
 
-    // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
     $field_table = $table_prefix . 'field_image_style';
-    $missing_image_styles_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+
+    // Update all card_group paragraph revision and non-revision items to set field_image_style if a value is not already set.
+    $missing_image_styles_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.id = i.entity_id AND p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_image_style_value IS NULL")->fetchAll();
     foreach ($missing_image_styles_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card_group',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
-          'field_image_style_value' => 'exdent'
-        ])->execute();
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card_group',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_image_style_value' => 'exdent'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
       }
       else {
         // Record does exist but is null, run update instead.
-        $database->update($field_table)->fields([
-          'field_image_style_value' => 'exdent'
-        ])->execute();
+        try {
+          $database->update($field_table)->fields([
+            'field_image_style_value' => 'exdent'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+
       }
     }
 
     // Update all card_group paragraph revision and non-revision items to set field_title_placement if a value is not already set.
     $field_table = $table_prefix . 'field_title_placement';
-    $missing_title_placement_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+
+    $missing_title_placement_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id AS field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card_group' AND i.field_title_placement_value IS NULL")->fetchAll();
     foreach ($missing_title_placement_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card_group',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
-          'field_title_placement_value' => 'media-first'
-        ])->execute();
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card_group',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_title_placement_value' => 'media-first'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
       }
       else {
         // Record does exist but is null, run update.
-        $database->update($field_table)->fields([
-          'field_title_placement_value' => 'media-first'
-        ])->execute();
+        try {
+          $database->update($field_table)->fields([
+            'field_title_placement_value' => 'media-first'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
       }
 
     }
 
     // Update all card paragraph revision and non-revision items to set field_flag_card_alignment if a value is not already set.
     $field_table = $table_prefix . 'field_flag_card_alignment';
-    $missing_flag_alignment_paragraphs = $database->query("SELECT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
+    $database->query("DELETE f FROM $field_table as f LEFT JOIN $item_table as i on f.revision_id = i.revision_id WHERE i.revision_id IS NULL");
+    $missing_flag_alignment_paragraphs = $database->query("SELECT DISTINCT p.id, p.revision_id, i.revision_id as field_revision_id FROM $item_table AS p LEFT JOIN $field_table AS i ON p.revision_id = i.revision_id WHERE p.type = 'card' AND i.field_flag_card_alignment_value IS NULL")->fetchAll();
     foreach ($missing_flag_alignment_paragraphs as $paragraph) {
       if (empty($paragraph->field_revision_id)) {
         // Record does not exist in field table.
-        $database->insert($field_table)->fields([
-          'bundle' => 'card',
-          'deleted' => 0,
-          'entity_id' => $paragraph->id,
-          'revision_id' => $paragraph->revision_id,
-          'langcode' => 'en',
-          'delta' => 0,
-          'field_flag_card_alignment_value' => 'default'
-        ])->execute();
+        try {
+          $database->insert($field_table)->fields([
+            'bundle' => 'card',
+            'deleted' => 0,
+            'entity_id' => $paragraph->id,
+            'revision_id' => $paragraph->revision_id,
+            'langcode' => 'en',
+            'delta' => 0,
+            'field_flag_card_alignment_value' => 'default'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error inserting record into $field_table table: " . $e->getMessage());
+        }
       }
-    else {
+      else {
         // Record does exist but is null, run update.
-      $database->update($field_table)->fields([
-        'field_flag_card_alignment_value' => 'default'
-      ])->execute();
+        try {
+          $database->update($field_table)->fields([
+            'field_flag_card_alignment_value' => 'default'
+          ])->execute();
+        }
+        catch (\Exception $e) {
+          \Drupal::logger('epa_core')->error("Error updating record into $field_table table: " . $e->getMessage());
+        }
+
       }
     }
   }
+}
+
+/**
+ * Setting notification_opt_in flag for node author, author of the latest
+ * revision, or author of the current revision
+ */
+function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Get all nodes.
+    $nodes = \Drupal::database()->query(
+      "SELECT node.nid,
+         latest.revision_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid);")
+      ->fetchAll();
+
+    $sandbox['total'] = count($nodes);
+    $sandbox['current'] = 0;
+    \Drupal::logger('epa_core')
+      ->notice('Queueing ' . count($nodes) . ' nodes to be updated with notification_opt_in flag');
+  }
+
+  // Query 500 at a time for batch.
+  $nodes = \Drupal::database()->query(
+    "SELECT node.nid,
+         latest.revision_uid as latest_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid) LIMIT 500
+        OFFSET " . $sandbox['current'] . ";")
+    ->fetchAll();
+
+  foreach ($nodes as $data) {
+    _epa_core_set_notification_opt_in_flag($data);
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' nodes updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Sets flag for node owner, current and latest revision owner for an entity.
+ *
+ * @param $data
+ *
+ * @return void
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _epa_core_set_notification_opt_in_flag($data) {
+  $database = \Drupal::database();
+  $flag_id = 'notification_opt_in';
+  if ($data->nid) {
+    if ($data->uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
+        $database->insert('flagging')->fields([
+          'uid' => $data->uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();
+      }
+    }
+    if ($data->revision_uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
+        $database->insert('flagging')->fields([
+          'uid' => $data->revision_uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();
+      }
+    }
+    if ($data->latest_uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
+        $database->insert('flagging')->fields([
+          'uid' => $data->latest_uid,
+          'flag_id' => $flag_id,
+          'entity_id' => $data->nid,
+          'entity_type' => 'node',
+          'global' => 0,
+        ])->execute();  
+      }
+    }
+  }
+}
+
+/**
+ * Check if user is already flagged to entity.
+ *
+ * @param $flag_id
+ * @param $entity_id
+ * @param $uid
+ *
+ * @return array
+ */
+function _epa_core_get_notification_opt_in_flag($flag_id, $entity_id, $uid) {
+  $current_flag = \Drupal::database()->query(
+    "SELECT *
+            FROM {flagging}
+            WHERE uid=" . $uid . "
+            AND flag_id='" . $flag_id . "'
+            AND entity_id=" . $entity_id . ";")->fetchAll();
+  return $current_flag;
 }
