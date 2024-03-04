@@ -805,6 +805,22 @@ function epa_core_node_presave(EntityInterface $node) {
 }
 
 /**
+ * Implements hook_node_update().
+ */
+function epa_core_node_update(EntityInterface $node) {
+  // Flag node for current user when node is created/updated.
+  /** @var \Drupal\flag\FlagServiceInterface $flag_service */
+  $flag_service = \Drupal::service('flag');
+  $flag = $flag_service->getFlagById('notification_opt_in');
+  if ($flag && $node) {
+    // Check to see if user is already watching node.
+    if (!$flag_service->getFlagging($flag, $node)) {
+      $flag_service->flag($flag, $node);
+    }
+  }
+}
+
+/**
  * Implements HOOK_form_FORM_ID_alter().
  */
 function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
