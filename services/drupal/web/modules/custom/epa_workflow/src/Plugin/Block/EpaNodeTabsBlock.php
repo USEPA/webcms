@@ -109,7 +109,8 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
    */
   public function build() {
     $cacheability = new CacheableMetadata();
-    $cacheability->addCacheContexts(['route', 'user']);
+    $cacheability->addCacheContexts(['route']);
+    $cacheability->addCacheTags(['node']);
     // @todo: Eventually remove me. This just outputs the local tasks as we normally would.
     $build['content'] = $this->pluginManagerMenuLocalTask->getTasksBuild($this->routeMatch->getRouteName(), $cacheability);
 
@@ -125,12 +126,13 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     foreach ($tasks['tabs'] as $task_key => $tab) {
       switch ($task_key) {
         case 'entity.node.canonical':
-          $loaded_node = Node::load($node->id());
-          if (!$loaded_node->isPublished()) {
-              $tab['#link']['url'] = new Url('<none>');
+          if (!$node->isPublished()) {
+            $tab['#link']['url'] = new Url('<none>');
+            $tab['#active'] = FALSE;
           }
+
           $tabs[] = $this->createTabItem(
-            'View live page',
+            $this->t('View live page'),
             $tab,
             Icons::LIVE,
             -90,
@@ -145,6 +147,15 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           );
           break;
         case 'content_moderation.workflows:node.latest_version_tab':
+          // The "View latest draft" tab should be enabled in the following:
+          // - should link to /node/[id]/latest if latest revision doesn't match current revision
+          // - should link to /node/[id] if latest revision matches current revision and current revision is NOT published
+          // - Or if latest revision == current revision and current revision IS NOT published then this s.
+          if ($node->isLatestRevision() && !$node->isPublished()) {
+            $tab['#link']['url'] = $node->toUrl();
+            $tab['#active'] = TRUE;
+          }
+
           // Access to the latest_version tab is not always allowed based on the workflow
           // state of the node. If that's the case we need to modify it so that we
           // can still show it.
