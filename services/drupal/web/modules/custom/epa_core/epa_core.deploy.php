@@ -522,40 +522,48 @@ WHERE latest.vid IN
  * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function _epa_core_set_notification_opt_in_flag($data) {
-  $database = \Drupal::database();
   $flag_id = 'notification_opt_in';
   if ($data->nid) {
     if ($data->uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
-        $database->insert('flagging')->fields([
-          'uid' => $data->uid,
-          'flag_id' => $flag_id,
-          'entity_id' => $data->nid,
-          'entity_type' => 'node',
-          'global' => 0,
-        ])->execute();
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
       }
     }
     if ($data->revision_uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
-        $database->insert('flagging')->fields([
-          'uid' => $data->revision_uid,
-          'flag_id' => $flag_id,
-          'entity_id' => $data->nid,
-          'entity_type' => 'node',
-          'global' => 0,
-        ])->execute();
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->revision_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
       }
     }
     if ($data->latest_uid) {
       if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
-        $database->insert('flagging')->fields([
-          'uid' => $data->latest_uid,
-          'flag_id' => $flag_id,
-          'entity_id' => $data->nid,
-          'entity_type' => 'node',
-          'global' => 0,
-        ])->execute();
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->latest_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
       }
     }
   }
