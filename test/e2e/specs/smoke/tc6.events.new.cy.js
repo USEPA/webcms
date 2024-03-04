@@ -1,12 +1,12 @@
 import {
   addPageSection,
   duplicatePageSection,
-  getPageFields, loginToDrupal, setPageFields, verifyPageElements,
+  getPageFields, getTodayDate, loginToDrupal, setPageFields, verifyPageElements, verifyPageSource,
 } from '../../support/functions';
 
-const formatFile = require('../../fixtures/basicPageNew.json');
+const formatFile = require('../../fixtures/eventsNew.json');
 
-describe(formatFile.testCaseName, () => {
+describe('TC6 - Events', () => {
   Cypress.on('uncaught:exception', (_err, _runnable) => false);
   before(() => {
     loginToDrupal('first');
@@ -45,13 +45,12 @@ describe(formatFile.testCaseName, () => {
   });
 
   it('Duplicate HTML Section', () => {
-    // duplicatePageSection('Body', '.paragraph-type--html', 0);
+    duplicatePageSection('Body', '.paragraph-type--html', 0);
   });
 
   it('Save after entering all required information', () => {
     cy.get('body').then(() => {
-      cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
-        .click({force: true});
+      cy.get('[data-drupal-selector="edit-actions"]').find('input').first().click({force: true});
     }).then(() => {
       cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been created.`);
     });
@@ -71,8 +70,16 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("View"):visible').first().click();
     }).then(() => {
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
       verifyPageElements(formatFile.expected);
     });
+  });
+
+  it('Verify Dates in Page Source', () => {
+    verifyPageSource('DC.date.created', getTodayDate('yyyy-MM-dd'));
+    verifyPageSource('DC.date.modified', getTodayDate('yyyy-MM-dd'));
+    verifyPageSource('DC.date.reviewed', getTodayDate('yyyy-MM-dd'), (60000 * 60 * 24 * 90));
   });
 
   it(`Edit ${formatFile.contentType}`, () => {
@@ -137,7 +144,6 @@ describe(formatFile.testCaseName, () => {
       cy.get('.usa-alert__text').should('contain.text', `The entity ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'of type node was cloned.');
       cy.get('.field--tight:contains("Moderation state")').should('contain.text', 'Draft');
-      verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
@@ -176,8 +182,37 @@ describe(formatFile.testCaseName, () => {
       cy.get('.views-table').find('tbody').find(`a:contains("${formatFile.pageTitle}")`).first()
         .click();
     }).then(() => {
-      verifyPageElements(formatFile.expected);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
+
+  it('Delete a cloned Event', () => {
+    cy.get('body').then(() => {
+      cy.get('nav').find('a:contains("My Web Areas")').first().click();
+      cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
+      cy.get(`a:contains("Cloned: ${formatFile.pageTitle}"):visible`).first().click();
+      cy.get('a:contains("Delete"):visible').first().click();
+      cy.get('[value="Delete"]').first().click();
+    }).then(() => {
+      cy.get('.usa-alert__text').should('contain.text', `The Event Cloned: ${formatFile.pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', 'has been deleted.');
+    });
+  });
+
+  it('Delete an Event', () => {
+    cy.get('body').then(() => {
+      cy.get('nav').find('a:contains("My Web Areas")').first().click();
+      cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
+      cy.get(`a:contains("${formatFile.pageTitle}"):visible`).first().click();
+      cy.get('a:contains("Delete"):visible').first().click();
+      cy.get('[value="Delete"]').first().click();
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(2000);
+    }).then(() => {
+      cy.get('.usa-alert__text').should('contain.text', `The Event ${formatFile.pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', 'has been deleted.');
+    });
+  });
 });
+
+
