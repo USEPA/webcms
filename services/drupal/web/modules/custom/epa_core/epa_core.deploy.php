@@ -381,3 +381,143 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
     }
   }
 }
+
+/**
+ * Setting notification_opt_in flag for node author, author of the latest
+ * revision, or author of the current revision
+ */
+function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    // Get all nodes.
+    $nodes = \Drupal::database()->query(
+      "SELECT node.nid,
+         latest.revision_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid);")
+      ->fetchAll();
+
+    $sandbox['total'] = count($nodes);
+    $sandbox['current'] = 0;
+    \Drupal::logger('epa_core')
+      ->notice('Queueing ' . count($nodes) . ' nodes to be updated with notification_opt_in flag');
+  }
+
+  // Query 500 at a time for batch.
+  $nodes = \Drupal::database()->query(
+    "SELECT node.nid,
+         latest.revision_uid as latest_uid,
+         node.uid,
+         current.revision_uid
+FROM node_revision AS latest
+LEFT JOIN node_field_data AS node
+    ON latest.nid = node.nid
+LEFT JOIN node_revision AS current
+    ON node.vid = current.vid
+WHERE latest.vid IN
+    (SELECT MAX(vid)
+    FROM node_revision
+    GROUP BY  nid) LIMIT 500
+        OFFSET " . $sandbox['current'] . ";")
+    ->fetchAll();
+
+  foreach ($nodes as $data) {
+    _epa_core_set_notification_opt_in_flag($data);
+    $sandbox['current']++;
+  }
+
+  \Drupal::logger('epa_core')->notice($sandbox['current'] . ' nodes updated.');
+
+  if ($sandbox['current'] >= $sandbox['total']) {
+    $sandbox['#finished'] = 1;
+  }
+  else {
+    $sandbox['#finished'] = ($sandbox['current'] / $sandbox['total']);
+  }
+}
+
+/**
+ * Sets flag for node owner, current and latest revision owner for an entity.
+ *
+ * @param $data
+ *
+ * @return void
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ * @throws \Drupal\Core\Entity\EntityStorageException
+ */
+function _epa_core_set_notification_opt_in_flag($data) {
+  $flag_id = 'notification_opt_in';
+  if ($data->nid) {
+    if ($data->uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
+      }
+    }
+    if ($data->revision_uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->revision_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
+      }
+    }
+    if ($data->latest_uid) {
+      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
+        $flagging = \Drupal::entityTypeManager()
+          ->getStorage('flagging')
+          ->create([
+            'uid' => $data->latest_uid,
+            'flag_id' => $flag_id,
+            'entity_id' => $data->nid,
+            'entity_type' => 'node',
+            'global' => 0,
+          ]);
+        $flagging->save();
+      }
+    }
+  }
+}
+
+/**
+ * Check if user is already flagged to entity.
+ *
+ * @param $flag_id
+ * @param $entity_id
+ * @param $uid
+ *
+ * @return array
+ */
+function _epa_core_get_notification_opt_in_flag($flag_id, $entity_id, $uid) {
+  $current_flag = \Drupal::database()->query(
+    "SELECT *
+            FROM {flagging}
+            WHERE uid=" . $uid . "
+            AND flag_id='" . $flag_id . "'
+            AND entity_id=" . $entity_id . ";")->fetchAll();
+  return $current_flag;
+}
+
