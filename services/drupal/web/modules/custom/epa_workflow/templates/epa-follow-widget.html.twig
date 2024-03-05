@@ -1,6 +1,28 @@
+{#
+/**
+ * @file
+ *
+ * Available variables:
+ * - current_user_following: Boolean for determining whether the current user has
+     flagged the node.
+ * - flag_link: The link provided by the Flag module that provides the follow/un-follow
+     capabilities.
+ * - flag_users: An 'item_list' (ul) render array of all users currently flagging the node.
+     Order is based on order of when the user flagged with the exception of the current
+     user. If current user is 'following' then they will show at the top of the list.
+ */
+#}
 <div>
-  <h2>I'm the flag widget</h2>
+  {% if current_user_is_following %}
+    {# This means the user is currently following. Add checkmark icon #}
+    <p>Following</p>
+  {% else %}
+    {# This means the user is currently not following. Add plus sign icon #}
+    <p>Follow</p>
+  {% endif %}
   {{ flag_link }}
-  <p>Following this node</p>
-  {{ flag_users }}
+  {% if flag_users is not empty %}
+    <p>Following this node</p>
+    {{ flag_users }}
+  {% endif %}
 </div>
