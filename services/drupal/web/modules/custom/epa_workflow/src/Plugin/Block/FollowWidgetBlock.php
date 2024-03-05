@@ -127,9 +127,12 @@ class FollowWidgetBlock extends BlockBase implements ContainerFactoryPluginInter
     $users = $this->flag->getFlaggingUsers($entity);
     $user_list = $this->getFlaggingUsersList($users);
 
+    $user_flaggings = $this->flag->getEntityFlaggings($flag, $entity, $this->currentUser);
+
     $build['flag_link'] = [
       '#theme' => 'epa_follow_widget',
       '#flag_link' => $flag_link,
+      '#current_user_is_following' => !empty($user_flaggings),
       '#flag_users' => $user_list,
     ];
 
