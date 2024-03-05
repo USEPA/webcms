@@ -388,27 +388,22 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
  */
 function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
   if (!isset($sandbox['total'])) {
-    // Get all nodes.
-    $nodes = \Drupal::database()->query(
-      "SELECT node.nid,
-         latest.revision_uid,
-         node.uid,
-         current.revision_uid
-FROM node_revision AS latest
-LEFT JOIN node_field_data AS node
-    ON latest.nid = node.nid
-LEFT JOIN node_revision AS current
-    ON node.vid = current.vid
-WHERE latest.vid IN
-    (SELECT MAX(vid)
-    FROM node_revision
-    GROUP BY  nid);")
-      ->fetchAll();
+    // Count all nodes.
+    $count = \Drupal::database()->query(
+      "SELECT COUNT(DISTINCT node.nid) AS total
+    FROM node_revision AS latest
+    LEFT JOIN node_field_data AS node ON latest.nid = node.nid
+    LEFT JOIN node_revision AS current ON node.vid = current.vid
+    WHERE latest.vid IN (
+        SELECT MAX(vid)
+        FROM node_revision
+        GROUP BY nid
+    )")->fetchField();
 
-    $sandbox['total'] = count($nodes);
+    $sandbox['total'] = $count;
     $sandbox['current'] = 0;
     \Drupal::logger('epa_core')
-      ->notice('Queueing ' . count($nodes) . ' nodes to be updated with notification_opt_in flag');
+      ->notice('Queueing ' . $count . ' nodes to be updated with notification_opt_in flag');
   }
 
   // Query 500 at a time for batch.
@@ -425,7 +420,9 @@ LEFT JOIN node_revision AS current
 WHERE latest.vid IN
     (SELECT MAX(vid)
     FROM node_revision
-    GROUP BY  nid) LIMIT 500
+    GROUP BY  nid)
+ORDER BY node.nid ASC
+LIMIT 500
         OFFSET " . $sandbox['current'] . ";")
     ->fetchAll();
 
@@ -456,41 +453,23 @@ WHERE latest.vid IN
  */
 function _epa_core_set_notification_opt_in_flag($data) {
   $flag_id = 'notification_opt_in';
+  // Check if the node ID exists.
   if ($data->nid) {
-    if ($data->uid) {
-      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->uid)) {
+    // Define the array of user IDs to iterate over.
+    $user_ids = [
+      'uid' => $data->uid,
+      'revision_uid' => $data->revision_uid,
+      'latest_uid' => $data->latest_uid,
+    ];
+
+    // Iterate over each user ID.
+    foreach ($user_ids as $uid) {
+      // Check if the user ID is set and the flag has not been set for this user and node combination.
+      if ($uid && !_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $uid)) {
         $flagging = \Drupal::entityTypeManager()
           ->getStorage('flagging')
           ->create([
-            'uid' => $data->uid,
-            'flag_id' => $flag_id,
-            'entity_id' => $data->nid,
-            'entity_type' => 'node',
-            'global' => 0,
-          ]);
-        $flagging->save();
-      }
-    }
-    if ($data->revision_uid) {
-      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->revision_uid)) {
-        $flagging = \Drupal::entityTypeManager()
-          ->getStorage('flagging')
-          ->create([
-            'uid' => $data->revision_uid,
-            'flag_id' => $flag_id,
-            'entity_id' => $data->nid,
-            'entity_type' => 'node',
-            'global' => 0,
-          ]);
-        $flagging->save();
-      }
-    }
-    if ($data->latest_uid) {
-      if (!_epa_core_get_notification_opt_in_flag($flag_id, $data->nid, $data->latest_uid)) {
-        $flagging = \Drupal::entityTypeManager()
-          ->getStorage('flagging')
-          ->create([
-            'uid' => $data->latest_uid,
+            'uid' => $uid,
             'flag_id' => $flag_id,
             'entity_id' => $data->nid,
             'entity_type' => 'node',
