@@ -11,6 +11,10 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
+{% set header_info %}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
+{% endset %}
+
 {% set sidenav = drupal_region('sidebar') %}
 
 {%  set press_offices = [] %}

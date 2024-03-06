@@ -23,6 +23,8 @@ use Drupal\group\Entity\GroupInterface;
 use Drupal\group_content_menu\GroupContentMenuInterface;
 use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\node\NodeInterface;
+
 
 /**
  * {@inheritdoc}
@@ -292,8 +294,21 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $langcode = $this->contentLanguage;
     $label = $this->t('Home', [], ['langcode' => $langcode]);
     $home_link = Link::createFromRoute($label, '<front>');
+
     // Add home link to the beginning of the breadcrumb trail.
     array_unshift($links, $home_link);
+
+   // Create a breadcrumb for News Releases.
+    function your_theme_preprocess_node(&$variables) {
+      $node = $variables['node'];
+    
+      // Check if the current node is a 'news_release' type.
+      if ($node->bundle() === 'news_release') {
+        $newsReleaseLabel = t('News Release');
+        $newsReleaseUrl = Url::fromUri('internal:/newsreleases/search');
+        $variables['news_release_breadcrumb'] = Link::fromTextAndUrl($newsReleaseLabel, Url::fromUri('internal:' . $newsReleaseUrl))->toString();
+      }
+    }
 
     /** @var \Drupal\Core\Link $last */
     $last = end($links);
