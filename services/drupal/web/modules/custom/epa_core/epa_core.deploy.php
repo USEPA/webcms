@@ -389,8 +389,8 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
 function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
   if (!isset($sandbox['total'])) {
     // Count all nodes.
-    $count = \Drupal::database()->query(
-      "SELECT COUNT(DISTINCT node.nid) AS total
+    $result = \Drupal::database()->query(
+      "SELECT COUNT(DISTINCT node.nid) AS total, MAX(node.nid) AS highest_nid
     FROM node_revision AS latest
     LEFT JOIN node_field_data AS node ON latest.nid = node.nid
     LEFT JOIN node_revision AS current ON node.vid = current.vid
@@ -398,15 +398,18 @@ function epa_core_deploy_0055_set_watch_flag(&$sandbox) {
         SELECT MAX(vid)
         FROM node_revision
         GROUP BY nid
-    )")->fetchField();
+    )")->fetchAssoc();
 
-    $sandbox['total'] = $count;
+    $sandbox['total'] = $result['total'];
+    $sandbox['highest_nid'] = $result['highest_nid'];
+    $sandbox['last_nid'] = 0;
     $sandbox['current'] = 0;
+    $sandbox['time'] = time();
     \Drupal::logger('epa_core')
-      ->notice('Queueing ' . $count . ' nodes to be updated with notification_opt_in flag');
+      ->notice('Queueing ' . $sandbox['total'] . ' nodes to be updated with notification_opt_in flag');
   }
 
-  // Query 500 at a time for batch.
+  // Query 2000 at a time for batch.
   $nodes = \Drupal::database()->query(
     "SELECT node.nid,
          latest.revision_uid as latest_uid,
@@ -421,19 +424,22 @@ WHERE latest.vid IN
     (SELECT MAX(vid)
     FROM node_revision
     GROUP BY  nid)
+AND node.nid > :startingNid
 ORDER BY node.nid ASC
-LIMIT 500
-        OFFSET " . $sandbox['current'] . ";")
-    ->fetchAll();
+LIMIT 2000",
+    [':startingNid' => $sandbox['last_nid'] ]
+)->fetchAll();
 
   foreach ($nodes as $data) {
     _epa_core_set_notification_opt_in_flag($data);
+    $sandbox['last_nid'] = $data->nid;
     $sandbox['current']++;
   }
 
   \Drupal::logger('epa_core')->notice($sandbox['current'] . ' nodes updated.');
-
-  if ($sandbox['current'] >= $sandbox['total']) {
+  \Drupal::logger('epa_core')->notice(time() - $sandbox['time']  . ' seconds to complete.');
+  $sandbox['time'] = time();
+  if ($sandbox['last_nid'] >= $sandbox['highest_nid']) {
     $sandbox['#finished'] = 1;
   }
   else {
