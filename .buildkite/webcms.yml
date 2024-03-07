@@ -124,9 +124,14 @@ steps:
           command:
             - -ec
             - |
+              mkdir -p ~/.aws
+              echo '[drush]' >> ~/.aws/credentials
+              echo 'role_arn = arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks' >> ~/.aws/credentials
+              echo 'credential_source = Ec2InstanceMetadata' >> ~/.aws/credentials
+
               cd ci
               npm ci
-              node drush.js
+              AWS_PROFILE=drush node drush.js
 
           propagate-aws-auth-tokens: true
           environment:
