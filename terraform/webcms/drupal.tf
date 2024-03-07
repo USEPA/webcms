@@ -120,28 +120,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
         }
       }
     },
-
-    # Report FPM metrics to CloudWatch using the custom metrics container. See the
-    # services/metrics directory for more.
-    {
-      name  = "metrics"
-      image = "${data.aws_ssm_parameter.ecr_metrics.value}:${var.image_tag}"
-
-      environment = [
-        { name = "AWS_REGION", value = var.aws_region },
-        { name = "WEBCMS_SITE", value = "${var.site}-${var.lang}" },
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.fpm_metrics_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "fpm-metrics"
-        }
-      }
-    },
   ])
 
   tags = var.tags
