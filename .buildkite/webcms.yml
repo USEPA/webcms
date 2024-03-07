@@ -76,18 +76,6 @@ steps:
                       --target="$$TARGET" \
                       --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-$$TARGET:${WEBCMS_IMAGE_TAG}"
 
-      - label: "Build fpm-metrics"
-        concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
-        concurrency: 4
-
-        commands:
-          - docker build services/metrics --tag "${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
-          - docker push "${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
-
-        plugins:
-          - cultureamp/aws-assume-role#v0.1.0:
-              role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
-
   - wait: ~
 
   - label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"
