@@ -23,6 +23,8 @@ use Drupal\group\Entity\GroupInterface;
 use Drupal\group_content_menu\GroupContentMenuInterface;
 use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Drupal\node\NodeInterface;
+
 
 /**
  * {@inheritdoc}
@@ -280,11 +282,18 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     // Create a breadcrumb for the Web Area's homepage if it's published.
     /** @var \Drupal\node\Entity\Node $web_area_home */
     $web_area_home = $this->group->get('field_homepage')->entity;
+    $node = $this->currentRequest->get('node');
     if ($web_area_home) {
-      $breadcrumb->addCacheableDependency($web_area_home);
-      if ($web_area_home->isPublished()) {
-        $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
-        array_unshift($links, $web_area_home_link);
+      if ($node && $node->bundle() === 'news_release') {
+        // Add the news release search page instead of the web area homepage for News Release nodes.
+        $links[] = Link::createFromRoute(t('News Releases'), 'view.search_news_releases.page_1');
+      }
+      else {
+        $breadcrumb->addCacheableDependency($web_area_home);
+        if ($web_area_home->isPublished()) {
+          $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
+          array_unshift($links, $web_area_home_link);
+        }
       }
     }
 
@@ -292,6 +301,7 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $langcode = $this->contentLanguage;
     $label = $this->t('Home', [], ['langcode' => $langcode]);
     $home_link = Link::createFromRoute($label, '<front>');
+
     // Add home link to the beginning of the breadcrumb trail.
     array_unshift($links, $home_link);
 
