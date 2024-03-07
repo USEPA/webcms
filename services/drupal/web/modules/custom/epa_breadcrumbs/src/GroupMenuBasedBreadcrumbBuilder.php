@@ -282,11 +282,18 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     // Create a breadcrumb for the Web Area's homepage if it's published.
     /** @var \Drupal\node\Entity\Node $web_area_home */
     $web_area_home = $this->group->get('field_homepage')->entity;
+    $node = $this->currentRequest->get('node');
     if ($web_area_home) {
-      $breadcrumb->addCacheableDependency($web_area_home);
-      if ($web_area_home->isPublished()) {
-        $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
-        array_unshift($links, $web_area_home_link);
+      if ($node && $node->bundle() === 'news_release') {
+        // Add the news release search page instead of the web area homepage for News Release nodes.
+        $links[] = Link::createFromRoute(t('News Releases'), 'view.search_news_releases.page_1');
+      }
+      else {
+        $breadcrumb->addCacheableDependency($web_area_home);
+        if ($web_area_home->isPublished()) {
+          $web_area_home_link =  Link::createFromRoute($this->group->label(), $web_area_home->toUrl()->getRouteName(), $web_area_home->toUrl()->getRouteParameters());
+          array_unshift($links, $web_area_home_link);
+        }
       }
     }
 
@@ -297,18 +304,6 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
 
     // Add home link to the beginning of the breadcrumb trail.
     array_unshift($links, $home_link);
-
-   // Create a breadcrumb for News Releases.
-    function your_theme_preprocess_node(&$variables) {
-      $node = $variables['node'];
-    
-      // Check if the current node is a 'news_release' type.
-      if ($node->bundle() === 'news_release') {
-        $newsReleaseLabel = t('News Release');
-        $newsReleaseUrl = Url::fromUri('internal:/newsreleases/search');
-        $variables['news_release_breadcrumb'] = Link::fromTextAndUrl($newsReleaseLabel, Url::fromUri('internal:' . $newsReleaseUrl))->toString();
-      }
-    }
 
     /** @var \Drupal\Core\Link $last */
     $last = end($links);
