@@ -80,24 +80,13 @@ steps:
         concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
         concurrency: 4
 
+        commands:
+          - docker build services/metrics --tag "${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
+          - docker push "${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
+
         plugins:
           - cultureamp/aws-assume-role#v0.1.0:
               role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
-
-          - docker#v3.12.0:
-              image: gcr.io/kaniko-project/executor:debug
-              workdir: /workspace
-
-              propagate-aws-auth-tokens: true
-
-              entrypoint: /bin/sh
-              command:
-                - -ec
-                - |
-                    echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
-                    /kaniko/executor \
-                      --context=/workspace/services/metrics \
-                      --destination="${WEBCMS_REPO_URL}/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:${WEBCMS_IMAGE_TAG}"
 
   - wait: ~
 
