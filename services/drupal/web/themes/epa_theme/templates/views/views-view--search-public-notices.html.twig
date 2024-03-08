@@ -5,16 +5,6 @@
  */
 #}
 
-{% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Public Notices'|t,
-  } %}
-{% endset %}
-
-{% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
-{% endset %}
-
 {% set admin_info %}
   {{ drupal_block('system_messages_block', wrapper=false) }}
   {{ drupal_block('local_tasks_block', wrapper=false) }}
@@ -73,8 +63,6 @@
 {% include '@templates/listing-pages/listing-page.twig' with {
   'has_header': true,
   'has_sidenav': true,
-  'header_info': header_info,
-  'contact_link': contact_link,
   'title': view.title,
   'contextual_links': title_suffix.contextual_links,
   'admin_info': admin_info,

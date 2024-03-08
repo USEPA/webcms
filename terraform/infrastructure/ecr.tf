@@ -30,16 +30,6 @@ resource "aws_ecr_repository" "drush" {
   tags = var.tags
 }
 
-# Create a custom repo for the Alpine-based metrics sidecar. See services/metrics for more
-# information.
-resource "aws_ecr_repository" "metrics" {
-  for_each = toset(var.sites)
-
-  name = "webcms-${var.environment}-${each.key}-fpm-metrics"
-
-  tags = var.tags
-}
-
 # Finally, we create a cache repository for Kaniko-based builds. This repository has some
 # lifecycle policies that aggressively expire images in order to avoid an arbitrarily large
 # cache from building up (see below).
