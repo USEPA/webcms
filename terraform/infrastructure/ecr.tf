@@ -30,30 +30,6 @@ resource "aws_ecr_repository" "drush" {
   tags = var.tags
 }
 
-# Create a custom repo for the Alpine-based metrics sidecar. See services/metrics for more
-# information.
-resource "aws_ecr_repository" "metrics" {
-  for_each = toset(var.sites)
-
-  name = "webcms-${var.environment}-${each.key}-fpm-metrics"
-
-  tags = var.tags
-}
-
-# The repositories here are mirrors of images on the Docker Hub. We bring them inside the
-# AWS perimeter because we are required to statically analyze *all* images prior to
-# deployment - not just custom ones.
-#
-# Mirrors are treated as being environment-wide resources, and thus do not have a for_each
-# associated with them.
-
-# This mirrors docker.io/amazon/cloudwatch-agent:latest
-resource "aws_ecr_repository" "cloudwatch_agent_mirror" {
-  name = "webcms-${var.environment}-aws-cloudwatch"
-
-  tags = var.tags
-}
-
 # Finally, we create a cache repository for Kaniko-based builds. This repository has some
 # lifecycle policies that aggressively expire images in order to avoid an arbitrarily large
 # cache from building up (see below).

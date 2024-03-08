@@ -1,10 +1,13 @@
 import {
+  addContent,
   addPageSection,
   duplicatePageSection,
-  getPageFields, loginToDrupal, setPageFields, verifyPageElements,
+  editWebformElements,
+  getPageFields, getTodayDate, loginToDrupal, navigateToWebArea, setPageFields, setWebformFields,
+  verifyPageElements, verifyPageSource,
 } from '../../support/functions';
 
-const formatFile = require('../../fixtures/basicPageNew.json');
+const formatFile = require('../../fixtures/formsNew.json');
 
 describe(formatFile.testCaseName, () => {
   Cypress.on('uncaught:exception', (_err, _runnable) => false);
@@ -17,10 +20,8 @@ describe(formatFile.testCaseName, () => {
   });
 
   it(`Add New ${formatFile.contentType}`, () => {
-    cy.get('.block:contains("My Web Areas")').find('a:contains("Web Guide"):visible').first().click();
-    cy.contains('a', 'Add new content').click();
-    cy.get('.admin-list').contains('a', formatFile.contentType).click();
-    cy.get('.page-title').should('contain.text', `Add Web Area: Group node (${formatFile.contentType})`);
+    navigateToWebArea('Web Guide');
+    addContent(formatFile.contentType);
   });
 
   it(`Add New ${formatFile.contentType} - defaults`, () => {
@@ -45,24 +46,34 @@ describe(formatFile.testCaseName, () => {
   });
 
   it('Duplicate HTML Section', () => {
-    // duplicatePageSection('Body', '.paragraph-type--html', 0);
+    duplicatePageSection('Body', '.paragraph-type--html');
   });
 
   it('Save after entering all required information', () => {
-    cy.get('body').then(() => {
-      cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
-        .click({force: true});
-    }).then(() => {
-      cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been created.`);
-    });
+    cy.get('[data-drupal-selector="edit-actions"]').find('input').first().click();
+    cy.get('.usa-alert').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been created.`);
+  });
+
+  it('Open webform editor', () => {
+    cy.get('p:contains("This webform has no elements added to it.")').should('exist');
+    cy.get('a:contains("Please add elements to this webform.")').click();
+    cy.get('a:contains("Add element")').should('exist');
+  });
+
+  it('Add Elements to the form', () => {
+    editWebformElements(formatFile.webform);
   });
 
   it('Set State to Draft Approved State', () => {
     cy.get('body').then(() => {
+      navigateToWebArea('Web Guide');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('a').first()
+        .click();
+    }).then(() => {
       cy.get('[data-drupal-selector="edit-new-state"]').first().select('Draft, approved');
       cy.get('[data-drupal-selector="edit-revision-log"]').type('Approved the draft');
     }).then(() => {
-      cy.get('[data-drupal-selector="edit-submit"]').click();
+      cy.get('[data-drupal-selector="edit-submit"]').first().click();
       cy.get('.usa-alert__text').should('contain.text', 'The moderation state has been updated.');
     });
   });
@@ -85,10 +96,77 @@ describe(formatFile.testCaseName, () => {
     }).then(() => {
       cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
         .click();
-      cy.get('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been updated.`);
+      cy.get('.usa-alert').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been updated.`);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
+
+  it('Edit Webform', () => {
+    cy.get('body').then(() => {
+      cy.get('a:contains("Edit"):visible').first().click();
+    }).then(() => {
+      cy.get('.form-item-webform-link').find('a').invoke('removeAttr', 'target').click();
+    }).then(() => {
+      editWebformElements(formatFile.webformEdited);
+    })
+      .then(() => {
+        cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
+          .click();
+      })
+      .then(() => {
+        navigateToWebArea('Web Guide');
+        cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('a').first()
+          .click();
+      })
+      .then(() => {
+        verifyPageElements(formatFile.expectedEdited);
+      });
+  });
+
+  it('Verify Dates in Page Source', () => {
+    verifyPageSource('DC.date.created', getTodayDate('yyyy-MM-dd'));
+    verifyPageSource('DC.date.modified', getTodayDate('yyyy-MM-dd'));
+    verifyPageSource('DC.date.reviewed', getTodayDate('yyyy-MM-dd'), (60000 * 60 * 24 * 90));
+  });
+
+  it('Submit form without entering required fields', () => {
+    cy.get('.webform-button--submit').click();
+    cy.get('.usa-alert--error').should('contain.text', 'This is a checkbox field is required.');
+    cy.get('.usa-alert--error').should('contain.text', 'First field is required.');
+    cy.get('.usa-alert--error').should('contain.text', 'Middle field is required.');
+    cy.get('.usa-alert--error').should('contain.text', 'Last field is required.');
+  });
+
+  it('Submit form after entering required fields', () => {
+    cy.get('.form-item--checkbox:contains("This is a checkbox")').check();
+    cy.get('.field--type-webform').find('.form-item--textfield:contains("First")').type('John');
+    cy.get('.field--type-webform').find('.form-item--textfield:contains("Middle")').type('Jacob Jingleheimer');
+    cy.get('.field--type-webform').find('.form-item--textfield:contains("Last")').type('Smith');
+    cy.get('.webform-button--submit').click();
+    cy.get('.webform-confirmation__message').should('contain.text', 'Thank you for contacting us.');
+  });
+
+  it('Verify form submission', () => {
+    cy.get('body').then(() => {
+      cy.get('a:contains("Back to form")').click();
+      navigateToWebArea('Web Guide');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('a').first()
+        .click();
+    }).then(() => {
+      cy.get('a:contains("Edit"):visible').first().click();
+    }).then(() => {
+      cy.get('.form-item-webform-link').find('a').invoke('removeAttr', 'target').click();
+      cy.get('a:contains("Results")').click();
+    })
+      .then(() => {
+
+
+        /*
+All submissions (if any) will be visible
+*/
+      });
+  });
+
 
   it('Publish the page', () => {
     cy.get('body').then(() => {
@@ -96,8 +174,8 @@ describe(formatFile.testCaseName, () => {
       cy.get('[data-drupal-selector="edit-revision-log"]').type('Published the page');
       cy.get('[id=edit-workflow-508-compliant]').check({force: true});
     }).then(() => {
-      cy.get('[data-drupal-selector="edit-submit"]').click();
-      cy.get('.usa-alert__text').should('contain.text', 'The moderation state has been updated.');
+      cy.get('.box').find('[data-drupal-selector="edit-submit"]').first().click();
+      cy.get('.usa-alert').should('contain.text', 'The moderation state has been updated.');
       cy.get('.field--tight:contains("Moderation state")').should('contain.text', 'Published');
     });
   });
