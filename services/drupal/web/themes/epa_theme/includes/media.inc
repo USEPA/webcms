@@ -7,6 +7,8 @@
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Link as LinkAlias;
+use Drupal\Core\Url;
 use Drupal\filter\Render\FilteredMarkup;
 
 /**
@@ -77,6 +79,12 @@ function epa_theme_preprocess_media(&$vars) {
   if ($media->hasField('field_limit_file_accessibility')) {
     $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
   }
+
+  if ($media->access('update', \Drupal::currentUser())) {
+    $edit_url = Url::fromRoute('entity.media.edit_form', ['media' => $media->id()], ['attributes' => ['class' => ['usa-button', 'usa-button--base']]]);
+    $vars['edit_link'] = new LinkAlias(t('Edit'), $edit_url);
+  }
+
 }
 
 /**
