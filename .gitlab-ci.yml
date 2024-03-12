@@ -350,7 +350,7 @@ build:drupal:
     WEBCMS_ENVIRONMENT: preproduction
 
  # Build the FPM metrics sidecar container.
-build:metrics:dev:
+.build:metrics:dev:
   extends: .kaniko
   stage: build
   rules:
@@ -516,7 +516,7 @@ Database:
     - rm -rf $CI_PROJECT_DIR
   allow_failure: true
 
-Metrics:
+.Metrics:
   stage: Image Scan
   tags:
     - twistcli
