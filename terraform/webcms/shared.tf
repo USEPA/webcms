@@ -90,10 +90,6 @@ data "aws_ssm_parameter" "ecr_drush" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/drush"
 }
 
-data "aws_ssm_parameter" "ecr_metrics" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/metrics"
-}
-
 #endregion
 
 #region Log groups
@@ -108,10 +104,6 @@ data "aws_ssm_parameter" "nginx_log_group" {
 
 data "aws_ssm_parameter" "drush_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/drush"
-}
-
-data "aws_ssm_parameter" "fpm_metrics_log_group" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/fpm-metrics"
 }
 
 data "aws_ssm_parameter" "drupal_log_group" {
