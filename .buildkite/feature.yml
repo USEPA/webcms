@@ -110,32 +110,6 @@ steps:
                       --target="$$TARGET" \
                       --no-push
 
-      # The FPM metrics sidecar is a much smaller image, so we can just let
-      # Kaniko build it without any caching logic. The build is otherwise
-      # identical to the one above.
-      - label: "Build fpm-metrics"
-        concurrency_group: $BUILDKITE_PIPELINE_SLUG/build-$BUILDKITE_BRANCH
-        concurrency: 4
-
-        plugins:
-          - cultureamp/aws-assume-role#v0.1.0:
-              role: arn:aws:iam::316981092358:role/BuildkiteRoleForImageBuilds
-
-          - docker#v3.12.0:
-              image: gcr.io/kaniko-project/executor:debug
-              workdir: /workspace
-
-              propagate-aws-auth-tokens: true
-
-              entrypoint: /bin/sh
-              command:
-                - -ec
-                - |
-                    echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
-                    /kaniko/executor \
-                      --context=/workspace/services/metrics \
-                      --no-push
-
   # Perform a Terraform formatting check. See the terraform-fmt.sh script for more details
   # on what is executed in this step.
   - label: ":terraform: Formatting"
