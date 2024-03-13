@@ -1,4 +1,5 @@
 @use '../../../00-config' as *;
+@use '../../../02-base' as *;
 
 .block--web-area-menu {
   @include breakpoint-min-max(gesso-breakpoint(tablet-lg), 899px) {
@@ -19,7 +20,8 @@
   }
 
   .block__title {
-    @include display-text-style(h3);
+    @extend %h3;
+    font-size: font-size(heading, md);
 
     @include at-media-max($theme-header-min-width) {
       border-left: 2px solid gesso-grayscale(gray-3);
