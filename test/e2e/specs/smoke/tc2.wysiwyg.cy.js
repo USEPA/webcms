@@ -1,11 +1,11 @@
 import {
   addPageSection,
-  loginToDrupal, setFormatting, setPageFields, verifyFormatting, verifyPageElements,
+  loginToDrupal, setFormatting, setPageFields, verifyPageElements,
 } from '../../support/functions';
 
 const formatFile = require('../../fixtures/wysiwyg.json');
 
-// TODO: Add this back to JSON file when definitions is working.  currently does not bring up data 
+// TODO: Add this back to JSON file when definitions is working.  currently does not bring up data
 /*
 
           {
@@ -16,7 +16,7 @@ const formatFile = require('../../fixtures/wysiwyg.json');
             "fields":
             [
               {
-                "fieldName": "Filter by Dictionary", "fieldValue": "", "fieldType": "select"
+                "fieldId": "Filter by Dictionary", "fieldValue": "", "fieldType": "select"
               }
             ]
           },
