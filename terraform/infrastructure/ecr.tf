@@ -69,7 +69,7 @@ resource "aws_ecr_lifecycle_policy" "nginx" {
   for_each = toset(var.sites)
 
   repository = aws_ecr_repository.nginx[each.key].name
-  
+
   policy = local.default_tag_policy
 }
 
