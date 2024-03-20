@@ -6,7 +6,6 @@ use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 
@@ -67,10 +66,7 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
     // Get the node from the context.
     $node = $this->getContextValue('node');
 
-    if ($node instanceof NodeInterface) {
-
-      // This loads the relationship entity that ties a node to a group.
-      $group_contents = \Drupal\group\Entity\GroupContent::loadByEntity($node);
+    $group_contents = $this->entityTypeManager->getStorage('group_content')->loadByEntity($node);
 
       // $group_contents is an array. We only care about the first one as there should only ever be one node to one group.
       $group_content = reset($group_contents);
@@ -85,14 +81,11 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
           // The referencedEntities() method returns an array as well. We only care about the first one.
           $editor_in_chief = reset($editor_in_chief_entities);
 
-          if ($editor_in_chief) {
-              // Now we can build the URL to the user and create a link.
-              $editorInChiefLink = \Drupal\Core\Link::fromTextAndUrl($editor_in_chief->getDisplayName(), $editor_in_chief->toUrl())->toString();
-          }
+         $editorInChiefLink = Link::fromTextAndUrl($editor_in_chief->getDisplayName(), $editor_in_chief->toUrl())->toString();
       }
       // Review deadline - assuming it's a field on the node.
       if ($node->hasField('field_review_deadline') && !$node->get('field_review_deadline')->isEmpty()) {
-        $reviewDeadline = $node->get('field_review_deadline')->date->format('F d, Y');
+        $reviewDeadline = $node->get('field_review_deadline')->date->format('F d, Y \a\t h:iA T');
       } else {
         $reviewDeadline = 'No deadline set';
       }
@@ -106,21 +99,13 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
     $revisionLink = Link::fromTextAndUrl($this->t('@revision_id', ['@revision_id' => $revisionId]), $revisionUrl)->toString();
 
       $build['content'] = [
-        '#markup' => $this->t('Node ID: @nid<br>Revision ID: @revision_id<br>Revision saved by: @editor_in_chief<br>Review Deadline: @review_deadline', [
-          '@nid' => $node->id(),
-          '@revision_id' => $revisionLink,
-          '@editor_in_chief' => $editorInChiefLink,
-          '@review_deadline' => $reviewDeadline,
-        ]),
-        '#allowed_tags' => ['br', 'a'], // Allow certain HTML tags.
+        '#theme' => 'epa_node_details',
+        '#nid' => $node->id(),
+        '#rid' => $revisionLink,
+        '#revision_author' => $editorInChiefLink,
+        '#review_deadline' => $reviewDeadline,
       ];
-    } else {
-      // Fallback content if no node is provided.
-      $build['content'] = [
-        '#markup' => $this->t('No node context provided.'),
-      ];
-    }
-
+  
     return $build;
   }
 }
