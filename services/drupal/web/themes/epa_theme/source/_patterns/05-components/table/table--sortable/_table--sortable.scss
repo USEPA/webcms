@@ -4,7 +4,7 @@
 @use '../../../00-config' as *;
 
 .usa-table--sortable {
-  /* stylelint-disable-next-line */
+  // stylelint-disable-next-line
   html.js & thead th {
     @include svg-background(sort);
     background-position: right 0.25rem top 50%;
@@ -18,7 +18,7 @@
       @include svg-background(sort-black);
     }
 
-    /* stylelint-disable-next-line */
+    // stylelint-disable-next-line selector-max-compound-selectors, selector-no-qualifying-type
     &[aria-sort='ascending'] {
       @include svg-background(sort-up);
 
@@ -28,7 +28,7 @@
       }
     }
 
-    /* stylelint-disable-next-line */
+    // stylelint-disable-next-line selector-max-compound-selectors, selector-no-qualifying-type
     &[aria-sort='descending'] {
       @include svg-background(sort-down);
 
@@ -39,13 +39,16 @@
     }
   }
 
+  // stylelint-disable-next-line selector-no-qualifying-type
   html.js .usa-dark-background & {
+    // stylelint-disable-next-line selector-max-compound-selectors
     thead th {
       @include svg-background(sort-white);
 
+      // stylelint-disable-next-line selector-max-compound-selectors
+      &:hover,
       &:focus,
-      &:focus-within,
-      &:hover {
+      &:focus-within {
         @include svg-background(sort-light-gray);
       }
     }
