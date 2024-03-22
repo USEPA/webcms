@@ -20,15 +20,13 @@
 {% endif %}
 
 {% set header_info %}
-  {% if nav_style == 'sidebar_navigation' %}
-    {% if node.field_wide_template.value %}
-      {% set display_sidenav = false %}
-      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
-      {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
-    {% else %}
-      {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
-      {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
-    {% endif %}
+  {% if node.field_wide_template.value %}
+    {% set display_sidenav = false %}
+    {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: true,shortname: true}}) }}
+    {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
+  {% else %}
+    {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+    {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
   {% endif %}
 {% endset %}
 
