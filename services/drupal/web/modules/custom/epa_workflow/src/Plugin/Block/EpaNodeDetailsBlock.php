@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Access\AccessResult;
+
 
 /**
  * Provides an EPA Node Details block.
@@ -58,6 +61,15 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
       $container->get('entity_type.manager')
     );
   }
+
+/**
+ * {@inheritdoc}
+ */
+protected function blockAccess(AccountInterface $account) {
+  // Only allow authenticated users access to this block.
+  return AccessResult::allowedIf($account->isAuthenticated())->addCacheContexts(['user.roles:authenticated']);
+}
+
 
   /**
    * {@inheritdoc}
