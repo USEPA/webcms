@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Access\AccessResult;
+
 
 /**
  * Provides an EPA Node Details block.
@@ -59,6 +62,15 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
     );
   }
 
+/**
+ * {@inheritdoc}
+ */
+protected function blockAccess(AccountInterface $account) {
+  // Only allow authenticated users access to this block.
+  return AccessResult::allowedIf($account->isAuthenticated())->addCacheContexts(['user.roles:authenticated']);
+}
+
+
   /**
    * {@inheritdoc}
    */
@@ -81,29 +93,29 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
           // The referencedEntities() method returns an array as well. We only care about the first one.
           $editor_in_chief = reset($editor_in_chief_entities);
 
-         $editorInChiefLink = Link::fromTextAndUrl($editor_in_chief->getDisplayName(), $editor_in_chief->toUrl())->toString();
+         $editor_in_chief_link = Link::fromTextAndUrl($editor_in_chief->getDisplayName(), $editor_in_chief->toUrl())->toString();
       }
       // Review deadline - assuming it's a field on the node.
       if ($node->hasField('field_review_deadline') && !$node->get('field_review_deadline')->isEmpty()) {
-        $reviewDeadline = $node->get('field_review_deadline')->date->format('F d, Y \a\t h:iA T');
+        $review_deadline = $node->get('field_review_deadline')->date->format('F j, Y \a\t g:iA T');
       } else {
-        $reviewDeadline = 'No deadline set';
+        $review_deadline = 'No deadline set';
       }
 
     // Get the node ID and the latest revision ID.
-    $nodeId = $node->id();
-    $revisionId = $node->getRevisionId();
+    $node_id = $node->id();
+    $revision_id = $node->getRevisionId();
     // Create a URL to the latest revision view page.
-    $revisionUrl = Url::fromRoute('entity.node.revision', ['node' => $nodeId, 'node_revision' => $revisionId]);
+    $revision_url = Url::fromRoute('entity.node.revision', ['node' => $node_id, 'node_revision' => $revision_id]);
     // Create a link with the revision ID as the link text.
-    $revisionLink = Link::fromTextAndUrl($this->t('@revision_id', ['@revision_id' => $revisionId]), $revisionUrl)->toString();
+    $revision_link = Link::fromTextAndUrl($this->t('@revision_id', ['@revision_id' => $revision_id]), $revision_url)->toString();
 
       $build['content'] = [
         '#theme' => 'epa_node_details',
         '#nid' => $node->id(),
-        '#rid' => $revisionLink,
-        '#revision_author' => $editorInChiefLink,
-        '#review_deadline' => $reviewDeadline,
+        '#rid' => $revision_link,
+        '#editor_in_chief' => $editor_in_chief_link,
+        '#review_deadline' => $review_deadline,
       ];
   
     return $build;
