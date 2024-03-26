@@ -12,7 +12,9 @@ __Variables:__
   * url: [string] The item's URL if available.
   * icon: [string] The name of the icon, if there is one.
   * is_active: [boolean] True / False is the item is active.
+  * is_disabled: [boolean] True / False is the item is disabled.
   * children: [array] Children of the item.
   	* title: [string] The title of the item.
   	* url: [string] The item's URL if available.
   	* is_active: [boolean] True / False is the item is active.
+    * is_disabled: [boolean] True / False is the item is disabled.

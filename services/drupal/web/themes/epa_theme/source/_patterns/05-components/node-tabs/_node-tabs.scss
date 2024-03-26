@@ -13,6 +13,10 @@
   list-style: none;
   margin: 0;
   padding: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .node-tabs__item {
@@ -20,6 +24,30 @@
 }
 
 .node-tabs__link {
+  align-items: center;
+  color: gesso-claro(primary, gray-800);
+  display: flex;
   font-size: rem(14px);
   padding: rem(gesso-spacing(105)) rem(gesso-spacing(2));
+  text-decoration: none;
+
+  .icon {
+    margin-right: rem(gesso-spacing(1));
+    top: auto;
+  }
+
+  &.is-active {
+    background-color: gesso-claro(primary, blue-050);
+    color: gesso-claro(primary, blue);
+    font-weight: bold;
+  }
+
+  &[aria-disabled="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.node-tabs__menu-child {
+  display: none;
 }
