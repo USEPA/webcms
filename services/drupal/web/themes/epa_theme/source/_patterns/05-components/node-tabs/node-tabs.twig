@@ -5,7 +5,7 @@
         <a
           class="node-tabs__link {% if item.is_active %}is-active{% endif %}"
 
-          {% if not item.is_disabled %} 
+          {% if item.url %} 
             href="{{ item.url }}" 
           {% else %}
             role="link"
@@ -26,7 +26,7 @@
                 <a 
                   class="{% if child.is_active %}is-active{% endif %}"
 
-                  {% if not child.is_disabled %} 
+                  {% if child.url %} 
                     href="{{ child.url }}" 
                   {% else %}
                     role="link"
