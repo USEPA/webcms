@@ -10,6 +10,7 @@
 
 .node-tabs__menu {
   display: flex;
+  flex-wrap: wrap;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -17,10 +18,20 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    flex-wrap: nowrap;
+    width: auto;
+  }
 }
 
 .node-tabs__item {
   margin-bottom: 0;
+  width: 100%;
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    width: auto;
+  }
 }
 
 .node-tabs__link {
@@ -28,8 +39,13 @@
   color: gesso-claro(primary, gray-800);
   display: flex;
   font-size: rem(14px);
+  justify-content: center;
   padding: rem(gesso-spacing(105)) rem(gesso-spacing(2));
   text-decoration: none;
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    justify-content: flex-start;
+  }
 
   &:focus,
   &:focus-within,
@@ -47,11 +63,8 @@
     color: gesso-claro(primary, blue);
     font-weight: bold;
 
-    .icon,
-    .icon path,
-    .icon g {
-      color: gesso-claro(primary, blue);
-      fill: gesso-claro(primary, blue);
+    .icon {
+      filter: invert(20%) sepia(53%) saturate(4536%) hue-rotate(218deg) brightness(86%) contrast(114%);
     }
   }
 
