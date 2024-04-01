@@ -815,6 +815,7 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
 $settings['s3fs.use_s3_for_public'] = TRUE;
 $settings['s3fs.use_s3_for_private'] = TRUE;
+$settings['s3fs.upload_as_private'] = TRUE;
 
 $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
