@@ -90,18 +90,6 @@ data "aws_ssm_parameter" "ecr_drush" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/drush"
 }
 
-data "aws_ssm_parameter" "ecr_metrics" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/metrics"
-}
-
-data "aws_ssm_parameter" "ecr_cloudwatch" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/cloudwatch"
-}
-
-data "aws_ssm_parameter" "ecr_newrelic" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/ecr/newrelic-daemon"
-}
-
 #endregion
 
 #region Log groups
@@ -118,18 +106,6 @@ data "aws_ssm_parameter" "drush_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/drush"
 }
 
-data "aws_ssm_parameter" "agent_log_group" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/cloudwatch-agent"
-}
-
-data "aws_ssm_parameter" "newrelic_log_group" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/newrelic-daemon"
-}
-
-data "aws_ssm_parameter" "fpm_metrics_log_group" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/fpm-metrics"
-}
-
 data "aws_ssm_parameter" "drupal_log_group" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/log-groups/drupal"
 }
@@ -144,10 +120,6 @@ data "aws_ssm_parameter" "db_d8_credentials" {
 
 data "aws_ssm_parameter" "db_d7_credentials" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials"
-}
-
-data "aws_ssm_parameter" "newrelic_license" {
-  name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license"
 }
 
 data "aws_ssm_parameter" "basic_auth" {
@@ -181,7 +153,6 @@ locals {
     { name = "WEBCMS_HASH_SALT", valueFrom = data.aws_ssm_parameter.hash_salt.value },
     { name = "WEBCMS_MAIL_PASS", valueFrom = data.aws_ssm_parameter.mail_pass.value },
     { name = "WEBCMS_SAML_SP_KEY", valueFrom = data.aws_ssm_parameter.saml_sp_key.value },
-    { name = "WEBCMS_NEW_RELIC_LICENSE", valueFrom = data.aws_ssm_parameter.newrelic_license.value },
   ]
 
   #endregion
@@ -225,16 +196,6 @@ locals {
     { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml_idp_slo_url },
     { name = "WEBCMS_SAML_IDP_CERT", value = var.saml_idp_cert },
     { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml_force_saml_login ? "1" : "0" },
-
-    # New Relic
-    {
-      # Construct two application names: the first is the "full" name (env/site/lang), and
-      # the second is a rollup name for the WebCMS env/site, which enables a view of the
-      # entire deployment across languages. This helps answer questions about how an
-      # entire codebase is performing in aggregate.
-      name  = "WEBCMS_NEW_RELIC_APPNAME"
-      value = join(";", ["WebCMS ${var.environment}/${var.site}/${var.lang}", "WebCMS ${var.environment}/${var.site}"])
-    },
   ]
 
   #endregion

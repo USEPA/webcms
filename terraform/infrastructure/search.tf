@@ -1,6 +1,6 @@
 resource "aws_iam_service_linked_role" "es" {
   #Only create this resource if the script is run in us-east-1
-  count = var.aws_region == "us-east-1" ? 1 : 0
+  count            = var.aws_region == "us-east-1" ? 1 : 0
   aws_service_name = "es.amazonaws.com"
   description      = "Allows Amazon ES to manage AWS resources for a domain on your behalf."
 }
