@@ -184,3 +184,16 @@ function epa_core_update_9007() {
       ->execute();
   }
 }
+
+/**
+ * Delete all flags assigned to anonymous user and log the number of items deleted.
+ */
+function epa_core_update_9008() {
+  $database = \Drupal::database();
+  $query = $database->delete('flagging')
+    ->condition('uid', 0);
+
+  $deletedCount = $query->execute();
+
+  \Drupal::logger('epa_core')->notice('@count flags assigned to anonymous user have been deleted.', ['@count' => $deletedCount]);
+}
