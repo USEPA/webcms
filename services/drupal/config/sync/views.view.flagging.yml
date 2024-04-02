@@ -5,7 +5,9 @@ dependencies:
   config:
     - flag.flag.notification_opt_in
   module:
+    - entity_usage
     - flag
+    - user
     - views_autocomplete_filters
 id: flagging
 label: Flagging
@@ -131,7 +133,7 @@ display:
           click_sort_column: value
           type: timestamp
           settings:
-            date_format: short_no_time
+            date_format: short
             custom_date_format: ''
             timezone: ''
           group_column: value
@@ -272,16 +274,84 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        uid_1:
+          id: uid_1
+          table: users_field_data
+          field: uid
+          relationship: uid
+          group_type: group
+          admin_label: ''
+          entity_type: user
+          entity_field: uid
+          plugin_id: field
+          label: 'User ID'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: number_integer
+          settings:
+            thousand_separator: ''
+            prefix_suffix: true
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
       pager:
-        type: mini
+        type: full
         options:
           offset: 0
-          items_per_page: 10
+          items_per_page: 100
           total_pages: null
           id: 0
           tags:
             next: ››
             previous: ‹‹
+            first: '« First'
+            last: 'Last »'
           expose:
             items_per_page: false
             items_per_page_label: 'Items per page'
@@ -290,6 +360,7 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
+          quantity: 9
       exposed_form:
         type: basic
         options:
@@ -310,6 +381,69 @@ display:
       sorts: {  }
       arguments: {  }
       filters:
+        uid:
+          id: uid
+          table: flagging
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: flagging
+          entity_field: uid
+          plugin_id: entity_reference
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_op
+            label: 'User ID'
+            description: ''
+            use_operator: false
+            operator: uid_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              beta_tester: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              menu_admin: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              administrator: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          handler: 'default:user'
+          widget: autocomplete
+          handler_settings:
+            target_bundles: null
+            sort:
+              field: uid
+              direction: ASC
+            auto_create: false
+            filter:
+              type: _none
+            include_anonymous: true
         flag_id:
           id: flag_id
           table: flagging
@@ -381,69 +515,6 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        uid:
-          id: uid
-          table: flagging
-          field: uid
-          relationship: none
-          group_type: group
-          admin_label: ''
-          entity_type: flagging
-          entity_field: uid
-          plugin_id: entity_reference
-          operator: or
-          value: {  }
-          group: 1
-          exposed: true
-          expose:
-            operator_id: uid_op
-            label: 'User ID'
-            description: ''
-            use_operator: false
-            operator: uid_op
-            operator_limit_selection: false
-            operator_list: {  }
-            identifier: uid
-            required: false
-            remember: false
-            multiple: false
-            remember_roles:
-              authenticated: authenticated
-              anonymous: '0'
-              beta_tester: '0'
-              paragraphs_library_contributor: '0'
-              layout_editor: '0'
-              alerts_manager: '0'
-              block_manager: '0'
-              menu_admin: '0'
-              system_editor: '0'
-              system_webmaster: '0'
-              administrator: '0'
-            reduce: false
-          is_grouped: false
-          group_info:
-            label: ''
-            description: ''
-            identifier: ''
-            optional: true
-            widget: select
-            multiple: false
-            remember: false
-            default_group: All
-            default_group_multiple: {  }
-            group_items: {  }
-          reduce_duplicates: false
-          handler: 'default:user'
-          widget: autocomplete
-          handler_settings:
-            target_bundles: null
-            sort:
-              field: _none
-              direction: ASC
-            auto_create: false
-            filter:
-              type: _none
-            include_anonymous: true
       filter_groups:
         operator: AND
         groups:
@@ -459,6 +530,7 @@ display:
             created: created
             entity_id: entity_id
             uid: uid
+            uid_1: uid_1
           default: '-1'
           info:
             flagging_bulk_form:
@@ -487,6 +559,13 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
+            uid_1:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
           override: true
           sticky: false
           summary: ''
@@ -508,7 +587,28 @@ display:
           distinct: false
           replica: false
           query_tags: {  }
-      relationships: {  }
+      relationships:
+        flagging_to_usage_entity:
+          id: flagging_to_usage_entity
+          table: flagging
+          field: flagging_to_usage_entity
+          relationship: none
+          group_type: group
+          admin_label: 'Usage information (Flagging)'
+          entity_type: flagging
+          plugin_id: standard
+          required: false
+        uid:
+          id: uid
+          table: flagging
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: User
+          entity_type: flagging
+          entity_field: uid
+          plugin_id: standard
+          required: false
       header: {  }
       footer: {  }
       display_extenders:
