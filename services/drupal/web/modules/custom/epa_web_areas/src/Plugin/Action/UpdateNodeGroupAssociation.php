@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @Action(
  *   id = "epa_web_areas_update_node_group_association",
- *   label = @Translation("Change Web Area association of nodes"),
+ *   label = @Translation("Change Web Area association of Nodes"),
  *   type = "node",
  *   category = @Translation("Custom")
  * )
