@@ -209,7 +209,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
         $group_content->get('gid')->setValue($this->configuration['updated_group']);
         $group_content->save();
       }
-      $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->name();
+      $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->getName();
       return UpdateGroupAssociationBase::SUCCESS . "|$title|{$group_content->getGroup()->label()}";
     }
     else {
@@ -223,7 +223,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       ];
       // Means it was never associated with a group
       $group_content = GroupContent::create($values)->save();
-      $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->name();
+      $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->getName();
       return UpdateGroupAssociationBase::SUCCESS . "|$title|{$group_content->getGroup()->label()}";
     }
   }
