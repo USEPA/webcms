@@ -1,22 +1,22 @@
-<div aria-role="dialog" class="node-dialog">
-	<ul class="node-dialog__list">
+{% set classes = [
+  'node-dialog',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+<ul class="{{ classes }}" role="dialog">
+	{% for item in nodeDialog %}
 		<li class="node-dialog__item">
-			<a class="node-dialog__link">Back to group dashboard</a>
+			<a 
+				class="node-dialog__link {% if item.is_active %}is-active{% endif %}"
+				{% if item.url %} 
+		          href="{{ item.url }}" 
+		        {% else %}
+		          role="link"
+		          aria-disabled="true"
+		        {% endif %}  
+			>
+				{{ item.title }}
+			</a>
 		</li>
-		<li class="node-dialog__item">
-			<a class="node-dialog__link is-active">Edit page layout</a>
-		</li>
-		<li class="node-dialog__item">
-			<a class="node-dialog__link">Preview view modes</a>
-		</li>
-		<li class="node-dialog__item">
-			<a class="node-dialog__link">Clone</a>
-		</li>
-		<li class="node-dialog__item">
-			<a class="node-dialog__link">Export</a>
-		</li>
-		<li class="node-dialog__item">
-			<a class="node-dialog__link">Delete</a>
-		</li>
-	</ul>
-</div>
+	{% endfor %}
+</ul>
