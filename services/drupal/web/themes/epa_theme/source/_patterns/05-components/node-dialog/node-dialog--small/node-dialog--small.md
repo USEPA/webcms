@@ -1,6 +1,6 @@
 ---
-el: .node-dialog
-title: Node Dialog
+el: .node-dialog--small
+title: Node Dialog (Small)
 state: in-progress
 ---
 The node dialog fields contain the dropdowns for the drupal local tasks
