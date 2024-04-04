@@ -257,13 +257,6 @@ class CloudWatch implements LoggerInterface {
    * Empties the internal buffer of log events and sends them all to CloudWatch Logs.
    */
   public function flushLogEvents() {
-    // Sometimes we get throttled by AWS when pushing logs up to the cloud.
-    // This ensures the time we spend waiting on the API doesn't get counted in
-    // our New Relic stats since it's not slowness the user experiences.
-    // Ensure PHP agent is available.
-    if (extension_loaded('newrelic')) {
-      newrelic_end_transaction();
-    }
     $all_events = self::$log_events;
     if (empty($all_events)) {
       return;
