@@ -282,7 +282,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       }
 
       $config_denied_string = "Denied: Unable to move @items as we don't allow changing the Web Area for @bundle content type.";
-      $denied_string = 'Denied: Unable to move @items as as you do not have access to content within the @web_areas Web Area(s)';
+      $denied_string = 'Denied: Unable to move @items as you do not have access to content within the @web_areas Web Area(s)';
       $special_denied_string = "Denied: Unable to move @items as the target Web Area does not support @bundle content type.";
       $success_string = "Success: Moved @items to the @web_areas Web Area. Review the menu links from the previously associated Web Area.";
       foreach($separated as $issue_type => $issues) {
@@ -320,36 +320,35 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
    *   The result items after the bulk update.
    */
   public static function processMessages($key, $message, array $results) {
-    foreach ($results as $type => $individual_group) {
-      $first_five = array_slice($individual_group, 0, 5);
-      $items = implode(', ', $first_five);
-      $items_message = rtrim($items, ', ');
+    $all = array_values($results);
+    $flattened = array_merge(...$all);
+    $first_five_values = array_splice($flattened, 0, 5);
+    $bundle = array_keys($results);
+    $bundle = implode(", ", $bundle);
+    $bundle = rtrim($bundle);
 
-      if (count($individual_group) > 5) {
-        $total_remaining = count($individual_group) - 5;
-        $items_message .= " and $total_remaining more...";
-      }
-      $bundle = array_keys($results);
-      $bundle = implode(", ", $bundle);
-      $bundle = rtrim($bundle);
+    $items = implode(', ', $first_five_values);
+    $items_message = rtrim($items, ', ');
+    if (count($results) > 5) {
+      $total_remaining = count($results) - 5;
+      $items_message .= " and $total_remaining more...";
+    }
 
-      // Based on message type display error or success message.
-      switch ($key) {
-        case UpdateGroupAssociationBase::DENIED:
-          $message = str_replace(['@items', '@web_areas'], [$items_message, $bundle], $message);
-          self::message($message, 'error');
-          break;
-        case UpdateGroupAssociationBase::CONFIG_DENIED:
-        case UpdateGroupAssociationBase::SPECIAL_DENIED:
-          $message = str_replace(['@items', '@bundle'], [$items_message, $bundle], $message);
-          self::message($message, 'error');
-          break;
-        case UpdateGroupAssociationBase::SUCCESS:
-          $message = str_replace(['@items', '@web_areas'], [$items_message, $bundle], $message);
-          self::message($message);
-          break;
-      }
+    // Based on message type display error or success message.
+    switch ($key) {
+      case UpdateGroupAssociationBase::DENIED:
+        $message = str_replace(['@items', '@web_areas'], [$items_message, $bundle], $message);
+        self::message($message, 'error');
+        break;
+      case UpdateGroupAssociationBase::CONFIG_DENIED:
+      case UpdateGroupAssociationBase::SPECIAL_DENIED:
+        $message = str_replace(['@items', '@bundle'], [$items_message, $bundle], $message);
+        self::message($message, 'error');
+        break;
+      case UpdateGroupAssociationBase::SUCCESS:
+        $message = str_replace(['@items', '@web_areas'], [$items_message, $bundle], $message);
+        self::message($message);
+        break;
     }
   }
-
 }
