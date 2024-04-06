@@ -1,0 +1,48 @@
+<h2>I'm the Node Tabs</h2>
+{#
+  Copied the contents of the menu.html.twig from system given that's what we're ultimately displaying
+/**
+ * @file
+ * Default theme implementation to display a menu.
+ *
+ * Available variables:
+ * - tabs: A nested list of menu items. Each menu item contains:
+ *   - attributes: HTML attributes for the menu item.
+ *   - below: The menu item child items.
+ *   - title: The menu link title.
+ *   - url: The menu link url, instance of \Drupal\Core\Url
+ *   - localized_options: Menu link localized options.
+ *   - is_expanded: TRUE if the link has visible children within the current
+ *     menu tree.
+ *   - is_collapsed: TRUE if the link has children within the current menu tree
+ *     that are not currently visible.
+ *   - in_active_trail: TRUE if the link is in the active trail.
+ *
+ * @ingroup themeable
+ */
+#}
+{% import _self as menus %}
+
+{#
+We call a macro which calls itself to render the full tree.
+@see https://twig.symfony.com/doc/1.x/tags/macro.html
+#}
+{{ menus.menu_links(tabs, attributes, 0) }}
+
+{% macro menu_links(tabs, attributes, menu_level) %}
+  {% import _self as menus %}
+  {% if tabs %}
+    {% if menu_level == 0 %}
+<ul{{ attributes }}>
+  {% else %}
+    <ul>
+  {% endif %}
+  {% for item in tabs %}
+      {{ item }} {# this is the epa-node-tab-item #}
+      {% if item['#children'] %}
+        {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
+      {% endif %}
+  {% endfor %}
+  </ul>
+  {% endif %}
+{% endmacro %}
