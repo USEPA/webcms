@@ -1,0 +1,45 @@
+<nav class="node-tabs" role="navigation" aria-label="Primary tasks">
+  <ul class="node-tabs__menu">
+    {% for item in tabs %}
+      <li class="node-tabs__item">
+        <a
+          class="node-tabs__link {% if item.is_active %}is-active{% endif %}"
+
+          {% if item.url %} 
+            href="{{ item.url }}" 
+          {% else %}
+            role="link"
+            aria-disabled="true"
+          {% endif %}  
+        >
+          {% include '@components/icon/icon.twig' with {
+            'is_hidden': true,
+            'icon_name': item.icon,
+          } %}
+          {{ item.title }}
+        </a>
+
+        {% if item.children %}
+          <ul class="node-tabs__menu-child">
+            {% for child in item.children %}
+              <li class="node-tabs__item-child">
+                <a 
+                  class="{% if child.is_active %}is-active{% endif %}"
+
+                  {% if child.url %} 
+                    href="{{ child.url }}" 
+                  {% else %}
+                    role="link"
+                    aria-disabled="true"
+                  {% endif %} 
+                >
+                  {{ child.title }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
