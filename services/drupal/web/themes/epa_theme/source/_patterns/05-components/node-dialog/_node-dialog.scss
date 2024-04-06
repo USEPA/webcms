@@ -5,10 +5,10 @@
 
 .node-dialog {
   background-color: gesso-grayscale(white);
-  border: 1px solid #DEDFE4;
+  border: 1px solid gesso-claro(primary, gray-100);
   border-radius: 2px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(gesso-grayscale(black), 0.1);
+  font-size: rem(16px);
   list-style: none;
   padding: 0;
   margin: 0;
@@ -22,17 +22,25 @@
 
 .node-dialog__item {
   margin-bottom: 0;
+
+  &.is-content {
+    margin: gesso-spacing('05') 0;
+  }
+
+  &.is-link + .is-content {
+    border-top: 1px solid gesso-claro(primary, gray-100);
+  }
 }
 
 .node-dialog__link {
   display: block;
-  padding: gesso-spacing(105) gesso-spacing(3);
+  padding: gesso-spacing('105') gesso-spacing('205');
   text-decoration: none;
   width: 100%;
 
   &:focus,
   &:hover {
-    background-color: #E5EDFF;
+    background-color: gesso-claro(primary, blue-050);
   }
 
   &[aria-disabled="true"] {
@@ -41,10 +49,21 @@
   }
 
   &.is-active {
-    background-color: #E3E3EA;
+    background-color: gesso-claro(primary, gray-100);
   }
 }
 
 .node-dialog__content {
   font-size: rem(13px);
+  padding: 0 gesso-spacing('205');
+
+  ul {
+    list-style: none;
+    margin: gesso-spacing(1) 0;
+    padding: 0;
+
+    li {
+      font-size: rem(16px);
+    }
+  }
 }
