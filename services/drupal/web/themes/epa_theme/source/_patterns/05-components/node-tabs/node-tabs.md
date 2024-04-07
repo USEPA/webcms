@@ -14,5 +14,6 @@ __Variables:__
   * is_active: [boolean] True / False is the item is active.
   * children: [array] Children of the item.
   	* title: [string] The title of the item.
+    * content: [object] The content of the item
   	* url: [string] The item's URL if available.
   	* is_active: [boolean] True / False is the item is active.
