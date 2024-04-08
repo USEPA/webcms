@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - flag.flag.notification_opt_in
+    - user.role.administrator
   module:
     - entity_usage
     - flag
@@ -372,8 +373,10 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       access:
-        type: none
-        options: {  }
+        type: role
+        options:
+          role:
+            administrator: administrator
       cache:
         type: tag
         options: {  }
@@ -621,6 +624,7 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user.roles
       tags: {  }
   page_1:
     id: page_1
@@ -628,8 +632,10 @@ display:
     display_plugin: page
     position: 1
     display_options:
-      display_extenders: {  }
-      path: flagging
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
+      path: admin/flagging
     cache_metadata:
       max-age: 0
       contexts:
@@ -637,4 +643,5 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
+        - user.roles
       tags: {  }
