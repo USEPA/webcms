@@ -17,22 +17,33 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
-{% set related_title = 'Related Information:'|t %}
+{%  set press_offices = [] %}
+{% for item in content.field_press_office|field_value %}
+  {% set press_offices = press_offices|merge([item|render]) %}
+{% endfor %}
 
-{% if content.field_press_office|field_value is not empty %}
+{% set title = 'Related Information'|t %}
+
+{% if press_offices is not empty %}
   {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    {{ content.field_press_office|field_value }}
-    <br>
+    {% include '@components/hublinks/hublinks.twig' with {
+      'title': title,
+      'links': press_offices,
+    } %}
 
     {% if more_link %}
-      {{ more_link }}
+      {% include '@components/hublinks/hublinks.twig' with {
+        'title': '',
+        'links': [more_link],
+      } %}
     {% endif %}
   {% endset %}
 {% elseif more_link %}
   {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    {{ more_link }}
+    {% include '@components/hublinks/hublinks.twig' with {
+      'title': title,
+      'links': [more_link],
+    } %}
   {% endset %}
 {% endif %}
 
