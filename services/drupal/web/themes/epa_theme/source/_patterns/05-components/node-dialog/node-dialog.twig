@@ -8,27 +8,30 @@
 	{% for item in nodeDialog %}
 		{% set itemClasses = [
 		  'node-dialog__item',
+		  item.item_classes ? item.item_classes,
 		  item.content ? 'is-content' : 'is-link',
 		]|join(' ')|trim %}
 
-		<li class="{{ itemClasses }}">
-			{% if not item.content %}
-				<a 
-					class="node-dialog__link{% if item.is_active %} is-active{% endif %}"
-					{% if item.url %} 
-			          href="{{ item.url }}" 
-			        {% else %}
-			          role="link"
-			          aria-disabled="true"
-			        {% endif %}  
-				>
-					{{ item.title }}
-				</a>
-			{% else %}
-				<div class="node-dialog__content">
-					{{ item.content }}
-				</div>	
-			{% endif %}	
-		</li>
+		{% if item.content or item.title %}
+			<li class="{{ itemClasses }}">
+				{% if not item.content %}
+					<a 
+						class="node-dialog__link{% if item.is_active %} is-active{% endif %}"
+						{% if item.url %} 
+				          href="{{ item.url }}" 
+				        {% else %}
+				          role="link"
+				          aria-disabled="true"
+				        {% endif %}  
+					>
+						{{ item.title }}
+					</a>
+				{% else %}
+					<div class="node-dialog__content">
+						{{ item.content }}
+					</div>	
+				{% endif %}	
+			</li>
+		{% endif %}		
 	{% endfor %}
 </ul>

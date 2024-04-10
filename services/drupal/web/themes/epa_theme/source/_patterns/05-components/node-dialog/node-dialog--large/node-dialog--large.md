@@ -13,3 +13,4 @@ __Variables:__
 	* content: [object] The content of the item
 	* url: [string] The item's URL if available
 	* is_active: [boolean] True / False if the item is active
+	* item_classes: [string] Classes to modify the default item styling
