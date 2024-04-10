@@ -2,47 +2,53 @@
 
 Note: this has only been tested on ddev 1.19 and above.
 
-1. First, start the project:
+1. Clone main branch of repo:
+
+   ```
+   git clone -b main git@github.com:USEPA/webcms.git
+   ```
+
+2. Then, start the project:
 
    ```
    cd services/drupal && ddev start
    ```
 
-2. Next, create the S3 bucket for s3fs:
+3. Next, create the S3 bucket for s3fs:
 
    ```
    ddev aws-setup
    ```
 
-3. After that, please download the latest database (see https://forumone.atlassian.net/wiki/spaces/EPA/pages/1794637894/HOWTO+Import+D8+InnoDB+Cold+Backup) and put the .tar file in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
+4. After that, please download the latest database (see https://forumone.atlassian.net/wiki/spaces/EPA/pages/1794637894/HOWTO+Import+D8+InnoDB+Cold+Backup) and put the .tar file in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
-4. Import the database by running:
+5. Import the database by running:
 
    ```
    ddev epa-import
    ```
 
-5. After the import you will need to restart:
+6. After the import you will need to restart:
 
    ```
    ddev poweroff && ddev start
    ```
 
-6. Copy `cp .env.example .env`.
+7. Copy `cp .env.example .env`.
 
-7. Install dependencies:
+8. Install dependencies:
 
    ```
    ddev composer install
    ```
 
-8. Install the requirements for the theme: `ddev gesso install`:
+9. Install the requirements for the theme: `ddev gesso install`:
 
    ```
    ddev gesso install
    ```
 
-9. Building/watching the CSS and Pattern Lab:
+10. Building/watching the CSS and Pattern Lab:
     1. to build
       ```````
       ddev gesso build
@@ -52,7 +58,7 @@ Note: this has only been tested on ddev 1.19 and above.
       ddev gesso watch
       ```````
 
-10. Install Drupal from config (or restore a backup).  You can install from config by running:
+11. Install Drupal from config (or restore a backup).  You can install from config by running:
     
     **Note**: Do not run this command if starting from a new installation. This will wipe the database out, instead skip to #11.
     
@@ -60,16 +66,16 @@ Note: this has only been tested on ddev 1.19 and above.
    ddev drush si --existing-config
    ```
 
-11. Ensure the latest configuration has been fully applied and clear cache:
+12. Ensure the latest configuration has been fully applied and clear cache:
    ```
    ddev drush deploy -y
    ```
 
-12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
+13. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin` 
+14. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin` 
 
-14.  Access the app at https://epa.ddev.site
+15. Access the app at https://epa.ddev.site
 
 # Testing migrations
 

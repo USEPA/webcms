@@ -1,7 +1,7 @@
 // Header Search script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.headerSearch = {
     attach(context, settings) {
       const BREAKPOINT = '(max-width: calc(55em - 1px))';
