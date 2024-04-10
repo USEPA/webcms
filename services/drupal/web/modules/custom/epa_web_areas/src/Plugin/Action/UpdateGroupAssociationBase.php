@@ -165,7 +165,8 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
     $group = Group::load($this->configuration['updated_group']);
     // $object is not allowed based on config.
     if ($config->get($object->getEntityTypeId()) && !in_array($object->bundle(), $config->get($object->getEntityTypeId()))) {
-      return $return_as_object ? new AccessResultForbidden(UpdateGroupAssociationBase::CONFIG_DENIED . "|{$object->getTitle()}|{$bundle->label()}") : FALSE;
+      $title = $object->getEntityTypeId() == 'node' ?  $object->getTitle() : $object->getName();
+      return $return_as_object ? new AccessResultForbidden(UpdateGroupAssociationBase::CONFIG_DENIED . "|$title|{$bundle->label()}") : FALSE;
     }
 
     // News Releases, Perspectives, and Speeches & Remarks are special in that
@@ -189,7 +190,8 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       $gc_item = reset($group_contents);
       $access = $object->access('update', $account, TRUE);
       if ($access instanceof AccessResultForbidden) {
-        $access->setReason(UpdateGroupAssociationBase::DENIED . "|{$object->getTitle()}|{$gc_item->getGroup()->label()}");
+        $title = $object->getEntityTypeId() == 'node' ?  $object->getTitle() : $object->getName();
+        $access->setReason(UpdateGroupAssociationBase::DENIED . "|{$title}|{$gc_item->getGroup()->label()}");
       }
       return $return_as_object ? $access : $access->isAllowed();
     }
@@ -219,7 +221,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
         'gid' => $this->configuration['updated_group'],
         'entity_id' => $entity->id(),
         'entity_type' => $entity->getEntityTypeId(),
-        'label' =>  $entity->getEntityTypeId() == 'node' ? $entity->getTitle() : $entity->label(),
+        'label' =>  $entity->getEntityTypeId() == 'node' ? $entity->getTitle() : $entity->getName(),
       ];
       // Means it was never associated with a group
       $group_content = GroupContent::create($values)->save();
