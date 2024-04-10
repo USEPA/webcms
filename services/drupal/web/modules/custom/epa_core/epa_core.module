@@ -188,6 +188,11 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     case 'node_commentary_edit_form':
       $form['field_type']['#access'] = FALSE;
       break;
+
+    case 'node_public_notice_edit_form':
+      // Custom validation to check proposed location.
+      $form['#validate'][] = 'epa_core_location_proposed_other_form_validate';
+      break;
   }
 }
 
@@ -566,7 +571,13 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
       if (empty($element['#description'])) {
         $element['#description'] = '';
       }
-      _epa_core_augment_datetime_description($element['#description']);
+
+      // Adjust the description if the field is a datetime field vs. just a date field.
+      /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
+      $items = $context['items'];
+      if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
+        _epa_core_augment_datetime_description($element['#description']);
+      }
     }
   }
 
@@ -657,8 +668,74 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
       ],
     ];
   }
+  if ($element['#paragraph_type'] == 'locations_of_prop_actions') {
+    $terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties([
+        'name' => 'Other',
+        'vid' => 'geographic_locations',
+      ]);
+
+    if (!empty($terms)) {
+      // If multiple terms are found with the same name, this will take the first one.
+      $term = reset($terms);
+      $term_id = $term->id();
+
+      /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+      $field_definition = $context['items']->getFieldDefinition();
+      $paragraph_entity_reference_field_name = $field_definition->getName();
+      $dependee_field_name = 'field_state_or_territory';
+      // Need to build specific selector to handle multiple card groups.
+      $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $paragraph_entity_reference_field_name, $element['#delta'], $dependee_field_name);
+
+      $element['subform']['field_location_proposed_other']['#states'] = [
+        'visible' => [
+          $selector => ['value' => $term_id]
+        ],
+        'invisible' => [
+          $selector => [
+            ['!value' => $term_id],
+            'or',
+            ['value' => 'empty']
+          ]
+        ],
+      ];
+
+      // To add the asterisk to the actual text field wwe need to target the textfield itself.
+      // @link https://www.drupal.org/forum/support/module-development-and-code-questions/2016-11-23/field-states-api-required-hidden-fields#comment-12881635
+      $element["subform"]["field_location_proposed_other"]["widget"][0]["value"]['#states'] = [
+        'required' => [
+          $selector => ['value' => $term_id]
+        ],
+      ];
+    }
+  }
 }
 
+/**
+ * Custom validation for Public Notices to check proposed location.
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *
+ * @return void
+ */
+function epa_core_location_proposed_other_form_validate(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $paragraphs = $form_state->getValue(['field_locations_of_prop_actions']);
+  if (!empty($paragraphs)) {
+    foreach ($paragraphs as $paragraph) {
+      if (isset($paragraph['subform']['field_state_or_territory'])) {
+        $trigger_field_value = $paragraph['subform']['field_state_or_territory'][0]['target_id'];
+        $term = Term::load($trigger_field_value);
+        $term_name = $term->getName();
+        $locations_of_prop_actions = $paragraph['subform']['field_location_proposed_other'][0]['value'];
+        // Check if Other is selected.
+        if ($term_name == 'Other' && empty($locations_of_prop_actions)) {
+          $form_state->setErrorByName('field_location_proposed_other', t('Please enter other location of proposed actions'));
+        }
+      }
+    }
+  }
+}
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
