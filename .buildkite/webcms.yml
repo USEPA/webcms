@@ -103,18 +103,20 @@ steps:
     concurrency: 1
 
     plugins:
-      - cultureamp/aws-assume-role#v0.1.0:
-          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
-
       - docker#v3.8.0:
           image: node:14-alpine
           entrypoint: /bin/sh
           command:
             - -ec
             - |
+              mkdir -p ~/.aws
+              echo '[drush]' >> ~/.aws/credentials
+              echo 'role_arn = arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks' >> ~/.aws/credentials
+              echo 'credential_source = Ec2InstanceMetadata' >> ~/.aws/credentials
+
               cd ci
               npm ci
-              node drush.js
+              AWS_PROFILE=drush node drush.js
 
           propagate-aws-auth-tokens: true
           environment:
@@ -132,18 +134,20 @@ steps:
     concurrency: 1
 
     plugins:
-      - cultureamp/aws-assume-role#v0.1.0:
-          role: arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks
-
       - docker#v3.8.0:
           image: node:14-alpine
           entrypoint: /bin/sh
           command:
             - -ec
             - |
+              mkdir -p ~/.aws
+              echo '[drush]' >> ~/.aws/credentials
+              echo 'role_arn = arn:aws:iam::316981092358:role/BuildkiteRoleForECSTasks' >> ~/.aws/credentials
+              echo 'credential_source = Ec2InstanceMetadata' >> ~/.aws/credentials
+
               cd ci
               npm ci
-              node drush.js
+              AWS_PROFILE=drush node drush.js
 
           propagate-aws-auth-tokens: true
           environment:
