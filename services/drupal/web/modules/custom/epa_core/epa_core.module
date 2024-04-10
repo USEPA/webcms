@@ -28,6 +28,8 @@ use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\search_api\Utility\Utility;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\views\ViewExecutable;
+use Drupal\search_api\Plugin\views\query\SearchApiQuery;
 
 /**
  * Implements hook_theme().
@@ -112,7 +114,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $form['revision_information']['actions'] = [
       '#type' => "actions",
       'submit' => $submit_copy,
-      ];
+    ];
   }
 
   // Change the "Revision log message" label to say "Revision notes".
@@ -336,7 +338,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         $parts[0],
         'medium',
         ''
-        ];
+      ];
       $parts = array_replace($defaults, $parts);
       $name = $parts[0];
     }
@@ -525,11 +527,11 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       $form["owner_uid"]["#size"] = "60";
     }
   }
-// Hide "Exclude - Cloned" option in the entity clone form
+  // Hide "Exclude - Cloned" option in the entity clone form
   if ($form_id === 'entity_clone_form') {
-      if (isset($form['no_suffix'])) {
-        $form['no_suffix']['#access'] = FALSE;
-      }
+    if (isset($form['no_suffix'])) {
+      $form['no_suffix']['#access'] = FALSE;
+    }
   }
 }
 
@@ -591,9 +593,9 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   // differs depending on whether the field has additional descriptive text configured.
   if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
     if ((is_array($element["uri"]["#description"])
-      && is_array($element["uri"]["#description"]['#items'])
-      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
-    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
+        && is_array($element["uri"]["#description"]['#items'])
+        && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
+      || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
       if (isset($element["#description"])) {
         $element["uri"]["#description"] = $element["#description"];
       }
@@ -888,12 +890,46 @@ function epa_core_node_presave(EntityInterface $node) {
 }
 
 /**
- * Implements HOOK_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for views_exposed_form().
+ *
+ * Custom integration for facets. When a Views exposed filter is modified on a
+ * search results page it will lose any facets which have been already selected.
+ * This adds hidden fields for each facet so their values are retained.
  */
-function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
- if (!empty($form["field_search_text_value"])) {
-     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
- }
+function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state) {
+  if (!empty($form["field_search_text_value"])) {
+    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+  }
+  // Retrieve the view object and the query plugin.
+  $storage = $form_state->getStorage();
+  if (!isset($storage['view'])) {
+    return;
+  }
+  $view = $storage['view'];
+  if (!($view instanceof ViewExecutable)) {
+    return;
+  }
+  $query_plugin = $view->getQuery();
+  // Make sure the view is based on Search API and has the "Preserve facets"
+  // option enabled, and that the Facets module is installed.
+  $preserve_facets = !empty($query_plugin->options['preserve_facet_query_args'])
+    && $query_plugin instanceof SearchApiQuery
+    && \Drupal::moduleHandler()->moduleExists('facets');
+  if ($preserve_facets) {
+    // Retrieve the facet source.
+    $query = $query_plugin->getSearchApiQuery();
+    $display_id = $query->getSearchId(FALSE);
+    $facet_source_id = str_replace(':', '__', 'search_api:' . $display_id);
+    $facet_source = \Drupal::entityTypeManager()
+      ->getStorage('facets_facet_source')
+      ->load($facet_source_id);
+    if (!$facet_source) {
+      return;
+    }
+    if ('facets_pretty_paths' == $facet_source->getUrlProcessorName()) {
+      $form['#action'] = NULL;
+    }
+  }
 }
 
 /**
