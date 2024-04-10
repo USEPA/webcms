@@ -1,63 +1,45 @@
-{% if not standalone_template %}
-  <script type="application/json" data-drupal-selector="drupal-settings-json">{}</script>
-  <script src="../../../../../core/assets/vendor/jquery/jquery.min.js?v=3.6.0"></script>
-  <script src="../../../../../core/assets/vendor/css-escape/css.escape.js?v=1.5.1"></script>
-  <script src="../../../../../core/assets/vendor/once/once.min.js?v=1.0.1"></script>
-  <script src="../../../../../core/assets/vendor/jquery-once/jquery.once.min.js?v=2.2.3"></script>
-  <script src="../../../../../core/misc/drupalSettingsLoader.js?v=9.2.6"></script>
-  <script src="../../../../../core/misc/drupal.js?v=9.2.6"></script>
-  <script src="../../../../../core/misc/drupal.init.js?v=9.2.6"></script>
-  <script src="../../../../../core/assets/vendor/picturefill/picturefill.min.js?v=3.0.3"></script>
-  <script src="../../../../../core/assets/vendor/tabbable/index.umd.min.js?v=5.2.0"></script>
-  <script src="../../../../../modules/custom/epa_wysiwyg/js/plugins/epaNew/epaNew.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/overrides/collapse.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/overrides/dropbutton.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/libraries/details-element-polyfill.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/libraries/svgxuse.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/common.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/scripts.min.js?{{ cacheBuster }}"></script>
+{% set location_root = '../../../../../' %}
+{% set location_theme = '../../../' %}
 
-  <script src="../../../js/dist/header-search.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/definition.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/external-links.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/protected-links.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/hero-slideshow.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/image-gallery.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/media-link.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/sitewide-alert.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/toggle-admin.min.js?{{ cacheBuster }}"></script>
-  <script src="../../../js/dist/before-after-swipe.min.js?{{ cacheBuster }}"></script>
+{%- if standalone_template %}
+  {% set location_root = 'https://www.epa.gov/' %}
+  {% set location_theme = 'https://www.epa.gov/themes/epa_theme/' %}
+  <script type="application/json" data-drupal-selector="drupal-settings-json">
+    {"path":{"isFront":false,"suppressDeprecationErrors":true}}
+  </script>
 {% else %}
-  {# Custom Standalone template foot #}
-  <script src="https://www.epa.gov/core/assets/vendor/jquery/jquery.min.js?v=3.6.0"></script>
-  <script src="https://www.epa.gov/core/assets/vendor/css-escape/css.escape.js?v=1.5.1"></script>
-  <script src="https://www.epa.gov/core/assets/vendor/jquery-once/jquery.once.min.js?v=2.2.3"></script>
-  <script src="https://www.epa.gov/core/misc/drupalSettingsLoader.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/misc/drupal.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/misc/drupal.init.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/assets/vendor/picturefill/picturefill.min.js?v=3.0.3"></script>
-  <script src="https://www.epa.gov/core/assets/vendor/tabbable/index.umd.min.js?v=5.2.0"></script>
-  <script src="https://www.epa.gov/modules/custom/epa_wysiwyg/js/plugins/epaNew/epaNew.js?r33yib"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/common.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/scripts.min.js?v=9.2.6"></script>
+  <script type="application/json" data-drupal-selector="drupal-settings-json">{}</script>
+{% endif -%}
 
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/sitewide-alert.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/definition.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/external-links.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/protected-links.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/media-link.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/hero-slideshow.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/themes/epa_theme/js/dist/before-after-swipe.min.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/assets/vendor/jquery-form/jquery.form.min.js?v=4.3.0"></script>
-  <script src="https://www.epa.gov/core/misc/progress.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/modules/responsive_image/js/responsive_image.ajax.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/misc/ajax.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/core/themes/stable/js/ajax.js?v=9.2.6"></script>
-  <script src="https://www.epa.gov/modules/contrib/views_ajax_get/views_ajax_get.js"></script>
-  <script src="https://www.epa.gov/modules/custom/epa_alerts/js/epaAlerts.js" defer async></script>
-{% endif %}
+<script src="{{ location_root }}core/assets/vendor/jquery/jquery.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/assets/vendor/css-escape/css.escape.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/assets/vendor/es6-promise/es6-promise.auto.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/assets/vendor/once/once.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/assets/vendor/jquery-once/jquery.once.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/misc/drupalSettingsLoader.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/misc/drupal.js?{{ cacheBuster }}"></script>
+<script src="{{ location_root }}core/misc/drupal.init.js?{{ cacheBuster }}"></script>
+<script src="{{ location_theme }}js/dist/common.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_theme }}js/dist/scripts.min.js?{{ cacheBuster }}"></script>
+<script src="{{ location_theme }}js/dist/header-search.min.js?{{ cacheBuster }}"></script>
 
-<!--DO NOT REMOVE-->
-{{ patternLabFoot | raw }}
+{%- if not standalone_template %}
+  <script src="{{ location_root }}modules/custom/epa_wysiwyg/js/plugins/epaNew/epaNew.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/before-after-swipe.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/definition.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/epa-alerts.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/external-links.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/hero-slideshow.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/image-gallery.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/media-link.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/private-sitewide-alert.es6.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/protected-links.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/sitewide-alert.min.js?{{ cacheBuster }}"></script>
+  <script src="{{ location_theme }}js/dist/toggle-admin.min.js?{{ cacheBuster }}"></script>
+
+  <!--DO NOT REMOVE-->
+  {{ patternLabFoot|raw }}
+{% endif -%}
+
 </body>
 </html>
