@@ -165,7 +165,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
     $group = Group::load($this->configuration['updated_group']);
     // $object is not allowed based on config.
     if ($config->get($object->getEntityTypeId()) && !in_array($object->bundle(), $config->get($object->getEntityTypeId()))) {
-      $title = $object->getEntityTypeId() == 'media' ? $object->getName() : $object->getTitle();
+      $title = $object->getEntityTypeId() == 'node' ?  $object->getTitle() : $object->getName();
       return $return_as_object ? new AccessResultForbidden(UpdateGroupAssociationBase::CONFIG_DENIED . "|$title|{$bundle->label()}") : FALSE;
     }
 
@@ -190,7 +190,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       $gc_item = reset($group_contents);
       $access = $object->access('update', $account, TRUE);
       if ($access instanceof AccessResultForbidden) {
-        $title = $object->getEntityTypeId() == 'media' ? $object->getName() : $object->getTitle();
+        $title = $object->getEntityTypeId() == 'node' ?  $object->getTitle() : $object->getName();
         $access->setReason(UpdateGroupAssociationBase::DENIED . "|{$title}|{$gc_item->getGroup()->label()}");
       }
       return $return_as_object ? $access : $access->isAllowed();
