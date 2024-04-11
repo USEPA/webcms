@@ -1,7 +1,7 @@
 // Media embed with link
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.vidCopy = {
     attach(context) {
       const windowHost = window.location.hostname;
@@ -12,7 +12,7 @@ import Drupal from 'drupal';
           .querySelector('.revision-link')
           .getAttribute('href');
         once('vid-copy', '.js-vid-copy', context).forEach(button => {
-          button.addEventListener('click', function(e) {
+          button.addEventListener('click', function (e) {
             e.preventDefault();
             const vidWriteText = `https://${windowHost}${vidCopyURL}`;
             navigator.clipboard.writeText(vidWriteText);

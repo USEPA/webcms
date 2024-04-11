@@ -6,8 +6,6 @@ import {
 
 const formatFile = require('../../fixtures/basicPageNew.json');
 
-let pageTitle = 'old news';
-
 describe(formatFile.testCaseName, () => {
   Cypress.on('uncaught:exception', (_err, _runnable) => false);
   before(() => {
@@ -16,7 +14,6 @@ describe(formatFile.testCaseName, () => {
 
   beforeEach(() => {
     cy.preserveAllCookiesOnce();
-    cy.wrap(pageTitle).as('pageTitle');
   });
 
   it(`Add New ${formatFile.contentType}`, () => {
@@ -53,15 +50,10 @@ describe(formatFile.testCaseName, () => {
 
   it('Save after entering all required information', () => {
     cy.get('body').then(() => {
-      cy.get('.field--name-title').find('input').then((titleField) => {
-        pageTitle = titleField.val().trim();
-        cy.wrap(pageTitle).as('pageTitle');
-      });
-    }).then(() => {
       cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
         .click({force: true});
     }).then(() => {
-      cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${pageTitle} has been created.`);
+      cy.get('.usa-alert--success').find('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been created.`);
     });
   });
 
@@ -93,7 +85,7 @@ describe(formatFile.testCaseName, () => {
     }).then(() => {
       cy.get('[data-drupal-selector="edit-actions"]').first().find('input').first()
         .click();
-      cy.get('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${pageTitle} has been updated.`);
+      cy.get('.usa-alert__text').should('contain.text', `${formatFile.contentType} ${formatFile.pageTitle} has been updated.`);
       verifyPageElements(formatFile.expectedEdited);
     });
   });
@@ -123,8 +115,8 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Group Dashboard"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Published');
     });
   });
 
@@ -132,17 +124,17 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Published Content"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
+      cy.get('.views-table').find(`tr:contains("${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Published');
     });
   });
 
   it('Clone the page', () => {
     cy.get('body').then(() => {
-      cy.get(`a:contains("${pageTitle}"):visible`).first().click();
+      cy.get(`a:contains("${formatFile.pageTitle}"):visible`).first().click();
       cy.get('a:contains("Clone"):visible').first().click();
       cy.get('[value="Clone"]').first().click();
     }).then(() => {
-      cy.get('.usa-alert__text').should('contain.text', `The entity ${pageTitle}`);
+      cy.get('.usa-alert__text').should('contain.text', `The entity ${formatFile.pageTitle}`);
       cy.get('.usa-alert__text').should('contain.text', 'of type node was cloned.');
       cy.get('.field--tight:contains("Moderation state")').should('contain.text', 'Draft');
       verifyPageElements(formatFile.expected);
@@ -164,8 +156,8 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Group Dashboard"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Draft');
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Draft');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).find('.views-field-moderation-state').should('contain.text', 'Draft');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).find('.views-field-moderation-state-1').should('contain.text', 'Draft');
     });
   });
 
@@ -173,7 +165,7 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Published Content"):visible').first().click();
     }).then(() => {
-      cy.get('.views-table').find(`tr:contains("Cloned: ${pageTitle}")`).should('not.exist');
+      cy.get('.views-table').find(`tr:contains("Cloned: ${formatFile.pageTitle}")`).should('not.exist');
     });
   });
 
@@ -181,7 +173,7 @@ describe(formatFile.testCaseName, () => {
     cy.get('body').then(() => {
       cy.get('a:contains("Latest Revisions")').click();
     }).then(() => {
-      cy.get('.views-table').find('tbody').find('a:contains("pageTitle")').first()
+      cy.get('.views-table').find('tbody').find(`a:contains("${formatFile.pageTitle}")`).first()
         .click();
     }).then(() => {
       verifyPageElements(formatFile.expected);

@@ -151,26 +151,6 @@ resource "aws_ssm_parameter" "ecr_drush" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "ecr_metrics" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/metrics"
-  type  = "String"
-  value = aws_ecr_repository.metrics[each.value.site].repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_cloudwatch" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/cloudwatch"
-  type  = "String"
-  value = aws_ecr_repository.cloudwatch_agent_mirror.repository_url
-
-  tags = var.tags
-}
-
 #endregion
 
 #region Log groups
@@ -201,26 +181,6 @@ resource "aws_ssm_parameter" "drush_log_group" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/drush"
   type  = "String"
   value = aws_cloudwatch_log_group.drush[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "agent_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/cloudwatch-agent"
-  type  = "String"
-  value = aws_cloudwatch_log_group.agent[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "fpm_metrics_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/fpm-metrics"
-  type  = "String"
-  value = aws_cloudwatch_log_group.fpm_metrics[each.key].name
 
   tags = var.tags
 }

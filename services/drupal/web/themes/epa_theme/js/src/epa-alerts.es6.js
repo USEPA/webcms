@@ -1,7 +1,7 @@
 /* global drupalSettings:true */
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   const slideDown = (target, duration = 400) => {
     target.style.removeProperty('display');
     let display = window.getComputedStyle(target).display;
@@ -52,7 +52,7 @@ import Drupal from 'drupal';
         };
         const getAlerts = Drupal.ajax(ajaxSettings);
 
-        getAlerts.commands.insert = function(ajax, response, status) {
+        getAlerts.commands.insert = function (ajax, response, status) {
           if (
             response.selector ===
             `.js-view-dom-id-js-view-dom-id-${alertContext}_alerts_default`
@@ -81,7 +81,7 @@ import Drupal from 'drupal';
           }
         };
 
-        getAlerts.commands.destroyObject = function(ajax, response, status) {
+        getAlerts.commands.destroyObject = function (ajax, response, status) {
           Drupal.ajax.instances[this.instanceIndex] = null;
         };
 

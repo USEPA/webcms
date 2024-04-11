@@ -1,7 +1,7 @@
 // Sitewide Alert script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.sitewideAlert = {
     attach(context) {
       const alerts = once('sitewide-alert', '.js-sitewide-alert', context);
