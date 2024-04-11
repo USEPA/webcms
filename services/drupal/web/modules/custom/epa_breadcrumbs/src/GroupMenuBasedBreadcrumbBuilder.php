@@ -312,6 +312,12 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       array_pop($links);
     }
 
+    // Per https://forumone.atlassian.net/browse/EPAD8-2411 we want to limit the
+    // breadcrumbs to a max of 3
+    if (count($links) > 3) {
+      array_splice($links, 3);
+    }
+
     return $breadcrumb->setLinks($links);
   }
 
