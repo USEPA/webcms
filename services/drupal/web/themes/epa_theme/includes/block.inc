@@ -75,6 +75,7 @@ function epa_theme_preprocess_block__webareamenu(&$variables) {
       $homepage_link = Link::fromTextAndUrl($short_name, $homepage_url);
       $variables['label'] = $homepage_link->toRenderable();
     }
-
+    // Ensure the block caching is based on the web area's homepage as well.
+    $variables['#cache']['tags'][] = 'node:' . $homepage_node->id();
   }
 }
