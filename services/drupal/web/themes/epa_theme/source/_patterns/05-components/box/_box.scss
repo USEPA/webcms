@@ -8,7 +8,14 @@
 .box {
   margin-bottom: rem(units(4));
   max-width: 100%;
-  overflow: auto;
+  overflow: visible;
+
+  &:before,
+  &:after {
+    clear: both;
+    content: '';
+    display: table;
+  }
 
   @include breakpoint(gesso-breakpoint(tablet)) {
     &.u-align-left,
@@ -37,6 +44,12 @@
 // stylelint-disable-next-line selector-no-qualifying-type
 div.box__title {
   @extend %h3;
+}
+
+h2.box__title {
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    font-size: rem(28px);
+  }
 }
 
 .box__image-link {

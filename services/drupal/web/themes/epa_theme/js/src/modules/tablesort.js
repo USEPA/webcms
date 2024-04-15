@@ -1,6 +1,6 @@
 import tablesort from 'tablesort/src/tablesort.js';
 
-export default function() {
+export default function () {
   const tables = once('tablesort', '.usa-table--sortable');
   tables.forEach(table => {
     tablesort(table);
