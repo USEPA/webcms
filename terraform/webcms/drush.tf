@@ -16,19 +16,10 @@ resource "aws_ecs_task_definition" "drush_task" {
       name  = "drush"
       image = "${data.aws_ssm_parameter.ecr_drush.value}:${var.image_tag}"
 
-      # Set the default command for our task definition to be crond. This is
-      # required to run Drush as an ECS service (see below), but by setting it
-      # as a command, we are able to easily override it when dispatching, e.g.,
-      # deployment script updates.
-      #
-      # The arguments to crond are as follows:
-      # 1. -f: Run in the foreground
-      # 2. -L /dev/stdout: Log to container standard out
-      #
-      # These arguments make crond container-friendly: its status will be the
-      # status of the service as a whole, and its output will be picked up by
-      # Fargate and exported to CloudWatch.
-      command = ["crond", "-f", "-L", "/dev/stdout"]
+      # Set the default command for our task definition to be a cron-like shell
+      # script loop. Busybox's crond doesn't seem to function when running as a
+      # non-root user, and even if it did, we only have one scheduled task.
+      command = ["sh", "-c", "while sleep 1m; do drush \"--uri=$${WEBCMS_SITE_URL}\" cron || true; done"]
 
       workingDirectory = "/var/www/html"
 
