@@ -1,14 +1,93 @@
+diff --git a/src/Payload.php b/src/Payload.php
+index fa42527..53e67f5 100644
+--- a/src/Payload.php
++++ b/src/Payload.php
+@@ -90,6 +90,7 @@ final class Payload extends PayloadBase {
+         'id' => $this->entity->id(),
+         'label' => $this->entity->label(),
+         'uid' => $this->entity->getOwnerId(),
++        'last_revision' => $this->entity->last_revision,
+       ],
+       'label' => $this->generateLabel(),
+     ];
+@@ -118,6 +119,7 @@ final class Payload extends PayloadBase {
+     else {
+       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+       $entity = $storage->load($payload['entity']['id']);
++      $entity->last_revision = $payload['entity']['last_revision'];
+ 
+       if (empty($entity)) {
+         // Entity got deleted, created a dummy entity and don't save it.
+@@ -125,6 +127,7 @@ final class Payload extends PayloadBase {
+           $storage->getEntityType()->getKey('bundle') => $payload['entity']['bundle'],
+           $storage->getEntityType()->getKey('id') => $payload['entity']['id'],
+           $storage->getEntityType()->getKey('label') => $payload['entity']['label'],
++          $storage->getEntityType()->getKey('last_revision') => $payload['entity']['last_revision'],
+         ]);
+       }
+     }
 diff --git a/src/Plugin/Danse/ContentModeration.php b/src/Plugin/Danse/ContentModeration.php
-index 989ce0d92a42b05a4de45075a0b65fc0e419e2cd..613d0b8603e6a862db58d1b1b282137df9fce542 100644
+index 989ce0d..c569e8a 100644
 --- a/src/Plugin/Danse/ContentModeration.php
 +++ b/src/Plugin/Danse/ContentModeration.php
-@@ -75,7 +75,8 @@ class ContentModeration extends PluginBase {
+@@ -72,10 +72,59 @@ class ContentModeration extends PluginBase {
+     $topic = $entity->moderation_state->value;
+     $parent_rev_id = $entity->content_entity_revision_id->value;
+     $parent_entity_type = $entity->content_entity_type_id->value;
++    /** @var \Drupal\node\Entity\Node $revision */
      $revision = \Drupal::entityTypeManager()->getStorage($parent_entity_type)->loadRevision($parent_rev_id);
-
++    // Try to load the 'previous' revision.
++    /** @var \Drupal\node\Entity\Node $last_version_node */
++    $last_version_node = $this->getPreviousRevision($revision->id(), $parent_rev_id);
++    $revision->last_revision = $last_version_node->getRevisionId();
+ 
      $label = $revision->label() . ' transitioned to ' . $topic;
 -    return $this->createEvent($topic, $label, $payload);
 +    $revision_payload = new Payload($revision);
 +    return $this->createEvent($topic, $label, $revision_payload);
++  }
++
++  /**
++   * @param $nid
++   * @param $currently_revision_id
++   *
++   * @return false|mixed
++   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
++   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
++   */
++  public function getPreviousRevision($nid, $currently_revision_id) {
++    // Getting the node storage.
++    /** @var \Drupal\node\NodeStorageInterface $node_storage */
++    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
++    // Getting the node.
++    $node = $node_storage->load($nid);
++
++    // Get all revisions of the current node, in all languages.
++    $revision_ids = $node_storage->revisionIds($node);
++
++    $revisions_before = [];
++    if (count($revision_ids) > 0) {
++      // Loop through the list of revision ids, select the ones that have.
++      // Same language as the current language AND are older than the current
++      // deleted revision.
++      foreach ($revision_ids as $vid) {
++        // Compare revision using vid, the newer revision has bigger vid.
++        if ($currently_revision_id - $vid > 0 ) {
++          $revision = $node_storage->loadRevision($vid);
++          array_push($revisions_before, $revision);
++        }
++      }
++
++      // Sort revisions by comparing revisionId, newest revision first.
++      usort($revisions_before, function ($rev1, $rev2) {
++        if ($rev1->getRevisionId() == $rev2->getRevisionId()) {
++          return 0;
++        }
++        return ($rev1->getRevisionId() < $rev2->getRevisionId()) ? -1 : 1;
++      });
++    }
++
++    return reset($revisions_before);
    }
-
+ 
  }
