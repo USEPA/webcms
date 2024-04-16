@@ -1,0 +1,33 @@
+// @file
+// Styles for the footer language list.
+
+@use '../../../00-config' as *;
+
+.list--footer-language-bar {
+	@include list-inline();
+
+	display: flex;
+	flex-wrap: wrap;
+	font-family: gesso-font-family(heading);
+	justify-content: space-between;
+
+	@include breakpoint(gesso-breakpoint(tablet)) {
+		flex-wrap: nowrap;
+	}
+
+	> li {
+		display: block;
+		margin-bottom: rem(gesso-spacing(1));
+		width: 100%;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		@include breakpoint(gesso-breakpoint(tablet)) {
+			display: inline;
+			margin-bottom: 0;
+			width: auto;
+		}
+	}
+}
