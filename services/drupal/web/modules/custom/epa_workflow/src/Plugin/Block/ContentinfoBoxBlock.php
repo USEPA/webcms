@@ -89,7 +89,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return AccessResultForbidden::forbidden();
     }
 
-    // @TODO: Add permission for this.
+    // @todo: Add permission for this.
     return AccessResult::allowed();
   }
 
@@ -99,18 +99,19 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
   public function build() {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->getContextValue('node');
-    // @TODO: Get the current node state.
-    $node_state = 'published_needs_review';
-    // @TODO: Determine this stuff
-    $compare_link = $this->buildCompareLink(123, 15, 16);
+    $moderation_state_id = $node->get('moderation_state')->getString();
+
+    // @todo: review this later. setting non caching on this block for now.
+    // @todo: Determine cache strategy for this block. It's going to be dependent on node revision we're looking at.
+    $build['#cache']['max-age'] = 0;
 
     $build['content'] = [
       '#theme' => 'epa_content_info_box_advanced',
-      '#content_moderation_form' => '', // @TODO: Add this later
-      '#compare_link' => $compare_link,
+      '#content_moderation_form' => '', // @todo: Add this later
+      '#compare_link' => $this->buildCompareLink(),
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
-      '#box_color' => self::colorToModerationStateMap($node_state),
+      '#box_color' => $this->moderationStateToColorMap($moderation_state_id),
       '#attributes' => new Attribute(),
     ];
 
@@ -118,31 +119,134 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
   }
 
   /**
-   * Based on the node in context
-   * @param $nid
-   * @param $revision1
-   * @param $revision2
+   * Based on the node in context, generate a 'Compare latest draft & live' link.
    *
    * @return array|mixed[]
+   *   The render array for the compare link or an empty array if not available.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  public function buildCompareLink($nid, $revision1, $revision2) {
-    // Based on the node in context determine if we can have a 'compare' link.
+  public function buildCompareLink() {
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $this->getContextValue('node');
 
-    // Always place the older revision on the left side of the comparison
-    // and the newer revision on the right side (however revisions can be
-    // compared both ways if we manually change the order of the parameters).
-    if ($revision1 > $revision2) {
-      $aux = $revision1;
-      $revision1 = $revision2;
-      $revision2 = $aux;
+    if ($node->isPublished() && $node->isLatestRevision()) {
+      // This means the latest revision is the published revision so nothing to
+      // compare.
+      return [];
     }
-    // Builds the redirect Url.
+
+    $published_revision_id = $this->getPublishedRevisionId();
+    // If no published revision ID then exit out.
+    if (!$published_revision_id) {
+      return [];
+    }
+
+    $latest_revision_id = $this->getLatestRevisionId();
+    // If no latest revision ID then exit out.
+    if (!$latest_revision_id) {
+      return [];
+    }
+
+    // Ensure that those revision IDs are not the same to ensure we have
+    // revisions to compare against
+    if ($published_revision_id != $latest_revision_id) {
+      return $this->generateCompareLink($node->id(), $published_revision_id, $latest_revision_id);
+    }
+
+    return [];
+  }
+
+  /**
+   * Helper method to get the published revision ID of the node in context.
+   *
+   * @return false|int
+   *   The published revision ID of the node in context or FALSE if none exist.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function getPublishedRevisionId() {
+    /** @var \Drupal\node\NodeInterface  $node */
+    $node = $this->getContextValue('node');
+
+    if ($node->isPublished()) {
+      return $node->getRevisionId();
+    }
+    else {
+      // Determine if we have a published revision at all
+      $published_revision = \Drupal::entityTypeManager()
+        ->getStorage($node->getEntityTypeId())
+        ->getQuery()
+        ->condition('nid', $node->id())
+        ->condition('status', 1)
+        ->execute();
+
+      if (!empty($published_revision)) {
+        // If we have a record here that means there's a published revision of the
+        // node.
+        return array_key_first($published_revision);
+      }
+    }
+
+    return FALSE;
+  }
+
+  /**
+   * Helper method to get the latest revision ID of the node in context.
+   *
+   * @return false|int
+   *   The latest revision ID for the node in context or FALSE if none exist.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
+  public function getLatestRevisionId() {
+    /** @var \Drupal\node\NodeInterface  $node */
+    $node = $this->getContextValue('node');
+
+    // Are we looking at the latest revision? If so, that's what we compare to.
+    if ($node->isLatestRevision()) {
+      return $node->getRevisionId();
+    }
+    else {
+      $latest_revision = \Drupal::entityTypeManager()
+        ->getStorage($node->getEntityTypeId())
+        ->getQuery()
+        ->condition('nid', $node->id())
+        ->latestRevision()
+        ->execute();
+
+      if (!empty($latest_revision)) {
+        return array_key_first($latest_revision);
+      }
+    }
+
+    // Should never get here.
+    return FALSE;
+  }
+
+  /**
+   * Generates a diff module compare link render array.
+   *
+   * @param $nid
+   *   The node ID.
+   * @param $published_revision
+   *   The published revision ID.
+   * @param $latest_revision
+   *   The latest revision ID.
+   *
+   * @return array|mixed[]
+   *   The render array of the compare link.
+   */
+  private function generateCompareLink($nid, $published_revision, $latest_revision) {
     $url = Url::fromRoute(
       'diff.revisions_diff',
       [
         'node' => $nid,
-        'left_revision' => $revision1,
-        'right_revision' => $revision2,
+        'left_revision' => $published_revision,
+        'right_revision' => $latest_revision,
         'filter' => self::DIFF_FILTER,
       ],
     );
@@ -151,6 +255,19 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
     return $link->toRenderable();
   }
 
+  /**
+   * Helper method to load and build the render array for a specified block.
+   *
+   * @param string $block_id
+   *   The block plugin's ID to build.
+   * @param array $block_config
+   *   (Optional) Any block configuration to pass along.
+   *
+   * @return array
+   *   The render array of the loaded block.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
   private function buildBlockInstance(string $block_id, array $block_config = []) {
     $node = $this->getContextValue('node');
     /** @var \Drupal\Core\Block\BlockBase $follow_widget */
