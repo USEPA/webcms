@@ -11,23 +11,32 @@
 	font-family: gesso-font-family(heading);
 	justify-content: space-between;
 
-	@include breakpoint(gesso-breakpoint(tablet)) {
+	@include breakpoint(gesso-breakpoint(tablet-lg)) {
 		flex-wrap: nowrap;
 	}
 
 	> li {
 		display: block;
 		margin-bottom: rem(gesso-spacing(1));
-		width: 100%;
+		width: 48%;
 
 		&:last-child {
 			margin-bottom: 0;
 		}
 
-		@include breakpoint(gesso-breakpoint(tablet)) {
+		@include breakpoint(gesso-breakpoint(tablet-lg)) {
 			display: inline;
 			margin-bottom: 0;
+			padding: 0 rem(gesso-spacing('05'));
 			width: auto;
+
+			&:first-child {
+				padding-left: 0;
+			}
+
+			&:last-child {
+				padding-right: 0;
+			}
 		}
 	}
 }
