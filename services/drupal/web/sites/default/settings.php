@@ -1007,3 +1007,6 @@ if (file_exists($app_root . '/modules/contrib/fast_404/fast404.inc')) {
   include_once $app_root . '/modules/contrib/fast_404/fast404.inc';
   fast404_preboot($settings);
 }
+
+// Set directory for static site generation export.
+$settings['tome_static_directory'] = 'private://html';
