@@ -11,20 +11,42 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
-{% set sidenav = drupal_region('sidebar') %}
 
-{% set display_sidenav = false %}
+{% set related_title = 'Related Links'|t %}
+{# @see epa_theme_preprocess_node__perspective__full() #}
+{% if related_links %}
+  {% set related_info %}
+    <strong>{{ related_title }}</strong>
+    <br/>
+    {{ subjects }}
 
-{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
-  {% set display_sidenav = true %}
+    {% if more_link %}
+      {{ more_link }}
+    {% endif %}
+  {% endset %}
+{% elseif more_link %}
+  {% set related_info %}
+    <strong>{{ related_title }}</strong>
+    {{ more_link }}
+  {% endset %}
 {% endif %}
+
+{% set sidenav %}
+  {{  drupal_region('sidebar') }}
+
+  {% include '@components/box/box--special/box--special.twig' with {
+    'modifier_classes': 'margin-y-4 font-sans-3xs box--related-links',
+    'content': related_info,
+  } only %}
+{% endset %}
+
+{% set display_sidenav = true %}
 
 {% set header_info %}
   {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}
-{#  {{ drupal_entity('block', 'webareaheader', check_access=false) }}#}
   {{ webarea_contact_link }}
 {% endset %}
 
