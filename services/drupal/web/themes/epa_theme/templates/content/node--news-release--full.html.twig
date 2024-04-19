@@ -17,13 +17,20 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
-{% set related_title = 'Related Information:'|t %}
+{%  set press_offices = [] %}
+{% for item in content.field_press_office|field_value %}
+  {% set press_offices = press_offices|merge([item|render]) %}
+{% endfor %}
 
-{% if content.field_press_office|field_value is not empty %}
+{% set related_title = 'Related Links'|t %}
+
+{% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty %}
   {% set related_info %}
     <strong>{{ related_title }}</strong>
+    <br/>
     {{ content.field_press_office|field_value }}
-    <br>
+
+    {{ content.field_subjects|field_value }}
 
     {% if more_link %}
       {{ more_link }}
@@ -32,9 +39,17 @@
 {% elseif more_link %}
   {% set related_info %}
     <strong>{{ related_title }}</strong>
+    {{ content.field_subjects|field_value }}
     {{ more_link }}
   {% endset %}
 {% endif %}
+
+{% set sidenav %}
+  {% include '@components/box/box--special/box--special.twig' with {
+    'modifier_classes': 'margin-y-4 font-sans-3xs box--related-links',
+    'content': related_info,
+  } only %}
+{% endset %}
 
 {% set contact_link %}
   {{ webarea_contact_link }}
@@ -79,10 +94,6 @@
     'field_press_office',
     'field_secondary_headline'
   ) }}
-  {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 font-sans-3xs box--editors-note',
-    'content': related_info,
-  } only %}
 {% endset %}
 
 {% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
