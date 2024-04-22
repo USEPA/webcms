@@ -1,0 +1,33 @@
+uuid: fd5022f3-325e-4602-bdca-a9562243da65
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    workflow_process: any
+id: epa_content_has_been_published
+group_use: true
+group_type: web_area
+workflow: epa_default
+group_roles:
+  web_area-watch_publication: web_area-watch_publication
+  web_area-administrator: '0'
+  web_area-approver: '0'
+  web_area-editor: '0'
+  web_area-member: '0'
+transitions:
+  publish: publish
+roles: {  }
+flags:
+  notification_opt_in: notification_opt_in
+author: false
+revision_author: false
+site_mail: false
+emails: ''
+subject: 'New Content Has Been Published: [node:group:title] > [node:title]'
+body:
+  value: "<p>Hi, you have received this email because you are watching for new pages in the [node:group:title] web area in EPA's Web Content Management System.</p>\r\n<p>The following EPA page has been published in the [node:group:title] web area:</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>[node:title]</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Log in with your LAN ID and password to review this web page:</p>\r\n<p><a href=\"[site:url]user/login?destination=node/[node:nid]\">[node:url]</a></p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Transitioned by: [node:revision-user:display-name]</p>\r\n\r\n<p>Comments: [node:revision-log]</p>"
+  format: unprocessed
+label: 'EPA Content Has Been Published'
