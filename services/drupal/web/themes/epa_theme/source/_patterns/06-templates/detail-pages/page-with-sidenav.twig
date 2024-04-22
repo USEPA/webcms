@@ -20,6 +20,9 @@
 
     {% block sidebar %}
       {{ sidenav }}
+      <div class="menu-sidenav__contact" id="menu-sidenav__contact">
+        {{ contact_link }}
+      </div>  
     {% endblock %}
   {% endembed %}
 
@@ -28,13 +31,13 @@
 {% embed '@layouts/page/page.twig' with {
   'has_header': has_header,
   'has_footer': has_footer,
+  'modifier_classes': 'page-has-sidebar',
 } %}
   {% block info %}
     {{ header_info }}
   {% endblock %}
 
   {% block contact %}
-    {{ contact_link }}
   {% endblock %}
 
   {% block content %}

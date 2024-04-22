@@ -520,43 +520,82 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
 /**
  * Implements hook_menu_local_tasks_alter().
  *
- * Overriding titles for tabs AND hiding the node Edit tab. Edit link will now
- * only appear if we're on the latest_version route now.
+ * Overriding titles and weights for tabs. This is to get the tabs in the correct
+ * order and with correct titles for using them within the custom node tabs.
  *
- * @see \epa_workflow_form_alter()
+ * @see \Drupal\epa_workflow\Plugin\Block\EpaNodeTabsBlock
  */
 function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
-  // Level 0 links are tabs and level 1 are subtabs.
+  // Order:
+  // - Back to group dashboard
+  // - Edit page layout
+  // - Preview view modes
+  // - clone
+  // - export
+  // - delete
+
   $override_link_titles = [
     [
-      'epa_web_areas.group_content' => 'Content',
-      'group.view' => 'Content',
+      'epa_web_areas.group_content' => [
+        'title' => 'Content',
+      ],
+      'group.view' => [
+        'title' => 'Content',
+      ],
+      'epa_web_areas.node_group_dashboard' => [
+        'weight' => -100
+      ],
+      'layout_builder_ui:layout_builder.overrides.node.view' => [
+        'title' => 'Edit page layout',
+        'weight' => -90
+      ],
+      'view_modes_display.entities:node.view_mode_display_tab' => [
+        'title' => 'Preview view modes',
+        'weight' => -80
+      ],
+      'entity_clone.clone:node.clone_tab' => [
+        'weight' => -70
+      ],
+      'epa_node_export.admin_page' => [
+        'weight' => -60
+      ],
+      'entity.node.delete_form' => [
+        'weight' => 100
+      ],
     ],
     [
-      'content_moderation.content' => 'Latest Revisions',
-    // Hides the task provided by the content moderation module.
-      'content_moderation.moderated_content' => FALSE,
+      'content_moderation.content' => [
+        'title' => 'Latest Revisions',
+      ],
+      // Hides the task provided by the content moderation module.
+      'content_moderation.moderated_content' => [
+        'title' => FALSE,
+      ],
     ],
   ];
 
+  // Level 0 links are tabs and level 1 are subtabs.
   foreach ($override_link_titles as $level => $link_overrides) {
     if (isset($data['tabs'][$level])) {
-      foreach ($link_overrides as $link_name => $link_title) {
+      foreach ($link_overrides as $link_name => $link_data) {
         if (isset($data['tabs'][$level][$link_name])) {
-          if ($link_title === FALSE) {
-            unset($data['tabs'][$level][$link_name]);
+          // Check if we have a title we want to override.
+          if (isset($link_data['title'])) {
+            if ($link_data['title'] === FALSE) {
+              unset($data['tabs'][$level][$link_name]);
+            }
+            else {
+              $data['tabs'][$level][$link_name]['#link']['title'] = $link_data['title'];
+            }
           }
-          else {
-            $data['tabs'][$level][$link_name]['#link']['title'] = $link_title;
+
+          // Check if we have a weight we want to override.
+          if (isset($link_data['weight'])) {
+            $data['tabs'][$level][$link_name]['#weight'] = $link_data['weight'];
           }
         }
       }
     }
-  }
-
-  // Hide the node edit tab always.
-  if (isset($data['tabs'][0]['entity.node.edit_form'])) {
-    unset($data['tabs'][0]['entity.node.edit_form']);
   }
 }
 
@@ -569,6 +608,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 
   $storage = \Drupal::entityTypeManager()->getStorage('node');
+  /** @var \Drupal\node\Entity\Node $original */
   $original = $node->original;
   if ($original) {
     $default_revision_id = $original->get('vid')->value;
@@ -875,6 +915,7 @@ function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateI
  * Implements hook_theme().
  */
 function epa_workflow_theme($existing, $type, $theme, $path) {
+  // @todo: Evaluate and remove the content_info_box given we won't use this after
   return [
     'epa_content_info_box' => [
       'variables' => [
@@ -888,5 +929,56 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
         'content_moderation_form' => NULL,
       ],
     ],
+    'epa_node_tabs' => [
+      'variables' => [
+        'tabs' => [],
+      ],
+    ],
+    'epa_node_tab_item' => [
+      'variables' => [
+        'title' => NULL,
+        'url' => NULL,
+        'icon' => NULL,
+        'is_active' => FALSE,
+        'children' => [],
+      ],
+    ],
+    'epa_follow_widget' => [
+      'variables' => [
+        'flag_link' => NULL,
+        'current_user_is_following' => FALSE,
+        'flag_users' => [],
+
+      ]
+      ],
+      'epa_node_details' => [
+        'variables' => [
+          'nid' => NULL,
+          'rid' => NULL,
+          'editor_in_chief' => NULL,
+          'review_deadline' => NULL,
+        ]
+      ]
   ];
+}
+
+/**
+ * Implements hook_page_top()
+ */
+function epa_workflow_page_top(array &$page_top) {
+  // Only add this block if we're on a node route.
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    // Load our custom block
+    $machine_name = 'epa_node_tabs';
+    /** @var Drupal\Core\Block\BlockBase $block */
+    $block = \Drupal::service('plugin.manager.block')
+      ->createInstance($machine_name, []);
+    if (!empty($block)) {
+      if ($block->access(\Drupal::currentUser())) {
+        // Add to page top
+        $block->setContextValue('node', $node);
+        $page_top['epa_node_tabs'] = $block->build();
+      }
+    }
+  }
 }

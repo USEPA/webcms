@@ -83,7 +83,7 @@ variable "db_instance_count" {
 
 variable "regional_cluster_endpoint" {
   description = "Endpoint of the regional cluster this instance will connect to"
-  type        = string
+  type = string
 }
 
 #endregion
@@ -91,7 +91,7 @@ variable "regional_cluster_endpoint" {
 #region S3
 # cf. s3.tf
 
-variable "s3_replication_role" {
+variable "replication_role" {
   description = "Role used for S3 object replication"
   type        = string
 

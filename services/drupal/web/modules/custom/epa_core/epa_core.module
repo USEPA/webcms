@@ -9,9 +9,10 @@ use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -20,17 +21,15 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\link\LinkItemInterface;
-use Drupal\media\Entity\Media;
-use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\search_api\Utility\Utility;
+use Drupal\link\LinkItemInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\views\ViewExecutable;
 use Drupal\search_api\Plugin\views\query\SearchApiQuery;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_theme().
@@ -59,6 +58,14 @@ function epa_core_rebuild() {
     $release = $tag;
   }
   \Drupal::state()->set('environment_indicator.current_release', $release);
+}
+
+function epa_core_preprocess_node(&$variables) {
+  if ($variables['view_mode'] === 'full'
+    && $variables['node']->hasField('field_include_jquery')
+    && $variables['node']->field_include_jquery->value) {
+    $variables['elements']['#attached']['library'][] = 'core/jquery';
+  }
 }
 
 /**
@@ -394,11 +401,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
             if ($forms = $group->field_contact_us_form->referencedEntities()) {
+              /** @var \Drupal\node\Entity\Node $contact_form */
               $contact_form = reset($forms);
               $bubbleable_metadata->addCacheableDependency($group);
               $bubbleable_metadata->addCacheableDependency($contact_form);
               $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form->id()]) : NULL;
-              $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
+              $replacements[$original] = $url ? Link::fromTextAndUrl($contact_form->getTitle(), $url)
                 ->toString() : $original;
             }
           }
@@ -889,11 +897,52 @@ function epa_core_node_presave(EntityInterface $node) {
  * Custom integration for facets. When a Views exposed filter is modified on a
  * search results page it will lose any facets which have been already selected.
  * This adds hidden fields for each facet so their values are retained.
+ * Implements hook_node_update().
  */
-function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state) {
-  if (!empty($form["field_search_text_value"])) {
-    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+function epa_core_node_update(EntityInterface $node) {
+  // Get current user and make sure it's not anonymous.
+  if ($account = User::load(\Drupal::currentUser()->id())){
+    if ($account->isAnonymous()) {
+      return;
+    }
+    // Flag node for current user when node is created/updated.
+    /** @var \Drupal\flag\FlagServiceInterface $flag_service */
+    $flag_service = \Drupal::service('flag');
+    $flag = $flag_service->getFlagById('notification_opt_in');
+    if ($flag && $node) {
+      // Check to see if user is already watching node.
+      if (!$flag_service->getFlagging($flag, $node, $account)) {
+        $flag_service->flag($flag, $node, $account);
+      }
+    }
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for views_exposed_form().
+ *
+ * Custom integration for facets. When a Views exposed filter is modified on a
+ * search results page it will lose any facets which have been already selected.
+ * This adds hidden fields for each facet so their values are retained.
+ */
+function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+ if (!empty($form["field_search_text_value"])) {
+     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+ }
+
+  $views_exposed_forms = [
+    'views-exposed-form-moderated-content-moderated-content',
+    'views-exposed-form-moderated-content-page-1',
+    'views-exposed-form-group-moderated-content-block-1',
+    'views-exposed-form-group-nodes-block-1',
+  ];
+
+  if (in_array($form['#id'], $views_exposed_forms) && isset($form['revision_uid'])) {
+    if ($form['revision_uid']['#description']) {
+      unset($form['revision_uid']['#description']);
+    }
+  }
+
   // Retrieve the view object and the query plugin.
   $storage = $form_state->getStorage();
   if (!isset($storage['view'])) {
@@ -924,6 +973,19 @@ function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form
       $form['#action'] = NULL;
     }
   }
+
+  $views_exposed_forms = [
+    'views-exposed-form-moderated-content-moderated-content',
+    'views-exposed-form-moderated-content-page-1',
+    'views-exposed-form-group-moderated-content-block-1',
+    'views-exposed-form-group-nodes-block-1',
+  ];
+
+  if (in_array($form['#id'], $views_exposed_forms) && isset($form['revision_uid'])) {
+    if ($form['revision_uid']['#description']) {
+      unset($form['revision_uid']['#description']);
+    }
+  }
 }
 
 /**
@@ -946,8 +1008,10 @@ function epa_core_entity_base_field_info_alter(&$fields, $entity_type) {
 /**
  * Implements hook_entity_field_access().
  */
-function epa_core_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, \Drupal\Core\Field\FieldItemListInterface $items = NULL)
-{
+function epa_core_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  if ($operation == 'edit' && $field_definition->getName() === 'field_include_jquery') {
+    return AccessResult::forbiddenIf(!$account->hasPermission('edit include jquery field'))->addCacheContexts(['user.permissions']);
+  }
   if ($field_definition->getTargetEntityTypeId() == 'user') {
     switch ($field_definition->getName()) {
       case 'status':

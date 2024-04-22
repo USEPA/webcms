@@ -1,8 +1,8 @@
 extends:
   - stylelint-config-sass-guidelines
-  - stylelint-config-prettier
 
 plugins:
+  - stylelint-order
   - stylelint-prettier
   - stylelint-selector-pseudo-class-lvhfa
 rules:
@@ -12,18 +12,10 @@ rules:
     - ignore:
       - 'inside-function'
   max-nesting-depth: 3
-  no-empty-first-line: true
-  order/order:
-    - - type: at-rule
-        hasBlock: false
-      - custom-properties
-      - declarations
-    - unspecified: ignore
-      disableFix: true
+  order/properties-alphabetical-order: true
   plugin/selector-pseudo-class-lvhfa: true
   prettier/prettier: true
   property-no-vendor-prefix: null
-  selector-attribute-brackets-space-inside: never
   selector-class-pattern:
     # "piece" regex:
     # [a-zA-Z0-9]+

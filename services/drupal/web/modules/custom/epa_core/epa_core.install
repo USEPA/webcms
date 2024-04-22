@@ -186,9 +186,14 @@ function epa_core_update_9007() {
 }
 
 /**
- * Disabling gcontent_moderation module (submodule of Groups from old patch) so
- * that we can enable the separate contrib module.
+ * Delete all flags assigned to anonymous user and log the number of items deleted.
  */
-function epa_core_update_9008() {
-  \Drupal::database()->truncate('cache_container');
+function epa_core_update_9010() {
+  $database = \Drupal::database();
+  $query = $database->delete('flagging')
+    ->condition('uid', 0);
+
+  $deletedCount = $query->execute();
+
+  \Drupal::logger('epa_core')->notice('@count flags assigned to anonymous user have been deleted.', ['@count' => $deletedCount]);
 }

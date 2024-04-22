@@ -64,6 +64,14 @@ data "aws_ssm_parameter" "terraform_database_security_group" {
 
 #endregion
 
+#region RDS parameters
+
+data "aws_ssm_parameter" "mysql_endpoint_parameter" {
+  name = "/webcms/${var.environment}/rds/mysql-endpoint"
+}
+
+#endregion
+
 locals {
   languages = ["en", "es"]
 
