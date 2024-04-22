@@ -26,27 +26,29 @@
 
 {% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty %}
   {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    <br/>
-    {{ content.field_press_office|field_value }}
+    <h2>{{ related_title }}</h2>
+    <ul>
+      <li>{{ content.field_press_office|field_value }}</li>
+      <li>{{ content.field_subjects|field_value }}</li>
 
-    {{ content.field_subjects|field_value }}
-
-    {% if more_link %}
-      {{ more_link }}
-    {% endif %}
+      {% if more_link %}
+        <li>{{ more_link }}</li>
+      {% endif %}
+    </ul>  
   {% endset %}
 {% elseif more_link %}
   {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    {{ content.field_subjects|field_value }}
-    {{ more_link }}
+    <h2>{{ related_title }}</h2>
+    <ul>
+      <li>{{ content.field_subjects|field_value }}</li>
+      <li>{{ more_link }}</li>
+    </ul>  
   {% endset %}
 {% endif %}
 
 {% set sidenav %}
   {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 font-sans-3xs box--related-links',
+    'modifier_classes': 'margin-y-4 box--related-links',
     'content': related_info,
   } only %}
 {% endset %}

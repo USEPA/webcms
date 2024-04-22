@@ -13,7 +13,7 @@
 
 {% set related_title = 'Related Links'|t %}
 {% set related %}
-  <strong>{{ related_title }}</strong>
+  <h2>{{ related_title }}</h2>
   <ul>
     {% if content.entitygroupfield|field_value -%}
       <li>{{ content.entitygroupfield }}</li>
@@ -21,10 +21,10 @@
     {%- if content.field_video|field_value -%}
       <li><a href="#watch">Watch the Event</a></li>
     {%- endif -%}
-    {{- content.field_related_information }}
+    <li>{{- content.field_related_information }}</li>
 
     {% if content.field_subjects|field_value %}
-      {{- content.field_subjects|field_value }}
+      <li>{{- content.field_subjects|field_value }}</li>
     {% endif %}
 
   </ul>
@@ -33,7 +33,7 @@
 {% set sidenav %}
   {{  drupal_region('sidebar') }}
   {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 font-sans-3xs box--related-links',
+    'modifier_classes': 'margin-y-4 box--related-links',
     'content': related,
   } only %}
 </div>
