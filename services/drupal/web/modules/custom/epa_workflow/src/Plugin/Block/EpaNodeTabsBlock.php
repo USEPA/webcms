@@ -186,8 +186,10 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
       }
     }
 
-    // After we've built the tabs lets remove the items that the user has access to.
-    usort($page_options['#children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
+    if (!empty($page_options['#children'])) {
+      // After we've built the tabs lets remove the items that the user has access to.
+      usort($page_options['#children'], ['Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
+    }
 
     // Finally adds the $page_options tabs to the rest of the tabs array.
     $tabs = array_merge($tabs, [$page_options]);
