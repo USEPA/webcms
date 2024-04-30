@@ -89,8 +89,12 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return AccessResultForbidden::forbidden();
     }
 
-    // @todo: Add permission for this.
-    return AccessResult::allowed();
+    if (\Drupal::currentUser()->isAuthenticated()) {
+      return AccessResult::allowed();
+    }
+
+    return AccessResultForbidden::forbidden();
+
   }
 
   /**
@@ -101,8 +105,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
     $node = $this->getContextValue('node');
     $moderation_state_id = $node->get('moderation_state')->getString();
 
-    // @todo: review this later. setting non caching on this block for now.
-    // @todo: Determine cache strategy for this block. It's going to be dependent on node revision we're looking at.
+    // @todo: Determine cache strategy for this block. It's going to be dependent on node revision we're looking at and user.
     $build['#cache']['max-age'] = 0;
 
     $build['content'] = [
