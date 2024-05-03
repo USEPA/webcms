@@ -557,9 +557,9 @@ function epa_core_node_view_alter(array &$build, EntityInterface $entity, Entity
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  */
-function epa_core_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_core_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
   $plugin_id = $context['widget']->getPluginId();
   // If the field is a datetime or daterange field, then add a note to the
   // field's description indicating that times must be entered according to the
@@ -568,24 +568,24 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
   if (strpos($plugin_id, 'datetime_') !== FALSE || strpos($plugin_id, 'daterange') !== FALSE) {
     $field_name = $context['items']->getName();
     if ($field_name == 'created') {
-      _epa_core_augment_datetime_description($element['value']['#description']);
+      _epa_core_augment_datetime_description($element['widget'][0]['value']['#description']);
     }
     else {
-      if (empty($element['#description'])) {
-        $element['#description'] = '';
+      if (empty($element['widget'][0]['#description'])) {
+        $element['widget'][0]['#description'] = '';
       }
 
       // Adjust the description if the field is a datetime field vs. just a date field.
       /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
       $items = $context['items'];
       if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
-        _epa_core_augment_datetime_description($element['#description']);
+        _epa_core_augment_datetime_description($element['widget'][0]['#description']);
       }
     }
   }
 
-  if ($plugin_id == 'smartdate_timezone' && isset($element['timezone']['#options'])) {
-    unset($element['timezone']['#options']['']);
+  if ($plugin_id == 'smartdate_timezone' && isset($element['widget'][0]['timezone']['#options'])) {
+    unset($element['widget'][0]['timezone']['#options']['']);
   }
 
   // If a link field only supports external links remove the confusing help text
