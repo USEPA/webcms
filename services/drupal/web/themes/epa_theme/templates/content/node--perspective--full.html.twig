@@ -12,21 +12,17 @@
 ] %}
 
 
-{% set related_title = 'Related Links'|t %}
+
 {# @see epa_theme_preprocess_node__perspective__full() #}
-{% if related_links %}
+{% if subjects or more_link %}
   {% set related_info %}
-    <h2>{{ related_title }}</h2>
-    {{ subjects }}
+    {% if subjects %}
+      {{ subjects }}
+    {% endif %}
 
     {% if more_link %}
       {{ more_link }}
     {% endif %}
-  {% endset %}
-{% elseif more_link %}
-  {% set related_info %}
-    <h2>{{ related_title }}</h2>
-    {{ more_link }}
   {% endset %}
 {% endif %}
 
@@ -34,8 +30,12 @@
   {{  drupal_region('sidebar') }}
 
   {% include '@components/box/box--related-links/box--related-links.twig' with {
-    'modifier_classes': 'margin-y-4 box--related-links',
+    'modifier_classes': 'margin-y-4',
     'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
   } only %}
 {% endset %}
 

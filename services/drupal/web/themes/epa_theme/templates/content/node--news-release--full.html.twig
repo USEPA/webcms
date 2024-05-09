@@ -22,26 +22,20 @@
   {% set press_offices = press_offices|merge([item|render]) %}
 {% endfor %}
 
-{% set related_title = 'Related Links'|t %}
 
-{% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty %}
+
+{% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty or more_link %}
   {% set related_info %}
-    <h2 class='related-links--title'>{{ related_title }}</h2>
     <ul class='related-links--list'>
-      <li class='related-links--item'>{{ content.field_press_office|field_value }}</li>
-      <li class='related-links--item'>{{ content.field_subjects|field_value }}</li>
-
+      {% if content.field_press_office|field_value %}
+        <li class='related-links--item'>{{ content.field_press_office|field_value }}</li>
+      {% endif %}
+      {% if content.field_subjects|field_value %}
+        <li class='related-links--item'>{{ content.field_subjects|field_value }}</li>
+      {% endif %}
       {% if more_link %}
         <li class='related-links--item'>{{ more_link }}</li>
       {% endif %}
-    </ul>  
-  {% endset %}
-{% elseif more_link %}
-  {% set related_info %}
-    <h2 class='related-links--title'>{{ related_title }}</h2>
-    <ul class='related-links--list'>
-      <li class='related-links--item'>{{ content.field_subjects|field_value }}</li>
-      <li class='related-links--item'>{{ more_link }}</li>
     </ul>  
   {% endset %}
 {% endif %}
@@ -50,6 +44,10 @@
   {% include '@components/box/box--related-links/box--related-links.twig' with {
     'modifier_classes': 'margin-y-4',
     'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
   } only %}
 {% endset %}
 

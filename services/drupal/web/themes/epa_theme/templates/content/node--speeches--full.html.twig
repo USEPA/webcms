@@ -11,30 +11,33 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
-{% set related_title = 'Related Links'|t %}
-{% set related %}
-  <h2>{{ related_title }}</h2>
-  <ul>
+{% set related_info %}
+  <ul class='related-links--list'>
     {% if content.entitygroupfield|field_value -%}
-      <li>{{ content.entitygroupfield }}</li>
+      <li class='related-links--item'>{{ content.entitygroupfield }}</li>
     {%- endif -%}
     {%- if content.field_video|field_value -%}
-      <li><a href="#watch">Watch the Event</a></li>
+      <li class='related-links--item'><a href="#watch">Watch the Event</a></li>
     {%- endif -%}
-    <li>{{- content.field_related_information }}</li>
-
+    {%- if content.field_related_information|field_value -%}
+      <li class='related-links--item'>{{- content.field_related_information }}</li>
+    {%- endif -%}
     {% if content.field_subjects|field_value %}
-      <li>{{- content.field_subjects|field_value }}</li>
+      <li class='related-links--item'>{{- content.field_subjects|field_value }}</li>
     {% endif %}
-
   </ul>
 {% endset %}
 
 {% set sidenav %}
   {{  drupal_region('sidebar') }}
+  
   {% include '@components/box/box--related-links/box--related-links.twig' with {
-    'modifier_classes': 'margin-y-4 box--related-links',
-    'content': related,
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
   } only %}
 </div>
 {% endset %}
