@@ -28,13 +28,25 @@
   <p>Learn more about EPA’s <a href="/pacific-southwest-media-center">Pacific Southwest Region</a>. Connect with us on&nbsp;<a href="https://www.facebook.com/EPAregion9">Facebook</a>&nbsp;and on&nbsp;<a href="https://twitter.com/EPAregion9">Twitter</a>.</p>
 {% endset %}
 
+{% set sidenav %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
 {% set page_content %}
-  {% include '@templates/detail-pages/page.twig' with {
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'title': page_title,
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
-    'is_narrow': true,
+    'sidenav': sidenav,
+    'has_sidenav': has_sidenav,
   } %}
 {% endset %}
 
