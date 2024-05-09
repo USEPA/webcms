@@ -1,0 +1,43 @@
+// @file
+// Styles for a Special Box.
+
+@use '../../../00-config' as *;
+@use '../../../02-base/02-html-elements/13-headings/headings' as *;
+@use '../../../02-base/03-extendables' as *;
+
+.box--related-links {
+  .related-links--title {
+    font-family: font-family(body);
+    font-size: rem(16px);
+    font-weight: bold;
+    margin-bottom: rem(14px);
+  }
+
+  .related-links--list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .related-links--item {
+    margin-bottom: 0;
+    
+    &:empty {
+      display: none;
+    }
+
+    a {
+      color: gesso-grayscale(black);
+      font-size: rem(16px);
+
+      &:focus,
+      &:hover {
+        color: gesso-color(text, link);
+        text-decoration: underline;
+      }
+    }
+
+    + .related-links--item {
+      margin-top: rem(14px);
+    }
+  }
+}

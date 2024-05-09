@@ -26,29 +26,29 @@
 
 {% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty %}
   {% set related_info %}
-    <h2>{{ related_title }}</h2>
-    <ul>
-      <li>{{ content.field_press_office|field_value }}</li>
-      <li>{{ content.field_subjects|field_value }}</li>
+    <h2 class='related-links--title'>{{ related_title }}</h2>
+    <ul class='related-links--list'>
+      <li class='related-links--item'>{{ content.field_press_office|field_value }}</li>
+      <li class='related-links--item'>{{ content.field_subjects|field_value }}</li>
 
       {% if more_link %}
-        <li>{{ more_link }}</li>
+        <li class='related-links--item'>{{ more_link }}</li>
       {% endif %}
     </ul>  
   {% endset %}
 {% elseif more_link %}
   {% set related_info %}
-    <h2>{{ related_title }}</h2>
-    <ul>
-      <li>{{ content.field_subjects|field_value }}</li>
-      <li>{{ more_link }}</li>
+    <h2 class='related-links--title'>{{ related_title }}</h2>
+    <ul class='related-links--list'>
+      <li class='related-links--item'>{{ content.field_subjects|field_value }}</li>
+      <li class='related-links--item'>{{ more_link }}</li>
     </ul>  
   {% endset %}
 {% endif %}
 
 {% set sidenav %}
-  {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 box--related-links',
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
     'content': related_info,
   } only %}
 {% endset %}
