@@ -49,7 +49,7 @@ content:
     label: above
     settings: {  }
     third_party_settings: {  }
-    weight: 5
+    weight: 6
     region: content
   field_paragraphs:
     type: entity_reference_revisions_entity_view
@@ -99,6 +99,19 @@ content:
     third_party_settings: {  }
     weight: 0
     region: content
+  field_subjects:
+    type: epa_core_hierarchical_term_facet_formatter
+    label: inline
+    settings:
+      display: all
+      link: true
+      wrap: none
+      separator: ' | '
+      reverse: false
+      facet_source: news_releases_subjects
+    third_party_settings: {  }
+    weight: 5
+    region: content
 hidden:
   content_moderation_control: true
   entitygroupfield: true
@@ -118,7 +131,6 @@ hidden:
   field_review_deadline: true
   field_scheduled_transition: true
   field_search_text: true
-  field_subjects: true
   field_type: true
   langcode: true
   links: true
