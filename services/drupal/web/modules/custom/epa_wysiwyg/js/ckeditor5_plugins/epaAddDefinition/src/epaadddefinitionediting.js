@@ -51,7 +51,7 @@ export default class EpaAddDefinitionEditing extends Plugin {
 
         const element = writer.createContainerElement(
           "dfn",
-          { title: definition },
+          { title: definition, class: CSS_TRIGGER },
           [writer.createText(term)]
         );
 

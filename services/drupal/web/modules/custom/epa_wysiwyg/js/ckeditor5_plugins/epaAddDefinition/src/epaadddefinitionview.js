@@ -1,5 +1,5 @@
-import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
 import { icons } from "ckeditor5/src/core";
+import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
 
 import MatchListView from "./views/matchlistview";
 

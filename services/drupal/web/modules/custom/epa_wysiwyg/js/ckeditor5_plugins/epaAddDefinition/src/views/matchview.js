@@ -61,7 +61,6 @@ export default class MatchView extends View {
 
           const selection =
             index === 0 ? "" : this.definitions[index - 1].definition;
-          console.log("setting selection to", selection);
           this.selected = selection;
         }),
       },
