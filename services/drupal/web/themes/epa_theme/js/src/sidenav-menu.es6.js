@@ -1,7 +1,7 @@
 // Sidenav menu script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.sidenavMenu = {
     attach(context) {
       once('sidenav-menu', 'html').forEach(() => {
@@ -50,7 +50,7 @@ import Drupal from 'drupal';
           }
 
           if (lastFocusableElement) {
-            lastFocusableElement.addEventListener('click', function() {
+            lastFocusableElement.addEventListener('click', function () {
               const swap = lastFocusableElement;
               lastFocusableElement = priorLastElement;
               priorLastElement = swap;
