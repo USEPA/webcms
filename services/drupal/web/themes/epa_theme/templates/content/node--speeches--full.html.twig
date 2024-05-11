@@ -20,7 +20,7 @@
       <li class='related-links--item'><a href="#watch">Watch the Event</a></li>
     {%- endif -%}
     {%- if content.field_related_information|field_value -%}
-      <li class='related-links--item'>{{- content.field_related_information }}</li>
+      <li class='related-links--item'>{{- content.field_related_information|field_value }}</li>
     {%- endif -%}
     {% if content.field_subjects|field_value %}
       <li class='related-links--item'>{{- content.field_subjects|field_value }}</li>
@@ -39,7 +39,6 @@
       'text': 'Related Links'|t,
     },
   } only %}
-</div>
 {% endset %}
 
 {% set display_sidenav = true %}
