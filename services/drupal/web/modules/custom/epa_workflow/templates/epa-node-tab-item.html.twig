@@ -1,6 +1,17 @@
-<li>
-  {% if icon %}
-    <span>{{ icon }}</span>
-  {% endif %}
-  <a href="{{ url }}" class="{{ is_active ? 'is-active' : '' }}">{{ title }}</a>
-</li>
+<a 
+  class="node-tabs__link {{ is_active ? 'is-active' : '' }}"
+  {% if url %} 
+    href="{{ url }}" 
+  {% else %}
+    role="link"
+    aria-disabled="true"
+  {% endif %} >
+    {% if icon %}
+      {% include '@components/icon/icon.twig' with {
+        'is_hidden': true,
+        'icon_name': icon,
+      } %}
+    {% endif %}
+
+    {{ title }}
+</a>

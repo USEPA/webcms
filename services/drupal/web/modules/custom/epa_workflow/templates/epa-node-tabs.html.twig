@@ -23,26 +23,35 @@
 #}
 {% import _self as menus %}
 
-{#
-We call a macro which calls itself to render the full tree.
-@see https://twig.symfony.com/doc/1.x/tags/macro.html
-#}
-{{ menus.menu_links(tabs, attributes, 0) }}
+<nav class="node-tabs" role="navigation" aria-label="Primary tasks">
 
-{% macro menu_links(tabs, attributes, menu_level) %}
-  {% import _self as menus %}
-  {% if tabs %}
-    {% if menu_level == 0 %}
-<ul{{ attributes }}>
-  {% else %}
-    <ul>
-  {% endif %}
-  {% for item in tabs %}
-      {{ item }} {# this is the epa-node-tab-item #}
-      {% if item['#children'] %}
-        {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
-      {% endif %}
-  {% endfor %}
-  </ul>
-  {% endif %}
-{% endmacro %}
+  {#
+  We call a macro which calls itself to render the full tree.
+  @see https://twig.symfony.com/doc/1.x/tags/macro.html
+  #}
+  {{ menus.menu_links(tabs, attributes, 0) }}
+
+  {% macro menu_links(tabs, attributes, menu_level) %}
+    {% import _self as menus %}
+
+    {% if tabs %}
+        {% if menu_level == 0 %}
+          <ul{{ attributes }} class="node-tabs__menu">
+        {% else %}
+          <ul class="node-tabs__menu-child">
+        {% endif %}
+
+        {% for item in tabs %}
+          <li class="node-tabs__item">
+            {{ item }} {# this is the epa-node-tab-item #}
+
+            {% if item['#children'] %}
+              {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
+            {% endif %}
+          </li>  
+        {% endfor %}
+
+        </ul>
+    {% endif %}
+  {% endmacro %}
+</nav>
