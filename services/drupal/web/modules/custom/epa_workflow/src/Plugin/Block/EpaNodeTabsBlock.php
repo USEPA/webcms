@@ -111,8 +111,6 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     $cacheability = new CacheableMetadata();
     $cacheability->addCacheContexts(['route']);
     $cacheability->addCacheTags(['node']);
-    // @todo: Eventually remove me. This just outputs the local tasks as we normally would.
-    $build['content'] = $this->pluginManagerMenuLocalTask->getTasksBuild($this->routeMatch->getRouteName(), $cacheability);
 
     /** @var NodeInterface $node */
     $node = $this->getContextValue('node');
