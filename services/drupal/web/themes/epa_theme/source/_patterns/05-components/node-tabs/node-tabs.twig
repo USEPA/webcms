@@ -1,7 +1,7 @@
 <nav class="node-tabs" role="navigation" aria-label="Primary tasks">
   <ul class="node-tabs__menu">
     {% for item in tabs %}
-      <li class="node-tabs__item">
+      <li class="node-tabs__item {% if item.children %}has-children{% endif %}">
         <a
           class="node-tabs__link {% if item.is_active %}is-active{% endif %}"
 
@@ -20,24 +20,10 @@
         </a>
 
         {% if item.children %}
-          <ul class="node-tabs__menu-child">
-            {% for child in item.children %}
-              <li class="node-tabs__item-child">
-                <a 
-                  class="{% if child.is_active %}is-active{% endif %}"
-
-                  {% if child.url %} 
-                    href="{{ child.url }}" 
-                  {% else %}
-                    role="link"
-                    aria-disabled="true"
-                  {% endif %} 
-                >
-                  {{ child.title }}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
+          {% include '@components/node-dialog/node-dialog.twig' with {
+            'modifier_classes': 'node-tabs__menu-child',
+            'nodeDialog': item.children,
+          } %}
         {% endif %}
       </li>
     {% endfor %}
