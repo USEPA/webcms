@@ -1,5 +1,11 @@
+{% set link_classes = [
+  'node-tabs__link ',
+  is_active ? 'is_active',
+  is_child ? 'node-dialog__link'
+]|join(' ')|trim %}
+
 <a 
-  class="node-tabs__link {{ is_active ? 'is-active' : '' }}"
+  class="{{ link_classes }}"
   {% if url %} 
     href="{{ url }}" 
   {% else %}

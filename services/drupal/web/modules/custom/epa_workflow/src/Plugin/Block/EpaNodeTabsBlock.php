@@ -261,6 +261,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
       '#is_active' => $tab['#active'] ?? FALSE,
       '#access' => $tab['#access'],
       '#weight' => $tab['#weight'],
+      '#is_child' => TRUE,
     ];
   }
 }
