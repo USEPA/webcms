@@ -180,11 +180,13 @@ export default class EpaAddDefinitionUI extends Plugin {
       modal.data.forEach((obj) => {
         const term = obj.term;
 
-        // Find the word in the accumulated text
-        const termIndex = userInput.indexOf(term) + initialOffset;
+        // Find the word in the accumulated text, without case sensitivity
+        const termIndex =
+          userInput.toLocaleLowerCase().indexOf(term) + initialOffset;
         if (termIndex !== -1) {
-          // Create the range from the calculated offsets
           const termEnd = termIndex + term.length;
+          // get the original term from the text to preserve case
+          const originalTerm = userInput.substring(termIndex, termEnd);
           const startInfo = offsets.find(
             (o) => o.startOffset <= termIndex && o.endOffset > termIndex
           );
@@ -210,6 +212,7 @@ export default class EpaAddDefinitionUI extends Plugin {
 
             termMarkersAndRanges.push({
               term: term,
+              originalTerm: originalTerm,
               range: wordRange,
               marker: marker,
             });
@@ -231,7 +234,7 @@ export default class EpaAddDefinitionUI extends Plugin {
             writer.insertElement(
               "epaDefinition",
               {
-                term: SelectedArray[i].term,
+                term: wordMapMatch.originalTerm, // Use the original term from the text to preserve case
                 definition: SelectedArray[i].selected,
               },
               wordRange.start
