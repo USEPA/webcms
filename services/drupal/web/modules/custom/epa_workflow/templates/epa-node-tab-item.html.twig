@@ -1,7 +1,6 @@
 {% set link_classes = [
-  'node-tabs__link ',
-  is_active ? 'is-active',
-  is_child ? 'node-dialog__link'
+  is_child ? 'node-dialog__link' : 'node-tabs__link',
+  is_active ? 'is-active'
 ]|join(' ')|trim %}
 
 <a 
@@ -12,12 +11,12 @@
     role="link"
     aria-disabled="true"
   {% endif %} >
-    {% if icon %}
-      {% include '@components/icon/icon.twig' with {
-        'is_hidden': true,
-        'icon_name': icon,
-      } %}
-    {% endif %}
+  {% if icon %}
+    {% include '@components/icon/icon.twig' with {
+      'is_hidden': true,
+      'icon_name': icon,
+    } %}
+  {% endif %}
 
-    {{ title }}
+  {{ title }}
 </a>
