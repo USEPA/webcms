@@ -46,6 +46,10 @@ describe('TC2 - WYSIWYG', () => {
 
   beforeEach(() => {
     cy.preserveAllCookiesOnce();
+    cy.session('cookies', () => {
+      cy.setCookie('session_id', '189jd09sufh33aaiidhf99d09')
+    })
+
   });
 
   formatFile.formats.forEach((currentFormat) => {

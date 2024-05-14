@@ -70,7 +70,8 @@ Cypress.Commands.add('selection', {prevSubject: true}, (subject, fn) => {
 Cypress.Commands.add('preserveAllCookiesOnce', () => {
   cy.getCookies().then(cookies => {
     const namesOfCookies = cookies.map(c => c.name);
-    Cypress.Cookies.preserveOnce(...namesOfCookies);
+    //Cypress.Cookies.preserveOnce(...namesOfCookies);
+    cy.session(...namesOfCookies,);
   });
 });
 
