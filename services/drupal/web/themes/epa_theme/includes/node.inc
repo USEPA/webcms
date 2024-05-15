@@ -167,6 +167,32 @@ function epa_theme_preprocess_node__news_release__full(&$variables) {
 }
 
 /**
+ * Implements hook_preprocess_node__BUNDEL__VIEW_MODE().
+ */
+function epa_theme_preprocess_node__perspective__full(&$variables) {
+  /** @var \Drupal\node\Entity\Node $node */
+  $node = $variables['node'];
+  if (!isset($variables['webarea_contact_link'])) {
+    _add_webarea_contact_link($node, $variables);
+  }
+
+  // Because the perspectives uses layout builder we need to build the subjects field separately.
+  $variables['subjects'] = $node->get('field_subjects')->view(
+    [
+      'label' => 'hidden',
+      'type' => 'epa_core_hierarchical_term_facet_formatter',
+      'settings' => [
+        'display' => 'all',
+        'link' => TRUE,
+        'wrap' => 'none',
+        'separator' => ' | ',
+        'reverse' => FALSE,
+        'facet_source' => 'perspectives_subjects'
+      ]
+    ]);
+}
+
+/**
  * Custom function to add page regions to node templates.
  */
 function _add_regions_to_node($allowed_regions, &$variables) {

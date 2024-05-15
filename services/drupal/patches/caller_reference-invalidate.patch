@@ -1,0 +1,23 @@
+diff --git a/cloudfront_cache_path_invalidate.module b/cloudfront_cache_path_invalidate.module
+index 7f566f4842163671241f9e9153f15f4e15612712..a06d2698882c1be32d689bf7d81773d81927f900 100755
+--- a/cloudfront_cache_path_invalidate.module
++++ b/cloudfront_cache_path_invalidate.module
+@@ -61,12 +61,17 @@ function cloudfront_cache_path_invalidate_url(array $paths) {
+   // Load AWS SDK.
+   $cloudFront = new CloudFrontClient($args);
+
++  // Try to create unique caller_reference. This is to hopefully resolve the
++  // "Your request contains a caller reference that was used for a previous
++  // invalidation batch for the same distribution." error that we sometimes get.
++  $caller_reference = md5(implode(',', $paths)) . time();
++
+   // Invalidate URL.
+   try {
+     $cloudFront->createInvalidation([
+       'DistributionId' => Settings::get('aws.distributionid'),
+       'InvalidationBatch' => [
+-        'CallerReference' => date('U') . \Drupal::currentUser()->getAccountName(),
++        'CallerReference' => $caller_reference,
+         'Paths' => [
+           'Items' => $paths,
+           'Quantity' => $total_paths,
