@@ -7,10 +7,6 @@
   background-color: gesso-grayscale(white);
   width: 100%;
   z-index: 3;
-
-  @include breakpoint(gesso-breakpoint(tablet)) {
-    position: sticky;
-  }
 }
 
 .node-tabs__menu {
@@ -39,7 +35,6 @@
   }
 
   &.has-children {
-    &:focus,
     &:focus-within,
     &.is-selected {
       .node-tabs__menu-child {
@@ -91,11 +86,14 @@
 
 .node-tabs__menu-child {
   display: none;
-  position: absolute;
+  margin-top: 39px;
+  max-width: 100%;
+  position: relative;
   z-index: 3;
 
-  @include breakpoint(max-width gesso-breakpoint(tablet)) {
-    max-width: 100%;
-    position: relative;
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    position: absolute;
+    margin-top: 0;
+    max-width: rem(245px);
   }
 }
