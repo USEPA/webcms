@@ -84,6 +84,9 @@ $databases['default']['default'] = array(
   'driver' => "mysql",
   'port' => '3306',
   'prefix' => "",
+  'init_commands' => [
+    'isolation_level' => 'SET SESSION tx_isolation=\'READ-COMMITTED\'',
+  ],
 );
 
 /**

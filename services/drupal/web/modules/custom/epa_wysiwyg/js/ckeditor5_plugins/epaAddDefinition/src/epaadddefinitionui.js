@@ -1,16 +1,11 @@
-// @ts-check
-
 import { Plugin } from "ckeditor5/src/core";
 import { ButtonView, Notification } from "ckeditor5/src/ui";
-
 import lookupTerms from "./lookupterms";
 import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";
 import EpaAddDefinitionView from "./epaadddefinitionview";
-
 import icon from '../../../../icons/book.svg';
 
 const ERR_UNEXPECTED = "An unexpected error occurred";
-
 const LOCK_ID = "epaAddDefinitions";
 
 export default class EpaAddDefinitionUI extends Plugin {
@@ -58,7 +53,7 @@ export default class EpaAddDefinitionUI extends Plugin {
 
   async _execute() {
     const modal = this.modalView;
-    if (!modal.isRendered) {
+    if (modal && !modal.isRendered) {
       modal.render();
       document.body.appendChild(modal.element);
     }
@@ -68,21 +63,20 @@ export default class EpaAddDefinitionUI extends Plugin {
     const range = selection.getFirstRange();
 
     // Skip if there's no selection
-    if (range.isCollapsed) {
+    if (range && range.isCollapsed) {
       return;
     }
 
-    const userInput = Array.from(range.getItems()).reduce((acc, node) => {
-      if (node.is("text") || node.is("textProxy")) {
+    const userInput = range && Array.from(range.getItems()).reduce((acc, node) => {
+      if (node.is("$text") || node.is("$textProxy")) {
         return acc + node.data;
       }
-
       // Crash if we found a non-text node in the selection
       throw new MultipleParagraphError();
     }, "");
 
     // Skip if there's no meaningful text highlighted
-    if (userInput.trim() === "") {
+    if (userInput && userInput.trim() === "") {
       return;
     }
 
@@ -92,28 +86,18 @@ export default class EpaAddDefinitionUI extends Plugin {
     let lookupResult = null;
 
     try {
+      if (!modal) {
+        throw new Error("Modal not initialized");
+      }
       // Lock the editor as read-only while the user makes selections
       this.editor.enableReadOnlyMode(LOCK_ID);
 
-      lookupResult = await lookupTerms(userInput);
-      if (lookupResult === null) {
-        return;
-      }
+        lookupResult = await lookupTerms(userInput);
+        if (lookupResult === null) {
+          return;
+        }
 
-      // We only support the case where a single term is matched by the whole
-      // input, so we search for that result in the array and fail if we
-      // couldn't find it.
-      //
-      // Two notes:
-      // 1. This has the effect of limiting search results to one hit (i.e., the
-      //    user cannot select a sentence or paragraph like they could in the
-      //    old model).
-      // 2. This will fail if the user's selection includes whitespace on either
-      //    end, since repositioning the `range` variable seems to be beyond
-      //    CKEditor 5's capabilities.
-      const result = lookupResult.matches.find(
-        (match) => match.term === userInput.toLowerCase()
-      );
+      const result = lookupResult ? lookupResult.matches : null;
 
       if (!result) {
         throw new IncompleteDefinitionError(
@@ -121,7 +105,8 @@ export default class EpaAddDefinitionUI extends Plugin {
         );
       }
 
-      modal.data = [result];
+      modal.data = result;
+
       modal.show();
 
       modalResult = await new Promise((resolve) => {
@@ -148,6 +133,9 @@ export default class EpaAddDefinitionUI extends Plugin {
         modal.on("cancel", createResolve(false));
       });
     } finally {
+      if (!modal) {
+        throw new Error("Modal not initialized");
+      }
       this.editor.disableReadOnlyMode(LOCK_ID);
       modal.hide();
     }
@@ -157,15 +145,56 @@ export default class EpaAddDefinitionUI extends Plugin {
       return;
     }
 
-    const selected = modal.listView.views.get(0);
+    // This is the array of all the MatchViews for all the terms
+    const SelectedArray = modal.listView.views._items;
 
+    // Iterate over the selected items and create and store a marker for each one
+    const wordMaps = [];
     model.change((writer) => {
-      writer.remove(range);
-      writer.insertElement(
-        "epaDefinition",
-        { term: userInput, definition: selected.selected },
-        range.start
-      );
+      modal.data.forEach(obj => {
+        const index = obj.index[0];
+        const term = obj.term;
+        const startPosition = model.createPositionAt(selection.getFirstRange().start.parent, index);
+        const endPosition = model.createPositionAt(selection.getFirstRange().start.parent, index + term.length);
+        const wordRange = model.createRange(startPosition, endPosition);
+        const marker = writer.addMarker(`${index}: ${term}`, { range: wordRange, usingOperation: true });
+        wordMaps.push({
+          term: term,
+          range: wordRange,
+          marker: marker,
+        });
+      });
     });
+
+    // this only happens after a definition is selected and _confirmed_ by clicking the green check mark button
+    if (SelectedArray) {
+      model.change((writer) => {
+
+        for (const i in SelectedArray) {
+          if (SelectedArray[i].selected) {
+            const wordMapMatch = wordMaps.find(word => word.term === SelectedArray[i].term);
+            const wordRange = wordMapMatch.marker.getRange();
+            writer.remove(wordRange);
+            writer.insertElement(
+              "epaDefinition",
+              {
+                term: SelectedArray[i].term,
+                definition: SelectedArray[i].selected
+              },
+              wordRange.start,
+            );
+          }
+        }
+
+      });
+    }
+
+    // Clean up all the markers
+    model.change((writer) => {
+      wordMaps.forEach(obj => {
+        writer.removeMarker(obj.marker);
+      });
+    });
+
   }
 }

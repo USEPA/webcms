@@ -24,6 +24,7 @@ const ENDPOINT = "https://termlookup.epa.gov/termlookup/v1/terms";
  * @param {string} text
  * @returns {Promise<LookupResult>}
  */
+
 async function lookupTerms(text) {
   const body = new URLSearchParams();
   body.set("text", text);

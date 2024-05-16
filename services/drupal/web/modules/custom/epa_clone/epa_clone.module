@@ -35,3 +35,20 @@ function epa_clone_cloned_node_validate($element, FormStateInterface &$form_stat
     $form_state->setError($element, t('This content has been cloned. Please update the %field field to remove the "Cloned" signifier.', ['%field' => $element['#title']]));
   }
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Hiding some form elements as they are not useful for content author
+ */
+function epa_clone_form_entity_clone_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  // Hiding "Cloned -" suffix form field as we force this.
+  if (isset($form['no_suffix'])) {
+    $form['no_suffix']['#access'] = FALSE;
+  }
+
+  // Hiding "Save cloned Content as published" setting as we do not want this either.
+  if (isset($form['status'])) {
+    $form['status']['#access'] = FALSE;
+  }
+}
