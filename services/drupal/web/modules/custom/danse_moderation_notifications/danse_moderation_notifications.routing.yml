@@ -1,0 +1,53 @@
+# This is the router item for listing all entities.
+entity.danse_moderation_notifications.collection:
+  path: '/admin/config/workflow/danse_notifications'
+  defaults:
+    _entity_list: 'danse_moderation_notifications'
+    _title: 'Danse Content Moderation Notifications'
+  requirements:
+    _permission: 'administer content moderation notifications'
+
+# This is the router item for adding our entity.
+entity.danse_moderation_notifications.add_form:
+  path: '/admin/config/workflow/danse_notifications/add'
+  defaults:
+    _title: 'Add notification'
+    _entity_form: danse_moderation_notifications.add
+  requirements:
+    _entity_create_access: danse_moderation_notifications
+
+# This is the router item for editing our entity.
+entity.danse_moderation_notifications.edit_form:
+  path: '/admin/config/workflow/danse_notifications/manage/{danse_moderation_notifications}'
+  defaults:
+    _title: 'Edit notification'
+    _entity_form: danse_moderation_notifications.edit
+  requirements:
+    _entity_access: danse_moderation_notifications.update
+
+# This is the router item for deleting an instance of our entity.
+entity.danse_moderation_notifications.delete_form:
+  path: '/admin/config/workflow/danse_notifications/manage/{danse_moderation_notifications}/delete'
+  defaults:
+    _title: 'Delete notification'
+    _entity_form: danse_moderation_notifications.delete
+  requirements:
+    _entity_access: danse_moderation_notifications.delete
+
+# Enable a notification.
+entity.danse_moderation_notifications.enable_form:
+  path: '/admin/config/workflow/danse_notifications/manage/{danse_moderation_notifications}/enable'
+  defaults:
+    _title: 'Enable notification'
+    _entity_form: danse_moderation_notifications.enable
+  requirements:
+    _entity_access: danse_moderation_notifications.update
+
+# Disable a notification.
+entity.danse_moderation_notifications.disable_form:
+  path: '/admin/config/workflow/danse_notifications/manage/{danse_moderation_notifications}/disable'
+  defaults:
+    _title: 'Disable notification'
+    _entity_form: danse_moderation_notifications.disable
+  requirements:
+    _entity_access: danse_moderation_notifications.update

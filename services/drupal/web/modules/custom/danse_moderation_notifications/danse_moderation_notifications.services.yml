@@ -1,0 +1,7 @@
+services:
+  danse_moderation_notifications.notification_information:
+    class: Drupal\danse_moderation_notifications\NotificationInformation
+    arguments: ['@entity_type.manager', '@content_moderation.moderation_information']
+  danse_moderation_notifications.notification:
+    class: Drupal\danse_moderation_notifications\Notification
+    arguments: ['@current_user', '@entity_type.manager', '@plugin.manager.mail', '@module_handler', '@danse_moderation_notifications.notification_information', '@?token.entity_mapper', '@?group.group_route_context', '@?flag.flag']
