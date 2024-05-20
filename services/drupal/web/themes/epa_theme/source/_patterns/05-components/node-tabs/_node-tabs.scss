@@ -32,6 +32,17 @@
   @include breakpoint(gesso-breakpoint(tablet)) {
     width: auto;
   }
+
+  &.has-children {
+    &:focus,
+    &:focus-within,
+    &:hover,
+    &.is-selected {
+      .node-tabs__menu-child {
+        display: block;
+      }
+    }
+  }
 }
 
 .node-tabs__link {
@@ -76,4 +87,11 @@
 
 .node-tabs__menu-child {
   display: none;
+  position: absolute;
+
+  @include breakpoint(max-width gesso-breakpoint(tablet)) {
+    max-width: 100%;
+    position: relative;
+    z-index: 1;
+  }
 }
