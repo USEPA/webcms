@@ -1,0 +1,23 @@
+<div class="node-follow {% if nodeDialog %}has-children{% endif %}">
+  <a
+    class="node-follow__link"
+    role="button"
+
+    {% if follow_content.url %} 
+      href="{{ url }}" 
+    {% endif %}  
+  >
+    {% include '@uswds/icon/icon.twig' with {
+      'is_hidden': true,
+      'icon_name': icon,
+    } %}
+    {{ title }}
+  </a>
+
+  {% if nodeDialog %}
+    {% include '@components/node-dialog/node-dialog--small/node-dialog--small.twig' with {
+      'modifier_classes': 'node-follow__menu-child',
+      'nodeDialog': nodeDialog,
+    } %}
+  {% endif %}
+</div>
