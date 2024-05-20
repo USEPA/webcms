@@ -1,0 +1,24 @@
+<div class="node-details {% if nodeDialog %}has-children{% endif %}">
+  <a
+    class="node-details__link"
+    role="button"
+
+    {% if url %} 
+      href="{{ url }}" 
+    {% endif %}  
+  >
+    {{ title }}
+    
+    {% include '@uswds/icon/icon.twig' with {
+      'is_hidden': true,
+      'icon_name': 'expand_more',
+    } %}
+  </a>
+
+  {% if nodeDialog %}
+    {% include '@components/node-dialog/node-dialog--small/node-dialog--small.twig' with {
+      'modifier_classes': 'node-details__menu-child reduced-space',
+      'nodeDialog': nodeDialog,
+    } %}
+  {% endif %}
+</div>
