@@ -1,6 +1,6 @@
 export class MultipleParagraphError extends Error {
-  constructor(_message, ...args) {
-    super("Unexpected non-text node", ...args);
+  constructor(...args) {
+    super(...args);
     this._userError = "Cannot add definitions across paragraphs";
   }
 }
@@ -8,7 +8,8 @@ export class MultipleParagraphError extends Error {
 export class IncompleteDefinitionError extends Error {
   constructor(...args) {
     super(...args);
-    this._userError = "No term definitions were found that exactly match your selected word or phrase";
+    this._userError =
+      "No term definitions were found that exactly match your selected word or phrase";
   }
 }
 
