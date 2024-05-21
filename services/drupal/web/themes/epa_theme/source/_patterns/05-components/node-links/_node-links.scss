@@ -3,44 +3,55 @@
 
 @use '../../00-config' as *;
 
-.node-follow.has-children {
+.node-links {
   position: relative;
   width: fit-content;
-
-  .node-dialog {
-    display: none;
-    position: absolute;
-    top: 100%;
-    width: 11.25rem;
-    z-index: 1;
-  }
 
   &.is-selected,
   &:hover,
   &:focus,
   &:focus-within {
-    .node-follow__link {
+    .node-links__link {
       background-color: gesso-claro(primary, gray-050);
       color: gesso-claro(primary, blue-700);
     }
-    
+  }
+
+  &.has-children {
     .node-dialog {
-      display: block;
+      display: none;
+      position: absolute;
+      top: 100%;
+      width: 11.25rem;
+      z-index: 1;
+    }
+
+    &.is-selected,
+    &:hover,
+    &:focus,
+    &:focus-within {
+      .node-dialog {
+        display: block;
+      }
     }
   }
 }
 
-.node-follow__link {
+.node-links__link {
   align-items: center;
   color: gesso-claro(primary, gray-800);
   cursor: pointer;
   display: flex;
   font-size: rem(14px);
-  padding: 2px 8px;
+  line-height: 1;
+  padding: 4px 8px;
   text-decoration: none;
   width: fit-content;
 
   svg {
     margin-right: 3px;
+    max-height: 12px;
+    max-width: 12px;
+    top: 0;
   }
 }

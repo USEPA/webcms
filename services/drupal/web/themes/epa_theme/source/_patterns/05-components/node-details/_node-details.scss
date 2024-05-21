@@ -4,47 +4,20 @@
 @use '../../00-config' as *;
 
 .node-details.has-children {
-  position: relative;
-  width: fit-content;
-
-  .node-dialog {
-    display: none;
-    position: absolute;
-    top: 100%;
-    width: 11.25rem;
-    z-index: 1;
-  }
-
   &.is-selected,
   &:hover,
   &:focus,
   &:focus-within {
     .node-details__link {
-      background-color: gesso-claro(primary, gray-050);
-      color: gesso-claro(primary, blue-700);
-
       svg {
         transform: rotate(180deg);
       }
     }
-
-    .node-dialog {
-      display: block;
-    }
   }
 }
 
-.node-details__link {
-  align-items: center;
-  color: gesso-claro(primary, gray-800);
-  cursor: pointer;
-  display: flex;
-  font-size: rem(14px);
-  padding: 2px 8px;
-  text-decoration: none;
-  width: fit-content;
-
-  svg {
-    margin-left: 3px;
-  }
+.node-details__link svg {
+  margin-left: 5px;
+  margin-right: 0;
+  order: 2;
 }
