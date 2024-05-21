@@ -1,6 +1,6 @@
 ---
-el: .node-follow
-title: Node Follow Link
+el: .node-links
+title: Node Link
 state: in-progress
 ---
 
@@ -12,6 +12,6 @@ __Variables:__
 * url: [string] The item's URL if available.
 * icon: [string] The name of the icon, if there is one.
 * node_dialog: [array] Children of the item.
-  * title: [string] The title of the item.
-  * url: [string] The item's URL if available.
-  * content: [string] The item's content if available.
+	* title: [string] The title of the item.
+	* url: [string] The item's URL if available.
+	* content: [string] The item's content if available.

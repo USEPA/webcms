@@ -1,0 +1,43 @@
+{% set parentClasses = [
+  'node-links',
+  parent_modifier_classes ? parent_modifier_classes,
+]|join(' ')|trim %}
+
+{% set linkClasses = [
+  'node-links__link',
+  link_modifier_classes ? link_modifier_classes,
+]|join(' ')|trim %}
+
+<div class="{{ parentClasses }} {% if node_dialog %}has-children{% endif %}">
+  {% if url %} 
+    <a
+      class="{{ linkClasses }}"
+      role="button"
+      href="{{ url }}"  
+    >
+  {% else %} 
+    <span class="{{ linkClasses }}">
+  {% endif %} 
+
+    {% if icon %}
+      {% include '@components/icon/icon.twig' with {
+        'is_hidden': true,
+        'icon_name': icon,
+      } %}
+    {% endif %}  
+
+    {{ title }}
+
+  {% if url %}   
+    </a>
+  {% else %} 
+    </span>
+  {% endif %}   
+
+  {% if node_dialog %}
+    {% include '@components/node-dialog/node-dialog--small/node-dialog--small.twig' with {
+      'modifier_classes': 'node-follow__menu-child',
+      'node_dialog': node_dialog,
+    } %}
+  {% endif %}
+</div>
