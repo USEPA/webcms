@@ -111,8 +111,6 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     $cacheability = new CacheableMetadata();
     $cacheability->addCacheContexts(['route']);
     $cacheability->addCacheTags(['node']);
-    // @todo: Eventually remove me. This just outputs the local tasks as we normally would.
-    $build['content'] = $this->pluginManagerMenuLocalTask->getTasksBuild($this->routeMatch->getRouteName(), $cacheability);
 
     /** @var NodeInterface $node */
     $node = $this->getContextValue('node');
@@ -213,7 +211,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     return [
       '#theme' => 'epa_node_tab_item',
       '#title' => $this->t('Page Options'),
-      '#url' => new Url('<none>'),
+      '#url' => '#',
       '#icon' => Icons::GRID,
       '#is_active' => FALSE, // @todo: this needs to be active if any of the children inside it are 'active'.
       '#weight' => -100,
@@ -263,6 +261,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
       '#is_active' => $tab['#active'] ?? FALSE,
       '#access' => $tab['#access'],
       '#weight' => $tab['#weight'],
+      '#is_child' => TRUE,
     ];
   }
 }
