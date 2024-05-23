@@ -71,7 +71,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_cpu" {
 # scaling out, then ECS will scale out. If all policies indicate scaling in,
 # then ECS will scale in.
 resource "aws_appautoscaling_policy" "drupal_autoscaling_requests" {
-  name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-cpu"
+  name        = "webcms-${var.environment}-${var.site}-${var.lang}-drupal-requests"
   policy_type = "TargetTrackingScaling"
 
   resource_id        = aws_appautoscaling_target.drupal.id
@@ -80,7 +80,7 @@ resource "aws_appautoscaling_policy" "drupal_autoscaling_requests" {
 
   target_tracking_scaling_policy_configuration {
     # Ask ECS to average around 100 requests/target
-    target_value = 150
+    target_value = 100
 
     scale_in_cooldown  = 5 * 60
     scale_out_cooldown = 60
