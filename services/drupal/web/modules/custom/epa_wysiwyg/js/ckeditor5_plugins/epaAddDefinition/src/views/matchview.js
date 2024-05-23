@@ -72,11 +72,14 @@ export default class MatchView extends View {
       options.add(h("option", { value: "" }, ""));
 
       for (const item of data) {
-        const label = `${item.dictionary}: ${item.definition}`;
+        const MAX_LENGTH = 125;
+        const value = `<${item.dictionary}> ${item.definition}`;
+        const truncated = value.substring(0, MAX_LENGTH);
+        const label = value.length >= MAX_LENGTH ? truncated + '[...]' : value; // Add an ellipsis if truncated
         options.add(
           h(
             "option",
-            { value: `${item.dictionary}: ${item.definition}` },
+            { value: value },
             label
           )
         );
