@@ -187,6 +187,15 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
 }
 
 /**
+ * Implements hook_push_framework_channel_info_alter().
+ */
+function epa_workflow_push_framework_channel_info_alter(array &$definitions) {
+  if (isset($definitions['email'])) {
+    $definitions['email']['class'] = 'Drupal\epa_workflow\Plugin\PushFrameworkChannel\EPAEmail';
+  }
+}
+
+/**
  * Implements hook_field_formatter_info_alter().
  */
 function epa_workflow_field_formatter_info_alter(array &$info) {
