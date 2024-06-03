@@ -1,0 +1,33 @@
+uuid: 943342b0-ca9d-40ef-a414-ced11343f6f7
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    workflow_process: any
+id: epa_content_has_been_approved
+group_use: true
+group_type: web_area
+workflow: epa_default
+group_roles:
+  web_area-approver: web_area-approver
+  web_area-administrator: '0'
+  web_area-editor: '0'
+  web_area-member: '0'
+  web_area-watch_publication: '0'
+transitions:
+  approve_leave_unpublished: approve_leave_unpublished
+roles: {  }
+flags:
+  notification_opt_in: notification_opt_in
+author: false
+revision_author: true
+site_mail: false
+emails: ''
+subject: 'EPA Content Has Been Approved: [node:group:title] > [node:title]'
+body:
+  value: "The following EPA page has been approved. It is not yet published\r\n@web_area_title > @page_title\r\n@content_edit_url\r\n\r\nTransitioned by: @user \r\nComments: @log_message "
+  format: unprocessed
+label: 'EPA Content Has Been Approved'
