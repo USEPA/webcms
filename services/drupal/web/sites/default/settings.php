@@ -996,9 +996,13 @@ $schemes = [
 $settings['flysystem'] = $schemes;
 
 /**
- * Set static directory for tome.
+ * Settings for tome.
+ * 
+ * Set static directory for tome and prevent crawling anchors and iframes.
  */
 $settings['tome_static_directory'] = 's3-snapshot://html';
+
+$settings['tome_static_crawl'] = FALSE;
 
 /**
  * Load local development override configuration, if available.
