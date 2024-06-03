@@ -107,6 +107,16 @@ resource "aws_ssm_parameter" "drupal_s3_bucket" {
   tags = var.tags
 }
 
+resource "aws_ssm_parameter" "drupal_s3_snapshot_bucket" {
+  for_each = local.sites
+
+  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/drupal/s3-snapshot-bucket"
+  type  = "String"
+  value = aws_secretsmanager_secret.s3_snapshot_bucket[each.key].arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "drupal_s3_domain" {
   for_each = local.sites
 
