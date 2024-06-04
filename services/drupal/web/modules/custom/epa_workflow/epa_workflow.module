@@ -143,9 +143,9 @@ function epa_workflow_mail_alter(&$message) {
 }
 
 /**
- * Implements hook_content_moderation_notification_mail_data_alter().
+ * Implements hook_danse_moderation_notification_mail_data().
  */
-function epa_workflow_content_moderation_notification_mail_data_alter(EntityInterface $entity, array &$data) {
+function epa_workflow_danse_moderation_notification_mail_data(EntityInterface $entity, array &$data) {
   $eic_notifications = [
     'epa_content_has_been_approved',
     'epa_content_needs_review',
@@ -157,7 +157,7 @@ function epa_workflow_content_moderation_notification_mail_data_alter(EntityInte
   if (in_array($data['notification']->id, $eic_notifications)) {
     $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($entity);
     foreach ($groups as $group) {
-      $eic_email = $group->field_editor_in_chief->entity->mail->value;
+      $eic_email = $group->field_editor_in_chief->entity->id();
       if (!in_array($eic_email, $data['to'])) {
         $data['to'][] = $eic_email;
       }
@@ -571,7 +571,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
   $storage = \Drupal::entityTypeManager()->getStorage('node');
   $original = $node->original;
   if ($original) {
-    $default_revision_id = $original->get('vid')->value;
+    $default_revision_id = $node->getRevisionId();
     $latest_revision_id = $storage->getLatestRevisionId($node->id());
     $loaded_rev_id = $node->getLoadedRevisionId();
     $moderation_state = $node->moderation_state->value;
