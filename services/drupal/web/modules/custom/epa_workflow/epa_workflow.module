@@ -503,18 +503,18 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     '#markup' => $renderer->render($flag_link),
   ];
 
-  $build['epa_content_moderation_info_box'] = [
-    '#theme' => 'epa_content_info_box',
-    '#node_edit_link' => $node_edit_link,
-    '#nid' => $nid,
-    '#vid' => $vid,
-    '#revision_author' => $revision_author,
-    '#review_deadline' => $review_deadline,
-    '#current' => $current,
-    '#flag_link' => $flag_link_item,
-    '#content_moderation_form' => \Drupal::formBuilder()
-      ->getForm(EntityModerationForm::class, $entity),
-  ];
+//  $build['epa_content_moderation_info_box'] = [
+//    '#theme' => 'epa_content_info_box',
+//    '#node_edit_link' => $node_edit_link,
+//    '#nid' => $nid,
+//    '#vid' => $vid,
+//    '#revision_author' => $revision_author,
+//    '#review_deadline' => $review_deadline,
+//    '#current' => $current,
+//    '#flag_link' => $flag_link_item,
+//    '#content_moderation_form' => \Drupal::formBuilder()
+//      ->getForm(EntityModerationForm::class, $entity),
+//  ];
 }
 
 /**
@@ -965,8 +965,13 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
         'follow_widget' => NULL,
         'node_details_widget' => NULL,
         'box_color' => NULL,
-      ]
-    ]
+      ],
+    ],
+    'epa_content_moderation_form' => [
+      'variables' => [
+        'content_moderation_form' => NULL,
+      ],
+    ],
   ];
 }
 

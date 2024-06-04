@@ -110,8 +110,8 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
 
     $build['content'] = [
       '#theme' => 'epa_content_info_box_advanced',
-      '#content_moderation_form' => '', // @todo: Add this later
       '#compare_link' => $this->buildCompareLink(),
+      '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'), // @todo: Add this later
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
       '#box_color' => $this->moderationStateToColorMap($moderation_state_id),
