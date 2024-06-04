@@ -294,11 +294,6 @@ RUN \
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate
 
-# Replace the default crontab with one that runs Drush every five minutes. By
-# default, cron is not run (since there is no systemd equivalent in containers),
-# but we use this in the Drush ECS service definition.
-RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
-
 # Wrap the entrypoint script with tini to allow graceful signal handling
 ENTRYPOINT ["tini", "--", "docker-php-entrypoint"]
 
@@ -308,3 +303,6 @@ ARG GIT_TAG=""
 ARG GIT_COMMIT=""
 
 ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
+
+# Lower user
+USER www-data
