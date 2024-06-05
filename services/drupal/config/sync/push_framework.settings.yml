@@ -5,14 +5,14 @@ display_modes:
   block_content: full
   content_moderation_state: token
   crop: teaser
-  danse_notification: teaser
-  danse_event: teaser
   danse_notification_action: teaser
+  danse_event: teaser
+  danse_notification: teaser
   entity_embed_fake_entity: teaser
   file: token
   flagging: teaser
-  group_content: teaser
   group: teaser
+  group_content: teaser
   group_content_menu: teaser
   media: card
   menu_link_content: token
@@ -27,8 +27,8 @@ display_modes:
   user: compact
   webform_submission: teaser
 pattern:
-  subject: 'DANSE [site:name] notification: [push-object:label]'
+  subject: '[danse_moderation_notifications:notification-subject|"EPA Notification"]'
   body:
-    value: "[user:display-name],\r\n\r\n[push-object:content]"
-    format: plain_text
+    value: "[danse_moderation_notifications:notification-message|push-object:content]\r\n"
+    format: full_html
 order_email: '1'
