@@ -2,6 +2,7 @@
 el: .hublinks
 title: Hublinks
 state: complete
+hidden: true
 ---
 
 __Variables:__

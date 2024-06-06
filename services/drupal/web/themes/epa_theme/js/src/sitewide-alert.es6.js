@@ -1,7 +1,7 @@
 // Sitewide Alert script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.sitewideAlert = {
     attach(context) {
       const alerts = once('sitewide-alert', '.js-sitewide-alert', context);
@@ -23,17 +23,19 @@ import Drupal from 'drupal';
           alert.classList.remove('u-hidden');
         }
 
-        closeButton.addEventListener('click', event => {
-          const timestamp = Date.now();
-          closedHashes = getClosedAlerts();
-          closedHashes[alertHash] = timestamp;
+        if (closeButton !== null) {
+          closeButton.addEventListener('click', event => {
+            const timestamp = Date.now();
+            closedHashes = getClosedAlerts();
+            closedHashes[alertHash] = timestamp;
 
-          // Hide alert when close button clicked.
-          alert.classList.add('u-hidden');
+            // Hide alert when close button clicked.
+            alert.classList.add('u-hidden');
 
-          // Add alert hash to localStorage.
-          setClosedAlerts(closedHashes);
-        });
+            // Add alert hash to localStorage.
+            setClosedAlerts(closedHashes);
+          });
+        }
       });
 
       function getClosedAlerts() {

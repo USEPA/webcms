@@ -1,7 +1,7 @@
 // Before/After Swipe script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.beforeAfterSwipe = {
     attach(context, settings) {
       const beforeAfters = once(

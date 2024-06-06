@@ -11,7 +11,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -20,14 +19,16 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\link\LinkItemInterface;
 use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\search_api\Utility\Utility;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\views\ViewExecutable;
+use Drupal\search_api\Plugin\views\query\SearchApiQuery;
 
 /**
  * Implements hook_theme().
@@ -82,8 +83,8 @@ function epa_core_menu_local_tasks_alter(&$local_tasks, $route_name, RefinableCa
       ->merge($node_canonical_local_tasks['cacheability']);
   }
 
-  // If the access_unpublished module is enabled and we have an active token using, disable the local tasks.
-  if (\Drupal::moduleHandler()->moduleExists('access_unpublished')) {
+  if (\Drupal::moduleHandler()->moduleExists('access_unpublished') && \Drupal::currentUser()->isAnonymous()) {
+    // If the access_unpublished module is enabled and the user is anonymous, disable all local tasks.
     $tokenGetter = \Drupal::service('access_unpublished.token_getter');
     if ($token = $tokenGetter->getToken()) {
       if (_is_access_token_valid($token)) {
@@ -112,7 +113,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     $form['revision_information']['actions'] = [
       '#type' => "actions",
       'submit' => $submit_copy,
-      ];
+    ];
   }
 
   // Change the "Revision log message" label to say "Revision notes".
@@ -187,6 +188,11 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     case 'node_commentary_form':
     case 'node_commentary_edit_form':
       $form['field_type']['#access'] = FALSE;
+      break;
+
+    case 'node_public_notice_edit_form':
+      // Custom validation to check proposed location.
+      $form['#validate'][] = 'epa_core_location_proposed_other_form_validate';
       break;
   }
 }
@@ -331,7 +337,7 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
         $parts[0],
         'medium',
         ''
-        ];
+      ];
       $parts = array_replace($defaults, $parts);
       $name = $parts[0];
     }
@@ -520,6 +526,12 @@ function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
       $form["owner_uid"]["#size"] = "60";
     }
   }
+  // Hide "Exclude - Cloned" option in the entity clone form
+  if ($form_id === 'entity_clone_form') {
+    if (isset($form['no_suffix'])) {
+      $form['no_suffix']['#access'] = FALSE;
+    }
+  }
 }
 
 /**
@@ -560,7 +572,13 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
       if (empty($element['#description'])) {
         $element['#description'] = '';
       }
-      _epa_core_augment_datetime_description($element['#description']);
+
+      // Adjust the description if the field is a datetime field vs. just a date field.
+      /** @var \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeFieldItemList $items */
+      $items = $context['items'];
+      if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
+        _epa_core_augment_datetime_description($element['#description']);
+      }
     }
   }
 
@@ -570,19 +588,12 @@ function epa_core_field_widget_form_alter(array &$element, FormStateInterface $f
 
   // If a link field only supports external links remove the confusing help text
   // the widget provides by default.
-  // The complicated logic here is necessary because the structure of this text
-  // differs depending on whether the field has additional descriptive text configured.
   if ($plugin_id == 'link_default' && isset($element["uri"]["#description"]))  {
-    if ((is_array($element["uri"]["#description"])
-      && is_array($element["uri"]["#description"]['#items'])
-      && $element["uri"]["#description"]["#items"][1]->getUntranslatedString() == 'This must be an external URL such as %url.')
-    || is_a($element["uri"]["#description"], 'Drupal\Core\StringTranslation\TranslatableMarkup')) {
-      if (isset($element["#description"])) {
-        $element["uri"]["#description"] = $element["#description"];
-      }
-      else {
-        unset($element["uri"]["#description"]);
-      }
+    if ($element["uri"]["#link_type"] == LinkItemInterface::LINK_EXTERNAL) {
+      $element["uri"]["#description"] = $element["#description"];
+    }
+    else {
+      unset($element["uri"]["#description"]);
     }
   }
 }
@@ -651,8 +662,74 @@ function epa_core_field_widget_paragraphs_form_alter(&$element, \Drupal\Core\For
       ],
     ];
   }
+  if ($element['#paragraph_type'] == 'locations_of_prop_actions') {
+    $terms = \Drupal::entityTypeManager()
+      ->getStorage('taxonomy_term')
+      ->loadByProperties([
+        'name' => 'Other',
+        'vid' => 'geographic_locations',
+      ]);
+
+    if (!empty($terms)) {
+      // If multiple terms are found with the same name, this will take the first one.
+      $term = reset($terms);
+      $term_id = $term->id();
+
+      /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+      $field_definition = $context['items']->getFieldDefinition();
+      $paragraph_entity_reference_field_name = $field_definition->getName();
+      $dependee_field_name = 'field_state_or_territory';
+      // Need to build specific selector to handle multiple card groups.
+      $selector = sprintf(':input[name="%s[%d][subform][%s]"]', $paragraph_entity_reference_field_name, $element['#delta'], $dependee_field_name);
+
+      $element['subform']['field_location_proposed_other']['#states'] = [
+        'visible' => [
+          $selector => ['value' => $term_id]
+        ],
+        'invisible' => [
+          $selector => [
+            ['!value' => $term_id],
+            'or',
+            ['value' => 'empty']
+          ]
+        ],
+      ];
+
+      // To add the asterisk to the actual text field wwe need to target the textfield itself.
+      // @link https://www.drupal.org/forum/support/module-development-and-code-questions/2016-11-23/field-states-api-required-hidden-fields#comment-12881635
+      $element["subform"]["field_location_proposed_other"]["widget"][0]["value"]['#states'] = [
+        'required' => [
+          $selector => ['value' => $term_id]
+        ],
+      ];
+    }
+  }
 }
 
+/**
+ * Custom validation for Public Notices to check proposed location.
+ * @param $form
+ * @param \Drupal\Core\Form\FormStateInterface $form_state
+ *
+ * @return void
+ */
+function epa_core_location_proposed_other_form_validate(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $paragraphs = $form_state->getValue(['field_locations_of_prop_actions']);
+  if (!empty($paragraphs)) {
+    foreach ($paragraphs as $paragraph) {
+      if (isset($paragraph['subform']['field_state_or_territory'])) {
+        $trigger_field_value = $paragraph['subform']['field_state_or_territory'][0]['target_id'];
+        $term = Term::load($trigger_field_value);
+        $term_name = $term->getName();
+        $locations_of_prop_actions = $paragraph['subform']['field_location_proposed_other'][0]['value'];
+        // Check if Other is selected.
+        if ($term_name == 'Other' && empty($locations_of_prop_actions)) {
+          $form_state->setErrorByName('field_location_proposed_other', t('Please enter other location of proposed actions'));
+        }
+      }
+    }
+  }
+}
 /**
  * Implements hook_entity_bundle_field_info_alter().
  */
@@ -805,12 +882,60 @@ function epa_core_node_presave(EntityInterface $node) {
 }
 
 /**
- * Implements HOOK_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for views_exposed_form().
+ *
+ * Custom integration for facets. When a Views exposed filter is modified on a
+ * search results page it will lose any facets which have been already selected.
+ * This adds hidden fields for each facet so their values are retained.
  */
-function epa_core_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
+function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
  if (!empty($form["field_search_text_value"])) {
      $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
  }
+
+  $views_exposed_forms = [
+    'views-exposed-form-moderated-content-moderated-content',
+    'views-exposed-form-moderated-content-page-1',
+    'views-exposed-form-group-moderated-content-block-1',
+    'views-exposed-form-group-nodes-block-1',
+  ];
+
+  if (in_array($form['#id'], $views_exposed_forms) && isset($form['revision_uid'])) {
+    if ($form['revision_uid']['#description']) {
+      unset($form['revision_uid']['#description']);
+    }
+  }
+
+  // Retrieve the view object and the query plugin.
+  $storage = $form_state->getStorage();
+  if (!isset($storage['view'])) {
+    return;
+  }
+  $view = $storage['view'];
+  if (!($view instanceof ViewExecutable)) {
+    return;
+  }
+  $query_plugin = $view->getQuery();
+  // Make sure the view is based on Search API and has the "Preserve facets"
+  // option enabled, and that the Facets module is installed.
+  $preserve_facets = !empty($query_plugin->options['preserve_facet_query_args'])
+    && $query_plugin instanceof SearchApiQuery
+    && \Drupal::moduleHandler()->moduleExists('facets');
+  if ($preserve_facets) {
+    // Retrieve the facet source.
+    $query = $query_plugin->getSearchApiQuery();
+    $display_id = $query->getSearchId(FALSE);
+    $facet_source_id = str_replace(':', '__', 'search_api:' . $display_id);
+    $facet_source = \Drupal::entityTypeManager()
+      ->getStorage('facets_facet_source')
+      ->load($facet_source_id);
+    if (!$facet_source) {
+      return;
+    }
+    if ('facets_pretty_paths' == $facet_source->getUrlProcessorName()) {
+      $form['#action'] = NULL;
+    }
+  }
 }
 
 /**
