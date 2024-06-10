@@ -3,8 +3,8 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
-use Drupal\content_moderation_notifications\NotificationInformationInterface;
-use Drupal\content_moderation_notifications\NotificationInterface;
+use Drupal\danse_moderation_notifications\NotificationInformationInterface;
+use Drupal\danse_moderation_notifications\NotificationInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
@@ -67,14 +67,14 @@ abstract class EPAModeration implements EPAModerationInterface {
   /**
    * The workflow storage.
    *
-   * @var \Drupal\content_moderation_notifications\NotificationInterface
+   * @var \Drupal\danse_moderation_notifications\NotificationInterface
    */
   protected $notification;
 
   /**
    * The workflow storage.
    *
-   * @var \Drupal\content_moderation_notifications\NotificationInformationInterface
+   * @var \Drupal\danse_moderation_notifications\NotificationInformationInterface
    */
   protected $notificationInformation;
 
@@ -85,9 +85,9 @@ abstract class EPAModeration implements EPAModerationInterface {
    *   The logger channel factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_moderation_notifications\NotificationInterface $notification
+   * @param \Drupal\danse_moderation_notifications\NotificationInterface $notification
    *   The content moderation notification service.
-   * @param \Drupal\content_moderation_notifications\NotificationInformationInterface $notification_information
+   * @param \Drupal\danse_moderation_notifications\NotificationInformationInterface $notification_information
    *   The content moderation notification information service.
    */
   public function __construct(LoggerChannelFactoryInterface $logger_factory, EntityTypeManagerInterface $entity_type_manager, NotificationInterface $notification, NotificationInformationInterface $notification_information) {

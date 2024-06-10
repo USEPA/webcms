@@ -3,7 +3,7 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\content_moderation\ModerationInformationInterface;
-use Drupal\content_moderation_notifications\NotificationInformation;
+use Drupal\danse_moderation_notifications\NotificationInformation;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -15,14 +15,14 @@ class EPANotificationInformation extends NotificationInformation {
   /**
    * Original service object.
    *
-   * @var \Drupal\content_moderation_notifications\NotificationInformation
+   * @var \Drupal\danse_moderation_notifications\NotificationInformation
    */
   protected $notificationInformation;
 
   /**
    * Creates a new NotificationInformation instance.
    *
-   * @param \Drupal\content_moderation_notifications\NotificationInformation $notification_information
+   * @param \Drupal\danse_moderation_notifications\NotificationInformation $notification_information
    *   The original notification information service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
@@ -65,7 +65,7 @@ class EPANotificationInformation extends NotificationInformation {
         }
 
         // Find out if we have a config entity that contains this transition.
-        $query = $this->entityTypeManager->getStorage('content_moderation_notification')
+        $query = $this->entityTypeManager->getStorage('danse_moderation_notifications')
           ->getQuery()
           ->condition('workflow', $workflow->id())
           ->condition('status', 1)
@@ -75,7 +75,7 @@ class EPANotificationInformation extends NotificationInformation {
         $notification_ids = $query->execute();
 
         $notifications = $this->entityTypeManager
-          ->getStorage('content_moderation_notification')
+          ->getStorage('danse_moderation_notifications')
           ->loadMultiple($notification_ids);
       }
     }

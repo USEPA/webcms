@@ -2,9 +2,9 @@
 
 namespace Drupal\epa_workflow;
 
-use Drupal\content_moderation_notifications\Notification;
-use Drupal\content_moderation_notifications\NotificationInformationInterface;
-use Drupal\content_moderation_notifications\NotificationInterface;
+use Drupal\danse_moderation_notifications\Notification;
+use Drupal\danse_moderation_notifications\NotificationInformationInterface;
+use Drupal\danse_moderation_notifications\NotificationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -23,14 +23,14 @@ class EPANotification extends Notification {
   /**
    * Original service object.
    *
-   * @var \Drupal\content_moderation_notifications\NotificationInterface
+   * @var \Drupal\danse_moderation_notifications\NotificationInterface
    */
   protected $notificationService;
 
   /**
    * Creates a new ModerationInformation instance.
    *
-   * @param \Drupal\content_moderation_notifications\NotificationInterface $notification
+   * @param \Drupal\danse_moderation_notifications\NotificationInterface $notification
    *   The notification service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
@@ -40,7 +40,7 @@ class EPANotification extends Notification {
    *   The mail manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\content_moderation_notifications\NotificationInformationInterface $notification_information
+   * @param \Drupal\danse_moderation_notifications\NotificationInformationInterface $notification_information
    *   The notification information service.
    * @param \Drupal\token\TokenEntityMapperInterface $token_entity_mappper
    *   The token entity mapper service.
