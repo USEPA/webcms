@@ -11,7 +11,6 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -26,7 +25,6 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\search_api\Utility\Utility;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\views\ViewExecutable;
@@ -890,10 +888,24 @@ function epa_core_node_presave(EntityInterface $node) {
  * search results page it will lose any facets which have been already selected.
  * This adds hidden fields for each facet so their values are retained.
  */
-function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state) {
-  if (!empty($form["field_search_text_value"])) {
-    $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+function epa_core_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+ if (!empty($form["field_search_text_value"])) {
+     $form["field_search_text_value"]['#field_suffix'] = t('Note: searches most fields');
+ }
+
+  $views_exposed_forms = [
+    'views-exposed-form-moderated-content-moderated-content',
+    'views-exposed-form-moderated-content-page-1',
+    'views-exposed-form-group-moderated-content-block-1',
+    'views-exposed-form-group-nodes-block-1',
+  ];
+
+  if (in_array($form['#id'], $views_exposed_forms) && isset($form['revision_uid'])) {
+    if ($form['revision_uid']['#description']) {
+      unset($form['revision_uid']['#description']);
+    }
   }
+
   // Retrieve the view object and the query plugin.
   $storage = $form_state->getStorage();
   if (!isset($storage['view'])) {
