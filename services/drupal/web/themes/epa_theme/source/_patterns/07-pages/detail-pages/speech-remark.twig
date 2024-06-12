@@ -12,13 +12,6 @@
         <img srcset="https://www.epa.gov/sites/default/files/2021-03/mr-crop.jpg 160w, https://www.epa.gov/sites/default/files/2021-03/mr-crop.jpg 320w" sizes="(max-width: 160px) calc(100vw - 2rem), 160px" src="https://www.epa.gov/sites/default/files/2021-03/mr-crop.jpg" width="300" alt="image of Michael Regan, EPA Administrator" loading="lazy">
       </div>
     </figure>
-    {% include '@components/box/box--related-info/box--related-info.twig' with {
-      'title': {
-        'tag': 'div',
-        'text': 'Related Information',
-      },
-      'content': '<ul><li><a href="#0">Read more EPA Speeches and Remarks</a></li><li><a href="#watch">Watch the Event</a></li><li><a href="#0">Read the September 2022 news release</a></li><li><a href="#0">Learn about Environmental Justice</a></li><li><a href="#0">Learn about External Civil Rights</a></li></ul>',
-    } only %}
   </div>
   <h2>Administrator Michael Regan</h2>
   <h3 class="h4">September 24th, 2022<br>Warren, North Carolina</h3>
@@ -41,13 +34,25 @@ because it’s mostly Black. Nobody thought people like us would make a fuss.”
   </div>
 {% endset %}
 
+{% set sidenav %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
 {% set page_content %}
-  {% include '@templates/detail-pages/page.twig' with {
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'title': page_title,
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
-    'is_narrow': true,
+    'sidenav': sidenav,
+    'has_sidenav': has_sidenav,
   } %}
 {% endset %}
 

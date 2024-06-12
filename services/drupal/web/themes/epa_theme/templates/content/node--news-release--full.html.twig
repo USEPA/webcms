@@ -17,24 +17,37 @@
 
 {% set sidenav = drupal_region('sidebar') %}
 
-{% set related_title = 'Related Information:'|t %}
+{%  set press_offices = [] %}
+{% for item in content.field_press_office|field_value %}
+  {% set press_offices = press_offices|merge([item|render]) %}
+{% endfor %}
 
-{% if content.field_press_office|field_value is not empty %}
+{% if content.field_press_office|field_value is not empty or content.field_subjects|field_value is not empty or more_link %}
   {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    {{ content.field_press_office|field_value }}
-    <br>
-
-    {% if more_link %}
-      {{ more_link }}
-    {% endif %}
-  {% endset %}
-{% elseif more_link %}
-  {% set related_info %}
-    <strong>{{ related_title }}</strong>
-    {{ more_link }}
+    <ul class='related-links--list'>
+      {% if content.field_press_office|field_value %}
+        <li class='related-links--item'>{{ content.field_press_office|field_value }}</li>
+      {% endif %}
+      {% if content.field_subjects|field_value %}
+        {{ content.field_subjects }}
+      {% endif %}
+      {% if more_link %}
+        <li class='related-links--item'>{{ more_link }}</li>
+      {% endif %}
+    </ul>  
   {% endset %}
 {% endif %}
+
+{% set sidenav %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
 
 {% set contact_link %}
   {{ webarea_contact_link }}
@@ -79,10 +92,6 @@
     'field_press_office',
     'field_secondary_headline'
   ) }}
-  {% include '@components/box/box--special/box--special.twig' with {
-    'modifier_classes': 'margin-y-4 font-sans-3xs box--editors-note',
-    'content': related_info,
-  } only %}
 {% endset %}
 
 {% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}

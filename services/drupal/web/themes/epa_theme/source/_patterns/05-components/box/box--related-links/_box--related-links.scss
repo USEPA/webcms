@@ -1,0 +1,55 @@
+// @file
+// Styles for a Related Links Box.
+
+@use '../../../00-config' as *;
+
+.box--related-links {
+  background: gesso-grayscale(gray-1);
+  padding: rem(units('205')) rem(units(2));
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  > .box__title {
+    font-family: font-family(body);
+    font-size: rem(16px);
+    font-weight: bold;
+    margin-bottom: rem(14px);
+  }
+}
+
+.related-links--list {
+  list-style: none;
+  margin-bottom: 0;
+  padding: 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.related-links--item {
+  line-height: 1.33;
+  margin-bottom: 0;
+  
+  &:empty {
+    display: none;
+  }
+
+  + .related-links--item {
+    margin-top: rem(12px);
+  }
+
+  a {
+    color: gesso-grayscale(black);
+    font-size: rem(16px);
+    text-decoration: none;
+
+    &:focus,
+    &:hover {
+      color: gesso-color(text, link);
+      text-decoration: underline;
+    }
+  }
+}

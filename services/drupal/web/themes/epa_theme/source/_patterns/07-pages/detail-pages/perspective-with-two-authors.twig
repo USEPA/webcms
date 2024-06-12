@@ -39,14 +39,6 @@
 
 {% set content %}
   <p>October 27, 2020</p>
-  {% include '@components/box/box--related-info/box--related-info.twig' with {
-    'modifier_classes': 'u-align-right',
-    'title': {
-      'tag': 'h2',
-      'text': 'Related Information',
-    },
-    'content': '<ul><li><a href="#">Read more EPA Perspectives</a></li><li><a href="#">Read other EPA Perspectives about [subject]</a></li><li><a href="#">Read other EPA Perspectives about [subject]</a></li></ul>',
-  } only %}
   <p>In celebration of Children’s Health Month, we are excited to kick off this year’s <a href="#">National Lead Poisoning Prevention Week</a> by showcasing <em>Lead Awareness in Indian Country: Keeping our Children Healthy!</em> – a new curriculum to help tribes and communities take the first step in protecting children from potential lead exposure by educating parents and caregivers. The curriculum is a robust set of educational tools that community leaders can use to improve public awareness of the health risks associated with lead exposure and promote actions to reduce this exposure.</p>
   <figure class="figure figure--small u-align-left">
     <div class="figure__media">
@@ -82,13 +74,25 @@
   } only %}
 {% endset %}
 
+{% set sidenav %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
 {% set page_content %}
-  {% include '@templates/detail-pages/page.twig' with {
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'title': page_title,
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
-    'is_narrow': true,
+    'sidenav': sidenav,
+    'has_sidenav': has_sidenav,
   } %}
 {% endset %}
 
