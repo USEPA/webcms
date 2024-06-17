@@ -24,22 +24,26 @@
     'l-column-layout'
   ]
   %}
-  <div{{ attributes.addClass(classes) }}>
-    {% if content.first %}
-      <div{{ region_attributes.first }}>{{ content.first }}</div>
-    {% endif %}
+  <div class="usa-section">
+    <div class="l-constrain">
+      <div{{ attributes.addClass(classes) }}>
+        {% if content.first %}
+          <div{{ region_attributes.first }}>{{ content.first }}</div>
+        {% endif %}
 
-    {% if content.second %}
-      <div{{ region_attributes.second }}>{{ content.second }}</div>
-    {% endif %}
+        {% if content.second %}
+          <div{{ region_attributes.second }}>{{ content.second }}</div>
+        {% endif %}
 
-    {% if content.third %}
-      <div{{ region_attributes.third }}>{{ content.third }}</div>
-    {% endif %}
+        {% if content.third %}
+          <div{{ region_attributes.third }}>{{ content.third }}</div>
+        {% endif %}
 
-    {% if content.fourth %}
-      <div{{ region_attributes.fourth }}>{{ content.fourth }}</div>
-    {% endif %}
+        {% if content.fourth %}
+          <div{{ region_attributes.fourth }}>{{ content.fourth }}</div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 {% else %}
   {{ content.first }}
