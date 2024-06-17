@@ -1,13 +1,12 @@
 // Private Sitewide Alert script
 import Drupal from 'drupal';
 
-(function(Drupal) {
+(function (Drupal) {
   Drupal.behaviors.sitewideAlertPrivate = {
     attach(context) {
       once('sitewide-alert-private', 'body').forEach(() => {
-        const privateMedia = document.getElementsByClassName(
-          'js-media-private'
-        );
+        const privateMedia =
+          document.getElementsByClassName('js-media-private');
         const privateMediaCount = privateMedia.length;
 
         if (privateMediaCount > 0) {

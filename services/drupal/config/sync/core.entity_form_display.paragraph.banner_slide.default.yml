@@ -5,10 +5,12 @@ dependencies:
   config:
     - field.field.paragraph.banner_slide.field_banner_image
     - field.field.paragraph.banner_slide.field_image
+    - field.field.paragraph.banner_slide.field_link
     - field.field.paragraph.banner_slide.field_text
     - field.field.paragraph.banner_slide.field_title
     - paragraphs.paragraphs_type.banner_slide
   module:
+    - link
     - media_library
     - text
 id: paragraph.banner_slide.default
@@ -22,6 +24,14 @@ content:
     region: content
     settings:
       media_types: {  }
+    third_party_settings: {  }
+  field_link:
+    type: link_default
+    weight: 3
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
     third_party_settings: {  }
   field_text:
     type: text_textarea
