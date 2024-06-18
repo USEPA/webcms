@@ -11,6 +11,8 @@ namespace Drupal\epa_workflow;
 trait ModerationStateToColorMapTrait {
 
   /**
+   * @todo Change the strings to consts once we're on 8.2.
+   *
    * @var array|string[]
    */
   public array $stateToColorMap = [

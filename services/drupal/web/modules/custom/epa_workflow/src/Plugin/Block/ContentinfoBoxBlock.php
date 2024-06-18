@@ -2,9 +2,14 @@
 
 namespace Drupal\epa_workflow\Plugin\Block;
 
+use Drupal\content_moderation\ContentModerationState;
+use Drupal\content_moderation\ModerationInformation;
+use Drupal\content_moderation\Plugin\WorkflowType\ContentModeration;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Datetime\DateFormatter;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -13,6 +18,7 @@ use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\ModerationStateToColorMapTrait;
 use Drupal\Core\Block\BlockManager;
+use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -47,6 +53,20 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
   protected $routeMatch;
 
   /**
+   * The content moderation info service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformation
+   */
+  protected $moderationInformationService;
+
+  /**
+   * The date time formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatter
+   */
+  protected $dateFormatter;
+
+  /**
    * Constructs a new ContentInfoBoxBlock instance.
    *
    * @param array $configuration
@@ -58,11 +78,16 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match service.
    * @param \Drupal\Core\Block\BlockManager $block_manager
+   *   The block plugin manager service.
+   * @param \Drupal\content_moderation\ModerationInformation $moderation_information_service
+   *   The content moderation info service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, BlockManager $block_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, BlockManager $block_manager, ModerationInformation $moderation_information_service, DateFormatter $date_formatter) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->routeMatch = $route_match;
     $this->blockManager = $block_manager;
+    $this->moderationInformationService = $moderation_information_service;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
@@ -74,7 +99,9 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('current_route_match'),
-      $container->get('plugin.manager.block')
+      $container->get('plugin.manager.block'),
+      $container->get('content_moderation.moderation_information'),
+      $container->get('date.formatter')
     );
   }
 
@@ -103,7 +130,25 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
   public function build() {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->getContextValue('node');
+    $moderation_label = $this->getModerationStateLabel($node);
     $moderation_state_id = $node->get('moderation_state')->getString();
+
+    $next_publish = $this->getNextScheduledPublish($node);
+    if ($next_publish) {
+      $scheduled_publish = $this->t('Schedule to publish on @date',
+        [
+          '@date' => $next_publish,
+        ]
+      );
+    }
+
+    try {
+      $box_color = $this->moderationStateToColorMap($moderation_state_id);
+    }
+    catch (\Exception $e) {
+      // @todo log some error
+      $box_color = 'yellow';
+    }
 
     // @todo: Determine cache strategy for this block. It's going to be dependent on node revision we're looking at and user.
     $build['#cache']['max-age'] = 0;
@@ -111,10 +156,13 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
     $build['content'] = [
       '#theme' => 'epa_content_info_box_advanced',
       '#compare_link' => $this->buildCompareLink(),
+      '#current_state' => $moderation_label ?? $this->t('No Workflow'),
+      '#last_modified' => $this->buildAuthorInfoText($node),
+      '#scheduled_publish' => $scheduled_publish ?? NULL,
       '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'), // @todo: Add this later
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
-      '#box_color' => $this->moderationStateToColorMap($moderation_state_id),
+      '#box_color' => $box_color,
       '#attributes' => new Attribute(),
     ];
 
@@ -284,6 +332,54 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return [];
     }
     return $block->build();
+  }
+
+  /**
+   * Returns the Workflow transition label based off the given node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node we want to get the moderation state label for.
+   *
+   * @return string
+   *   The moderation state label.
+   */
+  public function getModerationStateLabel(NodeInterface $node) {
+    $state_key = $node->get('moderation_state')->value;
+    $workflow = $this->moderationInformationService
+      ->getWorkflowForEntity($node);
+
+    return $workflow->getTypePlugin()
+      ->getState($state_key)
+      ->label();
+  }
+
+  /**
+   * Returns a "last authored on..." text for the current node revision.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   */
+  public function buildAuthorInfoText(NodeInterface $node) {
+    $message = $this->t("Last modified on @date by @user",
+      [
+        '@date' => $this->dateFormatter->format($node->getRevisionCreationTime(), 'formal_datetime'),
+        '@user' => $node->getRevisionUser()->toLink(NULL, 'canonical', ['attributes' => ['class' => ['my-class']]])->toString()
+      ]
+    );
+
+    return $message;
+  }
+
+  public function getNextScheduledPublish(NodeInterface $node) {
+    $scheduled_transitions = $node->get('field_scheduled_transition')->getValue();
+    if (!empty($scheduled_transitions)) {
+      $scheduled_datetime = $scheduled_transitions[0]['value'];
+      $date_time = new DrupalDateTime($scheduled_datetime);
+      return $this->dateFormatter->format($date_time->getTimestamp(), 'formal_datetime');
+    }
+
+    return NULL;
   }
 
 }
