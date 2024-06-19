@@ -17,22 +17,5 @@ function epa_workflow_views_data_alter(array &$data) {
     ],
   ];
 
-  //$data['danse_event']['reference_entity'] = [
-  //  'title' => t('Reference entity'),
-  //  'help' => t('The entity referenced in the payload.'),
-  //  'relationship' => [
-  //    'base' => 'node',
-  //    'base field' => 'nid',
-  //    'relationship field' => 'reference_id',
-  //    'id' => 'standard',
-  //    'extra' => [
-  //      [
-  //        'field' => 'entity_type',
-  //        'value' => 'node',
-  //      ],
-  //    ],
-  //  ],
-  //];
-
   return $data;
 }
