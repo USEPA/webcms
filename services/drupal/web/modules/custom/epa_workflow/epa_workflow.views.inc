@@ -6,7 +6,7 @@
  */
 
 /**
- * Implements hook_views_data().
+ * Implements hook_views_data_alter().
  */
 function epa_workflow_views_data_alter(array &$data) {
   $data['danse_event']['reference_web_area'] = [
