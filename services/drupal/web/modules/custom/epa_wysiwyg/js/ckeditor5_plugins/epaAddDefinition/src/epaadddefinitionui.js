@@ -61,35 +61,48 @@ export default class EpaAddDefinitionUI extends Plugin {
     const model = this.editor.model;
     const selection = model.document.selection;
     const range = selection.getFirstRange();
-    const rangeItems = Array.from(range.getItems());
 
     // Skip if there's no selection
     if (!range || (range && range.isCollapsed)) {
       return;
     }
 
-    let userInput = "";
-    let offsets = [];
-    const initialOffset = rangeItems[0].offsetInText;
+    const rangeItems = Array.from(range.getItems());
+    const firstPosition = selection.getFirstPosition();
+    const parentBlockElement = firstPosition.findAncestor("paragraph");
+    const paragraphChildren = Array.from(parentBlockElement.getChildren());
 
-    function traverse(node, currentOffset = initialOffset) {
+    let paragraphText = ""; // collected to accurately position terms within the paragraph
+    let userInput = ""; // gets sent to the API for lookup
+    let offsets = [];
+
+    function traverseSelectedRangeNode(node) {
       if (node.data) {
-        // Accumulate text and store offset for each text node
         userInput += node.data;
-        let startOffset = currentOffset + userInput.length - node.data.length;
+      } else if (node.name === "epaDefinition") {
+        userInput += " "; // Add one space to account for the character equivalent of one epaDef node
+      } else if (node.name === "paragraph") {
+        // Selecting across paragraphs is currently not supported
+        throw new MultipleParagraphError();
+      }
+    }
+
+    function traverseParagraphNode(node) {
+      if (node.data) {
+        let startOffset = paragraphText.length; // first time through, this is 0
+        paragraphText += node.data;
         offsets.push({
           node,
-          startOffset,
-          endOffset: currentOffset + userInput.length,
+          startOffset: startOffset,
+          endOffset: paragraphText.length,
         });
       } else if (node.name === "epaDefinition") {
-        let startOffset = currentOffset + userInput.length;
-        // userInput += node._attrs.get('term'); // not collecting the text (for now), but this would be one way
-        userInput += " "; // Instead, just add one space to account for the character equivalent of one epaDef node
+        let startOffset = paragraphText.length;
+        paragraphText += " ";
         offsets.push({
           node,
-          startOffset,
-          endOffset: startOffset + userInput.length + 1, // epaDefinition nodes are one offset in length
+          startOffset: startOffset,
+          endOffset: startOffset + paragraphText.length + 1,
         });
       } else if (node.name === "paragraph") {
         // Selecting across paragraphs is currently not supported
@@ -97,9 +110,17 @@ export default class EpaAddDefinitionUI extends Plugin {
       }
     }
 
-    for (const item of rangeItems) {
-      traverse(item);
+    // Traverse the paragraph containing the selected range to accurately place offsets
+    for (const item of paragraphChildren) {
+      traverseParagraphNode(item);
     }
+
+    // Traverse the selected range to accumulate text to send to API
+    for (const item of rangeItems) {
+      traverseSelectedRangeNode(item);
+    }
+
+    // Rationale: traversing the paragraph happens separately from the selection because the nodes might partially overlap, and the rangeItems[0].offsetInText will be a different number depending on whether there are definition nodes upstream, so it can't be relied upon for positioning offsets.  And we only know if the upstream text contained a definition node by first traversing the paragraph nodes.  If CKE5 has a way to get the offset which accounts for selectable characters in inline elements (such as the epaDefinition element), then this could be simplified.
 
     // Skip if there's no meaningful text highlighted
     if (userInput && userInput.trim() === "") {
@@ -180,13 +201,13 @@ export default class EpaAddDefinitionUI extends Plugin {
       modal.data.forEach((obj) => {
         const term = obj.term;
 
-        // Find the word in the accumulated text, without case sensitivity
-        const termIndex =
-          userInput.toLocaleLowerCase().indexOf(term) + initialOffset;
+        // Find the word in the accumulated text of the paragraph, without case sensitivity
+        const termIndex = paragraphText.toLocaleLowerCase().indexOf(term);
+        // termIndex needs to be relative to the paragraphText and not the userInput because the offsets are relative to the paragraph
+
         if (termIndex !== -1) {
           const termEnd = termIndex + term.length;
-          // get the original term from the text to preserve case
-          const originalTerm = userInput.substring(termIndex, termEnd);
+          const originalTerm = paragraphText.substring(termIndex, termEnd);
           const startInfo = offsets.find(
             (o) => o.startOffset <= termIndex && o.endOffset > termIndex
           );
@@ -229,7 +250,7 @@ export default class EpaAddDefinitionUI extends Plugin {
             const wordMapMatch = termMarkersAndRanges.find(
               (word) => word.term === SelectedArray[i].term
             );
-            const wordRange = wordMapMatch.marker.getRange();
+            const wordRange = wordMapMatch.range;
             writer.remove(wordRange);
             writer.insertElement(
               "epaDefinition",
