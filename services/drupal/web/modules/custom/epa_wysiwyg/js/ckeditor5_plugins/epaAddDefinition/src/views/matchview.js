@@ -1,5 +1,4 @@
 import { View } from "ckeditor5/src/ui";
-
 import createId from "./createid";
 
 /**
@@ -61,7 +60,6 @@ export default class MatchView extends View {
 
           const selection =
             index === 0 ? "" : this.definitions[index - 1].definition;
-          console.log("setting selection to", selection);
           this.selected = selection;
         }),
       },
@@ -74,8 +72,17 @@ export default class MatchView extends View {
       options.add(h("option", { value: "" }, ""));
 
       for (const item of data) {
-        const label = `${item.definition} (${item.dictionary})`;
-        options.add(h("option", { value: item.definition }, label));
+        const MAX_LENGTH = 125;
+        const value = `<${item.dictionary}> ${item.definition}`;
+        const truncated = value.substring(0, MAX_LENGTH);
+        const label = value.length >= MAX_LENGTH ? truncated + '[...]' : value; // Add an ellipsis if truncated
+        options.add(
+          h(
+            "option",
+            { value: value },
+            label
+          )
+        );
       }
     });
   }

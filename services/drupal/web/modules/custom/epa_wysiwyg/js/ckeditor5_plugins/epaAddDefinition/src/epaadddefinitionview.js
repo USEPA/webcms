@@ -1,9 +1,7 @@
-import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
 import { icons } from "ckeditor5/src/core";
-
-import MatchListView from "./views/matchlistview";
-
+import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
 import "./dialog.css";
+import MatchListView from "./views/matchlistview";
 
 export default class EpaAddDefinitionView extends View {
   constructor(locale) {

@@ -141,7 +141,7 @@ class CloudWatch implements LoggerInterface {
   /**
    * {@inheritdoc}
    */
-  public function log($level, $message, array $context = []) {
+  public function log($level, $message, array $context = []): void {
     // To save space in log messages (CloudWatch Logs imposes a maximum payload size),
     // remove any backtraces.
     unset($context['backtrace']);
