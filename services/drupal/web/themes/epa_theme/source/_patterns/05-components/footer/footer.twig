@@ -5,6 +5,11 @@
 
 <footer class="{{ classes }}" role="contentinfo">
   <div class="l-constrain">
+    <div class="footer__pre-footer">
+    {% block pre_footer %}
+      {{ pre_footer }}
+    {% endblock %}
+    </div>
     <img class="footer__epa-seal" src="{{ epa_theme_image_path }}epa-seal.svg" alt="{{ 'United States Environmental Protection Agency'|t }}" height="100" width="100">
     <div class="footer__content contextual-region">
       {% block content %}
