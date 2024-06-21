@@ -17,5 +17,13 @@ function epa_workflow_views_data_alter(array &$data) {
     ],
   ];
 
+  $data['danse_event']['reference_content_type'] = [
+    'title' => t('Reference Content Type'),
+    'help' => t('The content type of the related content entity.'),
+    'field' => [
+      'id' => 'epa_workflow_content_type',
+    ],
+  ];
+
   return $data;
 }
