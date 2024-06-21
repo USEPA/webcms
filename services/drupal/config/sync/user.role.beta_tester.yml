@@ -2,17 +2,23 @@ uuid: bb04e05b-a23b-4909-b304-19f136098885
 langcode: en
 status: true
 dependencies:
+  config:
+    - filter.format.ckeditor_5_test
   module:
     - access_unpublished
     - editoria11y
     - epa_workflow
+    - file
+    - filter
 id: beta_tester
 label: 'Beta Tester'
 weight: 0
 is_admin: null
 permissions:
+  - 'delete own files'
   - 'generate access unpublished tokens'
   - 'mark as hidden in editoria11y'
   - 'mark as ok in editoria11y'
+  - 'use text format ckeditor_5_test'
   - use_epa_node_tabs
   - 'view editoria11y checker'

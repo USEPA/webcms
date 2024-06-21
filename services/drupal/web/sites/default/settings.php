@@ -782,6 +782,9 @@ $databases['default']['default'] = [
     // driver won't actually initiate a TLS session).
     PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
   ],
+  'init_commands' => [
+    'isolation_level' => 'SET SESSION tx_isolation=\'READ-COMMITTED\'',
+  ],
 ];
 
 $credentials = json_decode(getenv('WEBCMS_DB_CREDS_D7'), FALSE, 512, JSON_THROW_ON_ERROR);
@@ -812,6 +815,7 @@ $config['s3fs.settings']['region'] = getenv('WEBCMS_S3_REGION');
 
 $settings['s3fs.use_s3_for_public'] = TRUE;
 $settings['s3fs.use_s3_for_private'] = TRUE;
+$settings['s3fs.upload_as_private'] = TRUE;
 
 $settings['php_storage']['twig']['directory'] = '/tmp/cache/twig';
 
