@@ -211,16 +211,16 @@ function epa_workflow_node_revision_create(EntityInterface $new_revision, Entity
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  */
-function epa_workflow_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_workflow_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
   $plugin_id = $context['widget']->getPluginId();
 
-  if ('moderation_state_default' === $plugin_id && isset($element["state"]["#options"]) && key_exists('draft', $element["state"]["#options"])) {
-    if (!in_array($element["state"]["#default_value"], ['draft_needs_review'])) {
-      $element["state"]["#default_value"] = 'draft';
+  if ('moderation_state_default' === $plugin_id && isset($element['widget'][0]["state"]["#options"]) && key_exists('draft', $element['widget'][0]["state"]["#options"])) {
+    if (!in_array($element['widget'][0]["state"]["#default_value"], ['draft_needs_review'])) {
+      $element['widget'][0]["state"]["#default_value"] = 'draft';
     }
-    $element["#access"] = FALSE;
+    $element['widget'][0]["#access"] = FALSE;
   }
 }
 

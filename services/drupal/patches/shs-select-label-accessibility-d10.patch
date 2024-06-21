@@ -1,0 +1,15 @@
+diff --git a/js/views/WidgetView.js b/js/views/WidgetView.js
+index f80528e..9441a71 100644
+--- a/js/views/WidgetView.js
++++ b/js/views/WidgetView.js
+@@ -73,6 +73,10 @@
+       if (widget.$el.attr('style') && (widget.$el.attr('style') === '')) {
+         widget.$el.removeAttr('style');
+       }
++      if (widget.model.itemCollection.length > 0) {
++        widget.$el.attr('aria-label', widget.container.app.$el.siblings('label').text());
++        widget.container.app.$el.siblings('label').prop('for', widget.container.app.$el.prop('id') + '-shs-' + widget.container.model.get('delta') + '-' + widget.model.get('level'));
++      }
+       if (widget.model.get('dataLoaded')) {
+         widget.$el.show();
+       }

@@ -22,6 +22,7 @@ dependencies:
     - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_scheduled_transition
     - field.field.node.perspective.field_search_text
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
@@ -141,10 +142,11 @@ third_party_settings:
                 entity: layout_builder.entity
                 view_mode: view_mode
               formatter:
-                type: tokenized_field_formatter
+                type: token_formatters_entity_reference
                 label: hidden
                 settings:
-                  token_string: '<a href="/perspectives/search/perspectives_subjects/[term:tid]">Read other EPA Perspectives about [term:name]</a>'
+                  text: '<a href="/perspectives/search/perspectives_subjects/[term:tid]">Read other EPA Perspectives about [term:name]</a>'
+                  link: ''
                 third_party_settings:
                   linked_field:
                     linked: 0

@@ -44,7 +44,7 @@ function epa_theme_preprocess_links__dropbutton(&$variables) {
  * @param $vars
  */
 function epa_theme_preprocess_menu(&$vars) {
-  if ($vars['theme_hook_original'] === 'menu__group_menu') {
+  if ($vars['theme_hook_original'] === 'menu__group_menu' || $vars['theme_hook_original'] === 'menu__group_menu__web_area_menu') {
     $vars['attributes']['class'][] = 'menu--sidenav';
   }
   epa_theme_menu_active_item($vars['items']);
