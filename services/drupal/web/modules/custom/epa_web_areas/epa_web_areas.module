@@ -147,11 +147,11 @@ function epa_web_areas_preprocess_menu(&$variables) {
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  *
  * @todo Create helper to get group.
  */
-function epa_web_areas_field_widget_form_alter($element, FormStateInterface $form_state, $context) {
+function epa_web_areas_field_widget_complete_form_alter($element, FormStateInterface $form_state, $context) {
   // Get the widget for media library.
   $plugin_type = $context['widget']->getPluginId();
   if (!empty($plugin_type)
@@ -177,13 +177,13 @@ function epa_web_areas_field_widget_form_alter($element, FormStateInterface $for
     // When a modal is opened, the group id will be included
     // as a query parameter. Though, we can extract the group id
     // directly from the media library state later.
-    $media_library_state = $element['open_button']['#media_library_state'];
+    $media_library_state = $element['widget']['open_button']['#media_library_state'];
     $opener_parameters = $media_library_state->getOpenerParameters();
     if (!empty($group)) {
       $opener_parameters['group'] = $group->id();
       $media_library_state->set('media_library_opener_parameters', $opener_parameters);
       $media_library_state->set('hash', $media_library_state->getHash());
-      $element['open_button']['#media_library_state'] = $media_library_state;
+      $element['widget']['open_button']['#media_library_state'] = $media_library_state;
     }
   }
 }
