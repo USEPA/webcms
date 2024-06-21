@@ -1,0 +1,34 @@
+uuid: 43cea374-f49c-4e47-a84f-6479d36482e1
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_in_page_403
+    - block_in_page_not_found
+    - system
+  theme:
+    - epa_theme
+id: epa_breadcrumbs
+theme: epa_theme
+region: title
+weight: -21
+provider: null
+plugin: system_breadcrumb_block
+settings:
+  id: system_breadcrumb_block
+  label: Breadcrumbs
+  label_display: '0'
+  provider: system
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: '*404*'
+  page_403:
+    id: page_403
+    negate: true
+    page_403: 1
+  page_not_found_request:
+    id: page_not_found_request
+    negate: true
+    page_not_found: true

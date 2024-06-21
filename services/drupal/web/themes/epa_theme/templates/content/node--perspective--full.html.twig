@@ -11,22 +11,44 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
-{% set sidenav = drupal_region('sidebar') %}
 
-{% set display_sidenav = false %}
 
-{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
-  {% set display_sidenav = true %}
+{# @see epa_theme_preprocess_node__perspective__full() #}
+{% if subjects or more_link %}
+  {% set related_info %}
+    <ul class='related-links--list'>
+      {% if subjects %}
+        {{ subjects }}
+      {% endif %}
+
+      {% if more_link %}
+        <li class='related-links--item'>{{ more_link }}</li>
+      {% endif %}
+    </ul>  
+  {% endset %}
 {% endif %}
 
+{% set sidenav %}
+  {{  drupal_region('sidebar') }}
+
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
+{% set display_sidenav = true %}
+
 {% set header_info %}
-  {% include '@components/web-area-title/web-area-title.twig' with {
-    'text': 'Perspectives'|t,
-  } %}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}

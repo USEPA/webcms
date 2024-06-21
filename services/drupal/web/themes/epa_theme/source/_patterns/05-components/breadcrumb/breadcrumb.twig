@@ -1,0 +1,41 @@
+{% set classes = [
+  'breadcrumb',
+  modifier_classes ? modifier_classes : '',
+]|join(' ')|trim %}
+
+{% set title_classes = [
+  'breadcrumb__title',
+  title_modifier_classes ? title_modifier_classes : '',
+  hide_title ? 'u-visually-hidden' : '',
+]|join(' ')|trim %}
+
+{% set breadcrumb_id = 'breadcrumb-label'|unique_id %}
+
+<nav {{ add_attributes({
+  'aria-labelledby': breadcrumb_id,
+  'class': classes,
+  'role': 'navigation',
+}) }}>
+  <{{ title_element ?: 'h2' }}
+    {{ add_attributes(
+      {
+        'id': breadcrumb_id,
+        'class': title_classes,
+      },
+    'title_attributes')
+  }}>{{ title|default('Breadcrumb') }}</{{ title_element ?: 'h2' }}>
+
+  <ol class="breadcrumb__list">
+    {% for item in breadcrumb %}
+      <li class="breadcrumb__item">
+        {% if item.url %}
+          <a class="breadcrumb__link" href="{{ item.url }}">{{ item.text }}</a>
+        {% else %}
+          <span aria-current="page">
+            {{ item.text }}
+          </span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</nav>

@@ -22,22 +22,6 @@ class WebAreasHelper {
   }
 
   /**
-   * Function checking if web area has a navigation style.
-   *
-   * @param Drupal\group\Entity\Group $group
-   *   The $group enity.
-   * @param string $style
-   *   The navigation style being tested.
-   *
-   * @return bool
-   *   Returns true if navigation style is selected for group.
-   */
-  public function checkNavigationStyle(Group $group, $style = 'hublinks') {
-    $group_type = $group->getGroupType()->id();
-    return $group_type == 'web_area' && $group->field_navigation_style->value == $style;
-  }
-
-  /**
    * Function to grab groups associated with node.
    *
    * @return array

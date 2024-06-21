@@ -1,0 +1,79 @@
+@use '../../../00-config' as *;
+@use '../../../02-base' as *;
+
+.block--web-area-menu {
+  @include breakpoint-min-max(gesso-breakpoint(tablet-lg), 899px) {
+    margin-top: -2.5rem;
+  }
+
+  @include at-media-max($theme-header-min-width) {
+    align-items: center;
+    background-color: color('base-lightest');
+    display: flex;
+    margin-bottom: 2.5rem;
+    margin-left: -1.5rem;
+    margin-top: -5.5rem;
+    padding: 1.125rem 1.5rem 0;
+    position: relative;
+    width: calc(100% + 3rem);
+    z-index: 1;
+  }
+
+  .block__title {
+    @extend %h3;
+    font-size: font-size(heading, md);
+
+    @include at-media-max($theme-header-min-width) {
+      border-left: 2px solid gesso-grayscale(gray-3);
+      order: 2;
+      padding-left: rem(12px);
+    }
+
+    a {
+      color: gesso-grayscale(black);
+      text-decoration: none;
+
+      &:visited {
+        color: gesso-color(text, link-visited);
+      }
+
+      &:hover,
+      &:focus {
+        color: gesso-color(text, link-hover);
+      }
+
+      &:active {
+        color: gesso-color(text, link-active);
+      }
+    }
+  }
+
+  //.menu--sidenav__menu-button {
+  .web-area-menu__button {
+    display: none;
+
+    @include at-media-max($theme-header-min-width) {
+      box-shadow: none;
+      display: block;
+      font-size: 2rem;
+      height: rem(32px);
+      margin-bottom: rem(15px);
+      order: 1;
+      padding: 0;
+    }
+
+    .menu-button--close {
+      display: none;
+    }
+
+    &.is-open {
+      .menu-button--close {
+        display: block;
+      }
+
+      .menu-button--open {
+        display: none;
+      }
+    }
+  }
+}

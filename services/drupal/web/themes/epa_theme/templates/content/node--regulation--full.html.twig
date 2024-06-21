@@ -20,15 +20,13 @@
 {% endif %}
 
 {% set header_info %}
-  {% if nav_style == 'sidebar_navigation' %}
-    {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
-  {% else %}
-    {{ node.field_hublinks|view({type: 'web_areas_homepage_link_formatter', settings: {}}) }}
-  {% endif %}
+  {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+{#  {{ drupal_entity('block', 'webareaheader', check_access=false) }}#}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}
