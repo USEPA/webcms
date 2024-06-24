@@ -25,5 +25,13 @@ function epa_workflow_views_data_alter(array &$data) {
     ],
   ];
 
+  $data['danse_event']['reference_node_transition'] = [
+    'title' => t('Node Transition'),
+    'help' => t('The before and after state of the related content entity.'),
+    'field' => [
+      'id' => 'epa_workflow_node_transition',
+    ],
+  ];
+
   return $data;
 }
