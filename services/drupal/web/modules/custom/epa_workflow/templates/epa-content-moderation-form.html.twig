@@ -1,3 +1,10 @@
 {% if content_moderation_form %}
+  <div class="content-moderation" style="margin-left: 1rem; padding-left: 1rem; border-left: 4px solid {{ box_color }};">
+    <h3>{{ current_state }}</h3>
+    <p>{{ last_modified }}</p>
+    {% if scheduled_publish %}
+      <strong>{{ scheduled_publish }}</strong>
+    {% endif %}
+  </div>
   {{ content_moderation_form }}
 {% endif %}

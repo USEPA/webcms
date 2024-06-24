@@ -2,10 +2,16 @@
 
 namespace Drupal\epa_workflow\Plugin\Block;
 
+use DateTimeZone;
 use Drupal\content_moderation\Form\EntityModerationForm;
+use Drupal\content_moderation\ModerationInformation;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Datetime\DateFormatter;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\epa_workflow\ModerationStateToColorMapTrait;
+use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,6 +27,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class EpaContentModerationFormBlock extends BlockBase implements ContainerFactoryPluginInterface {
+  use ModerationStateToColorMapTrait;
+
+  /**
+   * The date time formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatter
+   */
+  protected $dateFormatter;
 
   /**
    * The form builder.
@@ -28,6 +42,14 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
    * @var \Drupal\Core\Form\FormBuilderInterface
    */
   protected $formBuilder;
+
+  /**
+   * The content moderation info service.
+   *
+   * @var \Drupal\content_moderation\ModerationInformation
+   */
+  protected $moderationInformationService;
+
 
   /**
    * Constructs a new EpaContentModerationFormBlock instance.
@@ -44,9 +66,11 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatter $date_formatter, FormBuilderInterface $form_builder, ModerationInformation $moderation_information_service) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->dateFormatter = $date_formatter;
     $this->formBuilder = $form_builder;
+    $this->moderationInformationService = $moderation_information_service;
   }
 
   /**
@@ -57,7 +81,9 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('form_builder')
+      $container->get('date.formatter'),
+      $container->get('form_builder'),
+      $container->get('content_moderation.moderation_information'),
     );
   }
 
@@ -65,39 +91,141 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
    * {@inheritdoc}
    */
   public function build() {
-    $entity = $this->getContextValue('node');
-    // Get the current moderation state name and if available get the review deadline
-    if (!$entity->get('moderation_state')->isEmpty()) {
-      $current_state = $entity->get('moderation_state')->value;
-      /** @var \Drupal\workflows\WorkflowInterface $workflow */
-      $workflow = \Drupal::service('content_moderation.moderation_information')
-        ->getWorkflowForEntity($entity);
-
-      $current = [
-        '#type' => 'item',
-        '#title' => t('Moderation state'),
-        '#markup' => $workflow->getTypePlugin()
-          ->getState($current_state)
-          ->label(),
-      ];
-    }
-
-    if ($entity->hasField('field_review_deadline')) {
-      $review_deadline = $entity->get('field_review_deadline')->value;
-    }
+    /** @var \Drupal\node\Entity\Node $node */
+    $node = $this->getContextValue('node');
 
     $form = $this->formBuilder
-      ->getForm(EntityModerationForm::class, $entity);
+      ->getForm(EntityModerationForm::class, $node);
 
     $form['revision_log']['#resizable'] = 'none';
     $form['revision_log']['#rows'] = 10;
     $form['revision_log']['#cols'] = 10;
 
+    try {
+      $moderation_state_id = $node->get('moderation_state')->getString();
+      $box_color = $this->moderationStateToColorMap($moderation_state_id);
+    }
+    catch (\Exception $e) {
+      // @todo log some error
+      $box_color = 'yellow';
+    }
+
     $build['content'] = [
       '#theme' => 'epa_content_moderation_form',
+      '#box_color' => $box_color,
+      '#current_state' => $this->getModerationStateLabel() ?? $this->t('No Workflow'),
       '#content_moderation_form' => $form,
+      '#last_modified' => $this->buildLastModifiedByString($node),
+      '#scheduled_publish' => $this->buildScheduledPublishString() ?? NULL,
     ];
     return $build;
   }
 
+  /**
+   * Returns the workflow transition label based off the passed workflow state
+   * machine name, or if none supplied, the given node's current state.
+   *
+   * @param string $state_key
+   *   (Optional) The state key
+   *
+   * @return string
+   *   The moderation state label.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   */
+  public function getModerationStateLabel($state_key = '') {
+    /** @var NodeInterface $node */
+    $node = $this->getContextValue('node');
+    $workflow = $this->moderationInformationService
+      ->getWorkflowForEntity($node);
+
+    if ($state_key == '') {
+      $state_key = $node->get('moderation_state')->value;
+    }
+
+    try {
+      return $workflow->getTypePlugin()
+        ->getState($state_key)
+        ->label();
+    }
+    catch (\Exception $e) {
+      return NULL;
+    }
+  }
+
+  /**
+   * Returns a "last authored on..." text for the current node revision.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   */
+  public function buildLastModifiedByString(NodeInterface $node) {
+    return $this->t("Last modified on @date by @user",
+      [
+        '@date' => $this->buildFormalDatetimeString($node->getRevisionCreationTime()),
+        '@user' => $node->getRevisionUser()->toLink(NULL, 'canonical',
+            [
+              'attributes' => [
+                'class' => [
+                  'my-class',
+                ],
+              ],
+            ]
+          )->toString(),
+      ]
+    );
+  }
+
+  /**
+   * Formats a timestamp to a specified format ('formal_datetime' by default).
+   *
+   * @param int $timestamp
+   *   The timestamp to transform.
+   * @param string $format
+   *   (Optional) Defaults to our 'formal_datetime' format, i.e. September 12, 2024, 5:19 PM EDT.
+   *
+   * @return string
+   *   The formatted datetime string.
+   */
+  public function buildFormalDatetimeString(int $timestamp, string $format = 'formal_datetime'): string {
+    return $this->dateFormatter->format($timestamp, $format);
+  }
+
+  /**
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|void
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   */
+  public function buildScheduledPublishString() {
+    $next_publish = $this->getNextScheduledPublish($this->getContextValue('node'));
+    if ($next_publish) {
+      if ($next_publish['moderation_state'] == 'published') {
+        $scheduled_datetime = $next_publish['value'];
+        $date_time = new DrupalDateTime($scheduled_datetime, new DateTimeZone('UTC'));
+        return $this->t('Scheduled to Publish on @date',
+          [
+            '@date' => $this->buildFormalDatetimeString($date_time->getTimestamp()),
+          ]
+        );
+      }
+    }
+  }
+
+
+  /**
+   * Helper method to return the next scheduled publish date value.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node to look at for upcoming scheduled publish rows.
+   *
+   * @return array|null
+   *   The first (next) scheduled publish value otherwise null if none.
+   */
+  public function getNextScheduledPublish(NodeInterface $node) {
+    $scheduled_transitions = $node->get('field_scheduled_transition')->getValue();
+    if (!empty($scheduled_transitions) && is_array($scheduled_transitions)) {
+      return $scheduled_transitions[0];
+    }
+
+    return NULL;
+  }
 }
