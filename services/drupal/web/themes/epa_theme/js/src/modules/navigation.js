@@ -1,4 +1,4 @@
-export default function() {
+export default function () {
   const subnav = once('navigation', '.menu--accordion .menu__subnav');
   subnav.forEach((menu, index) => {
     menu.setAttribute('hidden', true);
@@ -21,7 +21,7 @@ export default function() {
     let lastFocusableElementMM;
     let priorLastElementMM;
 
-    mobileMenuButton.addEventListener('click', function() {
+    mobileMenuButton.addEventListener('click', function () {
       if (!focusableMM) {
         focusableMM = Array.from(
           mobileMenuNav.querySelectorAll(
@@ -41,7 +41,7 @@ export default function() {
       }
 
       if (lastFocusableElementMM) {
-        lastFocusableElementMM.addEventListener('click', function() {
+        lastFocusableElementMM.addEventListener('click', function () {
           const swapMM = lastFocusableElementMM;
           lastFocusableElementMM = priorLastElementMM;
           priorLastElementMM = swapMM;
