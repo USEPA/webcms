@@ -58,6 +58,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match service.
    * @param \Drupal\Core\Block\BlockManager $block_manager
+   *   The block plugin manager service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, BlockManager $block_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -74,7 +75,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       $plugin_id,
       $plugin_definition,
       $container->get('current_route_match'),
-      $container->get('plugin.manager.block')
+      $container->get('plugin.manager.block'),
     );
   }
 
@@ -103,18 +104,26 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
   public function build() {
     /** @var \Drupal\node\NodeInterface $node */
     $node = $this->getContextValue('node');
-    $moderation_state_id = $node->get('moderation_state')->getString();
+
+    try {
+      $moderation_state_id = $node->get('moderation_state')->getString();
+      $box_color = $this->moderationStateToColorMap($moderation_state_id);
+    }
+    catch (\Exception $e) {
+      // @todo log some error
+      $box_color = 'yellow';
+    }
 
     // @todo: Determine cache strategy for this block. It's going to be dependent on node revision we're looking at and user.
     $build['#cache']['max-age'] = 0;
 
     $build['content'] = [
       '#theme' => 'epa_content_info_box_advanced',
-      '#content_moderation_form' => '', // @todo: Add this later
+      '#box_color' => $box_color,
       '#compare_link' => $this->buildCompareLink(),
+      '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'), // @todo: Add this later
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
-      '#box_color' => $this->moderationStateToColorMap($moderation_state_id),
       '#attributes' => new Attribute(),
     ];
 
@@ -155,7 +164,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
     // Ensure that those revision IDs are not the same to ensure we have
     // revisions to compare against
     if ($published_revision_id != $latest_revision_id) {
-      return $this->generateCompareLink($node->id(), $published_revision_id, $latest_revision_id);
+      return $this->buildCompareLinkRenderArray($node->id(), $published_revision_id, $latest_revision_id);
     }
 
     return [];
@@ -182,6 +191,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       $published_revision = \Drupal::entityTypeManager()
         ->getStorage($node->getEntityTypeId())
         ->getQuery()
+        ->accessCheck()
         ->condition('nid', $node->id())
         ->condition('status', 1)
         ->execute();
@@ -243,7 +253,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
    * @return array|mixed[]
    *   The render array of the compare link.
    */
-  private function generateCompareLink($nid, $published_revision, $latest_revision) {
+  private function buildCompareLinkRenderArray($nid, $published_revision, $latest_revision) {
     $url = Url::fromRoute(
       'diff.revisions_diff',
       [
