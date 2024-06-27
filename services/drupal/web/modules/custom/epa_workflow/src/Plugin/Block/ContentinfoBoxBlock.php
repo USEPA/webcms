@@ -227,6 +227,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       $latest_revision = \Drupal::entityTypeManager()
         ->getStorage($node->getEntityTypeId())
         ->getQuery()
+        ->accessCheck()
         ->condition('nid', $node->id())
         ->latestRevision()
         ->execute();
