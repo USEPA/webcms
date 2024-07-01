@@ -67,6 +67,7 @@ class EPANotificationInformation extends NotificationInformation {
         // Find out if we have a config entity that contains this transition.
         $query = $this->entityTypeManager->getStorage('danse_moderation_notifications')
           ->getQuery()
+          ->accessCheck(FALSE)
           ->condition('workflow', $workflow->id())
           ->condition('status', 1)
           ->condition('transitions.' . $transition->id(), $transition->id())
