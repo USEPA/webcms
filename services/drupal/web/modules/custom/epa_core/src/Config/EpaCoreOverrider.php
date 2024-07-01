@@ -18,7 +18,7 @@ class EpaCoreOverrider implements ConfigFactoryOverrideInterface {
   public function loadOverrides($names) {
     $overrides = [];
     $notifications_enabled = Settings::get('epa_workflow_notifications_enabled', FALSE);
-    if (isset($names[0]) && strpos($names[0], 'content_moderation_notifications.content_moderation_notification.') === 0) {
+    if (isset($names[0]) && strpos($names[0], 'danse_moderation_notifications.content_moderation_notifications.') === 0) {
       foreach ($names as $name) {
         $overrides[$name] = ['status' => $notifications_enabled];
       }
