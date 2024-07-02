@@ -25,5 +25,29 @@ function epa_workflow_views_data_alter(array &$data) {
     ],
   ];
 
+  $data['danse_event']['reference_node_transition'] = [
+    'title' => t('Node Transition'),
+    'help' => t('The before and after state of the related content entity.'),
+    'field' => [
+      'id' => 'epa_workflow_node_transition',
+    ],
+  ];
+
+  $data['danse_event']['reference_node_transition_from'] = [
+    'title' => t('Node Transition From'),
+    'help' => t('The before state of the related content entity.'),
+    'field' => [
+      'id' => 'epa_workflow_node_transition_from',
+    ],
+  ];
+
+  $data['danse_event']['reference_node_transition_to'] = [
+    'title' => t('Node Transition To'),
+    'help' => t('The after state of the related content entity.'),
+    'field' => [
+      'id' => 'epa_workflow_node_transition_to',
+    ],
+  ];
+
   return $data;
 }

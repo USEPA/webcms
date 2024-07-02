@@ -5,7 +5,9 @@ dependencies:
   config:
     - user.role.authenticated
   module:
+    - content_moderation
     - danse
+    - epa_workflow
     - user
 _core:
   default_config_hash: gfvisJPBai5tVVkt4V49HS4D5MtwaKiHzrHl8lYx-ho
@@ -68,7 +70,7 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: false
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -82,6 +84,16 @@ display:
             date_format: medium
             custom_date_format: ''
             timezone: ''
+            tooltip:
+              date_format: ''
+              custom_date_format: ''
+            time_diff:
+              enabled: false
+              future_format: '@interval hence'
+              past_format: '@interval ago'
+              granularity: 2
+              refresh: 60
+              description: ''
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -157,17 +169,17 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        label:
-          id: label
+        uid:
+          id: uid
           table: danse_event
-          field: label
+          field: uid
           relationship: event
           group_type: group
           admin_label: ''
           entity_type: danse_event
-          entity_field: label
-          plugin_id: danse_event_label
-          label: Label
+          entity_field: uid
+          plugin_id: field
+          label: 'Event User'
           exclude: false
           alter:
             alter_text: false
@@ -200,7 +212,72 @@ display:
           element_class: ''
           element_label_type: ''
           element_label_class: ''
-          element_label_colon: false
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: target_id
+          type: entity_reference_label
+          settings:
+            link: true
+          group_column: target_id
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        label:
+          id: label
+          table: danse_event
+          field: label
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          entity_field: label
+          plugin_id: danse_event_label
+          label: Title
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
           element_wrapper_type: ''
           element_wrapper_class: ''
           element_default_classes: true
@@ -209,7 +286,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: value
-          type: string
+          type: content_moderation_state
           settings:
             link_to_entity: 0
           group_column: value
@@ -287,6 +364,9 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+          text: view
+          output_url_as_text: 0
+          absolute: 0
         seen:
           id: seen
           table: danse_notification
@@ -354,16 +434,266 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        reference_node_transition:
+          id: reference_node_transition
+          table: danse_event
+          field: reference_node_transition
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          plugin_id: epa_workflow_node_transition
+          label: 'Node Transition'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+        reference_node_transition_from:
+          id: reference_node_transition_from
+          table: danse_event
+          field: reference_node_transition_from
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          plugin_id: epa_workflow_node_transition_from
+          label: 'Node Transition From'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+        reference_node_transition_to:
+          id: reference_node_transition_to
+          table: danse_event
+          field: reference_node_transition_to
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          plugin_id: epa_workflow_node_transition_to
+          label: 'Node Transition To'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+        reference_content_type:
+          id: reference_content_type
+          table: danse_event
+          field: reference_content_type
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          plugin_id: epa_workflow_content_type
+          label: 'Reference Content Type'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+        reference_web_area:
+          id: reference_web_area
+          table: danse_event
+          field: reference_web_area
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          plugin_id: epa_workflow_web_area
+          label: 'Reference Web Area'
+          exclude: false
+          alter:
+            alter_text: false
+            text: ''
+            make_link: false
+            path: ''
+            absolute: false
+            external: false
+            replace_spaces: false
+            path_case: none
+            trim_whitespace: false
+            alt: ''
+            rel: ''
+            link_class: ''
+            prefix: ''
+            suffix: ''
+            target: ''
+            nl2br: false
+            max_length: 0
+            word_boundary: true
+            ellipsis: true
+            more_link: false
+            more_link_text: ''
+            more_link_path: ''
+            strip_tags: false
+            trim: false
+            preserve_tags: ''
+            html: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_label_colon: true
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
       pager:
         type: full
         options:
           offset: 0
-          items_per_page: 50
+          items_per_page: 10
           total_pages: null
           id: 0
           tags:
-            next: ››
-            previous: ‹‹
+            next: 'Next ›'
+            previous: '‹ Previous'
             first: '« First'
             last: 'Last »'
           expose:
@@ -379,7 +709,7 @@ display:
         type: basic
         options:
           submit_button: Apply
-          reset_button: false
+          reset_button: true
           reset_button_label: Reset
           exposed_sorts_label: 'Sort by'
           expose_sort_order: true
@@ -445,7 +775,6 @@ display:
           default_argument_type: user
           default_argument_options:
             user: false
-          default_argument_skip_url: false
           summary_options:
             base_path: ''
             count: true
@@ -464,52 +793,13 @@ display:
           not: false
       filters: {  }
       style:
-        type: table
+        type: grid_responsive
         options:
           grouping: {  }
-          row_class: ''
-          default_row_class: true
-          columns:
-            created: created
-            label: label
-            view_danse_event: view_danse_event
-            rendered_entity_1: rendered_entity_1
-          default: '-1'
-          info:
-            created:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            label:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            view_danse_event:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-            rendered_entity_1:
-              sortable: false
-              default_sort_order: asc
-              align: ''
-              separator: ''
-              empty_column: false
-              responsive: ''
-          override: true
-          sticky: true
-          summary: ''
-          empty_table: false
-          caption: ''
-          description: ''
+          columns: 2
+          cell_min_width: 100
+          grid_gutter: 10
+          alignment: horizontal
       row:
         type: fields
       query:
@@ -532,9 +822,21 @@ display:
           entity_field: event
           plugin_id: standard
           required: true
-      header: {  }
+      header:
+        result:
+          id: result
+          table: views
+          field: result
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: result
+          empty: false
+          content: 'Displaying @start - @end of @total'
       footer: {  }
-      display_extenders: {  }
+      display_extenders:
+        views_ajax_get:
+          ajax_get: false
     cache_metadata:
       max-age: -1
       contexts:
@@ -608,6 +910,15 @@ display:
             date_format: medium
             custom_date_format: ''
             timezone: ''
+            tooltip:
+              date_format: ''
+              custom_date_format: ''
+            time_diff:
+              enabled: false
+              future_format: '@interval hence'
+              past_format: '@interval ago'
+              granularity: 2
+              refresh: 60
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -840,7 +1151,6 @@ display:
           title: ''
           default_argument_type: current_user
           default_argument_options: {  }
-          default_argument_skip_url: false
           summary_options:
             base_path: ''
             count: true
@@ -1080,6 +1390,15 @@ display:
             date_format: medium
             custom_date_format: ''
             timezone: ''
+            tooltip:
+              date_format: ''
+              custom_date_format: ''
+            time_diff:
+              enabled: false
+              future_format: '@interval hence'
+              past_format: '@interval ago'
+              granularity: 2
+              refresh: 60
           group_column: value
           group_columns: {  }
           group_rows: true
@@ -1422,6 +1741,69 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
+        uid_1:
+          id: uid_1
+          table: danse_event
+          field: uid
+          relationship: event
+          group_type: group
+          admin_label: ''
+          entity_type: danse_event
+          entity_field: uid
+          plugin_id: entity_reference
+          operator: or
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: uid_1_op
+            label: 'User ID'
+            description: ''
+            use_operator: false
+            operator: uid_1_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: uid_1
+            required: false
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              paragraphs_library_contributor: '0'
+              layout_editor: '0'
+              alerts_manager: '0'
+              block_manager: '0'
+              system_editor: '0'
+              system_webmaster: '0'
+              menu_admin: '0'
+              administrator: '0'
+              beta_tester: '0'
+            reduce: false
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          reduce_duplicates: false
+          handler: 'default:user'
+          widget: autocomplete
+          handler_settings:
+            target_bundles: null
+            sort:
+              field: _none
+              direction: ASC
+            auto_create: false
+            filter:
+              type: _none
+            include_anonymous: true
       filter_groups:
         operator: AND
         groups:
@@ -1430,6 +1812,8 @@ display:
         filters: false
         filter_groups: false
       display_extenders:
+        views_ajax_get:
+          ajax_get: false
         metatag_display_extender:
           metatags: {  }
           tokenize: false
