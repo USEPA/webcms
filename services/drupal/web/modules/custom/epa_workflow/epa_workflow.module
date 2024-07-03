@@ -7,7 +7,7 @@
 
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
-use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\danse_moderation_notifications\ContentModerationNotificationInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -86,7 +86,7 @@ function epa_workflow_form_content_moderation_notification_form_alter(array &$fo
   $workflow_id = $form['workflow']['#default_value'];
   $workflow = \Drupal::entityTypeManager()->getStorage('workflow')->load($workflow_id);
   $entity_types = $workflow->getTypePlugin()->getEntityTypes();
-  $entity_types[] = 'content_moderation_notifications';
+  $entity_types[] = 'danse_moderation_notifications';
   $form['body']['token_tree_link']['#token_types'] = array_unique(array_merge($form['body']['token_tree_link']['#token_types'], $entity_types));
 
   $notification = $form_state->getFormObject()->getEntity();
@@ -122,12 +122,12 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
  *
  * Sets header content type to html.
  * Can also achieve by installing mailsystem and add a module specific
- * configuration for content_moderation_notifications.
+ * configuration for danse_moderation_notifications.
  *
  * @see https://www.drupal.org/project/content_moderation_notifications/issues/2903550
  */
 function epa_workflow_mail_alter(&$message) {
-  if ($message['id'] == 'content_moderation_notifications_content_moderation_notification') {
+  if ($message['id'] == 'danse_moderation_notifications_content_moderation_notification') {
     $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
 
     // Avoid sending the notification messages to the site email address; prefer donotreply.
@@ -137,7 +137,7 @@ function epa_workflow_mail_alter(&$message) {
 
     // Log here to avoid having to create our own mail service.
     $logger = \Drupal::logger('epa_workflow');
-    $transition = \Drupal::service('content_moderation_notifications.notification_information')->getTransition($message['params']['context']['node']);
+    $transition = \Drupal::service('danse_moderation_notifications.notification_information')->getTransition($message['params']['context']['node']);
     $logger->info('Notification email with subject: %subject was sent to: %to  when the %transition transition was executed on revision %vid', ['%to' => $message['params']['headers']['Bcc'], '%subject' => $message['subject'], '%vid' => $message['params']['context']['node']->getRevisionId(), '%transition' => $transition->label()]);
   }
 }
@@ -590,7 +590,7 @@ function epa_workflow_node_presave(NodeInterface $node) {
       $node->leapfrog = $latest_revision_id;
     }
 
-    // Set the "last_revision" property to fool the content_moderation_notifications
+    // Set the "last_revision" property to fool the danse_moderation_notifications
     // module into properly detecting which transition we are firing since it
     // does not expect us to be transitioning a non-latest revision.
     // So if we're doing a save on the default revision and there's a different
