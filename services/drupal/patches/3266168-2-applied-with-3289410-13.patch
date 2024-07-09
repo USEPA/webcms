@@ -1,0 +1,372 @@
+diff --git a/role_expose.info.yml b/role_expose.info.yml
+index 70059f5..f7d55ba 100644
+--- a/role_expose.info.yml
++++ b/role_expose.info.yml
+@@ -3,7 +3,7 @@ description: 'Module gives site administrators ability to expose user their own
+ package: User management
+ 
+ type: module
+-core_version_requirement: ^8.8 || ^9
++core_version_requirement: ^8.8 || ^9 || ^10
+ 
+ dependencies:
+   - drupal:user
+diff --git a/role_expose.module b/role_expose.module
+index 2d350ac..0098b9e 100644
+--- a/role_expose.module
++++ b/role_expose.module
+@@ -20,8 +20,8 @@ function role_expose_help($route_name, RouteMatchInterface $route_match) {
+   switch ($route_name) {
+     case 'help.page.role_expose':
+       return '<p>' . t('Role Expose -module gives site administrators ability to expose user their own user roles.')
+-             . ' ' . t('Users may be granted an option to view own roles or all users roles.') . '<p>' .
+-             '</p>' . t('By default all roles are unchecked ie. not visible.') . '</p>';
++        . ' ' . t('Users may be granted an option to view own roles or all users roles.') . '<p>' .
++        '</p>' . t('By default all roles are unchecked ie. not visible.') . '</p>';
+ 
+     case 'entity.user_role.collection':
+       return '<p>' . t("Role Expose -selection allows you to adjust which user roles are visible on user's profile page.") . '</p>';
+@@ -54,11 +54,14 @@ function role_expose_form_user_role_form_alter(&$form, FormStateInterface $form_
+     '#description' => t('Choose when this role should displayed in User profile page.'),
+   ];
+ 
+-  if (in_array($role->id(), [AccountInterface::ANONYMOUS_ROLE, AccountInterface::AUTHENTICATED_ROLE])) {
++  if (in_array($role->id(), [
++    AccountInterface::ANONYMOUS_ROLE,
++    AccountInterface::AUTHENTICATED_ROLE,
++  ])) {
+     $form['role_expose']['#disabled'] = 'disabled';
+     $form['role_expose']['#description'] .= ' ' . t("NOTE: Role %label can't be exposed in User's profile.", [
+-      '%label' => $role->label(),
+-    ]);
++        '%label' => $role->label(),
++      ]);
+   }
+ 
+   $form['#entity_builders'][] = 'role_expose_form_user_role_form_builder';
+@@ -114,64 +117,32 @@ function role_expose_user_view_alter(array &$build, EntityInterface $entity, Ent
+   if (empty($exposed_has) && empty($exposed_missing)) {
+     return;
+   }
+-  // Set the container first, with some title and description.
+-  $build['role_expose'] = [
+-    '#type' => 'fieldset',
+-    '#attributes' => [
+-      'class' => [
+-        'role-expose',
+-        'roles-list',
+-      ],
+-      // Satisfy template_preprocess_fieldset() with id, since we're also
+-      // providing #description.
+-      'id' => 'role_expose',
+-    ],
+-    '#title' => t('Roles'),
+-    '#description' => t('The roles give different permissions on the site. Please contact your site administration for more info.'),
+-  ];
+-
+-  // Roles that user has and should be exposed (if any)
+-  if (!empty($exposed_has)) {
+-    $items = [
+-      '#theme' => 'item_list',
+-    ];
+-    if ($own_user_profile) {
+-      $items['#prefix'] = '<h3>' . t('Roles you have') . '</h3>';
+-    }
+-    else {
+-      $items['#prefix'] = '<h3>' . t('Roles user has') . '</h3>';
+-    }
+ 
+-    foreach ($exposed_has as $role_id) {
+-      $items['#items'][] = $roles[$role_id]->label();
++  $exposed_role_objects = ['has' => [], 'missing' => []];
++  foreach (['has' => $exposed_has, 'missing' => $exposed_missing] as $key => $exposed_roles) {
++    foreach ($exposed_roles as $role_id) {
++      $exposed_role_objects[$key][$role_id] = $roles[$role_id];
+     }
+-    $items['#attributes'] = [
+-      'class' => [
+-        'roles-user-has',
+-      ],
+-    ];
+-    $build['role_expose']['has']['#markup'] = \Drupal::service('renderer')->render($items);
+   }
+ 
+-  // Roles that user does not have, but should be exposed (if any)
+-  if (!empty($exposed_missing)) {
+-    $items = [
+-      '#theme' => 'item_list',
+-    ];
+-    if ($own_user_profile) {
+-      $items['#prefix'] = '<h3>' . t('Roles you do not have') . '</h3>';
+-    }
+-    else {
+-      $items['#prefix'] = '<h3>' . t('Roles user does not have') . '</h3>';
+-    }
+-    foreach ($exposed_missing as $role_id) {
+-      $items['#items'][] = $roles[$role_id]->label();
+-    }
+-    $items['#attributes'] = [
+-      'class' => [
+-        'roles-user-does-not-have',
+-      ],
+-    ];
+-    $build['role_expose']['has-not']['#markup'] = \Drupal::service('renderer')->render($items);
+-  }
++  $build['role_expose'] = [
++    '#theme' => 'user_roles',
++    '#own_profile' => $own_user_profile,
++    '#roles_has' => $exposed_role_objects['has'],
++    '#roles_missing' => $exposed_role_objects['missing']
++  ];
++}
++
++/**
++ * Implements hook_theme().
++ */
++function role_expose_theme($existing, $type, $theme, $path) {
++  return [
++    'user_roles' => [
++      'variables' => [
++        'own_profile' => false,
++        'roles_has' => [],
++        'roles_missing' => [],
++      ]
++    ]];
+ }
+diff --git a/tests/src/Functional/RoleExposeHelpPageFoundTest.php b/tests/src/Functional/RoleExposeHelpPageFoundTest.php
+index 3889d52..9925b2d 100644
+--- a/tests/src/Functional/RoleExposeHelpPageFoundTest.php
++++ b/tests/src/Functional/RoleExposeHelpPageFoundTest.php
+@@ -14,7 +14,7 @@ class RoleExposeHelpPageFoundTest extends BrowserTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['role_expose', 'help'];
++  protected static $modules = ['role_expose', 'help'];
+ 
+   /**
+    * {@inheritdoc}
+@@ -32,10 +32,10 @@ class RoleExposeHelpPageFoundTest extends BrowserTestBase {
+ 
+     // Verify Role Expose is listed in help pages.
+     $this->drupalGet('admin/help');
+-    $this->assertLink('Role Expose', 0, 'Check Help page has module name as link.', 'Role Expose');
++    $this->assertSession()->linkExists('Role Expose', 0, 'Check Help page has module name as link.', 'Role Expose');
+     // Verify Role Expose page has correct content.
+     $this->clickLink('Role Expose');
+-    $this->assertText('Role Expose -module gives site administrators ability to expose user their own user roles.', 'Check Help page has module help test (check beginning of text).');
++    $this->assertSession()->pageTextContains('Role Expose -module gives site administrators ability to expose user their own user roles.');
+   }
+ 
+ }
+diff --git a/tests/src/Functional/RoleExposePermissionsAvailableTest.php b/tests/src/Functional/RoleExposePermissionsAvailableTest.php
+index 905f0e3..0df6e90 100644
+--- a/tests/src/Functional/RoleExposePermissionsAvailableTest.php
++++ b/tests/src/Functional/RoleExposePermissionsAvailableTest.php
+@@ -14,7 +14,7 @@ class RoleExposePermissionsAvailableTest extends BrowserTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['role_expose'];
++  protected static $modules = ['role_expose'];
+ 
+   /**
+    * {@inheritdoc}
+@@ -31,14 +31,14 @@ class RoleExposePermissionsAvailableTest extends BrowserTestBase {
+ 
+     $this->drupalGet('admin/people/permissions');
+ 
+-    $this->assertText('View own exposed roles', '"View own exposed roles" -grant available');
++    $this->assertSession()->pageTextContains('View own exposed roles');
+ 
+     $warning = 'Warning: Give to trusted roles only; this permission has security implications.';
+     $perms_2 = 'View exposed roles for all users';
+-    $this->assertText($perms_2, '"View exposed roles for all users" -grant available');
+-    $this->assertRaw('<div class="permission"><span class="title">' . $perms_2
++    $this->assertSession()->pageTextContains($perms_2);
++    $this->assertSession()->responseContains('<div class="permission"><span class="title">' . $perms_2
+         . '</span><div class="description"><em class="permission-warning">'
+-        . $warning, '"restrict access" effective with "View exposed roles for all users" -permission');
++        . $warning);
+   }
+ 
+ }
+diff --git a/tests/src/Functional/RoleExposeRoleFormTest.php b/tests/src/Functional/RoleExposeRoleFormTest.php
+index 69e5709..2d8c2e0 100644
+--- a/tests/src/Functional/RoleExposeRoleFormTest.php
++++ b/tests/src/Functional/RoleExposeRoleFormTest.php
+@@ -14,7 +14,7 @@ class RoleExposeRoleFormTest extends BrowserTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['role_expose'];
++  protected static $modules = ['role_expose'];
+ 
+   /**
+    * {@inheritdoc}
+@@ -31,12 +31,12 @@ class RoleExposeRoleFormTest extends BrowserTestBase {
+ 
+     $this->drupalGet('admin/people/roles/add');
+     // Check administrator -role, by form element name.
+-    $this->assertText('Role expose', 'Selector label exists.');
+-    $this->assertOption('edit-role-expose', '0', 'Select option "Never" is present.');
+-    $this->assertOption('edit-role-expose', '1', 'Select option "User with this role" is present.');
+-    $this->assertOption('edit-role-expose', '2', 'Select option "User without this role" is present.');
+-    $this->assertOption('edit-role-expose', '3', 'Select option "Always" is present.');
+-    $this->assertText('Choose when this role should displayed in User profile page.', 'Selector Description text found.');
++    $this->assertSession()->pageTextContains('Role expose');
++    $this->assertSession()->optionExists('edit-role-expose', '0', NULL, 'Select option "Never" is present.');
++    $this->assertSession()->optionExists('edit-role-expose', '1', NULL, 'Select option "User with this role" is present.');
++    $this->assertSession()->optionExists('edit-role-expose', '2', NULL, 'Select option "User without this role" is present.');
++    $this->assertSession()->optionExists('edit-role-expose', '3', NULL, 'Select option "Always" is present.');
++    $this->assertSession()->pageTextContains('Choose when this role should displayed in User profile page.');
+   }
+ 
+ }
+diff --git a/tests/src/Functional/RoleExposeRoleFormUsageTest.php b/tests/src/Functional/RoleExposeRoleFormUsageTest.php
+index c94a481..df634ec 100644
+--- a/tests/src/Functional/RoleExposeRoleFormUsageTest.php
++++ b/tests/src/Functional/RoleExposeRoleFormUsageTest.php
+@@ -15,7 +15,7 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static $modules = ['role_expose'];
++  protected static $modules = ['role_expose'];
+ 
+   /**
+    * {@inheritdoc}
+@@ -35,22 +35,22 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+     $role_hidden = $this->createRole([], 'hidden', 'Role never visible');
+     $this->drupalGet('admin/people/roles/manage/' . $role_hidden);
+     $edit['role_expose'] = ExposableRolesInterface::EXPOSE_NEVER;
+-    $this->drupalPostForm(NULL, $edit, 'Save');
++    $this->submitForm($edit, 'Save');
+ 
+     $role_visible_when_has = $this->createRole([], 'visible_when_has', 'Role visible when has');
+     $this->drupalGet('admin/people/roles/manage/' . $role_visible_when_has);
+     $edit['role_expose'] = ExposableRolesInterface::EXPOSE_WITH;
+-    $this->drupalPostForm(NULL, $edit, 'Save');
++    $this->submitForm($edit, 'Save');
+ 
+     $role_visible_when_not_has = $this->createRole([], 'visible_when_not_has', 'Role visible when not has');
+     $this->drupalGet('admin/people/roles/manage/' . $role_visible_when_not_has);
+     $edit['role_expose'] = ExposableRolesInterface::EXPOSE_WITHOUT;
+-    $this->drupalPostForm(NULL, $edit, 'Save');
++    $this->submitForm($edit, 'Save');
+ 
+     $role_visible = $this->createRole([], 'visible', 'Role always visible');
+     $this->drupalGet('admin/people/roles/manage/' . $role_visible);
+     $edit['role_expose'] = ExposableRolesInterface::EXPOSE_ALWAYS;
+-    $this->drupalPostForm(NULL, $edit, 'Save');
++    $this->submitForm($edit, 'Save');
+ 
+     // Log the resulted Permissions -page (incl. roles and grants)
+     $this->drupalGet('admin/people/permissions');
+@@ -64,18 +64,18 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+       'roles[visible_when_has]' => TRUE,
+       'roles[visible_when_not_has]' => TRUE,
+     ];
+-    $this->drupalPostForm(NULL, $edit, 'Save');
+-    $this->assertText('The changes have been saved.', 'Roles saved');
++    $this->submitForm($edit, 'Save');
++    $this->assertSession()->pageTextContains('The changes have been saved.');
+ 
+     // Check that we have NO roles visible in User profile page (no grants yet!)
+     $this->drupalLogin($user_basic);
+     $this->drupalGet('user');
+-    $this->assertNoText('Roles', 'Role Expose -section is hidden (title)');
+-    $this->assertNoText('The roles give different permissions on the site. Please contact your site administration for more info.', 'Role Expose -section is hidden (content check)');
+-    $this->assertNoText('Role always visible', 'Role <em>Role always visible</em> is NOT printed in the UI');
+-    $this->assertNoText('Role never visible', 'Role <em>Role never visible</em> is NOT printed in the UI');
+-    $this->assertNoText('Role visible when has', 'Role <em>Role visible when has</em> is NOT printed in the UI');
+-    $this->assertNoText('Role visible when not has', 'Role <em>Role visible when not has</em> is NOT printed in the UI');
++    $this->assertSession()->pageTextNotContains('Roles');
++    $this->assertSession()->pageTextNotContains('The roles give different permissions on the site. Please contact your site administration for more info.');
++    $this->assertSession()->pageTextNotContains('Role always visible');
++    $this->assertSession()->pageTextNotContains('Role never visible');
++    $this->assertSession()->pageTextNotContains('Role visible when has');
++    $this->assertSession()->pageTextNotContains('Role visible when not has');
+ 
+     $this->drupalLogin($user_admin);
+ 
+@@ -91,18 +91,18 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+       'roles[visible_when_has]' => TRUE,
+       'roles[visible_when_not_has]' => TRUE,
+     ];
+-    $this->drupalPostForm(NULL, $edit, 'Save');
+-    $this->assertText('The changes have been saved.', 'Roles saved');
++    $this->submitForm($edit, 'Save');
++    $this->assertSession()->pageTextContains('The changes have been saved.');
+ 
+     // Check that we have roles in User profile page -  grants are now set!
+     $this->drupalLogin($user_more_priviledged);
+     $this->drupalGet('user');
+-    $this->assertText('Roles', 'Role Expose -section is visible (title)');
+-    $this->assertText('The roles give different permissions on the site. Please contact your site administration for more info.', 'Role Expose -section visible (content check)');
+-    $this->assertText('Role always visible', 'Role <em>Role always visible</em> is printed in the UI');
+-    $this->assertNoText('Role never visible', 'Role <em>Role never visible</em> is NOT printed in the UI');
+-    $this->assertText('Role visible when has', 'Role <em>Role visible when has</em> is printed in the UI');
+-    $this->assertNoText('Role visible when not has', 'Role <em>Role visible when not has</em> is NOT printed in the UI');
++    $this->assertSession()->pageTextContains('Roles');
++    $this->assertSession()->pageTextContains('The roles give different permissions on the site. Please contact your site administration for more info.');
++    $this->assertSession()->pageTextContains('Role always visible');
++    $this->assertSession()->pageTextNotContains('Role never visible');
++    $this->assertSession()->pageTextContains('Role visible when has');
++    $this->assertSession()->pageTextNotContains('Role visible when not has');
+ 
+     // Check that we have roles in User profile page -  grants are now set!
+     $perms = [
+@@ -113,11 +113,11 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+     $this->drupalLogin($user_see_other_users_roles);
+     // Go to see *other* user's profile, with 'view roles of all users' -perms.
+     $this->drupalGet('user/' . $user_more_priviledged->id());
+-    $this->assertText('Roles', 'Role Expose -section is visible (title)');
+-    $this->assertText('Role always visible', 'Role <em>Role always visible</em> is printed in the UI');
+-    $this->assertNoText('Role never visible', 'Role <em>Role never visible</em> is NOT printed in the UI');
+-    $this->assertText('Role visible when has', 'Role <em>Role visible when has</em> is printed in the UI');
+-    $this->assertNoText('Role visible when not has', 'Role <em>Role visible when not has</em> is NOT printed in the UI');
++    $this->assertSession()->pageTextContains('Roles');
++    $this->assertSession()->pageTextContains('Role always visible');
++    $this->assertSession()->pageTextNotContains('Role never visible');
++    $this->assertSession()->pageTextContains('Role visible when has');
++    $this->assertSession()->pageTextNotContains('Role visible when not has');
+ 
+     // Check that we have roles in User profile page -  grants are now set!
+     $perms = [
+@@ -127,8 +127,8 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+     $this->drupalLogin($user_see_other_users_profile);
+     // Go to see *other* user's profile, with 'view roles of all users' -perms.
+     $this->drupalGet('user/' . $user_more_priviledged->id());
+-    $this->assertNoText('Roles', 'Role Expose -section is visible (title)');
+-    $this->assertNoText('Role always visible', 'Role <em>Role always visible</em> is printed in the UI');
++    $this->assertSession()->pageTextNotContains('Roles');
++    $this->assertSession()->pageTextNotContains('Role always visible');
+ 
+     $this->drupalLogin($user_admin);
+     $this->drupalGet('user/' . $user_more_priviledged->id() . '/edit');
+@@ -138,17 +138,17 @@ class RoleExposeRoleFormUsageTest extends BrowserTestBase {
+       'roles[visible_when_has]' => FALSE,
+       'roles[visible_when_not_has]' => FALSE,
+     ];
+-    $this->drupalPostForm(NULL, $edit, 'Save');
+-    $this->assertText('The changes have been saved.', 'Roles saved');
++    $this->submitForm($edit, 'Save');
++    $this->assertSession()->pageTextContains('The changes have been saved.');
+ 
+     // Check that we have roles in User profile page -  grants are now set!
+     $this->drupalLogin($user_more_priviledged);
+     $this->drupalGet('user');
+-    $this->assertText('Roles', 'Role Expose -section is visible (title)');
+-    $this->assertText('The roles give different permissions on the site. Please contact your site administration for more info.', 'Role Expose -section visible (content check)');
+-    $this->assertText('Role always visible', 'Role <em>Role always visible</em> is printed in the UI');
+-    $this->assertNoText('Role never visible', 'Role <em>Role never visible</em> is NOT printed in the UI');
+-    $this->assertNOText('Role visible when has', 'Role <em>Role visible when has</em> is printed in the UI');
++    $this->assertSession()->pageTextContains('Roles');
++    $this->assertSession()->pageTextContains('The roles give different permissions on the site. Please contact your site administration for more info.');
++    $this->assertSession()->pageTextContains('Role always visible');
++    $this->assertSession()->pageTextNotContains('Role never visible');
++    $this->assertSession()->pageTextNotContains('Role visible when has', 'Role <em>Role visible when has</em> is printed in the UI');
+     $this->assertText('Role visible when not has', 'Role <em>Role visible when not has</em> is NOT printed in the UI');
+ 
+   }
