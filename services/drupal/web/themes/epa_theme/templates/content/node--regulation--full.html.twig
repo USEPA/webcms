@@ -20,12 +20,8 @@
 {% endif %}
 
 {% set header_info %}
-  {% if nav_style == 'sidebar_navigation' %}
-    {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
-    {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
-  {% else %}
-    {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
-  {% endif %}
+  {{ node.entitygroupfield|view({type: 'group_homepage_node_formatter', settings: {link: false,shortname: true}}) }}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
 {% endset %}
 
 {% set contact_link %}

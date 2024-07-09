@@ -21,6 +21,13 @@
   } %}
 {% endset %}
 
+{% set contact_link %}
+  {% include '@components/header-link/header-link.twig' with {
+    'url': '#',
+    'text': 'Contact Us',
+  } %}
+{% endset %}
+
 {% set author_content %}
   <p><strong><a href="/themes/epa_theme/pattern-lab/patterns/07-pages-listing-pages-perspectives/07-pages-listing-pages-perspectives.rendered.html">Alexandra Dapolito Dunn</a></strong><br>Assistant Administrator<br>Office of Chemical Safety and Pollution Prevention</p>
   <p>Alexandra Dapolito Dunn is the Assistant Administrator for the Office of Chemical Safety and Pollution Prevention. Prior to that she served as the Regional Administrator for EPA Region 1, and her responsibilities included overseeing the states of Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont and ten tribal nations.</p>
@@ -34,14 +41,6 @@
 
 {% set content %}
   <p>March 12, 2020</p>
-  {% include '@components/box/box--related-info/box--related-info.twig' with {
-    'modifier_classes': 'u-align-right',
-    'title': {
-      'tag': 'h2',
-      'text': 'Related Information',
-    },
-    'content': '<ul><li><a href="#">Read more EPA Perspectives</a></li><li><a href="#">Read other EPA Perspectives about [subject]</a></li><li><a href="#">Read other EPA Perspectives about [subject]</a></li></ul>',
-  } only %}
   <p>On this day in 1990, a new era was ushered in for EPA and the nation when the Pollution Prevention (P2) Act was signed into law. The act gave the agency new tools to join with states, tribes, and communities to prevent pollution <em>before</em> it happens. It also marked a shift in the paradigm of environmental protection which had been mostly focused on end-of-pipe pollution control and clean-up strategies.</p>
   <p>Equally important, the P2 act strengthened EPA’s role as an ally of American businesses, helping them save billions of dollars and improve operations. As EPA Administrator Andrew Wheeler has said, “It’s far better to prevent pollution from occurring than to go in after the fact and clean it up.”</p>
   <p>The P2 Act greatly expanded the opportunities for “source reduction” to reduce or prevent pollution at the source through cost-effective changes in production, operation, and raw materials use. These changes can reduce the amount of pollution entering a waste stream or the environment prior to recycling, treatment or disposal, and can offer industry substantial savings in reduced raw material, pollution control, pollution clean-up and liability costs.</p>
@@ -65,13 +64,25 @@
   } only %}
 {% endset %}
 
+{% set sidenav %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
 {% set page_content %}
-  {% include '@templates/detail-pages/page.twig' with {
+  {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'title': page_title,
     'admin_info': page_admin_info,
     'intro': intro,
     'body': content,
-    'is_narrow': true,
+    'sidenav': sidenav,
+    'has_sidenav': has_sidenav,
   } %}
 {% endset %}
 
