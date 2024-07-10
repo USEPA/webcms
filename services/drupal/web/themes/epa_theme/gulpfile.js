@@ -130,7 +130,12 @@ async function lintPatterns() {
 }
 
 const buildPatternLab = () => {
-  return patternLab.build({ cleanPublic: true, watch: false });
+  return new Promise(function(resolve, reject) {
+    patternLab.build({ cleanPublic: true, watch: false });
+    resolve();
+  });
+
+  // return patternLab.build({ cleanPublic: true, watch: false });
 };
 
 async function webpackBundleScripts(mode) {
@@ -141,17 +146,17 @@ async function webpackBundleScripts(mode) {
   }
 }
 
-const bundleScripts = (exports.gessoBundleScripts = () =>
+const bundleScripts = (exports.gessoBundleScripts = async () =>
   webpackBundleScripts('production'));
 
-const bundleScriptsDev = () => webpackBundleScripts('development');
+const bundleScriptsDev = async () => webpackBundleScripts('development');
 
-const compileStyles = () => buildSass('production');
+const compileStyles = async () => buildSass('production');
 exports.buildStyles = series(lintStyles, compileStyles);
 
-const compileStylesDev = () => buildSass('development');
+const compileStylesDev = async () => buildSass('development');
 
-const watchFiles = () => {
+const watchFiles = async () => {
   watch(
     [
       'source/**/*.scss',
