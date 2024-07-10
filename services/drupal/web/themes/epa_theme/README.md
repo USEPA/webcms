@@ -19,7 +19,7 @@ Also available for [WordPress](https://github.com/forumone/gesso-wp).
 
 The United States Web Design System is a set of design guidelines and starting
 code for creating digital government services. For more information view the
-[USWDS](https://designsystem.digital.gov) project website or the 
+[USWDS](https://designsystem.digital.gov) project website or the
 [USWDS Github repo](https://github.com/uswds/uswds).
 
 ## Global Prerequisites
@@ -69,8 +69,8 @@ module.
 
 If you can’t use Drush, then manually replace all instances of `guswds`
 within this directory with a machine-readable name of your choice, including
-folder names, filenames, and all occurrences within Drupal theme files. 
-This custom name must start with a letter and may only contain lowercase 
+folder names, filenames, and all occurrences within Drupal theme files.
+This custom name must start with a letter and may only contain lowercase
 letters, numbers, and underscores.
 
 Edit the .info.yml file and update the theme name and description. You can also
@@ -288,11 +288,11 @@ when the Gulp tasks run. To change this, edit the included `.gitignore` file.
 break the build, so if you have a valid reason to break Stylelint rules you can
 have it ignore code in two ways:
 
-1. Add `/* stylelint-disable-next-line */` to the line just before where the
+1. Add `// stylelint-disable-next-line` to the line just before where the
    Stylelint warning is triggered.
 
-2. To ignore several lines, add `/* stylelint-disable */` before the code in
-   question and add `/* stylelint-enable */` afterwards.
+2. To ignore several lines, add `// stylelint-disable` before the code in
+   question and add `// stylelint-enable` afterwards.
 
 ### JavaScript
 

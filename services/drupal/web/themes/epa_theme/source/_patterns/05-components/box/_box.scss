@@ -10,8 +10,8 @@
   max-width: 100%;
   overflow: visible;
 
-  &:before,
-  &:after {
+  &::before,
+  &::after {
     clear: both;
     content: '';
     display: table;
@@ -41,7 +41,7 @@
   }
 }
 
-/* stylelint-disable-next-line selector-no-qualifying-type */
+// stylelint-disable-next-line selector-no-qualifying-type
 div.box__title {
   @extend %h3;
 }
@@ -54,6 +54,7 @@ h2.box__title {
 
 .box__image-link {
   &#{$external-urls} {
+    // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
     @extend .external-link--image;
   }
 
