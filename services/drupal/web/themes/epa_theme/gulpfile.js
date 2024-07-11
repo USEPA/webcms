@@ -213,7 +213,7 @@ const build = (isProduction = true) => {
     parallel(
       task('bundleScripts'),
       buildImages,
-      task('compileStyles'),
+      series(lintStyles, task('compileStyles')),
       buildPatterns
     )
   );
