@@ -2,7 +2,7 @@
 // Flex Grid mixins
 
 @use '../00-functions' as *;
-@use "sass:math";
+@use 'sass:math';
 
 // Set flex column width.
 // @param {Number} $columns Number of columns. 1 or 0 result in a single column.
@@ -13,7 +13,11 @@
   $gutter-width: gesso-get-map(gutter-width),
   $item-min-width: false
 ) {
-  $column-percentage: if($columns > 0, percentage(math.div(1, $columns)), 100%);
+  $column-percentage: if(
+    $columns > 0,
+    math.percentage(math.div(1, $columns)),
+    100%
+  );
 
   flex-basis: auto;
   flex-grow: 0;
