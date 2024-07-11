@@ -22,16 +22,9 @@ filters:
     status: true
     weight: -10
     settings:
-      allowed_html: '<p> <strong> <em> <ul> <li> <ol> <sup> <sub> <ins data-date>'
+      allowed_html: '<br> <p> <strong> <em> <sub> <sup> <ul> <ol> <li> <ins class="new" data-date><* >'
       filter_html_help: true
       filter_html_nofollow: false
-  token_filter:
-    id: token_filter
-    provider: token_filter
-    status: false
-    weight: 0
-    settings:
-      replace_empty: '0'
   media_inline_embed:
     id: media_inline_embed
     provider: media_inline_embed
@@ -41,3 +34,10 @@ filters:
       default_view_mode: default
       allowed_media_types: {  }
       allowed_view_modes: {  }
+  token_filter:
+    id: token_filter
+    provider: token_filter
+    status: false
+    weight: 0
+    settings:
+      replace_empty: '0'

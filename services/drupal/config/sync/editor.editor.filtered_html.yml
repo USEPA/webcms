@@ -1,76 +1,209 @@
-uuid: e9cbe7ce-8f71-4ade-bd6a-3ed216890035
+uuid: ed97b294-4430-4663-8f40-dd6ffa3d6a67
 langcode: en
 status: true
 dependencies:
   config:
     - filter.format.filtered_html
   module:
-    - ckeditor
+    - ckeditor5
 format: filtered_html
-editor: ckeditor
+editor: ckeditor5
 settings:
   toolbar:
-    rows:
-      -
-        -
-          name: Format
-          items:
-            - Format
-        -
-          name: Styles
-          items:
-            - Styles
-        -
-          name: Formatting
-          items:
-            - Bold
-            - Italic
-            - BulletedList
-            - NumberedList
-            - Indent
-            - Outdent
-            - Superscript
-            - Subscript
-            - Blockquote
-            - HorizontalRule
-            - Table
-            - abbr
-        -
-          name: Linking
-          items:
-            - DrupalLink
-            - DrupalUnlink
-            - drupalanchor
-            - DrupalInlineMedia
-        -
-          name: Embed
-          items:
-            - DrupalMediaLibrary
-            - paragraphs
-            - epaNewButton
-            - epaAddDefinitionsButton
-            - Iframe
-        -
-          name: Tools
-          items:
-            - Undo
-            - Redo
-            - Cut
-            - Copy
-            - RemoveFormat
-            - SpecialChar
-            - Maximize
-            - Source
-            - Resize
+    items:
+      - heading
+      - '|'
+      - style
+      - '|'
+      - bold
+      - italic
+      - bulletedList
+      - numberedList
+      - indent
+      - outdent
+      - superscript
+      - subscript
+      - blockQuote
+      - horizontalLine
+      - '-'
+      - insertTable
+      - abbreviation
+      - '|'
+      - link
+      - anchor
+      - drupalInlineMedia
+      - '|'
+      - drupalMedia
+      - ParagraphsEmbed
+      - epaNew
+      - epaAddDefinition
+      - iframeEmbed
+      - '|'
+      - undo
+      - redo
+      - removeFormat
+      - specialCharacters
+      - Fullscreen
+      - sourceEditing
   plugins:
-    stylescombo:
-      styles: "blockquote.pull-quote|Pull Quote\r\nblockquote.pull-quote.u-align-left|Left Pull Quote\r\nblockquote.pull-quote.u-align-right|Right Pull Quote\r\ntable.usa-table.usa-table--striped|Striped Table\r\ntable.usa-table.usa-table--unstyled|Unstyled Table\r\ntable.usa-table.usa-table--borderless|Borderless Table\r\ntable.usa-table.usa-table--stacked|Stacked Table\r\ntable.usa-table.usa-table--stacked-header|Stacked Header Table\r\nul.list.list--clean|Clean List\r\nul.list.list--pipeline|Pipeline List\r\nul.list.list--roomy|Roomy List\r\nol.list.list--roomy|Roomy Ordered List\r\nh2.highlight|H2 Highlight\r\nh3.highlight|H3 Highlight\r\nh4.highlight|H4 Highlight\r\nh5.highlight|H5 Highlight\r\nh6.highlight|H6 Highlight\r\ncode|Code\r\nmark|Mark\r\nsmall|Small\r\nspan.warning|Warning"
-    drupallink:
+    ckeditor5_heading:
+      enabled_headings:
+        - heading2
+        - heading3
+        - heading4
+        - heading5
+        - heading6
+    ckeditor5_list:
+      properties:
+        reversed: true
+        startIndex: true
+      multiBlock: true
+    ckeditor5_sourceEditing:
+      allowed_tags:
+        - '<article>'
+        - '<div>'
+        - '<figure>'
+        - '<figcaption>'
+        - '<dl>'
+        - '<dt>'
+        - '<dd>'
+        - '<address>'
+        - '<hgroup>'
+        - '<i>'
+        - '<b>'
+        - '<small>'
+        - '<section>'
+        - '<span>'
+        - '<mark>'
+        - '<cite>'
+        - '<dfn>'
+        - '<var>'
+        - '<samp>'
+        - '<kbd>'
+        - '<wbr>'
+        - '<bdi>'
+        - '<ruby>'
+        - '<rt>'
+        - '<rp>'
+        - '<summary>'
+        - '<legend>'
+        - '<datalist>'
+        - '<map>'
+        - '<svg>'
+        - '<title>'
+        - '<q cite>'
+        - '<del cite datetime>'
+        - '<time datetime pubdate>'
+        - '<bdo dir>'
+        - '<colgroup span>'
+        - '<col span>'
+        - '<details open>'
+        - '<form action method>'
+        - '<fieldset disabled form>'
+        - '<label for form>'
+        - '<input checked size type value disabled placeholder required readonly autocomplete autofocus>'
+        - '<textarea rows cols disabled placeholder required readonly autocomplete autofocus>'
+        - '<meter min max low high optimum form value>'
+        - '<select multiple size>'
+        - '<optgroup disabled label>'
+        - '<option value>'
+        - '<output for form>'
+        - '<button type value>'
+        - '<keygen autofocus challenge disabled form keytype>'
+        - '<progress max value>'
+        - '<img alt crossorigin height longdesc src width usemap>'
+        - '<embed height src type width>'
+        - '<object form height type usemap width>'
+        - '<param value>'
+        - '<iframe allowfullscreen sandbox seamless srcdoc>'
+        - '<video autoplay buffered controls crossorigin height loop muted played preload poster src width>'
+        - '<audio autoplay buffered controls loop muted played preloadsrc>'
+        - '<source media src type>'
+        - '<track default kind label src srclang>'
+        - '<canvas height width>'
+        - '<area alt coords href hreflang media rel shape target type>'
+        - '<use href>'
+        - '<a hreflang occurrence>'
+        - '<blockquote cite>'
+        - '<ol type>'
+        - '<ul type>'
+        - '<table summary width height>'
+        - '<th headers height scope width>'
+        - '<td headers scope width height>'
+        - '<drupal-paragraph drupal-paragraph>'
+    ckeditor5_style:
+      styles:
+        -
+          label: 'Pull Quote'
+          element: '<blockquote class="pull-quote">'
+        -
+          label: 'Left Pull Quote'
+          element: '<blockquote class="pull-quote u-align-left">'
+        -
+          label: 'Right Pull Quote'
+          element: '<blockquote class="pull-quote u-align-right">'
+        -
+          label: 'Clean List'
+          element: '<ul class="list list--clean">'
+        -
+          label: 'Pipeline List'
+          element: '<ul class="list list--pipeline">'
+        -
+          label: 'Roomy List'
+          element: '<ul class="list list--roomy">'
+        -
+          label: 'Roomy Ordered List'
+          element: '<ol class="list list--roomy">'
+        -
+          label: 'H2 Highlight'
+          element: '<h2 class="highlight">'
+        -
+          label: 'H3 Highlight'
+          element: '<h3 class="highlight">'
+        -
+          label: 'H4 Highlight'
+          element: '<h4 class="highlight">'
+        -
+          label: 'H5 Highlight'
+          element: '<h5 class="highlight">'
+        -
+          label: 'H6 Highlight'
+          element: '<h6 class="highlight">'
+        -
+          label: Warning
+          element: '<span class="warning">'
+    ckeditor_iframe_embed_iframeembed:
+      enabled_optional_attributes:
+        - height
+        - width
+        - name
+        - tabindex
+        - title
+    editor_advanced_link_link:
+      enabled_attributes:
+        - id
+        - rel
+        - target
+    filter_html_plus_white_list_attributes:
+      global_attributes:
+        - accesskey
+        - 'aria-*'
+        - class
+        - id
+        - role
+        - tabindex
+        - title
+        - data
+        - 'data-*'
+        - name
+        - hidden
+    linkit_extension:
       linkit_enabled: true
       linkit_profile: default
-    specialchars:
-      characters: "&fnof;\r\n&Alpha;\r\n&Beta;\r\n&Gamma;\r\n&Delta;\r\n&Epsilon;\r\n&Zeta;\r\n&Eta;\r\n&Theta;\r\n&Iota;\r\n&Kappa;\r\n&Lambda;\r\n&Mu;\r\n&Nu;\r\n&Xi;\r\n&Omicron;\r\n&Pi;\r\n&Rho;\r\n&Sigma;\r\n&Tau;\r\n&Upsilon;\r\n&Phi;\r\n&Chi;\r\n&Psi;\r\n&Omega;\r\n&alpha;\r\n&beta;\r\n&gamma;\r\n&delta;\r\n&epsilon;\r\n&zeta;\r\n&eta;\r\n&theta;\r\n&iota;\r\n&kappa;\r\n&lambda;\r\n&mu;\r\n&nu;\r\n&xi;\r\n&omicron;\r\n&pi;\r\n&rho;\r\n&sigma;\r\n&tau;\r\n&upsilon;\r\n&phi;\r\n&chi;\r\n&psi;\r\n&omega;"
-      replace: 1
+    media_library_inlineMediaLibrary:
+      allow_view_mode_override: false
+    media_media:
+      allow_view_mode_override: false
 image_upload:
   status: false
   scheme: public
