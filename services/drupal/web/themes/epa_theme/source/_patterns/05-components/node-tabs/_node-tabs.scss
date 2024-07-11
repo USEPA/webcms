@@ -34,9 +34,9 @@
   }
 
   &.has-children {
+    &:hover,
     &:focus,
     &:focus-within,
-    &:hover,
     &.is-selected {
       .node-tabs__menu-child {
         display: block;
@@ -58,9 +58,9 @@
     justify-content: flex-start;
   }
 
+  &:hover,
   &:focus,
-  &:focus-within,
-  &:hover {
+  &:focus-within {
     background-color: gesso-claro(primary, blue-050);
   }
 
@@ -75,11 +75,12 @@
     font-weight: bold;
 
     .icon {
-      filter: invert(20%) sepia(53%) saturate(4536%) hue-rotate(218deg) brightness(86%) contrast(114%);
+      filter: invert(20%) sepia(53%) saturate(4536%) hue-rotate(218deg)
+        brightness(86%) contrast(114%);
     }
   }
 
-  &[aria-disabled="true"] {
+  &[aria-disabled='true'] {
     opacity: 0.6;
     pointer-events: none;
   }

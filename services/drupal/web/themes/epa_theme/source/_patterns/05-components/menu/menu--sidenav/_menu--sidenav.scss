@@ -107,8 +107,8 @@
     left: 0;
     margin-bottom: 0;
     max-height: 50vh;
-    overflow-y: auto;
     overflow-x: scroll;
+    overflow-y: auto;
     padding: 0;
     position: absolute;
     right: 0;
@@ -126,10 +126,10 @@
 }
 
 .menu-sidenav__overlay {
-  @include u-pin("all");
-  position: fixed;
-  background: color("black-transparent-70");
+  @include u-pin('all');
+  background: color('black-transparent-70');
   opacity: opacity(0);
+  position: fixed;
   transition: opacity $project-easing;
   visibility: hidden;
   z-index: 1;
@@ -147,6 +147,7 @@
     display: none;
   }
 
+  // stylelint-disable-next-line selector-class-pattern
   &.-mobile {
     display: none;
     margin: 1rem 0;
