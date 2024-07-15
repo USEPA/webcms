@@ -77,7 +77,14 @@ RUN set -ex \
     -e 's/^;\(ping\.path =\)/\1/' \
     # 2. The 'status' endpoint response with metrics related to this FPM worker pool
     -e 's/^;\(pm\.status_path =\)/\1/' \
-    /usr/local/etc/php-fpm.d/www.conf
+    /usr/local/etc/php-fpm.d/www.conf \
+  && { \
+    # Switch the PHP-FPM pool to a static group of 10 servers. Restart the
+    # servers every 5,000 requests.
+    echo 'pm = static'; \
+    echo 'pm.max_children = 10'; \
+    echo 'pm.max_requests = 5000'; \
+  } >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Set the php-fpm log format. This was largely reverse-engineered from fpm_log.c in the
 # PHP sources. Notes on the available log options:
