@@ -18,6 +18,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    *   The ModifyHtmlEvent from Tome.
    *
    * @return void
+   *   Nothing.
    */
   public function onModifyHtml(ModifyHtmlEvent $event) {
     $html = $event->getHtml();
@@ -34,6 +35,50 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // official website of the United States Government" banner found on all
     // pages.
     $xpath = new \DOMXPath($doc);
+
+    // Add the alert markup.
+    $this->addAlertMarkup($xpath, $doc);
+
+    // Disable all form elements.
+    $this->removeFormElements($xpath, $doc);
+
+    // Add search listing replacement.
+    $this->addListingReplacement($xpath, $doc);
+
+    $event->setHtml($doc->saveHTML());
+  }
+
+  /**
+   * Helper method to check and set alert markup.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   * @param \DOMDocument $doc
+   *   The DOM Document we're working with.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function removeFormElements(\DOMXPath $xpath, \DOMDocument &$doc) {
+    $forms = $xpath->query('//form');
+
+    foreach ($forms as $form) {
+      $form->parentNode->removeChild($form);
+    }
+  }
+
+  /**
+   * Helper method to check and set alert markup.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   * @param \DOMDocument $doc
+   *   The DOM Document we're working with.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function addAlertMarkup(\DOMXPath $xpath, \DOMDocument &$doc) {
     $section = $xpath->query('//section[@class="usa-banner"]')->item(0);
 
     if ($section) {
@@ -49,8 +94,31 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         $section->parentNode->appendChild($alert);
       }
     }
+  }
 
-    $event->setHtml($doc->saveHTML());
+  /**
+   * Helper method to check and set alert markup.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   * @param \DOMDocument $doc
+   *   The DOM Document we're working with.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function addListingReplacement(\DOMXPath $xpath, \DOMDocument &$doc) {
+    // Select the listing wrapper.
+    $listing_wrapper = $xpath->query('//div[contains(@class, "epa-listing-page")]//div[contains(@class, "l-sidebar-first")]')->item(0);
+
+    // If listing wrapper replace page title and listing wrapper.
+    if ($listing_wrapper) {
+      $title = $xpath->query('//h1')->item(0);
+      $title->nodeValue = 'January 19, 2025 Snapshot';
+
+      $listing_replacement = $this->createListingReplacementMarkup($doc);
+      $listing_wrapper->parentNode->replaceChild($listing_replacement, $listing_wrapper);
+    }
   }
 
   /**
@@ -62,7 +130,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    * @return \DOMDocumentFragment|false
    *   The alert markup DOM Document fragment.
    */
-  public function createAlertMarkup(\DOMDocument $doc) {
+  protected function createAlertMarkup(\DOMDocument $doc) {
     $fragment = $doc->createDocumentFragment();
     $markup = '
     <div class="js-view-dom-id-epa-alerts--public" style="display: block; box-sizing: border-box;">
@@ -85,6 +153,79 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
             </div>
         </div>
     </div>';
+
+    $fragment->appendXML($markup);
+    return $fragment;
+  }
+
+  /**
+   * Helper method to generate snapshot listing page replacement.
+   *
+   * @param \DOMDocument $doc
+   *   The DOM Document we're working with.
+   *
+   * @return \DOMDocumentFragment|false
+   *   The alert markup DOM Document fragment.
+   */
+  protected function createListingReplacementMarkup(\DOMDocument $doc) {
+    $fragment = $doc->createDocumentFragment();
+    $markup = '
+      <p>
+        You have reached the help page for the January 19, 2025 Web Snapshot. This is
+        not the current EPA website.
+        <strong>To navigate to the current EPA website, please go to
+          <a href="https://www.epa.gov">www.epa.gov</a></strong>.
+      </p>
+
+      <h2>What is included in the Web Snapshot?</h2>
+
+      <p>
+        The Web Snapshot consists of static content, such as webpages and reports in
+        Portable Document Format (PDF), as that content appeared on EPA\'s website as
+        of January 19, 2025.
+      </p>
+
+      <h2>What is not included in the Web Snapshot?</h2>
+
+      <p>
+        There are technical limitations to what could be included in the Web Snapshot.
+        For example, many of the links from EPA\'s website are to databases that are
+        updated with new information on a regular basis. These databases are not part
+        of the static content that comprises the Web Snapshot. Links in the Web
+        Snapshot to dynamic databases will take you to the current version of the
+        database. Searches there will yield the latest data, rather than the data that
+        would have been returned for a search conducted on January 19, 2025. Alerts
+        should appear when you are leaving the Web Snapshot and linking elsewhere.
+      </p>
+      <p>Contact us and other forms have all been disabled.</p>
+
+      <p>
+        Links may have been broken in the website as it appeared on January 19, 2025.
+        Those links will appear as broken on the Web Snapshot. Likewise, links which
+        may have been working on January 19, 2025 but are now no longer active will
+        appear as broken links in the Web Snapshot.
+      </p>
+
+      <p>
+        Finally, certain dynamic collections of content were not included in the
+        Snapshot due to their size. Those collections remain available on the current
+        EPA website at the following links:
+      </p>
+
+      <ul>
+        <li>
+          EPA\'s Searchable News Releases: available at
+          <a href="https://www.epa.gov/newsreleases/search"
+            >https://www.epa.gov/newsreleases/search</a
+          >
+        </li>
+        <li>
+          EPA\'s older News Releases, available at
+          <a href="https://archive.epa.gov/epapages/newsroom_archive/"
+            >https://archive.epa.gov/epapages/newsroom_archive/</a
+          >
+        </li>
+      </ul>';
 
     $fragment->appendXML($markup);
     return $fragment;
