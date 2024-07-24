@@ -20,7 +20,6 @@ dependencies:
     - field.field.group.web_area.field_web_council_representative
     - group.type.web_area
   module:
-    - limited_field_widgets
     - media_library
 id: group.web_area.default
 targetEntityType: group
@@ -59,26 +58,18 @@ content:
       placeholder: ''
     third_party_settings: {  }
   field_depute_editor_in_chief:
-    type: entity_reference_autocomplete_tags
+    type: options_buttons
     weight: 4
     region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
+    settings: {  }
     third_party_settings:
       limited_field_widgets:
         limit_values: '0'
   field_editor_in_chief:
-    type: entity_reference_autocomplete
+    type: options_select
     weight: 3
     region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
+    settings: {  }
     third_party_settings: {  }
   field_homepage:
     type: entity_reference_autocomplete
@@ -137,14 +128,10 @@ content:
       placeholder: ''
     third_party_settings: {  }
   field_web_council_representative:
-    type: entity_reference_autocomplete
+    type: options_buttons
     weight: 8
     region: content
-    settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
+    settings: {  }
     third_party_settings: {  }
   label:
     type: string_textfield
