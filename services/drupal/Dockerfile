@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine AS memcached-ext
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS memcached-ext
 
 # Set working directory to /tmp
 WORKDIR /tmp
@@ -23,7 +23,7 @@ RUN set -ex \
   && make \
   && make install
 
-FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS base
 
 # Bump system packages
 RUN apk upgrade
