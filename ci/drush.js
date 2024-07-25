@@ -24,6 +24,7 @@ const util = require("./util");
 // `;
 
 const drushScript = dedent`
+  drush --debug --uri="$WEBCMS_SITE_URL" cr
   drush --debug --uri="$WEBCMS_SITE_URL" deploy -y
   drush --debug --uri="$WEBCMS_SITE_URL" cr
 `;
