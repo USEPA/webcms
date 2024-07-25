@@ -22,19 +22,19 @@ dependencies:
     - token_filter
 name: 'Filtered HTML'
 format: filtered_html
-weight: 0
+weight: -10
 filters:
   editor_file_reference:
     id: editor_file_reference
     provider: editor
     status: false
-    weight: -36
+    weight: -35
     settings: {  }
   entity_embed:
     id: entity_embed
     provider: entity_embed
-    status: false
-    weight: -33
+    status: true
+    weight: -41
     settings: {  }
   epa_filter_empty_paragraphs:
     id: epa_filter_empty_paragraphs
@@ -58,7 +58,7 @@ filters:
     id: filter_autop
     provider: filter
     status: false
-    weight: -35
+    weight: -34
     settings: {  }
   filter_caption:
     id: filter_caption
@@ -72,26 +72,32 @@ filters:
     status: true
     weight: -49
     settings:
-      allowed_html: '<a id target rel class="ck-anchor" hreflang occurrence href data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <blockquote class="pull-quote u-align-left u-align-right" cite> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <span class="warning"> <article> <div> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <small> <section> <mark> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <map> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <details open> <form action method> <fieldset disabled form> <label for form> <input checked size type value disabled placeholder required readonly autocomplete autofocus> <textarea rows cols disabled placeholder required readonly autocomplete autofocus> <meter min max low high optimum form value> <select multiple size> <optgroup disabled label> <option value> <output for form> <button type value> <keygen autofocus challenge disabled form keytype> <progress max value> <img alt crossorigin height longdesc src width usemap> <embed height src type width> <object form height type usemap width> <param value> <iframe allowfullscreen sandbox seamless srcdoc src height width name tabindex title> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas height width> <area alt coords href hreflang media rel shape target type> <use href> <table summary width height> <th headers height scope width rowspan colspan> <td headers scope width height rowspan colspan> <drupal-paragraph drupal-paragraph data-embed-button data-entity-label data-paragraph-id data-paragraph-revision-id> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-caption data-align> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode> <abbr title><* accesskey aria-* class id role tabindex title data data-* name hidden>'
+      allowed_html: '<a id target rel class="ck-anchor" hreflang occurrence href data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <blockquote class="pull-quote u-align-left u-align-right" cite> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <span class="warning"> <article> <div> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <small> <section> <mark> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <map> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <details open> <form action method> <fieldset disabled form> <label for form> <input checked size type value disabled placeholder required readonly autocomplete autofocus> <textarea rows cols disabled placeholder required readonly autocomplete autofocus> <meter min max low high optimum form value> <select multiple size> <optgroup disabled label> <option value> <output for form> <button type value> <keygen autofocus challenge disabled form keytype> <progress max value> <img alt crossorigin height longdesc src width usemap> <embed height src type width> <object form height type usemap width> <param value> <iframe allowfullscreen sandbox seamless srcdoc src height width name tabindex title> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas height width> <area alt coords href hreflang media rel shape target type> <use href> <table summary width height> <th headers height scope width rowspan colspan> <td headers scope width height rowspan colspan> <drupal-paragraph drupal-paragraph data-embed-button data-entity-label data-paragraph-id data-paragraph-revision-id> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-caption data-align> <abbr title> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode> <drupal-entity alt title data-align data-caption data-entity-embed-display data-entity-embed-display-settings data-view-mode data-entity-uuid data-langcode data-embed-button="node paragraphs" data-entity-type><* accesskey aria-* class id role tabindex title data data-* name hidden>'
       filter_html_help: true
       filter_html_nofollow: false
   filter_html_escape:
     id: filter_html_escape
     provider: filter
     status: false
-    weight: -37
+    weight: -36
     settings: {  }
   filter_html_image_secure:
     id: filter_html_image_secure
     provider: filter
     status: false
-    weight: -34
+    weight: -33
     settings: {  }
   filter_htmlcorrector:
     id: filter_htmlcorrector
     provider: filter
     status: false
-    weight: -39
+    weight: -38
+    settings: {  }
+  filter_image_lazy_load:
+    id: filter_image_lazy_load
+    provider: filter
+    status: false
+    weight: -32
     settings: {  }
   filter_pathologic:
     id: filter_pathologic
@@ -107,14 +113,14 @@ filters:
     id: filter_url
     provider: filter
     status: false
-    weight: -38
+    weight: -37
     settings:
       filter_url_length: 72
   linkit:
     id: linkit
     provider: linkit
     status: false
-    weight: -40
+    weight: -39
     settings:
       title: true
   media_embed:
@@ -153,7 +159,7 @@ filters:
     id: paragraphs_entity_embed
     provider: paragraphs_entity_embed
     status: true
-    weight: -41
+    weight: -40
     settings: {  }
   token_filter:
     id: token_filter
