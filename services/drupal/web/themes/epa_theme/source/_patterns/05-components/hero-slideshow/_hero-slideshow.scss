@@ -38,6 +38,12 @@
       display: none;
     }
   }
+
+  &[aria-hidden='true'] a,
+  &[aria-hidden='true'] button {
+    pointer-events: none;
+    visibility: hidden;
+  }
 }
 
 .hero-slideshow__nav {
@@ -52,6 +58,7 @@
 }
 
 .hero-slideshow__nav-button {
+  // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
   @extend .button;
   background-color: gesso-grayscale('gray-4');
   margin-right: gesso-spacing(1);
@@ -60,6 +67,7 @@
   &:hover,
   &:focus {
     background-color: gesso-brand(blue, base);
+    width: auto;
   }
 
   &:active,
