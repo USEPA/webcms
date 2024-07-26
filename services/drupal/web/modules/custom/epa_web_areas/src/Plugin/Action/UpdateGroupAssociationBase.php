@@ -16,6 +16,8 @@ use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupContent;
 use Drupal\group\GroupMembershipLoaderInterface;
 use Drupal\node\NodeInterface;
+use Drupal\search_api\Plugin\search_api\datasource\ContentEntityTrackingManager;
+use Drupal\search_api\Utility\TrackingHelper;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -57,6 +59,20 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
    */
   protected $targetGroup;
 
+  /**
+   * The Search API Tracking Helper service.
+   *
+   * @var \Drupal\search_api\Utility\TrackingHelper
+   */
+  protected $trackingHelper;
+
+  /**
+   * The Search API tracking manager service.
+   *
+   * @var \Drupal\search_api\Plugin\search_api\datasource\ContentEntityTrackingManager
+   */
+  protected $trackingManager;
+
   const DENIED = 'access_denied';
 
   const CONFIG_DENIED = 'config_denied';
@@ -79,6 +95,8 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       $container->get('group.membership_loader'),
       $container->get('config.factory'),
       $container->get('messenger'),
+      $container->get('search_api.entity_datasource.tracking_manager'),
+      $container->get('search_api.tracking_helper')
     );
   }
 
@@ -88,12 +106,14 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
    * @param $plugin_definition
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountProxyInterface $current_user, GroupMembershipLoaderInterface $group_membership_loader, ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountProxyInterface $current_user, GroupMembershipLoaderInterface $group_membership_loader, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, ContentEntityTrackingManager $tracking_manager, TrackingHelper $tracking_helper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->currentUser = $current_user;
     $this->groupMembershipLoader = $group_membership_loader;
     $this->configFactory = $config_factory;
     $this->messenger = $messenger;
+    $this->trackingManager = $tracking_manager;
+    $this->trackingHelper = $tracking_helper;
   }
 
   /**
@@ -212,6 +232,13 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
         $group_content->save();
       }
       $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->getName();
+
+      // Trigger an update on the entity's relevant search index.
+      $this->trackingManager->entityUpdate($entity);
+
+      // Update the tracking on any items that are referencing this entity.
+      $this->trackingHelper->trackReferencedEntityUpdate($entity);
+
       return UpdateGroupAssociationBase::SUCCESS . "|$title|{$group_content->getGroup()->label()}";
     }
     else {
@@ -226,6 +253,13 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       // Means it was never associated with a group
       $group_content = GroupContent::create($values)->save();
       $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->getName();
+
+      // Trigger an update on the entity's relevant search index.
+      $this->trackingManager->entityUpdate($entity);
+
+      // Update the tracking on any items that are referencing this entity.
+      $this->trackingHelper->trackReferencedEntityUpdate($entity);
+
       return UpdateGroupAssociationBase::SUCCESS . "|$title|{$group_content->getGroup()->label()}";
     }
   }
