@@ -9,21 +9,17 @@
             "role": ""
         }
     ],
-    "repositories": {
-        "assets": {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        },
-        "0": {
+    "repositories": [
+        {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
         },
-        "1": {
+        {
             "name": "nodespark/des-connector",
             "type": "vcs",
             "url": "https://github.com/safjoseph/des-connector"
         },
-        "2": {
+        {
             "type": "package",
             "package": {
                 "name": "drupal_git/viewsreference_filter",
@@ -41,7 +37,7 @@
                 }
             }
         },
-        "3": {
+        {
             "type": "package",
             "package": {
                 "name": "highlightjs/highlight.js",
@@ -54,7 +50,7 @@
                 }
             }
         },
-        "4": {
+        {
             "type": "package",
             "package": {
                 "name": "d3/d3",
@@ -67,7 +63,7 @@
                 }
             }
         },
-        "5": {
+        {
             "type": "package",
             "package": {
                 "name": "briancherne/jquery-hoverintent",
@@ -80,7 +76,7 @@
                 }
             }
         },
-        "6": {
+        {
             "type": "package",
             "package": {
                 "name": "drupal/content_moderation_revert",
@@ -93,7 +89,7 @@
                 }
             }
         },
-        "7": {
+        {
             "type": "package",
             "package": {
                 "name": "drupal/media_inline_embed",
@@ -106,7 +102,7 @@
                 }
             }
         },
-        "8": {
+        {
             "type": "package",
             "package": {
                 "name": "drupal/anchor",
@@ -119,7 +115,7 @@
                 }
             }
         },
-        "9": {
+        {
             "type": "package",
             "package": {
                 "name": "ckeditor-plugin/fakeobjects",
@@ -131,7 +127,7 @@
                 }
             }
         },
-        "10": {
+        {
             "type": "package",
             "package": {
                 "name": "ckeditor-plugin/iframe",
@@ -143,7 +139,7 @@
                 }
             }
         },
-        "11": {
+        {
             "type": "package",
             "package": {
                 "name": "ckeditor/resize",
@@ -155,7 +151,7 @@
                 }
             }
         }
-    },
+    ],
     "require": {
         "php": ">=8.1",
         "briancherne/jquery-hoverintent": "^1.10",
@@ -316,7 +312,6 @@
         "liuggio/statsd-php-client": "^1.0",
         "mglaman/composer-drupal-lenient": "^1.0",
         "nodespark/des-connector": "dev-php-update#d699e59 as 7.x-dev",
-        "npm-asset/northernco--ckeditor5-anchor-drupal": "^0.5.0",
         "oomphinc/composer-installers-extender": "^2.0",
         "popperjs/popperjs": "^2.11",
         "ruflin/elastica": "7.x-dev#72a4598544e3f99b5dd8cacb05d009ee75c2a701 as dev-master",
@@ -410,8 +405,7 @@
             "drush/Commands/contrib/{$name}": ["type:drupal-drush"],
             "web/modules/custom/{$name}": ["type:drupal-custom-module"],
             "web/themes/custom/{$name}": ["type:drupal-custom-theme"],
-            "web/libraries/ckeditor5-anchor-drupal": ["npm-asset/northernco--ckeditor5-anchor-drupal"],
-            "web/libraries/{$name}": ["type:drupal-library", "type:bower-asset", "type:npm-asset"]
+            "web/libraries/{$name}": ["type:drupal-library"]
         },
         "drupal-scaffold": {
             "locations": {
@@ -426,7 +420,6 @@
         },
         "drupal-lenient": {
             "allowed-list": ["drupal/address_formatter", "drupal/ckeditor_specialchars", "drupal/entitygroupfield", "drupal/group_outsider_in", "drupal/hierarchical_term_formatter", "drupal/redirect_metrics", "drupal/role_expose", "drupal/show_email", "drupal/address_formatter"]
-        },
-        "installer-types": ["npm-asset", "bower-asset"]
+        }
     }
 }
