@@ -342,7 +342,15 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
       $message = static::translate('Finished with an error.');
       static::message($message, 'error');
     }
-    return NULL;
+
+    $batch = &batch_get();
+    // Return back to view where they came from, but remove all query params.
+    // This is to resolve an issue where items still appear under the wrong Web Area after they've been changed.
+    /** @var \Drupal\Core\Url $redirect_url */
+    $redirect_url = $batch['batch_redirect'];
+    $redirect_url->setOption('query', []);
+    $url = $batch['batch_redirect']->toString();
+    return new RedirectResponse($url);
   }
 
   /**
