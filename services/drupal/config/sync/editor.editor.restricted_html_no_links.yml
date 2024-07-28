@@ -1,35 +1,35 @@
-uuid: ed97784b-72c7-4e0c-ab47-b1f4849fcc8b
+uuid: 71e0b279-89e7-409c-ab0b-1731e9fbe6a1
 langcode: en
 status: true
 dependencies:
   config:
     - filter.format.restricted_html_no_links
   module:
-    - ckeditor
+    - ckeditor5
 format: restricted_html_no_links
-editor: ckeditor
+editor: ckeditor5
 settings:
   toolbar:
-    rows:
-      -
-        -
-          name: Formatting
-          items:
-            - Bold
-            - Italic
-            - Superscript
-            - Subscript
-        -
-          name: Lists
-          items:
-            - BulletedList
-            - NumberedList
-        -
-          name: Tools
-          items:
-            - epaNewButton
-            - Maximize
-  plugins: {  }
+    items:
+      - bold
+      - italic
+      - superscript
+      - subscript
+      - '|'
+      - bulletedList
+      - numberedList
+      - '|'
+      - epaNew
+      - Fullscreen
+  plugins:
+    ckeditor5_list:
+      properties:
+        reversed: false
+        startIndex: false
+      multiBlock: true
+    filter_html_plus_white_list_attributes:
+      global_attributes:
+        - ''
 image_upload:
   status: false
   scheme: public

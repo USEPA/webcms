@@ -1,0 +1,27 @@
+uuid: 411336c8-d6fd-4cac-8017-c15d79c07a52
+langcode: en
+status: true
+dependencies:
+  module:
+    - uswds_ckeditor_integration
+_core:
+  default_config_hash: kyLvJlSZdaOcHwv8owdTvmexSZm5rXXzV5J6UEAasz8
+name: USWDS
+format: uswds
+weight: 0
+filters:
+  filter_html:
+    id: filter_html
+    provider: filter
+    status: true
+    weight: -10
+    settings:
+      allowed_html: '<a href class data-*> <ul type class> <ol class> <li class> <table class> <tbody> <thead> <tfoot> <th data-sortable scope role data-label> <td role data-label> <tr scope class> <div class> <p> <caption>'
+      filter_html_help: true
+      filter_html_nofollow: false
+  filter_table_attributes:
+    id: filter_table_attributes
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
