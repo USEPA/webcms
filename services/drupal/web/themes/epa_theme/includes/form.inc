@@ -26,6 +26,7 @@ function epa_theme_preprocess_fieldset(&$vars) {
  */
 function epa_theme_preprocess_form(&$vars) {
   if ($vars['element']['#form_id'] == 'views_exposed_form') {
+    $vars['attributes']['class'][] = 'u-hide-for-print';
     $vars['attributes']['class'][] = 'margin-y-3';
   }
 }

@@ -49,6 +49,10 @@
     outline-offset: 3px !important;
     outline-width: 2px !important;
   }
+
+  @media print {
+    display: none;
+  }
 }
 
 .l-header__search-button {
@@ -70,6 +74,10 @@
   }
 
   @include at-media($theme-header-min-width) {
+    display: none;
+  }
+
+  @media print {
     display: none;
   }
 }
@@ -103,6 +111,10 @@ svg.l-header__search-button-icon-close {
     position: relative;
   }
 
+  @media print {
+    display: none;
+  }
+
   [data-once='header-search'] & {
     left: 0;
     margin: 0;
@@ -112,5 +124,11 @@ svg.l-header__search-button-icon-close {
     @include at-media($theme-header-min-width) {
       position: relative;
     }
+  }
+}
+
+.l-header__nav {
+  @media print {
+    display: none;
   }
 }
