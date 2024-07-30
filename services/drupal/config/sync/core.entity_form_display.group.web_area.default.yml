@@ -7,7 +7,6 @@ dependencies:
     - field.field.group.web_area.field_allow_perspectives
     - field.field.group.web_area.field_allow_speeches
     - field.field.group.web_area.field_contact_us_form
-    - field.field.group.web_area.field_depute_editor_in_chief
     - field.field.group.web_area.field_editor_in_chief
     - field.field.group.web_area.field_homepage
     - field.field.group.web_area.field_homepage_pub_date
@@ -20,7 +19,9 @@ dependencies:
     - field.field.group.web_area.field_web_council_representative
     - group.type.web_area
   module:
+    - limited_field_widgets
     - media_library
+    - select2
 id: group.web_area.default
 targetEntityType: group
 bundle: web_area
@@ -57,14 +58,6 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-  field_depute_editor_in_chief:
-    type: options_buttons
-    weight: 4
-    region: content
-    settings: {  }
-    third_party_settings:
-      limited_field_widgets:
-        limit_values: '0'
   field_editor_in_chief:
     type: options_select
     weight: 3
@@ -108,7 +101,7 @@ content:
     region: content
     settings:
       match_operator: CONTAINS
-      match_limit: 10
+      match_limit: 0
       size: 60
       placeholder: ''
     third_party_settings: {  }
@@ -128,11 +121,17 @@ content:
       placeholder: ''
     third_party_settings: {  }
   field_web_council_representative:
-    type: options_buttons
+    type: select2_entity_reference
     weight: 8
     region: content
-    settings: {  }
-    third_party_settings: {  }
+    settings:
+      width: 50%
+      autocomplete: false
+      match_operator: CONTAINS
+      match_limit: 10
+    third_party_settings:
+      limited_field_widgets:
+        limit_values: '0'
   label:
     type: string_textfield
     weight: 0
