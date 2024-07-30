@@ -15,6 +15,10 @@
             "url": "https://packages.drupal.org/8"
         },
         {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        },
+        {
             "name": "nodespark/des-connector",
             "type": "vcs",
             "url": "https://github.com/safjoseph/des-connector"
@@ -270,6 +274,7 @@
         "drupal/schema_metatag": "^2.3",
         "drupal/search_api": "^1.27",
         "drupal/seckit": "^2.0",
+        "drupal/select2": "^1.15",
         "drupal/seven": "^1.0",
         "drupal/shield": "^1.7",
         "drupal/show_email": "^1.1",
@@ -311,6 +316,8 @@
         "liuggio/statsd-php-client": "^1.0",
         "mglaman/composer-drupal-lenient": "^1.0",
         "nodespark/des-connector": "dev-php-update#d699e59 as 7.x-dev",
+        "npm-asset/select2": "^4.0",
+        "oomphinc/composer-installers-extender": "^2.0",
         "popperjs/popperjs": "^2.11",
         "ruflin/elastica": "7.x-dev#72a4598544e3f99b5dd8cacb05d009ee75c2a701 as dev-master",
         "sabre/vobject": "^4.0",
@@ -355,7 +362,8 @@
             "drupal/core-project-message": true,
             "mglaman/composer-drupal-lenient": true,
             "drupal/core-vendor-hardening": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "oomphinc/composer-installers-extender": true
         }
     },
     "autoload": {
@@ -392,6 +400,7 @@
             "drupal/core": "-p2"
         },
         "patches-file": "composer.patches.json",
+        "installer-types": ["bower-asset", "npm-asset"],
         "installer-paths": {
             "web/core": [
                 "type:drupal-core"
@@ -416,6 +425,11 @@
             ],
             "web/themes/custom/{$name}": [
                 "type:drupal-custom-theme"
+            ],
+            "web/libraries/{$name}": [
+                "type:drupal-library",
+                "type:bower-asset",
+                "type:npm-asset"
             ]
         },
         "drupal-scaffold": {
