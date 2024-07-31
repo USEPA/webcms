@@ -23,6 +23,10 @@ $pager-bp: 600px !default;
   border-top: 1px solid gesso-grayscale(gray-2);
   margin-top: rem(gesso-spacing(3));
   padding-top: rem(gesso-spacing(3));
+
+  @media print {
+    display: block;
+  }
 }
 
 .pager__items {
@@ -44,6 +48,15 @@ $pager-bp: 600px !default;
     @include breakpoint($pager-bp) {
       display: inline-flex;
     }
+  }
+}
+
+.pager__item--first,
+.pager__item--previous,
+.pager__item--next,
+.pager__item--last {
+  @media print {
+    display: none;
   }
 }
 
@@ -73,6 +86,10 @@ $pager-bp: 600px !default;
   background-color: $pager-background-color;
   color: $pager-link-color-active;
   height: rem(gesso-spacing(5));
+
+  @media print {
+    border: 1px solid gesso-grayscale(black);
+  }
 }
 
 .pager__link {
