@@ -510,6 +510,10 @@ function epa_core_form_autosave_form_admin_settings_alter(&$form, FormStateInter
  * Implements hook_form_alter().
  */
 function epa_core_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $current_path = \Drupal::service('path.current')->getPath();
+  $route_name = Url::fromUserInput($current_path)->getRouteName();
+  \Drupal::messenger()->addMessage($route_name);
+
   // Disable HTML5 validation on all forms.
   $form['#attributes']['novalidate'] = 'novalidate';
 
