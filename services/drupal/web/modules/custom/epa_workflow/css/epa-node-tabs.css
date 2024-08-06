@@ -1,0 +1,117 @@
+.epa-node-tabs {
+  --color-border: #dedfe4;
+  --color-focus: #26a769;
+  --color-tabs: #55565b;
+  --color-tabs-bg-hover: #e5edff;
+  --color-tabs-hover: #0036b1;
+  --color-text: #232429;
+  --focus-border-offset-size: 2px;
+  --focus-border-size: 0.1875rem;
+  --focus-box-shadow: 0 0 0 var(--focus-border-offset-size) #fff, 0 0 0 calc(var(--focus-border-size) + var(--focus-border-offset-size)) var(--color-focus);
+  --focus-outline: 2px dotted transparent;
+  --font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  background-color: #fff;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  width: 100%;
+}
+
+.epa-node-tabs__menu {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+@media (min-width: 40em) {
+  .epa-node-tabs__menu {
+    flex-wrap: nowrap;
+    width: auto;
+  }
+}
+
+.epa-node-tabs__item {
+  margin: 0;
+}
+
+.epa-node-tabs__link,
+.epa-node-tabs__button,
+.epa-node-tabs__drawer-link {
+  background-color: transparent;
+  border: 0;
+  color: var(--color-tabs);
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: normal;
+  line-height: 1.25;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+    background-color: var(--color-tabs-bg-hover);
+    color: var(--color-tabs-hover);
+  }
+
+  &:focus {
+    box-shadow: var(--focus-box-shadow);
+    isolation: isolate;
+    outline: var(--focus-outline);
+  }
+}
+
+.epa-node-tabs__link {
+  &.is-active {
+    background-color: var(--color-tabs-bg-hover);
+    color: var(--color-tabs-hover);
+    font-weight: bold;
+  }
+}
+
+.epa-node-tabs__icon {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  margin-inline-end: 0.25em;
+  overflow: visible !important;
+  position: relative;
+  top: -2px;
+  transition: none;
+  vertical-align: middle;
+  width: 1em;
+
+  * {
+    transition: none;
+  }
+}
+
+.epa-node-tabs__button {
+  border-radius: 0;
+}
+
+.epa-node-tabs__drawer {
+  background-color: #fff;
+  border: 1px solid var(--color-border);
+  border-end-end-radius: 2px;
+  border-end-start-radius: 2px;
+  box-shadow: 0 2px 4px #0000001a;
+  list-style: none;
+  margin: 0;
+  max-width: 15.3125rem;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+
+  &[aria-expanded='false'] {
+    display: none;
+  }
+}
+
+.epa-node-tabs__drawer-item {
+  margin: 0;
+}
+
+.epa-node-tabs__drawer-link {
+  display: block;
+  font-size: 1rem;
+}

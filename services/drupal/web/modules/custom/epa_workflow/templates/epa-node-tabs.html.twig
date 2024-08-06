@@ -22,14 +22,9 @@
 #}
 {% import _self as menus %}
 
-{{ attach_library('epa_workflow/node_tabs') }}
+{{ attach_library('epa_workflow/epa_node_tabs') }}
 
-<nav class="node-tabs" role="navigation" aria-label="Primary tasks">
-
-  {#
-  We call a macro which calls itself to render the full tree.
-  @see https://twig.symfony.com/doc/1.x/tags/macro.html
-  #}
+<nav class="epa-node-tabs" role="navigation" aria-label="Primary tasks">
   {{ menus.menu_links(tabs, attributes, 0) }}
 
   {% macro menu_links(tabs, attributes, menu_level) %}
@@ -37,26 +32,31 @@
 
     {% if tabs %}
       {% if menu_level == 0 %}
-        <ul{{ attributes }} class="node-tabs__menu">
+        <ul{{ attributes }} class="epa-node-tabs__menu">
       {% else %}
-        <ul class="node-dialog node-tabs__menu-child" role="dialog">
+        <ul
+          class="epa-node-tabs__drawer"
+          id="epa-node-tabs-drawer"
+          role="region"
+          aria-labelledby="epa-node-tabs-button"
+          aria-expanded="true"
+        >
       {% endif %}
 
       {% for item in tabs %}
         {% set item_classes = [
-          'node-tabs__item',
+          menu_level > 0 ? 'epa-node-tabs__drawer-item' : 'epa-node-tabs__item',
           item['#children'] ? 'has-children',
-          menu_level > 0 ? 'node-dialog__item is-link'
         ]|join(' ')|trim %}
 
         <li class="{{ item_classes }}">
-          {{ item }} {# this is the epa-node-tab-item #}
+          {{ item }}
 
           {% if item['#children'] %}
-            {% set attributes = attributes|merge({'class': 'node-dialog__link'}) %}
+            {% set attributes = attributes|merge({'class': 'epa-node-tabs__drawer-children'}) %}
             {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
           {% endif %}
-        </li>  
+        </li>
       {% endfor %}
 
       </ul>
