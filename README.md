@@ -111,6 +111,8 @@ Here is a list of helpful commands:
 * `ddev epa-import` > Will import a specific database.
 * `ddev epa-export` > Exports a database with the current date.
 * `ddev aws-setup` > Sets up the requirements to get drupal file system to work
+* `ddev describe` or `ddev status` > Get a detailed description of a running DDEV project.
+* `ddev phpmyadmin` > Launch a browser with PhpMyAdmin
 
 # Disclaimer
 

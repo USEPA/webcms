@@ -1,0 +1,26 @@
+diff --git a/content_moderation_revert.info.yml b/content_moderation_revert.info.yml
+index 1c5c2a1..b331022 100644
+--- a/content_moderation_revert.info.yml
++++ b/content_moderation_revert.info.yml
+@@ -1,7 +1,7 @@
+ name: 'Content moderation revert'
+ type: module
+ description: 'Allow editors to choose a moderation state when reverting a revision.'
+-core_version_requirement: ^8 || ^9
++core_version_requirement: ^8 || ^9 || ^10
+ package: Core
+ dependencies:
+   - drupal:content_moderation
+diff --git a/src/Routing/RouteSubscriber.php b/src/Routing/RouteSubscriber.php
+index fdb0da9..db26ddb 100644
+--- a/src/Routing/RouteSubscriber.php
++++ b/src/Routing/RouteSubscriber.php
+@@ -26,7 +26,7 @@ class RouteSubscriber extends RouteSubscriberBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public static function getSubscribedEvents() {
++  public static function getSubscribedEvents(): array {
+     return [
+       RoutingEvents::ALTER => [
+         ['onAlterRoutes', -150],
