@@ -53,8 +53,6 @@ class EpaWebformAccessCheck implements AccessInterface {
     }
 
     // User must belong to a group if they don't have the above roles
-//    /** @var \Drupal\group\GroupMembershipLoader $group_membership_service */
-//    $group_membership_service = \Drupal::service('group.membership_loader');
     $group_memberships = $this->groupMembershipLoader->loadByUser($account);
 
     if (empty($group_memberships)) {
@@ -64,9 +62,9 @@ class EpaWebformAccessCheck implements AccessInterface {
     // Collect group IDs from user's memberships.
     $group_ids = array_map(fn($membership) => $membership->getGroup()->id(), $group_memberships);
 
-    // Webforms themselves aren't tied to a Web Area, but they are referenced
-    // by a "Form" node. The "Form" node does belong to a Web Area.
-    // Given the webform ID search for a matching node that references the webform.
+    // Webforms themselves aren't tied to a Group, but they are referenced
+    // by a "Form" node. The "Form" node does belong to a Group.
+    // Given the Webform ID, search for a matching node that references the webform.
     // If we find one, compare the node's group to see if the user belongs
     // to same group.
     /** @var \Drupal\webform\Entity\Webform $webform */
