@@ -44,19 +44,21 @@
       {% endif %}
 
       {% for item in tabs %}
-        {% set item_classes = [
-          menu_level > 0 ? 'epa-node-tabs__drawer-item' : 'epa-node-tabs__item',
-          item['#children'] ? 'has-children',
-        ]|join(' ')|trim %}
+        {% if item|render|striptags|trim %}
+          {% set item_classes = [
+            menu_level > 0 ? 'epa-node-tabs__drawer-item' : 'epa-node-tabs__item',
+            item['#children'] ? 'has-children',
+          ]|join(' ')|trim %}
 
-        <li class="{{ item_classes }}">
-          {{ item }}
+          <li class="{{ item_classes }}">
+            {{ item }}
 
-          {% if item['#children'] %}
-            {% set attributes = attributes|merge({'class': 'epa-node-tabs__drawer-children'}) %}
-            {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
-          {% endif %}
-        </li>
+            {% if item['#children'] %}
+              {% set attributes = attributes|merge({'class': 'epa-node-tabs__drawer-children'}) %}
+              {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
+            {% endif %}
+          </li>
+        {% endif %}
       {% endfor %}
 
       </ul>

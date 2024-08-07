@@ -48,7 +48,7 @@
   padding: 0.75rem 1rem;
   text-decoration: none;
 
-  &:hover {
+  &:not(.is-disabled):hover {
     background-color: var(--color-tabs-bg-hover);
     color: var(--color-tabs-hover);
   }
@@ -66,6 +66,10 @@
     background-color: var(--color-tabs-bg-hover);
     color: var(--color-tabs-hover);
     font-weight: bold;
+  }
+
+  &.is-disabled {
+    opacity: 0.6;
   }
 }
 
@@ -101,7 +105,7 @@
   max-width: 15.3125rem;
   padding: 0;
   position: absolute;
-  z-index: 1;
+  z-index: 3;
 
   &[aria-expanded='false'] {
     display: none;

@@ -9,12 +9,28 @@
   {% set link_class = 'epa-node-tabs__link' %}
 {% endif %}
 
+{% if url|render|striptags|trim is empty %}
+  {% set element = 'span' %}
+  {% set href = '' %}
+
+  {% if not is_active %}
+    {% set is_disabled = true %}
+  {% endif %}
+{% endif %}
+
 {% set additional_attributes = {
   'class': [
     is_child ? 'epa-node-tabs__drawer-link' : link_class,
     is_active ? 'is-active',
+    is_disabled ? 'is-disabled',
   ],
 } %}
+
+{% if is_active %}
+  {% set additional_attributes = additional_attributes|merge({
+    'aria-current': 'page',
+  }) %}
+{% endif %}
 
 {% if is_button %}
   {% set additional_attributes = additional_attributes|merge({
