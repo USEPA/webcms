@@ -53,6 +53,49 @@
       justify-content: space-between;
       width: 100%;
     }
+
+    .l-constrain {
+      flex-wrap: wrap;
+    }
+  }
+
+  .page-has-sidebar &,
+  .page-no-sidebar & {
+    background-color: gesso-grayscale(white);
+    margin-top: 0;
+    padding-bottom: rem(gesso-spacing(6));
+
+    .l-constrain,
+    .block {
+      flex-wrap: wrap;
+    }
+  }
+
+  .page-no-sidebar & {
+    .l-constrain {
+      display: flex;
+      padding-top: rem(gesso-spacing(3));
+      position: relative;
+
+      &::before {
+        background-color: gesso-grayscale(gray-3);
+        content: '';
+        height: 1px;
+        position: absolute;
+        top: 0;
+        width: measure(5);
+      }
+    }
+  }
+}
+
+.l-page__footer-contact {
+  .page-has-sidebar & {
+    display: none;
+  }
+
+  .page-no-sidebar & {
+    width: 100%;
   }
 }
 
@@ -60,10 +103,31 @@
   font-size: font-size(body, 3xs);
   line-height: gesso-line-height(2);
   margin-top: 1rem;
-  text-transform: uppercase;
 
   @include at-media($theme-site-margins-breakpoint) {
     margin-left: 1rem;
     margin-top: 0;
+  }
+
+  .page-has-sidebar & {
+    @include breakpoint(gesso-breakpoint(sidebar)) {
+      margin-left: calc(25% + 2.5rem);
+    }
+  }
+
+  .page-no-sidebar & {
+    margin-left: 0;
+    margin-top: rem(gesso-spacing(1));
+    width: 100%;
+  }
+}
+
+.l-page__footer-contact-last {
+  font-size: font-size(body, 3xs);
+  line-height: gesso-line-height(2);
+
+  @include at-media($theme-site-margins-breakpoint) {
+    text-align: right;
+    width: 100%;
   }
 }

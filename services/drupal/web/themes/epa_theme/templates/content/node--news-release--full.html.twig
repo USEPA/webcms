@@ -11,6 +11,10 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
+{% set header_info %}
+  {{ drupal_entity('block', 'epa_breadcrumbs', check_access=false) }}
+{% endset %}
+
 {% set sidenav = drupal_region('sidebar') %}
 
 {%  set press_offices = [] %}
@@ -18,20 +22,33 @@
   {% set press_offices = press_offices|merge([item|render]) %}
 {% endfor %}
 
-{% set header_info %}
-  {% include '@components/hublinks/hublinks.twig' with {
-    'title': 'News Releases'|t,
-    'links': press_offices,
-  } %}
+{% set title = 'Related Information'|t %}
 
-  {% include '@components/hublinks/hublinks.twig' with {
-    'title': '',
-    'links': [more_link],
-  } %}
-{% endset %}
+{% if press_offices is not empty %}
+  {% set related_info %}
+    {% include '@components/hublinks/hublinks.twig' with {
+      'title': title,
+      'links': press_offices,
+    } %}
+
+    {% if more_link %}
+      {% include '@components/hublinks/hublinks.twig' with {
+        'title': '',
+        'links': [more_link],
+      } %}
+    {% endif %}
+  {% endset %}
+{% elseif more_link %}
+  {% set related_info %}
+    {% include '@components/hublinks/hublinks.twig' with {
+      'title': title,
+      'links': [more_link],
+    } %}
+  {% endset %}
+{% endif %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}
@@ -73,6 +90,10 @@
     'field_press_office',
     'field_secondary_headline'
   ) }}
+  {% include '@components/box/box--special/box--special.twig' with {
+    'modifier_classes': 'margin-y-4 font-sans-3xs box--editors-note',
+    'content': related_info,
+  } only %}
 {% endset %}
 
 {% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
@@ -80,7 +101,6 @@
     'has_header': true,
     'has_footer': has_footer,
     'has_sidenav': true,
-    'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
     'admin_info': admin_info,
@@ -93,12 +113,12 @@
   {% include '@templates/detail-pages/page.twig' with {
     'has_header': true,
     'has_footer': has_footer,
-    'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
     'admin_info': admin_info,
     'show_admin_info': show_admin_info,
     'body': body,
     'footer': footer,
+    'is_narrow': true,
   } %}
 {% endif %}

@@ -1,0 +1,50 @@
+// Component: Breadcrumb
+
+@use '../../00-config' as *;
+
+$breadcrumb-background-color: gesso-color(breadcrumb, background) !default;
+$breadcrumb-divider-color: gesso-color(breadcrumb, divider) !default;
+$breadcrumb-link-color: gesso-color(breadcrumb, link) !default;
+$breadcrumb-text-color: gesso-color(breadcrumb, text) !default;
+
+.breadcrumb {
+  @include clearfix();
+  background-color: $breadcrumb-background-color;
+  color: $breadcrumb-text-color;
+  font-size: rem(14px);
+  margin: 0;
+  min-height: rem(40px);
+  padding-bottom: gesso-spacing(2);
+
+  @include at-media-max($theme-header-min-width) {
+    display: none;
+  }
+}
+
+.breadcrumb__title {
+  color: $breadcrumb-text-color;
+}
+
+.breadcrumb .breadcrumb__list {
+  @include list-inline();
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.breadcrumb__item {
+  &::after {
+    color: $breadcrumb-divider-color;
+    content: '/';
+    margin-left: 0.75em;
+    margin-right: 0.75em;
+  }
+
+  &:last-child::after {
+    content: '';
+    margin-left: 0;
+  }
+}
+
+.breadcrumb__link {
+  @include link($breadcrumb-link-color, $breadcrumb-text-color);
+}
