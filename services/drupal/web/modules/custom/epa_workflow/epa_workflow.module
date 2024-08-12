@@ -890,3 +890,33 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
+
+/**
+ * Implements hook_toolbar().
+ */
+function epa_workflow_toolbar() {
+  // @TODO: Test having a toolbar template in this module to act as the common shared template.
+  // Can't use a "toolbar" template unless we maintain two template for admin theme vs. front-end theme
+  // Toolbar seems to also be a special element that we can't override with a module template.
+  // @TODO: Looks like we may need something like https://git.drupalcode.org/project/toolbar_themes/-/blob/8.x-1.x/toolbar_themes.module?ref_type=heads to achieve this
+
+  // @TODO: It seems only "Render" elements are allowed in here.
+  // @see https://api.drupal.org/api/drupal/namespace/Drupal%21Core%21Render%21Element/10
+  $bid = 'epa_theme_views_block__danse_user_notifications_block_1';
+//  $block = \Drupal\block\Entity\Block::load($bid);
+//  $render = \Drupal::entityTypeManager()->getViewBuilder('block')->view($block);
+  // @TODO: Rework this to be the number of unseen notifications.
+  // @TODO: Clicking this should trigger an ajax call to load a block and display it.
+  $items['epa_notifications_widget'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      'anything' => [
+        '#type' => 'markup',
+        '#markup' => "<div>2</div>"
+        ],
+    ],
+    '#weight' => 200,
+  ];
+
+  return $items;
+}
