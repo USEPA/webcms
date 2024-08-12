@@ -1,4 +1,4 @@
-import { View } from "ckeditor5/src/ui";
+import { View, Template } from "ckeditor5/src/ui";
 import createId from "./createid";
 
 /**
@@ -41,6 +41,14 @@ export default class MatchView extends View {
 
     this.select = h("select", { id: this.selectId });
 
+    this.selectedTextFull = new Template({
+      tag: "p",
+      attributes: {
+        class: "epa-add-def-selected",
+      },
+      children: [{ text: bind.to("selected") }],
+    });
+
     this.setTemplate({
       tag: "div",
       attributes: {
@@ -50,9 +58,16 @@ export default class MatchView extends View {
         {
           tag: "label",
           attributes: { for: this.selectId },
-          children: [{ text: "Term: " }, { text: bind.to("term") }],
+          children: [
+            { text: "Term: " },
+            new Template({
+              tag: "strong",
+              children: [{ text: bind.to("term") }],
+            }),
+          ],
         },
         this.select,
+        this.selectedTextFull,
       ],
       on: {
         [`change@select#${this.selectId}`]: bind.to(() => {
@@ -73,16 +88,10 @@ export default class MatchView extends View {
 
       for (const item of data) {
         const MAX_LENGTH = 125;
-        const value = `<${item.dictionary}> ${item.definition}`;
+        const value = `${item.dictionary} -- ${item.definition}`;
         const truncated = value.substring(0, MAX_LENGTH);
-        const label = value.length >= MAX_LENGTH ? truncated + '[...]' : value; // Add an ellipsis if truncated
-        options.add(
-          h(
-            "option",
-            { value: value },
-            label
-          )
-        );
+        const label = value.length >= MAX_LENGTH ? truncated + "..." : value;
+        options.add(h("option", { value: value }, label));
       }
     });
   }
