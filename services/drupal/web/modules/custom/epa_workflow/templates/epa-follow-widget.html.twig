@@ -12,6 +12,8 @@
      user. If current user is 'following' then they will show at the top of the list.
  */
 #}
+{{ attach_library('epa_workflow/epa_follow_widget') }}
+
 <div class="epa-follow-widget">
   {% if current_user_is_following %}
     {# This means the user is currently following. Add checkmark icon #}
@@ -21,7 +23,7 @@
     <button class="epa-follow-widget__button">Follow</button>
   {% endif %}
 
-  <div style="display: none" class="epa-follow-widget__content">
+  <div class="epa-follow-widget__content">
     {{ flag_link }}
     {% if flag_users is not empty %}
       <p>Following this node</p>
