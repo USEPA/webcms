@@ -1,4 +1,3 @@
-<h2>I'm the Node Tabs</h2>
 {#
   Copied the contents of the menu.html.twig from system given that's what we're ultimately displaying
 /**
@@ -23,26 +22,46 @@
 #}
 {% import _self as menus %}
 
-{#
-We call a macro which calls itself to render the full tree.
-@see https://twig.symfony.com/doc/1.x/tags/macro.html
-#}
-{{ menus.menu_links(tabs, attributes, 0) }}
+{{ attach_library('epa_workflow/epa_node_tabs') }}
 
-{% macro menu_links(tabs, attributes, menu_level) %}
-  {% import _self as menus %}
-  {% if tabs %}
-    {% if menu_level == 0 %}
-<ul{{ attributes }}>
-  {% else %}
-    <ul>
-  {% endif %}
-  {% for item in tabs %}
-      {{ item }} {# this is the epa-node-tab-item #}
-      {% if item['#children'] %}
-        {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
+<nav class="epa-node-tabs" role="navigation" aria-label="Primary tasks">
+  {{ menus.menu_links(tabs, attributes, 0) }}
+
+  {% macro menu_links(tabs, attributes, menu_level) %}
+    {% import _self as menus %}
+
+    {% if tabs %}
+      {% if menu_level == 0 %}
+        <ul{{ attributes }} class="epa-node-tabs__menu">
+      {% else %}
+        <ul
+          class="epa-node-tabs__drawer"
+          id="epa-node-tabs-drawer"
+          role="region"
+          aria-labelledby="epa-node-tabs-button"
+          aria-expanded="true"
+        >
       {% endif %}
-  {% endfor %}
-  </ul>
-  {% endif %}
-{% endmacro %}
+
+      {% for item in tabs %}
+        {% if item|render|striptags|trim %}
+          {% set item_classes = [
+            menu_level > 0 ? 'epa-node-tabs__drawer-item' : 'epa-node-tabs__item',
+            item['#children'] ? 'has-children',
+          ]|join(' ')|trim %}
+
+          <li class="{{ item_classes }}">
+            {{ item }}
+
+            {% if item['#children'] %}
+              {% set attributes = attributes|merge({'class': 'epa-node-tabs__drawer-children'}) %}
+              {{ menus.menu_links(item['#children'], attributes, menu_level + 1) }}
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      </ul>
+    {% endif %}
+  {% endmacro %}
+</nav>
