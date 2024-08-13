@@ -12,10 +12,8 @@
 {% if url|render|striptags|trim is empty %}
   {% set element = 'span' %}
   {% set href = '' %}
-
-  {% if not is_active %}
-    {% set is_disabled = true %}
-  {% endif %}
+  {% set is_active = false %}
+  {% set is_disabled = true %}
 {% endif %}
 
 {% set additional_attributes = {
