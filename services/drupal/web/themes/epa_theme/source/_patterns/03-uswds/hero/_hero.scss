@@ -3,6 +3,14 @@
 
 .usa-hero {
   background-image: none;
+
+  @media print {
+    background: transparent !important;
+
+    > .grid-container {
+      display: block !important;
+    }
+  }
 }
 
 .usa-hero__callout.usa-dark-background {
@@ -10,11 +18,6 @@
   max-width: 25rem;
 
   @media print {
-    background-color: color('primary-darker') !important;
-    color: gesso-grayscale(white) !important;
-
-    * {
-      color: gesso-grayscale(white) !important;
-    }
+    max-width: 50%;
   }
 }
