@@ -1,0 +1,53 @@
+.epa-content-info-box {
+  --color-background: #fff;
+  --color-border: #dedfe4;
+  --color-focus: #26a769;
+  --color-tabs: #55565b;
+  --color-tabs-bg-hover: #e5edff;
+  --color-tabs-hover: #0036b1;
+  --color-text: #232429;
+  --focus-border-offset-size: 2px;
+  --focus-border-size: 0.1875rem;
+  --focus-box-shadow: 0 0 0 var(--focus-border-offset-size) #fff, 0 0 0 calc(var(--focus-border-size) + var(--focus-border-offset-size)) var(--color-focus);
+  --focus-outline: 2px dotted transparent;
+  --font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  background-color: var(--color-background);
+  border-bottom: 8px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  padding: 1rem 2rem;
+
+  @media (min-width: 40em) {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  @media print {
+    display: none !important;
+  }
+
+  &.is-green {
+    --color-background: oklch(55.02% 0.121 156.84 / 0.2);
+    --color-border: oklch(55.02% 0.121 156.84);
+  }
+
+  &.is-yellow {
+    --color-background: oklch(93.54% 0.094 93.3 / 0.4);
+    --color-border: oklch(83.43% 0.156 89.93);
+  }
+}
+
+.epa-content-info-box__content {
+  flex-grow: 1;
+}
+
+.epa-content-info-box__details {
+  @media (min-width: 40em) {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+}

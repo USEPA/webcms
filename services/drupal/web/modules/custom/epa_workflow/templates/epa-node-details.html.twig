@@ -9,9 +9,14 @@
  * - review_deadline: Review deadline formated  ex:'October 25, 2023 at 04:38PM UTC'.
  */
 #}
-<div>
-  <p> Node ID: {{ nid }}</p>
-  <p> Revision: {{ rid }}</p>
-  <p> Editor in Chief: {{editor_in_chief}}</p>
-  <p> Reviewed on: {{review_deadline}}</p>
+{{ attach_library('epa_workflow/epa_node_details') }}
+
+<div class="epa-node-details">
+  <button class="epa-node-details__button">Node Details</button>
+  <div class="epa-node-details__content">
+    <p> Node ID: {{ nid }}</p>
+    <p> Revision: {{ rid }}</p>
+    <p> Editor in Chief: {{editor_in_chief}}</p>
+    <p> Reviewed on: {{review_deadline}}</p>
+  </div>
 </div>
