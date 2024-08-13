@@ -12,17 +12,20 @@
      user. If current user is 'following' then they will show at the top of the list.
  */
 #}
-<div>
+<div class="epa-follow-widget">
   {% if current_user_is_following %}
     {# This means the user is currently following. Add checkmark icon #}
-    <p>Following</p>
+    <button class="epa-follow-widget__button">Following</button>
   {% else %}
     {# This means the user is currently not following. Add plus sign icon #}
-    <p>Follow</p>
+    <button class="epa-follow-widget__button">Follow</button>
   {% endif %}
-  {{ flag_link }}
-  {% if flag_users is not empty %}
-    <p>Following this node</p>
-    {{ flag_users }}
-  {% endif %}
+
+  <div style="display: none" class="epa-follow-widget__content">
+    {{ flag_link }}
+    {% if flag_users is not empty %}
+      <p>Following this node</p>
+      {{ flag_users }}
+    {% endif %}
+  </div>
 </div>
