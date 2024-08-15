@@ -9,6 +9,13 @@
  * Implements hook_views_data_alter().
  */
 function epa_workflow_views_data_alter(array &$data) {
+  $data['danse_event']['reference']['relationship'] = [
+    'id' => 'epa_workflow_danse_reference',
+    'base' => 'node_field_data',
+    'base field' => 'nid',
+    'label' => t('Danse Content Reference'),
+  ];
+
   $data['danse_event']['reference_web_area'] = [
     'title' => t('Reference Web Area'),
     'help' => t('The web area of the related content entity.'),
