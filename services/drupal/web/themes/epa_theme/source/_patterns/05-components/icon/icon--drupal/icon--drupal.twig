@@ -5,37 +5,23 @@
 
 {% if is_demo %}
   {% set icons = [
-    'angle',
-    'angle-double-left',
-    'angle-double-right',
-    'angle-left',
-    'angle-right',
-    'announcement',
+    'checkmark',
+    'chevron-down',
+    'ex',
     'file',
-    'magnifying-glass',
-    'rss',
-    'xmark',
-    'warning',
-    'chevron-circle-left',
-    'chevron-circle-right',
-    'minus-circle',
-    'plus-circle',
-    'times-circle',
-    'square',
-    'check-square',
-    'facebook-square',
-    'flickr-square',
-    'instagram-square',
-    'former-twitter-square',
-    'twitter-square',
-    'twitter',
-    'youtube-square',
+    'grid',
+    'pencil',
+    'plus',
+    'show',
+    'copy',
+    'cycle',
+    'live',
    ] %}
   {% for icon in icons %}
     <p>
       <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} role="img"{% endif %}>
         {% if label %}<title>{{ label }}</title>{% endif %}
-        <use href="{{ epa_theme_image_path }}sprite.artifact.svg#{{ icon }}"></use>
+        <use href="{{ epa_theme_image_path }}drupal-sprite.artifact.svg#{{ icon }}"></use>
       </svg>
       {{ icon }}
     </p>
@@ -44,7 +30,7 @@
   {% apply spaceless %}
     <svg class="{{ classes }}"{% if is_hidden %} aria-hidden="true"{% endif %}{% if label %} role="img"{% endif %}>
       {% if label %}<title>{{ label }}</title>{% endif %}
-      <use href="{{ epa_theme_image_path }}sprite.artifact.svg#{{ icon_name }}"></use>
+      <use href="{{ epa_theme_image_path }}drupal-sprite.artifact.svg#{{ icon_name }}"></use>
     </svg>
   {% endapply %}
 {%- endif -%}
