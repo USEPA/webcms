@@ -165,7 +165,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           $tabs[] = $this->createTabItem(
             $this->t('View latest draft'),
             $tab,
-            Icons::EYE,
+            Icons::SHOW,
             -70
           );
           break;
