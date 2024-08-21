@@ -3,9 +3,10 @@
 namespace Drupal\epa_workflow;
 
 abstract class Icons {
-  const PENCIL = 'pencil';
-  const LIVE = 'live';
-  const GRID = 'grid';
-  const EYE = 'eye';
+  const CLOSE = 'ex';
   const CYCLE = 'cycle';
+  const GRID = 'grid';
+  const LIVE = 'live';
+  const PENCIL = 'pencil';
+  const SHOW = 'show';
 }

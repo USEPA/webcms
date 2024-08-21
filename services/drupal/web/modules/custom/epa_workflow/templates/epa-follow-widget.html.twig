@@ -15,19 +15,43 @@
 {{ attach_library('epa_workflow/epa_follow_widget') }}
 
 <div class="epa-follow-widget">
-  {% if current_user_is_following %}
-    {# This means the user is currently following. Add checkmark icon #}
-    <button class="epa-follow-widget__button">Following</button>
-  {% else %}
-    {# This means the user is currently not following. Add plus sign icon #}
-    <button class="epa-follow-widget__button">Follow</button>
-  {% endif %}
+  <button
+    class="epa-follow-widget__button epa-dropdown__button js-epa-dropdown"
+    id="epa-follow-widget-button"
+    aria-expanded="true"
+    aria-controls="epa-follow-widget-drawer"
+  >
+    {%- if current_user_is_following -%}
+      <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
+        <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#check"></use>
+      </svg> Following
+    {%- else -%}
+      <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
+        <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#plus"></use>
+      </svg> Follow
+    {%- endif -%}
+  </button>
 
-  <div class="epa-follow-widget__content">
+  <div
+    class="epa-follow-widget__drawer epa-dropdown__drawer js-epa-dropdown-drawer"
+    id="epa-follow-widget-drawer"
+    role="region"
+    aria-labelledby="epa-follow-widget-button"
+    aria-expanded="true"
+  >
     {{ flag_link }}
-    {% if flag_users is not empty %}
-      <p>Following this node</p>
-      {{ flag_users }}
+
+    {% if flag_users|render|striptags|trim %}
+      {% set followers = flag_users|render %}
+    {% endif %}
+
+    {% if followers %}
+      <div class="epa-follow-widget__user-header">Following this node</div>
+      <div class="epa-follow-widget__followers">
+        {{ followers }}
+      </div>
+    {% else %}
+      <div class="epa-follow-widget__user-header">No Followers</div>
     {% endif %}
   </div>
 </div>

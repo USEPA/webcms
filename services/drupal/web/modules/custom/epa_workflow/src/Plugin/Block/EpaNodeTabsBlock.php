@@ -165,7 +165,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           $tabs[] = $this->createTabItem(
             $this->t('View latest draft'),
             $tab,
-            Icons::EYE,
+            Icons::SHOW,
             -70
           );
           break;
@@ -213,8 +213,9 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     return [
       '#theme' => 'epa_node_tab_item',
       '#title' => $this->t('Page Options'),
-      '#url' => '',
+      '#url' => '<button>',
       '#icon' => Icons::GRID,
+      '#icon_secondary' => Icons::CLOSE,
       '#is_active' => FALSE, // @todo: this needs to be active if any of the children inside it are 'active'.
       '#weight' => -100,
       '#access' => TRUE,

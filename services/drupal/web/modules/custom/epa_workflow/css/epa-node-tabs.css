@@ -77,14 +77,15 @@
   }
 }
 
-.epa-node-tabs__icon {
+.epa-node-tabs__icon,
+.epa-node-tabs__secondary-icon {
   display: inline-block;
   fill: currentColor;
   height: 1em;
   margin-inline-end: 0.25em;
   overflow: visible !important;
   position: relative;
-  top: -2px;
+  top: -1px;
   transition: none;
   vertical-align: middle;
   width: 1em;
@@ -96,6 +97,19 @@
 
 .epa-node-tabs__button {
   border-radius: 0;
+  padding: 0.75rem 1rem;
+
+  &[aria-expanded='true'] {
+    .epa-node-tabs__icon {
+      display: none;
+    }
+  }
+
+  &[aria-expanded='false'] {
+    .epa-node-tabs__secondary-icon {
+      display: none;
+    }
+  }
 }
 
 .epa-node-tabs__drawer {
