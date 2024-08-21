@@ -1,24 +1,44 @@
-{% set is_button = true %}
-{% set element = 'button' %}
-{% set link_class = 'epa-node-tabs__button' %}
+{#
+/**
+ * @file
+ * Theme implementation for an EPA node tab item.
+ *
+ * Available variables:
+ * - attributes: HTML attributes for the wrapper element.
+ * - is_active: Whether the item is an active tab.
+ * - title
+ * - url
+ * - icon
+ * - icon_secondary
+ * - children
+ * - is_child
+ *
+ * Note: This template renders the content for each tab item in
+ * epa-node-tabs.html.twig.
+ */
+#}
+{% set is_button = false %}
+{% set element = 'a' %}
 
 {% if url %}
-  {% set is_button = false %}
-  {% set element = 'a' %}
-  {% set href %} href="{{ url }}"{% endset %}
-  {% set link_class = 'epa-node-tabs__link' %}
-{% endif %}
-
-{% if url|render|striptags|trim is empty %}
-  {% set element = 'span' %}
-  {% set href = '' %}
-  {% set is_active = false %}
-  {% set is_disabled = true %}
+  {% if url == '<button>' %}
+    {% set is_button = true %}
+    {% set element = 'button' %}
+    {% set link_class = 'epa-node-tabs__button epa-dropdown__button js-epa-dropdown' %}
+  {% elseif url|render|striptags|trim is empty %}
+    {% set element = 'span' %}
+    {% set link_class = 'epa-node-tabs__link' %}
+    {% set is_active = false %}
+    {% set is_disabled = true %}
+  {% else %}
+    {% set href %} href="{{ url }}"{% endset %}
+    {% set link_class = 'epa-node-tabs__link' %}
+  {% endif %}
 {% endif %}
 
 {% set additional_attributes = {
   'class': [
-    is_child ? 'epa-node-tabs__drawer-link' : link_class,
+    is_child ? 'epa-node-tabs__drawer-link epa-dropdown__drawer-link' : link_class,
     is_active ? 'is-active',
     is_disabled ? 'is-disabled',
   ],
@@ -38,13 +58,18 @@
   }) %}
 {% endif %}
 
-<{{ element}} {{ add_attributes(additional_attributes) }}{{ href }}>
-
+<{{ element }} {{- add_attributes(additional_attributes) -}} {{- href }}>
   {% if icon %}
-    <svg class="epa-node-tabs__icon" aria-hidden="true" role="img">
-      <use href="/themes/epa_theme/images/sprite.artifact.svg#{{ icon }}"></use>
+    <svg class="epa-node-tabs__icon" aria-hidden="true" role="img"">
+      <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#{{ icon }}"></use>
+    </svg>
+  {% endif %}
+
+  {% if icon_secondary %}
+    <svg class="epa-node-tabs__secondary-icon aria-hidden="true" role="img">
+      <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#{{ icon_secondary }}"></use>
     </svg>
   {% endif %}
 
   {{ title }}
-</{{element}}>
+</{{ element }}>
