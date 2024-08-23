@@ -24,11 +24,11 @@
     {%- if current_user_is_following -%}
       <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
         <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#check"></use>
-      </svg> Following
+      </svg> {{ "Watching"|t  }}
     {%- else -%}
       <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
         <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#plus"></use>
-      </svg> Follow
+      </svg> {{ "Watch"|t  }}
     {%- endif -%}
   </button>
 
@@ -46,12 +46,12 @@
     {% endif %}
 
     {% if followers %}
-      <div class="epa-follow-widget__user-header">Following this node</div>
+      <div class="epa-follow-widget__user-header">{{ "Watching this node"|t }}</div>
       <div class="epa-follow-widget__followers">
         {{ followers }}
       </div>
     {% else %}
-      <div class="epa-follow-widget__user-header">No Followers</div>
+      <div class="epa-follow-widget__user-header">{{ "No watchers"|t }}</div>
     {% endif %}
   </div>
 </div>
