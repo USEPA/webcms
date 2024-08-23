@@ -529,7 +529,20 @@ display:
       cache:
         type: tag
         options: {  }
-      empty: {  }
+      empty:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: 'Not currently watching any content.'
+            format: filtered_html
+          tokenize: false
       sorts:
         changed:
           id: changed
@@ -1111,6 +1124,19 @@ display:
           plugin_id: result
           empty: false
           content: 'Displaying @start - @end of @total'
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: 'Filter and sort the table below to quickly access additional pages you are watching.'
+            format: ckeditor_5_test
+          tokenize: false
       footer: {  }
       display_extenders:
         views_ajax_get:
