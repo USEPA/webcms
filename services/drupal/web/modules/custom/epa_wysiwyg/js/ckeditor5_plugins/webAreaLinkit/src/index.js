@@ -234,7 +234,7 @@ class WebAreaLinkit extends Plugin {
     const t = this.locale.t;
     const labeledInput = new LabeledFieldView( this.locale, createLabeledInputText );
 
-    labeledInput.label = t( 'CARSON - Link URL' );
+    labeledInput.label = t( 'Link URL' );
 
     return labeledInput;
   }
