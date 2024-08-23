@@ -1,5 +1,4 @@
 import {
-  ButtonView,
   DropdownButtonView,
   LabeledFieldView,
   Model,
@@ -113,6 +112,9 @@ class WebAreaLinkit extends Plugin {
             linkFormView.focusTracker.add(newUrlField.element);
           }
         });
+
+        // Set the display of the url input to always display first
+        linkFormView.urlInputView.element.style.display = 'block';
 
       /**
        * Used to know if a selection was made from the autocomplete results.
