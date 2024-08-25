@@ -100,16 +100,62 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // pages.
     $xpath = new \DOMXPath($doc);
 
+    // Update metatags.
+    $this->updateMetaTags($xpath);
+
     // Add the alert markup.
     $this->addAlertMarkup($xpath, $doc);
 
     // Disable all form elements.
-    $this->removeFormElements($xpath, $doc);
+    $this->removeFormElements($xpath);
 
     // Add the search markup.
     $this->addSearchMarkup($xpath, $doc);
 
     $event->setHtml($doc->saveHTML());
+  }
+
+  /**
+   * Helper method to replace references to the site url.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function updateMetaTags(\DOMXPath $xpath) {
+    // Set the host url used for search and replace.
+    $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+
+    // Get link meta tags with href attribute starting with host.
+    $links = $xpath->query("//link[starts-with(@href,'$host')]");
+    $this->stripAttributeTextFromList($links, 'href', $host);
+
+    // Get link meta tags with content attribute starting with host.
+    // Strip the host from the content attribute.
+    $metatags = $xpath->query("//meta[starts-with(@content,'$host')]");
+    $this->stripAttributeTextFromList($metatags, 'content', $host);
+  }
+
+  /**
+   * Helper method to strip text element attributes in a node list.
+   *
+   * @param \DOMNodeList $items
+   *   The node list to process.
+   * @param string $attribute
+   *   The attribute of which values to strip.
+   * @param string $text
+   *   The the text to strip.
+   */
+  protected function stripAttributeTextFromList(\DOMNodeList $items, string $attribute, string $text) {
+    // Get meta tags with content attribute starting with host.
+    if (!empty($items)) {
+      foreach ($items as $item) {
+        /** @var \DOMElement $item */
+        $item->setAttribute($attribute, str_replace($text, '', $item->getAttribute($attribute)));
+      }
+    }
   }
 
   /**
@@ -142,7 +188,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Helper method to check and set search markup.
+   * Helper method to check and set alert markup.
    *
    * @param \DOMXPath $xpath
    *   The DOMXPath object.

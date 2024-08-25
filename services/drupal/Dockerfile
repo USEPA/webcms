@@ -63,6 +63,8 @@ RUN install-php-extensions apcu sockets \
   # GNU wget to override BusyBox
   wget
 
+ARG PHP_ERROR_REPORTING='E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED'
+
 RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
@@ -70,6 +72,7 @@ RUN set -ex \
     echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
+    echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
   # Enable special PHP-FPM status pages:
   && sed -i \
@@ -277,11 +280,15 @@ RUN install-php-extensions apcu sockets \
   # See ENTRYPOINT below
   tini
 
-# Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
-# instead of PHP)
+ARG PHP_ERROR_REPORTING='E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED'
+
 RUN set -ex \
   && { \
+    # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
+    # instead of PHP)
     echo 'memory_limit=-1'; \
+    # Switch to our custom error_reporting level
+    echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-cli.ini
 
 # Same as nginx: copy the built Drupal filesystem
