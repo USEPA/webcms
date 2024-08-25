@@ -5,11 +5,29 @@ namespace Drupal\epa_snapshot\EventSubscriber;
 use Drupal\tome_static\Event\ModifyHtmlEvent;
 use Drupal\tome_static\Event\TomeStaticEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * EPA Snapshot event subscriber.
  */
 class EpaSnapshotSubscriber implements EventSubscriberInterface {
+
+  /**
+   * The request stacks service.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * Constructs an EpaSnapshotSubscriber object.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack service.
+   */
+  public function __construct(RequestStack $requestStack) {
+    $this->requestStack = $requestStack;
+  }
 
   /**
    * Event subscriber method for modifying HTML.
@@ -36,11 +54,14 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // pages.
     $xpath = new \DOMXPath($doc);
 
+    // Update metatags.
+    $this->updateMetaTags($xpath);
+
     // Add the alert markup.
     $this->addAlertMarkup($xpath, $doc);
 
     // Disable all form elements.
-    $this->removeFormElements($xpath, $doc);
+    $this->removeFormElements($xpath);
 
     // Add search listing replacement.
     $this->addListingReplacement($xpath, $doc);
@@ -49,21 +70,45 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Helper method to check and set alert markup.
+   * Helper method to replace references to the site url.
    *
    * @param \DOMXPath $xpath
    *   The DOMXPath object.
-   * @param \DOMDocument $doc
-   *   The DOM Document we're working with.
    *
    * @return void
    *   Nothing.
    */
-  protected function removeFormElements(\DOMXPath $xpath, \DOMDocument &$doc) {
-    $forms = $xpath->query('//form');
+  protected function updateMetaTags(\DOMXPath $xpath) {
+    // Set the host url used for search and replace.
+    $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
 
-    foreach ($forms as $form) {
-      $form->parentNode->removeChild($form);
+    // Get link meta tags with href attribute starting with host.
+    $links = $xpath->query("//link[starts-with(@href,'$host')]");
+    $this->stripAttributeTextFromList($links, 'href', $host);
+
+    // Get link meta tags with content attribute starting with host.
+    // Strip the host from the content attribute.
+    $metatags = $xpath->query("//meta[starts-with(@content,'$host')]");
+    $this->stripAttributeTextFromList($metatags, 'content', $host);
+  }
+
+  /**
+   * Helper method to strip text element attributes in a node list.
+   *
+   * @param \DOMNodeList $items
+   *   The node list to process.
+   * @param string $attribute
+   *   The attribute of which values to strip.
+   * @param string $text
+   *   The the text to strip.
+   */
+  protected function stripAttributeTextFromList(\DOMNodeList $items, string $attribute, string $text) {
+    // Get meta tags with content attribute starting with host.
+    if (!empty($items)) {
+      foreach ($items as $item) {
+        /** @var \DOMElement $item */
+        $item->setAttribute($attribute, str_replace($text, '', $item->getAttribute($attribute)));
+      }
     }
   }
 
@@ -93,6 +138,23 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
       else {
         $section->parentNode->appendChild($alert);
       }
+    }
+  }
+
+  /**
+   * Helper method to check and set alert markup.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function removeFormElements(\DOMXPath $xpath) {
+    $forms = $xpath->query('//form');
+
+    foreach ($forms as $form) {
+      $form->parentNode->removeChild($form);
     }
   }
 
