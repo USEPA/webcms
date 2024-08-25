@@ -7,7 +7,7 @@ use Drupal\Core\Routing\TrustedRedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 
 /**
- * High-performance 404 exception subscriber for redirecting users to S3 when necessary.
+ * High-performance 404 exception subscriber to redirect users to S3 as needed.
  */
 class EPAMediaS3fsSubscriber extends Fast404ExceptionHtmlSubscriber {
 
@@ -31,7 +31,8 @@ class EPAMediaS3fsSubscriber extends Fast404ExceptionHtmlSubscriber {
     $new_path = preg_replace('/^\/sites\/.*\/files\/(.*)/i', 'public://$1', $path, -1, $count);
 
     if ($count) {
-      $response = \Drupal::service('file_url_generator')->generateAbsoluteString($new_path);
+      $file_path = \Drupal::service('file_url_generator')->generateAbsoluteString($new_path);
+      $response = new TrustedRedirectResponse($file_path, 302);
       $event->setResponse($response);
     }
   }
