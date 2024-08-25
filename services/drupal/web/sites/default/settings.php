@@ -982,30 +982,9 @@ $settings['fast404_respect_redirect'] = TRUE;
 $settings['fast404_exts'] = '/^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
 $settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
 
-/**
- * Create s3 stream wrapper for snapshots.
- */
-$schemes = [
-  's3-snapshot' => [
-    'driver' => 's3',
-    'config' => [
-      'region' => getenv('WEBCMS_S3_REGION'),
-      'bucket' => getenv('WEBCMS_S3_SNAPSHOT_BUCKET'),
-    ],
-    'cache' => TRUE,
-  ],
-];
-
-$settings['flysystem'] = $schemes;
-
-/**
- * Settings for tome.
- * 
- * Set static directory for tome and prevent crawling anchors and iframes.
- */
-$settings['tome_static_directory'] = 's3-snapshot://html';
-
-$settings['tome_static_crawl'] = FALSE;
+if (file_exists($app_root . '/' . $site_path . '/settings.snapshot.php')) {
+  include $app_root . '/' . $site_path . '/settings.snapshot.php';
+}
 
 /**
  * Load local development override configuration, if available.
