@@ -60,7 +60,7 @@ final class EpaPublishGuidanceBlock extends BlockBase implements ContainerFactor
    */
   public function build() {
     $config = $this->getConfiguration();
-    $content = $config['custom_wysiwyg_body'] ?? '';
+    $content = $config['body'] ?? '';
 
     // Render the WYSIWYG content with the text format.
     $renderable = [
@@ -79,7 +79,7 @@ final class EpaPublishGuidanceBlock extends BlockBase implements ContainerFactor
    */
   public function defaultConfiguration() {
     return [
-      'custom_wysiwyg_body' => '',
+      'body' => '',
     ];
   }
 
@@ -89,11 +89,11 @@ final class EpaPublishGuidanceBlock extends BlockBase implements ContainerFactor
   public function blockForm($form, FormStateInterface $form_state) {
     $config = $this->getConfiguration();
 
-    $form['custom_wysiwyg_body'] = [
+    $form['body'] = [
       '#type' => 'text_format',
       '#title' => $this->t('Body'),
-      '#format' => isset($config['custom_wysiwyg_body']['format']) ? $config['custom_wysiwyg_body']['format'] : 'restricted_html',
-      '#default_value' => isset($config['custom_wysiwyg_body']['value']) ? $config['custom_wysiwyg_body']['value'] : '',
+      '#format' => $config['body']['format'] ?? 'restricted_html',
+      '#default_value' => $config['body']['value'] ?? '',
       '#rows' => 10,
       '#required' => TRUE,
       '#allowed_formats' => ['filtered_html', 'restricted_html'],
@@ -106,7 +106,7 @@ final class EpaPublishGuidanceBlock extends BlockBase implements ContainerFactor
    * {@inheritdoc}
    */
   public function blockSubmit($form, FormStateInterface $form_state) {
-    $this->setConfigurationValue('custom_wysiwyg_body', $form_state->getValue('custom_wysiwyg_body'));
+    $this->setConfigurationValue('body', $form_state->getValue('body'));
   }
 
 }
