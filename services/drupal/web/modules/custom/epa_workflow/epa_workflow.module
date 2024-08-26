@@ -5,6 +5,7 @@
  * Contains epa_workflow.module.
  */
 
+use Drupal\block\Entity\Block;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
@@ -237,6 +238,24 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       ];
     }
 
+    $block = Block::load('epa_theme_publish_guidance');
+    if ($block) {
+      $block_content = \Drupal::entityTypeManager()
+        ->getViewBuilder('block')
+        ->view($block);
+
+      // Render the block content to a string.
+      $renderer = \Drupal::service('renderer');
+      $rendered_block = $renderer->renderRoot($block_content);
+      $rendered_block_markup = (string) $rendered_block;
+
+      // Add the rendered block markup to the form.
+      $form['publish_guidance'] = [
+        '#type' => 'markup',
+        '#markup' => $rendered_block_markup,
+      ];
+    }
+
     $form['current']['#required'] = TRUE;
     $form['current']['#value'] = NULL;
 
@@ -244,6 +263,9 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
     // Change "Revision Log" label to "Revision notes".
     $form['revision_log']['#title'] = t('Revision notes');
+    // New local task redesign says this should be a textarea.
+    $form['revision_log']['#type'] = 'textarea';
+    unset($form['revision_log']['#size']);
 
     $form_obj = $form_state->getFormObject();
   }
@@ -272,6 +294,20 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     // when on a non-prod environment.
     $form["field_workflow_debugger"]["#access"] = getenv('WEBCMS_SITE') !== 'prod';
   }
+}
+
+/**
+ * Lazy builder callback to render the block content.
+ */
+function epa_workflow_lazy_load_block($block_id) {
+  $block = Block::load($block_id);
+  if ($block) {
+    return \Drupal::entityTypeManager()
+      ->getViewBuilder('block')
+      ->view($block);
+  }
+
+  return [];
 }
 
 /**

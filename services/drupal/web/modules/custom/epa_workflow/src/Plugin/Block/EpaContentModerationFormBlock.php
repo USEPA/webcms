@@ -97,10 +97,6 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
     $form = $this->formBuilder
       ->getForm(EntityModerationForm::class, $node);
 
-    $form['revision_log']['#resizable'] = 'none';
-    $form['revision_log']['#rows'] = 10;
-    $form['revision_log']['#cols'] = 10;
-
     try {
       $moderation_state_id = $node->get('moderation_state')->getString();
       $box_color = $this->moderationStateToColorMap($moderation_state_id);
