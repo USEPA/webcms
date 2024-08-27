@@ -37,6 +37,14 @@
     --color-background: oklch(93.54% 0.094 93.3 / 0.4);
     --color-border: oklch(83.43% 0.156 89.93);
   }
+
+  a,
+  button {
+    &:focus {
+      outline: var(--focus-outline);
+      box-shadow: var(--focus-box-shadow);
+    }
+  }
 }
 
 .epa-content-info-box__content {
@@ -44,10 +52,12 @@
 }
 
 .epa-content-info-box__details {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  gap: 1rem;
+
   @media (min-width: 40em) {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 1rem;
     justify-content: flex-end;
   }
 }
