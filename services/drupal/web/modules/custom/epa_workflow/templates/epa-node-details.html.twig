@@ -12,11 +12,58 @@
 {{ attach_library('epa_workflow/epa_node_details') }}
 
 <div class="epa-node-details">
-  <button class="epa-node-details__button">Node Details</button>
-  <div class="epa-node-details__content">
-    <p> Node ID: {{ nid }}</p>
-    <p> Revision: {{ rid }}</p>
-    <p> Editor in Chief: {{editor_in_chief}}</p>
-    <p> Reviewed on: {{review_deadline}}</p>
+  <button
+    class="epa-node-details__button epa-dropdown__button js-epa-dropdown"
+    id="epa-node-details-button"
+    aria-expanded="true"
+    aria-controls="epa-node-details-drawer"
+  >
+    {{ 'Node Details'|t  }}
+    <svg class="epa-dropdown__icon epa-node-details__button-icon" aria-hidden="true" role="img">
+      <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#chevron-down"></use>
+    </svg>
+  </button>
+
+  <div
+    class="epa-node-details__drawer epa-dropdown__drawer js-epa-dropdown-drawer"
+    id="epa-node-details-drawer"
+    role="region"
+    aria-labelledby="epa-node-details-button"
+    aria-expanded="true"
+  >
+    <div class="epa-node-details__drawer-item">
+      {{ 'Node ID'|t }}: {{ nid }}
+      <button
+        class="epa-copy-button js-epa-copy-button"
+        type="button"
+        data-copy-value="{{ nid }}"
+        aria-label="{{ 'Copy this node ID'|t }}"
+      >
+        <svg class="epa-copy-button__icon">
+          <title>{{ 'Copy this ID'|t }}</title>
+          <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#copy"></use>
+        </svg>
+      </button>
+    </div>
+    <div class="epa-node-details__drawer-item">
+      {{ 'Revision ID'|t }}: {{ revision_link }}
+      <button
+        class="epa-copy-button js-epa-copy-button"
+        type="button"
+        data-copy-value="{{ rid }}"
+        aria-label="{{ 'Copy this revision ID'|t }}"
+      >
+        <svg class="epa-copy-button__icon">
+          <title>{{ 'Copy this ID'|t }}</title>
+          <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#copy"></use>
+        </svg>
+      </button>
+    </div>
+    <div class="epa-node-details__drawer-item">
+      {{ 'Editor in Chief'|t }}: {{editor_in_chief }}
+    </div>
+    <div class="epa-node-details__drawer-item">
+      {{ 'Review Deadline on'|t }} {{ review_deadline }}
+    </div>
   </div>
 </div>
