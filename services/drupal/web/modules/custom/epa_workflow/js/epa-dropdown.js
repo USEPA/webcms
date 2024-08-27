@@ -6,12 +6,11 @@
 Drupal.behaviors.epaDropdown = {
   attach(context) {
     const dropdownButtons = once('epa-dropdown', '.js-epa-dropdown', context);
-    console.log('Drupal.behaviors.epaDropdown');
 
     dropdownButtons.forEach(dropdownButton => {
       const dropdownDrawerID = dropdownButton.getAttribute('aria-controls');
       const dropdownDrawer = document.getElementById(dropdownDrawerID);
-      const drawerLinks = dropdownDrawer.querySelectorAll('a');
+      const drawerLinks = dropdownDrawer.querySelectorAll('a, button');
 
       // Close drawer on outside click.
       const handleOutsideClick = event => {
