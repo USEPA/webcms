@@ -101,11 +101,12 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
       $build['content'] = [
         '#theme' => 'epa_node_details',
         '#nid' => $node->id(),
-        '#rid' => $revision_link,
+        '#rid' => $revision_id,
+        '#revision_link' => $revision_link,
         '#editor_in_chief' => $editor_in_chief_link,
         '#review_deadline' => $review_deadline,
       ];
-  
+
     return $build;
   }
 }
