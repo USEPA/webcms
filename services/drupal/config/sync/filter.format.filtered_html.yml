@@ -20,6 +20,7 @@ dependencies:
     - paragraphs_entity_embed
     - pathologic
     - token_filter
+    - uswds_ckeditor_integration
 name: 'Filtered HTML'
 format: filtered_html
 weight: -10
@@ -109,6 +110,12 @@ filters:
       local_settings:
         protocol_style: full
         local_paths: ''
+  filter_table_attributes:
+    id: filter_table_attributes
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
   filter_url:
     id: filter_url
     provider: filter
@@ -116,6 +123,12 @@ filters:
     weight: -37
     settings:
       filter_url_length: 72
+  filter_uswds_table_sortable:
+    id: filter_uswds_table_sortable
+    provider: uswds_ckeditor_integration
+    status: true
+    weight: 0
+    settings: {  }
   linkit:
     id: linkit
     provider: linkit
