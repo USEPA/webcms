@@ -2,7 +2,7 @@ version: '3.6'
 services:
   gesso:
     container_name: ddev-${DDEV_SITENAME}-gesso
-    image: forumone/gesso:3-node-v16-php-8.0
+    build: ./gesso
     command: "sleep infinity"
     volumes:
       - ./../web/themes/epa_theme:/var/www/html/web/themes/epa_theme:cached

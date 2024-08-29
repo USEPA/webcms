@@ -58,7 +58,24 @@ getDirectories('./js/ckeditor5_plugins').forEach((dir) => {
       }),
     ],
     module: {
-      rules: [{ test: /\.svg$/, use: 'raw-loader' }],
+      rules: [
+        { test: /\.svg$/, use: 'raw-loader' },
+        {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'style-loader',
+              options: {
+                injectType: 'singletonStyleTag',
+                attributes: {
+                  'data-cke': true
+                }
+              }
+            },
+            'css-loader',
+          ]
+        }
+      ],
     },
   };
 

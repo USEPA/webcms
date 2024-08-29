@@ -104,7 +104,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * {@inheritdoc}
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     // Need this to run after layout builder adds its routes.
     $events[RoutingEvents::ALTER] = ['onAlterRoutes', -161];
     return $events;

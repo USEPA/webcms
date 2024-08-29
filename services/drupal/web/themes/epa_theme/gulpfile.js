@@ -87,11 +87,9 @@ const buildSass = mode => {
     .pipe(
       sass({
         includePaths: [
-          './node_modules/tiny-slider/src',
           './node_modules/@uswds/uswds/packages',
         ],
         precision: 10,
-        // importer: sassGlobImporter(),
         outputStyle: mode === 'production' ? 'compressed' : 'expanded',
       })
     )
@@ -129,9 +127,12 @@ async function lintPatterns() {
   }
 }
 
-const buildPatternLab = () => {
-  return patternLab.build({ cleanPublic: true, watch: false });
-};
+async function buildPatternLab() {
+  const errors = await patternLab.build({ cleanPublic: true, watch: false });
+  if (Array.isArray(errors) && errors.length > 0) {
+    throw new Error(errors.join('\n'));
+  }
+}
 
 async function webpackBundleScripts(mode) {
   const webpackConfig = require('./webpack.config')(mode);
@@ -141,17 +142,17 @@ async function webpackBundleScripts(mode) {
   }
 }
 
-const bundleScripts = (exports.gessoBundleScripts = () =>
+const bundleScripts = (exports.gessoBundleScripts = async () =>
   webpackBundleScripts('production'));
 
-const bundleScriptsDev = () => webpackBundleScripts('development');
+const bundleScriptsDev = async () => webpackBundleScripts('development');
 
 const compileStyles = () => buildSass('production');
 exports.buildStyles = series(lintStyles, compileStyles);
 
 const compileStylesDev = () => buildSass('development');
 
-const watchFiles = () => {
+const watchFiles = async () => {
   watch(
     [
       'source/**/*.scss',
@@ -194,7 +195,7 @@ const watchFiles = () => {
 
 const buildPatterns = (exports.buildPatterns = series(
   lintPatterns,
-  buildPatternLab
+  buildPatternLab,
 ));
 const buildImages = (exports.buildImages = createSprite);
 
@@ -208,8 +209,8 @@ const build = (isProduction = true) => {
     parallel(
       task('bundleScripts'),
       buildImages,
-      task('compileStyles'),
-      buildPatterns
+      series(lintStyles, task('compileStyles')),
+      buildPatterns,
     )
   );
 };
