@@ -68,12 +68,22 @@ class EpaWorkflowNodeTransition extends EpaWorkflowReferenceBase {
         $previous_state = $last_revision->get('moderation_state')->getString();
       }
 
-      /** @var \Drupal\workflows\WorkflowInterface $workflow */
-      $workflow = \Drupal::service('content_moderation.moderation_information')->getWorkflowForEntity($entity);
-      $previous_state_label = $workflow->getTypePlugin()->getState($previous_state)->label();
-      $current_state_label = $workflow->getTypePlugin()->getState($current_state)->label();
+      if (!empty($current_state) || !empty($previous_state)) {
+        /** @var \Drupal\workflows\WorkflowInterface $workflow */
+        $workflow = \Drupal::service('content_moderation.moderation_information')->getWorkflowForEntity($entity);
 
-      $transition = 'Transitioned to ' . $previous_state_label . ' from ' . $current_state_label;
+        $transition .= 'Transitioned';
+
+        if (!empty($current_state)) {
+          $current_state_label = $workflow->getTypePlugin()->getState($current_state)->label();
+          $transition .= ' to ' . $current_state_label;
+        }
+
+        if (!empty($previous_state)) {
+          $previous_state_label = $workflow->getTypePlugin()->getState($previous_state)->label();
+          $transition .= ' from ' . $previous_state_label;
+        }
+      }
     }
     return $this->sanitizeValue($transition);
   }
