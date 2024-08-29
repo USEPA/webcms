@@ -4,7 +4,7 @@
 resource "aws_iam_role" "drupal_exec" {
   for_each = local.sites
 
-  name        = "${var.iam_prefix}-${var.environment}-${each.key}-DrupalExecution"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-${each.key}-DrupalExecution"
   description = "WebCMS task execution role"
 
   assume_role_policy = data.aws_iam_policy_document.ecs_task_assume.json
@@ -33,7 +33,6 @@ data "aws_iam_policy_document" "drupal_secrets_access" {
       aws_secretsmanager_secret.hash_salt[each.key].arn,
       aws_secretsmanager_secret.mail_pass[each.key].arn,
       aws_secretsmanager_secret.saml_sp_key[each.key].arn,
-      aws_secretsmanager_secret.newrelic_license[each.value.site].arn,
       aws_secretsmanager_secret.basic_auth[each.value.site].arn,
     ]
   }
@@ -42,7 +41,7 @@ data "aws_iam_policy_document" "drupal_secrets_access" {
 resource "aws_iam_policy" "drupal_secrets_access" {
   for_each = local.sites
 
-  name        = "${var.iam_prefix}-${var.environment}-${each.key}-SecretsAccess"
+  name        = "${var.iam_prefix}-${var.aws_region}-${var.environment}-${each.key}-SecretsAccess"
   description = "Grants access to the WebCMS' secrets"
 
   policy = data.aws_iam_policy_document.drupal_secrets_access[each.key].json

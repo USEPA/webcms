@@ -5,6 +5,7 @@
  * Contains epa_media.module.
  */
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -24,12 +25,68 @@ function epa_media_entity_access(EntityInterface $entity, $operation, AccountInt
   // also affects files attached to the affected media. Therefore this single
   // access check covers the media view mode output and any direct file views
   // either of the original file or of image style generated files.
-  if ($operation == 'view' && $entity->getEntityTypeId() == 'media' && !$account->hasPermission('access private epa_media')) {
-    if ($entity->hasField('field_limit_file_accessibility') && !empty($entity->field_limit_file_accessibility->value)) {
-      return AccessResult::forbidden();
+  // Additionally, we're checking access to the media entity if the URL has a
+  // valid access_unpublished token.
+  // @link https://forumone.atlassian.net/browse/EPAD8-2225
+
+  // Check the URL for the auHash query parameter. If it exists, then we can allow access.
+  if ($operation == 'view' && $entity->getEntityTypeId() == 'media') {
+    /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
+    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+    if ($token = $tokenGetter->getToken()) {
+      // The access_unpublished tokens are also store the with the entity type,
+      // nodes in our case, and the entity ID. We don't have contextual info here
+      // to determine if we're looking at the node so we're going to attempt to load
+      // the access token just by the value, then check if the token is still valid.
+      return _is_access_token_valid($token) ?
+        AccessResult::neutral() :
+        AccessResult::forbidden();
+    }
+    else if ($referer_url = \Drupal::request()->headers->get('referer')) {
+      // Individual file requests don't contain the hash key, so we have to
+      // check the referer instead.
+      $config = \Drupal::config('access_unpublished.settings');
+      $referer_url_parsed = UrlHelper::parse($referer_url);
+      if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
+        $token = $referer_url_parsed['query'][$config->get('hash_key')];
+        return _is_access_token_valid($token) ?
+          AccessResult::neutral() :
+          AccessResult::forbidden();
+      }
+    }
+
+    // If there's no access_unpublished token check if user has permission.
+    if (!$account->hasPermission('access private epa_media')) {
+      if ($entity->hasField('field_limit_file_accessibility') && !empty($entity->field_limit_file_accessibility->value)) {
+        return AccessResult::forbidden();
+      }
     }
   }
   return AccessResult::neutral();
+}
+
+/**
+ * Custom function to check if access token is valid.
+ *
+ * @param string $token
+ *   The access_unpublished token.
+ *
+ * @return bool
+ *   TRUE if the token is valid, FALSE otherwise.
+ */
+function _is_access_token_valid(string $token) {
+  $tokens = \Drupal::entityTypeManager()
+    ->getStorage('access_token')
+    ->loadByProperties([
+      'value' => $token
+    ]);
+
+  if ($tokens) {
+    $tokenEntity = reset($tokens);
+    return !$tokenEntity->isExpired();
+  }
+
+  return FALSE;
 }
 
 /**
@@ -111,7 +168,12 @@ function epa_media_form_media_form_alter(&$form, FormStateInterface $form_state,
       }
     }
   }
+  if (isset($form['replace_file']['keep_original_filename']['#description'])) {
+    $form['replace_file']['keep_original_filename']['#description'] = "<ul><li>If checked, the system will use the original filename and replace the file’s contents. The file’s web address (aka URL) will remain the same. You might not see the updated content of overwritten files immediately because they can be externally cached.</li>
+    <li>If unchecked, the system will use the filename of the replacement file and create a new file. The file’s web address (aka URL) will be updated. The original file may be deleted if it is not referenced elsewhere in the WebCMS.</li></ul>";
+  }
 }
+
 
 /**
  * Implements hook_preprocess_HOOK().
@@ -176,4 +238,35 @@ function epa_media_menu_local_actions_alter(&$local_actions) {
   // this in order to get the add and relate media buttons at the top of the new view.
   $local_actions['group_content.group_media_add_page']['appears_on'] = ['view.group_media_search_api.page_1'];
   $local_actions['group_content.group_media_relate_page']['appears_on'] = ['view.group_media_search_api.page_1'];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_build_defaults_alter() for media items.
+ *
+ * Alters the field_limit_file_accessbibility value based on whether an
+ * access_unpublished token is detected and valid in the URL.
+ */
+function epa_media_media_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode) {
+  if ($entity->hasField('field_limit_file_accessibility')) {
+    $entity->field_limit_file_accessibility->value = filter_var($entity->field_limit_file_accessibility->value, FILTER_VALIDATE_BOOLEAN);
+
+    /** @var \Drupal\access_unpublished\TokenGetter $tokenGetter */
+    $tokenGetter = \Drupal::service('access_unpublished.token_getter');
+    if ($token = $tokenGetter->getToken()) {
+      if (_is_access_token_valid($token)) {
+        $entity->field_limit_file_accessibility->value = FALSE;
+      }
+    } else if ($referer_url = \Drupal::request()->headers->get('referer')) {
+      // Individual file requests don't contain the hash key, so we have to
+      // check the referer instead.
+      $config = \Drupal::config('access_unpublished.settings');
+      $referer_url_parsed = UrlHelper::parse($referer_url);
+      if (isset($referer_url_parsed['query'][$config->get('hash_key')])) {
+        $token = $referer_url_parsed['query'][$config->get('hash_key')];
+        if (_is_access_token_valid($token)) {
+          $entity->field_limit_file_accessibility->value = FALSE;
+        }
+      }
+    }
+  }
 }

@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Theme override to display a link node.
+ */
+#}
+
+{% set more_info = [] %}
+
+{% if content.field_daterange|field_value %}
+  {% set more_info = more_info|merge([
+    {
+      'text': content.field_daterange|field_value,
+    },
+    {
+      'text': content.field_location|field_value,
+    }
+  ]) %}
+{% endif %}
+
+{% include '@uswds/collection/_collection-item.twig' with {
+  'url': url,
+  'heading': label,
+  'more_info' : more_info
+} %}
+
+{{ content|without(
+  'field_daterange',
+  'field_location'
+) }}
+{% set catch_cache = content|render %}

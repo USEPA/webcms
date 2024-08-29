@@ -17,31 +17,31 @@ settings:
       - undo
       - redo
       - removeFormat
-      - indent
-      - outdent
       - '|'
       - bold
       - italic
-      - anchor
-      - '|'
-      - link
-      - codeBlock
-      - blockQuote
-      - horizontalLine
       - bulletedList
       - numberedList
-      - strikethrough
-      - subscript
+      - indent
+      - outdent
       - superscript
-      - epaNew
-      - code
+      - subscript
+      - blockQuote
+      - horizontalLine
+      - '-'
       - insertTable
-      - sourceEditing
+      - abbreviation
+      - link
+      - anchor
       - drupalInlineMedia
       - drupalMedia
-      - specialCharacters
-      - paragraphs
       - ParagraphsEmbed
+      - epaNew
+      - epaAddDefinition
+      - code
+      - sourceEditing
+      - specialCharacters
+      - Fullscreen
   plugins:
     ckeditor5_heading:
       enabled_headings:
@@ -50,8 +50,112 @@ settings:
         - heading4
         - heading5
         - heading6
+    ckeditor5_list:
+      properties:
+        reversed: true
+        startIndex: true
+      multiBlock: true
+    ckeditor5_sourceEditing:
+      allowed_tags:
+        - '<article>'
+        - '<div>'
+        - '<figure>'
+        - '<figcaption>'
+        - '<dl>'
+        - '<dt>'
+        - '<dd>'
+        - '<address>'
+        - '<hgroup>'
+        - '<i>'
+        - '<b>'
+        - '<small>'
+        - '<section>'
+        - '<span>'
+        - '<mark>'
+        - '<cite>'
+        - '<dfn>'
+        - '<var>'
+        - '<samp>'
+        - '<kbd>'
+        - '<wbr>'
+        - '<bdi>'
+        - '<ruby>'
+        - '<rt>'
+        - '<rp>'
+        - '<summary>'
+        - '<legend>'
+        - '<datalist>'
+        - '<svg>'
+        - '<title>'
+        - '<a hreflang occurrence>'
+        - '<blockquote cite>'
+        - '<ol type>'
+        - '<ul type>'
+        - '<q cite>'
+        - '<del cite datetime>'
+        - '<time datetime pubdate>'
+        - '<bdo dir>'
+        - '<table summary width height>'
+        - '<colgroup span>'
+        - '<col span>'
+        - '<th headers scope width height>'
+        - '<td headers scope width height>'
+        - '<details open>'
+        - '<form action method>'
+        - '<fieldset disabled="disabled" form name>'
+        - '<label for form>'
+        - '<input checked="checked" size type value disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus>'
+        - '<textarea rows cols disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus>'
+        - '<meter min max low high optimum form value>'
+        - '<select multiple="multiple" size>'
+        - '<optgroup disabled="disabled" label>'
+        - '<option value>'
+        - '<output for form name>'
+        - '<button value>'
+        - '<keygen autofocus challenge disabled="disabled" form keytype name>'
+        - '<progress max value>'
+        - '<embed src type width height>'
+        - '<object form name type usemap width height>'
+        - '<param name value>'
+        - '<iframe allowfullscreen name sandbox scrolling seamless src srcdoc width height>'
+        - '<video autoplay buffered controls crossorigin loop muted played preload poster src width height>'
+        - '<audio autoplay buffered controls loop muted played preloadsrc>'
+        - '<source media src type>'
+        - '<track default kind label src srclang>'
+        - '<canvas width height>'
+        - '<map name>'
+        - '<area alt coords href hreflang media rel shape target type>'
+        - '<use href>'
+        - '<img alt crossorigin longdesc src usemap data-caption data-align width height data-entity-type data-entity-uuid>'
     ckeditor5_style:
       styles:
+        -
+          label: 'Striped Table'
+          element: '<table class="usa-table usa-table--striped">'
+        -
+          label: 'Unstyled Table'
+          element: '<table class="usa-table usa-table--unstyled">'
+        -
+          label: 'Borderless Table'
+          element: '<table class="usa-table usa-table--borderless">'
+        -
+          label: 'Stacked Table'
+          element: '<table class="usa-table usa-table--stacked">'
+        -
+          label: 'Stacked Header Table'
+          element: '<table class="usa-table usa-table--stacked-header">'
+        -
+          label: 'Clean List'
+          element: '<ul class="list list--clean">'
+        -
+          label: 'Pipeline List'
+          element: '<ul class="list list--pipeline">'
+        -
+          label: 'Roomy List'
+          element: '<ul class="list list--roomy">'
+        -
+          label: 'Roomy Ordered List'
+          element: '<ol class="list list--roomy">'
         -
           label: 'Pull Quote'
           element: '<blockquote class="pull-quote">'
@@ -88,85 +192,6 @@ settings:
         -
           label: Warning
           element: '<span class="warning">'
-    ckeditor5_sourceEditing:
-      allowed_tags:
-        - '<article>'
-        - '<div>'
-        - '<figure>'
-        - '<figcaption>'
-        - '<dl>'
-        - '<dt>'
-        - '<dd>'
-        - '<address>'
-        - '<hgroup>'
-        - '<i>'
-        - '<b>'
-        - '<small>'
-        - '<section>'
-        - '<span>'
-        - '<mark>'
-        - '<abbr>'
-        - '<cite>'
-        - '<dfn>'
-        - '<var>'
-        - '<samp>'
-        - '<kbd>'
-        - '<wbr>'
-        - '<bdi>'
-        - '<ruby>'
-        - '<rt>'
-        - '<rp>'
-        - '<summary>'
-        - '<legend>'
-        - '<datalist>'
-        - '<svg>'
-        - '<title>'
-        - '<a hreflang occurrence id name target rel class aria-label title>'
-        - '<blockquote cite>'
-        - '<ol type>'
-        - '<ul type>'
-        - '<q cite>'
-        - '<del cite datetime>'
-        - '<time datetime pubdate>'
-        - '<bdo dir>'
-        - '<table summary width height>'
-        - '<colgroup span>'
-        - '<col span>'
-        - '<th headers scope width height>'
-        - '<td headers scope width height>'
-        - '<details open>'
-        - '<form action method>'
-        - '<fieldset disabled="disabled" form name>'
-        - '<label for form>'
-        - '<input checked="checked" size type value disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus>'
-        - '<textarea rows cols disabled="disabled" placeholder required readonly="readonly" autocomplete autofocus>'
-        - '<meter min max low high optimum form value>'
-        - '<select multiple="multiple" size>'
-        - '<optgroup disabled="disabled" label>'
-        - '<option value>'
-        - '<output for form name>'
-        - '<button type value>'
-        - '<keygen autofocus challenge disabled="disabled" form keytype name>'
-        - '<progress max value>'
-        - '<embed src type width height>'
-        - '<object form name type usemap width height>'
-        - '<param name value>'
-        - '<iframe allowfullscreen name sandbox scrolling seamless src srcdoc width height>'
-        - '<video autoplay buffered controls crossorigin loop muted played preload poster src width height>'
-        - '<audio autoplay buffered controls loop muted played preloadsrc>'
-        - '<source media src type>'
-        - '<track default kind label src srclang>'
-        - '<canvas width height>'
-        - '<map name>'
-        - '<area alt coords href hreflang media rel shape target type>'
-        - '<drupal-paragraph data-embed-button data-entity-label data-paragraph-id drupal-paragraph data-paragraph-revision-id>'
-        - '<use href>'
-        - '<img alt crossorigin longdesc src usemap data-caption data-align width height data-entity-type data-entity-uuid>'
-    ckeditor5_list:
-      reversed: true
-      startIndex: true
-    media_media:
-      allow_view_mode_override: true
     editor_advanced_link_link:
       enabled_attributes:
         - aria-label
@@ -193,4 +218,12 @@ settings:
       linkit_profile: default
     media_library_inlineMediaLibrary:
       allow_view_mode_override: true
+    media_media:
+      allow_view_mode_override: true
+    uswds_ckeditor_integration_ckeditor5_overrides:
+      override_lists: false
+      override_links: false
+      override_tables: false
+    uswds_ckeditor_integration_ckeditor5_table_content_items:
+      table_content_items: false
 image_upload: {  }

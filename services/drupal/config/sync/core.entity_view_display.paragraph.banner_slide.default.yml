@@ -5,12 +5,14 @@ dependencies:
   config:
     - field.field.paragraph.banner_slide.field_banner_image
     - field.field.paragraph.banner_slide.field_image
+    - field.field.paragraph.banner_slide.field_link
     - field.field.paragraph.banner_slide.field_text
     - field.field.paragraph.banner_slide.field_title
     - image.style.hero
     - paragraphs.paragraphs_type.banner_slide
   module:
     - epa_media
+    - link
     - svg_image
     - text
 id: paragraph.banner_slide.default
@@ -24,6 +26,8 @@ content:
     settings:
       image_style: hero
       image_link: ''
+      image_loading:
+        attribute: lazy
     third_party_settings: {  }
     weight: 3
     region: content
@@ -34,6 +38,18 @@ content:
       image_style: hero
     third_party_settings: {  }
     weight: 2
+    region: content
+  field_link:
+    type: link
+    label: hidden
+    settings:
+      trim_length: 40
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 4
     region: content
   field_text:
     type: text_default

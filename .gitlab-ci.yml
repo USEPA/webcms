@@ -8,15 +8,21 @@ stages:
   # without it, Docker builds could attempt to push to empty ECR repositories.
   # First step is to build the traefik module as the traefik service is created and updated in the infrastructure module
   - infrastructure_preprod_build
+  - infrastructure_preprod_west_init
+  - infrastructure_preprod_west_validate
+  - infrastructure_preprod_west_plan
+  - infrastructure_preprod_west_apply
   - infrastructure_preprod_init
   - infrastructure_preprod_validate
   - infrastructure_preprod_plan
   - infrastructure_preprod_apply
-
+  
+  
   # Docker builds
   - build
   - copy
-
+  - Image Scan
+  
   - deploy:dev:init:en
   - deploy:dev:validate:en
   - deploy:dev:plan:en
@@ -27,6 +33,16 @@ stages:
   - deploy:dev:plan:es
   - deploy:dev:apply:es
 
+  - deploy:dev-west:init:en
+  - deploy:dev-west:validate:en
+  - deploy:dev-west:plan:en
+  - deploy:dev-west:apply:en
+
+  - deploy:dev-west:init:es
+  - deploy:dev-west:validate:es
+  - deploy:dev-west:plan:es
+  - deploy:dev-west:apply:es
+  
   - deploy:stage:init
   - deploy:stage:validate
   - deploy:stage:plan
@@ -39,6 +55,9 @@ stages:
   # Create Release
   - artifacts
   - release
+  
+  #Add "test" stage for Gitlab Scanners
+  - test
 
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
@@ -50,6 +69,11 @@ default:
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
+#Including Gitlab scan templates
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
 
 #region Templates
 
@@ -272,7 +296,7 @@ variables:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-
+    
 #region Image builds
 
 # We build Drupal-based images using another parallel:matrix: to cut down on the repetition
@@ -308,19 +332,25 @@ build:drupal:
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
   script:
+    - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
       --snapshotMode=redo
       --use-new-run
       --context=$CI_PROJECT_DIR/services/drupal
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --target=$WEBCMS_TARGET
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
  # Build the FPM metrics sidecar container.
-build:metrics:dev:
+.build:metrics:dev:
   extends: .kaniko
   stage: build
   rules:
@@ -330,29 +360,15 @@ build:metrics:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/metrics
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
-
- # On the main and live branches (the tracking branches for the AWS environments), we also
- # build the database Terraform container. See the terraform/database/ directory for more
- # information.
-build:database:dev:
-  extends: .kaniko
-  stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
-  script:
-    - /kaniko/executor
-      $KANIKO_CACHE_ARGS
-      --context=$CI_PROJECT_DIR/terraform/database
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-terraform-database:latest
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
-
+    
  #endregion
 
  #region Docker Hub mirrors
@@ -369,7 +385,7 @@ build:database:dev:
  # infrastructure: this typically means that we mirror only on the main and live branches.
 
  # Mirror the AWS CloudWatch agent image using the latest tag.
-copy:cloudwatch:dev:
+.copy:cloudwatch:dev:
   extends: .kaniko
   stage: copy
   rules:
@@ -380,14 +396,19 @@ copy:cloudwatch:dev:
     - echo 'FROM amazon/cloudwatch-agent' >/workspace/Dockerfile
     - /kaniko/executor
       --context=/workspace
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
 
 # Build custom Traefik image based off the 2.4 tag. Use latest tag(Keep this as "latest" Traefik tag mentions found
 # in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
-build:traefik:dev:
+.build:traefik:dev:
   extends: .kaniko
   stage: infrastructure_preprod_build
   rules:
@@ -396,13 +417,17 @@ build:traefik:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --context=$CI_PROJECT_DIR/services/traefik
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
 
 # Mirror the New Relic PHP daemon
-copy:newrelic:dev:
+.copy:newrelic:dev:
   extends: .kaniko
   stage: copy
   rules:
@@ -412,12 +437,152 @@ copy:newrelic:dev:
     - echo 'FROM newrelic/php-daemon' >/workspace/Dockerfile
     - /kaniko/executor
       --context=/workspace
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
+      --destination=$WEBCMS_REPO_URL_WEST/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-newrelic-daemon
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
 
 #endregion
+
+Drupal:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drupal:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Nginx:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-nginx:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Drush:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drush:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Database:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-terraform-database:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-terraform-database:latest --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+.Metrics:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-dev-fpm-metrics:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-dev-fpm-metrics:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+.New Relic:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-newrelic-daemon
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-newrelic-daemon --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+.Traefik:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-traefik:latest
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-traefik:latest --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+.CloudWatch:
+  stage: Image Scan
+  tags:
+    - twistcli
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-preproduction-aws-cloudwatch
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-preproduction-aws-cloudwatch --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    # Cleanup the above space use on Runner.
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
 
 
 #region Preproduction
@@ -426,7 +591,7 @@ copy:newrelic:dev:
 # preproduction environment encompasses two sites: development and staging, hence
 # the subregions below the infrastructure step.
 
-# Preproduction infrastructure builds are triggered only by the 'main' branch.
+# Preproduction infrastructure builds are triggered only by the 'live' branch.
 infrastructure:preproduction:init:
   extends: .infrastructure
   stage: infrastructure_preprod_init
@@ -467,6 +632,7 @@ infrastructure:preproduction:plan:
     - gitlab-terraform init -upgrade
     - gitlab-terraform plan
     - gitlab-terraform plan-json
+  timeout: 24h
   environment:
     name: infra/preproduction
   artifacts:
@@ -481,7 +647,6 @@ infrastructure:preproduction:apply:
   stage: infrastructure_preprod_apply
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-
   dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -492,7 +657,81 @@ infrastructure:preproduction:apply:
   environment:
     name: infra/preproduction
 
+#sub-region us-west-2: 
+# These steps deploy into the infra/preproduction-west environment
+# the infra/preproduction-west environment is pointed to the us-west-2 region within the DrupalCloud AWS accounts
+infrastructure:preproduction-west:init:
+  extends: .infrastructure
+  stage: infrastructure_preprod_west_init
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform init
+  environment:
+    name: infra/preproduction-west
 
+infrastructure:preproduction-west:validate:
+  extends: .infrastructure
+  stage: infrastructure_preprod_west_validate
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform validate
+  environment:
+    name: infra/preproduction-west
+
+infrastructure:preproduction-west:plan:
+  extends: .infrastructure
+  stage: infrastructure_preprod_west_plan
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  timeout: 24h 
+  environment:
+    name: infra/preproduction-west
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+infrastructure:preproduction-west:apply:
+  extends: .infrastructure
+  stage: infrastructure_preprod_west_apply
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  dependencies: ["infrastructure:preproduction-west:plan"]
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    TF_STATE_NAME: dev-west
+    #override the TF_ADDRESS in .infrastructure
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-west
+  script:
+    - gitlab-terraform init -upgrade
+    - gitlab-terraform apply
+  environment:
+    name: infra/preproduction-west
 
 
 
@@ -705,12 +944,11 @@ deploy:dev:apply-en:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: manual
-
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success
 
     - when: never
@@ -755,12 +993,11 @@ deploy:dev:apply-es:
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: manual
-
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live" || $CI_COMMIT_BRANCH == "ci-work")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success
 
     - when: never
@@ -768,6 +1005,267 @@ deploy:dev:apply-es:
 #endregion
 
 
+
+
+
+
+#region:  US West 2 deployment
+deploy:dev-west:init:en:
+  extends: .deploy
+  stage: deploy:dev-west:init:en
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+  variables:
+    WEBCMS_LANG: en
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - echo $TF_ADDRESS
+    - gitlab-terraform init
+
+deploy:dev-west:init:es:
+  extends: .deploy
+  stage: deploy:dev-west:init:es
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+  variables:
+    WEBCMS_LANG: es
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - echo $TF_ADDRESS
+    - gitlab-terraform init
+
+
+# Validate syntax and configuration
+deploy:dev-west:validate:en:
+  extends: .deploy
+  stage: deploy:dev-west:validate:en
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+  script:
+    - gitlab-terraform validate
+
+# Validate syntax and configuration
+deploy:dev-west:validate:es:
+  extends: .deploy
+  stage: deploy:dev-west:validate:es
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+  script:
+    - gitlab-terraform validate
+
+# Perform a plan, uploading the plan files as GitLab artifacts.
+deploy:dev-west:plan-en:
+  extends: .deploy
+  stage: deploy:dev-west:plan:en
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+deploy:dev-west:plan-es:
+  extends: .deploy
+  stage: deploy:dev-west:plan:es
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+
+  artifacts:
+    name: plan
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+
+
+# Perform an apply. Note that this is not always automatic; see the comments above the rules
+# for more.
+deploy:dev-west:apply-en:
+  extends: .deploy
+  stage: deploy:dev-west:apply:en
+
+  # Download the plan files from the previous step.
+  dependencies: ["deploy:dev-west:plan-en"]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
+
+    - when: never
+
+deploy:dev-west:apply-es:
+  extends: .deploy
+  stage: deploy:dev-west:apply:es
+
+  # Download the plan files from the previous step.
+  dependencies: ["deploy:dev-west:plan-es"]
+
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
+
+  # As mentioned in the comments on the infrastructure:preproduction job, we use a
+  # resource group to prevent overlapping Terraform runs. The environment names here are
+  # prefixed with "site/" to indicate that they're for the Drupal site instead of
+  # infrastructure.
+  resource_group: site/dev-west-$WEBCMS_LANG
+  environment:
+    name: site/dev-west-$WEBCMS_LANG
+
+  script:
+    - gitlab-terraform apply
+
+  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  #
+  # There are three rules:
+  # 1. We require approval of the infrastructure module on its tracking branches (main and
+  #    live).
+  # 2. We permit automatic application of the webcms module, since it only updates a
+  #    limited subset of ECS resources.
+  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
+  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
+  #    live AWS resources.
+  #
+  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
+  # rule does not have an `if:` condition limiting when it applies.
+  rules:
+    - if: >-
+        $TF_MODULE == "infrastructure" &&
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: manual
+
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+      when: on_success
+
+    - when: never
 
 
 
@@ -971,7 +1469,6 @@ Artifacts:
   artifacts:
     paths:
       - ./ci
-      - ./terraform/database
       - ./terraform/infrastructure
       - ./terraform/webcms
 

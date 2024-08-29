@@ -1,6 +1,7 @@
 @use '../../00-config' as *;
 @use '../../02-base/03-extendables' as *;
 
+// stylelint-disable max-nesting-depth, selector-class-pattern, selector-max-compound-selectors, selector-no-qualifying-type
 .usa-dark-background {
   color: gesso-grayscale(white);
 
@@ -9,7 +10,6 @@
       color: gesso-grayscale(white);
     }
 
-    // stylelint-disable selector-max-compound-selectors, max-nesting-depth
     &:not(.usa-table--unstyled) {
       thead a,
       tbody a {
@@ -29,7 +29,83 @@
           color: gesso-color(text, link-active);
         }
       }
+
+      thead th {
+        background-color: gesso-brand(blue, dark);
+        border-color: gesso-grayscale(gray-1);
+        color: gesso-grayscale(white);
+
+        .usa-table__header__button .usa-icon > g,
+        .usa-table__header__button .usa-icon > g {
+          fill: gesso-grayscale(white);
+        }
+      }
+
+      tbody th,
+      tbody td,
+      tfoot th,
+      tfoot td {
+        background-color: transparent;
+        border-color: gesso-grayscale(gray-1);
+        color: gesso-grayscale(white);
+      }
+
+      th[data-sortable][aria-sort='descending'],
+      th[data-sortable][aria-sort='ascending'],
+      td[data-sort-active],
+      th[data-sort-active] {
+        background-color: gesso-brand(aqua, dark-1);
+      }
+
+      th[data-sortable][aria-sort='ascending']
+        .usa-table__header__button
+        .usa-icon
+        > g.ascending,
+      th[data-sortable][aria-sort='descending']
+        .usa-table__header__button
+        .usa-icon
+        > g.descending,
+      th[data-sortable]:not([aria-sort])
+        .usa-table__header__button
+        .usa-icon
+        > g.unsorted,
+      th[data-sortable][aria-sort='none']
+        .usa-table__header__button
+        .usa-icon
+        > g.unsorted {
+        fill: gesso-grayscale(white);
+      }
+
+      th[data-sortable]:not([aria-sort])
+        .usa-table__header__button:hover
+        .usa-icon
+        > g.unsorted,
+      th[data-sortable][aria-sort='none']
+        .usa-table__header__button:hover
+        .usa-icon
+        > g.unsorted,
+      th[data-sortable]:not([aria-sort])
+        .usa-table__header__button:focus
+        .usa-icon
+        > g.unsorted,
+      th[data-sortable][aria-sort='none']
+        .usa-table__header__button:focus
+        .usa-icon
+        > g.unsorted {
+        fill: gesso-grayscale(gray-2);
+      }
+
+      &.usa-table--borderless thead th {
+        background-color: transparent;
+      }
+
+      &.usa-table--striped {
+        tbody tr:nth-child(odd) td,
+        tbody tr:nth-child(odd) th {
+          background-color: gesso-grayscale(gray-5);
+        }
+      }
     }
-    // stylelint-enable selector-max-compound-selectors, max-nesting-depth
   }
 }
+// stylelint-enable max-nesting-depth, selector-class-pattern, selector-max-compound-selectors, selector-no-qualifying-type

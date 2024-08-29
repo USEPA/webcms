@@ -16,6 +16,7 @@
 }
 
 .definition__trigger {
+  // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
   @extend .usa-button--unstyled;
   border-bottom: 1px dotted;
   position: relative;
@@ -40,7 +41,16 @@
   max-width: rem(960px);
   padding: gesso-spacing(2);
   position: absolute;
+  word-break: break-word;
   z-index: 1;
+
+  @include breakpoint(gesso-breakpoint(tablet)) {
+    min-width: rem(320px);
+
+    .l-sidebar__sidebar & {
+      min-width: rem(150px);
+    }
+  }
 
   a:not(.usa-button, .button) {
     @extend %dark-bg-link;

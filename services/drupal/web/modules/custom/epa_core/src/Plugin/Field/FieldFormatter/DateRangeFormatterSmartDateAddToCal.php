@@ -61,6 +61,7 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
         'location' => '',
         'description' => '',
         'past_events' => FALSE,
+        'hide_add_to_cal' => FALSE,
       ] + parent::defaultSettings();
   }
 
@@ -83,6 +84,9 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
     if ($description) {
       $summary[] = $this->t('Event description: %description', ['%description' => $description]);
     }
+
+    $hide_add_to_cal = $this->getSetting('hide_add_to_cal') ? 'Yes' : 'No';
+    $summary[] = $this->t('Hide the AddtoCal widget: %hide_add_to_cal', ['%hide_add_to_cal' => $hide_add_to_cal]);
 
     $past_events = $this->getSetting('past_events') ? 'Yes' : 'No';
     $summary[] = $this->t('Show the widget for past events: %past_events', ['%past_events' => $past_events]);
@@ -118,6 +122,13 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
       '#description' => $this->t('Optional. You can use static text or tokens.'),
     ];
 
+    $form['hide_add_to_cal'] = [
+      '#title' => $this->t('Hide Add to Cal widget?'),
+      '#type' => 'checkbox',
+      '#description' => $this->t('By default if unchecked the Addtocal widget is shown. If checked this hides the Addtocal widget.'),
+      '#default_value' => $this->getSetting('hide_add_to_cal'),
+    ];
+
     $form['past_events'] = [
       '#title' => $this->t('Show Add to Cal widget for past events?'),
       '#type' => 'checkbox',
@@ -141,11 +152,7 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
     $elements = [];
 
     $entity = $items->getEntity();
-    $settings = $this->getSettings();
     $field = $this->fieldDefinition;
-    $field_name = $field->get('field_name');
-    $settings['field_name'] = $field_name;
-    $elements['#attached']['library'][] = 'addtocal/addtocal';
     $elements['#cache']['contexts'][] = 'timezone';
 
     foreach ($items as $delta => $item) {
@@ -189,6 +196,11 @@ class DateRangeFormatterSmartDateAddToCal extends DateRangeFormatterRangeFormatt
         }
 
         // Addtocal code
+        if (filter_var($this->getSetting('hide_add_to_cal'), FILTER_VALIDATE_BOOLEAN) === TRUE) {
+          continue;
+        }
+
+        $elements['#attached']['library'][] = 'addtocal/addtocal';
         $start_date = DrupalDateTime::createFromTimestamp($item->value, $timezone);
         $end_date = DrupalDateTime::createFromTimestamp($item->end_value, $timezone);
 

@@ -211,16 +211,16 @@ function epa_workflow_node_revision_create(EntityInterface $new_revision, Entity
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_complete_form_alter().
  */
-function epa_workflow_field_widget_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_workflow_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
   $plugin_id = $context['widget']->getPluginId();
 
-  if ('moderation_state_default' === $plugin_id && isset($element["state"]["#options"]) && key_exists('draft', $element["state"]["#options"])) {
-    if (!in_array($element["state"]["#default_value"], ['draft_needs_review'])) {
-      $element["state"]["#default_value"] = 'draft';
+  if ('moderation_state_default' === $plugin_id && isset($element['widget'][0]["state"]["#options"]) && key_exists('draft', $element['widget'][0]["state"]["#options"])) {
+    if (!in_array($element['widget'][0]["state"]["#default_value"], ['draft_needs_review'])) {
+      $element['widget'][0]["state"]["#default_value"] = 'draft';
     }
-    $element["#access"] = FALSE;
+    $element['widget'][0]["#access"] = FALSE;
   }
 }
 
@@ -244,6 +244,8 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
     // Change "Revision Log" label to "Revision notes".
     $form['revision_log']['#title'] = t('Revision notes');
+
+    $form_obj = $form_state->getFormObject();
   }
 
   if ((in_array($form_id, ['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
@@ -372,6 +374,7 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
 function build_content_moderation_info_box(EntityInterface $entity, array &$build): void {
   /** @var \Drupal\Core\Render\Renderer $renderer */
   $renderer = \Drupal::service('renderer');
+  /** @var \Drupal\node\Entity\Node  $entity */
 
   $node_edit_link = NULL;
   if ($entity->isLatestRevision() && $entity->access('update')) {
@@ -399,6 +402,30 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     '#type' => 'item',
     '#title' => t("Node ID"),
     '#markup' => $entity->id(),
+  ];
+
+  $latest_vid = \Drupal::entityTypeManager()
+    ->getStorage($entity->getEntityTypeId())
+    ->getLatestRevisionId($entity->id());
+
+  $latest_revision_link = Link::fromTextAndUrl(
+    $latest_vid,
+    Url::fromRoute(
+      'entity.node.revision',
+      ['node' => $entity->id(), 'node_revision' => $latest_vid],
+      [
+        'attributes' => [
+          'title' => t('Latest revision ID'),
+          'class' => ['revision-link']
+        ],
+      ]
+    ),
+  )->toRenderable();
+
+  $vid = [
+    '#type' => 'item',
+    '#title' => t('Revision ID'),
+    '#markup' => $latest_revision_link,
   ];
 
   // Build display for the author who made the revision.
@@ -480,6 +507,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     '#theme' => 'epa_content_info_box',
     '#node_edit_link' => $node_edit_link,
     '#nid' => $nid,
+    '#vid' => $vid,
     '#revision_author' => $revision_author,
     '#review_deadline' => $review_deadline,
     '#current' => $current,
@@ -852,6 +880,7 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
       'variables' => [
         'node_edit_link' => NULL,
         'nid' => NULL,
+        'vid' => NULL,
         'revision_author' => NULL,
         'review_deadline' => NULL,
         'current' => NULL,

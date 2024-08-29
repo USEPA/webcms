@@ -76,6 +76,16 @@ variable "db_instance_count" {
   type        = number
 }
 
+#variable "proxy_target_endpoint" {
+#  description = "Name of the endpoint the proxy connects to"
+#  type = string
+#}
+
+variable "regional_cluster_endpoint" {
+  description = "Endpoint of the regional cluster this instance will connect to"
+  type        = string
+}
+
 #endregion
 
 #region S3

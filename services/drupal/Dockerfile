@@ -1,4 +1,4 @@
-FROM php:8.1-fpm-alpine AS memcached-ext
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS memcached-ext
 
 # Set working directory to /tmp
 WORKDIR /tmp
@@ -23,7 +23,10 @@ RUN set -ex \
   && make \
   && make install
 
-FROM php:8.1-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS base
+
+# Bump system packages
+RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
@@ -45,16 +48,6 @@ RUN set -ex \
 
 WORKDIR /var/www/html
 
-# Download and install the New Relic APM extension. Note that, unlike in the docs, we do
-# not configure the extension here. That must happen at runtime since the license keys
-# and application names are environment-dependent.
-RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.11.0.3 \
-  && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
-  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
-  && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
-  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
-
 # Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
   /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
@@ -70,6 +63,8 @@ RUN install-php-extensions apcu sockets \
   # GNU wget to override BusyBox
   wget
 
+ARG PHP_ERROR_REPORTING='E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED'
+
 RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
@@ -77,6 +72,7 @@ RUN set -ex \
     echo 'memory_limit=512M'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
+    echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
   # Enable special PHP-FPM status pages:
   && sed -i \
@@ -84,7 +80,14 @@ RUN set -ex \
     -e 's/^;\(ping\.path =\)/\1/' \
     # 2. The 'status' endpoint response with metrics related to this FPM worker pool
     -e 's/^;\(pm\.status_path =\)/\1/' \
-    /usr/local/etc/php-fpm.d/www.conf
+    /usr/local/etc/php-fpm.d/www.conf \
+  && { \
+    # Switch the PHP-FPM pool to a static group of 10 servers. Restart the
+    # servers every 5,000 requests.
+    echo 'pm = static'; \
+    echo 'pm.max_children = 10'; \
+    echo 'pm.max_requests = 5000'; \
+  } >> /usr/local/etc/php-fpm.d/zz-docker.conf
 
 # Set the php-fpm log format. This was largely reverse-engineered from fpm_log.c in the
 # PHP sources. Notes on the available log options:
@@ -124,7 +127,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM composer:2 AS deps
+FROM public.ecr.aws/docker/library/composer:2 AS deps
 
 WORKDIR /app
 
@@ -149,7 +152,7 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:3-node-v16-php-8.0 AS gesso
+FROM forumone/gesso:3-node-v18-php-8.1 AS gesso
 
 WORKDIR /app
 
@@ -200,12 +203,6 @@ RUN \
   # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
   && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
-# Add the entrypoint logic to configure the New Relic extension
-COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
-RUN chmod +x /webcms-entrypoint
-
-ENTRYPOINT ["/webcms-entrypoint"]
-CMD [ "php-fpm" ]
 
 # Add build metadata to the image. We expose two optional build args:
 # * GIT_TAG, the named Git tag being built.
@@ -220,7 +217,10 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
-FROM nginx:mainline-alpine AS nginx
+FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
+
+# Bump system packages
+RUN apk upgrade
 
 # Copy the Drupal filesystem into this image
 COPY --from=drupal /var/www/html /var/www/html
@@ -239,7 +239,10 @@ CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM php:8.1-cli-alpine AS drush
+FROM public.ecr.aws/docker/library/php:8.1-cli-alpine AS drush
+
+# Bump system packages
+RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
@@ -262,14 +265,6 @@ RUN set -ex \
 ENV PATH=${PATH}:/var/www/html/vendor/bin
 WORKDIR /var/www/html
 
-# Download and install New Relic
-RUN set -ex \
-  && NEW_RELIC_AGENT_VERSION=10.11.0.3 \
-  && curl -L https://download.newrelic.com/php_agent/archive/$NEW_RELIC_AGENT_VERSION/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl.tar.gz | tar -C /tmp -zx \
-  && export NR_INSTALL_USE_CP_NOT_LN=1 NR_INSTALL_SILENT=1 \
-  && /tmp/newrelic-php5-$NEW_RELIC_AGENT_VERSION-linux-musl/newrelic-install install \
-  && rm -rf /tmp/newrelic-php5-* /tmp/nrinstall*
-
 # Copy and enable the memcached extension (and its dependency, igbinary)
 COPY --from=memcached-ext \
   /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
@@ -285,11 +280,15 @@ RUN install-php-extensions apcu sockets \
   # See ENTRYPOINT below
   tini
 
-# Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
-# instead of PHP)
+ARG PHP_ERROR_REPORTING='E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED'
+
 RUN set -ex \
   && { \
+    # Allow unlimited memory usage when running Drush tasks (ECS will constrain the memory
+    # instead of PHP)
     echo 'memory_limit=-1'; \
+    # Switch to our custom error_reporting level
+    echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-cli.ini
 
 # Same as nginx: copy the built Drupal filesystem
@@ -309,17 +308,8 @@ RUN \
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
 RUN chmod +x /usr/local/bin/drush-migrate
 
-# Add the entrypoint logic to configure the New Relic extension
-COPY scripts/ecs/drupal-entrypoint.sh /webcms-entrypoint
-RUN chmod +x /webcms-entrypoint
-
-# Replace the default crontab with one that runs Drush every five minutes. By
-# default, cron is not run (since there is no systemd equivalent in containers),
-# but we use this in the Drush ECS service definition.
-RUN echo '*/5 * * * * drush cron --uri="${WEBCMS_SITE_URL}" 2>&1' | crontab -
-
 # Wrap the entrypoint script with tini to allow graceful signal handling
-ENTRYPOINT ["tini", "--", "/webcms-entrypoint"]
+ENTRYPOINT ["tini", "--", "docker-php-entrypoint"]
 
 # Add build metadata to the image. See the comments for these ARG instructions
 # in the Drupal stage for more details.
@@ -327,3 +317,6 @@ ARG GIT_TAG=""
 ARG GIT_COMMIT=""
 
 ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
+
+# Lower user
+USER www-data

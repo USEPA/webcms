@@ -79,7 +79,9 @@ class EPAPublished extends EPAModeration {
           $node->set('field_notice_sort_date', $computed_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT));
 
           $expiration_date = new DrupalDateTime($computed_date->format(DateTimeItemInterface::DATE_STORAGE_FORMAT). 'T23:59:59', 'America/New_York');
-          //  Schedule the node to be unpublished when it closes for comments.
+          //  Schedule the node to be unpublished 5 days after it closes for
+          // comments. See https://forumone.atlassian.net/browse/EPAD8-2155
+          $expiration_date->add(new \DateInterval("P5D"));
           $node->set('field_expiration_date', $expiration_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, ['timezone' => 'UTC']));
         }
         else {

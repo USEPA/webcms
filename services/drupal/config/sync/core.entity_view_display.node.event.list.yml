@@ -1,0 +1,115 @@
+uuid: 184c57f5-8e48-4fc7-97dd-850ec30698e1
+langcode: en
+status: true
+dependencies:
+  config:
+    - address_formatter.options.city_state
+    - core.entity_view_mode.node.list
+    - field.field.node.event.field_add_to_cal_description
+    - field.field.node.event.field_channel
+    - field.field.node.event.field_date
+    - field.field.node.event.field_daterange
+    - field.field.node.event.field_deadline
+    - field.field.node.event.field_description
+    - field.field.node.event.field_display_arcgis_map
+    - field.field.node.event.field_env_laws_regs_and_treaties
+    - field.field.node.event.field_event_cancellation
+    - field.field.node.event.field_event_host
+    - field.field.node.event.field_event_type
+    - field.field.node.event.field_expiration_date
+    - field.field.node.event.field_geographic_locations
+    - field.field.node.event.field_hublinks
+    - field.field.node.event.field_is_searchable_collection
+    - field.field.node.event.field_keywords
+    - field.field.node.event.field_language
+    - field.field.node.event.field_last_published
+    - field.field.node.event.field_links
+    - field.field.node.event.field_location
+    - field.field.node.event.field_machine_name
+    - field.field.node.event.field_meta_tags
+    - field.field.node.event.field_owning_office
+    - field.field.node.event.field_page_head
+    - field.field.node.event.field_paragraphs
+    - field.field.node.event.field_publish_date
+    - field.field.node.event.field_review_deadline
+    - field.field.node.event.field_scheduled_transition
+    - field.field.node.event.field_search_text
+    - field.field.node.event.field_type
+    - node.type.event
+  module:
+    - address_formatter
+    - epa_core
+    - layout_builder
+    - user
+third_party_settings:
+  layout_builder:
+    enabled: false
+    allow_custom: false
+id: node.event.list
+targetEntityType: node
+bundle: event
+mode: list
+content:
+  field_daterange:
+    type: date_range_without_time_smartdate
+    label: hidden
+    settings:
+      timezone_override: ''
+      single: 'F j, Y'
+      single_all_day: 'F j, Y'
+      one_day: 'F j, Y'
+      one_month: 'F j - {j}, {Y}'
+      several_months: 'F j, Y - {F} {j}, {Y}'
+      several_years: 'F j, Y - {F} {j}, {Y}'
+      event_title: ''
+      location: '[node:field_location:address_line1] [node:field_location:address_line2], [node:field_location:locality], [node:field_location:administrative_area] [node:field_location:postal_code], [node:field_location:country_code]'
+      description: '[node:epa-addtocal-description]'
+      hide_add_to_cal: '1'
+      past_events: 0
+      separator: '-'
+      date_format: 'Y-m-d\TH:i:s'
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_location:
+    type: address_html
+    label: hidden
+    settings:
+      options: city_state
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  content_moderation_control: true
+  entitygroupfield: true
+  field_add_to_cal_description: true
+  field_channel: true
+  field_date: true
+  field_deadline: true
+  field_description: true
+  field_display_arcgis_map: true
+  field_env_laws_regs_and_treaties: true
+  field_event_cancellation: true
+  field_event_host: true
+  field_event_type: true
+  field_expiration_date: true
+  field_geographic_locations: true
+  field_hublinks: true
+  field_is_searchable_collection: true
+  field_keywords: true
+  field_language: true
+  field_last_published: true
+  field_links: true
+  field_machine_name: true
+  field_meta_tags: true
+  field_owning_office: true
+  field_page_head: true
+  field_paragraphs: true
+  field_publish_date: true
+  field_review_deadline: true
+  field_scheduled_transition: true
+  field_search_text: true
+  field_type: true
+  langcode: true
+  links: true
+  search_api_excerpt: true

@@ -20,6 +20,14 @@ resource "aws_ssm_parameter" "ecs_cluster_arn" {
 
 #region ALB
 
+resource "aws_ssm_parameter" "alb_arn" {
+  name  = "/webcms/${var.environment}/alb/arn"
+  type  = "String"
+  value = aws_lb.app_load_balancer.arn
+
+  tags = var.tags
+}
+
 resource "aws_ssm_parameter" "alb_listener" {
   name  = "/webcms/${var.environment}/alb/listener"
   type  = "String"
@@ -52,7 +60,7 @@ resource "aws_ssm_parameter" "elasticache_node_endpoints" {
 resource "aws_ssm_parameter" "rds_proxy_endpoint" {
   name  = "/webcms/${var.environment}/endpoints/rds-proxy"
   type  = "String"
-  value = aws_db_proxy.proxy.endpoint
+  value = var.regional_cluster_endpoint
 
   tags = var.tags
 }
@@ -143,36 +151,6 @@ resource "aws_ssm_parameter" "ecr_drush" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "ecr_metrics" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/metrics"
-  type  = "String"
-  value = aws_ecr_repository.metrics[each.value.site].repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_cloudwatch" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/cloudwatch"
-  type  = "String"
-  value = aws_ecr_repository.cloudwatch_agent_mirror.repository_url
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "ecr_newrelic" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/ecr/newrelic-daemon"
-  type  = "String"
-  value = aws_ecr_repository.newrelic_daemon_mirror.repository_url
-
-  tags = var.tags
-}
-
 #endregion
 
 #region Log groups
@@ -207,36 +185,6 @@ resource "aws_ssm_parameter" "drush_log_group" {
   tags = var.tags
 }
 
-resource "aws_ssm_parameter" "agent_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/cloudwatch-agent"
-  type  = "String"
-  value = aws_cloudwatch_log_group.agent[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "newrelic_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/newrelic-daemon"
-  type  = "String"
-  value = aws_cloudwatch_log_group.newrelic[each.key].name
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "fpm_metrics_log_group" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/log-groups/fpm-metrics"
-  type  = "String"
-  value = aws_cloudwatch_log_group.fpm_metrics[each.key].name
-
-  tags = var.tags
-}
-
 resource "aws_ssm_parameter" "drupal_log_group" {
   for_each = local.sites
 
@@ -267,16 +215,6 @@ resource "aws_ssm_parameter" "db_d7_credentials" {
   name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/db-d7-credentials"
   type  = "String"
   value = aws_secretsmanager_secret.db_d7_credentials[each.key].arn
-
-  tags = var.tags
-}
-
-resource "aws_ssm_parameter" "newrelic_license" {
-  for_each = local.sites
-
-  name  = "/webcms/${var.environment}/${each.value.site}/${each.value.lang}/secrets/newrelic-license"
-  type  = "String"
-  value = aws_secretsmanager_secret.newrelic_license[each.value.site].arn
 
   tags = var.tags
 }

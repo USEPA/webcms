@@ -36,6 +36,7 @@
     display: flex;
     font-size: font-size(body, sm);
     font-weight: bold;
+    gap: rem(gesso-spacing('05'));
     justify-content: space-between;
     line-height: math.div(units(2), font-size(body, sm));
     padding: gesso-spacing(2);
@@ -50,13 +51,15 @@
     &:hover,
     &:focus,
     &.is-active {
-      background: gesso-grayscale(gray-1);
-      color: gesso-brand(blue, base);
       text-decoration: underline;
     }
 
     &[aria-expanded='true'] {
       border-color: gesso-brand(blue, base);
+
+      > .menu__link-icon {
+        transform: rotate(0deg);
+      }
     }
 
     @include breakpoint(900px) {
@@ -64,36 +67,23 @@
       line-height: math.div(units(2), font-size(heading, sm));
     }
 
-    &.has-subnav {
-      display: flex;
-      gap: rem(gesso-spacing('05'));
-      justify-content: space-between;
+    @include at-media($theme-header-min-width) {
+      border-width: 0;
+      color: gesso-grayscale(white);
+      font-family: font-family(heading);
+      font-size: font-size(heading, xs);
+      line-height: math.div(units(2), font-size(heading, xs));
+      padding: gesso-spacing(2) gesso-spacing(3);
+      width: auto;
 
-      &[aria-expanded='true'] > .menu__link-icon {
-        transform: rotate(0deg);
+      &:visited {
+        color: gesso-grayscale(white);
       }
 
-      @include at-media($theme-header-min-width) {
-        background: gesso-brand(blue, dark);
-        border: 0;
-        color: gesso-grayscale(white);
-        font-family: font-family(heading);
-        font-size: font-size(heading, xs);
-        line-height: math.div(units(2), font-size(heading, xs));
-        padding: gesso-spacing(2) gesso-spacing(3);
-        width: auto;
-
-        // stylelint-disable-next-line max-nesting-depth
-        &:visited {
-          color: gesso-grayscale(white);
-        }
-
-        // stylelint-disable-next-line max-nesting-depth
-        &:hover,
-        &:focus,
-        &.is-active {
-          background: transparent;
-        }
+      &:hover,
+      &:focus,
+      &.is-active {
+        background: transparent;
       }
     }
   }
@@ -140,29 +130,31 @@
 
   .menu__subnav {
     @include list-clean();
-    background: gesso-grayscale(white);
+    background: gesso-grayscale(gray-1);
     width: 100%;
 
     @include at-media($theme-header-min-width) {
       box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.1);
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
       position: absolute;
       width: auto;
       z-index: 1;
 
-      &.is-wide {
-        grid-template-columns: 1fr 1fr 1fr;
-
-        // stylelint-disable-next-line
-        .menu__item:first-child {
-          grid-column: 1 / span 3;
-        }
-      }
-
       // stylelint-disable-next-line selector-no-qualifying-type
       html:not(.no-js) &[hidden] {
         display: none;
+      }
+
+      .usa-header--extended & {
+        padding: gesso-spacing(3) gesso-spacing(2);
+
+        // stylelint-disable-next-line max-nesting-depth
+        &::before,
+        &::after {
+          background: gesso-grayscale(gray-1);
+          box-shadow: 0 16px 32px 0 rgba(237, 239, 240, 0.1);
+        }
       }
     }
 
@@ -176,13 +168,16 @@
         border: 0;
         display: grid;
         grid-template-columns: 1fr;
-        width: 12rem;
       }
 
       // First menu item is for section overview page.
       &:first-child {
-        grid-column: 1 / span 2;
-        width: auto;
+        grid-column: 1 / span 4;
+
+        // stylelint-disable-next-line max-nesting-depth
+        @include at-media($theme-header-min-width) {
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
 
         // stylelint-disable-next-line
         .menu__link {
@@ -197,7 +192,8 @@
       font-size: font-size(body, 2xs);
       font-weight: normal;
       line-height: gesso-line-height(2);
-      padding-left: gesso-spacing(4);
+      padding: gesso-spacing(1) gesso-spacing(1) gesso-spacing(1)
+        gesso-spacing(4);
       width: 100%;
 
       &:visited {
@@ -208,12 +204,14 @@
         border-width: 0 units(0.5);
         display: block;
         font-size: font-size(body, xs);
-        padding-left: gesso-spacing(2);
+        padding: gesso-spacing(1) gesso-spacing(1) gesso-spacing(1)
+          gesso-spacing(2);
 
         // stylelint-disable-next-line max-nesting-depth
         &:hover,
         &:focus,
         &.is-active {
+          background: gesso-grayscale(gray-2);
           border-color: gesso-brand(blue, base);
           color: gesso-brand(blue, base);
         }
