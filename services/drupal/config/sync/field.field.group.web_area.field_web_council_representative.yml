@@ -5,12 +5,6 @@ dependencies:
   config:
     - field.storage.group.field_web_council_representative
     - group.type.web_area
-  module:
-    - custom_add_another
-third_party_settings:
-  custom_add_another:
-    custom_add_another: ''
-    custom_remove: ''
 id: group.web_area.field_web_council_representative
 field_name: field_web_council_representative
 entity_type: group
@@ -22,13 +16,10 @@ translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: 'default:user'
+  handler: views
   handler_settings:
-    target_bundles: null
-    sort:
-      field: _none
-    auto_create: false
-    filter:
-      type: _none
-    include_anonymous: true
+    view:
+      view_name: group_users
+      display_name: entity_reference_1
+      arguments: {  }
 field_type: entity_reference
