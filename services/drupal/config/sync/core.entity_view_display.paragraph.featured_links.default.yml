@@ -1,0 +1,37 @@
+uuid: c18ebd1b-023a-4798-9cc2-4c50b7273a94
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.featured_links.field_links
+    - field.field.paragraph.featured_links.field_title
+    - paragraphs.paragraphs_type.featured_links
+  module:
+    - epa_links
+id: paragraph.featured_links.default
+targetEntityType: paragraph
+bundle: featured_links
+mode: default
+content:
+  field_links:
+    type: epa_links_link_with_entity_title_or_link_text
+    label: hidden
+    settings:
+      trim_length: ''
+      url_only: false
+      url_plain: false
+      rel: 0
+      target: 0
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_title:
+    type: string
+    label: hidden
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  search_api_excerpt: true
