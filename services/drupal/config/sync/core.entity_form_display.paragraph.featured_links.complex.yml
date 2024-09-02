@@ -1,8 +1,9 @@
-uuid: 833c9588-ac51-4e8c-9def-13bbc7187c83
+uuid: 201e6960-6537-44b8-a9a8-8411583a10c4
 langcode: en
 status: true
 dependencies:
   config:
+    - core.entity_form_mode.paragraph.complex
     - field.field.paragraph.featured_links.field_theme_color
     - field.field.paragraph.featured_links.field_links
     - field.field.paragraph.featured_links.field_title
@@ -11,14 +12,14 @@ dependencies:
     - limited_field_widgets
     - link
     - maxlength
-id: paragraph.featured_links.default
+id: paragraph.featured_links.complex
 targetEntityType: paragraph
 bundle: featured_links
-mode: default
+mode: complex
 content:
   field_links:
     type: link_default
-    weight: 1
+    weight: 2
     region: content
     settings:
       placeholder_url: ''
@@ -30,6 +31,12 @@ content:
         maxlength_js_enforce: false
       limited_field_widgets:
         limit_values: '4'
+  field_theme_color:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_title:
     type: string_textfield
     weight: 0
@@ -40,5 +47,4 @@ content:
     third_party_settings: {  }
 hidden:
   created: true
-  field_theme_color: true
   status: true
