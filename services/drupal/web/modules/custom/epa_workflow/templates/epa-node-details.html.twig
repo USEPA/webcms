@@ -4,7 +4,8 @@
  *
  * Available variables:
  * - nid: the Node ID.
- * - rid: Current Revision ID link.
+ * - revision_url: URL of Current Revision.
+ * - revision_link: Link to Current Revision.
  * - editor_in_chief: Latest editor in chief.
  * - review_deadline: Review deadline formated  ex:'October 25, 2023 at 04:38PM UTC'.
  */
@@ -31,7 +32,7 @@
     aria-labelledby="epa-node-details-button"
     aria-expanded="true"
   >
-    <div class="epa-node-details__drawer-item">
+    <div class="epa-node-details__drawer-item is-single-line">
       {{ 'Node ID'|t }}: {{ nid }}
       <button
         class="epa-copy-button js-epa-copy-button"
@@ -40,21 +41,21 @@
         aria-label="{{ 'Copy this node ID'|t }}"
       >
         <svg class="epa-copy-button__icon">
-          <title>{{ 'Copy this ID'|t }}</title>
+          <title>{{ 'Copy this node ID'|t }}</title>
           <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#copy"></use>
         </svg>
       </button>
     </div>
-    <div class="epa-node-details__drawer-item">
+    <div class="epa-node-details__drawer-item is-single-line">
       {{ 'Revision ID'|t }}: {{ revision_link }}
       <button
         class="epa-copy-button js-epa-copy-button"
         type="button"
-        data-copy-value="{{ rid }}"
-        aria-label="{{ 'Copy this revision ID'|t }}"
+        data-copy-value="{{ revision_url }}"
+        aria-label="{{ 'Copy this revision URL'|t }}"
       >
         <svg class="epa-copy-button__icon">
-          <title>{{ 'Copy this ID'|t }}</title>
+          <title>{{ 'Copy this revision URL'|t }}</title>
           <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#copy"></use>
         </svg>
       </button>
