@@ -151,6 +151,46 @@ RUN composer install \
 # Remove any Composer authentication file if present.
 RUN rm auth.json
 
+FROM public.ecr.aws/docker/library/composer:2 AS deps-dev
+
+WORKDIR /app
+
+# Create a stub 'web' folder instead of copying to maximize cache usage
+RUN mkdir web
+
+# Copy "base" Composer scripts and patches first - we assume these change less frequently
+# than composer.json and friends
+COPY ./scripts scripts
+COPY ./patches patches
+
+# Copy Composer manifest files
+COPY composer.json composer.lock composer.patches.json auth.json ./
+
+# Perform a production-quality Composer build
+RUN composer install --ignore-platform-reqs # --optimize-autoloader
+
+# Remove any Composer authentication file if present.
+RUN rm auth.json
+
+FROM base AS dev
+
+COPY web web
+COPY config config
+COPY drush drush
+
+# Copy Composer-installed packages
+COPY --from=deps /app/web web
+COPY --from=deps /app/vendor vendor
+COPY --from=deps /app/scripts scripts
+
+# Copy composer.json files
+COPY --from=deps /app/composer.json /app/composer.lock /app/composer.patches.json ./
+
+COPY load.environment.php ./
+COPY phpstan* ./
+
+# RUN echo 'memory_limit=-1' >> /etc/php/php.d/zz-memory.ini
+
 # Build Gesso, the WebCMS' theme
 FROM forumone/gesso:3-node-v18-php-8.1 AS gesso
 

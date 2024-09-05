@@ -9,6 +9,33 @@ env:
   WEBCMS_REPO_URL: ${WEBCMS_REPO_URL}
 
 steps:
+  - group: ":php: Static Analysis"
+    steps:
+      - label: ":docker: Build Dev Image"
+        key: build-dev
+
+        agents:
+          queue: docker-builders
+
+        env:
+          DOCKER_BUILDKIT: '1'
+          BUILDKIT_PROGRESS: plain
+
+        commands:
+          - docker build services/drupal --target dev --tag 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
+          - docker push 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
+
+      - label: ":php: Run PHPstan"
+        depends_on: build-dev
+
+        command:
+          - docker pull 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
+          - >-
+            docker run --rm -it 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
+            vendor/bin/phpstan --configuration=phpstan.neon.dist --memory-limit=1G
+
+        soft_fail: true
+
   # This grouped step builds all Docker images used in the ECS cluster: Drupal,
   # Drush, nginx, and the FPM metrics sidecar.
   - group: ":docker: Build images"
