@@ -25,6 +25,16 @@ steps:
           - docker build services/drupal --target dev --tag 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
           - docker push 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
 
+        plugins:
+          - seek-oss/aws-sm#v2.3.1:
+              region: us-east-1
+              file:
+                - path: services/drupal/auth.json
+                  secret-id: buildkite/github_access_token
+          - ecr#v2.7.0:
+              login: true
+              no-include-email: true
+
       - label: ":php: Run PHPstan"
         depends_on: build-dev
 
@@ -33,6 +43,11 @@ steps:
           - >-
             docker run --rm -it 165761832703.dkr.ecr.us-east-1.amazonaws.com/buildkite:$BUILDKITE_PIPELINE_SLUG-$BUILDKITE_BUILD_NUMBER
             vendor/bin/phpstan --configuration=phpstan.neon.dist --memory-limit=1G
+
+        plugins:
+          - ecr#v2.7.0:
+              login: true
+              no-include-email: true
 
         soft_fail: true
 
