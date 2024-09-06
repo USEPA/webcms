@@ -11,6 +11,15 @@ services:
     arguments: ['@config.factory']
     tags:
       - { name: event_subscriber }
+  epa_core.route_subscriber:
+    class: Drupal\epa_core\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  epa_core.webform_access_check:
+    class: Drupal\epa_core\Access\EpaWebformAccessCheck
+    arguments: ['@group.membership_loader', '@entity_type.manager']
+    tags:
+      - { name: access_check, applies_to: _epa_webform_access_check }
   entity.autocomplete_matcher:
     class: Drupal\epa_core\Entity\EntityAutocompleteMatcher
     arguments: [ '@plugin.manager.entity_reference_selection' ]
