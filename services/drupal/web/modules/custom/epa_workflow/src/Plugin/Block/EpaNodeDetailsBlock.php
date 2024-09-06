@@ -94,14 +94,14 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
     $node_id = $node->id();
     $revision_id = $node->getRevisionId();
     // Create a URL to the latest revision view page.
-    $revision_url = Url::fromRoute('entity.node.revision', ['node' => $node_id, 'node_revision' => $revision_id]);
+    $revision_url = Url::fromRoute('entity.node.revision', ['node' => $node_id, 'node_revision' => $revision_id], ['absolute' => TRUE]);
     // Create a link with the revision ID as the link text.
     $revision_link = Link::fromTextAndUrl($this->t('@revision_id', ['@revision_id' => $revision_id]), $revision_url)->toString();
 
       $build['content'] = [
         '#theme' => 'epa_node_details',
         '#nid' => $node->id(),
-        '#rid' => $revision_id,
+        '#revision_url' => $revision_url,
         '#revision_link' => $revision_link,
         '#editor_in_chief' => $editor_in_chief_link,
         '#review_deadline' => $review_deadline,

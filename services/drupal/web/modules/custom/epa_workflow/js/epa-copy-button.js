@@ -19,6 +19,12 @@ Drupal.behaviors.epaCopyButton = {
       copyButton.addEventListener('click', event => {
         event.preventDefault();
         navigator.clipboard.writeText(copyValue);
+        alert(Drupal.t(
+          'Copied “@value” to your clipboard.',
+          {
+            '@value': copyValue
+          }
+        ));
       });
     });
   },
