@@ -100,6 +100,9 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // pages.
     $xpath = new \DOMXPath($doc);
 
+    // Get current path.
+    $current_path = $this->requestStack->getCurrentRequest()->getPathInfo();
+
     // Update metatags.
     $this->updateMetaTags($xpath);
 
@@ -107,7 +110,9 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     $this->addAlertMarkup($xpath, $doc);
 
     // Disable all form elements.
-    $this->removeFormElements($xpath);
+    if (strpos($current_path, '/home/january-19-2025-snapshot') === FALSE) {
+      $this->removeFormElements($xpath);
+    }
 
     // Add the search markup.
     $this->addSearchMarkup($xpath, $doc);
