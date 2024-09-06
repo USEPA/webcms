@@ -1,0 +1,17 @@
+{{ attach_library('epa_workflow/epa_content_info_box') }}
+
+{% set classes = [
+  'epa-content-info-box',
+  box_color ? 'is-' ~ box_color,
+] %}
+
+<div{{ attributes.addClass(classes) }}>
+  <div class="epa-content-info-box__content">
+    {{ content_moderation_form }}
+  </div>
+  <div class="epa-content-info-box__details">
+    {{ compare_link }}
+    {{ follow_widget }}
+    {{ node_details_widget }}
+  </div>
+</div>

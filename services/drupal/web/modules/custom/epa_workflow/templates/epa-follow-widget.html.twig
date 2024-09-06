@@ -1,0 +1,57 @@
+{#
+/**
+ * @file
+ *
+ * Available variables:
+ * - current_user_following: Boolean for determining whether the current user has
+     flagged the node.
+ * - flag_link: The link provided by the Flag module that provides the follow/un-follow
+     capabilities.
+ * - flag_users: An 'item_list' (ul) render array of all users currently flagging the node.
+     Order is based on order of when the user flagged with the exception of the current
+     user. If current user is 'following' then they will show at the top of the list.
+ */
+#}
+{{ attach_library('epa_workflow/epa_follow_widget') }}
+
+<div class="epa-follow-widget">
+  <button
+    class="epa-follow-widget__button epa-dropdown__button js-epa-dropdown"
+    id="epa-follow-widget-button"
+    aria-expanded="true"
+    aria-controls="epa-follow-widget-drawer"
+  >
+    {%- if current_user_is_following -%}
+      <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
+        <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#check"></use>
+      </svg> {{ "Watching"|t  }}
+    {%- else -%}
+      <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
+        <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#plus"></use>
+      </svg> {{ "Watch"|t  }}
+    {%- endif -%}
+  </button>
+
+  <div
+    class="epa-follow-widget__drawer epa-dropdown__drawer js-epa-dropdown-drawer"
+    id="epa-follow-widget-drawer"
+    role="region"
+    aria-labelledby="epa-follow-widget-button"
+    aria-expanded="true"
+  >
+    {{ flag_link }}
+
+    {% if flag_users|render|striptags|trim %}
+      {% set followers = flag_users|render %}
+    {% endif %}
+
+    {% if followers %}
+      <div class="epa-follow-widget__user-header">{{ "Watching this node"|t }}</div>
+      <div class="epa-follow-widget__followers">
+        {{ followers }}
+      </div>
+    {% else %}
+      <div class="epa-follow-widget__user-header">{{ "No watchers"|t }}</div>
+    {% endif %}
+  </div>
+</div>

@@ -1,0 +1,15 @@
+{{ attach_library('epa_workflow/epa_content_moderation') }}
+
+{% if content_moderation_form %}
+  <div class="epa-content-moderation">
+    <h2 class="epa-content-moderation__heading">{{ current_state }}</h3>
+    <div class="epa-content-moderation__details">
+      <p>{{ last_modified }}</p>
+
+      {% if scheduled_publish %}
+        <strong>{{ scheduled_publish }}</strong>
+      {% endif %}
+    </div>
+  </div>
+  {{ content_moderation_form }}
+{% endif %}

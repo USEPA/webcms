@@ -120,6 +120,21 @@ const createSprite = () => {
     .pipe(dest('images'));
 };
 
+const createDrupalSprite = () => {
+  return src('**/*.svg', { cwd: 'images/_drupal-sprite-source-files/' })
+    .pipe(
+      svgSprite({
+        mode: {
+          symbol: {
+            dest: '',
+            sprite: 'drupal-sprite.artifact.svg',
+          },
+        },
+      })
+    )
+    .pipe(dest('images'));
+};
+
 async function lintPatterns() {
   const errors = await lintPatternLab();
   if (Array.isArray(errors) && errors.length > 0) {
@@ -162,7 +177,10 @@ const watchFiles = async () => {
     series(lintStyles, compileStylesDev)
   );
   watch(
-    ['images/_sprite-source-files/*.svg'],
+    [
+      'images/_sprite-source-files/*.svg',
+      'images/_drupal-sprite-source-files/*.svg',
+    ],
     { usePolling: true, interval: 1500 },
     buildImages
   );
@@ -197,7 +215,10 @@ const buildPatterns = (exports.buildPatterns = series(
   lintPatterns,
   buildPatternLab,
 ));
-const buildImages = (exports.buildImages = createSprite);
+const buildImages = (exports.buildImages = parallel(
+  createSprite,
+  createDrupalSprite,
+));
 
 const build = (isProduction = true) => {
   const scriptTask = isProduction ? bundleScripts : bundleScriptsDev;

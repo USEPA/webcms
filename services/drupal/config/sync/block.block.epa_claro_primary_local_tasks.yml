@@ -2,6 +2,10 @@ uuid: 5d4ccd32-161d-4550-8863-82f443ee3779
 langcode: en
 status: true
 dependencies:
+  module:
+    - block_in_page_403
+    - block_in_page_not_found
+    - system
   theme:
     - epa_claro
 id: epa_claro_primary_local_tasks
@@ -17,4 +21,16 @@ settings:
   provider: core
   primary: true
   secondary: false
-visibility: {  }
+visibility:
+  page_403:
+    id: page_403
+    negate: false
+    page_403: 0
+  page_not_found_request:
+    id: page_not_found_request
+    negate: false
+    page_not_found: false
+  request_path:
+    id: request_path
+    negate: true
+    pages: '/node/*'
