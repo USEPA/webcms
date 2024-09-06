@@ -1,5 +1,4 @@
 import {
-  ButtonView,
   DropdownButtonView,
   LabeledFieldView,
   Model,
@@ -11,6 +10,18 @@ import { Plugin, icons } from 'ckeditor5/src/core';
 import { Collection } from 'ckeditor5/src/utils';
 import initializeAutocomplete from "../../../../../../contrib/linkit/js/ckeditor5_plugins/linkit/src/autocomplete";
 
+/**
+ * This plugin provides a dropdown that lets users select between different
+ * linkit matchers. We have two linkit matchers currently; the default which
+ * allows filtering to all content and  the second one filtering results to only
+ * nodes in Web Areas the user belongs to.
+ *
+ * To achieve this we're following a similar pattern to what Linkit takes.
+ *
+ * We create an autocomplete textfield that is connected to the second
+ * "web area only" matcher and the dropdown toggles between showing the default
+ * autocomplete or our custom one.
+ */
 class WebAreaLinkit extends Plugin {
 
   /**
@@ -21,17 +32,25 @@ class WebAreaLinkit extends Plugin {
   }
 
   init() {
-    const editor = this.editor;
-    this.locale = editor.locale;
-    this.options = editor.config.get('linkit');
-    this.options = {...this.options, autocompleteUrl: "/linkit/autocomplete/web_area_content" };
+    this.locale = this.editor.locale;
+    this.options = {...this.editor.config.get('linkit'), autocompleteUrl: "/linkit/autocomplete/web_area_content" };
+    // TRICKY: Work-around until the CKEditor team offers a better solution:
+    // force the ContextualBalloon to get instantiated early thanks to
+    // DrupalImage not yet being optimized like
+    // https://github.com/ckeditor/ckeditor5/commit/c276c45a934e4ad7c2a8ccd0bd9a01f6442d4cd3#diff-1753317a1a0b947ca8b66581b533616a5309f6d4236a527b9d21ba03e13a78d8.
+    if (this.editor.plugins.get('LinkUI')._createViews) {
+      this.editor.plugins.get('LinkUI')._createViews();
+    }
+
+    // this._addLinkitProfileSelector();
     this._extendLinkUITemplate();
     this._handleExtraFormFieldSubmit();
     this._handleDataLoadingIntoExtraFormField();
   }
 
   _extendLinkUITemplate() {
-    const editor = this.editor;
+    const { editor } = this;
+
     // Create a new dropdown element we'll use for switching linkit profiles.
     const dropdownView = createDropdown( this.locale, DropdownButtonView );
     const itemList = this._buildLinkitProfileList();
@@ -46,27 +65,56 @@ class WebAreaLinkit extends Plugin {
       }
     } );
 
+    // Create a new input field that we'll turn into a linkit autocomplete field.
+    const newUrlField = this._createUrlInput();
+
     // Brought all this over from the Linkit plugin.
-    const linkFormView = editor.plugins.get( 'LinkUI' ).formView;
     let wasAutocompleteAdded = false;
 
-    editor.plugins.get( 'ContextualBalloon' )._rotatorView.content.on('add', ( evt, view ) => {
-      if (view !== linkFormView || wasAutocompleteAdded) {
-        return;
-      }
+    // Copy the same solution from LinkUI as pointed out on
+    // https://www.drupal.org/project/drupal/issues/3317769#comment-14985648 and
+    // https://git.drupalcode.org/project/drupal/-/merge_requests/2909/diffs?commit_id=cc2cece3be1a9513b02a53d8a6862a6841ef4d5a.
+    editor.plugins
+      .get('ContextualBalloon')
+      .on('set:visibleView', (evt, propertyName, newValue, oldValue) => {
+        const linkFormView = editor.plugins.get('LinkUI').formView;
+        if (newValue === oldValue || newValue !== linkFormView) {
+          return;
+        }
 
-      // Create a new input field that we'll turn into a linkit autocomplete field.
-      const newUrlField = this._createUrlInput();
-      // Add the dropdown as the first element of the LinkFormView.
-      linkFormView.children.add(dropdownView, 0);
-      linkFormView.children.add(newUrlField, 1);
+        // Manual check to see if the dropdownView is already in the collection
+        let dropdownExists = false;
+        let urlFieldExists = false;
 
-      linkFormView.on( 'render', () => {
-        linkFormView._focusables.add( dropdownView, 1 );
-        linkFormView.focusTracker.add( dropdownView.element );
-        linkFormView._focusables.add( newUrlField, 1 );
-        linkFormView.focusTracker.add( newUrlField.element );
-      } );
+        for (let i = 0; i < linkFormView.children.length; i++) {
+          if (linkFormView.children.get(i) === dropdownView) {
+            dropdownExists = true;
+          }
+          if (linkFormView.children.get(i) === newUrlField) {
+            urlFieldExists = true;
+          }
+        }
+
+        if (!dropdownExists) {
+          linkFormView.children.add(dropdownView, 0);
+        }
+        if (!urlFieldExists) {
+          linkFormView.children.add(newUrlField, 2);
+        }
+
+        linkFormView.on('render', () => {
+          if (!linkFormView._focusables.has(dropdownView)) {
+            linkFormView._focusables.add(dropdownView, 1);
+            linkFormView.focusTracker.add(dropdownView.element);
+          }
+          if (!linkFormView._focusables.has(newUrlField)) {
+            linkFormView._focusables.add(newUrlField, 1);
+            linkFormView.focusTracker.add(newUrlField.element);
+          }
+        });
+
+        // Set the display of the url input to always display first
+        linkFormView.urlInputView.element.style.display = 'block';
 
       /**
        * Used to know if a selection was made from the autocomplete results.
@@ -176,42 +224,6 @@ class WebAreaLinkit extends Plugin {
 
     return items;
 
-  }
-
-  /**
-   * Creates a button and stores it in the editor component factory.
-   *
-   * @param {Drupal.CKEditor5~DrupalElementStyle} buttonConfig
-   *   The button configuration.
-   * @param {string} group
-   *   The name of the group (e.g. 'align', 'viewMode').
-   * @param {Drupal.CKEditor5~DrupalElementStyleDefinition[]} definedStyles
-   *   A list of defined styles of one group.
-   *
-   * @see module:ui/componentfactory~ComponentFactory
-   *
-   * @private
-   */
-  _createButton(buttonConfig, group, definedStyles) {
-    const buttonName = buttonConfig.name;
-    const command = this.editor.commands.get('drupalElementStyle');
-    const view = new ButtonView(this.locale);
-
-    view.set({
-      label: buttonConfig.title,
-      icon: buttonConfig.icon,
-      tooltip: true,
-      isToggleable: true,
-    });
-
-    view.bind('isEnabled').to(command, 'isEnabled');
-    view.bind('isOn').to(command, 'value', (value) => {
-      return value && value[group] === buttonName;
-    });
-
-    view.on('execute', this._executeCommand.bind(this, buttonName, group));
-
-    return view;
   }
 
   /**
