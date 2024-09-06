@@ -15,6 +15,10 @@
             "url": "https://packages.drupal.org/8"
         },
         {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        },
+        {
             "name": "nodespark/des-connector",
             "type": "vcs",
             "url": "https://github.com/safjoseph/des-connector"
@@ -196,6 +200,9 @@
         "drupal/core-recommended": "^10",
         "drupal/cshs": "^4.0",
         "drupal/custom_add_another": "^2.1@beta",
+        "drupal/danse": "^2.2",
+        "drupal/danse_content_moderation": "^2.0@beta",
+        "drupal/danse_moderation_notifications": "1.0.x-dev@dev",
         "drupal/date_range_formatter": "^4.0",
         "drupal/default_content": "^2.0@alpha",
         "drupal/devel": "^5.0",
@@ -260,6 +267,8 @@
         "drupal/paragraphs_entity_embed": "2.x-dev",
         "drupal/pathauto": "^1.4",
         "drupal/pathologic": "^2.0@alpha",
+        "drupal/pf_email": "^2.1",
+        "drupal/push_framework": "^2.2",
         "drupal/queue_ui": "^3.1",
         "drupal/rabbit_hole": "^1.0-beta10",
         "drupal/redirect": "^1.6",
@@ -272,6 +281,7 @@
         "drupal/schema_metatag": "^2.3",
         "drupal/search_api": "^1.27",
         "drupal/seckit": "^2.0",
+        "drupal/select2": "^1.15",
         "drupal/seven": "^1.0",
         "drupal/shield": "^1.7",
         "drupal/show_email": "^1.1",
@@ -287,6 +297,7 @@
         "drupal/token": "^1.9",
         "drupal/token_filter": "^2.0",
         "drupal/token_formatters": "^1.0@alpha",
+        "drupal/token_or": "^2.2",
         "drupal/transliterate_filenames": "^2.0",
         "drupal/twig_field_value": "^2.0",
         "drupal/twig_tweak": "^3.2",
@@ -313,6 +324,8 @@
         "liuggio/statsd-php-client": "^1.0",
         "mglaman/composer-drupal-lenient": "^1.0",
         "nodespark/des-connector": "dev-php-update#d699e59 as 7.x-dev",
+        "npm-asset/select2": "^4.0",
+        "oomphinc/composer-installers-extender": "^2.0",
         "popperjs/popperjs": "^2.11",
         "ruflin/elastica": "7.x-dev#72a4598544e3f99b5dd8cacb05d009ee75c2a701 as dev-master",
         "sabre/vobject": "^4.0",
@@ -357,7 +370,8 @@
             "drupal/core-project-message": true,
             "mglaman/composer-drupal-lenient": true,
             "drupal/core-vendor-hardening": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "oomphinc/composer-installers-extender": true
         }
     },
     "autoload": {
@@ -394,12 +408,15 @@
             "drupal/core": "-p2"
         },
         "patches-file": "composer.patches.json",
+        "installer-types": ["bower-asset", "npm-asset"],
         "installer-paths": {
             "web/core": [
                 "type:drupal-core"
             ],
             "web/libraries/{$name}": [
-                "type:drupal-library"
+                "type:drupal-library",
+                "type:bower-asset",
+                "type:npm-asset"
             ],
             "web/modules/contrib/{$name}": [
                 "type:drupal-module"

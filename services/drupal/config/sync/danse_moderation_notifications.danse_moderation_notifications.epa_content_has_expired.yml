@@ -1,0 +1,33 @@
+uuid: 55a675f5-a041-4bd1-8fe9-68a1bbe80396
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    workflow_process: automatic
+id: epa_content_has_expired
+group_use: true
+group_type: web_area
+workflow: epa_default
+group_roles:
+  web_area-administrator: web_area-administrator
+  web_area-approver: '0'
+  web_area-editor: '0'
+  web_area-member: '0'
+  web_area-watch_publication: '0'
+transitions:
+  unpublish: unpublish
+roles: {  }
+flags:
+  notification_opt_in: notification_opt_in
+author: true
+revision_author: true
+site_mail: false
+emails: ''
+subject: 'EPA Content Has Expired: [node:group:title] > [node:title]'
+body:
+  value: "<p>The following EPA page has expired and been unpublished. The page is no longer accessible to the public:</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>[node:group:title] &gt; [node:title]</p>\r\n\r\n<p><a href=\"[site:url]user/login?destination=node/[node:nid]\">[node:url]</a></p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Transitioned by: [node:revision-user:display-name]</p>\r\n\r\n<p>Comments: [node:revision-log]</p>"
+  format: unprocessed
+label: 'EPA Content Has Expired'

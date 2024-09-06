@@ -1,0 +1,33 @@
+uuid: cc37a203-1592-4284-bbf1-116ab4a955b8
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+third_party_settings:
+  epa_workflow:
+    workflow_process: any
+id: epa_content_needs_approval
+group_use: true
+group_type: web_area
+workflow: epa_default
+group_roles:
+  web_area-approver: web_area-approver
+  web_area-administrator: '0'
+  web_area-editor: '0'
+  web_area-member: '0'
+  web_area-watch_publication: '0'
+transitions:
+  send_for_review: send_for_review
+roles: {  }
+flags:
+  notification_opt_in: notification_opt_in
+author: false
+revision_author: false
+site_mail: false
+emails: ''
+subject: 'EPA Content Needs Approval: [node:group:title] > [node:title]'
+body:
+  value: "<p>The following EPA page has been submitted for approval. Please approve it or make changes:</p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>[node:group:title] &gt; [node:title]</p>\r\n\r\n<p><a href=\"[site:url]user/login?destination=node/[node:nid]/revisions/[node:vid]/view\">[node:url:unaliased]/revisions/[node:vid]/view</a></p>\r\n\r\n<p>&nbsp;</p>\r\n\r\n<p>Transitioned by: [node:revision-user:display-name]</p>\r\n\r\n<p>Comments: [node:revision-log]</p>\r\n"
+  format: unprocessed
+label: 'EPA Content Needs Approval'

@@ -1,0 +1,29 @@
+uuid: 976d55bb-aaf7-4164-97ed-653fc8272b69
+langcode: en
+status: true
+dependencies:
+  module:
+    - push_framework
+title: 'Default cron handler'
+id: push_framework_cron
+weight: 0
+module: push_framework
+callback: push_framework_cron
+scheduler:
+  id: simple
+  configuration:
+    rules:
+      - '*/5+@ * * * *'
+launcher:
+  id: serial
+  configuration:
+    timeouts:
+      lock_timeout: 3600
+    launcher:
+      thread: 0
+logger:
+  id: database
+  configuration:
+    method: '3'
+    expire: 1209600
+    retain: 1000
