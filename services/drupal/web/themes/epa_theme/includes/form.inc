@@ -66,16 +66,6 @@ function epa_theme_preprocess_entity_moderation_form(&$vars) {
 /**
  * Implements HOOK_form_FORM_ID_alter().
  */
-function epa_theme_form_content_moderation_entity_moderation_form_alter(&$form, &$form_state, $form_id) {
-  $form['new_state']['#title'] = t('Change state to');
-  $form['new_state']['#wrapper_attributes']['class'][] = 'is-inline';
-  $form['revision_log']['#wrapper_attributes']['class'][] = 'is-inline';
-  $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'is-inline';
-}
-
-/**
- * Implements HOOK_form_FORM_ID_alter().
- */
 function epa_theme_form_views_exposed_form_alter(&$form, &$form_state, $form_id) {
   // Switch template used for actions wrapper.
   $form['actions']['#theme_wrappers'] = ['container__no_wrapper'];
