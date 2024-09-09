@@ -46,6 +46,13 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
   protected $hostString = 'https://www.epa.gov';
 
   /**
+   * Snapshot host address.
+   *
+   * @var string
+   */
+  protected $snapshotHost = 'https://19january2025snapshot.epa.gov';
+
+  /**
    * Constructs an EpaSnapshotSubscriber object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -140,12 +147,12 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
 
     // Get link meta tags with href attribute starting with host.
     $links = $xpath->query("//link[starts-with(@href,'$host')]");
-    $this->stripAttributeTextFromList($links, 'href', $host);
+    $this->stripAttributeTextFromList($links, 'href', $host, $this->snapshotHost);
 
     // Get link meta tags with content attribute starting with host.
     // Strip the host from the content attribute.
     $metatags = $xpath->query("//meta[starts-with(@content,'$host')]");
-    $this->stripAttributeTextFromList($metatags, 'content', $host);
+    $this->stripAttributeTextFromList($metatags, 'content', $host, $this->snapshotHost);
   }
 
   /**
@@ -157,13 +164,15 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    *   The attribute of which values to strip.
    * @param string $text
    *   The the text to strip.
+   * @param string $replacement
+   *   The replacement text.
    */
-  protected function stripAttributeTextFromList(\DOMNodeList $items, string $attribute, string $text) {
+  protected function stripAttributeTextFromList(\DOMNodeList $items, string $attribute, string $text, $replacement = '') {
     // Get meta tags with content attribute starting with host.
     if (!empty($items)) {
       foreach ($items as $item) {
         /** @var \DOMElement $item */
-        $item->setAttribute($attribute, str_replace($text, '', $item->getAttribute($attribute)));
+        $item->setAttribute($attribute, str_replace($text, $replacement, $item->getAttribute($attribute)));
       }
     }
   }
