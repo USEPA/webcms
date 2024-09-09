@@ -63,8 +63,11 @@
     <div class="epa-node-details__drawer-item">
       {{ 'Editor in Chief'|t }}: {{editor_in_chief }}
     </div>
-    <div class="epa-node-details__drawer-item">
-      {{ 'Review Deadline on'|t }} {{ review_deadline }}
-    </div>
+
+    {% if review_deadline and review_deadline is not same as('No deadline set') %}
+      <div class="epa-node-details__drawer-item">
+        {{ 'Review Deadline on'|t }} {{ review_deadline }}
+      </div>
+    {% endif %}
   </div>
 </div>
