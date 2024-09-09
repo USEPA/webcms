@@ -76,8 +76,6 @@ class EpaWebAreasGroupNodeController extends GroupContentController {
         $bundle_label = $storage_handler->load($plugin->getEntityBundle())->label();
         $description = $storage_handler->load($plugin->getEntityBundle())->getDescription();
 
-//        $t_args = ['%description' => $description];
-//        $description = $this->t('%description', $t_args);
         $build['#bundles'][$bundle_name]['label'] = $bundle_label;
         $build['#bundles'][$bundle_name]['add_link']->setText($bundle_label);
         $build['#bundles'][$bundle_name]['description'] = $description;
