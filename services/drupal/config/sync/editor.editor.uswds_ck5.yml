@@ -1,6 +1,6 @@
 uuid: 873cfe2f-5966-4730-80a5-a6c5d9b969ea
 langcode: en
-status: true
+status: false
 dependencies:
   config:
     - filter.format.uswds_ck5
@@ -33,6 +33,14 @@ settings:
         - heading4
         - heading5
         - heading6
+    ckeditor5_list:
+      properties:
+        reversed: true
+        startIndex: true
+      multiBlock: true
+    ckeditor5_sourceEditing:
+      allowed_tags:
+        - '<div>'
     ckeditor5_style:
       styles:
         -
@@ -53,14 +61,6 @@ settings:
         -
           label: 'Button - Secondary'
           element: '<a class="usa-button usa-button-secondary">'
-    ckeditor5_sourceEditing:
-      allowed_tags:
-        - '<div>'
-    ckeditor5_list:
-      properties:
-        reversed: true
-        startIndex: true
-      multiBlock: true
     uswds_ckeditor_integration_ckeditor5_overrides:
       override_lists: true
       override_links: true
