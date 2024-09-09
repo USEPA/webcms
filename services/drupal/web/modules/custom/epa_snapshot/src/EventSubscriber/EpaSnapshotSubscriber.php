@@ -39,6 +39,13 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
   ];
 
   /**
+   * Host address to explicitly strip.
+   *
+   * @var string
+   */
+  protected $hostString = 'https://www.epa.gov';
+
+  /**
    * Constructs an EpaSnapshotSubscriber object.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -100,19 +107,17 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // pages.
     $xpath = new \DOMXPath($doc);
 
-    // Get current path.
-    $current_path = $this->requestStack->getCurrentRequest()->getPathInfo();
-
     // Update metatags.
     $this->updateMetaTags($xpath);
+
+    // Strip the host string from anchor tags.
+    $this->stripHostStringFromAnchors($xpath);
 
     // Add the alert markup.
     $this->addAlertMarkup($xpath, $doc);
 
-    // Disable all form elements.
-    if (strpos($current_path, '/home/january-19-2025-snapshot') === FALSE) {
-      $this->removeFormElements($xpath);
-    }
+    // Disable form elements except paths to be excluded.
+    $this->removeFormElements($xpath);
 
     // Add the search markup.
     $this->addSearchMarkup($xpath, $doc);
@@ -224,8 +229,13 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    */
   protected function removeFormElements(\DOMXPath $xpath) {
     $forms = $xpath->query('//form');
+    $snapshot_inputs = $xpath->query('//input[@name="site" and @value="snapshot2025"]');
+    $snapshot_input = $snapshot_inputs->item(0);
 
     foreach ($forms as $form) {
+      if (!empty($snapshot_input) && $form->isSameNode($snapshot_input->parentNode->parentNode)) {
+        continue;
+      }
       $form->parentNode->removeChild($form);
     }
   }
@@ -299,6 +309,25 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
 
     $fragment->appendXML($markup);
     return $fragment;
+  }
+
+  /**
+   * Helper method to strip anchor tags of $hostString.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function stripHostStringFromAnchors(\DOMXPath $xpath) {
+    $anchors = $xpath->query('//a');
+
+    foreach ($anchors as $anchor) {
+      /** @var \DOMElement $anchor */
+      $href = $anchor->getAttribute('href');
+      $anchor->setAttribute('href', str_replace($this->hostString, '', $href));
+    }
   }
 
   /**
