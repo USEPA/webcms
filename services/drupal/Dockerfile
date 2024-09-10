@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.3-fpm-alpine AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -121,7 +121,7 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:3-node-v18-php-8.1 AS gesso
+FROM forumone/gesso:3-node-v18-php-8.3 AS gesso
 
 WORKDIR /app
 
@@ -208,7 +208,7 @@ CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM public.ecr.aws/docker/library/php:8.2-cli-alpine AS drush
+FROM public.ecr.aws/docker/library/php:8.3-cli-alpine AS drush
 
 # Bump system packages
 RUN apk upgrade
