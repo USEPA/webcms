@@ -54,7 +54,7 @@ class SSOController extends ControllerBase {
       'destination' => $destination_url,
     ]);
 
-    return RedirectResponse::create($destination->toString());
+    return new RedirectResponse($destination->toString());
   }
 
 }
