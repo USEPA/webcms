@@ -238,6 +238,13 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       ];
     }
 
+    // Tweak classes.
+    $form['new_state']['#title'] = t('Change state to');
+    $form['new_state']['#wrapper_attributes']['class'][] = 'epa-content-moderation__fancy-select';
+    $form['revision_log']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
+    $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
+    $form['submit']['#attributes']['class'][] = 'button--primary';
+
     $block = Block::load('epa_publish_guidance');
     if ($block) {
       $block_content = \Drupal::entityTypeManager()
@@ -953,6 +960,10 @@ function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateI
 function epa_workflow_theme($existing, $type, $theme, $path) {
   // @todo: Evaluate and remove the content_info_box given we won't use this after
   return [
+    'entity_moderation_form' => [
+      'template' => 'entity-moderation-form',
+      'base hook' => 'content_moderation',
+    ],
     'epa_content_info_box' => [
       'variables' => [
         'node_edit_link' => NULL,

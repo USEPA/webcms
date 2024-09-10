@@ -2,14 +2,28 @@
 
 {% if content_moderation_form %}
   <div class="epa-content-moderation">
-    <h2 class="epa-content-moderation__heading">{{ current_state }}</h3>
-    <div class="epa-content-moderation__details">
-      <p>{{ last_modified }}</p>
-
-      {% if scheduled_publish %}
-        <strong>{{ scheduled_publish }}</strong>
-      {% endif %}
+    <div class="epa-content-moderation__content">
+      <details class="epa-content-moderation__details">
+        <summary class="epa-content-moderation__heading">
+          {{ current_state }}
+          <svg class="epa-content-moderation__heading-icon" aria-hidden="true" role="img">
+            <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#chevron-down"></use>
+          </svg>
+        </summary>
+        <div class="epa-content-moderation__details-content">
+          {{ content_moderation_form }}
+        </div>
+      </details>
+      <p class="epa-content-moderation__info">{{ last_modified }}</p>
     </div>
+
+    {% if scheduled_publish %}
+      <div class="epa-content-moderation__notice">
+        <svg class="epa-content-moderation__notice-icon" aria-hidden="true" role="img">
+          <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#warning"></use>
+        </svg>
+        {{ scheduled_publish }}
+      </div>
+    {% endif %}
   </div>
-  {{ content_moderation_form }}
 {% endif %}
