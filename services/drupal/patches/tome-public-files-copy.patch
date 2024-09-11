@@ -1,5 +1,5 @@
 diff --git a/modules/tome_static/src/StaticGenerator.php b/modules/tome_static/src/StaticGenerator.php
-index 845568f..90505a3 100644
+index 845568f..76df462 100644
 --- a/modules/tome_static/src/StaticGenerator.php
 +++ b/modules/tome_static/src/StaticGenerator.php
 @@ -167,6 +167,14 @@ class StaticGenerator implements StaticGeneratorInterface {
@@ -17,28 +17,3 @@ index 845568f..90505a3 100644
      if ($response->isRedirection() || $response->isOk()) {
        $directory = dirname($destination);
        $this->fileSystem->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
-@@ -475,12 +483,6 @@ class StaticGenerator implements StaticGeneratorInterface {
-       }
-     }
-     /** @var \DOMElement $node */
--    foreach ($document->getElementsByTagName('a') as $node) {
--      if ($node->hasAttribute('href')) {
--        $paths[] = $node->getAttribute('href');
--      }
--    }
--    /** @var \DOMElement $node */
-     foreach ($document->getElementsByTagName('script') as $node) {
-       if ($node->hasAttribute('src')) {
-         $paths[] = $node->getAttribute('src');
-@@ -499,11 +501,6 @@ class StaticGenerator implements StaticGeneratorInterface {
-         $paths[] = $node->getAttribute('src');
-       }
-     }
--
--    // Recursive call in HTML comments in order to retrieve conditional assets.
--    /** @var \DOMElement $node */
--    foreach ($xpath->query('//comment()') as $node) {
--      $paths = array_merge($paths, $this->getHtmlAssets($node->nodeValue, $root));
-     }
- 
-     return $paths;
