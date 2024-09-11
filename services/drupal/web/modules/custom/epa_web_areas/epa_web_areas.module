@@ -11,6 +11,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\group\Entity\Group;
@@ -172,6 +173,25 @@ function epa_web_areas_form_media_library_add_form_alter(&$form, FormStateInterf
  * Implements hook_form_FORM_ID_alter().
  */
 function epa_web_areas_form_embedded_paragraphs_paragraphs_entity_embed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add custom help text describing each paragraph item.
+  // @link https://forumone.atlassian.net/browse/EPAD8-2509
+  $items = [
+    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/and-after-images">Before/After Swipe</a>: compare two images side-by-side'),
+    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/adding-boxes-webcms-editor">Boxes</a> highlight specific web content. Each box style has specific content requirements'),
+    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-dynamic-list">Dynamic Lists</a> are automated lists of WebCMS content based on filters'),
+    Markup::create('From Library can be used to add "<a target="_blank" href="https://www.epa.gov/webcmstraining/reusable-paragraphs-repeatable-content">reusable paragraphs</a>," which can be embedded on multiple pages'),
+    'Add Header adds headings like h2, h3, etc.',
+    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/adding-link-list">Link List</a> are bulleted lists of links'),
+    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-slideshows">Slideshows</a> are pictures that can be cycled through'),
+  ];
+
+  $help_text_list = [
+    '#theme' => 'item_list',
+    '#type' => 'ul',
+    '#items' => $items,
+    '#weight' => -100,
+  ];
+  $form['help_text'] = $help_text_list;
   // Add a custom submit handler that runs after media is added and saved.
   if (!empty($form['actions'])) {
     $form['#submit'][] = 'epa_web_areas_group_media_submit';
@@ -481,5 +501,34 @@ function epa_web_areas_views_data_alter(array &$data) {
     $data["search_api_index_media"]["gid"]["filter"]['field_name'] = 'gid';
     $data["search_api_index_media"]["gid"]["filter"]['entity_type'] = 'group_content';
     $data["search_api_index_media"]["gid"]["filter"]['id'] = 'search_api_entity_reference';
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for the page variable.
+ *
+ * Adds custom status message to the below routes.
+ * @link https://forumone.atlassian.net/browse/EPAD8-2490
+ */
+function epa_web_areas_preprocess_page(&$variables) {
+  $routes = [
+    'entity.group.canonical',
+    'system.admin_content'
+  ];
+  if (in_array(\Drupal::routeMatch()->getRouteName(), $routes)) {
+    $message = Markup::create('Add new content or use these filters to <a href="https://www.epa.gov/webcmstraining/finding-your-content">find content that you are looking for</a>. Type your User ID into the Author or the Last Updated By fields to find content you\'ve worked on.');
+    $variables['page']['highlighted']['#attached']['library'][] = 'epa_web_areas/custom_message';
+    $variables['page']['highlighted']['custom_message'] = [
+      '#theme' => 'status_messages',
+      '#attributes' => [
+        'class' => ['epa-web-areas-custom-message'],
+      ],
+      '#message_list' => [
+        'warning' => [$message]
+      ],
+      '#status_headings' => [
+        'warning' => '',
+      ],
+    ];
   }
 }
