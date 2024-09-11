@@ -7,10 +7,12 @@
 ] %}
 
 {% if title is not empty -%}
-  <label{{ attributes.addClass(classes) }}>
-    {{ title }}
-    {% if required and title_display != 'after' -%}
-      <abbr class="usa-hint usa-hint--required" title="{{ 'required'|t }}">*</abbr>
-    {%- endif %}
-  </label>
+  {% apply spaceless %}
+    <label{{ attributes.addClass(classes) }}>
+      {{- title -}}
+      {%- if required and title_display != 'after' -%}
+        <abbr class="usa-hint usa-hint--required" title="{{ 'required'|t }}">*</abbr>
+      {%- endif -%}
+    </label>
+  {% endapply %}
 {%- endif %}
