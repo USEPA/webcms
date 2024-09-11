@@ -30,6 +30,8 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     '/entity:user:/',
     '/entity:taxonomy_term:/',
     '/entity:danse_event:/',
+    '/entity:danse_notification:/',
+    '/entity:danse_notification_action:/',
     '/\/forms\//',
     '/\/perspectives\/search\//',
     '/\/faqs\/search\//',
