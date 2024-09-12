@@ -22,6 +22,7 @@ dependencies:
     - field.field.node.perspective.field_publisher
     - field.field.node.perspective.field_release
     - field.field.node.perspective.field_review_deadline
+    - field.field.node.perspective.field_scheduled_transition
     - field.field.node.perspective.field_search_text
     - field.field.node.perspective.field_subjects
     - field.field.node.perspective.field_type
@@ -67,9 +68,10 @@ third_party_settings:
       format_type: tab
       format_settings:
         classes: ''
+        show_empty_fields: false
         id: ''
         formatter: open
-        description: ''
+        description: '<a target="_blank" href="https://www.epa.gov/webguide/entering-good-metadata-your-webpages">Metadata</a> is information that describes your content: it should be succinct, descriptive information about the page or document. It also improves your page rank in EPA''''s internal search engine.'
         required_fields: true
     group_page_javascript:
       children:
@@ -232,6 +234,7 @@ content:
     region: content
     settings:
       sidebar: true
+      use_details: true
     third_party_settings: {  }
   field_owning_office:
     type: entity_reference_autocomplete_tags
