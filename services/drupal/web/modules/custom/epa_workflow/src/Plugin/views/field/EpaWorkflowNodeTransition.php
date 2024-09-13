@@ -2,89 +2,59 @@
 
 namespace Drupal\epa_workflow\Plugin\views\field;
 
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\views\ResultRow;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a field for views to show the content reference's transition states.
  *
  * @ViewsField("epa_workflow_node_transition")
  */
-class EpaWorkflowNodeTransition extends EpaWorkflowReferenceBase {
-
-  /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInformation;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $instance = new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager')
-    );
-
-    $instance->setModerationInformation($container->get('content_moderation.moderation_information'));
-
-    return $instance;
-  }
-
-  /**
-   * Sets the moderation information service.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
-   *   The moderation information service.
-   */
-  public function setModerationInformation(ModerationInformationInterface $moderation_information) {
-    $this->moderationInformation = $moderation_information;
-  }
+class EpaWorkflowNodeTransition extends EpaWorkflowReferenceTransitionBase {
 
   /**
    * {@inheritdoc}
    */
   public function render(ResultRow $values) {
     $entity = $this->getEntity($values);
+
+    if (empty($entity) || !$entity instanceof ContentEntityInterface) {
+      return '';
+    }
+
+    $transition_revision_ids = $this->getTransitionRevisionIds($values);
+
     $transition = '';
     $current_state = '';
     $previous_state = '';
 
-    if ($entity instanceof ContentEntityInterface) {
-      $current_state = $entity->moderation_state->value;
+    if (!empty($transition_revision_ids['from'])) {
+      $last_revision = $this->getRevisionEntity($transition_revision_ids['from']);
+      $previous_state = !empty($last_revision) ? $last_revision->get('moderation_state')->getString() : '';
+    }
 
-      if (isset($entity->last_revision) && !empty($entity->last_revision)) {
-        $revision_id = $entity->last_revision;
-        /** @var \Drupal\node\Entity\Node $last_revision */
-        $last_revision = \Drupal::entityTypeManager()
-          ->getStorage('node')
-          ->loadRevision($revision_id);
-        $previous_state = $last_revision->get('moderation_state')->getString();
+    if (!empty($transition_revision_ids['to'])) {
+      $current_revision = $this->getRevisionEntity($transition_revision_ids['to']);
+      $current_state = !empty($current_revision) ? $current_revision->get('moderation_state')->getString() : '';
+    }
+
+    if (!empty($current_state) || !empty($previous_state)) {
+      /** @var \Drupal\workflows\WorkflowInterface $workflow */
+      $workflow = \Drupal::service('content_moderation.moderation_information')->getWorkflowForEntity($entity);
+
+      $transition .= 'Transitioned';
+
+      if (!empty($current_state)) {
+        $current_state_label = $workflow->getTypePlugin()->getState($current_state)->label();
+        $transition .= ' to ' . $current_state_label;
       }
 
-      if (!empty($current_state) || !empty($previous_state)) {
-        /** @var \Drupal\workflows\WorkflowInterface $workflow */
-        $workflow = \Drupal::service('content_moderation.moderation_information')->getWorkflowForEntity($entity);
-
-        $transition .= 'Transitioned';
-
-        if (!empty($current_state)) {
-          $current_state_label = $workflow->getTypePlugin()->getState($current_state)->label();
-          $transition .= ' to ' . $current_state_label;
-        }
-
-        if (!empty($previous_state)) {
-          $previous_state_label = $workflow->getTypePlugin()->getState($previous_state)->label();
-          $transition .= ' from ' . $previous_state_label;
-        }
+      if (!empty($previous_state)) {
+        $previous_state_label = $workflow->getTypePlugin()->getState($previous_state)->label();
+        $transition .= ' from ' . $previous_state_label;
       }
     }
+
     return $this->sanitizeValue($transition);
   }
 
