@@ -56,11 +56,29 @@ abstract class EpaWorkflowReferenceBase extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function getEntity(ResultRow $values) {
-    $event = parent::getEntity($values);
+    $event = $this->getEvent($values);
     if ($event instanceof Event && $payload = $event->getPayload()) {
       return $payload->getEntity();
     }
     return $event;
+  }
+
+  /**
+   * Gets the Danse entity matching the current row and relationship.
+   *
+   * @param \Drupal\views\ResultRow $values
+   *   An object containing all retrieved values.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Returns the Danse entity matching the values or NULL if there is
+   *   no matching entity.
+   */
+  public function getEvent(ResultRow $values) {
+    $event = parent::getEntity($values);
+    if ($event instanceof Event) {
+      return $event;
+    }
+    return NULL;
   }
 
   /**
