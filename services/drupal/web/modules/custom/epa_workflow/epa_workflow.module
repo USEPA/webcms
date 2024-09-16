@@ -890,3 +890,30 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
     ],
   ];
 }
+
+/**
+ * Implements hook_toolbar().
+ */
+function epa_workflow_toolbar() {
+  $items['epa_notifications'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => 'Notifications',
+      '#url' => Url::fromUri('base://admin/content/notifications'),
+      '#attributes' => [
+        'class' => ['toolbar-icon', 'toolbar-icon-notifications'],
+        'title' => 'View and manage content moderation notifications.',
+      ],
+    ],
+    '#wrapper_attributes' => [
+      'class' => ['epa-workflow-notifications-toolbar-tab'],
+    ],
+    '#attached' => [
+      'library' => [
+        'epa_workflow/notifications-toolbar',
+      ],
+    ],
+  ];
+  return $items;
+}
