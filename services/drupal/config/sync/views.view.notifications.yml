@@ -2,6 +2,8 @@ uuid: c7406576-7757-4070-ad92-95ad34bbde73
 langcode: en
 status: true
 dependencies:
+  config:
+    - user.role.authenticated
   module:
     - danse
     - epa_workflow
@@ -559,9 +561,10 @@ display:
           sort_asc_label: Asc
           sort_desc_label: Desc
       access:
-        type: perm
+        type: role
         options:
-          perm: 'access content'
+          role:
+            authenticated: authenticated
       cache:
         type: tag
         options: {  }
@@ -764,7 +767,7 @@ display:
         - url
         - url.query_args
         - user
-        - user.permissions
+        - user.roles
       tags: {  }
   page_1:
     id: page_1
@@ -795,5 +798,5 @@ display:
         - url
         - url.query_args
         - user
-        - user.permissions
+        - user.roles
       tags: {  }
