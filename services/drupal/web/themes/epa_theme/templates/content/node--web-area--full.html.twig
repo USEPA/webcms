@@ -54,11 +54,21 @@
   {{ node.field_banner|view({settings: {}}) }}
 {% endset %}
 
+{% set description %}
+  {{ node.field_web_area_description|view({label: 'hidden', settings: {view_mode: 'default'}}) }}
+{% endset %}
+
+{% set popular_links %}
+  {{ node.field_web_area_popular_links|view({type: 'entity_reference_revisions_entity_view', label: 'hidden', settings: {view_mode: 'default'}}) }}
+{% endset %}
+
 {% set body %}
   {{ content|without(
     'epa_content_moderation_info_box',
     'field_banner',
-    'field_wide_content'
+    'field_wide_content',
+    'field_web_area_description',
+    'field_web_area_popular_links'
   ) }}
   {{ node.field_wide_content|view({type: 'layout_paragraphs', label: 'hidden', settings: {view_mode: 'default'}}) }}
 {% endset %}
@@ -73,5 +83,7 @@
   'show_admin_info': show_admin_info,
   'slideshow': slideshow,
   'body': body,
+  'description': description,
+  'popular_links': popular_links,
   'footer': footer,
 } %}

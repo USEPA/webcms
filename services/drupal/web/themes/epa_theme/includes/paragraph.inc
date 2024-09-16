@@ -6,7 +6,6 @@
  */
 
 use Drupal\Core\Render\Element;
-use Drupal\Core\Template\Attribute;
 
 /**
  * Implements theme_preprocess_paragraph()
@@ -96,5 +95,26 @@ function epa_theme_preprocess_paragraph__card(&$variables) {
 
   if ($parent->hasField('field_image_style')) {
     $variables['image_placement_style'] = $parent->get('field_image_style')->value;
+  }
+}
+
+/**
+ * Implements template_preprocess_paragraph()
+ */
+function epa_theme_preprocess_paragraph__featured_links(&$variables) {
+  $paragraph = $variables['paragraph'];
+
+  // Get parent component.
+  $parent_uuid = $paragraph->getBehaviorSetting('layout_paragraphs', 'parent_uuid');
+
+  // If parent component is set, load it and get behavior settings.
+  if (!empty($parent_uuid)) {
+    $parent_component = \Drupal::service('entity.repository')->loadEntityByUuid('paragraph', $parent_uuid);
+
+    // If parent component has a color class, pass it to the paragraph template.
+    $parent_class_color = $parent_component->getBehaviorSetting('layout_paragraphs', ['config', 'classes', 'color']);
+    if (!empty($parent_class_color)) {
+      $variables['parent_class_color'] = $parent_class_color;
+    }
   }
 }
