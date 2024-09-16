@@ -1,6 +1,7 @@
 @use '../../../00-config' as *;
+@use '../../../02-base' as *;
 
-.block__web-area-menu {
+.block--web-area-menu {
   @include breakpoint-min-max(gesso-breakpoint(tablet-lg), 899px) {
     margin-top: -2.5rem;
   }
@@ -19,7 +20,8 @@
   }
 
   .block__title {
-    @include display-text-style(h3);
+    @extend %h3;
+    font-size: font-size(heading, md);
 
     @include at-media-max($theme-header-min-width) {
       border-left: 2px solid gesso-grayscale(gray-3);
@@ -29,6 +31,7 @@
 
     a {
       color: gesso-grayscale(black);
+      text-decoration: none;
 
       &:visited {
         color: gesso-color(text, link-visited);

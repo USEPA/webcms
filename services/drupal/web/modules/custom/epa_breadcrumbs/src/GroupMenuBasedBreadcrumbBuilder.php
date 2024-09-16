@@ -312,6 +312,12 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       array_pop($links);
     }
 
+    // Per https://forumone.atlassian.net/browse/EPAD8-2411 we want to limit the
+    // breadcrumbs to a max of 5 (Home -> Web Area Homepage -> Parent -> Child -> Grand Child)
+    if (count($links) > 5) {
+      array_splice($links, 5);
+    }
+
     return $breadcrumb->setLinks($links);
   }
 
