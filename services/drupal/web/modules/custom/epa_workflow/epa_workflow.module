@@ -258,8 +258,16 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
       // Add the rendered block markup to the form.
       $form['publish_guidance'] = [
-        '#type' => 'markup',
+        '#type' => 'item',
         '#markup' => $rendered_block_markup,
+        '#states' => [
+          'visible' => [
+            ':input[name="new_state"]' => ['value' => 'published'],
+          ],
+          'invisible' => [
+            ':input[name="new_state"]' => ['!value' => 'published'],
+          ]
+        ]
       ];
     }
 
