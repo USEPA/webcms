@@ -10,6 +10,7 @@ use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\Markup;
 use Drupal\epa_workflow\ModerationStateToColorMapTrait;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -113,6 +114,7 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       '#content_moderation_form' => $form,
       '#last_modified' => $this->buildLastModifiedByString($node),
       '#scheduled_publish' => $this->buildScheduledPublishString() ?? NULL,
+      '#help_text' => Markup::create($this->t('This represents a moderation state. <a target="_blank" href=":url">Learn more about moderation states here ></a>', [':url' => 'https://www.epa.gov/webcmstraining/detailed-workflows-webcms']))
     ];
     return $build;
   }
