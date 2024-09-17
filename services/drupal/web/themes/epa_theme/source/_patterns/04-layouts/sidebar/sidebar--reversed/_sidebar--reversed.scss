@@ -4,8 +4,13 @@
 @use '../../../00-config' as *;
 
 .l-sidebar--reversed {
+  display: flex;
+  flex-direction: column-reverse;
+  flex-wrap: wrap;
+
   @include breakpoint(gesso-breakpoint(sidebar)) {
     flex-direction: row-reverse;
+    flex-wrap: nowrap;
 
     > .l-sidebar__sidebar {
       margin-left: 0;
