@@ -37,6 +37,7 @@ dependencies:
   module:
     - datetime
     - entity_reference_revisions
+    - epa_core
     - epa_web_areas
     - link
     - metatag
@@ -244,10 +245,15 @@ content:
     weight: 28
     region: content
   field_subjects:
-    type: entity_reference_label
-    label: above
+    type: epa_core_hierarchical_term_facet_formatter
+    label: inline
     settings:
+      display: all
       link: true
+      wrap: none
+      separator: ' | '
+      reverse: false
+      facet_source: speeches_subjects
     third_party_settings: {  }
     weight: 5
     region: content

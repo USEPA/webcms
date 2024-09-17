@@ -99,6 +99,11 @@ class RouteSubscriber extends RouteSubscriberBase {
         $route->addOptions(['_admin_route' => TRUE]);
       }
     }
+    // Need to alter the group node route to alter the output as we want.
+    // @link https://forumone.atlassian.net/browse/EPAD8-2489
+    if ($route = $collection->get('entity.group_content.group_node_add_page')) {
+      $route->setDefault('_controller', '\Drupal\epa_web_areas\Controller\EpaWebAreasGroupNodeController::addPage');
+    }
   }
 
   /**
