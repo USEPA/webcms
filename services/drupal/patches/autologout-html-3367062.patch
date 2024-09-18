@@ -1,0 +1,20 @@
+diff --git a/src/AutologoutManager.php b/src/AutologoutManager.php
+index 5c50f99..e876d86 100644
+--- a/src/AutologoutManager.php
++++ b/src/AutologoutManager.php
+@@ -3,6 +3,7 @@
+ namespace Drupal\autologout;
+ 
+ use Drupal\Component\Datetime\TimeInterface;
++use Drupal\Component\Render\FormattableMarkup;
+ use Drupal\Component\Utility\Xss;
+ use Drupal\Core\Config\Config;
+ use Drupal\Core\Config\ConfigFactoryInterface;
+@@ -177,6 +178,7 @@ class AutologoutManager implements AutologoutManagerInterface {
+    */
+   public function inactivityMessage() {
+     $message = Xss::filter($this->autoLogoutSettings->get('inactivity_message'));
++    $message = new FormattableMarkup($message, []);
+     $type = $this->autoLogoutSettings->get('inactivity_message_type');
+     if (!empty($message)) {
+       $this->messenger->addMessage($this->t('@message', ['@message' => $message]), $type);

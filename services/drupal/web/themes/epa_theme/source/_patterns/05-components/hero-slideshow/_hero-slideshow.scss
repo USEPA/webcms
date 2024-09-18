@@ -7,6 +7,10 @@
 
 .hero-slideshow {
   margin-bottom: rem(gesso-spacing(3));
+
+  @media print {
+    display: none;
+  }
 }
 
 .hero-slideshow__list {
@@ -39,8 +43,8 @@
     }
   }
 
-  &[aria-hidden="true"] a,
-  &[aria-hidden="true"] button {
+  &[aria-hidden='true'] a,
+  &[aria-hidden='true'] button {
     pointer-events: none;
     visibility: hidden;
   }
@@ -55,9 +59,14 @@
   .js & {
     display: block;
   }
+
+  @media print {
+    display: none !important;
+  }
 }
 
 .hero-slideshow__nav-button {
+  // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
   @extend .button;
   background-color: gesso-grayscale('gray-4');
   margin-right: gesso-spacing(1);
