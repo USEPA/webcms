@@ -1,0 +1,90 @@
+// @file
+// Styles for Popular Links.
+
+@use '../../00-config' as *;
+
+$breakpoint-2-cols: 450px;
+$breakpoint-4-cols: 900px;
+
+.popular-links {
+  --epa-color-bg: #{gesso-grayscale(white)};
+  --epa-color-border: #{gesso-brand(blue, base)};
+  --epa-color-link: #{gesso-color(text, primary)};
+  --epa-color-link-bg-hover: #{gesso-brand(blue, base)};
+  --epa-color-link-text-hover: #{gesso-grayscale(white)};
+  --epa-color-star: #{gesso-brand(blue, base)};
+  --epa-color-text: #{gesso-color(text, primary)};
+  background: var(--epa-color-bg);
+  color: var(--epa-color-text);
+  margin-block-end: rem(gesso-spacing(5));
+  padding-block: rem(gesso-spacing(4));
+}
+
+.popular-links__title {
+  color: var(--epa-color-text) !important;
+}
+
+.popular-links__title-icon {
+  color: var(--epa-color-star);
+}
+
+.popular-links__list {
+  @include list-clean();
+  display: flex;
+  flex-wrap: wrap;
+  gap: rem(gesso-spacing(3));
+
+  li {
+    flex-basis: 100%;
+    flex-grow: 1;
+
+    @include breakpoint($breakpoint-2-cols) {
+      flex-basis: 46%;
+    }
+
+    @include breakpoint($breakpoint-4-cols) {
+      flex-basis: 22%;
+    }
+  }
+
+  a {
+    border-left: 2px solid var(--epa-color-border);
+    display: inline-flex;
+    font-family: font-family(heading);
+    font-size: font-size(heading, $theme-h4-font-size);
+    font-weight: gesso-font-weight(bold);
+    height: 100%;
+    line-height: line-height(heading, $theme-heading-line-height);
+    padding: rem(units('105')) rem(gesso-spacing(2));
+    text-decoration: none;
+    width: 100%;
+
+    &:link,
+    &:visited {
+      background: transparent;
+      color: var(--epa-color-link);
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: var(--epa-color-link-bg-hover);
+      color: var(--epa-color-link-text-hover);
+      text-decoration: underline;
+    }
+  }
+}
+
+.popular-links--dark-blue {
+  --epa-color-bg: #{gesso-brand(blue, dark)};
+  --epa-color-border: #{gesso-grayscale(white)};
+  --epa-color-link: #{gesso-grayscale(white)};
+  --epa-color-link-active: #{gesso-grayscale(white)};
+  --epa-color-link-hover: #{gesso-grayscale(white)};
+  --epa-color-star: #{gesso-grayscale(white)};
+  --epa-color-text: #{gesso-grayscale(white)};
+}
+
+.popular-links--light-gray {
+  --epa-color-bg: #{color('base-lightest')};
+}

@@ -3,12 +3,13 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.field.paragraph.featured_links.field_theme_color
     - field.field.paragraph.featured_links.field_links
+    - field.field.paragraph.featured_links.field_theme_color
     - field.field.paragraph.featured_links.field_title
     - paragraphs.paragraphs_type.featured_links
   module:
     - epa_links
+    - options
 id: paragraph.featured_links.default
 targetEntityType: paragraph
 bundle: featured_links
@@ -24,7 +25,14 @@ content:
       rel: 0
       target: 0
     third_party_settings: {  }
-    weight: 1
+    weight: 2
+    region: content
+  field_theme_color:
+    type: list_key
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
     region: content
   field_title:
     type: string
@@ -32,8 +40,7 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
-    weight: 0
+    weight: 1
     region: content
 hidden:
-  field_theme_color: true
   search_api_excerpt: true
