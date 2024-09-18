@@ -16,6 +16,7 @@ $breakpoint-4-cols: 900px;
   --epa-color-text: #{gesso-color(text, primary)};
   background: var(--epa-color-bg);
   color: var(--epa-color-text);
+  container-type: inline-size;
   margin-block-end: rem(gesso-spacing(5));
   padding-block: rem(gesso-spacing(4));
 }
@@ -38,11 +39,11 @@ $breakpoint-4-cols: 900px;
     flex-basis: 100%;
     flex-grow: 1;
 
-    @include breakpoint($breakpoint-2-cols) {
+    @include container-query($breakpoint-2-cols) {
       flex-basis: 46%;
     }
 
-    @include breakpoint($breakpoint-4-cols) {
+    @include container-query($breakpoint-4-cols) {
       flex-basis: 22%;
     }
   }
