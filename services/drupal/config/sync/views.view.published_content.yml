@@ -1101,7 +1101,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -1815,6 +1814,56 @@ display:
           hierarchy: false
           limit: true
           error_message: true
+        users_in_groups:
+          id: users_in_groups
+          table: group_content_field_data
+          field: users_in_groups
+          relationship: group_content
+          group_type: group
+          admin_label: ''
+          operator: in
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: users_in_groups_op
+            label: 'Web area filter'
+            description: ''
+            use_operator: 0
+            operator: users_in_groups_op
+            operator_limit_selection: 0
+            operator_list: {  }
+            identifier: users_in_groups
+            required: 0
+            remember: 0
+            multiple: 0
+            remember_roles:
+              authenticated: authenticated
+              anonymous: 0
+              paragraphs_library_contributor: 0
+              layout_editor: 0
+              alerts_manager: 0
+              block_manager: 0
+              system_editor: 0
+              system_webmaster: 0
+              menu_admin: 0
+              administrator: 0
+              beta_tester: 0
+            reduce: 0
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: 0
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: group_content
+          plugin_id: epa_web_areas_users_groups
         combine:
           id: combine
           table: views
@@ -2000,7 +2049,6 @@ display:
         - 'languages:language_interface'
         - url
         - url.query_args
-        - user
         - 'user.node_grants:view'
         - user.permissions
       tags:
