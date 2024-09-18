@@ -1,0 +1,44 @@
+uuid: 833c9588-ac51-4e8c-9def-13bbc7187c83
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.featured_links.field_theme_color
+    - field.field.paragraph.featured_links.field_links
+    - field.field.paragraph.featured_links.field_title
+    - paragraphs.paragraphs_type.featured_links
+  module:
+    - limited_field_widgets
+    - link
+    - maxlength
+id: paragraph.featured_links.default
+targetEntityType: paragraph
+bundle: featured_links
+mode: default
+content:
+  field_links:
+    type: link_default
+    weight: 1
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings:
+      maxlength:
+        maxlength_js: null
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+        maxlength_js_enforce: false
+      limited_field_widgets:
+        limit_values: '4'
+  field_title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  field_theme_color: true
+  status: true
