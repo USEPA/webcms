@@ -17,6 +17,15 @@
       <p class="epa-content-moderation__info">{{ last_modified }}</p>
     </div>
 
+    {% if review_deadline %}
+      <div class="epa-content-moderation__notice">
+        <svg class="epa-content-moderation__notice-icon" aria-hidden="true" role="img">
+          <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#warning"></use>
+        </svg>
+        {{ review_deadline }}
+      </div>
+    {% endif %}
+
     {% if scheduled_publish %}
       <div class="epa-content-moderation__notice">
         <svg class="epa-content-moderation__notice-icon" aria-hidden="true" role="img">

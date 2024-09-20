@@ -90,6 +90,11 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return AccessResultForbidden::forbidden();
     }
 
+    // This block doesn't make sense on the revisions listing page.
+    if ($this->routeMatch->getRouteName() == 'entity.node.version_history') {
+      return AccessResultForbidden::forbidden();
+    }
+
     if (\Drupal::currentUser()->isAuthenticated()) {
       return AccessResult::allowed();
     }
