@@ -15,10 +15,7 @@ const util = require("./util");
  */
 
 const drushScript = dedent`
-  drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 1 --input-format=integer
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
   drush --debug --uri="$WEBCMS_SITE_URL" deploy -y
-  drush --debug --uri="$WEBCMS_SITE_URL" sset system.maintenance_mode 0 --input-format=integer
   drush --debug --uri="$WEBCMS_SITE_URL" cr
 `;
 
