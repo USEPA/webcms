@@ -108,6 +108,10 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
     }
 
     // @todo: Only display the review_deadline if the revision is published
+    $review_deadline = '';
+    if ($node->isPublished()) {
+      $review_deadline = $this->buildReviewByString($node);
+    }
 
     $build['content'] = [
       '#theme' => 'epa_content_moderation_form',
@@ -115,7 +119,7 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       '#current_state' => $this->getModerationStateLabel() ?? $this->t('No Workflow'),
       '#content_moderation_form' => $form,
       '#last_modified' => $this->buildLastModifiedByString($node),
-      '#review_deadline' => $this->buildReviewByString($node),
+      '#review_deadline' => $review_deadline,
       '#scheduled_publish' => $this->buildScheduledPublishString() ?? NULL,
       '#help_text' => Markup::create($this->t('This represents a moderation state. <a target="_blank" href=":url">Learn more about moderation states here ></a>', [':url' => 'https://www.epa.gov/webcmstraining/detailed-workflows-webcms']))
     ];

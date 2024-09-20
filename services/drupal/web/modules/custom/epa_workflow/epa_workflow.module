@@ -312,20 +312,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 }
 
 /**
- * Lazy builder callback to render the block content.
- */
-function epa_workflow_lazy_load_block($block_id) {
-  $block = Block::load($block_id);
-  if ($block) {
-    return \Drupal::entityTypeManager()
-      ->getViewBuilder('block')
-      ->view($block);
-  }
-
-  return [];
-}
-
-/**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
