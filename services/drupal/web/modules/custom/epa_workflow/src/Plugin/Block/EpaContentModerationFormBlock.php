@@ -107,12 +107,19 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       $box_color = 'yellow';
     }
 
+    // @todo: Only display the review_deadline if the revision is published
+    $review_deadline = '';
+    if ($node->isPublished()) {
+      $review_deadline = $this->buildReviewByString($node);
+    }
+
     $build['content'] = [
       '#theme' => 'epa_content_moderation_form',
       '#box_color' => $box_color,
       '#current_state' => $this->getModerationStateLabel() ?? $this->t('No Workflow'),
       '#content_moderation_form' => $form,
       '#last_modified' => $this->buildLastModifiedByString($node),
+      '#review_deadline' => $review_deadline,
       '#scheduled_publish' => $this->buildScheduledPublishString() ?? NULL,
       '#help_text' => Markup::create($this->t('This represents a moderation state. <a target="_blank" href=":url">Learn more about moderation states here ></a>', [':url' => 'https://www.epa.gov/webcmstraining/detailed-workflows-webcms']))
     ];
@@ -172,6 +179,20 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
           )->toString(),
       ]
     );
+  }
+
+  public function buildReviewByString(NodeInterface $node) {
+    /** @var \Drupal\datetime\Plugin\Field\FieldType\DateTimeItem $review_deadline_timestamp */
+    $review_deadline = $node->get('field_review_deadline')[0];
+    if ($review_deadline) {
+      /** @var \Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601 $value */
+      $value  = $review_deadline->get('value');
+      $timestamp = $value->getDateTime()->getTimestamp();
+      return $this->t("Review by @review_deadline", ['@review_deadline' => $this->buildFormalDatetimeString($timestamp)]);
+    }
+
+    return '';
+
   }
 
   /**
