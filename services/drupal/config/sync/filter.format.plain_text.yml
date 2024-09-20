@@ -13,24 +13,17 @@ name: 'Plain text'
 format: plain_text
 weight: 10
 filters:
-  filter_html_escape:
-    id: filter_html_escape
-    provider: filter
-    status: true
-    weight: -10
-    settings: {  }
-  filter_url:
-    id: filter_url
-    provider: filter
-    status: true
-    weight: 0
-    settings:
-      filter_url_length: 72
   filter_autop:
     id: filter_autop
     provider: filter
     status: true
     weight: 0
+    settings: {  }
+  filter_html_escape:
+    id: filter_html_escape
+    provider: filter
+    status: true
+    weight: -10
     settings: {  }
   filter_pathologic:
     id: filter_pathologic
@@ -42,22 +35,13 @@ filters:
       local_settings:
         protocol_style: full
         local_paths: ''
-  token_filter:
-    id: token_filter
-    provider: token_filter
-    status: false
+  filter_url:
+    id: filter_url
+    provider: filter
+    status: true
     weight: 0
     settings:
-      replace_empty: '0'
-  media_embed:
-    id: media_embed
-    provider: media
-    status: false
-    weight: 100
-    settings:
-      default_view_mode: default
-      allowed_view_modes: {  }
-      allowed_media_types: {  }
+      filter_url_length: 72
   media_inline_embed:
     id: media_inline_embed
     provider: media_inline_embed
@@ -67,3 +51,10 @@ filters:
       default_view_mode: default
       allowed_media_types: {  }
       allowed_view_modes: {  }
+  token_filter:
+    id: token_filter
+    provider: token_filter
+    status: false
+    weight: 0
+    settings:
+      replace_empty: '0'
