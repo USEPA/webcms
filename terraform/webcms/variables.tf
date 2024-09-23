@@ -50,6 +50,12 @@ variable "image_tag" {
   type        = string
 }
 
+variable "cpu_architecture" {
+  description = "The CPU architecture to pass to Fargate. Should be either 'X86_64' or 'ARM64'. Leave null to apply the Fargate default."
+  type        = string
+  default     = null
+}
+
 #endregion
 
 #region Drupal service configuration

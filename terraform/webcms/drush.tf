@@ -11,6 +11,11 @@ resource "aws_ecs_task_definition" "drush_task" {
   cpu    = 1024
   memory = 2048
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = var.cpu_architecture
+  }
+
   container_definitions = jsonencode([
     {
       name  = "drush"
