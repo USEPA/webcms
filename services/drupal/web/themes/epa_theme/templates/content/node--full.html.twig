@@ -64,12 +64,12 @@
   {% endif %}
 {% endif %}
 
-
 {% if display_sidenav %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
     'has_header': true,
     'has_footer': has_footer,
     'has_sidenav': true,
+    'has_in_page_nav': node.field_in_page_navigation.value,
     'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
@@ -83,6 +83,7 @@
   {% include '@templates/detail-pages/page.twig' with {
     'has_header': true,
     'has_footer': has_footer,
+    'has_in_page_nav': node.field_in_page_navigation.value,
     'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
