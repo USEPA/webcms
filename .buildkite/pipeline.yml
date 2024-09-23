@@ -17,8 +17,7 @@ steps:
       build.branch != "integration" &&
       build.branch != "main" &&
       build.branch != "release" &&
-      build.branch != "live" &&
-      build.branch != "EPAD8-1705-USWDS-3"
+      build.branch != "live"
 
     command: buildkite-agent pipeline upload .buildkite/feature.yml
     env:
@@ -59,15 +58,3 @@ steps:
     env:
       WEBCMS_ENVIRONMENT: preproduction
       WEBCMS_SITE: ${BUILDKITE_BRANCH}
-
-  # The USWDS environment gets deployed from a branch where WEBCMS_SITE doesn't
-  # match up, so we handle it specially here.
-  - label: ":pipeline: WebCMS (uswds)"
-    if:
-      build.pull_request.id == null &&
-      build.branch == "EPAD8-1705-USWDS-3"
-
-    command: buildkite-agent pipeline upload .buildkite/webcms.yml
-    env:
-      WEBCMS_ENVIRONMENT: preproduction
-      WEBCMS_SITE: uswds
