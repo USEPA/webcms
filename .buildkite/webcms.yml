@@ -78,6 +78,9 @@ steps:
 
   - wait: ~
 
+  # It's safe to deploy English and Spanish ECS Terraform in parallel since they
+  # are independent at the AWS API level
+
   - label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"
     command: buildkite-agent pipeline upload .buildkite/terraform.apply.yml
 
@@ -98,6 +101,8 @@ steps:
 
   - wait: ~
 
+  # Similarly, it's safe to run Drush on English and Spanish in parallel
+
   - label: ":ecs: Drush (${WEBCMS_SITE}-en)"
     concurrency_group: $BUILDKITE_PIPELINE_SLUG/drush-$WEBCMS_SITE-en
     concurrency: 1
@@ -106,6 +111,11 @@ steps:
       - docker#v3.8.0:
           image: node:14-alpine
           entrypoint: /bin/sh
+
+          # We create ~/.aws/credentials and use AWS_PROFILE here instead of
+          # generating session tokens because Drush can sometimes run for a very
+          # long time, causing one-time tokens to expire. By using a profile,
+          # the AWS SDK can refresh its session tokens.
           command:
             - -ec
             - |
