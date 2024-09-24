@@ -39,6 +39,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.epaAlerts = {
     attach(context, settings) {
       const alerts = once('loadEpaAlerts', 'body', context);
+      drupalSettings.ajax.hide_ajax_errors = true;
       alerts.forEach(alert => {
         const alertContext = drupalSettings.epaAlerts.context;
         const viewInfo = {
@@ -85,10 +86,7 @@ import Drupal from 'drupal';
           Drupal.ajax.instances[this.instanceIndex] = null;
         };
 
-        getAlerts.execute().fail(() => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to load alerts.');
-        });
+        getAlerts.execute();
       });
     },
   };
