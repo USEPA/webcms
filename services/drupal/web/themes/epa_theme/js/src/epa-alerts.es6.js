@@ -86,6 +86,7 @@ import Drupal from 'drupal';
         };
 
         getAlerts.execute().fail(() => {
+          // eslint-disable-next-line no-console
           console.error('Failed to load alerts.');
         });
       });
