@@ -31,7 +31,7 @@ hierarchy:
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 widget:
-  type: links
+  type: checkbox
   config:
     show_numbers: false
     soft_limit: 0
@@ -41,6 +41,7 @@ widget:
     soft_limit_settings:
       show_less_label: 'Show less'
       show_more_label: 'Show more'
+    disable_autosubmit: 1
 empty_behavior:
   behavior: none
 only_visible_when_facet_source_is_visible: true
@@ -61,6 +62,12 @@ processor_configs:
       date_display: actual_date
       granularity: 6
       date_format: ''
+      hierarchy: false
+  hierarchy_processor:
+    processor_id: hierarchy_processor
+    weights:
+      build: 100
+    settings: {  }
   raw_value_widget_order:
     processor_id: raw_value_widget_order
     weights:

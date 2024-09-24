@@ -31,7 +31,7 @@ hierarchy:
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 widget:
-  type: links
+  type: checkbox
   config:
     show_numbers: false
     soft_limit: 10
@@ -41,6 +41,7 @@ widget:
     soft_limit_settings:
       show_less_label: 'Show less'
       show_more_label: 'Show more'
+    disable_autosubmit: 1
 empty_behavior:
   behavior: none
 only_visible_when_facet_source_is_visible: true
@@ -59,6 +60,11 @@ processor_configs:
       sort: 40
     settings:
       sort: ASC
+  hierarchy_processor:
+    processor_id: hierarchy_processor
+    weights:
+      build: 100
+    settings: {  }
   translate_entity:
     processor_id: translate_entity
     weights:
@@ -69,9 +75,4 @@ processor_configs:
     weights:
       pre_query: 50
       build: 15
-    settings: {  }
-  hierarchy_processor:
-    id: hierarchy_processor
-    weights:
-      build: 100
     settings: {  }

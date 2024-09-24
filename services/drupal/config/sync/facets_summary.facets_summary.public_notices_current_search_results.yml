@@ -9,6 +9,20 @@ dependencies:
     - search_api
 id: public_notices_current_search_results
 name: 'Current search results'
+facet_source_id: 'search_api:views_page__search_public_notices__page_1'
+processor_configs:
+  hide_when_not_rendered:
+    processor_id: hide_when_not_rendered
+    weights:
+      build: '45'
+    settings: {  }
+  reset_facets:
+    processor_id: reset_facets
+    weights:
+      build: '30'
+    settings:
+      link_text: ''
+      position: before
 facets:
   public_notices_comments_due_date:
     checked: true
@@ -34,17 +48,3 @@ facets:
     separator: ', '
     show_count: false
     weight: 0
-facet_source_id: 'search_api:views_page__search_public_notices__page_1'
-processor_configs:
-  hide_when_not_rendered:
-    processor_id: hide_when_not_rendered
-    weights:
-      build: '45'
-    settings: {  }
-  reset_facets:
-    processor_id: reset_facets
-    weights:
-      build: '30'
-    settings:
-      link_text: ''
-      position: before
