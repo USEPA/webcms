@@ -338,20 +338,6 @@ function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_stat
 }
 
 /**
- * Implements hook_preprocess_form_element_label().
- */
-function epa_workflow_preprocess_form_element_label(array &$variables) {
-  // The revision log is not required when transitioning between all moderation
-  // states but we want to always make it render as if it were. Setting the
-  // 'required' variable to TRUE here allows the template to render the field as
-  // if it were required without interfering with the actual form validation.
-  $element = $variables['element'];
-  if (isset($element['#id']) && $element['#id'] == 'edit-revision-log') {
-    $variables['required'] = TRUE;
-  }
-}
-
-/**
  * Custom submit handler for the content moderation form when placed on node
  * view pages.
  */

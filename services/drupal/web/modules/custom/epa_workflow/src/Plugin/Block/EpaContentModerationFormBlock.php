@@ -31,6 +31,16 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
   use ModerationStateToColorMapTrait;
 
   /**
+   * Moderation states that are considered still in the "published" state.
+   */
+  const PUBLISHED_MODERATION_STATES = [
+    'published',
+    'published_needs_review',
+    'published_expiring',
+    'published_day_til_expire'
+  ];
+
+  /**
    * The date time formatter service.
    *
    * @var \Drupal\Core\Datetime\DateFormatter
@@ -118,7 +128,7 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       '#box_color' => $box_color,
       '#current_state' => $this->getModerationStateLabel() ?? $this->t('No Workflow'),
       '#content_moderation_form' => $form,
-      '#last_modified' => $this->buildLastModifiedByString($node),
+      '#last_modified' => in_array($moderation_state_id, self::PUBLISHED_MODERATION_STATES) ? $this->buildLastPublishedOnString($node) : $this->buildLastModifiedByString($node),
       '#review_deadline' => $review_deadline,
       '#scheduled_publish' => $this->buildScheduledPublishString() ?? NULL,
       '#help_text' => Markup::create($this->t('This represents a moderation state. <a target="_blank" href=":url">Learn more about moderation states here ></a>', [':url' => 'https://www.epa.gov/webcmstraining/detailed-workflows-webcms']))
@@ -157,6 +167,15 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
     }
   }
 
+  public function buildLastPublishedOnString(NodeInterface $node) {
+    return $this->t("Published on @date by @user",
+      [
+        '@date' => $this->buildFormalDatetimeString($node->getRevisionCreationTime()),
+        '@user' => $node->getRevisionUser()->toLink(NULL, 'canonical')->toString(),
+      ]
+    );
+  }
+
   /**
    * Returns a "last authored on..." text for the current node revision.
    *
@@ -168,15 +187,7 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
     return $this->t("Last modified on @date by @user",
       [
         '@date' => $this->buildFormalDatetimeString($node->getRevisionCreationTime()),
-        '@user' => $node->getRevisionUser()->toLink(NULL, 'canonical',
-            [
-              'attributes' => [
-                'class' => [
-                  'my-class',
-                ],
-              ],
-            ]
-          )->toString(),
+        '@user' => $node->getRevisionUser()->toLink(NULL, 'canonical')->toString(),
       ]
     );
   }
