@@ -85,10 +85,7 @@ import Drupal from 'drupal';
           Drupal.ajax.instances[this.instanceIndex] = null;
         };
 
-        getAlerts.execute().fail(() => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to load alerts.');
-        });
+        getAlerts.execute();
       });
     },
   };
