@@ -85,7 +85,9 @@ import Drupal from 'drupal';
           Drupal.ajax.instances[this.instanceIndex] = null;
         };
 
-        getAlerts.execute();
+        getAlerts.execute().fail(() => {
+          console.error('Failed to load alerts.');
+        });
       });
     },
   };
