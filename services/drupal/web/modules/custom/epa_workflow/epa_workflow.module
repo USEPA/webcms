@@ -1031,6 +1031,7 @@ function epa_workflow_page_top(array &$page_top) {
       if ($block->access(\Drupal::currentUser())) {
         $block->setContextValue('node', $node);
         $page_top['epa_node_tabs'] = $block->build();
+        $page_top['epa_node_tabs']['#weight'] = 1000;
       }
     }
 
@@ -1044,6 +1045,7 @@ function epa_workflow_page_top(array &$page_top) {
       if ($content_info_block->access(\Drupal::currentUser())) {
         $content_info_block->setContextValue('node', $separate);
         $page_top['content_info_box'] = $content_info_block->build();
+        $page_top['content_info_box']['#weight'] = 1001;
       }
     }
   }
