@@ -258,8 +258,16 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 
       // Add the rendered block markup to the form.
       $form['publish_guidance'] = [
-        '#type' => 'markup',
+        '#type' => 'item',
         '#markup' => $rendered_block_markup,
+        '#states' => [
+          'visible' => [
+            ':input[name="new_state"]' => ['value' => 'published'],
+          ],
+          'invisible' => [
+            ':input[name="new_state"]' => ['!value' => 'published'],
+          ]
+        ]
       ];
     }
 
@@ -304,20 +312,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
 }
 
 /**
- * Lazy builder callback to render the block content.
- */
-function epa_workflow_lazy_load_block($block_id) {
-  $block = Block::load($block_id);
-  if ($block) {
-    return \Drupal::entityTypeManager()
-      ->getViewBuilder('block')
-      ->view($block);
-  }
-
-  return [];
-}
-
-/**
  * Implements hook_form_BASE_FORM_ID_alter().
  */
 function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
@@ -339,20 +333,6 @@ function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_stat
       $markup = t("<strong>Note:</strong> The revision you are editing is not the currently published content. It may include edits that are not visible on the published page. Refer to the <a target='_blank' href='@url'>revision page</a> to see other revisions and revert if necessary.", ['@url' => $url]);
       \Drupal::messenger()->addWarning($markup);
     }
-  }
-}
-
-/**
- * Implements hook_preprocess_form_element_label().
- */
-function epa_workflow_preprocess_form_element_label(array &$variables) {
-  // The revision log is not required when transitioning between all moderation
-  // states but we want to always make it render as if it were. Setting the
-  // 'required' variable to TRUE here allows the template to render the field as
-  // if it were required without interfering with the actual form validation.
-  $element = $variables['element'];
-  if (isset($element['#id']) && $element['#id'] == 'edit-revision-log') {
-    $variables['required'] = TRUE;
   }
 }
 
@@ -1022,8 +1002,10 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
         'box_color' => NULL,
         'current_state' => NULL,
         'content_moderation_form' => NULL,
+        'review_deadline' => NULL,
         'last_modified' => NULL,
         'scheduled_publish' => NULL,
+        'help_text' => NULL,
       ],
     ],
     'flag__notification_opt_in' => [

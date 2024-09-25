@@ -112,8 +112,15 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     $cacheability->addCacheContexts(['route']);
     $cacheability->addCacheTags(['node']);
 
-    /** @var NodeInterface $node */
-    $node = $this->getContextValue('node');
+    /** @var NodeInterface $context_node */
+    // The node from context is based on the route parameter so this could be
+    // a published revision, forward revision or some revision in the past.
+    $context_node = $this->getContextValue('node');
+
+    /** @var NodeInterface $latest_node */
+    // Node::load() either returns the published revision or if one doesn't exist
+    // the latest revision.
+    $latest_node = Node::load($context_node->id());
 
     $tabs = [];
     $route_name = $this->routeMatch->getRouteName();
@@ -124,7 +131,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     foreach ($tasks['tabs'] as $task_key => $tab) {
       switch ($task_key) {
         case 'entity.node.canonical':
-          if (!$node->isPublished()) {
+          if (!$latest_node->isPublished()) {
             $tab['#link']['url'] = new Url('<none>');
             $tab['#active'] = FALSE;
           }
@@ -145,20 +152,21 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           );
           break;
         case 'content_moderation.workflows:node.latest_version_tab':
-          // The "View latest draft" tab should be enabled in the following:
-          // - should link to /node/[id]/latest if latest revision doesn't match current revision
-          // - should link to /node/[id] if latest revision matches current revision and current revision is NOT published
-          // - Or if latest revision == current revision and current revision IS NOT published then this s.
-          if ($node->isLatestRevision() && !$node->isPublished()) {
-            $tab['#link']['url'] = $node->toUrl();
-            $tab['#active'] = TRUE;
+          // Set tab to active if we're on the page.
+          $tab['#active'] = $this->routeMatch->getRouteName() === 'entity.node.latest_version';
+
+          if ($latest_node->isPublished() && $latest_node->isLatestRevision() && $context_node->getRevisionId() === $latest_node->getRevisionId()) {
+            $tab['#link']['url'] = new Url('<none>');
+            $tab['#active'] = FALSE;
           }
 
           // Access to the latest_version tab is not always allowed based on the workflow
           // state of the node. If that's the case we need to modify it so that we
           // can still show it.
           if ($tab['#access'] instanceof AccessResultForbidden) {
-            $tab['#link']['url'] = new Url('<none>');
+            if (!$context_node->isPublished()) {
+              $tab['#link']['url'] = $context_node->toUrl();
+            }
             $tab['#access'] = new AccessResultAllowed();
           }
 

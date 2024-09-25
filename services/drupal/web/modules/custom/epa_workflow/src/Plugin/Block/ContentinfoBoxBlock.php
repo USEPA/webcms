@@ -90,6 +90,11 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return AccessResultForbidden::forbidden();
     }
 
+    // This block doesn't make sense on the revisions listing page.
+    if ($this->routeMatch->getRouteName() == 'entity.node.version_history') {
+      return AccessResultForbidden::forbidden();
+    }
+
     if (\Drupal::currentUser()->isAuthenticated()) {
       return AccessResult::allowed();
     }
@@ -121,7 +126,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       '#theme' => 'epa_content_info_box_advanced',
       '#box_color' => $box_color,
       '#compare_link' => $this->buildCompareLink(),
-      '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'), // @todo: Add this later
+      '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'),
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
       '#attributes' => new Attribute(),
