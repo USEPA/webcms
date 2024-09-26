@@ -1,0 +1,52 @@
+<?php
+
+/**
+ * @file
+ * Hook implementations for the content moderation notifications module.
+ */
+
+use Drupal\danse_moderation_notifications\DanseModerationNotificationsInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_entity_operation().
+ */
+function danse_moderation_notifications_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  if ($entity instanceof DanseModerationNotificationsInterface) {
+    if ($entity->status()) {
+      $operations['disable'] = [
+        'title' => t('Disable'),
+        'url' => $entity->toUrl('disable-form'),
+        'weight' => 50,
+      ];
+    }
+    else {
+      $operations['enable'] = [
+        'title' => t('Enable'),
+        'url' => $entity->toUrl('enable-form'),
+        'weight' => 50,
+      ];
+    }
+  }
+
+  return $operations;
+}
+
+/**
+ * Implements hook_help().
+ */
+function danse_moderation_notifications_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.danse_moderation_notifications':
+      $output = '';
+      $output .= '<h3>' . t("Introduction") . '</h3>';
+      $output .= '<p>' . t("The Content Moderation Notifications module allows
+        notifications to be sent to all users of a particular role, or to the
+        content's author when a piece of content is transitioned from one state
+        to another via core's Content Moderation module.") . '</p>';
+      return $output;
+  }
+}
