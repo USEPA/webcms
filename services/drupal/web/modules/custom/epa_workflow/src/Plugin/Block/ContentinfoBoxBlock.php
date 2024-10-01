@@ -84,17 +84,29 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
    * {@inheritdoc}
    */
   protected function blockAccess(AccountInterface $account) {
-    // Check if we are on a node first
+    // Check if we are on a node first.
     if (!$this->routeMatch->getParameter('node')) {
       // Not on a node, exit early.
       return AccessResultForbidden::forbidden();
     }
 
-    // This block doesn't make sense on the revisions listing page.
-    if ($this->routeMatch->getRouteName() == 'entity.node.version_history') {
+    // This block doesn't make sense on the below routes.
+    // - Node revisions listing page.
+    // - Node delete form.
+    // - Custom node export page.
+    // - entity clone page.
+    $unavailable_routes = [
+      'entity.node.version_history',
+      'entity.node.delete_form',
+      'epa_node_export.admin_page',
+      'entity.node.clone_form'
+    ];
+
+    if (in_array($this->routeMatch->getRouteName(), $unavailable_routes)) {
       return AccessResultForbidden::forbidden();
     }
 
+    // Users must be authenticated to see this block.
     if (\Drupal::currentUser()->isAuthenticated()) {
       return AccessResult::allowed();
     }
