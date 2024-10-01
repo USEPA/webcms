@@ -131,13 +131,15 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
     foreach ($tasks['tabs'] as $task_key => $tab) {
       switch ($task_key) {
         case 'entity.node.canonical':
+          $tab_title = $this->t("View live page");
           if (!$latest_node->isPublished()) {
             $tab['#link']['url'] = new Url('<none>');
             $tab['#active'] = FALSE;
+            $tab_title = $this->t("No live page");
           }
 
           $tabs[] = $this->createTabItem(
-            $this->t('View live page'),
+            $tab_title,
             $tab,
             Icons::LIVE,
             -90,
@@ -152,12 +154,19 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           );
           break;
         case 'content_moderation.workflows:node.latest_version_tab':
+          $tab_title = $this->t("View latest draft");
           // Set tab to active if we're on the page.
           $tab['#active'] = $this->routeMatch->getRouteName() === 'entity.node.latest_version';
 
           if ($latest_node->isPublished() && $latest_node->isLatestRevision() && $context_node->getRevisionId() === $latest_node->getRevisionId()) {
             $tab['#link']['url'] = new Url('<none>');
             $tab['#active'] = FALSE;
+            $tab_title = $this->t("No latest draft");
+          }
+
+          // If the node isn't published, but is the latest revision we're actually on the canonical route.
+          if (!$latest_node->isPublished() && $latest_node->isLatestRevision() && $this->routeMatch->getRouteName() === 'entity.node.canonical') {
+            $tab['#active'] = TRUE;
           }
 
           // Access to the latest_version tab is not always allowed based on the workflow
@@ -171,7 +180,7 @@ class EpaNodeTabsBlock extends BlockBase implements ContainerFactoryPluginInterf
           }
 
           $tabs[] = $this->createTabItem(
-            $this->t('View latest draft'),
+            $tab_title,
             $tab,
             Icons::SHOW,
             -70
