@@ -310,6 +310,10 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     // when on a non-prod environment.
     $form["field_workflow_debugger"]["#access"] = getenv('WEBCMS_SITE') !== 'prod';
   }
+
+  if ($form_id === 'node_page_delete_form') {
+    $form['description']['#markup'] = '<p>This will delete the published and any draft versions of this page. Also, all past revisions of this page will be deleted.</p><p>This action cannot be undone.</p>';
+  }
 }
 
 /**
@@ -334,6 +338,20 @@ function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_stat
       $markup = t("<strong>Note:</strong> The revision you are editing is not the currently published content. It may include edits that are not visible on the published page. Refer to the <a target='_blank' href='@url'>revision page</a> to see other revisions and revert if necessary.", ['@url' => $url]);
       \Drupal::messenger()->addWarning($markup);
     }
+
+    // Adding "Last updated by" above the "Author" in the meta details group
+    $form['meta']['last_updated_by'] = [
+      '#type' => 'item',
+      '#markup' => $node->getRevisionUser()->getAccountName(),
+      '#title' => t("Last updated by"),
+      '#attributes' => [
+        'class' => ['entity-meta__last-updated-by']
+      ],
+      '#weight' => 10,
+    ];
+
+    $form['meta']['author']['#title'] = t('Created by');
+    $form['meta']['author']['#weight'] = 20;
   }
 }
 
