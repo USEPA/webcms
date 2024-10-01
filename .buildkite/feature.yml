@@ -42,10 +42,9 @@ steps:
           #
           # [1]: https://getcomposer.org/doc/articles/authentication-for-private-packages.md#authentication-in-auth-json-per-project
           - seek-oss/aws-sm#v2.3.1:
-              region: us-east-1
               file:
                 - path: services/drupal/auth.json
-                  secret-id: buildkite/github_access_token
+                  secret-id: forumone/composer-auth
 
           # Assume cross-account build role. We don't log in directly to ECR as Kaniko is able
           # to do that for us.
