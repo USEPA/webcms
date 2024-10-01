@@ -85,7 +85,10 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
       }
       // Review deadline - assuming it's a field on the node.
       if ($node->hasField('field_review_deadline') && !$node->get('field_review_deadline')->isEmpty()) {
-        $review_deadline = $node->get('field_review_deadline')->date->format('F j, Y \a\t g:iA T');
+        $review_deadline = $node->get('field_review_deadline')[0];
+        $value  = $review_deadline->get('value');
+        $timestamp = $value->getDateTime()->getTimestamp();
+        $review_deadline = \Drupal::service('date.formatter')->format($timestamp, 'formal_datetime');
       } else {
         $review_deadline = 'No deadline set';
       }
