@@ -272,6 +272,11 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
       ];
     }
 
+    // Adjust label of "Draft" state
+    if (isset($form['new_state']['#options']['draft'])) {
+      $form['new_state']['#options']['draft'] = t('Create new Draft');
+    }
+
     $form['current']['#required'] = TRUE;
     $form['current']['#value'] = NULL;
 
@@ -282,8 +287,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     // New local task redesign says this should be a textarea.
     $form['revision_log']['#type'] = 'textarea';
     unset($form['revision_log']['#size']);
-
-    $form_obj = $form_state->getFormObject();
   }
 
   if ((in_array($form_id, ['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
@@ -380,7 +383,12 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
 
   \Drupal::messenger()->addStatus(t('The moderation state has been updated.'));
 
-  $form_state->setRedirectUrl($entity->toUrl('canonical'));
+  if ($new_state === 'draft') {
+    $form_state->setRedirectUrl($entity->toUrl('edit-form'));
+  }
+  else {
+    $form_state->setRedirectUrl($entity->toUrl('canonical'));
+  }
 }
 
 /**
