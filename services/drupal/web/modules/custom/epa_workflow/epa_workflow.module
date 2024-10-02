@@ -332,7 +332,12 @@ function epa_workflow_form_entity_clone_form_alter(&$form, \Drupal\Core\Form\For
  * Adjusts the description text shown on the 'delete node' page.
  */
 function epa_workflow_form_node_confirm_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-  $form['description']['#markup'] = '<p>This will delete the published and any draft versions of this page. Also, all past revisions of this page will be deleted.</p><p>This action cannot be undone.</p>';
+  $node = $form_state->getFormObject()->getEntity();
+  if (!$node) {
+    return;
+  }
+
+  $form['description']['#markup'] = t('<p>This action cannot be undone. Clicking this link will delete every revision of this page, including the published revision.</p><p>You can save a copy of the published page, by <a href=":href">exporting it here</a> first.</p>', [':href' => Url::fromRoute('epa_node_export.admin_page', ['node' => $node->id() ])->toString()]);
 }
 
 /**
