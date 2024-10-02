@@ -336,7 +336,7 @@ function epa_workflow_form_node_confirm_form_alter(&$form, \Drupal\Core\Form\For
     return;
   }
 
-  $form['description']['#markup'] = t('<p>This action cannot be undone. Clicking this link will delete every revision of this page, including the published revision.</p><p>You can save a copy of the published page, by <a href=":href">exporting it here</a> first.</p>', [':href' => Url::fromRoute('epa_node_export.admin_page', ['node' => $node->id() ])->toString()]);
+  $form['description']['#markup'] = t('<p>This action cannot be undone. Clicking the "Delete" button below will delete every revision of this page, including the published revision.</p><p>You can save a copy of the published page, by <a href=":href">exporting it here</a> first.</p>', [':href' => Url::fromRoute('epa_node_export.admin_page', ['node' => $node->id() ])->toString()]);
 }
 
 /**
