@@ -3,6 +3,7 @@
 namespace Drupal\epa_workflow\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Datetime\DateFormatter;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -31,6 +32,13 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
   protected $entityTypeManager;
 
   /**
+   * The core date formatter service.
+   *
+   * @var \Drupal\Core\Datetime\DateFormatter
+   */
+  protected $dateFormatter;
+
+  /**
    * Constructs a new EpaNodeDetailsBlock instance.
    *
    * @param array $configuration
@@ -39,12 +47,15 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Datetime\DateFormatter $date_formatter
+   *   The date formatter service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, DateFormatter $date_formatter) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->entityTypeManager = $entityTypeManager;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->dateFormatter = $date_formatter;
   }
 
   /**
@@ -55,7 +66,8 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('date.formatter'),
     );
   }
 
@@ -88,7 +100,7 @@ class EpaNodeDetailsBlock extends BlockBase implements ContainerFactoryPluginInt
         $review_deadline = $node->get('field_review_deadline')[0];
         $value  = $review_deadline->get('value');
         $timestamp = $value->getDateTime()->getTimestamp();
-        $review_deadline = \Drupal::service('date.formatter')->format($timestamp, 'formal_datetime');
+        $review_deadline = $this->dateFormatter->format($timestamp, 'formal_datetime');
       } else {
         $review_deadline = 'No deadline set';
       }
