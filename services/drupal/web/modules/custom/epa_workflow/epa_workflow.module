@@ -317,6 +317,12 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   if ($form_id === 'node_page_delete_form') {
     $form['description']['#markup'] = '<p>This will delete the published and any draft versions of this page. Also, all past revisions of this page will be deleted.</p><p>This action cannot be undone.</p>';
   }
+
+  if ($form_id === 'entity_clone_form') {
+    /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $markup */
+    $default_args = $form['description']['#markup']->getArguments();
+    $form['description']['#markup'] = t('<p>Do you want to clone the <em>@type</em> entity named <em>@title</em>?</p><p>Note: Cloning this page does not impact the current page.</p><ul><li>If there is a \'live page\' you will be cloning the live page content.<ul><li>It will not clone both the live and draft content</li></ul><li>If there is not a \'live page\' you will be cloning the latest draft content.</li></ul><p>Your newly created cloned entity will automatically be set to draft.</p>', $default_args);
+  }
 }
 
 /**
@@ -383,7 +389,7 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
 
   \Drupal::messenger()->addStatus(t('The moderation state has been updated.'));
 
-  if ($new_state === 'draft') {
+  if (isset($new_state) && $new_state === 'draft') {
     $form_state->setRedirectUrl($entity->toUrl('edit-form'));
   }
   else {
