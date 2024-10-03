@@ -143,6 +143,13 @@ data "aws_ssm_parameter" "saml_sp_key" {
 #region Locals
 
 locals {
+  #region Configuration from Variables
+
+  # (optional) Snapshot bucket in S3 - see the infrastructure module for permissions support
+  snapshot_bucket = var.drupal_en_snapshot_bucket ? [{ name = "WEBCMS_S3_SNAPSHOT_BUCKET", value = var.drupal_en_snapshot_bucket }] : []
+
+  #endregion
+
   #region Secret bindings
 
   drupal_secrets = [
@@ -159,44 +166,48 @@ locals {
 
   #region Environment variables
 
-  drupal_environment = [
-    { name = "WEBCMS_S3_BUCKET", value = data.aws_ssm_parameter.drupal_s3_bucket.value },
-    { name = "WEBCMS_S3_REGION", value = var.aws_region },
-    { name = "WEBCMS_CF_DISTRIBUTIONID", value = var.cloudfront_distributionid },
-    { name = "WEBCMS_SITE_URL", value = "https://${var.drupal_hostname}" },
-    { name = "WEBCMS_SITE_HOSTNAME", value = var.drupal_hostname },
-    { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
-    { name = "WEBCMS_SITE", value = var.site },
-    { name = "WEBCMS_LANG", value = var.lang },
-    { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = join(",", var.drupal_csrf_origin_whitelist) },
-    { name = "WEBCMS_LOG_GROUP", value = data.aws_ssm_parameter.drupal_log_group.value },
+  drupal_environment = concat(
+    [
+      { name = "WEBCMS_S3_BUCKET", value = data.aws_ssm_parameter.drupal_s3_bucket.value },
+      { name = "WEBCMS_S3_REGION", value = var.aws_region },
+      { name = "WEBCMS_CF_DISTRIBUTIONID", value = var.cloudfront_distributionid },
+      { name = "WEBCMS_SITE_URL", value = "https://${var.drupal_hostname}" },
+      { name = "WEBCMS_SITE_HOSTNAME", value = var.drupal_hostname },
+      { name = "WEBCMS_ENV_STATE", value = var.drupal_state },
+      { name = "WEBCMS_SITE", value = var.site },
+      { name = "WEBCMS_LANG", value = var.lang },
+      { name = "WEBCMS_CSRF_ORIGIN_WHITELIST", value = join(",", var.drupal_csrf_origin_whitelist) },
+      { name = "WEBCMS_LOG_GROUP", value = data.aws_ssm_parameter.drupal_log_group.value },
 
-    # DB info
-    { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
-    { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },
-    { name = "WEBCMS_DB_NAME_D7", valueFrom = "webcms_${var.site}_${var.lang}_d7" },
+      # DB info
+      { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
+      { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },
+      { name = "WEBCMS_DB_NAME_D7", valueFrom = "webcms_${var.site}_${var.lang}_d7" },
 
-    # Mail
-    { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
-    { name = "WEBCMS_MAIL_FROM", value = var.email_from },
-    { name = "WEBCMS_MAIL_HOST", value = var.email_host },
-    { name = "WEBCMS_MAIL_PORT", value = tostring(var.email_port) },
-    { name = "WEBCMS_MAIL_PROTOCOL", value = var.email_protocol },
-    { name = "WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS", value = var.email_enable_workflow_notifications ? "1" : "0" },
+      # Mail
+      { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
+      { name = "WEBCMS_MAIL_FROM", value = var.email_from },
+      { name = "WEBCMS_MAIL_HOST", value = var.email_host },
+      { name = "WEBCMS_MAIL_PORT", value = tostring(var.email_port) },
+      { name = "WEBCMS_MAIL_PROTOCOL", value = var.email_protocol },
+      { name = "WEBCMS_MAIL_ENABLE_WORKFLOW_NOTIFICATIONS", value = var.email_enable_workflow_notifications ? "1" : "0" },
 
-    # Injected hosts' names and ports
-    { name = "WEBCMS_SEARCH_HOST", value = "https://${data.aws_ssm_parameter.elasticsearch_endpoint.value}:443" },
-    { name = "WEBCMS_CACHE_HOSTS", value = data.aws_ssm_parameter.elasticache_endpoints.value },
+      # Injected hosts' names and ports
+      { name = "WEBCMS_SEARCH_HOST", value = "https://${data.aws_ssm_parameter.elasticsearch_endpoint.value}:443" },
+      { name = "WEBCMS_CACHE_HOSTS", value = data.aws_ssm_parameter.elasticache_endpoints.value },
 
-    # SAML
-    { name = "WEBCMS_SAML_SP_ENTITY_ID", value = var.saml_sp_entity_id },
-    { name = "WEBCMS_SAML_SP_CERT", value = var.saml_sp_cert },
-    { name = "WEBCMS_SAML_IDP_ID", value = var.saml_idp_id },
-    { name = "WEBCMS_SAML_IDP_SSO_URL", value = var.saml_idp_sso_url },
-    { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml_idp_slo_url },
-    { name = "WEBCMS_SAML_IDP_CERT", value = var.saml_idp_cert },
-    { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml_force_saml_login ? "1" : "0" },
-  ]
+      # SAML
+      { name = "WEBCMS_SAML_SP_ENTITY_ID", value = var.saml_sp_entity_id },
+      { name = "WEBCMS_SAML_SP_CERT", value = var.saml_sp_cert },
+      { name = "WEBCMS_SAML_IDP_ID", value = var.saml_idp_id },
+      { name = "WEBCMS_SAML_IDP_SSO_URL", value = var.saml_idp_sso_url },
+      { name = "WEBCMS_SAML_IDP_SLO_URL", value = var.saml_idp_slo_url },
+      { name = "WEBCMS_SAML_IDP_CERT", value = var.saml_idp_cert },
+      { name = "WEBCMS_SAML_FORCE_SAML_LOGIN", value = var.saml_force_saml_login ? "1" : "0" },
+    ],
+    # Concatenate optional values
+    local.snapshot_bucket
+  )
 
   #endregion
 }
