@@ -74,4 +74,12 @@ locals {
       lang = pair[1]
     }
   }
+
+  en_extra_policies = {
+    for pair in setproduct(var.sites, var.drupal_en_extra_iam_policies) :
+    "${pair[0]}-${pair[1]}" => {
+      site = pair[0]
+      arn  = pair[1]
+    }
+  }
 }

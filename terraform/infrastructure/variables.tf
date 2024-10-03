@@ -31,6 +31,12 @@ variable "iam_prefix" {
   default     = "WebCMS"
 }
 
+variable "drupal_en_extra_iam_policies" {
+  description = "ARNs of any additional IAM policies to attach to the English Drupal tasks. Mainly provided for snapshot support."
+  type        = list(string)
+  default     = []
+}
+
 #endregion
 
 #region Load balancer
