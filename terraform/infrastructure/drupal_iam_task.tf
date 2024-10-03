@@ -121,3 +121,11 @@ resource "aws_iam_role_policy_attachment" "drupal_put_logs" {
   role       = aws_iam_role.drupal_task[each.key].name
   policy_arn = aws_iam_policy.drupal_put_logs.arn
 }
+
+# Apply extra policies to the English Drupal site(s)' task role(s).
+resource "aws_iam_role_policy_attachment" "en_extra_policies" {
+  for_each = local.en_extra_policies
+
+  role       = aws_iam_role.drupal_task["en-${each.value.site}"].name
+  policy_arn = each.value.arn
+}
