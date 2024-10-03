@@ -126,6 +126,6 @@ resource "aws_iam_role_policy_attachment" "drupal_put_logs" {
 resource "aws_iam_role_policy_attachment" "en_extra_policies" {
   for_each = local.en_extra_policies
 
-  role       = aws_iam_role.drupal_task["en-${each.value.site}"].name
+  role       = aws_iam_role.drupal_task["${each.value.site}-en"].name
   policy_arn = each.value.arn
 }
