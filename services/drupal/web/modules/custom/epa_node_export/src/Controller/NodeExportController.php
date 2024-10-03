@@ -157,7 +157,15 @@ class NodeExportController extends ControllerBase {
       'export_notice' => [
         '#type' => 'markup',
         '#markup' => $this->t('<p>Click the button below to generate a zip file with a standalone copy of this page and any necessary support files.</p>
-        <p><em>Do not navigate away from this page while the zip file is being generated. It will download automatically when the process is complete.</em></p>'),
+        <p><em>Do not navigate away from this page while the zip file is being generated. It will download automatically when the process is complete.</em></p>
+        <p><strong>What is being exported?</strong></p>
+        <p>This will only export the live page content (\'Published\'). It will not export drafts or previous revisions.</p>
+        <p><strong>What can you do with this export file?</strong></p>
+        <p>Once you have downloaded your .zip file, locate it on your computer (typically your .zip file can be found in your Downloads folder under <code>C:\Users\[Your User Name]\Downloads)</code>.</p>
+        <p>In order to send the .zip file to EPA\'s records repository, you can either drag the .zip into the <strong>EZ Records - Shared</strong> folder icon located on your desktop or you can right click the .zip file, select Send to and choose the <strong>EZ Records - Shared</strong> folder option (this method will leave a copy of the .zip file onto your computer). <a target="_blank" href=":instructions">Detailed instructions can be found here</a>. Contact the <a target="_blank" href=":email">Email Records group</a> with your records questions.</p>', [
+          ':instructions' => 'https://usepa.sharepoint.com/sites/oei/ermd/ECMS/SitePages/EZ-Desktop-Records.aspx',
+          ':email' => 'mailto:records@epa.gov',
+        ]),
       ],
       'export' => [
         '#type' => 'link',
