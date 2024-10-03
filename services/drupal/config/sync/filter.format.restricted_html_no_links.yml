@@ -4,11 +4,10 @@ status: true
 dependencies:
   module:
     - epa_wysiwyg
-    - media_inline_embed
     - token_filter
 name: 'Restricted HTML - no links'
 format: restricted_html_no_links
-weight: 0
+weight: -6
 filters:
   epa_filter_empty_paragraphs:
     id: epa_filter_empty_paragraphs
@@ -22,18 +21,9 @@ filters:
     status: true
     weight: -10
     settings:
-      allowed_html: '<p> <strong> <em> <ul> <li> <ol> <sup> <sub> <ins data-date>'
+      allowed_html: '<br> <p> <strong> <em> <sub> <sup> <ul> <ol> <li> <ins class="new" data-date><* >'
       filter_html_help: true
       filter_html_nofollow: false
-  media_inline_embed:
-    id: media_inline_embed
-    provider: media_inline_embed
-    status: false
-    weight: 100
-    settings:
-      default_view_mode: default
-      allowed_media_types: {  }
-      allowed_view_modes: {  }
   token_filter:
     id: token_filter
     provider: token_filter
