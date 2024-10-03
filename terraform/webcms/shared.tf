@@ -146,7 +146,7 @@ locals {
   #region Configuration from Variables
 
   # (optional) Snapshot bucket in S3 - see the infrastructure module for permissions support
-  snapshot_bucket = var.drupal_en_snapshot_bucket ? [{ name = "WEBCMS_S3_SNAPSHOT_BUCKET", value = var.drupal_en_snapshot_bucket }] : []
+  snapshot_bucket = var.drupal_en_snapshot_bucket != null ? [{ name = "WEBCMS_S3_SNAPSHOT_BUCKET", value = var.drupal_en_snapshot_bucket }] : []
 
   #endregion
 
