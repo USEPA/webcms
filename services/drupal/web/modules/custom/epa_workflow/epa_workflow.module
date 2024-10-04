@@ -9,6 +9,7 @@ use Drupal\block\Entity\Block;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
@@ -16,6 +17,7 @@ use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
@@ -232,7 +234,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
   if ($form_id === 'content_moderation_entity_moderation_form') {
     $request = \Drupal::request();
     $route = $request->attributes->get('_route');
-    if ($route == 'entity.node.canonical') {
+    if ($route == 'entity.node.canonical' || $route == 'entity.node.edit_form') {
       $form['#submit'] = [
         '_epa_workflow_node_view_moderation_form_submit',
       ];
@@ -244,6 +246,7 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     $form['revision_log']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
     $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
     $form['submit']['#attributes']['class'][] = 'button--primary';
+
 
     $block = Block::load('epa_publish_guidance');
     if ($block) {
@@ -268,6 +271,57 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
             ':input[name="new_state"]' => ['!value' => 'published'],
           ]
         ]
+      ];
+    }
+
+    $block = Block::load('epa_draft_approved_guidance');
+    if ($block) {
+      $block_content = \Drupal::entityTypeManager()
+        ->getViewBuilder('block')
+        ->view($block);
+
+      // Render the block content to a string.
+      $renderer = \Drupal::service('renderer');
+      $rendered_block = $renderer->renderRoot($block_content);
+      $rendered_block_markup = (string) $rendered_block;
+
+      $form['draft_approved_guidance'] = [
+        '#type' => 'item',
+        '#markup' => $rendered_block_markup,
+        '#states' => [
+          'visible' => [
+            ':input[name="new_state"]' => ['value' => 'draft_approved'],
+          ],
+          'invisible' => [
+            ':input[name="new_state"]' => ['!value' => 'draft_approved'],
+          ]
+        ]
+      ];
+    }
+
+    /**
+     * @see EntityModerationForm::buildForm()
+     * The entity gets persisted in the base form for use later.
+     * This is the node in our case.
+     * @var \Drupal\node\Entity\Node $node
+     */
+    if ($node = $form_state->get('entity')) {
+      $field_definition = $node->getFieldDefinition('field_publish_date');
+      $form['publish_date'] = [
+        '#type' => 'container',
+        '#states' => [
+          'visible' => [
+            ':input[name="new_state"]' => ['value' => 'draft_approved'],
+          ],
+        ],
+      ];
+
+      $form['publish_date']['field_publish_date'] = [
+        '#type' => 'datetime',
+        '#title' => 'Date Time',
+        '#date_increment' => 1,
+        '#date_timezone' => 'America/New_York',
+        '#description' => $field_definition->getDescription() . '<p><strong>Note: </strong>Specify time in EDT</p>',
       ];
     }
 
@@ -391,6 +445,11 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
   $entity = $storage->createRevision($entity, $entity->isDefaultRevision());
 
   $new_state = $form_state->getValue('new_state');
+
+  /** @var DrupalDateTime $publish_date */
+  if ($publish_date = $form_state->getValue('field_publish_date')) {
+    $entity->set('field_publish_date', $publish_date->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT, ['timezone' => 'UTC']));
+  }
 
   $entity->set('moderation_state', $new_state);
 
