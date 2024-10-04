@@ -14,6 +14,7 @@
 {% endset %}
 
 {% embed '@layouts/page/page.twig' with {
+  'has_in_page_nav': has_in_page_nav,
   'has_header': has_header,
   'has_footer': has_footer,
   'is_narrow': is_narrow,
@@ -25,6 +26,9 @@
 
   {% block contact %}
     {{ contact_link }}
+  {% endblock %}
+
+  {% block in_page_nav %}
   {% endblock %}
 
   {% block content %}
