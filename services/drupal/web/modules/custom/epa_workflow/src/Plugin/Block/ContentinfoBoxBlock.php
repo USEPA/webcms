@@ -141,6 +141,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'),
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
+      '#publicly_available' => str_contains($moderation_state_id, 'publish') ?? FALSE,
       '#attributes' => new Attribute(),
     ];
 
