@@ -30,7 +30,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInterface {
   use ModerationStateToColorMapTrait;
 
+  /**
+   * The default compare revision mode we use
+   */
   const DIFF_FILTER = 'visual_inline';
+
+  /**
+   * Const for tracking the various "published" workflow states.
+   */
+  const PUBLISHED_STATES = ['published', 'published_needs_review', 'published_expiring', 'published_day_til_expire'];
 
   /**
    * The block plugin manager service.
@@ -45,6 +53,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
    * @var \Drupal\Core\Routing\RouteMatchInterface
    */
   protected $routeMatch;
+
 
   /**
    * Constructs a new ContentInfoBoxBlock instance.
@@ -141,7 +150,7 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       '#content_moderation_form' => $this->buildBlockInstance('epa_workflow_content_moderation_form'),
       '#follow_widget' => $this->buildBlockInstance('epa_workflow_follow_widget'),
       '#node_details_widget' => $this->buildBlockInstance('epa_node_details'),
-      '#publicly_available' => str_contains($moderation_state_id, 'publish') ?? FALSE,
+      '#publicly_available' => $this->isPubliclyAvailable(),
       '#attributes' => new Attribute(),
     ];
 
@@ -313,6 +322,39 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
       return [];
     }
     return $block->build();
+  }
+
+  /**
+   * Helper to see if page is publicly available (in some form of 'publish' state).
+   *
+   * @return bool
+   *   TRUE if the page is published AND not in the special 'WebCMS Training' Web Area.
+   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   */
+  private function isPubliclyAvailable(): bool {
+    $node = $this->getContextValue('node');
+    /** @var \Drupal\epa_web_areas\Utility\WebAreasHelper $helper */
+    $helper = \Drupal::service('epa_web_areas.web_areas_helper');
+    $groups = $helper->getNodeReferencingGroups($node);
+
+    if (!empty($groups)) {
+      // 252195 is the group ID to the 'WebCMS Training' web area. While these
+      // nodes are published these are actually hidden by nginx from the public.
+      // If the node is in this web are we don't want to display a 'publicly available' tag.
+      foreach ($groups as $group) {
+        if ($group->id() == 252195) {
+          return FALSE;
+        }
+      }
+    }
+
+    // If the node's moderation state contains 'publish' in it, then it's publicly available.
+    if (in_array($node->get('moderation_state')->getString(), self::PUBLISHED_STATES)) {
+      return TRUE;
+    }
+
+    return FALSE;
+
   }
 
 }
