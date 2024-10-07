@@ -15,6 +15,11 @@ class RouteSubscriber extends RouteSubscriberBase {
     if ($route) {
       $route->setRequirement('_epa_webform_access_check', TRUE);
     }
+
+    // See more explanation in Controller override as to why.
+    if ($route = $collection->get('layout_paragraphs.builder.choose_component')) {
+      $route->setDefault('_controller', '\Drupal\epa_core\Controller\EpaChooseComponentController::list');
+    }
   }
 
 }

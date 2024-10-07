@@ -599,6 +599,16 @@ function epa_core_field_widget_complete_form_alter(array &$element, FormStateInt
     }
   }
 
+  // Need to remove capability for content authors to add new "Link List"
+  // components, but still allow them to edit any that already exist. We can't
+  // simply remove them from config.
+  // @link https://forumone.atlassian.net/browse/EPAD8-2552
+  if ($plugin_id == 'paragraphs' && $element["widget"]["#field_name"] == 'field_paragraphs') {
+    if (isset($element["widget"]["add_more"]["operations"]["#links"]["add_more_button_link_list"])) {
+      unset($element["widget"]["add_more"]["operations"]["#links"]["add_more_button_link_list"]);
+    }
+  }
+
   if ($plugin_id == 'smartdate_timezone' && isset($element['widget'][0]['timezone']['#options'])) {
     unset($element['widget'][0]['timezone']['#options']['']);
   }
