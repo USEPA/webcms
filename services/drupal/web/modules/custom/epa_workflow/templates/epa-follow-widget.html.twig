@@ -14,13 +14,8 @@
 #}
 {{ attach_library('epa_workflow/epa_follow_widget') }}
 
-<div class="epa-follow-widget epa-dropdown">
-  <button
-    class="epa-follow-widget__button epa-dropdown__button js-epa-dropdown"
-    id="epa-follow-widget-button"
-    aria-expanded="true"
-    aria-controls="epa-follow-widget-drawer"
-  >
+<details class="epa-follow-widget epa-dropdown js-epa-dropdown">
+  <summary class="epa-follow-widget__button epa-dropdown__button">
     {%- if current_user_is_following -%}
       <svg class="epa-dropdown__icon epa-follow-widget__button-icon" aria-hidden="true" role="img">
         <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#check"></use>
@@ -30,15 +25,9 @@
         <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#plus"></use>
       </svg> {{ "Watch"|t  }}
     {%- endif -%}
-  </button>
+  </summary>
 
-  <div
-    class="epa-follow-widget__drawer epa-dropdown__drawer js-epa-dropdown-drawer"
-    id="epa-follow-widget-drawer"
-    role="region"
-    aria-labelledby="epa-follow-widget-button"
-    aria-expanded="true"
-  >
+  <div class="epa-follow-widget__drawer epa-dropdown__drawer">
     {{ flag_link }}
 
     {% if flag_users|render|striptags|trim %}

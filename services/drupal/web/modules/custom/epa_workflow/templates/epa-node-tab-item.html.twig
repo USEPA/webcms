@@ -23,8 +23,8 @@
 {% if url %}
   {% if url == '<button>' %}
     {% set is_button = true %}
-    {% set element = 'button' %}
-    {% set link_class = 'epa-node-tabs__button epa-dropdown__button js-epa-dropdown' %}
+    {% set element = 'summary' %}
+    {% set link_class = 'epa-node-tabs__button' %}
   {% elseif url|render|striptags|trim is empty %}
     {% set element = 'span' %}
     {% set link_class = 'epa-node-tabs__link' %}
@@ -52,21 +52,23 @@
 
 {% if is_button %}
   {% set additional_attributes = additional_attributes|merge({
-    'id': 'epa-node-tabs-button',
-    'aria-expanded': 'true',
-    'aria-controls': 'epa-node-tabs-drawer',
+    'class': [
+      'epa-node-tabs__button',
+      'epa-dropdown__button',
+    ]
   }) %}
+  <details class="epa-node-tabs__dropdown epa-dropdown js-epa-dropdown">
 {% endif %}
 
 <{{ element }} {{- add_attributes(additional_attributes) -}} {{- href }}>
   {% if icon %}
-    <svg class="epa-node-tabs__icon" aria-hidden="true" role="img"">
+    <svg class="epa-node-tabs__icon epa-dropdown__icon" aria-hidden="true" role="img">
       <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#{{ icon }}"></use>
     </svg>
   {% endif %}
 
   {% if icon_secondary %}
-    <svg class="epa-node-tabs__secondary-icon aria-hidden="true" role="img">
+    <svg class="epa-node-tabs__secondary-icon epa-dropdown__icon" aria-hidden="true" role="img">
       <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#{{ icon_secondary }}"></use>
     </svg>
   {% endif %}
