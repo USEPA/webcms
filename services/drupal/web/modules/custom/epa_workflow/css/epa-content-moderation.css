@@ -48,6 +48,7 @@
   }
 
   p {
+    line-height: inherit;
     margin-block: 0;
   }
 
@@ -133,6 +134,15 @@
     }
   }
 
+  .form-items-inline {
+    margin-block: -2px;
+  }
+
+  .form-items-inline > .form-item {
+    display: inline-block;
+    margin-block: 2px;
+  }
+
   .form-item {
     margin-block: 0 var(--space-l);
   }
@@ -197,6 +207,7 @@
     color: var(--input-fg-color--description);
     font-size: var(--font-size-xs); /* ~13px */
     line-height: calc(17rem / 16); /* 17px */
+    max-width: 30rem;
   }
 
   .form-item__description.is-disabled {
@@ -213,7 +224,9 @@
 
   .form-item__select,
   .form-item__textarea,
-  .form-element {
+  .form-element,
+  .form-date,
+  .form-time {
     box-sizing: border-box;
     max-width: 100%;
     min-height: calc(((var(--input-padding-vertical) + var(--input-border-size)) * 2) + var(--input-line-height)); /* iOS. */
@@ -231,20 +244,26 @@
 
   .form-item__select:active,
   .form-item__textarea:active,
-  .form-element:active {
+  .form-element:active,
+  .form-date:active ,
+  .form-time:active {
     border-color: var(--input--focus-border-color);
   }
 
   .form-item__select:hover,
   .form-item__textarea:hover,
-  .form-element:hover {
+  .form-element:hover,
+  .form-date:hover,
+  .form-time:hover {
     border-color: var(--input--hover-border-color);
     box-shadow: inset 0 0 0 var(--input-border-size) var(--input--hover-border-color);
   }
 
   .form-item__select:focus,
   .form-item__textarea:focus,
-  .form-element:focus {
+  .form-element:focus,
+  .form-date:focus,
+  .form-time:focus {
     box-shadow:
       0 0 0 2px var(--color-white),
       0 0 0 5px var(--color-focus);
@@ -252,7 +271,9 @@
 
   .form-item__select:hover:focus,
   .form-item__textarea:hover:focus,
-  .form-element:hover:focus {
+  .form-element:hover:focus,
+  .form-date:hover:focus,
+  .form-time:hover:focus {
     box-shadow:
       0 0 0 2px var(--color-white),
       0 0 0 5px var(--color-focus),
@@ -261,20 +282,26 @@
 
   .form-item__select.has-error,
   .form-item__textarea.has-error,
-  .form-element.error {
+  .form-element.error,
+  .form-date.error ,
+  .form-time.error {
     border-color: var(--input--error-border-color);
     border-width: var(--input--error-border-size);
   }
 
   .form-item__select.has-error:hover,
   .form-item__textarea.has-error:hover,
-  .form-element.error:hover {
+  .form-element.error:hover,
+  .form-date.error:hover,
+  .form-time.error:hover {
     box-shadow: none;
   }
 
   .form-item__select.has-error:hover:focus,
   .form-item__textarea.has-error:hover:focus,
-  .form-element.error:hover:focus {
+  .form-element.error:hover:focus,
+  .form-date.error:hover:focus,
+  .form-time.error:hover:focus {
     box-shadow:
       0 0 0 2px var(--color-white),
       0 0 0 5px var(--color-focus);
@@ -493,6 +520,16 @@
 
   .form-item--checkbox .form-item__label::before {
     display: none;
+  }
+
+  .form-date {
+    min-width: 9.5rem;
+  }
+
+  .field--type-text-with-summary {
+    > :last-child {
+      margin-block-end: 0;
+    }
   }
 
   .usa-hint--required {
