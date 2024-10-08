@@ -40,24 +40,34 @@ Drupal.behaviors.epaDropdown = {
         if (!hasOpenDropdown) {
           document.removeEventListener('click', handleOutsideClick);
           document.removeEventListener('focusout', handleOutsideFocus);
+          document.removeEventListener('keydown', handleKeydown);
         }
       }
     };
 
     dropdowns.forEach(dropdown => {
-      const dropdownButton = dropdown.querySelector('summary');
+      const closeButtons = dropdown.querySelectorAll('.js-epa-dropdown-close');
 
-      // Add outside click handler when opening a dropdown.
+      if (closeButtons.length > 0) {
+        closeButtons.forEach(closeButton => {
+          closeButton.addEventListener('click', e => {
+            e.preventDefault();
+            closeDropdown(dropdown);
+          });
+        });
+      }
+
+      // Add event handlers when opening a dropdown.
       dropdown.addEventListener('toggle', e => {
         if (dropdown.open) {
           document.addEventListener('click', handleOutsideClick);
           document.addEventListener('focusout', handleOutsideFocus, false);
-          document.addEventListener('keydown', handleKeydown);
+          document.addEventListener('keydown', handleKeydown(dropdown));
         }
       });
 
       // Function to handle keydowns while drawer is open.
-      const handleKeyDown = element => {
+      const handleKeydown = element => {
         element.addEventListener('keydown', e => {
           if (e.key === 'Escape') {
             // Close drawer on escape key press.
@@ -66,9 +76,6 @@ Drupal.behaviors.epaDropdown = {
           }
         });
       };
-
-      // Trap focus inside drawer.
-      handleKeyDown(dropdown);
     });
   },
 };
