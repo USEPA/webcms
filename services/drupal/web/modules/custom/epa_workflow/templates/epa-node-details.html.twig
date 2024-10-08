@@ -12,26 +12,15 @@
 #}
 {{ attach_library('epa_workflow/epa_node_details') }}
 
-<div class="epa-node-details epa-dropdown">
-  <button
-    class="epa-node-details__button epa-dropdown__button js-epa-dropdown"
-    id="epa-node-details-button"
-    aria-expanded="true"
-    aria-controls="epa-node-details-drawer"
-  >
+<details class="epa-node-details epa-dropdown js-epa-dropdown">
+  <summary class="epa-node-details__button epa-dropdown__button">
     {{ 'Node Details'|t  }}
     <svg class="epa-dropdown__icon epa-node-details__button-icon" aria-hidden="true" role="img">
       <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#chevron-down"></use>
     </svg>
-  </button>
+  </summary>
 
-  <div
-    class="epa-node-details__drawer epa-dropdown__drawer js-epa-dropdown-drawer"
-    id="epa-node-details-drawer"
-    role="region"
-    aria-labelledby="epa-node-details-button"
-    aria-expanded="true"
-  >
+  <div class="epa-node-details__drawer epa-dropdown__drawer">
     <div class="epa-node-details__drawer-item is-single-line">
       {{ 'Node ID'|t }}: {{ nid }}
       <button

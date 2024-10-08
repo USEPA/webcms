@@ -34,13 +34,7 @@
       {% if menu_level == 0 %}
         <ul{{ attributes }} class="epa-node-tabs__menu">
       {% else %}
-        <ul
-          class="epa-node-tabs__drawer"
-          id="epa-node-tabs-drawer"
-          role="region"
-          aria-labelledby="epa-node-tabs-button"
-          aria-expanded="true"
-        >
+        <ul class="epa-node-tabs__drawer epa-dropdown__drawer">
       {% endif %}
 
       {% for item in tabs %}
@@ -61,7 +55,12 @@
         {% endif %}
       {% endfor %}
 
-      </ul>
+      {% if menu_level == 0 %}
+        </ul>
+      {% else %}
+          </ul>
+        </details>
+      {% endif %}
     {% endif %}
   {% endmacro %}
 </nav>

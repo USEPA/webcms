@@ -5,92 +5,70 @@
 
 Drupal.behaviors.epaDropdown = {
   attach(context) {
-    const dropdownButtons = once('epa-dropdown', '.js-epa-dropdown', context);
+    const dropdowns = once('epa-dropdown', '.js-epa-dropdown', context);
 
-    dropdownButtons.forEach(dropdownButton => {
-      const dropdownDrawerID = dropdownButton.getAttribute('aria-controls');
-      const dropdownDrawer = document.getElementById(dropdownDrawerID);
-      const drawerLinks = dropdownDrawer.querySelectorAll('a, button');
-
-      // Close drawer on outside click.
-      const handleOutsideClick = event => {
-        if (event.target.closest(`#${dropdownDrawerID}`)) return;
-        closeDrawer(dropdownDrawer, dropdownButton);
-      };
-
-      const openDrawer = (drawer, button) => {
-        if (
-          button.getAttribute('aria-expanded') === 'false'
-        ) {
-          button.setAttribute('aria-expanded', 'true');
-          drawer.setAttribute('aria-expanded', 'true');
-          document.addEventListener('click', handleOutsideClick);
+    // Handler to close dropdown on outside click.
+    const handleOutsideClick = e => {
+      dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(e.target)) {
+          closeDropdown(dropdown);
         }
-      };
+      });
+    };
 
-      const closeDrawer = (drawer, button) => {
-        if (
-          button.getAttribute('aria-expanded') === 'true'
-        ) {
-          button.setAttribute('aria-expanded', 'false');
-          drawer.setAttribute('aria-expanded', 'false');
+     // Handler to close dropdown on outside focus.
+     const handleOutsideFocus = e => {
+      dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(e.relatedTarget)) {
+          closeDropdown(dropdown);
+        }
+      });
+    };
+
+    // Close dropdown and remove outside click handler if no dropdowns are open.
+    const closeDropdown = (dropdown) => {
+      if (dropdown.hasAttribute('open')) {
+        dropdown.removeAttribute('open');
+
+        let hasOpenDropdown = false;
+        dropdowns.forEach(dropdown => {
+          if (dropdown.hasAttribute('open')) {
+            hasOpenDropdown = true;
+          }
+        });
+
+        if (!hasOpenDropdown) {
           document.removeEventListener('click', handleOutsideClick);
+          document.removeEventListener('focusout', handleOutsideFocus);
         }
-      };
+      }
+    };
 
-      dropdownButton.addEventListener('click', event => {
-        const isExpanded = event.target.getAttribute('aria-expanded') === 'true';
+    dropdowns.forEach(dropdown => {
+      const dropdownButton = dropdown.querySelector('summary');
 
-        if (!isExpanded) {
-          openDrawer(
-            document.getElementById(event.target.getAttribute('aria-controls')),
-            event.target
-          );
-        } else {
-          closeDrawer(
-            document.getElementById(event.target.getAttribute('aria-controls')),
-            event.target
-          );
+      // Add outside click handler when opening a dropdown.
+      dropdown.addEventListener('toggle', e => {
+        if (dropdown.open) {
+          document.addEventListener('click', handleOutsideClick);
+          document.addEventListener('focusout', handleOutsideFocus, false);
+          document.addEventListener('keydown', handleKeydown);
         }
-
-        event.preventDefault();
-        event.stopPropagation();
       });
 
-      // Function to handle key downs while drawer is open.
+      // Function to handle keydowns while drawer is open.
       const handleKeyDown = element => {
-        const firstFocusableElement = drawerLinks[0];
-        const lastFocusableElement = drawerLinks[drawerLinks.length - 1];
-
         element.addEventListener('keydown', e => {
-          if (e.key === 'Tab') {
-            // If shift key pressed for shift + tab combination
-            if (e.shiftKey) {
-              if (document.activeElement === firstFocusableElement) {
-                // Add focus for the last focusable element
-                lastFocusableElement.focus();
-                e.preventDefault();
-              }
-            }
-            // If focused has reached to last focusable element then focus first focusable element after pressing tab
-            else if (document.activeElement === lastFocusableElement) {
-              // Add focus for the first focusable element
-              firstFocusableElement.focus();
-              e.preventDefault();
-            }
-          } else if (e.key === 'Escape') {
+          if (e.key === 'Escape') {
             // Close drawer on escape key press.
             e.preventDefault();
-            closeDrawer(dropdownDrawer, dropdownButton);
+            closeDropdown(dropdown);
           }
         });
       };
 
-      // Close drawer on page load.
-      closeDrawer(dropdownDrawer, dropdownButton);
-
       // Trap focus inside drawer.
-      handleKeyDown(dropdownDrawer);
+      handleKeyDown(dropdown);
     });
   },
 };
