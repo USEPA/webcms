@@ -70,3 +70,6 @@ services:
     arguments: ['@plugin.manager.danse.plugin']
     tags:
       - { name: event_subscriber }
+  epa_workflow.notification_email_cron:
+    class: Drupal\epa_workflow\EPANotificationEmailCron
+    arguments: ['@entity_type.manager', '@plugin.manager.mail']

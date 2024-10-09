@@ -14,9 +14,9 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\paragraphs\Entity\Paragraph;
 
@@ -115,6 +115,19 @@ function epa_workflow_form_content_moderation_notification_form_alter(array &$fo
 function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentModerationNotificationInterface $notification, &$form, FormStateInterface &$form_state) {
   $workflow_process = $form_state->getValue('workflow_process', 'any');
   $notification->setThirdPartySetting('epa_workflow', 'workflow_process', $workflow_process);
+}
+
+/**
+ * Implements hook_mail().
+ */
+function epa_workflow_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'epa_workflow_notification_summary':
+
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+
+      break;
+  }
 }
 
 /**
@@ -789,6 +802,17 @@ function epa_workflow_cron() {
      */
     $scheduledPublishUpdate = \Drupal::service('scheduled_publish.update');
     $scheduledPublishUpdate->doUpdate();
+  }
+}
+
+/**
+ * Callback to run notification cron.
+ */
+function _epa_workflow_notification_email_cron() {
+  $env_state = getenv('WEBCMS_ENV_STATE');
+  if ($env_state !== 'migration') {
+    $notifcation_email_cron = \Drupal::service('epa_workflow.notification_email_cron');
+    $notifcation_email_cron->sendNotificationEmails();
   }
 }
 
