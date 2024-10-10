@@ -1,0 +1,51 @@
+diff --git a/src/Form/RevisionOverviewForm.php b/src/Form/RevisionOverviewForm.php
+index 3ef6f43..191493d 100755
+--- a/src/Form/RevisionOverviewForm.php
++++ b/src/Form/RevisionOverviewForm.php
+@@ -261,13 +261,28 @@ class RevisionOverviewForm extends FormBase {
+               ];
+             }
+             $row['operations'] = [
+-              '#prefix' => '<em>',
+-              '#markup' => $this->t('Current revision'),
+-              '#suffix' => '</em>',
+-              '#attributes' => [
+-                'class' => ['revision-current'],
++              'current-revision' => [
++                '#prefix' => '<em>',
++                '#markup' => $this->t('Current revision'),
++                '#suffix' => '</em>',
++                '#attributes' => [
++                  'class' => ['revision-current'],
++                ],
+               ],
+             ];
++
++            $links = [];
++            if ($revert_permission && !$revision->isLatestRevision()) {
++              $links['revert'] = [
++                'title' => $this->t('Copy and Set as Latest Revision'),
++                'url' => $has_translations ?
++                  Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode]) :
++                  Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
++              ];
++            }
++            $row['operations']['links'] = [
++              '#type' => 'operations',
++              '#links' => $links,
++            ];
+             $row['#attributes'] = [
+               'class' => ['revision-current'],
+             ];
+@@ -279,9 +294,9 @@ class RevisionOverviewForm extends FormBase {
+               'langcode' => $langcode,
+             ];
+             $links = [];
+-            if ($revert_permission) {
++            if ($revert_permission && !$revision->isLatestRevision()) {
+               $links['revert'] = [
+-                'title' => $vid < $node->getRevisionId() ? $this->t('Revert') : $this->t('Set as current revision'),
++                'title' => $this->t('Copy and Set as Latest revision'),
+                 'url' => $has_translations ?
+                 Url::fromRoute('node.revision_revert_translation_confirm', ['node' => $node->id(), 'node_revision' => $vid, 'langcode' => $langcode]) :
+                 Url::fromRoute('node.revision_revert_confirm', ['node' => $node->id(), 'node_revision' => $vid]),
