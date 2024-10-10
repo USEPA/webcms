@@ -4,6 +4,7 @@ status: true
 dependencies:
   module:
     - epa_wysiwyg
+    - media_inline_embed
     - pathologic
     - token_filter
 name: 'Restricted HTML'
@@ -28,7 +29,7 @@ filters:
     status: true
     weight: -10
     settings:
-      allowed_html: '<br> <p> <a hreflang href data-entity-type data-entity-uuid data-entity-substitution> <strong> <em> <sub> <sup> <ul> <ol> <li> <ins class="new" data-date><* >'
+      allowed_html: '<br> <p> <a hreflang href aria-label id target="_blank" rel data-entity-type data-entity-uuid data-entity-substitution> <strong> <em> <sub> <sup> <ul> <ol> <li> <ins class="new" data-date><* >'
       filter_html_help: true
       filter_html_nofollow: false
   filter_pathologic:
@@ -41,6 +42,15 @@ filters:
       local_settings:
         protocol_style: full
         local_paths: ''
+  media_inline_embed:
+    id: media_inline_embed
+    provider: media_inline_embed
+    status: false
+    weight: 100
+    settings:
+      default_view_mode: default
+      allowed_media_types: {  }
+      allowed_view_modes: {  }
   token_filter:
     id: token_filter
     provider: token_filter
