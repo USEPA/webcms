@@ -24,7 +24,14 @@
     'l-column-layout'
   ]
   %}
-  <div class="usa-section">
+  {%
+  set section_classes = [
+    'usa-section',
+    attributes.hasClass('dark') ? 'usa-section--dark usa-dark-background' : '',
+    attributes.hasClass('light') ? 'usa-section--light' : '',
+  ]|join(' ')|trim
+  %}
+  <div class="{{ section_classes }}">
     <div class="l-constrain">
       <div{{ attributes.addClass(classes) }}>
         {% if content.first %}
