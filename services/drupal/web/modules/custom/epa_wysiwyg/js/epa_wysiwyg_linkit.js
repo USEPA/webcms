@@ -3,7 +3,7 @@
  * EPA Linkit customizations.
  */
 
-(function ($) {
+(function (Drupal, $, once) {
 
   Drupal.behaviors.epaWysiwygLinkit = {
     attach: function (context) {
@@ -13,21 +13,20 @@
 
       // Populate the defaultInput with the value of hrefInput on load, if there
       // is one.
-      $('[name="attributes[href]"]', context).once('epaWysiwygLinkitInitInput').each(function() {
+      $(once('epaWysiwygLinkitInitInput', '[name="attributes[href]"]', context)).each(function() {
         if ($hrefInput.val() != '') {
           $defaultInput.val($hrefInput.val());
           $hrefInput.val('');
         }
       });
 
-
       // Clear the linkit input values when the profile is changed to reset the
       // autocomplete results.
-      $('[name="attributes[select-profile]"]', context).once('epaWysiwygLinkitResetInput').change(function() {
+      $(once('epaWysiwygLinkitResetInput', '[name="attributes[select-profile]"]', context)).change(function() {
         $defaultInput.val('');
         $webAreaInput.val('');
       });
     }
   };
 
-})(jQuery);
+})(Drupal, jQuery, once);
