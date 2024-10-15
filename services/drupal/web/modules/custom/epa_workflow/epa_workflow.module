@@ -347,12 +347,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     _epa_workflow_add_compliance_checkboxes($form);
   }
 
-  if ($form_id == 'revision_overview_form' && isset($form['submit'])) {
-    // Adds a second diff comparison button at the top of the form for
-    // convenience and discoverability.
-    $form['submit2'] = $form['submit'];
-    $form['submit2']['#weight'] = -1000;
-  }
   if ($form_id == 'revision_overview_form') {
     $form['#attached']['library'][] = 'epa_workflow/revision_list';
     foreach ($form['node_revisions_table'] as $key => $row) {
