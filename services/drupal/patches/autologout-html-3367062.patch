@@ -1,5 +1,5 @@
 diff --git a/src/AutologoutManager.php b/src/AutologoutManager.php
-index d62171d..a9cd0f9 100644
+index 5c50f99..e876d86 100644
 --- a/src/AutologoutManager.php
 +++ b/src/AutologoutManager.php
 @@ -3,6 +3,7 @@
@@ -7,10 +7,10 @@ index d62171d..a9cd0f9 100644
  
  use Drupal\Component\Datetime\TimeInterface;
 +use Drupal\Component\Render\FormattableMarkup;
+ use Drupal\Component\Utility\Xss;
+ use Drupal\Core\Config\Config;
  use Drupal\Core\Config\ConfigFactoryInterface;
- use Drupal\Core\Entity\EntityTypeManagerInterface;
- use Drupal\Core\Extension\ModuleHandlerInterface;
-@@ -185,6 +186,7 @@ class AutologoutManager implements AutologoutManagerInterface {
+@@ -177,6 +178,7 @@ class AutologoutManager implements AutologoutManagerInterface {
     */
    public function inactivityMessage() {
      $message = Xss::filter($this->autoLogoutSettings->get('inactivity_message'));
