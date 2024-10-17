@@ -351,10 +351,12 @@
   }
 
   .form-item--checkbox .form-item__checkbox,
+  .form-type--checkbox .form-checkbox,
   .form-type--boolean .form-boolean {
     position: relative;
     inset-block-start: calc(var(--space-l) / 2);
     float: left;
+    line-height: 24px;
     margin-inline-start: calc(var(--input--label-spacing) * -1);
     transform: translateY(-50%);
     left: auto;
@@ -372,6 +374,7 @@
   }
 
   .form-item--checkbox.form-item--no-label .form-item__checkbox,
+  .form-type--checkbox.form-item--no-label .form-checkbox,
   .form-type--boolean.form-item--no-label .form-boolean {
     position: static;
     float: none;
@@ -380,6 +383,7 @@
   }
 
   .form-item__checkbox,
+  .form-checkbox,
   .form-boolean {
     display: inline-block;
     box-sizing: border-box;
@@ -397,6 +401,8 @@
 
   .form-item__checkbox:active,
   .form-item__checkbox:hover,
+  .form-checkbox:active,
+  .form-checkbox:hover,
   .form-boolean:active,
   .form-boolean:hover {
     border-color: var(--input-fg-color);
@@ -405,6 +411,8 @@
 
   .form-item__checkbox:focus:active,
   .form-item__checkbox:focus:hover,
+  .form-checkbox:focus:active,
+  .form-checkbox:focus:hover,
   .form-boolean:focus:active,
   .form-boolean:focus:hover {
     box-shadow:
@@ -415,6 +423,7 @@
 
   @media (forced-colors: active) {
     .form-item__checkbox,
+    .form-checkbox,
     .form-boolean {
       -webkit-appearance: auto;
       appearance: auto;
@@ -428,6 +437,7 @@
   }
 
   .form-item__checkbox:checked,
+  .form-checkbox:checked,
   .form-boolean--type-checkbox:checked {
     border-color: var(--input--focus-border-color);
     background-color: var(--input--focus-border-color);
@@ -436,6 +446,8 @@
 
   .form-item__checkbox:checked:active,
   .form-item__checkbox:checked:hover,
+  .form-checkbox:checked:active,
+  .form-checkbox:checked:hover,
   .form-boolean--type-checkbox:checked:active,
   .form-boolean--type-checkbox:checked:hover {
     border-color: var(--input-fg-color);
@@ -443,6 +455,7 @@
   }
 
   .form-item__checkbox.has-error,
+  .form-checkbox.error,
   .form-boolean.error {
     border-color: var(--input--error-border-color);
     background-color: var(--input-bg-color);
@@ -451,6 +464,8 @@
 
   .form-item__checkbox.has-error:active,
   .form-item__checkbox.has-error:hover,
+  .form-checkbox.error:active,
+  .form-checkbox.error:hover,
   .form-boolean.error:active,
   .form-boolean.error:hover {
     box-shadow: inset 0 0 0 1px var(--input--error-border-color);
@@ -459,6 +474,9 @@
   .form-item__checkbox.has-error:focus,
   .form-item__checkbox.has-error:focus:active,
   .form-item__checkbox.has-error:focus:hover,
+  .form-checkbox.error:focus,
+  .form-checkbox.error:focus:active,
+  .form-checkbox.error:focus:hover,
   .form-boolean.error:focus,
   .form-boolean.error:focus:active,
   .form-boolean.error:focus:hover {
@@ -470,6 +488,8 @@
 
   .form-item__checkbox.has-error:active,
   .form-item__checkbox.has-error:hover,
+  .form-checkbox.error:checked:active,
+  .form-checkbox.error:checked:hover,
   .form-boolean.error:checked:active,
   .form-boolean.error:checked:hover {
     border-color: var(--input--error-border-color);
@@ -489,6 +509,10 @@
   .form-item__checkbox[disabled]:hover,
   .form-item__checkbox[disabled].has-error,
   .form-item__checkbox[disabled].has-error:hover,
+  .form-checkbox[disabled],
+  .form-checkbox[disabled]:hover,
+  .form-checkbox[disabled].error,
+  .form-checkbox[disabled].error:hover,
   .form-boolean[disabled],
   .form-boolean[disabled]:hover,
   .form-boolean[disabled].error,
