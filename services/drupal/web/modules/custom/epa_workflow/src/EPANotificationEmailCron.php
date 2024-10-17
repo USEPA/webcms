@@ -95,6 +95,7 @@ class EPANotificationEmailCron {
       foreach ($emails as $email) {
         $params['group_id'] = $email->getId();
         $params['group_label'] = $email->getLabel();
+        /** @var \Drupal\user\Entity\User $recipient */
         foreach ($email->getRecipients() as $recipient) {
           $to = $recipient->getEmail();
           $langcode = $recipient->getPreferredLangcode();
