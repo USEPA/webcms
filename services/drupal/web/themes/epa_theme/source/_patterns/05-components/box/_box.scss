@@ -2,8 +2,39 @@
 // Styles for a Box.
 
 @use '../../00-config' as *;
-@use '../../02-base' as *;
+@use '../../02-base/02-html-elements/13-headings/headings' as *;
 @use '../external-link/external-link--image/external-link--image' as *;
+
+// Extending a placeholder in a separate partial doesn’t work with
+// @include meta.load-css(), which we use for the CKeditor stylesheet, so we
+// reproduce those placeholders here.
+@if $wysiwyg {
+  %hN {
+    @include typeset-heading();
+    clear: none;
+    hyphens: none;
+    text-rendering: optimizeLegibility;
+
+    @media print {
+      orphans: 3;
+      page-break-after: avoid;
+      widows: 3;
+
+      &::after {
+        display: inline-block;
+      }
+    }
+  }
+
+  %h3 {
+    @extend %hN;
+    @include display-text-style(h3);
+
+    @include breakpoint(max-width gesso-breakpoint(tablet)) {
+      font-size: font-size(heading, md);
+    }
+  }
+}
 
 .box {
   margin-bottom: rem(units(4));
@@ -142,6 +173,21 @@ h2.box__title {
       color: gesso-grayscale(white);
       text-decoration: underline;
     }
+  }
+}
+
+@if $wysiwyg {
+  // Extending a placeholder in a separate partial doesn’t work with
+  // @include meta.load-css(), which we use for the CKeditor stylesheet, so we
+  // have all box variants extend it here.
+  .box--alert,
+  .box--blog,
+  .box--highlight,
+  .box--multipurpose,
+  .box--news,
+  .box--related-info,
+  .box--rss {
+    @extend %box--with-borders;
   }
 }
 
