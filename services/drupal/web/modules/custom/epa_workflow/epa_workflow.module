@@ -429,6 +429,10 @@ function epa_workflow_form_node_form_alter(&$form, FormStateInterface $form_stat
 
     $form['meta']['author']['#title'] = t('Original Author');
     $form['meta']['author']['#weight'] = 20;
+
+    // Updating the "Last saved" to reflect the revision's last saved date rather than the node's last "changed" date.
+    $form['meta']['changed']['#markup'] = \Drupal::service('date.formatter')->format($node->getRevisionCreationTime(), 'formal_datetime');
+
   }
 }
 
