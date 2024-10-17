@@ -2,9 +2,11 @@
 
 namespace Drupal\epa_workflow\Plugin\Block;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Block\BlockManager;
 use Drupal\Core\Link;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -12,7 +14,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\ModerationStateToColorMapTrait;
-use Drupal\Core\Block\BlockManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -290,9 +291,17 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
         'right_revision' => $latest_revision,
         'filter' => self::DIFF_FILTER,
       ],
+      [
+        'attributes' => [
+          'class' => [
+            'epa-admin-link',
+          ],
+        ],
+      ]
     );
 
-    $link = new Link($this->t('Compare latest draft & live'), $url);
+    $link_content = new FormattableMarkup('<svg class="epa-admin-link__icon is-rotated-45" role="img" aria-hidden="true"><use xlink:href="/themes/epa_theme/images/drupal-sprite.artifact.svg#compare"></use></svg> @text', ['@text' => $this->t('Compare latest draft & live')]);
+    $link = new Link($link_content, $url);
     return $link->toRenderable();
   }
 
