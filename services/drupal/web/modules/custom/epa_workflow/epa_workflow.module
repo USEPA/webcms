@@ -5,9 +5,7 @@
  * Contains epa_workflow.module.
  */
 
-use Drupal\block\Entity\Block;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
-use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -16,12 +14,13 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Link;
-use Drupal\Core\Url;
 use Drupal\paragraphs\Entity\Paragraph;
+use Drupal\epa_workflow\Form\EPAContentModerationEntityModerationForm;
 
 /**
  * Implements hook_entity_base_field_info().
@@ -232,114 +231,9 @@ function epa_workflow_field_widget_complete_form_alter(array &$element, FormStat
  */
 function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   if ($form_id === 'content_moderation_entity_moderation_form') {
-    $request = \Drupal::request();
-    $route = $request->attributes->get('_route');
-    if ($route == 'entity.node.canonical' || $route == 'entity.node.edit_form') {
-      $form['#submit'] = [
-        '_epa_workflow_node_view_moderation_form_submit',
-      ];
-    }
-
-    // Tweak classes.
-    $form['new_state']['#title'] = t('Change state to');
-    $form['new_state']['#wrapper_attributes']['class'][] = 'epa-content-moderation__fancy-select';
-    $form['revision_log']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
-    $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
-    $form['submit']['#attributes']['class'][] = 'button--primary';
-
-
-    $block = Block::load('epa_publish_guidance');
-    if ($block) {
-      $block_content = \Drupal::entityTypeManager()
-        ->getViewBuilder('block')
-        ->view($block);
-
-      // Render the block content to a string.
-      $renderer = \Drupal::service('renderer');
-      $rendered_block = $renderer->renderRoot($block_content);
-      $rendered_block_markup = (string) $rendered_block;
-
-      // Add the rendered block markup to the form.
-      $form['publish_guidance'] = [
-        '#type' => 'item',
-        '#markup' => $rendered_block_markup,
-        '#states' => [
-          'visible' => [
-            ':input[name="new_state"]' => ['value' => 'published'],
-          ],
-          'invisible' => [
-            ':input[name="new_state"]' => ['!value' => 'published'],
-          ]
-        ]
-      ];
-    }
-
-    $block = Block::load('epa_draft_approved_guidance');
-    if ($block) {
-      $block_content = \Drupal::entityTypeManager()
-        ->getViewBuilder('block')
-        ->view($block);
-
-      // Render the block content to a string.
-      $renderer = \Drupal::service('renderer');
-      $rendered_block = $renderer->renderRoot($block_content);
-      $rendered_block_markup = (string) $rendered_block;
-
-      $form['draft_approved_guidance'] = [
-        '#type' => 'item',
-        '#markup' => $rendered_block_markup,
-        '#states' => [
-          'visible' => [
-            ':input[name="new_state"]' => ['value' => 'draft_approved'],
-          ],
-          'invisible' => [
-            ':input[name="new_state"]' => ['!value' => 'draft_approved'],
-          ]
-        ]
-      ];
-    }
-
-    /**
-     * @see EntityModerationForm::buildForm()
-     * The entity gets persisted in the base form for use later.
-     * This is the node in our case.
-     * @var \Drupal\node\Entity\Node $node
-     */
-    if ($node = $form_state->get('entity')) {
-      $field_definition = $node->getFieldDefinition('field_publish_date');
-      $form['publish_date'] = [
-        '#type' => 'container',
-        '#states' => [
-          'visible' => [
-            ':input[name="new_state"]' => ['value' => 'draft_approved'],
-          ],
-        ],
-      ];
-
-      $form['publish_date']['field_publish_date'] = [
-        '#type' => 'datetime',
-        '#title' => 'Date Time',
-        '#date_increment' => 1,
-        '#date_timezone' => 'America/New_York',
-        '#description' => $field_definition->getDescription() . '<p><strong>Note: </strong>Specify time in EDT</p>',
-      ];
-    }
-
-    // Adjust label of "Draft" state
-    if (isset($form['new_state']['#options']['draft'])) {
-      $form['new_state']['#options']['draft'] = t('Create new Draft');
-    }
-
-    $form['current']['#required'] = TRUE;
-    $form['current']['#value'] = NULL;
-
-    $form['new_state']['#required'] = TRUE;
-
-    // Change "Revision Log" label to "Revision notes".
-    $form['revision_log']['#title'] = t('Revision notes');
-    // New local task redesign says this should be a textarea.
-    $form['revision_log']['#type'] = 'textarea';
-    unset($form['revision_log']['#size']);
+    \Drupal::service('class_resolver')
+      ->getInstanceFromDefinition(EPAContentModerationEntityModerationForm::class)
+      ->formAlter($form, $form_state);
   }
 
   if ((in_array($form_id, ['content_moderation_entity_moderation_form']) && isset($form['submit'])) || isset($form['node_bulk_form'])) {
