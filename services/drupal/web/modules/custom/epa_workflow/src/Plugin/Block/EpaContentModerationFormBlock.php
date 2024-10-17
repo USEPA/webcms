@@ -117,7 +117,6 @@ class EpaContentModerationFormBlock extends BlockBase implements ContainerFactor
       $box_color = 'yellow';
     }
 
-    // @todo: Only display the review_deadline if the revision is published
     $review_deadline = '';
     if ($node->isPublished()) {
       $review_deadline = $this->buildReviewByString($node);
