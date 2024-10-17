@@ -8,12 +8,13 @@ title: 'EPA Workflow Notification Email'
 id: epa_workflow_notification_email_cron
 weight: 0
 module: epa_workflow
-callback: _epa_workflow_notification_email_cron
+callback: 'epa_workflow.notification_email_cron:sendNotificationEmails'
 scheduler:
-  id: simple
+  id: crontab
   configuration:
     rules:
-      - '0+@ 0 * * 0'
+      - '0 4 * * MON'
+    catch_up: 0
 launcher:
   id: serial
   configuration:

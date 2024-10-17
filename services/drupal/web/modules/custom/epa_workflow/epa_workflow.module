@@ -5,6 +5,7 @@
  * Contains epa_workflow.module.
  */
 
+use Drupal\Component\Utility\Html;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
@@ -16,8 +17,8 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
-use Drupal\node\NodeInterface;
 use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
 use Drupal\paragraphs\Entity\Paragraph;
 
 /**
@@ -123,9 +124,10 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
 function epa_workflow_mail($key, &$message, $params) {
   switch ($key) {
     case 'epa_workflow_notification_summary':
-
       $message['from'] = \Drupal::config('system.site')->get('mail');
-
+      $message['subject'] = t('EPA Workflow Notification: @group_label', ['@group_label' => $params['group_label']]);
+      // @todo handle message https://forumone.atlassian.net/browse/EPAD8-2557.
+      $message['body'][] = t('Congrats here is your group_id: @group_id', ['@group_id' => $params['group_id']]);
       break;
   }
 }
@@ -802,17 +804,6 @@ function epa_workflow_cron() {
      */
     $scheduledPublishUpdate = \Drupal::service('scheduled_publish.update');
     $scheduledPublishUpdate->doUpdate();
-  }
-}
-
-/**
- * Callback to run notification cron.
- */
-function _epa_workflow_notification_email_cron() {
-  $env_state = getenv('WEBCMS_ENV_STATE');
-  if ($env_state !== 'migration') {
-    $notifcation_email_cron = \Drupal::service('epa_workflow.notification_email_cron');
-    $notifcation_email_cron->sendNotificationEmails();
   }
 }
 

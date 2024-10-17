@@ -3,7 +3,9 @@
 namespace Drupal\epa_workflow;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\epa_workflow\EPAWorkflowEmailHandler;
 
 /**
  * Class EPANotificationEmailCron.
@@ -29,66 +31,81 @@ class EPANotificationEmailCron {
   protected $mailManager;
 
   /**
+   * The logger channel.
+   *
+   * @var \Psr\Log\LoggerInterface.
+   */
+  protected $logger;
+
+  /**
    * EPANotificationEmailCron constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger channel factory.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager, LoggerChannelFactoryInterface $logger_factory) {
     $this->entityTypeManager = $entity_type_manager;
     $this->mailManager = $mail_manager;
-  }
-
-  /**
-   * Load group content.
-   */
-  public function loadGroupContent() {
-    $group_content_entity_ids = $this->getGroupContentEntityIds();
-    $group_content_entities = $this->entityTypeManager->getStorage('group_content')->loadMultiple($group_content_entity_ids);
-    return $group_content_entities;
-  }
-
-  /**
-   * Get group entity ids.
-   */
-  protected function getGroupContentEntityIds() {
-    $query = $this->entityTypeManager->getStorage('group_content')
-      ->getQuery()
-      ->accessCheck(FALSE);
-    return $query->execute();
+    $this->logger = $logger_factory->get('epa_workflow');
   }
 
   /**
    * Get Editors in Chief and deputies.
+   *
+   * @return \Drupal\epa_workflow\EPANotificationEmailHandler[]
    */
-  protected function getEditorsInChief() {
-    $group_contents = $this->loadGroupContent();
-    $editors_in_chief = [];
-    foreach ($group_contents as $group_content) {
-      if ($group_content->get('field_editor_in_chief')) {
-        $group_content_id = $group_content->id();
-        $editors_in_chief[$group_content_id][] = $group_content->field_editor_in_chief->entity->id();
+  protected function getGroupEmailData(): array {
+    $groups = $this->entityTypeManager->getStorage('group')->loadMultiple();
+    $data = [];
+    foreach ($groups as $group) {
+      $recipients = [];
+      $email_handler = new EPAWorkflowEmailHandler();
+      /** @var $group \Drupal\group\Entity\Group */
+      if ($group->hasField('field_editor_in_chief') && !$group->get('field_editor_in_chief')->isEmpty()) {
+        $email_handler->setId($group->id());
+        $email_handler->setLabel($group->label());
+        $recipients[] = $group->field_editor_in_chief->entity;
 
         // Get Deputy Editors in Chief.
-        $group = $group_content->getGroup();
-        $members = $group->getMembers();
+        $members = $group->getMembers(['web_area-deputy_editor_in_chief']);
         foreach ($members as $member) {
-          if ($member->hasRole('deputy_editor_in_chief')) {
-            $editors_in_chief[$group_content_id][] = $member->id();
-          }
+          $recipients[] = $member->getUser();
         }
+        $email_handler->setRecipients($recipients);
+        $data[] = $email_handler;
       }
     }
-    return $editors_in_chief;
+    return $data;
   }
 
   /**
    * Send notification emails.
    */
-  public function sendNotificationEmails() {
-    $editors_in_chief = $this->getEditorsInChief();
+  public function sendNotificationEmails(): void {
+    $env_state = getenv('WEBCMS_ENV_STATE');
+    if ($env_state !== 'migration') {
+      $emails = $this->getGroupEmailData();
+      $module = 'epa_workflow';
+      $key = 'epa_workflow_notification_summary';
+
+      foreach ($emails as $email) {
+        $params['group_id'] = $email->getId();
+        $params['group_label'] = $email->getLabel();
+        foreach ($email->getRecipients() as $recipient) {
+          $to = $recipient->getEmail();
+          $langcode = $recipient->getPreferredLangcode();
+          $result = $this->mailManager->mail($module, $key, $to, $langcode, $params);
+          if (!$result['result']) {
+            $message = t('There was a problem sending your email notification to @email.', ['@email' => $to]);
+            $this->logger->error($message);
+          }
+        }
+      }
+    }
   }
 
 }
