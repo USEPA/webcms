@@ -91,6 +91,8 @@ class EPANotificationEmailCron {
       $emails = $this->getGroupEmailData();
       $module = 'epa_workflow';
       $key = 'epa_workflow_notification_summary';
+      $date = new \DateTime();
+      $params['date'] = $date->format('F jS, Y');
 
       foreach ($emails as $email) {
         $params['group_id'] = $email->getId();
@@ -105,6 +107,7 @@ class EPANotificationEmailCron {
             $this->logger->error($message);
           }
         }
+        break;
       }
     }
   }

@@ -124,12 +124,51 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
 function epa_workflow_mail($key, &$message, $params) {
   switch ($key) {
     case 'epa_workflow_notification_summary':
+      $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
       $message['from'] = \Drupal::config('system.site')->get('mail');
-      $message['subject'] = t('EPA Workflow Notification: @group_label', ['@group_label' => $params['group_label']]);
-      // @todo handle message https://forumone.atlassian.net/browse/EPAD8-2557.
-      $message['body'][] = t('Congrats here is your group_id: @group_id', ['@group_id' => $params['group_id']]);
+      $message['subject'] = t('Expiring content for @group_label Web Area week of @date', ['@group_label' => $params['group_label'], '@date' => $params['date']]);
+      $message['body'][] = t("<p>Hi, you have received this email because you are a Editor in Chief (EIC) or Deputy EIC of the @group_label web area in EPA's Web Content Management System.</p>", ['@group_label' => $params['group_label']]);
+      $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
+
+      $view = \Drupal::entityTypeManager()
+        ->getStorage('view')
+        ->load('published_content')
+        ->getExecutable();
+
+      // Get the NID from the View result.
+      $exposed_filters_values = [
+        'title' => '',
+        'gid' => 'Education (7)',
+        'type' => 'All',
+        'field_owning_office_target_id' => '',
+        'combine' => '',
+        'moderation_state' => [
+          'epa_default-published_needs_review',
+          'epa_default-published_expiring',
+          'epa_default-published_day_til_expire',
+        ],
+        'order' => 'field_review_deadline',
+        'sort' => 'desc',
+      ];
+      $view->initDisplay();
+      $view->setDisplay('page_1');
+//      $view->setExposedInput($exposed_filters_values);
+      $view->setExposedInput([]);
+      // Get views exposed filters
+      $handlers = $view->getHandlers('filter', 'page_1');
+
+      foreach ($handlers as $handler) {
+        $view->removeHandler('page_1', 'filter', $handler['id']);
+      }
+      $view->execute();
+      $output = \Drupal::service('renderer')->render($view->render());
+      $message['body'][] = $output->__toString();
+      $message['body'][] = '<p>...</p>';
+      $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a></p>.');
       break;
   }
+
+  $stop=1;
 }
 
 /**
