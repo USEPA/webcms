@@ -135,10 +135,12 @@ function epa_workflow_mail($key, &$message, $params) {
         ->load('published_content')
         ->getExecutable();
 
-      // Get the NID from the View result.
+      // @todo: remove sort from headers.
+      $gid_parameter = sprintf('%s (%s)',$params['group_label'],$params['group_id']);
+      // Build exposed filters parameters to send to view.
       $exposed_filters_values = [
         'title' => '',
-        'gid' => 'Education (7)',
+        'gid' => $gid_parameter,
         'type' => 'All',
         'field_owning_office_target_id' => '',
         'combine' => '',
@@ -152,6 +154,7 @@ function epa_workflow_mail($key, &$message, $params) {
       ];
       $view->initDisplay();
       $view->setDisplay('page_1');
+      $view->setItemsPerPage(12);
 //      $view->setExposedInput($exposed_filters_values);
       $view->setExposedInput([]);
       // Get views exposed filters
@@ -161,14 +164,13 @@ function epa_workflow_mail($key, &$message, $params) {
         $view->removeHandler('page_1', 'filter', $handler['id']);
       }
       $view->execute();
-      $output = \Drupal::service('renderer')->render($view->render());
+      $rendered_view = $view->render();
+      $output = \Drupal::service('renderer')->render($rendered_view);
       $message['body'][] = $output->__toString();
       $message['body'][] = '<p>...</p>';
-      $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a></p>.');
+      $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
       break;
   }
-
-  $stop=1;
 }
 
 /**
