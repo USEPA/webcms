@@ -11,13 +11,37 @@
   not node.isPublished() ? 'is-unpublished',
 ] %}
 
-{% set sidenav = drupal_region('sidebar') %}
+{% set related_info %}
+  <ul class='related-links--list'>
+    {% if content.entitygroupfield|field_value -%}
+      <li class='related-links--item'>{{ content.entitygroupfield }}</li>
+    {%- endif -%}
+    {%- if content.field_video|field_value -%}
+      <li class='related-links--item'><a href="#watch">Watch the Event</a></li>
+    {%- endif -%}
+    {%- if content.field_related_information|field_value -%}
+      <li class='related-links--item'>{{- content.field_related_information|field_value }}</li>
+    {%- endif -%}
+    {% if content.field_subjects|field_value %}
+      {{- content.field_subjects }}
+    {% endif %}
+  </ul>
+{% endset %}
 
-{% set display_sidenav = false %}
+{% set sidenav %}
+  {{  drupal_region('sidebar') }}
 
-{% if sidenav|render|striptags('<drupal-render-placeholder>')|trim %}
-  {% set display_sidenav = true %}
-{% endif %}
+  {% include '@components/box/box--related-links/box--related-links.twig' with {
+    'modifier_classes': 'margin-y-4',
+    'content': related_info,
+    'title': {
+      'tag': 'h2',
+      'text': 'Related Links'|t,
+    },
+  } only %}
+{% endset %}
+
+{% set display_sidenav = true %}
 
 {% set header_info %}
   {% include '@components/web-area-title/web-area-title.twig' with {
@@ -26,7 +50,7 @@
 {% endset %}
 
 {% set contact_link %}
-  {{ drupal_entity('block', 'webareaheader', check_access=false) }}
+  {{ webarea_contact_link }}
 {% endset %}
 
 {% set admin_info %}
@@ -59,18 +83,6 @@
   {% endif %}
 {% endif %}
 
-{% set related %}
-  <ul>
-    {% if content.entitygroupfield|field_value -%}
-      <li>{{ content.entitygroupfield }}</li>
-    {%- endif -%}
-    {%- if content.field_video|field_value -%}
-      <li><a href="#watch">Watch the Event</a></li>
-    {%- endif -%}
-    {{- content.field_related_information }}
-  </ul>
-{% endset %}
-
 {% set author_names %}
   {% for term in node.field_authors -%}
     {% set tid = term.entity.field_author.target_id %}
@@ -80,17 +92,6 @@
 {% endset %}
 
 {% set body %}
-  <div class="u-align-right box-wrap">
-    {{ content.field_authors }}
-    {% include '@components/box/box--related-info/box--related-info.twig' with {
-      'modifier_classes': '',
-      'title': {
-        'tag': 'div',
-        'text': 'Related Information',
-        },
-      'content': related,
-    } only %}
-  </div>
   <h2>{{ author_names }}</h2>
   <h3 class="h4">{{ content.field_release|field_value }}<br>{{ content.field_text_location|field_value }}</h3>
   {{ content.field_paragraphs|field_value }}
@@ -103,10 +104,8 @@
 
 {% if display_sidenav %}
   {% include '@templates/detail-pages/page-with-sidenav.twig' with {
-    'has_header': true,
     'has_footer': has_footer,
     'has_sidenav': true,
-    'header_info': header_info,
     'contact_link': contact_link,
     'title': label,
     'admin_info': admin_info,

@@ -16,6 +16,10 @@
   @include breakpoint(gesso-breakpoint(sidebar)) {
     max-width: calc(75% - #{rem(gesso-get-map(gutter-width))});
   }
+
+  @media print {
+    max-width: 100%;
+  }
 }
 
 .l-sidebar-first__sidebar {
@@ -26,5 +30,9 @@
     margin-left: rem(gesso-get-map(gutter-width));
     margin-right: 0;
     width: 25%;
+  }
+
+  @media print {
+    display: none;
   }
 }

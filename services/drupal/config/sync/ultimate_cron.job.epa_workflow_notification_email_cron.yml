@@ -1,0 +1,30 @@
+uuid: fa6f0fc0-05dc-41f8-9db0-d93ca4fb8339
+langcode: en
+status: true
+dependencies:
+  module:
+    - epa_workflow
+title: 'EPA Workflow Notification Email'
+id: epa_workflow_notification_email_cron
+weight: 0
+module: epa_workflow
+callback: 'epa_workflow.notification_email_cron:sendNotificationEmails'
+scheduler:
+  id: crontab
+  configuration:
+    rules:
+      - '0 4 * * MON'
+    catch_up: 0
+launcher:
+  id: serial
+  configuration:
+    timeouts:
+      lock_timeout: 3600
+    launcher:
+      thread: 0
+logger:
+  id: database
+  configuration:
+    method: '3'
+    expire: 1209600
+    retain: 1000
