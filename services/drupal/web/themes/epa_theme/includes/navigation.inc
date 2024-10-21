@@ -44,7 +44,7 @@ function epa_theme_preprocess_links__dropbutton(&$variables) {
  * @param $vars
  */
 function epa_theme_preprocess_menu(&$vars) {
-  if ($vars['theme_hook_original'] === 'menu__group_menu') {
+  if ($vars['theme_hook_original'] === 'menu__group_menu' || $vars['theme_hook_original'] === 'menu__group_menu__web_area_menu') {
     $vars['attributes']['class'][] = 'menu--sidenav';
   }
   epa_theme_menu_active_item($vars['items']);
@@ -79,5 +79,33 @@ function epa_theme_preprocess_menu_local_tasks(&$variables) {
 
     // Overwrite the original tabs data.
     $variables[$type] = $tabs;
+  }
+}
+
+/**
+ * Implements hook_preprocess_breadcrumb().
+ */
+function epa_theme_preprocess_breadcrumb(array &$variables) {
+  if ($variables['breadcrumb']) {
+    /** @var \Drupal\Core\Render\Renderer $renderer */
+    $renderer = \Drupal::service('renderer');
+    $variables['include_current_page']
+      = theme_get_setting('include_current_page_in_breadcrumb', 'epa_theme') ?? TRUE;
+    $themeConfig = \Drupal::config('epa_theme.settings');
+    $renderer->addCacheableDependency($variables, $themeConfig);
+
+    if ($variables['include_current_page']) {
+      $request = \Drupal::request();
+      $route_match = \Drupal::routeMatch();
+      $variables['#cache']['contexts'][] = 'route';
+      $page_title = \Drupal::service('title_resolver')->getTitle($request, $route_match->getRouteObject());
+
+      if (!empty($page_title)) {
+        $variables['page_title'] = $page_title;
+        $variables['breadcrumb'][] = [
+          'text' => $page_title,
+        ];
+      }
+    }
   }
 }

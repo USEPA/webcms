@@ -15,7 +15,9 @@ epa-wysiwyg-linkit:
   js:
     js/epa_wysiwyg_linkit.js: {}
   dependencies:
+    - core/drupal
     - core/jquery
+    - core/once
 
 # CKEditor5 libraries
 epa-new-tag-ckeditor5:
@@ -44,3 +46,14 @@ web-area-linkit-ckeditor5:
   dependencies:
     - ckeditor5/ckeditor5
     - linkit/ckeditor5
+
+epa-add-definition-ckeditor5:
+  js:
+    js/build/epaAddDefinition.js: { preprocess: false, minified: true }
+  dependencies:
+    - ckeditor5/ckeditor5
+
+admin.epa-add-definition:
+  css:
+    theme:
+      css/epaAddDefinition.admin.css: {}

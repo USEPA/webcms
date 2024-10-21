@@ -4,4 +4,33 @@
  * Theme override for the group menus block.
  */
 #}
-{% extends "block--admin.html.twig" %}
+{{ attach_library('epa_theme/sidenav_menu') }}
+
+{% set classes = [
+  'block--web-area-menu',
+] %}
+
+{% set attributes = attributes.addClass(classes) %}
+
+{% set block_content %}
+  {% block block_content %}
+    {{ content }}
+  {% endblock %}
+{% endset %}
+
+<div class="menu-sidenav__overlay"></div>
+
+{% embed '@components/block/block.twig' with {
+  'hide_wrapper': false,
+  'has_constrain': false,
+  'title_prefix': title_prefix,
+  'label': (label_display == '1') ? label : '',
+  'title_suffix': title_suffix,
+  'hide_content_wrapper': false,
+} %}
+
+  {% block content %}
+    {{ block_content }}
+  {% endblock %}
+
+{% endembed %}

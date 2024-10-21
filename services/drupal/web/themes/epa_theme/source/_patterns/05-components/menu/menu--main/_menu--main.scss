@@ -36,6 +36,7 @@
     display: flex;
     font-size: font-size(body, sm);
     font-weight: bold;
+    gap: rem(gesso-spacing('05'));
     justify-content: space-between;
     line-height: math.div(units(2), font-size(body, sm));
     padding: gesso-spacing(2);
@@ -50,17 +51,15 @@
     &:hover,
     &:focus,
     &.is-active {
-      background: gesso-grayscale(gray-2);
-      color: gesso-brand(blue, base);
       text-decoration: underline;
     }
 
     &[aria-expanded='true'] {
       border-color: gesso-brand(blue, base);
-    }
 
-    @include at-media($theme-header-min-width) {
-      padding: gesso-spacing(1);
+      > .menu__link-icon {
+        transform: rotate(0deg);
+      }
     }
 
     @include breakpoint(900px) {
@@ -68,36 +67,23 @@
       line-height: math.div(units(2), font-size(heading, sm));
     }
 
-    &.has-subnav {
-      display: flex;
-      gap: rem(gesso-spacing('05'));
-      justify-content: space-between;
+    @include at-media($theme-header-min-width) {
+      border-width: 0;
+      color: gesso-grayscale(white);
+      font-family: font-family(heading);
+      font-size: font-size(heading, xs);
+      line-height: math.div(units(2), font-size(heading, xs));
+      padding: gesso-spacing(2) gesso-spacing(3);
+      width: auto;
 
-      &[aria-expanded='true'] > .menu__link-icon {
-        transform: rotate(0deg);
+      &:visited {
+        color: gesso-grayscale(white);
       }
 
-      @include at-media($theme-header-min-width) {
-        background: gesso-brand(blue, dark);
-        border: 0;
-        color: gesso-grayscale(white);
-        font-family: font-family(heading);
-        font-size: font-size(heading, xs);
-        line-height: math.div(units(2), font-size(heading, xs));
-        padding: gesso-spacing(2) gesso-spacing(3);
-        width: auto;
-
-        // stylelint-disable-next-line max-nesting-depth
-        &:visited {
-          color: gesso-grayscale(white);
-        }
-
-        // stylelint-disable-next-line max-nesting-depth
-        &:hover,
-        &:focus,
-        &.is-active {
-          background: transparent;
-        }
+      &:hover,
+      &:focus,
+      &.is-active {
+        background: transparent;
       }
     }
   }
@@ -163,6 +149,7 @@
       .usa-header--extended & {
         padding: gesso-spacing(3) gesso-spacing(2);
 
+        // stylelint-disable-next-line max-nesting-depth
         &::before,
         &::after {
           background: gesso-grayscale(gray-1);
@@ -187,6 +174,7 @@
       &:first-child {
         grid-column: 1 / span 4;
 
+        // stylelint-disable-next-line max-nesting-depth
         @include at-media($theme-header-min-width) {
           grid-template-columns: 1fr 1fr 1fr 1fr;
         }
@@ -204,7 +192,8 @@
       font-size: font-size(body, 2xs);
       font-weight: normal;
       line-height: gesso-line-height(2);
-      padding-left: gesso-spacing(4);
+      padding: gesso-spacing(1) gesso-spacing(1) gesso-spacing(1)
+        gesso-spacing(4);
       width: 100%;
 
       &:visited {
@@ -215,12 +204,14 @@
         border-width: 0 units(0.5);
         display: block;
         font-size: font-size(body, xs);
-        padding-left: gesso-spacing(2);
+        padding: gesso-spacing(1) gesso-spacing(1) gesso-spacing(1)
+          gesso-spacing(2);
 
         // stylelint-disable-next-line max-nesting-depth
         &:hover,
         &:focus,
         &.is-active {
+          background: gesso-grayscale(gray-2);
           border-color: gesso-brand(blue, base);
           color: gesso-brand(blue, base);
         }

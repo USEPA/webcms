@@ -58,29 +58,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
       name  = "nginx"
       image = "${data.aws_ssm_parameter.ecr_nginx.value}:${var.image_tag}"
 
-      # Docker labels are how we communicate our routing preferences to Traefik. These
-      # settings correspond to Traefik's own configuration names. Specifically, we make
-      # use of router configuration to dynamically create a Router (see
-      # https://doc.traefik.io/traefik/routing/routers/) when this task launches in ECS.
-      dockerLabels = {
-        # Advertise to Traefik that we want to receive traffic
-        "traefik.enable" = "true"
-
-        # Tell Traefik to allow any hostname provided in variables. The expression on the
-        # right is a map over the list of domains, which expands to a Traefik routing rule
-        # like the below:
-        #
-        #     Rule: Host(`example.org`) || Host(`example.com`)
-        "traefik.http.routers.${var.site}_${var.lang}.rule" = join(" || ", formatlist("Host(`%s`)", concat([var.drupal_hostname], var.drupal_extra_hostnames)))
-
-        # Only allow routing to this task via the "websecure" (port 443) entrypoint
-        "traefik.http.routers.${var.site}_${var.lang}.entrypoints" = "websecure"
-
-        # Ask Traefik to forward traffic to nginx port 443
-        "traefik.http.services.${var.site}_${var.lang}.loadbalancer.server.port" = "443"
-      }
-
       secrets = [
+        # Inject basic auth configuration to nginx. Leave the secret blank (or use
+        # a single period) to tun it off.
         { name = "WEBCMS_BASIC_AUTH", valueFrom = data.aws_ssm_parameter.basic_auth.value },
       ]
 
@@ -117,79 +97,6 @@ resource "aws_ecs_task_definition" "drupal_task" {
           awslogs-group         = data.aws_ssm_parameter.nginx_log_group.value
           awslogs-region        = var.aws_region
           awslogs-stream-prefix = "nginx"
-        }
-      }
-    },
-
-    # In ECS, Amazon's CloudWatch agent can be run to collect application metrics. See
-    # the epa_metrics module for what we export to the agent.
-    {
-      name  = "cloudwatch"
-      image = "${data.aws_ssm_parameter.ecr_cloudwatch.value}:latest"
-
-      # The agent reads its JSON-formatted configuration from the environment in containers
-      environment = [
-        {
-          name = "CW_CONFIG_CONTENT"
-          # cf. https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html
-          value = jsonencode({
-            metrics = {
-              namespace = "WebCMS",
-              metrics_collected = {
-                statsd = {
-                  service_address = ":8125"
-                },
-              },
-            },
-          }),
-        },
-      ],
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.agent_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "cloudwatch"
-        }
-      }
-    },
-
-    # Report FPM metrics to CloudWatch using the custom metrics container. See the
-    # services/metrics directory for more.
-    {
-      name  = "metrics"
-      image = "${data.aws_ssm_parameter.ecr_metrics.value}:${var.image_tag}"
-
-      environment = [
-        { name = "AWS_REGION", value = var.aws_region },
-        { name = "WEBCMS_SITE", value = "${var.site}-${var.lang}" },
-      ]
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.fpm_metrics_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "fpm-metrics"
-        }
-      }
-    },
-
-    # Attach the New Relic PHP daemon
-    {
-      name  = "newrelic"
-      image = "${data.aws_ssm_parameter.ecr_newrelic.value}:latest"
-
-      logConfiguration = {
-        logDriver = "awslogs"
-
-        options = {
-          awslogs-group         = data.aws_ssm_parameter.newrelic_log_group.value
-          awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "newrelic"
         }
       }
     },

@@ -60,7 +60,7 @@ See the [parent directory's README](../) for instructions on using a backend for
 
 ### Built Images
 
-The images for Drupal, nginx, Drush, and the metrics sidecar must have been built before this module is deployed. See [How to Run](#how-to-run) for more information.
+The images for Drupal, nginx, and Drush must have been built before this module is deployed. See [How to Run](#how-to-run) for more information.
 
 ## Module Inputs
 
@@ -173,15 +173,12 @@ As with the infrastructure and database modules, this module assumes that certai
 - Log group identifiers are also read from Parameter Store:
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/php-fpm`: The name of the log group for Drupal's PHP-FPM container.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/nginx`: The name of the log group for Drupal's nginx container.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/cloudwatch-agent`: The name of the log group for Drupal's Cloudwatch agent container.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/fpm-metrics`: The name of the log group for for Drupal's FPM metrics container.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drush`: The name of the log group for Drush runs.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drupal`: The name of the log group for Drupal application logs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/newrelic-license`: The ARN of the New Relic license key.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/saml-sp-key`: The ARN of the private key for Drupal's SAML certificate.
 
@@ -189,7 +186,7 @@ As with the infrastructure and database modules, this module assumes that certai
 
 ### Drupal
 
-This module creates an ECS task definition and service for running the WebCMS. This task includes a pair of containers, nginx and PHP-FPM, that handle incoming web traffic. In addition, a Cloudwatch agent container runs in order to ingest metric data pushed from Drupal (see the epa_metrics module). Finally, a fourth container runs a basic Alpine image that gathers PHP-FPM metrics every 60 seconds and publishes them to CloudWatch.
+This module creates an ECS task definition and service for running the WebCMS. This task includes a pair of containers, nginx and PHP-FPM, that handle incoming web traffic.
 
 An autoscaling policy is attached to the Drupal service that tracks 60% CPU utilization. Scale-out is more aggressive than scale-in by a factor of five. We enforce slow scale in due to the relatively slow warm-up time of the Drupal containers; a long cooldown smooths out spiky traffic patterns and keeps containers from exhibiting thrashing-like behavior as opcache warms up.
 
@@ -211,7 +208,7 @@ Deployments can be broken down into three steps: build images, apply Terraform, 
 
 ### Build Images
 
-There are four custom Docker images: Drupal, nginx, Drush, and the metrics sidecar. While it is possible to build these in parallel, it is probably best to build them in serial and push after deployments. A sample shell script is below:
+There are four custom Docker images: Drupal, nginx, and Drush. Depending on the CI/CD infrastructure in play, it can be good to save time by parallelizing the builds. The below shell scripts shows the minimum amount of work necessary to push the images, using the local Docker build cache instead of the ECR-based one:
 
 ```sh
 #!/bin/bash
@@ -233,10 +230,6 @@ docker build services/drupal --tag "<drush repository>:$BUILD_TAG" --target drus
 docker push "<drupal repository>:$BUILD_TAG"
 docker push "<nginx repository>:$BUILD_TAG"
 docker push "<drush repository>:$BUILD_TAG"
-
-# Now, build the metrics sidecar.
-docker build services/metrics --tag "<metrics repository>:$BUILD_TAG"
-docker push "<metrics repository>:$BUILD_TAG"
 ```
 
 Note that this script does not cover authenticating with ECR or other topics; see the AWS CLI's documentation on authenticating with ECR:
@@ -272,7 +265,7 @@ Conceptually, there are three steps involved:
    2. Capture the AWSVPC configuration needed by Fargate to launch Drush. At a minimum, this must include the Drupal security group ID and the private subnet ID(s). (If more than one subnet is provided, ECS will choose one.)
 3. Use ECS' run task functionality ([`aws ecs run-task`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/run-task.html), [`RunTask` API](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html)) to spawn a one-off Drush task.
 
-The [`run-drush.sh`](../../.buildkite/run-drush.sh) script can be used as a reference for this part. Since the RunTask API is asynchronous (it returns successfully as soon as the launch request is acknowledged by ECS), the latter portion of the script captures the new task's ARN and waits for its status to change to "STOPPED". If the task did not exit cleanly, then an error is raised to the CI/CD runner.
+The scripts in [the `ci` directory](../../ci/) can be used as a reference for this part. Since the RunTask API is asynchronous (it returns successfully as soon as the launch request is acknowledged by ECS), the latter portion of the code captures the new task's ARN and waits for its status to change to "STOPPED". If the task did not exit cleanly, then an error is raised to the CI/CD runner.
 
 For more information on the Drush commands issued in these script steps, see:
 
@@ -286,7 +279,7 @@ After the first deployment (or if some values change), some manual steps will ne
 
 ### DNS
 
-Any public hostnames (set via `var.drupal_hostname` and, if set, `var.drupal_extra_hostnames`) will need to be exposed to the internet. For example, if `var.drupal_hostname` is `www.example.com`, then the `www.example.com` record will need to be a CNAME for this environment's network load balancer.
+Any public hostnames (set via `var.drupal_hostname` and, if set, `var.drupal_extra_hostnames`) will need to be exposed to the internet. For example, if `var.drupal_hostname` is `www.example.com`, then the `www.example.com` record will need to be a CNAME for this environment's network load balancer. This configuration needs to be adjusted for CDN layers.
 
 ### Site Installation
 

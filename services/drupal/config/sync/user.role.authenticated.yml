@@ -16,12 +16,12 @@ dependencies:
     - node.type.public_notice
     - node.type.regulation
     - node.type.speeches
+    - node.type.webform
     - taxonomy.vocabulary.author
     - taxonomy.vocabulary.keywords
   module:
     - actions_permissions
     - admin_toolbar_search
-    - coffee
     - content_moderation
     - content_moderation_revert
     - contextual
@@ -32,6 +32,7 @@ dependencies:
     - epa_media
     - epa_web_areas
     - epa_workflow
+    - file
     - filter
     - flag
     - group
@@ -53,11 +54,9 @@ weight: -9
 is_admin: false
 permissions:
   - 'access administration pages'
-  - 'access coffee'
   - 'access content'
   - 'access content overview'
   - 'access contextual links'
-  - 'access email field'
   - 'access environment indicator'
   - 'access group overview'
   - 'access media overview'
@@ -77,6 +76,8 @@ permissions:
   - 'create speeches content'
   - 'create terms in author'
   - 'create terms in keywords'
+  - 'create webform content'
+  - 'delete own files'
   - 'edit own paragraph library items'
   - 'execute entity:publish_action block_content'
   - 'execute entity:publish_action media'
@@ -104,6 +105,8 @@ permissions:
   - 'execute entity:unpublish_action paragraphs_library_item'
   - 'execute entity:unpublish_action path_alias'
   - 'execute entity:unpublish_action taxonomy_term'
+  - 'execute epa_web_areas_update_media_group_association media'
+  - 'execute epa_web_areas_update_node_group_association node'
   - 'execute moderation_state_change block_content'
   - 'execute moderation_state_change crop'
   - 'execute moderation_state_change embedded_paragraphs'
@@ -141,7 +144,6 @@ permissions:
   - 'take_ownership_on_clone node entity'
   - 'unflag notification_opt_in'
   - 'use admin toolbar search'
-  - 'use blizz_bulk_creator ajax autocomplete'
   - 'use siteimprove'
   - 'use siteimprove prepublish'
   - 'use text format filtered_html'

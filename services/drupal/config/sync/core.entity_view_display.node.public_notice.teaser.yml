@@ -41,6 +41,7 @@ dependencies:
     - node.type.public_notice
   module:
     - datetime
+    - smart_trim
     - user
 id: node.public_notice.teaser
 targetEntityType: node
@@ -57,9 +58,23 @@ content:
     weight: 0
     region: content
   field_description:
-    type: basic_string
+    type: smart_trim
     label: hidden
-    settings: {  }
+    settings:
+      trim_length: 50
+      trim_type: words
+      trim_suffix: …
+      wrap_output: false
+      wrap_class: trimmed
+      summary_handler: full
+      trim_options:
+        text: false
+        trim_zero: false
+        replace_tokens: false
+      more_link: false
+      more_class: more-link
+      more_text: More
+      more_aria_label: 'Read more about [node:title]'
     third_party_settings: {  }
     weight: 2
     region: content

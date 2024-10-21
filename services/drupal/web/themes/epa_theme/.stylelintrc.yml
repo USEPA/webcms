@@ -1,18 +1,18 @@
 extends:
   - stylelint-config-sass-guidelines
-  - stylelint-config-prettier
 
 plugins:
+  - stylelint-order
   - stylelint-prettier
   - stylelint-selector-pseudo-class-lvhfa
+  - stylelint-order
 rules:
   block-no-empty: null
   color-named:
     - never
     - ignore:
       - 'inside-function'
-  max-nesting-depth: 3
-  no-empty-first-line: true
+  max-nesting-depth: 4
   order/order:
     - - type: at-rule
         hasBlock: false
@@ -20,10 +20,10 @@ rules:
       - declarations
     - unspecified: ignore
       disableFix: true
+  order/properties-alphabetical-order: error
   plugin/selector-pseudo-class-lvhfa: true
   prettier/prettier: true
   property-no-vendor-prefix: null
-  selector-attribute-brackets-space-inside: never
   selector-class-pattern:
     # "piece" regex:
     # [a-zA-Z0-9]+
@@ -34,9 +34,6 @@ rules:
     #   ----------------------------------------------     -----------------------------------------------      -----------------------------------------------
     - '^[a-zA-Z][a-zA-Z0-9]*(?:-[a-zA-Z0-9]+)*(?:__[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?$'
   selector-no-qualifying-type:
-    - true
-    - ignore:
-      - attribute
   string-no-newline: true
   scss/at-import-partial-extension-blacklist:
     - 'less'
@@ -59,4 +56,3 @@ rules:
     #   Block                                              Element (optional)                                   Modifier (also optional)
     #   ----------------------------------------------     -----------------------------------------------      -----------------------------------------------
     - '^[a-zA-Z][a-zA-Z0-9]*(?:-[a-zA-Z0-9]+)*(?:__[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?$'
-  scss/at-extend-no-missing-placeholder: null

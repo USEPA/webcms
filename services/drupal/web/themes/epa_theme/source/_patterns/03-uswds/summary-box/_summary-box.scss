@@ -1,9 +1,19 @@
+@use '../../00-config' as *;
+@use '../../02-base/03-extendables' as *;
+
 .usa-summary-box {
-  overflow: auto;
+  overflow: visible;
+
+  &::before,
+  &::after {
+    clear: both;
+    content: '';
+    display: table;
+  }
 }
 
 .usa-summary-box__body {
-  overflow: hidden;
+  overflow: visible;
 }
 
 .usa-summary-box__body,
@@ -11,8 +21,25 @@
   > :last-child {
     margin-bottom: 0;
   }
+
+  .usa-dark-background & {
+    color: gesso-color(text, primary);
+
+    a:not(.usa-button, .button) {
+      @extend %light-bg-link;
+    }
+
+    p,
+    span {
+      color: gesso-color(text, primary);
+    }
+  }
 }
 
 .usa-summary-box__heading {
   clear: none;
+
+  .usa-dark-background & {
+    color: gesso-color(text, primary);
+  }
 }
