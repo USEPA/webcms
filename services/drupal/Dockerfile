@@ -1,29 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS memcached-ext
-
-# Set working directory to /tmp
-WORKDIR /tmp
-
-# First, install compile-time dependencies
-RUN apk add --no-cache $PHPIZE_DEPS libmemcached-dev zlib-dev
-
-# Next, install the prequisite igbinary extension
-RUN pecl install igbinary
-
-# Finally, build and install memcached. We have to do this instead of the
-# traditional pecl install method because we pass custom flags to memcached's
-# ./configure script, which does not appear to be supported by the pecl command.
-RUN set -ex \
-  && PECL_MEMCACHED_VERSION=3.2.0 \
-  && cd /tmp \
-  && pecl download memcached-$PECL_MEMCACHED_VERSION \
-  && tar xzf memcached-$PECL_MEMCACHED_VERSION.tgz \
-  && cd memcached-$PECL_MEMCACHED_VERSION \
-  && phpize \
-  && ./configure --enable-memcached-igbinary \
-  && make \
-  && make install
-
-FROM public.ecr.aws/docker/library/php:8.1-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -48,15 +23,9 @@ RUN set -ex \
 
 WORKDIR /var/www/html
 
-# Copy and enable the memcached extension (and its dependency, igbinary)
-COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/
-RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
-
-# APK packages needed by this image
-RUN install-php-extensions apcu sockets \
+# PHP packages needed by this image
+RUN install-php-extensions apcu sockets igbinary memcached \
+  # APK packages needed by this image
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached \
@@ -239,7 +208,7 @@ CMD [ "nginx", "-g", "daemon off;" ]
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
-FROM public.ecr.aws/docker/library/php:8.1-cli-alpine AS drush
+FROM public.ecr.aws/docker/library/php:8.2-cli-alpine AS drush
 
 # Bump system packages
 RUN apk upgrade
@@ -253,6 +222,8 @@ RUN set -ex \
     opcache \
     pdo_mysql \
     zip \
+    igbinary \
+    memcached \
   && apk add --no-cache \
     mysql-client \
     openssh \
@@ -264,13 +235,6 @@ RUN set -ex \
 
 ENV PATH=${PATH}:/var/www/html/vendor/bin
 WORKDIR /var/www/html
-
-# Copy and enable the memcached extension (and its dependency, igbinary)
-COPY --from=memcached-ext \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/igbinary.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/memcached.so \
-  /usr/local/lib/php/extensions/no-debug-non-zts-20210902/
-RUN docker-php-ext-enable igbinary && docker-php-ext-enable memcached
 
 # APK packages needed by this image
 RUN install-php-extensions apcu sockets \
