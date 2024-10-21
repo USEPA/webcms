@@ -12,9 +12,15 @@ dependencies:
     - paragraphs.paragraphs_type.from_library
     - paragraphs.paragraphs_type.header
     - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
     - paragraphs.paragraphs_type.slideshow
   module:
+    - custom_add_another
     - entity_reference_revisions
+third_party_settings:
+  custom_add_another:
+    custom_add_another: ''
+    custom_remove: ''
 id: node.webform.field_paragraphs
 field_name: field_paragraphs
 entity_type: node
@@ -30,6 +36,7 @@ settings:
   handler_settings:
     target_bundles:
       html: html
+      link_list: link_list
       box: box
       header: header
       dynamic_list: dynamic_list
@@ -78,9 +85,6 @@ settings:
       from_library:
         weight: -27
         enabled: true
-      graphic_list:
-        weight: 39
-        enabled: false
       header:
         weight: -30
         enabled: true
@@ -92,18 +96,12 @@ settings:
         enabled: false
       link_list:
         weight: -32
-        enabled: false
+        enabled: true
       locations_of_prop_actions:
         weight: -19
         enabled: false
-      media_block:
-        weight: 45
-        enabled: false
       press_officers:
         weight: -18
-        enabled: false
-      section:
-        weight: 47
         enabled: false
       slide:
         weight: 37
@@ -111,7 +109,4 @@ settings:
       slideshow:
         weight: -28
         enabled: true
-      tagline:
-        weight: 50
-        enabled: false
 field_type: entity_reference_revisions
