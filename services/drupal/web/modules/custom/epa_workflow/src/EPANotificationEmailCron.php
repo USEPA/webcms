@@ -151,7 +151,6 @@ class EPANotificationEmailCron {
     // Build exposed filters parameters to send to view.
     $exposed_filters_values = [
       'title' => '',
-      'gid' => '',
       'gid' => $gid_parameter,
       'type' => 'All',
       'field_owning_office_target_id' => '',
@@ -183,7 +182,7 @@ class EPANotificationEmailCron {
     // Get the View's render array.
     $rendered_view = $view->render();
     // Render the array into html.
-    $view_html = \Drupal::service('renderer')->render($rendered_view);
+    $view_html = $this->renderer->render($rendered_view);
     return $view_html->__toString();
   }
 
