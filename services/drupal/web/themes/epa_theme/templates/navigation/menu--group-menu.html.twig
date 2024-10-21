@@ -1,0 +1,36 @@
+{#
+  /**
+  * @file
+  * Theme override for Menu.
+  *
+  */
+#}
+
+{% if items %}
+  <button type="button" class="usa-button usa-button--outline web-area-menu__button" id="web-area-menu__button" aria-label="{{ 'toggle the side navigation menu'|t }}">
+    {% include '@uswds/icon/icon.twig' with {
+      'modifier_classes': 'menu-button--open',
+      'is_hidden': true,
+      'icon_name': 'menu',
+      'label': 'Open Sidenav Menu',
+      'epa_theme_image_path': epa_theme_image_path
+    } %}
+    {% include '@uswds/icon/icon.twig' with {
+      'modifier_classes': 'menu-button--close',
+      'is_hidden': true,
+      'icon_name': 'close',
+      'label': 'Close Sidenav Menu',
+      'epa_theme_image_path': epa_theme_image_path
+    } %}
+  </button>
+
+  <nav class="menu--sidenav-nav">
+{% endif %}
+
+{% include '@components/menu/menu--sidenav/menu--sidenav.twig' with {
+  'main_items': items,
+} %}
+
+{% if items %}
+  </nav>
+{% endif %}

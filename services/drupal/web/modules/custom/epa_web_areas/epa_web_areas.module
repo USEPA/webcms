@@ -40,12 +40,6 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $group = $form_state->getStorage()['group'];
     }
 
-    // Set access to hublinks for Web Area homepage.
-    if (isset($form['field_hublinks'])) {
-      $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : FALSE;
-      $form['field_hublinks']['#access'] = $has_hublinks;
-    }
-
     // Add group label to form.
     if (!empty($group)) {
       $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
@@ -75,30 +69,6 @@ function epa_web_areas_form_group_web_area_edit_form_alter(&$form, FormStateInte
   if (isset($form['field_allow_speeches'])) {
     $form['field_allow_speeches']['#access'] = $account->hasPermission('permit speeches');
   }
-}
-
-/**
- * Implements hook_block_access().
- *
- * - Used to hide sidebar menu if content belongs to group using hublinks
- * as its naviagtion style.
- */
-function epa_web_areas_block_access(Block $block, $operation, AccountInterface $account) {
-  if ($operation == 'view' && $block->getPluginId() == 'groupmenus') {
-    $node = \Drupal::routeMatch()->getParameter('node');
-    if ($node) {
-      $group_contents = GroupContent::loadByEntity($node);
-      foreach ($group_contents as $group_content) {
-        $group = $group_content->getGroup();
-      }
-    }
-    else {
-      $group = \Drupal::routeMatch()->getParameter('group');
-    }
-    $has_hublinks = !empty($group) ? \Drupal::service('epa_web_areas.web_areas_helper')->checkNavigationStyle($group) : TRUE;
-    return AccessResult::forbiddenIf($has_hublinks)->addCacheableDependency($block);
-  }
-  return AccessResult::neutral();
 }
 
 /**
@@ -206,13 +176,12 @@ function epa_web_areas_form_embedded_paragraphs_paragraphs_entity_embed_form_alt
   // Add custom help text describing each paragraph item.
   // @link https://forumone.atlassian.net/browse/EPAD8-2509
   $items = [
-    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/and-after-images">Before/After Swipe</a>: compare two images side-by-side'),
-    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/adding-boxes-webcms-editor">Boxes</a> highlight specific web content. Each box style has specific content requirements'),
-    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-dynamic-list">Dynamic Lists</a> are automated lists of WebCMS content based on filters'),
-    Markup::create('From Library can be used to add "<a target="_blank" href="https://www.epa.gov/webcmstraining/reusable-paragraphs-repeatable-content">reusable paragraphs</a>," which can be embedded on multiple pages'),
-    'Add Header adds headings like h2, h3, etc.',
-    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/adding-link-list">Link List</a> are bulleted lists of links'),
-    Markup::create('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-slideshows">Slideshows</a> are pictures that can be cycled through'),
+    Markup::create(t('<a target="_blank" href="https://www.epa.gov/webcmstraining/and-after-images">Before/After Swipe</a>: compare two images side-by-side')),
+    Markup::create(t('<a target="_blank" href="https://www.epa.gov/webcmstraining/adding-boxes-webcms-editor">Boxes</a> highlight specific web content. Each box style has specific content requirements')),
+    Markup::create(t('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-dynamic-list">Dynamic Lists</a> are automated lists of WebCMS content based on filters')),
+    Markup::create(t('From Library can be used to add "<a target="_blank" href="https://www.epa.gov/webcmstraining/reusable-paragraphs-repeatable-content">reusable paragraphs</a>," which can be embedded on multiple pages')),
+    t('Add Header adds headings like h2, h3, etc.'),
+    Markup::create(t('<a target="_blank" href="https://www.epa.gov/webcmstraining/creating-slideshows">Slideshows</a> are pictures that can be cycled through')),
   ];
 
   $help_text_list = [
@@ -417,29 +386,6 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
 }
 
 /**
- * Implements hook_node_presave().
- */
-function epa_web_areas_node_presave(EntityInterface $entity) {
-  if ($entity->hasField('field_hublinks') && $entity->id()) {
-    $groups = \Drupal::service('epa_web_areas.web_areas_helper')
-      ->getNodeReferencingGroups($entity);
-    $hublinks = $entity->field_hublinks->getValue();
-
-    foreach ($groups as $group) {
-      $group_hublink = ['target_id' => $group->id()];
-      $the_group = array_filter($hublinks, function ($item) use ($group_hublink) {
-        return !empty($item['target_id']) && $item['target_id'] == $group_hublink['target_id'];
-      });
-      if (empty($the_group)) {
-        array_unshift($hublinks, $group_hublink);
-      }
-    }
-
-    $entity->field_hublinks->setValue($hublinks);
-  }
-}
-
-/**
  * Alter local actions plugins.
  *
  * @param array $local_actions
@@ -524,17 +470,6 @@ function epa_web_areas_entity_access(EntityInterface $entity, $operation, Accoun
     return AccessResult::allowed();
   }
   return group_entity_access($entity, $operation, $account);
-}
-
-/**
- *
- */
-function epa_web_areas_preprocess_node(&$variables) {
-  $groups = \Drupal::service('epa_web_areas.web_areas_helper')->getNodeReferencingGroups($variables['node']);
-  $group = reset($groups);
-  if ($group && $group->hasField('field_navigation_style')) {
-    $variables['nav_style'] = $group->field_navigation_style->value;
-  }
 }
 
 /**
