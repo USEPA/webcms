@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\danse\Entity\Event;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
-use Symfony\Component\DependencyInjection\ContainerInterface as DependencyInjectionContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a base plugin to retrieve content from danse events.
@@ -14,6 +14,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface as DependencyInject
  * @ingroup views_plugins
  */
 abstract class EpaWorkflowReferenceBase extends FieldPluginBase {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
 
   /**
    * Constructs a \Drupal\field\Plugin\views\field\Field object.
@@ -36,7 +43,7 @@ abstract class EpaWorkflowReferenceBase extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(DependencyInjectionContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
       $plugin_id,
@@ -49,11 +56,29 @@ abstract class EpaWorkflowReferenceBase extends FieldPluginBase {
    * {@inheritdoc}
    */
   public function getEntity(ResultRow $values) {
-    $event = parent::getEntity($values);
+    $event = $this->getEvent($values);
     if ($event instanceof Event && $payload = $event->getPayload()) {
       return $payload->getEntity();
     }
     return $event;
+  }
+
+  /**
+   * Gets the Danse entity matching the current row and relationship.
+   *
+   * @param \Drupal\views\ResultRow $values
+   *   An object containing all retrieved values.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
+   *   Returns the Danse entity matching the values or NULL if there is
+   *   no matching entity.
+   */
+  public function getEvent(ResultRow $values) {
+    $event = parent::getEntity($values);
+    if ($event instanceof Event) {
+      return $event;
+    }
+    return NULL;
   }
 
   /**

@@ -10,7 +10,7 @@ use Drupal\views\ResultRow;
  *
  * @ViewsField("epa_workflow_node_transition_to")
  */
-class EpaWorkflowNodeTransitionTo extends EpaWorkflowReferenceBase {
+class EpaWorkflowNodeTransitionTo extends EpaWorkflowReferenceTransitionBase {
 
   /**
    * {@inheritdoc}
@@ -20,7 +20,12 @@ class EpaWorkflowNodeTransitionTo extends EpaWorkflowReferenceBase {
     $current_state = '';
 
     if ($entity instanceof ContentEntityInterface) {
-      $current_state = $entity->moderation_state->value;
+      $transition_revision_ids = $this->getTransitionRevisionIds($values);
+
+      if (!empty($transition_revision_ids['to'])) {
+        $current_revision = $this->getRevisionEntity($transition_revision_ids['to']);
+        $current_state = !empty($current_revision) ? $current_revision->get('moderation_state')->getString() : '';
+      }
     }
     return $this->sanitizeValue($current_state);
   }
