@@ -18,6 +18,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\epa_workflow\EpaNotificationService;
 use Drupal\node\NodeInterface;
 use Drupal\paragraphs\Entity\Paragraph;
 
@@ -904,4 +905,39 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
       ],
     ],
   ];
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function epa_workflow_toolbar() {
+  $items['epa_notifications'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => 'Notifications',
+      '#url' => Url::fromUri('base://admin/content/notifications'),
+      '#attributes' => [
+        'class' => ['toolbar-icon', 'toolbar-icon-notifications'],
+        'title' => 'View and manage content moderation notifications.',
+      ],
+    ],
+    '#wrapper_attributes' => [
+      'class' => ['epa-workflow-notifications-toolbar-tab'],
+    ],
+    '#attached' => [
+      'library' => [
+        'epa_workflow/notifications-toolbar',
+      ],
+    ],
+  ];
+  return $items;
+}
+
+/**
+ * Implements hook_toolbar_alter().
+ */
+function epa_workflow_toolbar_alter(&$items) {
+  $notifications_count = EpaNotificationService::getNotificationsCount();
+  $items['epa_notifications']['tab']['#title'] .= $notifications_count ? ' (' . $notifications_count . ')' : '';
 }
