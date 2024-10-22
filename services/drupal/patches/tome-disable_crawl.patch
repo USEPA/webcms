@@ -1,0 +1,65 @@
+diff --git a/README.txt b/README.txt
+index ec7d4da..b8438f6 100644
+--- a/README.txt
++++ b/README.txt
+@@ -36,6 +36,8 @@ in settings.php are:
+  - tome_static_cache_exclude: An array of paths to always exclude from cache.
+  - tome_static_path_exclude: An array of paths to exclude from static site
+    generation. Useful for system paths.
++ - tome_static_crawl: A boolean indicating that Tome should crawl paths found
++   in HTML, for example from anchor tags. Defaults to TRUE.
+  - tome_sync_encoder: The encoder to use when exporting content. Defaults to
+    "json" but "yaml" is also available in an experimental state.
+ 
+diff --git a/modules/tome_static/src/StaticGenerator.php b/modules/tome_static/src/StaticGenerator.php
+index 845568f..218b2ff 100644
+--- a/modules/tome_static/src/StaticGenerator.php
++++ b/modules/tome_static/src/StaticGenerator.php
+@@ -475,12 +475,6 @@ class StaticGenerator implements StaticGeneratorInterface {
+       }
+     }
+     /** @var \DOMElement $node */
+-    foreach ($document->getElementsByTagName('a') as $node) {
+-      if ($node->hasAttribute('href')) {
+-        $paths[] = $node->getAttribute('href');
+-      }
+-    }
+-    /** @var \DOMElement $node */
+     foreach ($document->getElementsByTagName('script') as $node) {
+       if ($node->hasAttribute('src')) {
+         $paths[] = $node->getAttribute('src');
+@@ -493,12 +487,6 @@ class StaticGenerator implements StaticGeneratorInterface {
+     foreach ($xpath->query('//*[@style]') as $node) {
+       $paths = array_merge($paths, $this->getCssAssets($node->getAttribute('style'), $root));
+     }
+-    /** @var \DOMElement $node */
+-    foreach ($document->getElementsByTagName('iframe') as $node) {
+-      if ($node->hasAttribute('src')) {
+-        $paths[] = $node->getAttribute('src');
+-      }
+-    }
+ 
+     // Recursive call in HTML comments in order to retrieve conditional assets.
+     /** @var \DOMElement $node */
+@@ -506,6 +494,21 @@ class StaticGenerator implements StaticGeneratorInterface {
+       $paths = array_merge($paths, $this->getHtmlAssets($node->nodeValue, $root));
+     }
+ 
++    if (Settings::get('tome_static_crawl', TRUE)) {
++      /** @var \DOMElement $node */
++      foreach ($document->getElementsByTagName('a') as $node) {
++        if ($node->hasAttribute('href')) {
++          $paths[] = $node->getAttribute('href');
++        }
++      }
++      /** @var \DOMElement $node */
++      foreach ($document->getElementsByTagName('iframe') as $node) {
++        if ($node->hasAttribute('src')) {
++          $paths[] = $node->getAttribute('src');
++        }
++      }
++    }
++
+     return $paths;
+   }
+ 
