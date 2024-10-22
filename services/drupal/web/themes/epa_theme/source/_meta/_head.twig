@@ -88,3 +88,34 @@
 </head>
 <body class="{{ body_class }}" id="#top">
 {% include '@components/skiplinks/skiplinks.twig' %}
+
+{% if standalone_template %}
+  {% set domain = get_domain() %}
+
+  {% for key, value in domain %}
+    <h3>{{ key }}</h3>
+    {%- if value is iterable %}
+      <ul>
+      {% for subkey, subvalue in value  %}
+        <li>{{ subkey }}
+          {%- if subvalue is iterable %}
+            <ul>
+            {% for subsubkey, subsubvalue in subvalue  %}
+              <li>{{ subsubkey }}
+                {%- if subsubvalue is not iterable %}
+                  : {{ subsubvalue }}
+                {% endif %}
+              </li>
+            {% endfor %}
+            </ul>
+          {%- else -%}
+            : {{ subvalue }}
+          {% endif %}
+        </li>
+      {% endfor %}
+      </ul>
+    {%- else -%}
+      <pre>{{ value }}</pre>
+    {% endif %}
+  {% endfor %}
+{% endif %}
