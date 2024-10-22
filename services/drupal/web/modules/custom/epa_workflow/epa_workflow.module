@@ -16,11 +16,11 @@ use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Url;
+use Drupal\epa_workflow\EpaNotificationService;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
-use Drupal\Core\Url;
-use Drupal\epa_workflow\EpaNotificationService;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\epa_workflow\Form\EPAContentModerationEntityModerationForm;
 
@@ -128,6 +128,7 @@ function epa_workflow_mail($key, &$message, $params) {
   switch ($key) {
     case 'epa_workflow_notification_summary':
       $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed; delsp=yes';
+      $message['Reply-to'] = 'donotreply@epa.gov';
       $message['from'] = \Drupal::config('system.site')->get('mail');
       $message['subject'] = t('Expiring content for @group_label Web Area week of @date', ['@group_label' => $params['group_label'], '@date' => $params['date']]);
       $message['body'][] = t("<p>Hi, you have received this email because you are a Editor in Chief (EIC) or Deputy EIC of the @group_label web area in EPA's Web Content Management System.</p>", ['@group_label' => $params['group_label']]);
@@ -1032,41 +1033,6 @@ function epa_workflow_theme($existing, $type, $theme, $path) {
       'base hook' => 'flag',
     ],
   ];
-}
-
-/**
- * Implements hook_page_top()
- */
-function epa_workflow_page_top(array &$page_top) {
-  // Only add this block if we're on a node route.
-  if ($node = \Drupal::routeMatch()->getParameter('node')) {
-    // Load our custom block
-    $machine_name = 'epa_node_tabs';
-    /** @var Drupal\Core\Block\BlockBase $block */
-    $block = \Drupal::service('plugin.manager.block')
-      ->createInstance($machine_name, []);
-    if (!empty($block)) {
-      if ($block->access(\Drupal::currentUser())) {
-        $block->setContextValue('node', $node);
-        $page_top['epa_node_tabs'] = $block->build();
-        $page_top['epa_node_tabs']['#weight'] = 1000;
-      }
-    }
-
-    $separate = $node;
-
-    $machine_name = 'epa_workflow_contentinfobox';
-    /** @var Drupal\Core\Block\BlockBase $content_info_block */
-    $content_info_block = \Drupal::service('plugin.manager.block')
-      ->createInstance($machine_name, []);
-    if (!empty($content_info_block)) {
-      if ($content_info_block->access(\Drupal::currentUser())) {
-        $content_info_block->setContextValue('node', $separate);
-        $page_top['content_info_box'] = $content_info_block->build();
-        $page_top['content_info_box']['#weight'] = 1001;
-      }
-    }
-  }
 }
 
 /**
