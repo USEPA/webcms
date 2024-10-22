@@ -30,6 +30,11 @@ function epa_theme_preprocess_paragraph__slideshow(&$variables) {
     // If media item is private and user is anonymous we should remove it from display.
     /** @var \Drupal\media\MediaInterface $media_item */
     $media_item = $slides[$key]['#paragraph']->field_slide_image->entity;
+
+    if (!$media_item) {
+      return;
+    }
+
     if (\Drupal::currentUser()->isAnonymous() &&
       $media_item->hasField('field_limit_file_accessibility')
     ) {

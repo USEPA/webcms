@@ -21,6 +21,13 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
   protected $valueFormType = 'select';
 
   /**
+   * The current display (machine name) of the view.
+   *
+   * @var string
+   */
+  protected $currentDisplay;
+
+  /**
    * Group membership loader service.
    *
    * @var \Drupal\group\GroupMembershipLoaderInterface
