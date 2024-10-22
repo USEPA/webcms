@@ -10,9 +10,9 @@ dependencies:
     - field.field.paragraph.author.field_position
     - paragraphs.paragraphs_type.author
   module:
+    - epa_core
     - layout_builder
     - layout_builder_restrictions
-    - linked_field
     - text
 third_party_settings:
   layout_builder:
@@ -30,17 +30,16 @@ bundle: author
 mode: default
 content:
   field_author:
-    type: entity_reference_label
+    type: epa_core_hierarchical_term_facet_formatter
     label: hidden
     settings:
-      link: false
-    third_party_settings:
-      linked_field:
-        linked: '1'
-        type: custom
-        destination: 'internal:/perspectives/search/perspectives_author/[paragraph:field_author:target_id]'
-        advanced: {  }
-        token: ''
+      display: leaf
+      link: true
+      wrap: none
+      separator: ' » '
+      reverse: false
+      facet_source: perspectives_author
+    third_party_settings: {  }
     weight: 0
     region: content
   field_biography:

@@ -49,14 +49,27 @@ function epa_core_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implements hook_rebuild().
+ * Implements hook_requirements().
  */
-function epa_core_rebuild() {
-  $release = getenv('GIT_COMMIT');
-  if ($tag = getenv('GIT_TAG')) {
-    $release = $tag;
+function epa_core_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime') {
+    $release = getenv('GIT_COMMIT');
+    if ($tag = getenv('GIT_TAG')) {
+      $release = $tag;
+    }
+    if (empty($release)) {
+      $release = 'Neither the GIT_TAG nor GIT_COMMIT environment variables have been set.';
+    }
+    $requirements['epa_core_release_version'] = array(
+      'title' => t('EPA Drupal WebCMS Release Version'),
+      'value' => $release,
+      'severity' => REQUIREMENT_OK,
+    );
   }
-  \Drupal::state()->set('environment_indicator.current_release', $release);
+
+  return $requirements;
 }
 
 /**
@@ -392,11 +405,12 @@ function epa_core_tokens($type, $tokens, array $data, array $options, Bubbleable
             ->getNodeReferencingGroups($node);
           foreach ($groups as $group) {
             if ($forms = $group->field_contact_us_form->referencedEntities()) {
+              /** @var \Drupal\node\Entity\Node $contact_form */
               $contact_form = reset($forms);
               $bubbleable_metadata->addCacheableDependency($group);
               $bubbleable_metadata->addCacheableDependency($contact_form);
               $url = $contact_form ? Url::fromRoute('entity.node.canonical', ['node' => $contact_form->id()]) : NULL;
-              $replacements[$original] = $url ? Link::fromTextAndUrl(t('Contact Us'), $url)
+              $replacements[$original] = $url ? Link::fromTextAndUrl($contact_form->getTitle(), $url)
                 ->toString() : $original;
             }
           }
@@ -579,6 +593,16 @@ function epa_core_field_widget_complete_form_alter(array &$element, FormStateInt
       if ($items->getFieldDefinition()->getSetting('datetime_type') === 'datetime' ) {
         _epa_core_augment_datetime_description($element['widget'][0]['#description']);
       }
+    }
+  }
+
+  // Need to remove capability for content authors to add new "Link List"
+  // components, but still allow them to edit any that already exist. We can't
+  // simply remove them from config.
+  // @link https://forumone.atlassian.net/browse/EPAD8-2552
+  if ($plugin_id == 'paragraphs' && ($element["widget"]["#field_name"] == 'field_paragraphs' || $element["widget"]["#field_name"] == 'field_paragraphs_1' )) {
+    if (isset($element["widget"]["add_more"]["operations"]["#links"]["add_more_button_link_list"])) {
+      unset($element["widget"]["add_more"]["operations"]["#links"]["add_more_button_link_list"]);
     }
   }
 

@@ -208,7 +208,7 @@ Deployments can be broken down into three steps: build images, apply Terraform, 
 
 ### Build Images
 
-There are four custom Docker images: Drupal, nginx, and Drush. While it is possible to build these in parallel, it is probably best to build them in serial and push after deployments. A sample shell script is below:
+There are four custom Docker images: Drupal, nginx, and Drush. Depending on the CI/CD infrastructure in play, it can be good to save time by parallelizing the builds. The below shell scripts shows the minimum amount of work necessary to push the images, using the local Docker build cache instead of the ECR-based one:
 
 ```sh
 #!/bin/bash
@@ -265,7 +265,7 @@ Conceptually, there are three steps involved:
    2. Capture the AWSVPC configuration needed by Fargate to launch Drush. At a minimum, this must include the Drupal security group ID and the private subnet ID(s). (If more than one subnet is provided, ECS will choose one.)
 3. Use ECS' run task functionality ([`aws ecs run-task`](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ecs/run-task.html), [`RunTask` API](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html)) to spawn a one-off Drush task.
 
-The [`run-drush.sh`](../../.buildkite/run-drush.sh) script can be used as a reference for this part. Since the RunTask API is asynchronous (it returns successfully as soon as the launch request is acknowledged by ECS), the latter portion of the script captures the new task's ARN and waits for its status to change to "STOPPED". If the task did not exit cleanly, then an error is raised to the CI/CD runner.
+The scripts in [the `ci` directory](../../ci/) can be used as a reference for this part. Since the RunTask API is asynchronous (it returns successfully as soon as the launch request is acknowledged by ECS), the latter portion of the code captures the new task's ARN and waits for its status to change to "STOPPED". If the task did not exit cleanly, then an error is raised to the CI/CD runner.
 
 For more information on the Drush commands issued in these script steps, see:
 
@@ -279,7 +279,7 @@ After the first deployment (or if some values change), some manual steps will ne
 
 ### DNS
 
-Any public hostnames (set via `var.drupal_hostname` and, if set, `var.drupal_extra_hostnames`) will need to be exposed to the internet. For example, if `var.drupal_hostname` is `www.example.com`, then the `www.example.com` record will need to be a CNAME for this environment's network load balancer.
+Any public hostnames (set via `var.drupal_hostname` and, if set, `var.drupal_extra_hostnames`) will need to be exposed to the internet. For example, if `var.drupal_hostname` is `www.example.com`, then the `www.example.com` record will need to be a CNAME for this environment's network load balancer. This configuration needs to be adjusted for CDN layers.
 
 ### Site Installation
 

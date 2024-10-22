@@ -9,9 +9,11 @@ dependencies:
     - paragraphs.paragraphs_type.box
     - paragraphs.paragraphs_type.card_group
     - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.featured_links
     - paragraphs.paragraphs_type.from_library
     - paragraphs.paragraphs_type.header
     - paragraphs.paragraphs_type.html
+    - paragraphs.paragraphs_type.link_list
     - paragraphs.paragraphs_type.slideshow
   module:
     - entity_reference_revisions
@@ -20,7 +22,7 @@ field_name: field_paragraphs
 entity_type: node
 bundle: page
 label: Body
-description: ''
+description: 'You can add paragraphs in using this dropdown menu, or you can <a target="_blank" href="https://www.epa.gov/webcmstraining/embedding-paragraphs">embed paragraphs</a> directly into the editor by selecting the paragraphs buttons.'
 required: true
 translatable: true
 default_value: {  }
@@ -30,6 +32,7 @@ settings:
   handler_settings:
     target_bundles:
       html: html
+      link_list: link_list
       box: box
       header: header
       dynamic_list: dynamic_list
@@ -37,6 +40,7 @@ settings:
       from_library: from_library
       card_group: card_group
       before_after_swipe_component: before_after_swipe_component
+      featured_links: featured_links
     negate: 0
     target_bundles_drag_drop:
       applicants_or_respondents:
@@ -72,6 +76,9 @@ settings:
       dynamic_list:
         weight: -29
         enabled: true
+      featured_links:
+        weight: 38
+        enabled: true
       frc:
         weight: -23
         enabled: false
@@ -79,7 +86,7 @@ settings:
         weight: -27
         enabled: true
       graphic_list:
-        weight: 39
+        weight: 41
         enabled: false
       header:
         weight: -30
@@ -92,18 +99,18 @@ settings:
         enabled: false
       link_list:
         weight: -32
-        enabled: false
+        enabled: true
       locations_of_prop_actions:
         weight: -19
         enabled: false
       media_block:
-        weight: 45
+        weight: 47
         enabled: false
       press_officers:
         weight: -18
         enabled: false
       section:
-        weight: 47
+        weight: 49
         enabled: false
       slide:
         weight: 33
@@ -112,6 +119,6 @@ settings:
         weight: -28
         enabled: true
       tagline:
-        weight: 50
+        weight: 52
         enabled: false
 field_type: entity_reference_revisions
