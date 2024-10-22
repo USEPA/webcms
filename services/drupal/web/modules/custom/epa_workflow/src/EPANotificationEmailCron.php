@@ -74,8 +74,8 @@ class EPANotificationEmailCron {
     $data = [];
     /** @var $group \Drupal\group\Entity\Group */
     foreach ($groups as $group) {
-      // Skip group if there is no expired content.
       $expiring_content = $this->getExpiringGroupContent($group->id(), $group->label());
+      // Skip group if there is no expired content.
       if (empty($expiring_content)) {
         continue;
       }
@@ -125,7 +125,6 @@ class EPANotificationEmailCron {
             $this->logger->error($message);
           }
         }
-        break;
       }
     }
   }
@@ -146,8 +145,9 @@ class EPANotificationEmailCron {
       ->load('published_content')
       ->getExecutable();
 
-    // @todo: remove sort from headers.
-    $gid_parameter = sprintf('%s (%s)',$group_label,$group_id);
+    // Wrap group parameter value in double quotes to handle groups with commas
+    // in the name.
+    $gid_parameter = sprintf('"%s (%s)"',$group_label,$group_id);
     // Build exposed filters parameters to send to view.
     $exposed_filters_values = [
       'title' => '',
@@ -167,23 +167,24 @@ class EPANotificationEmailCron {
     $view->setDisplay('page_1');
     $view->setItemsPerPage(12);
     $view->setExposedInput($exposed_filters_values);
+    $view->execute();
+
     // If there are no results exit early.
-    if ($view->result == 0) {
+    if (empty($view->result)) {
       return null;
     }
 
-    // Get views exposed filters and remove them so they are not rendered in
-    // the email.
-    $handlers = $view->getHandlers('filter', 'page_1');
-    foreach ($handlers as $handler) {
-      $view->removeHandler('page_1', 'filter', $handler['id']);
-    }
-    $view->execute();
     // Get the View's render array.
     $rendered_view = $view->render();
+    // Do not cache the view results as we will build multiple result sets with
+    // different criteria. $view->execute() does not invalidate cache and
+    // without this change, you will always see the first result set regardless
+    // of filter parameters passed.
+    $rendered_view['#cache']['max-age'] = 0;
+    unset($rendered_view['#pre_render']);
     // Render the array into html.
     $view_html = $this->renderer->render($rendered_view);
-    return $view_html->__toString();
+    return empty($view_html) ? '' : $view_html->__toString();
   }
 
 }
