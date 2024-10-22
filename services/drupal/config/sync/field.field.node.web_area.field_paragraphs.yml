@@ -9,24 +9,20 @@ dependencies:
     - paragraphs.paragraphs_type.box
     - paragraphs.paragraphs_type.card_group
     - paragraphs.paragraphs_type.dynamic_list
+    - paragraphs.paragraphs_type.featured_links
     - paragraphs.paragraphs_type.from_library
     - paragraphs.paragraphs_type.header
     - paragraphs.paragraphs_type.html
     - paragraphs.paragraphs_type.link_list
     - paragraphs.paragraphs_type.slideshow
   module:
-    - custom_add_another
     - entity_reference_revisions
-third_party_settings:
-  custom_add_another:
-    custom_add_another: ''
-    custom_remove: ''
 id: node.web_area.field_paragraphs
 field_name: field_paragraphs
 entity_type: node
 bundle: web_area
 label: Body
-description: ''
+description: 'You can add paragraphs in using this dropdown menu, or you can <a target="_blank" href="https://www.epa.gov/webcmstraining/embedding-paragraphs">embed paragraphs</a> directly into the editor by selecting the paragraphs buttons.'
 required: false
 translatable: false
 default_value: {  }
@@ -44,6 +40,7 @@ settings:
       from_library: from_library
       card_group: card_group
       before_after_swipe_component: before_after_swipe_component
+      featured_links: featured_links
     negate: 0
     target_bundles_drag_drop:
       applicants_or_respondents:
@@ -78,6 +75,9 @@ settings:
         enabled: false
       dynamic_list:
         weight: -42
+        enabled: true
+      featured_links:
+        weight: 38
         enabled: true
       frc:
         weight: -34

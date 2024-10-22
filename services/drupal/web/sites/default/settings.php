@@ -982,6 +982,10 @@ $settings['fast404_respect_redirect'] = TRUE;
 $settings['fast404_exts'] = '/^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
 $settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
 
+if (file_exists($app_root . '/' . $site_path . '/settings.snapshot.php')) {
+  include $app_root . '/' . $site_path . '/settings.snapshot.php';
+}
+
 /**
  * Load local development override configuration, if available.
  *
