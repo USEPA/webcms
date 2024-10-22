@@ -104,6 +104,12 @@ variable "drupal_csrf_origin_whitelist" {
   default     = []
 }
 
+variable "drupal_en_snapshot_bucket" {
+  description = "Name (not ARN) of the S3 bucket in which to store a site snapshot. Leave as null in order to skip snapshot support."
+  type        = string
+  default     = null
+}
+
 #endregion
 
 #region Drush service Configuration
