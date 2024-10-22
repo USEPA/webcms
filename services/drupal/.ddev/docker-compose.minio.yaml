@@ -8,13 +8,17 @@ services:
       - minio
       - server
       - /data
+      - --console-address
+      - :9090
     environment:
       MINIO_ACCESS_KEY: minio_access
       MINIO_SECRET_KEY: minio_secret
+      MINIO_UID: $DDEV_UID
+      MINIO_GUID: $DDEV_UID
       MINIO_DOMAIN: minio
       VIRTUAL_HOST: $DDEV_HOSTNAME
-      HTTP_EXPOSE: 9001:9000
-      HTTPS_EXPOSE: 9002:9000
+      HTTP_EXPOSE: "9001:9000,9089:9090"
+      HTTPS_EXPOSE: "9002:9000,9090:9090"
     labels:
       com.ddev.site-name: ${DDEV_SITENAME}
       com.ddev.approot: $DDEV_APPROOT
