@@ -450,6 +450,14 @@ function epa_core_deploy_0004_set_card_field_default_values(&$sandbox) {
 }
 
 /**
+ * Un-sets the release name so that it does not appear in the admin toolbar.
+ * @return void
+ */
+function epa_core_deploy_0005_clear_environment_indicator_release() {
+  \Drupal::state()->set('environment_indicator.current_release', null);
+}
+
+/**
  * Setting notification_opt_in flag for node author, author of the latest
  * revision, or author of the current revision
  */

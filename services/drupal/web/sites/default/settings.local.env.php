@@ -39,6 +39,12 @@ $config['s3fs.settings']['domain'] = 'localhost:8888';
 // Minio doesn't support ListObjectVersions
 $config['s3fs.settings']['disable_version_sync'] = TRUE;
 
+// Unset Flysystem schemes so we can use private filesystem for tome.
+unset($settings['flysystem']);
+
+// Use private filesystem for Tome.
+$settings['tome_static_directory'] = 'private://snapshot';
+
 // Map twig cache onto shared filesystem to allow drush to clear and write twig cache for local development.
 $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default/files/tmp/cache/twig';
 

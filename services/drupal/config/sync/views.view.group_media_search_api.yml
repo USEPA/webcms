@@ -1018,6 +1018,48 @@ display:
                 operator: or
                 value: {  }
           reduce_duplicates: false
+        field_limit_file_accessibility:
+          id: field_limit_file_accessibility
+          table: search_api_index_media
+          field: field_limit_file_accessibility
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_boolean
+          operator: '='
+          value: ''
+          group: 1
+          exposed: true
+          expose:
+            operator_id: ''
+            label: 'File Availability'
+            description: null
+            use_operator: false
+            operator: field_limit_file_accessibility_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: field_limit_file_accessibility
+            required: true
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+          is_grouped: true
+          group_info:
+            label: 'File Availability'
+            description: 'Filter for private files'
+            identifier: field_limit_file_accessibility
+            optional: true
+            widget: radios
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items:
+              1:
+                title: Private
+                operator: '='
+                value: '1'
       style:
         type: table
         options:
@@ -1129,11 +1171,11 @@ display:
         - route.group
         - url
         - url.query_args
-        - user
         - user.group_permissions
       tags:
         - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
+        - 'search_api_list:media'
   data_export_1:
     id: data_export_1
     display_title: 'Data export'
@@ -1778,10 +1820,10 @@ display:
         - request_format
         - route.group
         - url
-        - user
         - user.group_permissions
       tags:
         - 'config:search_api.index.media'
+        - 'search_api_list:media'
   page_1:
     id: page_1
     display_title: Page
@@ -2497,8 +2539,8 @@ display:
         - route.group
         - url
         - url.query_args
-        - user
         - user.group_permissions
       tags:
         - 'config:field.storage.media.field_banner_image_restricted'
         - 'config:search_api.index.media'
+        - 'search_api_list:media'
