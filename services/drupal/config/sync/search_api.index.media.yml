@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.storage.media.field_media_audio_file
     - field.storage.media.field_description
+    - field.storage.media.field_limit_file_accessibility
     - field.storage.media.field_media_file
     - field.storage.media.field_media_file_1
     - field.storage.media.field_media_image
@@ -13,9 +14,9 @@ dependencies:
     - field.storage.media.field_banner_image_restricted
     - search_api.server.localhost
   module:
+    - file
     - media
     - user
-    - file
     - entitygroupfield
     - group
     - search_api
@@ -85,6 +86,14 @@ field_settings:
     dependencies:
       config:
         - field.storage.media.field_description
+  field_limit_file_accessibility:
+    label: 'File Availability'
+    datasource_id: 'entity:media'
+    property_path: field_limit_file_accessibility
+    type: boolean
+    dependencies:
+      config:
+        - field.storage.media.field_limit_file_accessibility
   field_media_tags:
     label: Tags
     datasource_id: 'entity:media'
@@ -187,6 +196,7 @@ datasource_settings:
 processor_settings:
   add_url: {  }
   aggregated_field: {  }
+  custom_value: {  }
   entity_type: {  }
   ignorecase:
     weights:
@@ -197,6 +207,7 @@ processor_settings:
       - aggregated_filenames
       - author_name
       - bundle
+      - field_banner_image_restricted
       - field_description
       - field_publication_number
       - filename
@@ -298,6 +309,7 @@ processor_settings:
       - aggregated_filenames
       - author_name
       - bundle
+      - field_banner_image_restricted
       - field_description
       - field_publication_number
       - filename

@@ -15,6 +15,11 @@ resource "aws_ecs_task_definition" "drupal_task" {
   cpu    = 1024
   memory = 2048
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = var.cpu_architecture
+  }
+
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
     # container, which means that by itself it cannot receive HTTP requests. Instead, the
