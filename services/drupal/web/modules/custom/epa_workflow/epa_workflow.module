@@ -122,6 +122,28 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
 }
 
 /**
+ * Populate the queue with groups.
+ *
+ * The queue will check if a group has expiring content and if so send the
+ * necessary emails.
+ *
+ * @return void
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+ */
+function _epa_workflow_cron_callback() {
+  $groups = \Drupal::entityTypeManager()->getStorage('group')->loadMultiple();
+  // Load queue.
+  /** @var QueueFactory $queue_factory */
+  $queue_factory = \Drupal::service('queue');
+  /** @var QueueInterface $queue */
+  $queue = $queue_factory->get('epa_workflow_epa_expiring_content_emails');
+  foreach ($groups as $group) {
+    $queue->createItem($group);
+  }
+}
+
+/**
  * Implements hook_mail().
  */
 function epa_workflow_mail($key, &$message, $params) {
