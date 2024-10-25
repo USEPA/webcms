@@ -70,12 +70,12 @@ class EPANotificationEmailCron {
    * @return \Drupal\epa_workflow\EPANotificationEmailHandler[]
    */
   protected function getGroupEmailData(): array {
-    $groups = $this->entityTypeManager->getStorage('group')->loadMultiple([7, 45061, 141779, 93463]);
+//    $groups = $this->entityTypeManager->getStorage('group')->loadMultiple([7, 45061, 141779, 93463]);
+    $groups = $this->entityTypeManager->getStorage('group')->loadMultiple();
     $data = [];
     /** @var $group \Drupal\group\Entity\Group */
     foreach ($groups as $group) {
       $expiring_content = $this->getExpiringGroupContent($group->id(), $group->label());
-//      $expiring_content = $this->getExpiringGroupContent($group['id'], $group['label']);
       // Skip group if there is no expired content.
       if (empty($expiring_content)) {
         continue;
