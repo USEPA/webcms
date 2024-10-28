@@ -158,6 +158,8 @@ function epa_workflow_mail($key, &$message, $params) {
       $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
       $message['body'][] = $params['body'];
       $message['body'][] = '<p>...</p>';
+      $message['body'][] = $params['view_link'];
+
       $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
       break;
   }

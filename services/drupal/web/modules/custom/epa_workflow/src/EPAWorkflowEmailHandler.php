@@ -111,4 +111,18 @@ class EPAWorkflowEmailHandler {
     return $this->body;
   }
 
+  /**
+   * Create the gid value so it can be used as view filter.
+   *
+   * @param $url_encode bool
+   *   Whether the resulting string needs to be encoded or not.
+   *
+   * @return string
+   */
+  public function getViewGidValue($url_encode = FALSE): string {
+    $gid_parameter = sprintf('"%s (%s)"',$this->getLabel(),$this->getId());
+    return $url_encode ? urlencode($gid_parameter) : $gid_parameter;
+
+  }
+
 }

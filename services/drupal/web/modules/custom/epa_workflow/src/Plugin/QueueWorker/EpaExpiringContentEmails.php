@@ -12,8 +12,9 @@ use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\epa_workflow\EPAWorkflowEmailHandler;
 use Drupal\group\Entity\Group;
+use Drupal\shs\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Defines 'epa_workflow_epa_expiring_content_emails' queue worker.
@@ -26,6 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 final class EpaExpiringContentEmails extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
+  use StringTranslationTrait;
+
   /**
    * Constructs a new EpaExpiringContentEmails instance.
    */
@@ -37,6 +40,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
     private readonly MailManagerInterface $mailManager,
     private readonly LoggerChannelInterface $logger,
     private readonly RendererInterface $renderer,
+    private readonly Request $request,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -53,6 +57,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
       $container->get('plugin.manager.mail'),
       $container->get('logger.factory')->get('epa_workflow'),
       $container->get('renderer'),
+      $container->get('request_stack')->getCurrentRequest()
     );
   }
 
@@ -75,6 +80,9 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
       $params['group_id'] = $email->getId();
       $params['group_label'] = $email->getLabel();
       $params['body'] = $email->getBody();
+      $view_path_with_args_escaped = "admin/content/published?title=&gid=". $email->getViewGidValue(TRUE) . "&type=All&field_owning_office_target_id=&combine=&moderation_state%5B0%5D=epa_default-published_needs_review&moderation_state%5B1%5D=epa_default-published_expiring&moderation_state%5B2%5D=epa_default-published_day_til_expire&order=field_review_deadline&sort=desc";
+      $params['view_link'] = sprintf('<p><a href="%s/%s">%s</a></p>', $this->request->getBaseUrl(), $view_path_with_args_escaped, $this->t('View in WebCMS here.'));
+
 
       /** @var \Drupal\user\Entity\User $recipient */
       foreach ($email->getRecipients() as $recipient) {
