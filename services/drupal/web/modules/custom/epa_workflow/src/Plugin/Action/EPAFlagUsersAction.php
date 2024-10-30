@@ -68,11 +68,20 @@ class EPAFlagUsersAction extends ViewsBulkOperationsActionBase implements Contai
    * {@inheritDoc}
    */
   public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-    // A user could have any one of these admin_roles and be permitted to this action.
-    $admin_roles = ['system_webmaster', 'administrator'];
-    if (!empty(array_intersect($admin_roles, $account->getRoles()))) {
+    if ($account->hasPermission('execute watch content on behalf of user')) {
       return AccessResult::allowed();
     }
+
+    $grp_membership_service = \Drupal::service('group.membership_loader');
+    /** @var \Drupal\group\GroupMembership[] $grps */
+    $grps = $grp_membership_service->loadByUser($account);
+
+    foreach ($grps as $grp) {
+      if ($grp->hasPermission('execute watch content on behalf of user')) {
+        return AccessResult::allowed();
+      }
+    }
+
 
     return AccessResult::forbidden();
   }
