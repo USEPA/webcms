@@ -203,9 +203,12 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     }
 
     $group = $group_content->getGroup();
-    $menus = group_content_menu_get_menus_per_group($group);
-    $menu = reset($menus);
-    $menu_id = GroupContentMenuInterface::MENU_PREFIX . $menu->id();
+    $gc_menus = group_content_menu_get_menus_per_group($group);
+    $gc_menu = reset($gc_menus);
+    // The object loaded is a group content object. The actual menu is what's returned from the getEntity() call.
+    // For unknown reasons (presumably an artifact of the migration) the loaded $gc_menu object's ID is different than the menu ID which does work for a majority of web areas.
+    // This change should always work as we're always going to get the correct entity ID now.
+    $menu_id = GroupContentMenuInterface::MENU_PREFIX . $gc_menu->getEntity()->id();
 
     if ($menu_id) {
       $this->menuTrail = [];
