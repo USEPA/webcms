@@ -2,6 +2,7 @@
 
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\group_content_menu\GroupContentMenuInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Disable the first link for each Web Area menu's if it links to the same homepage node as what's set on the field_homepage for the group AND if it doesn't have any children.
@@ -113,3 +114,4 @@ function epa_web_areas_post_update_0001_web_area_menu_disable_home_link(&$sandbo
     }
   }
 }
+
