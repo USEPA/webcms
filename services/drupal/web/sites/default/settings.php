@@ -783,7 +783,7 @@ $databases['default']['default'] = [
     PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
   ],
   'init_commands' => [
-    'isolation_level' => 'SET SESSION tx_isolation=\'READ-COMMITTED\'',
+    'isolation_level' => 'SET SESSION transaction_isolation=\'READ-COMMITTED\'',
   ],
 ];
 
