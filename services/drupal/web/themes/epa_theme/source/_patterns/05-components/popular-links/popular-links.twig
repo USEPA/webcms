@@ -1,0 +1,32 @@
+{% set classes = [
+  'popular-links',
+  modifier_classes ? modifier_classes,
+]|join(' ')|trim %}
+
+{% set constrain_classes = [
+  'l-constrain',
+  constrain_modifier_classes ? constrain_modifier_classes,
+]|join(' ')|trim %}
+
+<div {{ add_attributes({ 'class': classes }) }}>
+  {% if has_constrain %}
+    <div class="{{ constrain_classes }}">
+  {% endif %}
+
+  {% if title %}
+    <{{ title_element ?: 'h3' }} class="h2 popular-links__title">
+      {% include '@components/icon/icon.twig' with {
+        'is_hidden': true,
+        'modifier_classes': 'popular-links__title-icon is-double-spaced-after',
+        'icon_name': 'star-circle'
+      } -%}
+      {{ title }}
+    </{{ title_element ?: 'h3' }}>
+  {% endif %}
+
+  {{ links }}
+
+  {% if has_constrain %}
+    </div>
+  {% endif %}
+</div>
