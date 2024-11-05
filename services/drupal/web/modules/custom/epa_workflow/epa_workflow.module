@@ -410,25 +410,6 @@ function _epa_workflow_node_view_moderation_form_submit(array &$form, FormStateI
 }
 
 /**
- * Implements hook_entity_view().
- */
-function epa_workflow_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-  // Add the moderation form to the full view mode of a node for authenticated
-  // users.
-  if ($view_mode === 'full' && $entity->getEntityTypeId() == 'node' && \Drupal::currentUser()->isAuthenticated()) {
-    if (isset($entity->in_preview) && $entity->in_preview) {
-      return;
-    }
-    // Only display the interface on the latest and default revisions.
-    if (!$entity->isLatestRevision() && !$entity->isDefaultRevision()) {
-      return;
-    }
-
-    build_content_moderation_info_box($entity, $build);
-  }
-}
-
-/**
  * Helper function to build 'info box' for displaying content moderation info.
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -983,23 +964,10 @@ function epa_workflow_form_node_revision_revert_confirm_alter(&$form, FormStateI
  * Implements hook_theme().
  */
 function epa_workflow_theme($existing, $type, $theme, $path) {
-  // @todo: Evaluate and remove the content_info_box given we won't use this after
   return [
     'entity_moderation_form' => [
       'template' => 'entity-moderation-form',
       'base hook' => 'content_moderation',
-    ],
-    'epa_content_info_box' => [
-      'variables' => [
-        'node_edit_link' => NULL,
-        'nid' => NULL,
-        'vid' => NULL,
-        'revision_author' => NULL,
-        'review_deadline' => NULL,
-        'current' => NULL,
-        'flag_link' => NULL,
-        'content_moderation_form' => NULL,
-      ],
     ],
     'epa_node_tabs' => [
       'variables' => [
