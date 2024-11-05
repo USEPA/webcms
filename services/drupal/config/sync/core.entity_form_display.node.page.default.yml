@@ -68,9 +68,10 @@ third_party_settings:
       format_type: tab
       format_settings:
         classes: ''
+        show_empty_fields: false
         id: ''
         formatter: open
-        description: ''
+        description: '<a target="_blank" href="https://www.epa.gov/webguide/entering-good-metadata-your-webpages">Metadata</a> is information that describes your content: it should be succinct, descriptive information about the page or document. It also improves your page rank in EPA&#39;s internal search engine.'
         required_fields: true
     group_other_metadata:
       children:
@@ -100,9 +101,10 @@ third_party_settings:
       format_type: tab
       format_settings:
         classes: ''
+        show_empty_fields: false
         id: ''
         formatter: closed
-        description: ''
+        description: 'This is the only place you can add JavaScript to your web page. Any content added here will be inserted in the footer of the published page. Read the <a target="_blank" href="https://www.epa.gov/web-policies-and-procedures/web-standard-javascript">JavaScript Web Standards</a> to learn more about the requirements.'
         required_fields: true
 id: node.page.default
 targetEntityType: node
@@ -244,13 +246,15 @@ content:
       autocollapse: none
       closed_mode_threshold: 0
       add_mode: dropdown
-      form_display_mode: default
+      form_display_mode: complex
       default_paragraph_type: html
       features:
         add_above: '0'
         collapse_edit_all: collapse_edit_all
         duplicate: duplicate
-    third_party_settings: {  }
+    third_party_settings:
+      limited_field_widgets:
+        limit_values: '0'
   field_paragraphs_1:
     type: paragraphs
     weight: 4
