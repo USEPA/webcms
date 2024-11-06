@@ -81,7 +81,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
       $params['group_label'] = $email->getLabel();
       $params['body'] = $email->getBody();
       $view_path_with_args_escaped = "admin/content/published?title=&gid=". $email->getViewGidValue(TRUE) . "&type=All&field_owning_office_target_id=&combine=&moderation_state%5B0%5D=epa_default-published_needs_review&moderation_state%5B1%5D=epa_default-published_expiring&moderation_state%5B2%5D=epa_default-published_day_til_expire&order=field_review_deadline&sort=desc";
-      $params['view_link'] = sprintf('<p><a href="%s/%s">%s</a></p>', $this->request->getBaseUrl(), $view_path_with_args_escaped, $this->t('View in WebCMS here.'));
+      $params['view_link'] = sprintf('<p><a href="%s/%s">%s</a></p>', $this->request->getBaseUrl(), $view_path_with_args_escaped, $this->t('View in WebCMS here'));
 
 
       /** @var \Drupal\user\Entity\User $recipient */
