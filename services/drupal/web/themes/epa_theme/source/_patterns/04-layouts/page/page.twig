@@ -27,7 +27,11 @@
 
     {% if has_in_page_nav %}
       <div class="usa-in-page-nav-container">
-        <aside class="usa-in-page-nav">
+        <aside
+          class="usa-in-page-nav"
+          data-main-content-selector=".article"
+          data-title-heading-level="h2"
+        >
           {% block in_page_nav %}
             {% include '@layouts/_sample-content/sample-content.twig' with {
               'content': 'In-page Navigation',

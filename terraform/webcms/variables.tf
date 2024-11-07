@@ -50,6 +50,12 @@ variable "image_tag" {
   type        = string
 }
 
+variable "cpu_architecture" {
+  description = "The CPU architecture to pass to Fargate. Should be either 'X86_64' or 'ARM64'. Leave null to apply the Fargate default."
+  type        = string
+  default     = null
+}
+
 #endregion
 
 #region Drupal service configuration
@@ -96,6 +102,12 @@ variable "drupal_csrf_origin_whitelist" {
   description = "A list of domains considered trustworthy by Drupal's Security Kit module. Each should be of the form PROTOCOL://DOMAIN[:PORT], such as http://example.com or https://example.net:123. The site's own domain is already part of this list."
   type        = list(string)
   default     = []
+}
+
+variable "drupal_en_snapshot_bucket" {
+  description = "Name (not ARN) of the S3 bucket in which to store a site snapshot. Leave as null in order to skip snapshot support."
+  type        = string
+  default     = null
 }
 
 #endregion

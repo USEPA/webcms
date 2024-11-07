@@ -783,7 +783,7 @@ $databases['default']['default'] = [
     PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
   ],
   'init_commands' => [
-    'isolation_level' => 'SET SESSION tx_isolation=\'READ-COMMITTED\'',
+    'isolation_level' => 'SET SESSION transaction_isolation=\'READ-COMMITTED\'',
   ],
 ];
 
@@ -981,6 +981,10 @@ $settings['fast404_respect_redirect'] = TRUE;
 // Ensure we do not send fast404 responses for sites/production/files/* since requests for those files need to get redirected to sites/default/files/*
 $settings['fast404_exts'] = '/^(?!\/robots)^(?!\/system\/files)^(?!\/sites\/production\/files).*\.(txt|png|gif|jpe?g|css|js|ico|swf|flv|cgi|bat|pl|dll|exe|asp)$/i';
 $settings['fast404_HTML_error_page'] = 'themes/epa_theme/source/fast-404.html';
+
+if (file_exists($app_root . '/' . $site_path . '/settings.snapshot.php')) {
+  include $app_root . '/' . $site_path . '/settings.snapshot.php';
+}
 
 /**
  * Load local development override configuration, if available.
