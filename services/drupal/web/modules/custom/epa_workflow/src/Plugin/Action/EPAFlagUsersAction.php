@@ -133,28 +133,51 @@ class EPAFlagUsersAction extends ViewsBulkOperationsActionBase implements Contai
     if ($entity && !empty($selected_users)) {
       $entity = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->load($entity->id());
 
+      // Arrays to keep track of flagged and unflagged users.
+      $flagged_users = [];
+      $unflagged_users = [];
+
       foreach ($selected_users as $user) {
         $flag_service = $this->flagService;
+        /** @var \Drupal\flag\Entity\Flag $flag */
         $flag = $flag_service->getFlagById(self::NOTIFICATION_FLAG_ID);
+
         if ($flag->isFlagged($entity, $user)) {
-          // User already has flagged the entity. Move on.
-          // @todo: potentially log message here.
-          continue;
+          // Unflag the entity for the user.
+          $flag_service->unflag($flag, $entity, $user);
+          $unflagged_users[] = $user->getAccountName();
         }
         else {
+          // Flag the entity for the user.
           $flag_service->flag($flag, $entity, $user);
+          $flagged_users[] = $user->getAccountName();
         }
       }
 
-      $usernames = array_map(function($user) {
-        return $user->getAccountName();
-      }, $selected_users);
+      // Create messages based on flagged and unflagged users.
+      $messages = [];
+      if (!empty($flagged_users)) {
+        $flagged_users_string = implode(', ', $flagged_users);
+        $messages[] = $this->t('Successfully flagged node @id for user(s): @users', [
+          '@id' => $entity->id(),
+          '@users' => $flagged_users_string,
+        ]);
+      }
+      if (!empty($unflagged_users)) {
+        $unflagged_users_string = implode(', ', $unflagged_users);
+        $messages[] = $this->t('Successfully unflagged node @id for user(s): @users', [
+          '@id' => $entity->id(),
+          '@users' => $unflagged_users_string,
+        ]);
+      }
 
-      $usernames_string = implode(', ', $usernames);
-
-      return $this->t('Successfully flagged node @id for user(s): @users', ['@id' => $entity->id() ,'@users' => $usernames_string]);
+      // Join messages with line breaks for clarity.
+      return implode("\n", $messages);
     }
+
+    return NULL;
   }
+
 
   /**
    * {@inheritDoc}
