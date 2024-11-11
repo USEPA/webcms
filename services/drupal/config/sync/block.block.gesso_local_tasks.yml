@@ -1,18 +1,17 @@
-uuid: 1af0c01b-357e-4d33-8897-af6baf9519ff
+uuid: 14b47cb3-903e-42cf-ac69-782695ee1778
 langcode: en
 status: true
 dependencies:
   module:
     - block_in_page_403
-    - system
+    - block_in_page_not_found
+    - user_not_role
   theme:
     - epa_theme
-_core:
-  default_config_hash: c-06bbElRY5sKmglk74ppgTW93Et4-EJFyNiUZMb8JY
 id: gesso_local_tasks
 theme: epa_theme
 region: messages
-weight: -21
+weight: 0
 provider: null
 plugin: local_tasks_block
 settings:
@@ -27,7 +26,14 @@ visibility:
     id: page_403
     negate: false
     page_403: 0
-  request_path:
-    id: request_path
-    negate: true
-    pages: '/node/*'
+  page_not_found_request:
+    id: page_not_found_request
+    negate: false
+    page_not_found: false
+  user_not_role:
+    id: user_not_role
+    negate: false
+    context_mapping:
+      user: '@user.current_user_context:current_user'
+    roles:
+      beta_tester: beta_tester
