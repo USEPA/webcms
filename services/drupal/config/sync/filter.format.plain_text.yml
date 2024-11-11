@@ -3,15 +3,13 @@ langcode: en
 status: true
 dependencies:
   module:
-    - media
-    - media_inline_embed
     - pathologic
     - token_filter
 _core:
   default_config_hash: NIKBt6kw_uPhNI0qtR2DnRf7mSOgAQdx7Q94SKMjXbQ
 name: 'Plain text'
 format: plain_text
-weight: 10
+weight: -4
 filters:
   filter_autop:
     id: filter_autop
@@ -42,15 +40,6 @@ filters:
     weight: 0
     settings:
       filter_url_length: 72
-  media_inline_embed:
-    id: media_inline_embed
-    provider: media_inline_embed
-    status: false
-    weight: 100
-    settings:
-      default_view_mode: default
-      allowed_media_types: {  }
-      allowed_view_modes: {  }
   token_filter:
     id: token_filter
     provider: token_filter

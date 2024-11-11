@@ -168,7 +168,7 @@
         "drupal/admin_toolbar": "^3.3",
         "drupal/allowed_formats": "^2.0",
         "drupal/anchor": "^1.0",
-        "drupal/anchor_link": "3.0.x-dev",
+        "drupal/anchor_link": "~3.0",
         "drupal/auto_entitylabel": "^3.0",
         "drupal/autologout": "^2.0",
         "drupal/autosave_form": "^1.3",
@@ -180,7 +180,7 @@
         "drupal/ckeditor5_dev": "^1.0",
         "drupal/ckeditor5_fullscreen": "^1.0@beta",
         "drupal/ckeditor_abbreviation": "^4.0@alpha",
-        "drupal/ckeditor_iframe": "^2.",
+        "drupal/ckeditor_iframe": "^3.0@beta",
         "drupal/ckeditor_resize": "^1.3",
         "drupal/ckeditor_specialchars": "^1.2",
         "drupal/cloudfront_cache_path_invalidate": "^3.0",
@@ -214,6 +214,7 @@
         "drupal/environment_indicator": "4.0.10",
         "drupal/facets": "^2.0",
         "drupal/facets_pretty_paths": "^1.4",
+        "drupal/fakeobjects": "^1.2",
         "drupal/fast_404": "^3.2",
         "drupal/field_group": "^3.0",
         "drupal/filter_html_plus": "^2.0",
@@ -261,7 +262,7 @@
         "drupal/node_title_help_text": "^1.4",
         "drupal/page_manager": "^4.0@RC",
         "drupal/paragraphs": "^1.9",
-        "drupal/paragraphs_entity_embed": "2.x-dev",
+        "drupal/paragraphs_entity_embed": "^3.0.1",
         "drupal/pathauto": "^1.4",
         "drupal/pathologic": "^2.0@alpha",
         "drupal/queue_ui": "^3.1",
@@ -318,6 +319,7 @@
         "liuggio/statsd-php-client": "^1.0",
         "mglaman/composer-drupal-lenient": "^1.0",
         "nodespark/des-connector": "dev-php-update#d699e59 as 7.x-dev",
+        "oomphinc/composer-installers-extender": "^2.0",
         "popperjs/popperjs": "^2.11",
         "ruflin/elastica": "7.x-dev#72a4598544e3f99b5dd8cacb05d009ee75c2a701 as dev-master",
         "sabre/vobject": "^4.0",
@@ -362,14 +364,17 @@
             "drupal/core-project-message": true,
             "mglaman/composer-drupal-lenient": true,
             "drupal/core-vendor-hardening": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "oomphinc/composer-installers-extender": true
         }
     },
     "autoload": {
         "classmap": [
             "scripts/composer/ScriptHandler.php"
         ],
-        "files": ["load.environment.php"]
+        "files": [
+            "load.environment.php"
+        ]
     },
     "scripts": {
         "install-codestandards": [
@@ -400,30 +405,14 @@
         },
         "patches-file": "composer.patches.json",
         "installer-paths": {
-            "web/core": [
-                "type:drupal-core"
-            ],
-            "web/libraries/{$name}": [
-                "type:drupal-library"
-            ],
-            "web/modules/contrib/{$name}": [
-                "type:drupal-module"
-            ],
-            "web/profiles/contrib/{$name}": [
-                "type:drupal-profile"
-            ],
-            "web/themes/contrib/{$name}": [
-                "type:drupal-theme"
-            ],
-            "drush/Commands/contrib/{$name}": [
-                "type:drupal-drush"
-            ],
-            "web/modules/custom/{$name}": [
-                "type:drupal-custom-module"
-            ],
-            "web/themes/custom/{$name}": [
-                "type:drupal-custom-theme"
-            ]
+            "web/core": ["type:drupal-core"],
+            "web/modules/contrib/{$name}": ["type:drupal-module"],
+            "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+            "web/themes/contrib/{$name}": ["type:drupal-theme"],
+            "drush/Commands/contrib/{$name}": ["type:drupal-drush"],
+            "web/modules/custom/{$name}": ["type:drupal-custom-module"],
+            "web/themes/custom/{$name}": ["type:drupal-custom-theme"],
+            "web/libraries/{$name}": ["type:drupal-library"]
         },
         "drupal-scaffold": {
             "locations": {
@@ -434,10 +423,7 @@
             }
         },
         "merge-plugin": {
-            "include": [
-                "web/modules/contrib/webform/composer.libraries.json",
-                "web/modules/contrib/anchor_link/composer.libraries.json"
-            ]
+            "include": ["web/modules/contrib/webform/composer.libraries.json", "web/modules/contrib/anchor_link/composer.libraries.json"]
         },
         "drupal-lenient": {
             "allowed-list": ["drupal/address_formatter", "drupal/ckeditor_specialchars", "drupal/entitygroupfield", "drupal/group_outsider_in", "drupal/hierarchical_term_formatter", "drupal/redirect_metrics", "drupal/role_expose", "drupal/show_email", "drupal/address_formatter"]
