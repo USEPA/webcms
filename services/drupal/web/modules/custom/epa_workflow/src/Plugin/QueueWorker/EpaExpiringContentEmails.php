@@ -69,17 +69,14 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
     $env_state = getenv('WEBCMS_ENV_STATE');
     if ($env_state !== 'migration') {
       $email = $this->getGroupEmailData($group);
-      // Exit early.
-      if (empty($email)) {
-        return;
-      }
       $module = 'epa_workflow';
       $key = 'epa_workflow_notification_summary';
       $date = new \DateTime();
       $params['date'] = $date->format('F jS, Y');
       $params['group_id'] = $email->getId();
       $params['group_label'] = $email->getLabel();
-      $params['body'] = $email->getBody();
+      // Nullsafe operator. Return $email if $emial is null.
+      $params['body'] = $email?->getBody();
       $view_path_with_args_escaped = "admin/content/published?title=&gid=". $email->getViewGidValue(TRUE) . "&type=All&field_owning_office_target_id=&combine=&moderation_state%5B0%5D=epa_default-published_needs_review&moderation_state%5B1%5D=epa_default-published_expiring&moderation_state%5B2%5D=epa_default-published_day_til_expire&order=field_review_deadline&sort=desc";
       $params['view_link'] = sprintf('<p><a href="%s/%s">%s</a></p>', $this->request->getBaseUrl(), $view_path_with_args_escaped, $this->t('View in WebCMS here'));
 
@@ -104,25 +101,23 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
    */
   protected function getGroupEmailData(Group $group): EPAWorkflowEmailHandler|NULL {
     $expiring_content = $this->getExpiringGroupContent($group->id(), $group->label());
-    // Skip group if there is no expired content.
-    if (!empty($expiring_content)) {
-      $recipients = [];
-      $email_handler = new EPAWorkflowEmailHandler();
-      if ($group->hasField('field_editor_in_chief') && !$group->get('field_editor_in_chief')->isEmpty()) {
-        $email_handler->setId((int) $group->id());
-        $email_handler->setLabel($group->label());
-        $email_handler->setBody($expiring_content);
-        $recipients[] = $group->field_editor_in_chief->entity;
+    $recipients = [];
+    $email_handler = new EPAWorkflowEmailHandler();
+    if ($group->hasField('field_editor_in_chief') && !$group->get('field_editor_in_chief')->isEmpty()) {
+      $email_handler->setId((int) $group->id());
+      $email_handler->setLabel($group->label());
+      $email_handler->setBody($expiring_content ?? 'No content expiring soon in your web area.');
+      $recipients[] = $group->field_editor_in_chief->entity;
 
-        // Get Deputy Editors in Chief.
-        $members = $group->getMembers(['web_area-deputy_editor_in_chief']);
-        foreach ($members as $member) {
-          $recipients[] = $member->getUser();
-        }
-        $email_handler->setRecipients($recipients);
-        return $email_handler;
+      // Get Deputy Editors in Chief.
+      $members = $group->getMembers(['web_area-deputy_editor_in_chief']);
+      foreach ($members as $member) {
+        $recipients[] = $member->getUser();
       }
+      $email_handler->setRecipients($recipients);
+      return $email_handler;
     }
+
     return NULL;
   }
 
