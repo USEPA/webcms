@@ -1,0 +1,80 @@
+{% if node_edit_link %}
+  {{ node_edit_link }}
+{% endif %}
+
+{% set box_content %}
+  {% if flag_link %}
+    {{ flag_link }}
+  {% endif %}
+
+  {% if nid %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': nid['#title'],
+      'field_items': [{ content: nid['#markup'] }],
+    } %}
+  {% endif %}
+
+  {% if vid %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight field--inline',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': vid['#title'],
+      'field_items': [{ content: vid['#markup'] }],
+    } %}
+
+    <button type="button" class="usa-button usa-button--unstyled js-vid-copy" aria-label="Copy this revision’s URL">
+      {%- include '@uswds/icon/icon.twig' with {
+        'icon_name': 'content_copy',
+        'modifier_classes': '',
+        'label': 'Copy this URL',
+      } -%}
+    </button>
+  {% endif %}
+
+  {% if revision_author %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': revision_author['#title'],
+      'field_items': [{ content: revision_author['#markup'] }],
+    } %}
+  {% endif %}
+
+  {% if review_deadline %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': review_deadline['#title'],
+      'field_items': [{ content: review_deadline['#markup'] }],
+    } %}
+  {% endif %}
+
+  {% if current %}
+    {% include '@components/field/field.twig' with {
+      'element': 'div',
+      'modifier_classes': 'field--tight',
+      'label_display': 'inline',
+      'label_element': 'div',
+      'label': current['#title'],
+      'field_items': [{ content: current['#markup'] }],
+    } %}
+  {% endif %}
+
+  {% if content_moderation_form %}
+    {{ content_moderation_form }}
+  {% endif %}
+{% endset %}
+
+{% include '@components/box/box--special/box--special.twig' with {
+  'content': box_content,
+} %}

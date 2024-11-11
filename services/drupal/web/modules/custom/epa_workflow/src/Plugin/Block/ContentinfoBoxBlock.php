@@ -14,6 +14,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\ModerationStateToColorMapTrait;
+use Drupal\node\Entity\Node;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -97,6 +98,10 @@ class ContentinfoBoxBlock extends BlockBase implements ContainerFactoryPluginInt
     // Check if we are on a node first.
     if (!$this->routeMatch->getParameter('node')) {
       // Not on a node, exit early.
+      return AccessResultForbidden::forbidden();
+    }
+
+    if (!\Drupal::currentUser()->hasPermission('use_epa_node_tabs')) {
       return AccessResultForbidden::forbidden();
     }
 
