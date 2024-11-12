@@ -13,8 +13,7 @@
   - [`pipeline.yml`](#pipelineyml)
     - [Upload Feature Pipeline](#upload-feature-pipeline)
     - [Upload Infrastructure Pipeline](#upload-infrastructure-pipeline)
-    - [Upload Dev Site Pipeline](#upload-dev-site-pipeline)
-    - [Upload Stage Site Pipeline](#upload-stage-site-pipeline)
+    - [Upload Site Deployment Pipeline](#upload-site-deployment-pipeline)
   - [`feature.yml`](#featureyml)
     - [Build Images](#build-images)
     - [Terraform Formatting](#terraform-formatting)
@@ -22,6 +21,8 @@
     - [Module Validation: Infrastructure](#module-validation-infrastructure)
     - [Module Validation: WebCMS](#module-validation-webcms)
   - [`infrastructure.yml`](#infrastructureyml)
+    - [Terraform Apply: Network](#terraform-apply-network)
+    - [Terraform Apply: Infrastructure](#terraform-apply-infrastructure)
   - [`webcms.yml`](#webcmsyml)
     - [Build Images](#build-images-1)
     - [Deploy Site: English](#deploy-site-english)
@@ -31,9 +32,7 @@
   - [`terraform.plan.yml`](#terraformplanyml)
   - [`terraform.apply.yml`](#terraformapplyyml)
 - [Scripts](#scripts)
-  - [`build-images.sh`](#build-imagessh)
   - [`terraform-fmt.sh`](#terraform-fmtsh)
-  - [`run-drush.sh`](#run-drushsh)
 - [Plugins](#plugins)
   - [`aws-parameters`](#aws-parameters)
 - [External Links](#external-links)
@@ -46,8 +45,6 @@
   - `webcms.yml` - WebCMS deployment pipeline
   - `terraform.apply.yml` - Template pipeline for `terraform apply` runs
   - `terraform.plan.yml` - Template pipeline for `terraform plan` runs
-  - `build-images.sh` - Builds Docker images using Kaniko
-  - `run-rush.sh` - Script to spawn Drush in ECS, performing schema and configuration updates
   - `terraform-fmt.sh` - Script to run `terraform fmt` in each module, doing basic formatting and syntax validation
   - `plugins/` - Custom plugins
     - `aws-parameters/` - Custom plugin to download specific Parameter Store values
@@ -109,7 +106,7 @@ We use environment variables to communicate values from one pipeline to any chil
 
 - **Pipeline step:** `label: ":pipeline: Feature"`
 - **Uploaded pipeline:** [`feature.yml`](#featureyml)
-- **Branch limits:** Runs _unless_ the branch is `main` or `integration`.
+- **Branch limits:** Runs _unless_ the branch is `integration`, `main`, `live` or `release`.
 - **Prerequisites:** _(none)_
 - **Permissions:** Documented in the pipeline.
 
@@ -117,36 +114,32 @@ This step simply uploads the feature pipeline. The steps from that pipeline are 
 
 #### Upload Infrastructure Pipeline
 
-#### Upload Dev Site Pipeline
-
-- **Pipeline step:** `label: ":pipeline: Dev"`
-- **Uploaded pipeline:** [`webcms.yml`](#webcmsyml)
-- **Branch limits:** Runs _only_ if the branch is `integration` and this is not a pull request.
-- **Prerequisites:** _(none)_
-- **Permissions:** Documented in the pipeline.
-
-This step uploads the application deployment pipeline with settings for the dev site.
-
-#### Upload Stage Site Pipeline
-
-- **Pipeline step:** `label: ":pipeline: Stage"`
-- **Uploaded pipeline:** [`webcms.yml`](#webcmsyml)
+- **Pipeline step:** `label: ":pipeline: Infrastructure`
+- **Uploaded pipeline:** [`infrastructure.yml`](#infrastructureyml)
 - **Branch limits:** Runs _only_ if the branch is `main` and this is not a pull request.
-- **Prerequisites:** The network and infrastructure pipelines must have completed succesfully.
+- **Prerequisites:** _(none)_
+
+This step uploads the infrastructure pipeline.
+
+#### Upload Site Deployment Pipeline
+
+- **Pipeline step:** `label: ":pipeline: WebCMS (${BUILDKITE_BRANCH})"`
+- **Uploaded pipeline:** [`webcms.yml`](#webcmsyml)
+- **Branch limits:** Runs _only_ if a) the branch is `integration`, `main`, `release`, or `live` and b) this is not a pull request.
+- **Prerequisites:** If triggered, the infrastructure pipeline and its steps must all have completed successfully.
 - **Permissions:** Documented in the pipeline.
 
-As with the dev site step above, this uploads the application deployment pipeline, targeting the stage site.
+This step uploads the site deployment steps for the environments matching the given branch.
 
 ### `feature.yml`
 
 #### Build Images
 
-- **Pipeline step:** `label: ":docker: Build images"`
-- **Supporting code:** [`build-images.sh`](#build-imagessh)
+- **Pipeline step:** `group: ":docker: Build images"`
 - **Uploaded pipeline:** _(none)_
 - **Permissions:** Push access to ECR.
 
-This step builds the WebCMS' custom images using [Kaniko](https://github.com/GoogleContainerTools/kaniko), which is a tool that can build OCI images from in a container without resorting to Docker-in-Docker or sharing the host's Docker socket.
+The steps in this group build the WebCMS' custom images using [Kaniko](https://github.com/GoogleContainerTools/kaniko), which is a tool that can build OCI images from in a container without resorting to Docker-in-Docker or sharing the host's Docker socket. For feature branches, they save cached layers but not the final image. This allows priming the cache for incoming changes but avoids wasting ECR storage space for final images.
 
 #### Terraform Formatting
 
@@ -186,17 +179,35 @@ This is similar to the above two steps, but targets the [`webcms module`](../ter
 
 ### `infrastructure.yml`
 
+#### Terraform Apply: Network
+
+- **Pipeline step:** `label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"`
+- **Supporting code:** [terraform/network](../terraform/network/)
+- **Uploaded pipeline:** [`terraform.apply.yml`](#terraformapplyyml)
+- **Prerequisites:** _(none)_
+- **Permissions:** Read/write access to DynamoDB and S3 for Terraform, read/write access to VPC and Parameter Store APIs for creating VPC resources and recording their IDs.
+
+This step uploads the Terraform application pipeline to run Terraform on a basic VPC. This VPC is _not_ used in production; it exists largely to demonstrate the bare minimum requirements for security groups and availability zone/subnet layout.
+
+#### Terraform Apply: Infrastructure
+
+- **Pipeline step:** `label: ":terraform: WebCMS (${WEBCMS_SITE}-en)"`
+- **Supporting code:** [terraform/infrastructure](../terraform/infrastructure/)
+- **Uploaded pipeline:** [`terraform.apply.yml`](#terraformapplyyml)
+- **Prerequisites:** The prior network pipeline must have completed successfully.
+- **Permissions:** Read/write access to most conventional AWS resources: ECS, ELB, Parameter Store, ECR, etc., for creating container cluster resources.
+
+This step uploads the Terraform application pipeline to run Terraform on the WebCMS' infrastructure.
+
 ### `webcms.yml`
 
 #### Build Images
 
-- **Pipeline step:** `label: ":docker: Build images"`
-- **Supporting code:** [`build-images.sh`](#build-imagessh)
+- **Pipeline step:** `group: ":docker: Build images"`
 - **Uploaded pipeline:** _(none)_
-- **Prerequisites:** _(none)_
 - **Permissions:** Push access to ECR.
 
-This step is identical to the build images step in the feature pipeline: it runs a Kaniko-powered image build for the WebCMS' custom images.
+This step is identical to the build images step in the feature pipeline: it runs a Kaniko-powered image build for the WebCMS' custom images. Unlike the feature pipeline, this step asks Kaniko to upload the resulting image to ECR.
 
 #### Deploy Site: English
 
@@ -208,6 +219,8 @@ This step is identical to the build images step in the feature pipeline: it runs
 
 This step uploads the Terraform apply pipeline, targeting the [`webcms module`](../terraform/webcms) where `WEBCMS_LANG` is set to the code `"en"`.
 
+This step and the Spanish step below are executed in parallel since the two Terraform deployments are kept separate from each other.
+
 #### Deploy Site: Spanish
 
 - **Pipeline step:** `label: ":terraform: WebCMS (${WEBCMS_SITE}-es)"`
@@ -217,6 +230,8 @@ This step uploads the Terraform apply pipeline, targeting the [`webcms module`](
 - **Permissions:** Read/write access to ECS, read/write access to S3 state and DynamoDB locks.
 
 This is almost identical to the English site's steps, save that it executes the module for the Spanish site.
+
+This step and the English step above are executed in parallel since the two Terraform deployments are kept separate from each other.
 
 #### Drush Updates: English
 
@@ -228,6 +243,8 @@ This is almost identical to the English site's steps, save that it executes the 
 
 This step dispatches an ECS task to run any pending updates (DB schema changes, configuration synchronization, etc.) due to changes in modules. The step waits until it has confirmed that Drush has exited. If Drush did not exit cleanly, the step records an error.
 
+This step and the Spanish step below are executed in parallel since the two Terraform deployments are kept separate from each other.
+
 #### Drush Updates: Spanish
 
 - **Pipeline step:** `label: ":ecs: Drush (${WEBCMS_SITE}-es)"`
@@ -237,6 +254,8 @@ This step dispatches an ECS task to run any pending updates (DB schema changes, 
 - **Permissions:** ECS RunTask and DescribeTaskDefinition API calls.
 
 This is almost identical to the English Drush step, save that it targets the Spanish site.
+
+This step and the English step above are executed in parallel since the two Terraform deployments are kept separate from each other.
 
 ### `terraform.plan.yml`
 
@@ -265,46 +284,12 @@ This pipeline is (deliberately) a near mirror of the plan pipeline. The only dif
 
 ## Scripts
 
-### `build-images.sh`
-
-This script uses [Kaniko](https://github.com/GoogleContainerTools/kaniko) to build the WebCMS' custom images. While we assume that Buildkite agents have access to Docker, production deployments will use a Docker-based runner and won't be using a system like Docker-in-Docker or bind mounting the Docker daemon socket. By performing Kaniko builds here, we ensure consistency and will be able to catch any issues before they impede production deployments.
-
-There are four custom images that are built for the WebCMS: three are built from [`services/drupal`](../services/drupal) because they need Drupal-related assets, and a fourth is built from [`services/metrics`](../services/metrics). We build all of them from a single script (instead of running them in parallel) since the builds are more IO-bound than CPU-bound and benefit from having a local cache of shared layers instead of needing to pull them from a registry.
-
-The builds of the `services/drupal`-derived images (Drupal, Drush, and nginx) are built using both a filesystem-based cache and a registry-based one. By storing intermediate layers in a registry, builds on a new agent server can download cached layers instead of rebuild them. This avoids the especially expensive initial build that occurs without a cache: we have to build a memcached extension from source in order to take advantage of AWS ElastiCache's auto-discovery mechanism. This layer does not change often, so we can make aggressive use of the cached layer across servers.
-
-By comparison, the metrics image's build is much lighter: it is an Alpine-based image that installs some `apk` packages and copies two files (an entrypoint and a transformation script). The build is therefore not cached as we assume querying remote caches would be more expensive than simply executing the build each time.
-
-Note that while Kaniko does have native support for authenticating with AWS ECR, it can only do so with the default AWS credentials chain. Our builds target repositories in another account, and so we use a Buildkite plugin to assume a cross-account role and simply forward the credentials variables to the Kaniko image.
-
 ### `terraform-fmt.sh`
 
 This script uses `terraform fmt`'s ability to do checks in order to ensure that all Terraform module code meets the community's formatting standards. While this could have been written as `terraform fmt -diff -check` lines in the step's command, we choose a shell script for two reasons reasons:
 
 1. The script can iterate over a directory listing, ensuring that we don't forget to check new modules.
 2. As we iterate, we can make a note of failure instead of exiting immediately at the first one. This lets us see the status of all modules in a single pass.
-
-### `run-drush.sh`
-
-This script appears lengthy, but its steps are easy to break down. We begin with an overview:
-
-1. The script begins by validating and loading configuration. Errors are issued early for missing environment variables, and Parameter Store is consulted for stored configuration values.
-2. Before we can launch a Drush task, we force ECS to stop all running Drupal tasks. Since this script is run immediately after a Terraform deployment completes, ECS may not have launched Drupal tasks using the newly-built images. When code (not configuration) changes between deployments, this can cause some cache corruption: web requests can cache the old code, which Drush will then read. As a stopgap, we simply interrupt all running tasks and let ECS relaunch new ones. The downtime that results (about 1-3 minutes) is acceptable for dev sites and much faster than waiting for old tasks to gracefully stop.
-3. We use the AWS CLI to spawn a Drush task on Fargate. The command's overrides parameter includes the Drush script needed to update the site, listed below. If the launch failed, the script prints any failure information it received and then fails, ensuring that the Buildkite job as a whole is marked as a failure.
-4. Since the RunTask API is asynchronous (it succeeds as soon as the request was received by ECS), the script captures the launched task's ARN and waits on its status. Every 5 seconds, it uses the [DescribeTasks](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html) API to query the status. Most of the code in this loop is used to verify that Drush exited cleanly: the "hot" part of the loop simply checks if it should report a new task state (such as moving from PROVISIONING to PENDING) or if the status is STOPPED. The loop continues if the task is still running.
-
-   Once the task has reached the STOPPED state, the script outputs all of the stop information it can gather. This includes the stop code and reason (where available): this will indicate if the container exited or if there was an API error. If the container has an exit code, it is inspected to determine if it exited cleanly (exit code 0), or with an error. An exit code above 128 indicates exiting due to a signal, and we print the signal name if we can identify it. For example, if the container ran afoul of its memory limits, it would have been terminated by the SIGKILL signal.
-
-   Finally, regardless of exit status, the script prints a clickable link to the logs.
-
-The update script run inside the Drush container has a few steps:
-
-1. Put the site into maintenance mode. Drupal responds early to requests while in this mode, preventing another potential source of cache corruption.
-2. Apply any pending database schema updates with [`drush updb`](https://www.drush.org/latest/commands/updatedb/).
-3. Rebuild the cache.
-4. Apply any pending configuration changes with [`drush cim`](https://www.drush.org/latest/commands/config_import/).
-5. Disable maintenance mode.
-6. Perform a final cache rebuild.
 
 ## Plugins
 
@@ -321,9 +306,5 @@ This plugin provides a `pre-command` script file. As the name implies, Buildkite
   - [Pipelines](https://buildkite.com/docs/pipelines)
   - [Plugins](https://buildkite.com/docs/plugins)
 - [Terraform CLI](https://www.terraform.io/docs/cli-index.html)
-- [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/)
-  - [`aws ecs run-task`](https://docs.aws.amazon.com/cli/latest/reference/ecs/run-task.html)
-- The [RunTask API](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html)
-  - The [`networkConfiguration` parameter](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-networkConfiguration)
-  - The [`overrides` parameter](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html#ECS-RunTask-request-overrides)
 - [jq](https://stedolan.github.io/jq/)
+- [kaniko](https://github.com/GoogleContainerTools/kaniko)

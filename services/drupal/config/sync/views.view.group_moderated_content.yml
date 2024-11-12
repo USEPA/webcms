@@ -1428,7 +1428,20 @@ display:
           entity_field: uid
           plugin_id: standard
           required: false
-      header: {  }
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: 'Add new content or use these filters to <a href="https://www.epa.gov/webcmstraining/finding-your-content">find content that you are looking for</a>. Type your User ID into the Author or the Last Updated By fields to find content you''ve worked on.'
+            format: ckeditor_5_test
+          tokenize: false
       footer: {  }
       display_extenders:
         views_ajax_get:
@@ -1442,7 +1455,6 @@ display:
         - route.group
         - url
         - url.query_args
-        - user
         - user.group_permissions
         - 'user.node_grants:view'
       tags:
@@ -2675,7 +2687,6 @@ display:
         - route.group
         - url
         - url.query_args
-        - user
         - user.group_permissions
         - 'user.node_grants:view'
       tags:
@@ -3293,7 +3304,7 @@ display:
           id: link_to_latest_revision
           table: node_revision
           field: link_to_latest_revision
-          relationship: none
+          relationship: nid
           group_type: group
           admin_label: ''
           entity_type: node
@@ -3424,7 +3435,6 @@ display:
         - route
         - route.group
         - url
-        - user
         - user.group_permissions
         - 'user.node_grants:view'
       tags:
@@ -3460,7 +3470,6 @@ display:
         - route.group
         - url
         - url.query_args
-        - user
         - user.group_permissions
         - 'user.node_grants:view'
       tags:

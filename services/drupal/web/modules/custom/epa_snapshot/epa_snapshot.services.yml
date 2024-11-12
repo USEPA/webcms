@@ -1,0 +1,6 @@
+services:
+  epa_snapshot.event_subscriber:
+    class: Drupal\epa_snapshot\EventSubscriber\EpaSnapshotSubscriber
+    arguments: ['@request_stack']
+    tags:
+      - { name: event_subscriber }
