@@ -24,7 +24,6 @@ class InternalAlertsBlock extends BlockBase {
     $build['#theme'][] = 'epa_alerts';
     $build['#alertContext'] = 'internal';
     $build['#attached']['drupalSettings']['epaAlerts']['context'] = 'internal';
-    $build['#attached']['drupalSettings']['epaAlerts']['tomeEnabled'] = \Drupal::moduleHandler()->moduleExists('tome');
 
     return $build;
   }

@@ -39,10 +39,7 @@ import Drupal from 'drupal';
   Drupal.behaviors.epaAlerts = {
     attach(context, settings) {
       const alerts = once('loadEpaAlerts', 'body', context);
-      // We want to ensure that if we're running the snapshot that we don't inadvertently display any alerts.
-      if (drupalSettings.epaAlerts.tomeEnabled) {
-        drupalSettings.ajax.hide_ajax_errors = true;
-      }
+      drupalSettings.ajax.hide_ajax_errors = true;
       alerts.forEach(alert => {
         const alertContext = drupalSettings.epaAlerts.context;
         const viewInfo = {
