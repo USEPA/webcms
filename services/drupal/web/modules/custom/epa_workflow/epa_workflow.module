@@ -131,13 +131,18 @@ function _epa_workflow_moderation_form_entity_builder($entity_type_id, ContentMo
  */
 function _epa_workflow_cron_callback() {
   $groups = \Drupal::entityTypeManager()->getStorage('group')->loadMultiple();
+  $groups = \Drupal::entityTypeManager()->getStorage('group')->load(7);
   // Load queue.
   /** @var QueueFactory $queue_factory */
   $queue_factory = \Drupal::service('queue');
+  $queue = $queue_factory->get('epa_workflow_epa_expiring_content_emails');
+  $queue->createItem($groups);
+
+  return;
   /** @var QueueInterface $queue */
   $queue = $queue_factory->get('epa_workflow_epa_expiring_content_emails');
   foreach ($groups as $group) {
-    $queue->createItem($group);
+    $queue->createItem($group->$grou);
   }
 }
 
@@ -153,12 +158,18 @@ function epa_workflow_mail($key, &$message, $params) {
       $message['from'] = 'EDA <donotreply@epa.gov>';
       $message['subject'] = t('Expiring content for @group_label Web Area week of @date', ['@group_label' => $params['group_label'], '@date' => $params['date']]);
       $message['body'][] = t("<p>Hi, you have received this email because you are an Editor in Chief (EIC) or Deputy EIC of the @group_label web area in EPA's Web Content Management System.</p>", ['@group_label' => $params['group_label']]);
-      $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
-      $message['body'][] = $params['body'];
-      $message['body'][] = '<p>...</p>';
-      $message['body'][] = $params['view_link'];
+      if (empty($params['body'])) {
+        $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
+        $message['body'][] = $params['body'];
+        $message['body'][] = '<p>...</p>';
+        $message['body'][] = $params['view_link'];
+        $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
+      }
+    else {
+        $message['body'][] = t("<p>The @group_label web area does not have any content expiring within the next three weeks.</p>", ['@group_label' => $params['group_label']]);
+        $message['body'][] = t("<p>Thank you!</p>");
+      }
 
-      $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
       break;
   }
 }
