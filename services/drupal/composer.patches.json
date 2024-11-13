@@ -36,9 +36,9 @@
       "PHP message: Error: Call to a member function getEntityTypeId() on null (Layout Builder)": "https://www.drupal.org/files/issues/2023-06-12/3049332-82.diff",
       "Responsive image width/height values are not used from fallback image style": "https://www.drupal.org/files/issues/2023-08-04/3377420-responsive-image-dimension-fallback-style-9.patch",
       "CKEditor 5 toolbar items of multi-value field (typically Paragraphs) overflowing on narrow viewports and overlapping with node form's sidebar on wide viewports": "https://www.drupal.org/files/issues/2024-04-09/3332416-79.patch",
-      "Error: Call to a member function label() on null in Drupal\\menu_link_content\\Form\\MenuLinkContentForm->form() (line 99 of /var/www/html/docroot/core/modules/menu_link_content/src/Form/MenuLinkContentForm.php).": "patches/7228.patch",
-      "Media Type links in Media Library modal missing vertical tabs styling in Claro": "https://www.drupal.org/files/issues/2024-01-04/missing_variables_in_claro-3404866-41.patch",
-      "Background colour of UI widgets get overridden on Ajax load.": "https://www.drupal.org/files/issues/2023-08-29/3383631-7_0.patch"
+      "Allows hiding ajax errors": "https://www.drupal.org/files/issues/2024-02-05/2987444-53.patch",
+      "Background colour of UI widgets get overridden on Ajax load.": "https://www.drupal.org/files/issues/2023-08-29/3383631-7_0.patch",
+      "Provides a link to the latest revision": "https://www.drupal.org/files/issues/2023-11-30/2906455-44.patch"
     },
     "drupal/group": {
       "Get a token of a node's parent group to create a pathauto pattern": "https://www.drupal.org/files/issues/2020-02-21/group-gnode_tokens-2774827-62.patch",
@@ -53,7 +53,8 @@
       "Access to Revisions of Group Content is Broken": "https://www.drupal.org/files/issues/2022-03-30/group-3256998-35.patch",
       "Fix uasort deprecation notice in PHP 8": "https://www.drupal.org/files/issues/2021-04-26/uasort-comparison-3210808-2.patch",
       "Fix translation issue on permissions page": "https://www.drupal.org/files/issues/2022-07-27/group-3294949-2.patch",
-      "Duplicate revision tab": "patches/145.diff"
+      "Duplicate revision tab": "patches/145.diff",
+      "Fix deprecated code": "https://www.drupal.org/files/issues/2023-07-25/3349565-6.patch"
     },
     "drupal/groupmedia": {
       "Display media bundles in alpha order": "https://www.drupal.org/files/issues/2020-10-20/groupmedia-order_bundles-3178034-3.patch"
@@ -91,10 +92,15 @@
       "Add option to email Revision Author": "patches/content_moderation_notifications-3133940-23-rolled-to-apply-with-3015276-42.patch",
       "Flag module support": "patches/content_moderation_notifications-3316633-9-rolled-to-apply-with-3133940-23-and-3015276-42.patch"
     },
+    "drupal/tome": {
+      "Add condition to copy public files": "patches/tome-public-files-copy.patch",
+      "Add a method to disable crawling": "patches/tome-disable_crawl.patch"
+    },
     "drupal/paragraphs": {
       "Fix integrity constraint violation when embedding paragraphs on blocks in layout builder": "https://www.drupal.org/files/issues/2019-07-10/paragraphs-set_langcode_widgets-2901390-29.patch",
       "Fixes paragraphs not rendering on current revision when they have been edited on forward revision": "https://www.drupal.org/files/issues/2020-07-08/access-controll-issue-3090200-22.patch",
-      "Add paragraph button too large when using Claro admin theme": "https://www.drupal.org/files/issues/2024-03-13/add-paragraph-button-styles-claro-3424471-5.patch"
+      "Add paragraph button too large when using Claro admin theme": "https://www.drupal.org/files/issues/2024-03-13/add-paragraph-button-styles-claro-3424471-5.patch",
+      "Space missing between the word \"to\" and the emphasis tag near the add button" : "https://git.drupalcode.org/project/paragraphs/-/merge_requests/101.diff"
     },
     "drupal/subpathauto": {
       "Shows page not found when url has encoded characters": "https://www.drupal.org/files/issues/shows_page_not_found-2865039-3.patch"
@@ -142,7 +148,7 @@
       "Do not affect permissions for non-reusable blocks": "https://www.drupal.org/files/issues/2020-11-03/block_content_permissions-ignore_non_reusable_blocks-3180549-2.patch"
     },
     "drupal/media_inline_embed": {
-      "CKEditor5 compatibility": "patches/media_inline_embed-ckeditor5-3322512-8f808ee9.patch"
+      "CKEditor5 compatibility": "patches/media_inline_embed-ckeditor5-3322512-053c2ff9.patch"
     },
     "drupal/entity_reference_revisions": {
       "Views doesn't recognize relationship to host": "https://www.drupal.org/files/issues/2021-11-12/2799479-163-relationship-host-id.patch"
@@ -168,7 +174,8 @@
       "Add media_wysiwyg_filter just once": "https://www.drupal.org/files/issues/2020-11-07/media_migration-add_media_wysiwyg_filter_once-3181180-2.patch"
     },
     "drupal/editor_advanced_link": {
-      "Hide empty attributes after applying patches to provide default link text": "https://www.drupal.org/files/issues/2021-06-16/editor_advanced_link-hide_attributes-3219141-6.patch"
+      "Hide empty attributes after applying patches to provide default link text": "https://www.drupal.org/files/issues/2021-06-16/editor_advanced_link-hide_attributes-3219141-6.patch",
+      "Exceptions thrown when toggling Advanced section of linking form": "https://git.drupalcode.org/project/editor_advanced_link/-/merge_requests/17.diff"
     },
     "drupal/shs": {
       "Fix label accessibility when new select elements created": "patches/shs-select-label-accessibility-d10.patch"
@@ -178,17 +185,15 @@
       "Allow scrolling autocomplete results": "https://www.drupal.org/files/issues/2021-11-02/linkit-missing_scroll_bar-3067904-3.patch"
     },
     "drupal/paragraphs_entity_embed": {
-      "Migrate to CKEditor 5 for Drupal 9.4+ / Drupal 10": "patches/paragraphs_entity_embed-3322523-ckeditor5-fixes.patch",
       "Prevent the reuse of embedded paragraphs": "https://www.drupal.org/files/issues/2020-04-30/paragraphs_entity_embed-single_use-3132549-2.patch",
-      "Add openerParameters": "patches/paragraphs_entity_embed-add-opener-parameters-with-3322523-ckeditor5-and-3132549-2-single-use.patch",
-      "Fix paragraphs embed modal styles": "patches/adjusted-css-for-modal.patch"
+      "add openerParameters to ensure media added within embedded paragraphs is associated with the group": "patches/add-opener-parameters-ck5.patch"
     },
     "drupal/linked_field": {
       "Generate relative links rather than absolute": "https://www.drupal.org/files/issues/2020-05-22/linked_field-relative-destination-url-3139179-1-D8.patch",
       "Fixes issue with misconfigured layout_builder block": "patches/add-logic-to-resolve-broken-value.patch"
     },
     "drupal/diff": {
-      "Patch diff interface to get language to match core patches in these issues: 3252521, 2899719, and 3252540": "patches/diff-patch-revision-language-to-match-3252521-2899719-3252540-2.patch",
+      "Patch diff interface to get language to match core patches in these issues: 3252521, 2899719, and 3252540": "patches/diff-patch-revision-language-to-match-3252521-2899719-3252540-3.patch",
       "Add classes to allow color-coding of revisions list": "https://www.drupal.org/files/issues/2021-12-03/diff-add_classes-3252547-2.patch"
     },
     "drupal/entitygroupfield":  {
@@ -230,9 +235,6 @@
     },
     "drupal/filter_html_plus": {
       "CKEditor5 readiness": "https://www.drupal.org/files/issues/2024-10-18/3322249-ckeditor5-10.patch"
-    },
-    "drupal/anchor_link": {
-      "Start a 3.0.x branch for CKEditor Anchor Link for semantic versioning and better integration with Drupal 10, CKEditor 5, and LinkIt" : "https://www.drupal.org/files/issues/2023-08-22/anchor_link-ckeditor5-compatibility-3206676-98.patch"
     },
     "drupal/hierarchical_term_formatter": {
       "Automated Drupal 10 compatibility fixes": "https://git.drupalcode.org/project/hierarchical_term_formatter/-/merge_requests/5.diff"

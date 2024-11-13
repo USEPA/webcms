@@ -15,6 +15,11 @@ resource "aws_ecs_task_definition" "drupal_task" {
   cpu    = 1024
   memory = 2048
 
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = var.cpu_architecture
+  }
+
   container_definitions = jsonencode([
     # Drupal container. The WebCMS' Drupal container is based on an FPM-powered PHP
     # container, which means that by itself it cannot receive HTTP requests. Instead, the
@@ -58,29 +63,9 @@ resource "aws_ecs_task_definition" "drupal_task" {
       name  = "nginx"
       image = "${data.aws_ssm_parameter.ecr_nginx.value}:${var.image_tag}"
 
-      # Docker labels are how we communicate our routing preferences to Traefik. These
-      # settings correspond to Traefik's own configuration names. Specifically, we make
-      # use of router configuration to dynamically create a Router (see
-      # https://doc.traefik.io/traefik/routing/routers/) when this task launches in ECS.
-      dockerLabels = {
-        # Advertise to Traefik that we want to receive traffic
-        "traefik.enable" = "true"
-
-        # Tell Traefik to allow any hostname provided in variables. The expression on the
-        # right is a map over the list of domains, which expands to a Traefik routing rule
-        # like the below:
-        #
-        #     Rule: Host(`example.org`) || Host(`example.com`)
-        "traefik.http.routers.${var.site}_${var.lang}.rule" = join(" || ", formatlist("Host(`%s`)", concat([var.drupal_hostname], var.drupal_extra_hostnames)))
-
-        # Only allow routing to this task via the "websecure" (port 443) entrypoint
-        "traefik.http.routers.${var.site}_${var.lang}.entrypoints" = "websecure"
-
-        # Ask Traefik to forward traffic to nginx port 443
-        "traefik.http.services.${var.site}_${var.lang}.loadbalancer.server.port" = "443"
-      }
-
       secrets = [
+        # Inject basic auth configuration to nginx. Leave the secret blank (or use
+        # a single period) to tun it off.
         { name = "WEBCMS_BASIC_AUTH", valueFrom = data.aws_ssm_parameter.basic_auth.value },
       ]
 
