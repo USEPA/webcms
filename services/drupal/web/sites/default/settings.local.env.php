@@ -39,6 +39,12 @@ $config['s3fs.settings']['domain'] = 'localhost:8888';
 // Minio doesn't support ListObjectVersions
 $config['s3fs.settings']['disable_version_sync'] = TRUE;
 
+// Unset Flysystem schemes so we can use private filesystem for tome.
+unset($settings['flysystem']);
+
+// Use private filesystem for Tome.
+$settings['tome_static_directory'] = 'private://snapshot';
+
 // Map twig cache onto shared filesystem to allow drush to clear and write twig cache for local development.
 $settings['php_storage']['twig']['directory'] = '/var/www/html/web/sites/default/files/tmp/cache/twig';
 
@@ -101,3 +107,21 @@ $databases['default']['default'] = array(
  * @see \epa_workflow_content_moderation_notification_mail_data_alter()
  */
 $settings['epa_content_moderation_email_debug'] = TRUE;
+
+/**
+ * Show all error messages, with backtrace information.
+ *
+ * In case the error level could not be fetched from the database, as for
+ * example the database connection failed, we rely only on this value.
+ */
+$config['system.logging']['error_level'] = 'verbose';
+
+/**
+ * Disable CSS and JS aggregation.
+ */
+$config['system.performance']['css']['preprocess'] = FALSE;
+$config['system.performance']['js']['preprocess'] = FALSE;
+
+$settings['skip_permissions_hardening'] = TRUE;
+
+$settings['rebuild_access'] = TRUE;

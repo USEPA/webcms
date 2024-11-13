@@ -1,0 +1,43 @@
+{#
+/**
+ * @file
+ * Theme override to display a paragraph.
+ */
+#}
+{% set modifier_classes = [] %}
+
+{% if parent_field is same as('field_web_area_popular_links') %}
+  {% set modifier_classes = modifier_classes|merge([
+    'popular-links--dark-blue',
+    'u-full-width',
+  ]) %}
+{% elseif parent_field is same as('field_paragraphs') %}
+  {% set theme = content.field_theme_color|field_value|render|trim %}
+  {% if theme is same as('gray') %}
+    {% set modifier_classes = modifier_classes|merge([
+      'popular-links--light-gray',
+    ]) %}
+  {% elseif theme is same as('dark_blue') %}
+    {% set modifier_classes = modifier_classes|merge([
+      'popular-links--dark-blue',
+    ]) %}
+  {% else %}
+    {% set modifier_classes = modifier_classes|merge([
+      'popular-links--light-gray',
+    ]) %}
+  {% endif %}
+{% elseif parent_field is same as('field_wide_content') %}
+  {% if parent_class_color is same as('default') %}
+    {% set modifier_classes = modifier_classes|merge([
+      'popular-links--dark-blue',
+    ]) %}
+  {% endif %}
+{% endif %}
+
+{% include '@components/popular-links/popular-links.twig' with {
+  'attributes': attributes,
+  'modifier_classes': modifier_classes|join(' ')|trim,
+  'has_constrain': true,
+  'title': content.field_title|field_value|render,
+  'links': content.field_links|render,
+} %}
