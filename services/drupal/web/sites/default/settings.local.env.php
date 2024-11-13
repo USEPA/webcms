@@ -16,6 +16,7 @@ $config['system.mail']['interface'] = [
 // local email works.
 $config['mailsystem.settings']['defaults']['sender'] = 'mime_mail';
 $config['mailsystem.settings']['defaults']['formatter'] = 'mime_mail';
+$config['mailsystem.settings']['modules']['epa_workflow']['epa_workflow_notification_summary']['sender'] = 'mime_mail';
 
 // Don't initiate TLS sessions during local development; the MySQL certificate is
 // self-signed, which OpenSSL rejects
