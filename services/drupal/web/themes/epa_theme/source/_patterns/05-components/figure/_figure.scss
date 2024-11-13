@@ -18,6 +18,12 @@
       margin-bottom: rem(units(3));
       margin-top: 0;
       max-width: calc(50% - #{rem(gesso-get-map(gutter-width))});
+
+      @if $wysiwyg {
+        float: none;
+        margin-inline: 0;
+        max-width: 100%;
+      }
     }
   }
 
@@ -111,9 +117,13 @@
 @if $wysiwyg {
   // stylelint-disable-next-line
   figure.ck-widget {
-    display: block;
-    max-width: 100%;
-    width: 100%;
+    &.drupal-media-style-align-left {
+      margin-right: rem(gesso-get-map(gutter-width));
+    }
+
+    &.drupal-media-style-align-right {
+      margin-left: rem(gesso-get-map(gutter-width));
+    }
   }
 
   // stylelint-disable-next-line
