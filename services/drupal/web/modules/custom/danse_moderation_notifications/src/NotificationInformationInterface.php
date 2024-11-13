@@ -4,6 +4,7 @@ namespace Drupal\danse_moderation_notifications;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\workflows\WorkflowInterface;
 
 /**
  * Interface for notification_information service.
@@ -31,6 +32,14 @@ interface NotificationInformationInterface {
    *   The workflow object if the entity is moderated, FALSE otherwise.
    */
   public function getWorkflow(ContentEntityInterface $entity);
+
+  /**
+   * Set for the workflow object of the moderated entity.
+   *
+   * @param \Drupal\workflows\WorkflowInterface $workflow
+   *    The workflow object if the entity is moderated, FALSE otherwise.
+   */
+  public function setWorkflow(WorkflowInterface $workflow);
 
   /**
    * Checks for the current transition of the moderated entity.
@@ -64,19 +73,5 @@ interface NotificationInformationInterface {
    *   An array containing the notifications list.
    */
   public function getNotifications(EntityInterface $entity);
-
-  /**
-   * Loads the latest revision of a specific entity.
-   *
-   * @param string $entity_type_id
-   *   The entity type ID.
-   * @param int $entity_id
-   *   The entity ID.
-   *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
-   *   The latest entity revision or NULL, if the entity type / entity doesn't
-   *   exist.
-   */
-  public function getLatestRevision($entity_type_id, $entity_id);
 
 }
