@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\workflows\WorkflowInterface;
 
 /**
  * Service for notification related questions about the moderated entity.
@@ -26,6 +27,13 @@ class NotificationInformation implements NotificationInformationInterface {
    * @var \Drupal\content_moderation\ModerationInformation
    */
   protected $moderationInformation;
+
+  /**
+   * The workflow object we're interacting with.
+   *
+   * @var \Drupal\workflows\Entity\Workflow
+   */
+  protected $workflow;
 
   /**
    * Creates a new NotificationInformation instance.
@@ -58,9 +66,9 @@ class NotificationInformation implements NotificationInformationInterface {
     $revision_ids = array_slice(array_reverse(array_values($revision_ids)),1,1);
     $previous_revision_id = reset($revision_ids);
 
-    /** @var \Drupal\node\Entity\Node $previous_revision */
-    $previous_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($previous_revision_id);
-    $previous_state = $previous_revision->get('moderation_state')->getString() ?? FALSE;
+    /** @var \Drupal\node\Entity\Node $last_revision */
+    $last_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($previous_revision_id);
+    $previous_state = $last_revision->get('moderation_state')->getString() ?? FALSE;
 
     if (!$previous_state) {
       $previous_state = $workflow->getTypePlugin()->getInitialState($entity)->id();
@@ -73,8 +81,17 @@ class NotificationInformation implements NotificationInformationInterface {
    * {@inheritdoc}
    */
   public function getWorkflow(ContentEntityInterface $entity) {
-    return $this->isModeratedEntity($entity) ? $this->moderationInformation
-      ->getWorkflowForEntity($entity) : FALSE;
+    if (!$this->workflow) {
+      $this->setWorkflow($this->moderationInformation->getWorkflowForEntity($entity));
+    }
+   return $this->workflow;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWorkflow(WorkflowInterface $workflow): void {
+    $this->workflow = $workflow;
   }
 
   /**
