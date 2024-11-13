@@ -51,14 +51,16 @@ class NotificationInformation implements NotificationInformationInterface {
    * {@inheritdoc}
    */
   public function getPreviousState(ContentEntityInterface $entity) {
-    $previous_state = FALSE;
     $workflow = $this->getWorkflow($entity);
-    if (isset($entity->last_revision) && !empty($entity->last_revision)) {
-      $revision_id = $entity->last_revision;
-      /** @var \Drupal\node\Entity\Node $last_revision */
-      $last_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($revision_id);
-      $previous_state = $last_revision->get('moderation_state')->getString();
-    }
+    $revision_ids = \Drupal::entityTypeManager()->getStorage('node')->revisionIds($entity);
+    // Since revisionIds() returns ids in asc order (newest last), we need to
+    // reverse the array and grab the 2nd revision id.
+    $revision_ids = array_slice(array_reverse(array_values($revision_ids)),1,1);
+    $previous_revision_id = reset($revision_ids);
+
+    /** @var \Drupal\node\Entity\Node $previous_revision */
+    $previous_revision = \Drupal::entityTypeManager()->getStorage('node')->loadRevision($previous_revision_id);
+    $previous_state = $previous_revision->get('moderation_state')->getString() ?? FALSE;
 
     if (!$previous_state) {
       $previous_state = $workflow->getTypePlugin()->getInitialState($entity)->id();
