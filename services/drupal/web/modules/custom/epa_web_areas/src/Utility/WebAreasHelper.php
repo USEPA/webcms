@@ -12,6 +12,13 @@ use Drupal\group\Entity\GroupContentType;
 class WebAreasHelper {
 
   /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * Constructs a new WebAreasHelper.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager

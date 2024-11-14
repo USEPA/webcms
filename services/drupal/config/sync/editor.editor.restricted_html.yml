@@ -1,41 +1,48 @@
-uuid: f3b9854f-a50b-4f4e-aef2-9948e4738a54
+uuid: ae055dcd-b512-4b7a-9770-f897866631d5
 langcode: en
 status: true
 dependencies:
   config:
     - filter.format.restricted_html
   module:
-    - ckeditor
+    - ckeditor5
 format: restricted_html
-editor: ckeditor
+editor: ckeditor5
 settings:
   toolbar:
-    rows:
-      -
-        -
-          name: Formatting
-          items:
-            - Bold
-            - Italic
-            - Superscript
-            - Subscript
-        -
-          name: Links
-          items:
-            - DrupalLink
-            - DrupalUnlink
-        -
-          name: Lists
-          items:
-            - BulletedList
-            - NumberedList
-        -
-          name: Tools
-          items:
-            - epaNewButton
-            - Maximize
+    items:
+      - bold
+      - italic
+      - superscript
+      - subscript
+      - '|'
+      - link
+      - '|'
+      - bulletedList
+      - numberedList
+      - '|'
+      - epaNew
+      - sourceEditing
+      - Fullscreen
   plugins:
-    drupallink:
+    ckeditor5_list:
+      properties:
+        reversed: false
+        startIndex: false
+      multiBlock: true
+    ckeditor5_sourceEditing:
+      allowed_tags:
+        - '<a hreflang>'
+    editor_advanced_link_link:
+      enabled_attributes:
+        - aria-label
+        - id
+        - rel
+        - target
+    filter_html_plus_white_list_attributes:
+      global_attributes:
+        - ''
+    linkit_extension:
       linkit_enabled: true
       linkit_profile: default
 image_upload:

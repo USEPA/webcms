@@ -154,18 +154,12 @@ function epa_workflow_mail($key, &$message, $params) {
       $message['from'] = 'EDA <donotreply@epa.gov>';
       $message['subject'] = t('Expiring content for @group_label Web Area week of @date', ['@group_label' => $params['group_label'], '@date' => $params['date']]);
       $message['body'][] = t("<p>Hi, you have received this email because you are an Editor in Chief (EIC) or Deputy EIC of the @group_label web area in EPA's Web Content Management System.</p>", ['@group_label' => $params['group_label']]);
-      if (empty($params['body'])) {
-        $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
-        $message['body'][] = $params['body'];
-        $message['body'][] = '<p>...</p>';
-        $message['body'][] = $params['view_link'];
-        $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
-      }
-    else {
-        $message['body'][] = t("<p>The @group_label web area does not have any content expiring within the next three weeks.</p>", ['@group_label' => $params['group_label']]);
-        $message['body'][] = t("<p>Thank you!</p>");
-      }
+      $message['body'][] = t("<p>The @group_label web area has the following content expiring soon:</p>", ['@group_label' => $params['group_label']]);
+      $message['body'][] = $params['body'];
+      $message['body'][] = '<p>...</p>';
+      $message['body'][] = $params['view_link'];
 
+      $message['body'][] = t('<p>Unsure of what to do? Please see <a class="external-link" href="https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do">https://www.epa.gov/webcmstraining/i-just-got-epa-content-about-expire-e-mail-what-do-i-do</a>.</p>');
       break;
   }
 }
@@ -305,12 +299,6 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     _epa_workflow_add_compliance_checkboxes($form);
   }
 
-  if ($form_id == 'revision_overview_form' && isset($form['submit'])) {
-    // Adds a second diff comparison button at the top of the form for
-    // convenience and discoverability.
-    $form['submit2'] = $form['submit'];
-    $form['submit2']['#weight'] = -1000;
-  }
   if ($form_id == 'revision_overview_form') {
     $form['#attached']['library'][] = 'epa_workflow/revision_list';
     foreach ($form['node_revisions_table'] as $key => $row) {
