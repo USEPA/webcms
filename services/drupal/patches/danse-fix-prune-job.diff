@@ -1,0 +1,20 @@
+diff --git a/src/Cron.php b/src/Cron.php
+index 6ed607d..529b2c1 100644
+--- a/src/Cron.php
++++ b/src/Cron.php
+@@ -84,6 +84,7 @@ class Cron {
+         $min_row = $query2
+           ->range($value - 1, 1)
+           ->sort('id', 'DESC')
++          ->count()
+           ->execute();
+         if (empty($min_row)) {
+           continue;
+@@ -167,7 +168,6 @@ class Cron {
+     }
+     if ($batch !== NULL && !empty($batch['operations'])) {
+       batch_set($batch);
+-      batch_process();
+     }
+   }
+ 
