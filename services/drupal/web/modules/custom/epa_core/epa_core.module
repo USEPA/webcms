@@ -137,19 +137,6 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
     case 'node_news_release_form':
     case 'node_news_release_edit_form':
       $node = $form_state->getFormObject()->getEntity();
-      $node_langcode = $node->language()->getId();
-
-      // UI element for generating default description.
-      $description = $node->field_description->value;
-      $default_description = t('EPA News Release: @title', ['@title' => Markup::create($node->label())], ['langcode' => $node_langcode]);
-
-      $form['generate_description'] = [
-        '#type' => 'checkbox',
-        '#title' => t('Generate automatic description'),
-        '#default_value' => !$node->label() || $description == $default_description ? TRUE : FALSE,
-        '#description' => t('Uncheck this to create a custom description above.'),
-        '#weight' => isset($form['field_description']['#weight']) ? (int) $form['field_description']['#weight'] - 0.5 : 7.5,
-      ];
 
       // Validate if the current subjects and their ancestors match what is
       // currently in the keywords field.
@@ -162,7 +149,6 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       sort($keywords);
       $keywords = implode(', ', $keywords);
 
-      $default_keywords = [];
       $default_keyword_ids = [];
       foreach ($node->field_subjects as $subject) {
         $default_keyword_ids[] = ['target_id' => $subject->target_id];
@@ -180,12 +166,7 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       ];
 
       // Use states to disable fields when checked.
-      $form['field_description']['#states']['!enabled']['input[name="generate_description"]'] = ['checked' => TRUE];
       $form['field_keywords']['#states']['!enabled']['input[name="generate_keywords"]'] = ['checked' => TRUE];
-
-      // Element validation.
-      $form['field_description']['widget'][0]['value']['#required'] = FALSE;
-      $form['field_description']['widget']['#element_validate'] = ['epa_core_new_release_description_validate'];
 
       // Add in the default autocomplete validators since they aren't
       // initially set on the form and setting our custom validation handler
@@ -208,24 +189,6 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
       // Custom validation to check proposed location.
       $form['#validate'][] = 'epa_core_location_proposed_other_form_validate';
       break;
-  }
-}
-
-/**
- * Element validation: new release description field.
- */
-function epa_core_new_release_description_validate(array &$element, FormStateInterface $form_state, $form) {
-  if (!$form_state->getErrors() && !empty($form_state->getValue('generate_description'))) {
-    $node = $form_state->getFormObject()->getEntity();
-    $node_langcode = $node->language()->getId();
-    $title = $form_state->getValue('title');
-    $description = t('EPA News Release: @title', ['@title' => Markup::create($title[0]['value'])], ['langcode' => $node_langcode]);
-    $element[0]['value']['#value'] = $description->render();
-    $form_state->setValueforElement($element, [['value' => $element[0]['value']['#value']]]);
-  }
-
-  if (empty($element[0]['value']['#value']) && $element[0]['value']['#value'] !== 0) {
-    $form_state->setError($element, t('%field is required', ['%field' => $element['#title']]));
   }
 }
 
