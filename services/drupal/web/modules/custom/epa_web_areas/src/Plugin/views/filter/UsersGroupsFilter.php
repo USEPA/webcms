@@ -65,8 +65,6 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
     $this->valueOptions = [
       'groups' => $this->t('Limit to my Web Areas'),
     ];
-
-    $this->currentDisplay = $view->current_display;
   }
 
   /**
