@@ -1,0 +1,94 @@
+diff --git a/src/Payload.php b/src/Payload.php
+index fa42527..39d3a18 100644
+--- a/src/Payload.php
++++ b/src/Payload.php
+@@ -90,6 +90,8 @@ final class Payload extends PayloadBase {
+         'id' => $this->entity->id(),
+         'label' => $this->entity->label(),
+         'uid' => $this->entity->getOwnerId(),
++        'prev_revision' => $this->entity->prev_revision,
++        'current_revision' => $this->entity->current_revision,
+       ],
+       'label' => $this->generateLabel(),
+     ];
+@@ -117,7 +119,7 @@ final class Payload extends PayloadBase {
+     }
+     else {
+       /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+-      $entity = $storage->load($payload['entity']['id']);
++      $entity = $payload['entity']['current_revision'] ? $storage->loadRevision($payload['entity']['current_revision']) : $storage->load($payload['entity']['id']);
+ 
+       if (empty($entity)) {
+         // Entity got deleted, created a dummy entity and don't save it.
+@@ -125,6 +127,8 @@ final class Payload extends PayloadBase {
+           $storage->getEntityType()->getKey('bundle') => $payload['entity']['bundle'],
+           $storage->getEntityType()->getKey('id') => $payload['entity']['id'],
+           $storage->getEntityType()->getKey('label') => $payload['entity']['label'],
++          $storage->getEntityType()->getKey('prev_revision') => $payload['entity']['prev_revision'],
++          $storage->getEntityType()->getKey('current_revision') => $payload['entity']['current_revision'],
+         ]);
+       }
+     }
+diff --git a/src/Plugin/Danse/ContentModeration.php b/src/Plugin/Danse/ContentModeration.php
+index 989ce0d..1e29f89 100644
+--- a/src/Plugin/Danse/ContentModeration.php
++++ b/src/Plugin/Danse/ContentModeration.php
+@@ -72,10 +72,55 @@ class ContentModeration extends PluginBase {
+     $topic = $entity->moderation_state->value;
+     $parent_rev_id = $entity->content_entity_revision_id->value;
+     $parent_entity_type = $entity->content_entity_type_id->value;
+-    $revision = \Drupal::entityTypeManager()->getStorage($parent_entity_type)->loadRevision($parent_rev_id);
++    /** @var \Drupal\node\Entity\Node $revision */
++    $revision = \Drupal::entityTypeManager()
++      ->getStorage($parent_entity_type)
++      ->loadRevision($parent_rev_id);
++    // Try to load the 'previous' revision.
++    if ($last_version_id = $this->getPreviousRevision($revision->id(), $parent_rev_id)) {
++      $revision->prev_revision = $last_version_id;
++      $revision->current_revision = $parent_rev_id;
++      $label = $revision->label() . ' transitioned to ' . $topic;
++      $revision_payload = new Payload($revision);
++      return $this->createEvent($topic, $label, $revision_payload);
++    }
++  }
++
++  /**
++   * @param $nid
++   * @param $currently_revision_id
++   *
++   * @return false|mixed
++   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
++   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
++   */
++  public function getPreviousRevision($nid, $currently_revision_id) {
++    // Getting the node storage.
++    /** @var \Drupal\node\NodeStorageInterface $node_storage */
++    $node_storage = \Drupal::entityTypeManager()->getStorage('node');
++    // Getting the node.
++    $node = $node_storage->load($nid);
++
++    // Get all revisions of the current node, in all languages.
++    $revision_ids = $node_storage->revisionIds($node);
++
++    $last_version_id = '';
++    $revisions_before = [];
++    if (count($revision_ids) > 0) {
++      // Loop through the list of revision ids, select the ones that have.
++      foreach ($revision_ids as $vid) {
++        if ($currently_revision_id - $vid > 0) {
++          array_push($revisions_before, $vid);
++        }
++      }
++      if (!empty($revisions_before)) {
++        $last_version_id = max($revisions_before);
++      } else {
++        $last_version_id = null;
++      }
++    }
+ 
+-    $label = $revision->label() . ' transitioned to ' . $topic;
+-    return $this->createEvent($topic, $label, $payload);
++    return $last_version_id;
+   }
+ 
+ }
