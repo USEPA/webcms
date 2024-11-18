@@ -43,3 +43,96 @@ index e3c4082..39e02eb 100644
    /**
     * Marks the notification as delivered.
     *
+diff --git a/src/Plugin/Action/NotificationSeenAction.php b/src/Plugin/Action/NotificationSeenAction.php
+new file mode 100644
+index 0000000..7881c95
+--- /dev/null
++++ b/src/Plugin/Action/NotificationSeenAction.php
+@@ -0,0 +1,87 @@
++<?php
++
++namespace Drupal\danse\Plugin\Action;
++
++use Drupal\Component\Render\FormattableMarkup;
++use Drupal\Core\Access\AccessResult;
++use Drupal\Core\Session\AccountInterface;
++use Drupal\danse\Entity\Notification;
++use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
++use Symfony\Component\HttpFoundation\RedirectResponse;
++
++/**
++ * DANSE action for marking notifications as having been seen/unseen.
++ *
++ * @Action(
++ *   id = "danse_notification_seen_action",
++ *   label = @Translation("Mark notification Seen/unseen"),
++ *   type = "danse_notification",
++ * )
++ */
++class NotificationSeenAction extends ViewsBulkOperationsActionBase {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function execute($entity = NULL) {
++    if ($entity instanceof Notification) {
++      try {
++        // While this is a boolean, as per Drupal this returns truth-y values of '1' or '0'.
++        $seen = $entity->get('seen')->value;
++        // If it's 'seen' (TRUE) then mark it unseen and vice versa
++        filter_var($seen, FILTER_VALIDATE_BOOL) ? $entity->markUnseen() : $entity->markSeen();
++        return $this->t('Successfully marked notification as @seen.', ['@seen' => filter_var($seen, FILTER_VALIDATE_BOOL) ? $this->t('unseen') : $this->t('seen')]);
++      }
++      catch (\LogicException $e) {
++        // @todo Error handling?
++      }
++    }
++  }
++
++  /**
++   * {@inheritDoc}
++   */
++  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
++    if ($object instanceof Notification) {
++      return $object->access('view', $account, TRUE);
++    }
++
++    return AccessResult::forbidden();
++  }
++
++  /**
++   * @param bool $success
++   *
++   * @param array $results
++   * @param array $operations
++   *
++   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
++   */
++  public static function finished($success, array $results, array $operations): ?RedirectResponse {
++    if ($success) {
++      foreach ($results['operations'] as $item) {
++        // Default fallback to maintain backwards compatibility:
++        // if api version equals to "1" and type equals to "status",
++        // previous message is displayed, otherwise we display exactly what's
++        // specified in the action.
++        if ($item['type'] === 'status' && $results['api_version'] === '1') {
++          $message = static::translate('@operation', [
++            '@operation' => $item['message'],
++          ]);
++        }
++        else {
++          $message = new FormattableMarkup('@message', [
++            '@message' => $item['message'],
++          ]);
++        }
++        static::message($message, $item['type']);
++      }
++    }
++    else {
++      $message = static::translate('Finished with an error.');
++      static::message($message, 'error');
++    }
++    return NULL;
++  }
++
++}
