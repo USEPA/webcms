@@ -88,7 +88,7 @@ abstract class EpaWorkflowReferenceTransitionBase extends EpaWorkflowReferenceBa
     ) {
       $payload = $event->get('payload')->value;
       $payload_values = json_decode($payload, TRUE);
-      $transition_revision_ids['from'] = $payload_values['entity']['last_revision'];
+      $transition_revision_ids['from'] = $payload_values['entity']['prev_revision'];
 
       /** @var \Drupal\node\NodeStorageInterface $node_storage */
       $node_storage = $this->entityTypeManager->getStorage('node');
