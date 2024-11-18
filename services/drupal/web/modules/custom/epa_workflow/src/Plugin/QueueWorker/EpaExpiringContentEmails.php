@@ -75,7 +75,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
       $params['date'] = $date->format('F jS, Y');
       $params['group_id'] = $email->getId();
       $params['group_label'] = $email->getLabel();
-      // Nullsafe operator. Return $email if $emial is null.
+      // Nullsafe operator. Return $email if $email is null.
       $params['body'] = $email?->getBody();
       $view_path_with_args_escaped = "admin/content/published?title=&gid=". $email->getViewGidValue(TRUE) . "&type=All&field_owning_office_target_id=&combine=&moderation_state%5B0%5D=epa_default-published_needs_review&moderation_state%5B1%5D=epa_default-published_expiring&moderation_state%5B2%5D=epa_default-published_day_til_expire&order=field_review_deadline&sort=desc";
       $params['view_link'] = sprintf('<p><a href="%s/%s">%s</a></p>', $this->request->getBaseUrl(), $view_path_with_args_escaped, $this->t('View in WebCMS here'));
@@ -106,7 +106,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
     if ($group->hasField('field_editor_in_chief') && !$group->get('field_editor_in_chief')->isEmpty()) {
       $email_handler->setId((int) $group->id());
       $email_handler->setLabel($group->label());
-      $email_handler->setBody($expiring_content ?? 'No content expiring soon in your web area.');
+      $email_handler->setBody($expiring_content ?? t('<p>The @web_area web area does not have any content expiring within the next three weeks.</p>', ['@web_area' => $group->label()])->render());
       $recipients[] = $group->field_editor_in_chief->entity;
 
       // Get Deputy Editors in Chief.
@@ -132,6 +132,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   private function getExpiringGroupContent(string $group_id, string $group_label): string|null {
+    /** @var \Drupal\views\ViewExecutable $view */
     $view = $this->entityTypeManager
       ->getStorage('view')
       ->load('published_content')
@@ -139,7 +140,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
 
     // Wrap group parameter value in double quotes to handle groups with commas
     // in the name.
-    $gid_parameter = sprintf('"%s (%s)"',$group_label,$group_id);
+    $gid_parameter = sprintf('"%s (%s)"', $group_label, $group_id);
     // Build exposed filters parameters to send to view.
     $exposed_filters_values = [
       'title' => '',
@@ -176,7 +177,11 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
     unset($rendered_view['#pre_render']);
     // Render the array into html.
     $view_html = $this->renderer->renderPlain($rendered_view);
-    return empty($view_html) ? '' : $view_html->__toString();
+    $rendered = $view_html->__toString();
+    if ($view->total_rows > 12) {
+      $rendered .= '<p>... and more</p>';
+    }
+    return empty($view_html) ? '' : $rendered;
   }
 
 }
