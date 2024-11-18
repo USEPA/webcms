@@ -1,0 +1,45 @@
+diff --git a/src/Entity/Notification.php b/src/Entity/Notification.php
+index 5aebcd8..2a47972 100644
+--- a/src/Entity/Notification.php
++++ b/src/Entity/Notification.php
+@@ -78,6 +78,21 @@ class Notification extends ContentEntityBase implements NotificationInterface {
+     return $this;
+   }
+ 
++  /**
++   * {@inheritdoc}
++   */
++  public function markUnseen(): NotificationInterface {
++    try {
++      $this
++        ->set('seen', FALSE)
++        ->save();
++    }
++    catch (EntityStorageException $e) {
++      // @todo Log this exception.
++    }
++  return $this;
++  }
++
+   /**
+    * {@inheritdoc}
+    */
+diff --git a/src/Entity/NotificationInterface.php b/src/Entity/NotificationInterface.php
+index e3c4082..39e02eb 100644
+--- a/src/Entity/NotificationInterface.php
++++ b/src/Entity/NotificationInterface.php
+@@ -33,6 +33,14 @@ interface NotificationInterface extends ContentEntityInterface {
+    */
+   public function markSeen(): NotificationInterface;
+ 
++  /**
++   * Marks the notification as un-seen.
++   *
++   * @return \Drupal\danse\Entity\NotificationInterface
++   *   Self.
++   */
++  public function markUnseen(): NotificationInterface;
++
+   /**
+    * Marks the notification as delivered.
+    *
