@@ -102,7 +102,7 @@ class EPAFlagUsersAction extends ViewsBulkOperationsActionBase implements Contai
     $form['selected_users'] = [
       '#type' => 'entity_autocomplete',
       '#tags' => TRUE,
-      '#title' => t('Select user to watch on behalf for'),
+      '#title' => t('Select user(s) to watch on behalf of'),
       '#target_type' => 'user',
       '#required' => TRUE,
     ];
