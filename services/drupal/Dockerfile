@@ -123,11 +123,15 @@ RUN rm auth.json
 # Build Gesso, the WebCMS' theme
 FROM forumone/gesso:node-v18-php-8.1 AS gesso
 
+ARG WEBCMS_SITE=prod
+
 WORKDIR /app
 
 # Install base npm dependencies (npm ci = npm clean-install)
 COPY web/themes/epa_theme/package*.json ./
 RUN npm ci
+
+ENV WEBCMS_SITE=${WEBCMS_SITE}
 
 # Copy theme source files and perform a build
 COPY web/themes/epa_theme ./
