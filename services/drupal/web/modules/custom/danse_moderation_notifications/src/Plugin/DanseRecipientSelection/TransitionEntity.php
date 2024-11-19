@@ -29,29 +29,24 @@ class TransitionEntity extends RecipientSelectionBase {
   public function getRecipients(PayloadInterface $payload): array {
     $result = [];
 
-    // Load the revision from the payload.
+    // Each of the TransitionEntity plugins is iterated over, in the Danse PluginBase, but we want to ensure we create notifications for the correct plugin.
+    $plugin_id = $this->getPluginId();
+    $transition_id = strstr($plugin_id, "transition_entity:");
+    $transition_id = str_replace("transition_entity:", "", $transition_id);
+    // Load the node revision from the payload.
     $revision = $payload->getEntity();
     $notification_uid = $revision->getRevisionUser()->id();
 
-    /** @var \Drupal\danse_moderation_notifications\NotificationInformation $notification */
+    /** @var \Drupal\danse_moderation_notifications\NotificationInformation[] $notifications */
     $notifications = \Drupal::service('danse_moderation_notifications.notification_information')
       ->getNotifications($revision);
 
-    if (!empty($notifications)) {
-      $entity_type_id = 'danse_moderation_notifications';
-      // TODO: Dependency injection.
-      $entity_storage = \Drupal::entityTypeManager()
-        ->getStorage($entity_type_id);
-      $entities = $entity_storage->loadMultiple();
-      // Extract recipient information from entities.
-      foreach ($entities as $key => $value) {
-        if (array_key_exists($key, $notifications)) {
-          /** @var \Drupal\danse_moderation_notifications\Notification $recipients */
-          $recipients = \Drupal::service('danse_moderation_notifications.notification')
-            ->getNotificationRecipients($revision, $notifications);
-          $result = $recipients['to'];
-        }
-      }
+    // Ensure the transition we're acting on is the same plugin we're on right now.
+    if (!empty($notifications) && $transition_id === key($notifications)) {
+      /** @var \Drupal\danse_moderation_notifications\Notification $recipients */
+      $recipients = \Drupal::service('danse_moderation_notifications.notification')
+        ->getNotificationRecipients($revision, $notifications);
+      $result = $recipients['to'];
     }
 
     // Remove $notification_uid from $result.

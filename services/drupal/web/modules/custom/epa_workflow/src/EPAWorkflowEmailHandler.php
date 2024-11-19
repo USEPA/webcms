@@ -22,10 +22,16 @@ class EPAWorkflowEmailHandler {
   private string $label;
 
   /**
-   * The recipeints of the email.
+   * The recipients of the email.
    * @var array $recipients
    */
   private array $recipients;
+
+  /**
+   * The expiring content view rendered results.
+   * @var string $body
+   */
+  private string $body;
 
   /**
    * Set group id.
@@ -59,6 +65,16 @@ class EPAWorkflowEmailHandler {
   public function setRecipients(array $recipients): void {
     $this->recipients = $recipients;
   }
+  /**
+   * Set body.
+   *
+   * @param string $body
+   *
+   * @return void
+   */
+  public function setBody(string $body): void {
+    $this->body = $body;
+  }
 
   /**
    * Get group id.
@@ -85,6 +101,28 @@ class EPAWorkflowEmailHandler {
    */
   public function getRecipients(): array {
     return $this->recipients;
+  }
+  /**
+   * Get body.
+   *
+   * @return string
+   */
+  public function getBody(): string {
+    return $this->body;
+  }
+
+  /**
+   * Create the gid value so it can be used as view filter.
+   *
+   * @param $url_encode bool
+   *   Whether the resulting string needs to be encoded or not.
+   *
+   * @return string
+   */
+  public function getViewGidValue($url_encode = FALSE): string {
+    $gid_parameter = sprintf('"%s (%s)"',$this->getLabel(),$this->getId());
+    return $url_encode ? urlencode($gid_parameter) : $gid_parameter;
+
   }
 
 }
