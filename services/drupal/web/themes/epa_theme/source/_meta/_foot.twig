@@ -2,8 +2,13 @@
 {% set location_theme = '../../../' %}
 
 {%- if standalone_template %}
-  {% set location_root = 'https://www.epa.gov/' %}
-  {% set location_theme = 'https://www.epa.gov/themes/epa_theme/' %}
+  {% set environment = get_environment() %}
+
+  {% if environment == 'prod' %}
+    {% set location_root = 'https://www.epa.gov/' %}
+    {% set location_theme = 'https://www.epa.gov/themes/epa_theme/' %}
+  {% endif %}
+
   <script type="application/json" data-drupal-selector="drupal-settings-json">
     {"path":{"isFront":false,"suppressDeprecationErrors":true}}
   </script>
