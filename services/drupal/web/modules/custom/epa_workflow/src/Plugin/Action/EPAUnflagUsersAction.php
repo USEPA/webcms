@@ -3,16 +3,16 @@
 namespace Drupal\epa_workflow\Plugin\Action;
 
 /**
- * Provides the 'Flag content on behalf of user' action.
+ * Provides the 'Unflag content on behalf of user' action.
  *
  * @Action(
- *  id = "epa_flag_on_behalf_of_user",
- *  label = @Translation("Flag content on behalf of user"),
+ *  id = "epa_unflag_on_behalf_of_user",
+ *  label = @Translation("Unflag content on behalf of user"),
  *  type = "node",
  *  category = @Translation("Custom")
  * )
  */
-class EPAFlagUsersAction extends EPAFlagUsersActionBase {
+class EPAUnflagUsersAction extends EPAFlagUsersActionBase {
 
   /**
    * {@inheritDoc}
@@ -25,24 +25,24 @@ class EPAFlagUsersAction extends EPAFlagUsersActionBase {
       $entity = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->load($entity->id());
 
       // Arrays to keep track of users.
-      $flagged_users = [];
+      $unflagged_users = [];
 
       foreach ($selected_users as $user) {
         $flag_service = $this->flagService;
         /** @var \Drupal\flag\Entity\Flag $flag */
         $flag = $flag_service->getFlagById(self::NOTIFICATION_FLAG_ID);
         // Flag the entity for the user.
-        $flag_service->flag($flag, $entity, $user);
-        $flagged_users[] = $user->getAccountName();
+        $flag_service->unflag($flag, $entity, $user);
+        $unflagged_users[] = $user->getAccountName();
       }
 
-      // Create messages based on flagged users.
+      // Create messages based on unflagged users.
       $messages = [];
-      if (!empty($flagged_users)) {
-        $flagged_users_string = implode(', ', $flagged_users);
-        $messages[] = $this->t('Successfully flagged node @id for user(s): @users.', [
+      if (!empty($unflagged_users)) {
+        $unflagged_users_string = implode(', ', $unflagged_users);
+        $messages[] = $this->t('Successfully unflagged node @id for user(s): @users', [
           '@id' => $entity->id(),
-          '@users' => trim($flagged_users_string),
+          '@users' => trim($unflagged_users_string),
         ]);
       }
 
