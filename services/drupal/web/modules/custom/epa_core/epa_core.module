@@ -132,6 +132,10 @@ function epa_core_form_node_form_alter(&$form, FormStateInterface $form_state, $
   // Change the "Revision log message" label to say "Revision notes".
   $form['revision_log']['widget'][0]['value']['#title'] = t("Revision notes");
 
+  if (isset($form['field_in_page_navigation'])) {
+    $form['field_in_page_navigation']['#states']['!enabled']['input[name="field_wide_template[value]"]'] = ['checked' => TRUE];
+  }
+
   switch ($form_id) {
     case 'node_news_release_form':
     case 'node_news_release_edit_form':
