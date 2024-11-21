@@ -6,9 +6,11 @@
  */
 
 use Drupal\Component\Utility\Html;
+use Drupal\block\Entity\Block;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -16,12 +18,13 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\epa_workflow\EpaNotificationService;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\node\NodeInterface;
-use Drupal\Core\Link;
 use Drupal\paragraphs\Entity\Paragraph;
 use Drupal\epa_workflow\Form\EPAContentModerationEntityModerationForm;
 
@@ -1151,4 +1154,27 @@ function epa_workflow_toolbar() {
 function epa_workflow_toolbar_alter(&$items) {
   $notifications_count = EpaNotificationService::getNotificationsCount();
   $items['epa_notifications']['tab']['#title'] .= $notifications_count ? ' (' . $notifications_count . ')' : '';
+}
+
+/**
+ * Implements hook_block_access().
+ *
+ * @todo: Remove this once the local task redesign work becomes the standard for all.
+ */
+function epa_workflow_block_access(Block $block, $operation, AccountInterface $account) {
+  // The core local tasks are special now with the local task redesign work.
+  // We want to only have the standard local tasks shown if:
+  // 1. Not on a node page
+  // 2. If we are on a node page AND the user does not have the "Beta Tester" role
+  if ($block->id() == 'gesso_local_tasks') {
+    // First check to see if we're on a node route.
+    if (!\Drupal::routeMatch()->getParameter('node')) {
+      return AccessResult::neutral();
+    }
+
+    // Must mean we're on a node route so check if the user is a beta tester
+    if ($account->hasRole('beta_tester')) {
+      return AccessResult::forbidden();
+    }
+  }
 }
