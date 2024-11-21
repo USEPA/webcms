@@ -183,9 +183,15 @@ class EPAContentModerationEntityModerationForm implements ContainerInjectionInte
   private function tweakFormClasses(array &$form) {
     $form['new_state']['#title'] = t('Change state to');
     $form['new_state']['#wrapper_attributes']['class'][] = 'epa-content-moderation__fancy-select';
-    $form['revision_log']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
+
     $form['workflow_508_compliant']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
-    $form['submit']['#attributes']['class'][] = 'button--primary';
+    if (isset($form['submit'])) {
+      $form['submit']['#attributes']['class'][] = 'button--primary';
+    }
+
+    if (isset($form['revision_log'])) {
+      $form['revision_log']['#wrapper_attributes']['class'][] = 'epa-content-moderation__form-item';
+    }
   }
 
   /**
@@ -214,9 +220,11 @@ class EPAContentModerationEntityModerationForm implements ContainerInjectionInte
    * @return void
    */
   private function adjustRevisionLog(array &$form) {
-    $form['revision_log']['#title'] = t('Revision notes');
-    $form['revision_log']['#type'] = 'textarea';
-    unset($form['revision_log']['#size']);
+    if (isset($form['revision_log'])) {
+      $form['revision_log']['#title'] = t('Revision notes');
+      $form['revision_log']['#type'] = 'textarea';
+      unset($form['revision_log']['#size']);
+    }
   }
 
   /**
