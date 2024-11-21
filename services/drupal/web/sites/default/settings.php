@@ -782,9 +782,6 @@ $databases['default']['default'] = [
     // driver won't actually initiate a TLS session).
     PDO::MYSQL_ATTR_SSL_CA => '/etc/ssl/cert.pem',
   ],
-  'init_commands' => [
-    'isolation_level' => 'SET SESSION transaction_isolation=\'READ-COMMITTED\'',
-  ],
 ];
 
 $credentials = json_decode(getenv('WEBCMS_DB_CREDS_D7'), FALSE, 512, JSON_THROW_ON_ERROR);
