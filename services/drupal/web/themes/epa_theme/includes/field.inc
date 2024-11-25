@@ -86,7 +86,7 @@ function _alter_field_subjects(&$variables) {
   $plural_bundles = [
     'perspective' => 'Perspectives',
     'news_release' => 'News Releases',
-    'speeches' => 'Speeches & Remarks',
+    'speeches' => 'Speeches and Remarks',
   ];
 
   // Loop over each subject in the field and alter the term name to be what we want.
