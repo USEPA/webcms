@@ -106,7 +106,7 @@ final class EpaExpiringContentEmails extends QueueWorkerBase implements Containe
     if ($group->hasField('field_editor_in_chief') && !$group->get('field_editor_in_chief')->isEmpty()) {
       $email_handler->setId((int) $group->id());
       $email_handler->setLabel($group->label());
-      $email_handler->setBody($expiring_content ?? t('<p>The @web_area web area does not have any content expiring within the next three weeks.</p>', ['@web_area' => $group->label()])->render());
+      $email_handler->setBody($expiring_content ?? t('<p>The @web_area web area does not have any content expiring within the next three weeks.</p><p>Thank you!</p>', ['@web_area' => $group->label()])->render());
       $recipients[] = $group->field_editor_in_chief->entity;
 
       // Get Deputy Editors in Chief.
