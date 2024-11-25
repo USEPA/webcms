@@ -2,6 +2,8 @@
 
 namespace Drupal\epa_workflow\Plugin\Action;
 
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Provides the 'Unflag content on behalf of user' action.
  *
@@ -13,6 +15,21 @@ namespace Drupal\epa_workflow\Plugin\Action;
  * )
  */
 class EPAUnflagUsersAction extends EPAFlagUsersActionBase {
+
+  /**
+   * {@inheritDoc}
+   */
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    $form['selected_users'] = [
+      '#type' => 'entity_autocomplete',
+      '#tags' => TRUE,
+      '#title' => t('Select user(s) to un-watch on behalf of'),
+      '#target_type' => 'user',
+      '#required' => TRUE,
+    ];
+
+    return $form;
+  }
 
   /**
    * {@inheritDoc}
@@ -31,8 +48,12 @@ class EPAUnflagUsersAction extends EPAFlagUsersActionBase {
         $flag_service = $this->flagService;
         /** @var \Drupal\flag\Entity\Flag $flag */
         $flag = $flag_service->getFlagById(self::NOTIFICATION_FLAG_ID);
-        // Flag the entity for the user.
-        $flag_service->unflag($flag, $entity, $user);
+
+        if ($flag->isFlagged($entity, $user)) {
+          // Flag the entity for the user.
+          $flag_service->unflag($flag, $entity, $user);
+        }
+
         $unflagged_users[] = $user->getAccountName();
       }
 
