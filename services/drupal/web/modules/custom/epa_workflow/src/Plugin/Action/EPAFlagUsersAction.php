@@ -31,8 +31,10 @@ class EPAFlagUsersAction extends EPAFlagUsersActionBase {
         $flag_service = $this->flagService;
         /** @var \Drupal\flag\Entity\Flag $flag */
         $flag = $flag_service->getFlagById(self::NOTIFICATION_FLAG_ID);
-        // Flag the entity for the user.
-        $flag_service->flag($flag, $entity, $user);
+        if (!$flag->isFlagged($entity, $user)) {
+          // Flag the entity for the user.
+          $flag_service->flag($flag, $entity, $user);
+        }
         $flagged_users[] = $user->getAccountName();
       }
 
@@ -40,7 +42,7 @@ class EPAFlagUsersAction extends EPAFlagUsersActionBase {
       $messages = [];
       if (!empty($flagged_users)) {
         $flagged_users_string = implode(', ', $flagged_users);
-        $messages[] = $this->t('Successfully flagged node @id for user(s): @users.', [
+        $messages[] = $this->t('Successfully flagged node @id for user(s): @users', [
           '@id' => $entity->id(),
           '@users' => trim($flagged_users_string),
         ]);
