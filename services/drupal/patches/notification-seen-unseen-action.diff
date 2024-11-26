@@ -5,7 +5,7 @@ index 5aebcd8..2a47972 100644
 @@ -78,6 +78,21 @@ class Notification extends ContentEntityBase implements NotificationInterface {
      return $this;
    }
- 
+
 +  /**
 +   * {@inheritdoc}
 +   */
@@ -31,7 +31,7 @@ index e3c4082..39e02eb 100644
 @@ -33,6 +33,14 @@ interface NotificationInterface extends ContentEntityInterface {
     */
    public function markSeen(): NotificationInterface;
- 
+
 +  /**
 +   * Marks the notification as un-seen.
 +   *
@@ -45,10 +45,10 @@ index e3c4082..39e02eb 100644
     *
 diff --git a/src/Plugin/Action/NotificationSeenAction.php b/src/Plugin/Action/NotificationSeenAction.php
 new file mode 100644
-index 0000000..7881c95
+index 0000000..feae3ab
 --- /dev/null
 +++ b/src/Plugin/Action/NotificationSeenAction.php
-@@ -0,0 +1,87 @@
+@@ -0,0 +1,84 @@
 +<?php
 +
 +namespace Drupal\danse\Plugin\Action;
@@ -93,11 +93,8 @@ index 0000000..7881c95
 +   * {@inheritDoc}
 +   */
 +  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
-+    if ($object instanceof Notification) {
-+      return $object->access('view', $account, TRUE);
-+    }
-+
-+    return AccessResult::forbidden();
++    // @todo: Is there any permissions we want to have for this? DANSE doesn't offer any permissions for the entities it provides
++    return AccessResult::allowed();
 +  }
 +
 +  /**
