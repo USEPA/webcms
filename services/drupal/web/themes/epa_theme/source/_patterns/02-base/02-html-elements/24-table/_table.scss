@@ -7,6 +7,20 @@ table {
   @include usa-table();
 }
 
+@if $wysiwyg {
+  // To override CKEditor table styles.
+  .table {
+    table {
+      @include usa-table();
+
+      td,
+      th {
+        height: auto;
+      }
+    }
+  }
+}
+
 thead {
   @media print {
     display: table-header-group;
