@@ -1,7 +1,25 @@
+@use '../../00-config' as *;
+
 .usa-table--borderless {
   tbody {
     th {
       background-color: transparent;
+    }
+  }
+
+  @if $wysiwyg {
+    border: 0 !important;
+
+    thead {
+      th {
+        background-color: #0000 !important;
+        border-block-start: 0 !important;
+      }
+    }
+
+    td,
+    th {
+      border-inline: 0 !important;
     }
   }
 }
