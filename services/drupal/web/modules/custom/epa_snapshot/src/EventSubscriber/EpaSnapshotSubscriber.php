@@ -38,6 +38,12 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     '/\/publicnotices\/notices-search\//',
     '/\/newsreleases\/search\//',
     '/\/speeches\/search\//',
+    '/\/webguide\//',
+    '/\/search-central\//',
+    '/\/drupaltraining\//',
+    '/\/web-analytics\//',
+    '/\/webcmstraining\//',
+    '/\/social-media-guide\//',
   ];
 
   /**
@@ -84,10 +90,13 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     foreach ($paths as $path => $metadata) {
       foreach ($excluded_patterns as $pattern) {
         if (preg_match($pattern, $path) || (isset($metadata['original_path']) && preg_match($pattern, $metadata['original_path']))) {
+          \Drupal::logger('epa_snapshot')->notice($path);
+          \Drupal::messenger()->addMessage($path);
           unset($paths[$path]);
         }
       }
     }
+
     $event->replacePaths($paths);
   }
 
