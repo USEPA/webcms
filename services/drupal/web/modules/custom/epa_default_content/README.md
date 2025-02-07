@@ -1,5 +1,7 @@
 # EPA Default Content
 
+**Update: Feb. 5, 2025 -- This module is not in use. Recommend to remove**
+
 This module creates placeholder content items for nodes and taxonomies on install with the goal of reducing redundant content entry during QA.
 
 ## Requirements
