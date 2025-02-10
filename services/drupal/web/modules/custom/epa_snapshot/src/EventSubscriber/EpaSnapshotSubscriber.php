@@ -38,6 +38,12 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     '/\/publicnotices\/notices-search\//',
     '/\/newsreleases\/search\//',
     '/\/speeches\/search\//',
+    '/\/webguide\//',
+    '/\/search-central\//',
+    '/\/drupaltraining\//',
+    '/\/web-analytics\//',
+    '/\/webcmstraining\//',
+    '/\/social-media-guide\//',
   ];
 
   /**
@@ -88,6 +94,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         }
       }
     }
+
     $event->replacePaths($paths);
   }
 
