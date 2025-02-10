@@ -5,7 +5,6 @@ const patternLabConfig = require('./pattern-lab-config.json');
 const patternLab = require('@pattern-lab/core')(patternLabConfig);
 const postcss = require('gulp-postcss');
 const sass = require('gulp-sass')(require('sass'));
-// const sassGlobImporter = require('node-sass-glob-importer');
 const sourcemaps = require('gulp-sourcemaps');
 const stylelint = require('@ronilaukkarinen/gulp-stylelint');
 const svgSprite = require('gulp-svg-sprite');
