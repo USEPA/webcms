@@ -51,7 +51,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    *
    * @var string
    */
-  protected $hostString = 'https://www.epa.gov';
+  protected $hostString = 'www.epa.gov';
 
   /**
    * Snapshot host address.
@@ -94,7 +94,6 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         }
       }
     }
-
     $event->replacePaths($paths);
   }
 
@@ -344,7 +343,20 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     foreach ($anchors as $anchor) {
       /** @var \DOMElement $anchor */
       $href = $anchor->getAttribute('href');
-      $anchor->setAttribute('href', str_replace($this->hostString, '', $href));
+
+      // Extract the domain from the href.
+      $parsed_url = parse_url($href);
+
+      if (!isset($parsed_url['host'])) {
+        continue; // Skip if no host in URL (e.g., relative links).
+      }
+
+      // Check if the host contains "www.epa.gov" in any subdomain variation.
+      if (strpos($parsed_url['host'], $this->hostString) !== false) {
+        // Remove only the host portion from the href to get a relative path.
+        $relative_href = preg_replace('#https?://[^/]+#', '', $href);
+        $anchor->setAttribute('href', $relative_href);
+      }
     }
   }
 
