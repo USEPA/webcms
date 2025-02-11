@@ -351,9 +351,9 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         continue; // Skip if no host in URL (e.g., relative links).
       }
 
-      // Check if the host contains "www.example.com" in any subdomain variation.
+      // Check if the host contains "www.epa.gov" in any subdomain variation.
       if (strpos($parsed_url['host'], $this->hostString) !== false) {
-        // Remove only the host portion from the href.
+        // Remove only the host portion from the href to get a relative path.
         $relative_href = preg_replace('#https?://[^/]+#', '', $href);
         $anchor->setAttribute('href', $relative_href);
       }
