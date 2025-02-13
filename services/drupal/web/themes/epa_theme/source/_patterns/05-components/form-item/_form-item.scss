@@ -56,7 +56,7 @@
 .form-item__label {
   // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
   @extend .usa-label;
-  font-weight: gesso-font-weight(bold);
+  font-weight: gesso-font-weight(normal);
   margin-bottom: gesso-spacing('05');
   margin-top: 0;
 
@@ -108,9 +108,9 @@
   margin-top: 0;
 
   &:disabled {
-    background-color: color($theme-color-disabled-light);
+    background-color: color($theme-color-disabled-lighter);
     background-image: none;
-    border-color: color($theme-color-disabled);
+    border-color: color($theme-color-disabled-light);
     color: color($theme-color-disabled-dark);
   }
 
@@ -145,10 +145,6 @@
 .form-item__radio {
   // stylelint-disable-next-line scss/at-extend-no-missing-placeholder
   @extend .usa-radio__input;
-
-  &:disabled + .form-item__label {
-    color: color('disabled');
-  }
 }
 
 .form-item__range {

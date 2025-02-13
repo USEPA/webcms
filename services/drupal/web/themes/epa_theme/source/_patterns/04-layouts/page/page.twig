@@ -25,11 +25,33 @@
       </div>
     {% endif %}
 
+    {% if has_in_page_nav %}
+      <div class="usa-in-page-nav-container">
+        <aside
+          class="usa-in-page-nav"
+          data-main-content-selector=".article"
+          data-title-heading-level="h2"
+        >
+          {% block in_page_nav %}
+            {% include '@layouts/_sample-content/sample-content.twig' with {
+              'content': 'In-page Navigation',
+            } %}
+          {% endblock %}
+        </aside>
+        <div class="usa-in-page-nav-main">
+    {% endif %}
+
     {% block content %}
       {% include '@layouts/_sample-content/sample-content.twig' with {
         'content': 'Page Content',
       } %}
     {% endblock %}
+
+    {% if has_in_page_nav %}
+        </div>
+      </div>
+    {% endif %}
+
   </div>
 
   {% if has_footer %}
