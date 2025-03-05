@@ -125,6 +125,9 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // Update metatags.
     $this->updateMetaTags($xpath);
 
+    // Strip the host string from meta refresh redirects.
+    $this->stripHostFromMetaRefresh($xpath);
+
     // Strip the host string from anchor tags.
     $this->stripHostStringFromAnchors($xpath);
 
@@ -183,6 +186,35 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         $item->setAttribute($attribute, str_replace($text, $replacement, $item->getAttribute($attribute)));
       }
     }
+  }
+
+  /**
+   * Helper method to replace references to the site url.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function stripHostFromMetaRefresh(\DOMXPath $xpath) {
+    // Set the host url used for search and replace.
+    $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+
+    // Get link meta tags with content attribute starting with 0.
+    // Strip the host from the content attribute.
+    $metatags = $xpath->query("//meta[starts-with(@content,'0')]");
+    $this->stripAttributeTextFromList($metatags, 'content', $host);
+
+    // Get the title.
+    $title = $xpath->query('//title')->item(0);
+    $title->nodeValue = str_replace($host, '', $title->nodeValue);
+
+    // Update the link.
+    $link = $xpath->query('//body/a')->item(0);
+    /** @var \DOMElement $link */
+    $link->setAttribute('href', str_replace($host, '', $link->getAttribute('href')));
+    $link->nodeValue = str_replace($host, '', $link->nodeValue);
   }
 
   /**
