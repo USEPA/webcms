@@ -38,6 +38,12 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     '/\/publicnotices\/notices-search\//',
     '/\/newsreleases\/search\//',
     '/\/speeches\/search\//',
+    '/\/webguide\//',
+    '/\/search-central\//',
+    '/\/drupaltraining\//',
+    '/\/web-analytics\//',
+    '/\/webcmstraining\//',
+    '/\/social-media-guide\//',
   ];
 
   /**
@@ -45,7 +51,7 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
    *
    * @var string
    */
-  protected $hostString = 'https://www.epa.gov';
+  protected $hostString = 'www.epa.gov';
 
   /**
    * Snapshot host address.
@@ -119,6 +125,9 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     // Update metatags.
     $this->updateMetaTags($xpath);
 
+    // Strip the host string from meta refresh redirects.
+    $this->stripHostFromMetaRefresh($xpath);
+
     // Strip the host string from anchor tags.
     $this->stripHostStringFromAnchors($xpath);
 
@@ -177,6 +186,41 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
         $item->setAttribute($attribute, str_replace($text, $replacement, $item->getAttribute($attribute)));
       }
     }
+  }
+
+  /**
+   * Helper method to replace references to the site url on redirects.
+   *
+   * @param \DOMXPath $xpath
+   *   The DOMXPath object.
+   *
+   * @return void
+   *   Nothing.
+   */
+  protected function stripHostFromMetaRefresh(\DOMXPath $xpath) {
+    // Get link meta tags with content attribute starting with 0.
+    $metatags = $xpath->query('//meta[@http-equiv="refresh"]');
+
+    // Return if no meta tags found.
+    if (empty($metatags) || $metatags->length === 0) {
+      return;
+    }
+
+    // Set the host url used for search and replace.
+    $host = $this->requestStack->getCurrentRequest()->getSchemeAndHttpHost();
+
+    // Strip the host from the content attribute.
+    $this->stripAttributeTextFromList($metatags, 'content', $host);
+
+    // Get the title.
+    $title = $xpath->query('//title')->item(0);
+    $title->nodeValue = str_replace($host, '', $title->nodeValue);
+
+    // Update the link.
+    $link = $xpath->query('//body/a')->item(0);
+    /** @var \DOMElement $link */
+    $link->setAttribute('href', str_replace($host, '', $link->getAttribute('href')));
+    $link->nodeValue = str_replace($host, '', $link->nodeValue);
   }
 
   /**
@@ -337,7 +381,21 @@ class EpaSnapshotSubscriber implements EventSubscriberInterface {
     foreach ($anchors as $anchor) {
       /** @var \DOMElement $anchor */
       $href = $anchor->getAttribute('href');
-      $anchor->setAttribute('href', str_replace($this->hostString, '', $href));
+
+      // Extract the domain from the href.
+      $parsed_url = parse_url($href);
+
+      // Skip if no host in URL (e.g., relative links).
+      if (!isset($parsed_url['host'])) {
+        continue;
+      }
+
+      // Check if the host contains "www.epa.gov" in any subdomain variation.
+      if (strpos($parsed_url['host'], $this->hostString) !== FALSE) {
+        // Remove only the host portion from the href to get a relative path.
+        $relative_href = preg_replace('#https?://[^/]+#', '', $href);
+        $anchor->setAttribute('href', $relative_href);
+      }
     }
   }
 
