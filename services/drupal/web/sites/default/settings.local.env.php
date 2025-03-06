@@ -88,19 +88,6 @@ $config['epa_cloudwatch']['log_stream'] = 'app-drupal';
 
 $settings['config_sync_directory'] = '../config/sync';
 
-$databases['default']['default'] = array(
-  'database' => "web",
-  'username' => "web",
-  'password' => "web",
-  'host' => 'mysql',
-  'driver' => "mysql",
-  'port' => '3306',
-  'prefix' => "",
-  'init_commands' => [
-    'isolation_level' => 'SET SESSION tx_isolation=\'READ-COMMITTED\'',
-  ],
-);
-
 /**
  * Locally, we always want this set.
  *
