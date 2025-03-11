@@ -16,4 +16,7 @@ use Drupal\search_api\Plugin\views\field\SearchApiFieldTrait;
 class SearchApiMediaLibrarySelectForm extends MediaLibrarySelectForm {
   use SearchApiFieldTrait;
 
+  public function form_element_row_id(int $row_id): string {
+    return $this->getEntity($this->view->result[$row_id])->mid->value;
+  }
 }
