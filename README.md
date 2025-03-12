@@ -22,31 +22,33 @@ Note: this has only been tested on ddev 1.19 and above.
 
 4. After that, please download the latest database (see https://forumone.atlassian.net/wiki/spaces/EPA/pages/1794637894/HOWTO+Import+D8+InnoDB+Cold+Backup) and put the .tar file in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
-5. Import the database by running [`ddev import-db`](https://ddev.readthedocs.io/en/stable/users/usage/database-management/#database-imports)
+5. Import the database by running:
 
    ```
-   ddev import-db [--file=path/to/backup.sql.gz]
+   ddev epa-import
    ```
 
-   Note that for very large dumps this may time out. Sometimes, DDEV lets the import process run in the background (verify this by watching the CPU and I/O activity of `docker stats`).
+6. After the import you will need to restart:
 
-   If DDEV kills the import process, try connecting a MySQL command-line client directly to the container (use `ddev status` to see the forwarded MySQL port) and import that way.
+   ```
+   ddev poweroff && ddev start
+   ```
 
-6. Copy `cp .env.example .env`.
+7. Copy `cp .env.example .env`.
 
-7. Install dependencies:
+8. Install dependencies:
 
    ```
    ddev composer install
    ```
 
-8. Install the requirements for the theme: `ddev gesso install`:
+9. Install the requirements for the theme: `ddev gesso install`:
 
    ```
    ddev gesso install
    ```
 
-9.  Building/watching the CSS and Pattern Lab:
+10. Building/watching the CSS and Pattern Lab:
     1. to build
       ```````
       ddev gesso build
@@ -56,24 +58,32 @@ Note: this has only been tested on ddev 1.19 and above.
       ddev gesso watch
       ```````
 
-10. Install Drupal from config (or restore a backup).  You can install from config by running:
-
+11. Install Drupal from config (or restore a backup).  You can install from config by running:
+    
     **Note**: Do not run this command if starting from a new installation. This will wipe the database out, instead skip to #11.
-
+    
    ```
    ddev drush si --existing-config
    ```
 
-11. Ensure the latest configuration has been fully applied and clear cache:
+12. Ensure the latest configuration has been fully applied and clear cache:
    ```
    ddev drush deploy -y
    ```
 
-12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of memcached caching.
+13. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of Redis caching.
 
-13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin`
+14. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin` 
 
-14. Access the app at https://epa.ddev.site
+15. Access the app at https://epa.ddev.site
+
+# Testing migrations
+
+To load a D7 DB copy for testing:
+
+```
+gunzip < cleaned-d7-db.sql.gz | f1 drush sqlc --db-url mysql://web_d7:web_d7@mysql:3306/web_d7
+```
 
 # Other READMEs
 
@@ -98,8 +108,8 @@ Here is a list of helpful commands:
 * `ddev gesso watch` > Same thing as build but will watch for changes.
 * `ddev ssh` > Goes into the web container.
 * `ddev drush` > Runs any drush command.
-* `ddev import-db` > Will import a specific database.
-* `ddev export-db` > mExports a database with the current date.
+* `ddev epa-import` > Will import a specific database.
+* `ddev epa-export` > Exports a database with the current date.
 * `ddev aws-setup` > Sets up the requirements to get drupal file system to work
 * `ddev describe` or `ddev status` > Get a detailed description of a running DDEV project.
 * `ddev phpmyadmin` > Launch a browser with PhpMyAdmin
