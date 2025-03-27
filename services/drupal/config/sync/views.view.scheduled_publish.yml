@@ -2,10 +2,13 @@ uuid: c91ca6c8-2408-43cb-b9f1-1037c371861b
 langcode: en
 status: true
 dependencies:
+  config:
+    - field.storage.node.field_scheduled_transition
   module:
     - node
     - scheduled_publish
     - user
+    - views_autocomplete_filters
 id: scheduled_publish
 label: 'Scheduled publish'
 module: views
@@ -513,6 +516,7 @@ display:
             offset: false
             offset_label: Offset
           quantity: 9
+          pagination_heading_level: h4
       exposed_form:
         type: basic
         options:

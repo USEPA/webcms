@@ -1,10 +1,10 @@
 diff --git a/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php b/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
-index 8de394c349..7f26a289aa 100644
+index 087ef13d85e..87af3993473 100644
 --- a/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
 +++ b/core/modules/layout_builder/src/Plugin/Derivative/ExtraFieldBlockDeriver.php
-@@ -89,6 +89,10 @@ public static function create(ContainerInterface $container, $base_plugin_id) {
-   public function getDerivativeDefinitions($base_plugin_definition) {
-     $entity_type_labels = $this->entityTypeRepository->getEntityTypeLabels();
+@@ -101,6 +101,10 @@ public function getDerivativeDefinitions($base_plugin_definition) {
+     $enabled_bundle_ids = $this->bundleIdsWithLayoutBuilderDisplays();
+     $expose_all_fields = $this->moduleHandler->moduleExists('layout_builder_expose_all_field_blocks');
      foreach ($this->entityTypeManager->getDefinitions() as $entity_type_id => $entity_type) {
 +      // Don't process webform_submission entities.
 +      if ($entity_type_id == 'webform_submission') {
@@ -14,13 +14,13 @@ index 8de394c349..7f26a289aa 100644
        if (!$entity_type->entityClassImplements(FieldableEntityInterface::class)) {
          continue;
 diff --git a/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php b/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
-index a2a94a024d..d7454b618a 100644
+index e01a0300201..b75962a4f4e 100644
 --- a/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
 +++ b/core/modules/layout_builder/src/Plugin/Derivative/FieldBlockDeriver.php
-@@ -90,6 +90,10 @@ public static function create(ContainerInterface $container, $base_plugin_id) {
+@@ -107,6 +107,10 @@ public static function create(ContainerInterface $container, $base_plugin_id) {
    public function getDerivativeDefinitions($base_plugin_definition) {
      $entity_type_labels = $this->entityTypeRepository->getEntityTypeLabels();
-     foreach ($this->entityFieldManager->getFieldMap() as $entity_type_id => $entity_field_map) {
+     foreach ($this->getFieldMap() as $entity_type_id => $entity_field_map) {
 +      // Don't process webform_submission entities.
 +      if ($entity_type_id == 'webform_submission') {
 +        continue;
