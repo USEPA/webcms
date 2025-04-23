@@ -660,7 +660,7 @@ infrastructure:preproduction:apply:
 #sub-region us-west-2: 
 # These steps deploy into the infra/preproduction-west environment
 # the infra/preproduction-west environment is pointed to the us-west-2 region within the DrupalCloud AWS accounts
-infrastructure:preproduction-west:init:
+.infrastructure:preproduction-west:init:
   extends: .infrastructure
   stage: infrastructure_preprod_west_init
   rules:
@@ -676,7 +676,7 @@ infrastructure:preproduction-west:init:
   environment:
     name: infra/preproduction-west
 
-infrastructure:preproduction-west:validate:
+.infrastructure:preproduction-west:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_west_validate
   rules:
@@ -692,7 +692,7 @@ infrastructure:preproduction-west:validate:
   environment:
     name: infra/preproduction-west
 
-infrastructure:preproduction-west:plan:
+.infrastructure:preproduction-west:plan:
   extends: .infrastructure
   stage: infrastructure_preprod_west_plan
   rules:
@@ -716,7 +716,7 @@ infrastructure:preproduction-west:plan:
     reports:
       terraform: $TF_ROOT/plan.json
 
-infrastructure:preproduction-west:apply:
+.infrastructure:preproduction-west:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_west_apply
   rules:
