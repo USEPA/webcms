@@ -1,0 +1,10 @@
+services:
+  media_inline_embed.route_subscriber:
+    class: Drupal\media_inline_embed\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  media_inline_embed.opener.editor:
+    class: Drupal\media_inline_embed\MediaInlineEmbedEditorOpener
+    arguments: [ '@entity_type.manager' ]
+    tags:
+      - { name: media_library.opener }
