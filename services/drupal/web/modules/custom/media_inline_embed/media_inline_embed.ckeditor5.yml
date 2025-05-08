@@ -1,0 +1,45 @@
+media_inline_embed_drupal_inline_media:
+  provider: media
+  ckeditor5:
+    plugins:
+      - mediaInlineEmbed.DrupalInlineMedia
+      - drupalMedia.DrupalMedia
+      - mediaInlineEmbed.DrupalInlineElementStyle
+    config: []
+  drupal:
+    label: Media Inline Embed
+    library: media_inline_embed/drupal_inline_media
+    elements:
+      - <drupal-inline-media>
+      - <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode>
+    conditions:
+      filter: media_inline_embed
+      toolbarItem: drupalMedia
+
+media_library_inlineMediaLibrary:
+  provider: media_library
+  ckeditor5:
+    plugins: []
+    config:
+      drupalMedia:
+        openDialog:
+          func:
+            name: Drupal.ckeditor5.openDialog
+            invoke: false
+        dialogSettings:
+          height: 75%
+          dialogClass: media-library-widget-modal
+          title: Add or select media
+  drupal:
+    label: Media Library (Inline)
+    elements: false
+    admin_library: media_inline_embed/admin.media_inline_embed
+    class: Drupal\media_inline_embed\Plugin\CKEditor5Plugin\DrupalInlineMedia
+    library: editor/drupal.editor.dialog
+    toolbar_items:
+      drupalInlineMedia:
+        label: Insert inline from Media Library
+    conditions:
+      filter: media_inline_embed
+      toolbarItem: drupalInlineMedia
+
