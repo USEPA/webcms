@@ -100,9 +100,19 @@ svg.l-header__search-button-icon-close {
 
 .l-header__search {
   background: gesso-grayscale(gray-1);
+  display: flex;
+  gap: 1rem;
   margin: 0 rem(gesso-site-margins(mobile) * -1);
   padding: rem(gesso-spacing(2)) rem(gesso-site-margins(mobile));
   transition-duration: 1ms;
+
+  &[hidden] {
+    display: none;
+  }
+
+  form {
+    flex-grow: 1;
+  }
 
   @include at-media($theme-header-min-width) {
     background: transparent;
