@@ -5,8 +5,11 @@
  * Contains epa_workflow.module.
  */
 
+use Drupal\block\Entity\Block;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\content_moderation_notifications\ContentModerationNotificationInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -15,6 +18,7 @@ use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
@@ -378,7 +382,10 @@ function epa_workflow_entity_view(array &$build, EntityInterface $entity, Entity
       return;
     }
 
-    build_content_moderation_info_box($entity, $build);
+    // Logic to ensure that only non-beta tester role users get to see the 'old' content moderation info box.
+    if (!in_array('beta_tester', \Drupal::currentUser()->getRoles())) {
+      build_content_moderation_info_box($entity, $build);
+    }
   }
 }
 
@@ -525,18 +532,18 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
     '#markup' => $renderer->render($flag_link),
   ];
 
-//  $build['epa_content_moderation_info_box'] = [
-//    '#theme' => 'epa_content_info_box',
-//    '#node_edit_link' => $node_edit_link,
-//    '#nid' => $nid,
-//    '#vid' => $vid,
-//    '#revision_author' => $revision_author,
-//    '#review_deadline' => $review_deadline,
-//    '#current' => $current,
-//    '#flag_link' => $flag_link_item,
-//    '#content_moderation_form' => \Drupal::formBuilder()
-//      ->getForm(EntityModerationForm::class, $entity),
-//  ];
+  $build['epa_content_moderation_info_box'] = [
+    '#theme' => 'epa_content_info_box',
+    '#node_edit_link' => $node_edit_link,
+    '#nid' => $nid,
+    '#vid' => $vid,
+    '#revision_author' => $revision_author,
+    '#review_deadline' => $review_deadline,
+    '#current' => $current,
+    '#flag_link' => $flag_link_item,
+    '#content_moderation_form' => \Drupal::formBuilder()
+      ->getForm(EntityModerationForm::class, $entity),
+  ];
 }
 
 /**
@@ -548,6 +555,17 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
  * @see \Drupal\epa_workflow\Plugin\Block\EpaNodeTabsBlock
  */
 function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
+
+  // Hide the node edit tab always. This is added back as a separate button in the epa_content_info_box
+  if (isset($data['tabs'][0]['entity.node.edit_form'])) {
+    unset($data['tabs'][0]['entity.node.edit_form']);
+  }
+
+  // This should only be altered if the user has the permission to the new node tabs.
+  if (!\Drupal::currentUser()->hasPermission('use_epa_node_tabs')) {
+    return;
+  }
+
   // Order:
   // - Back to group dashboard
   // - Edit page layout
@@ -565,6 +583,7 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
         'title' => 'Content',
       ],
       'epa_web_areas.node_group_dashboard' => [
+        'title' => 'Back to group dashboard',
         'weight' => -100
       ],
       'layout_builder_ui:layout_builder.overrides.node.view' => [
@@ -619,6 +638,7 @@ function epa_workflow_menu_local_tasks_alter(array &$data, $route_name) {
       }
     }
   }
+
 }
 
 /**
@@ -1046,6 +1066,29 @@ function epa_workflow_page_top(array &$page_top) {
         $page_top['content_info_box'] = $content_info_block->build();
         $page_top['content_info_box']['#weight'] = 1001;
       }
+    }
+  }
+}
+
+/**
+ * Implements hook_block_access().
+ *
+ * @todo: Remove this once the local task redesign work becomes the standard for all.
+ */
+function epa_workflow_block_access(Block $block, $operation, AccountInterface $account) {
+  // The core local tasks are special now with the local task redesign work.
+  // We want to only have the standard local tasks shown if:
+  // 1. Not on a node page
+  // 2. If we are on a node page AND the user does not have the "Beta Tester" role
+  if ($block->id() == 'gesso_local_tasks') {
+    // First check to see if we're on a node route.
+    if (!\Drupal::routeMatch()->getParameter('node')) {
+      return AccessResult::neutral();
+    }
+
+    // Must mean we're on a node route so check if the user is a beta tester
+    if ($account->hasRole('beta_tester')) {
+      return AccessResult::forbidden();
     }
   }
 }

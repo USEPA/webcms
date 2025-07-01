@@ -6,13 +6,17 @@
       <details class="epa-content-moderation__dropdown epa-dropdown js-epa-dropdown">
         <summary class="epa-content-moderation__button epa-dropdown__button">
           {{ current_state }}
-          <svg class="epa-content-moderation__button-icon epa-dropdown__icon" aria-hidden="true" role="img">
-            <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#chevron-down"></use>
-          </svg>
+          {% if content_moderation_form|render|striptags|trim is not empty %}
+            <svg class="epa-content-moderation__button-icon epa-dropdown__icon" aria-hidden="true" role="img">
+              <use href="/themes/epa_theme/images/drupal-sprite.artifact.svg#chevron-down"></use>
+            </svg>
+          {% endif %}
         </summary>
-        <div class="epa-content-moderation__drawer epa-dropdown__drawer">
-          {{ content_moderation_form }}
-        </div>
+        {% if content_moderation_form|render|striptags|trim is not empty %}
+          <div class="epa-content-moderation__drawer epa-dropdown__drawer">
+            {{ content_moderation_form }}
+          </div>
+        {% endif %}
       </details>
       <p class="epa-content-moderation__info">{{ last_modified }}</p>
       <p class="epa-content-moderation__help-text">{{ help_text }}</p>
