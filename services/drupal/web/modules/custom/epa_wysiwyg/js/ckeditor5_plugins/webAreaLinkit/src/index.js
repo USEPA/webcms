@@ -1,7 +1,7 @@
 import {
   DropdownButtonView,
   LabeledFieldView,
-  Model,
+  ViewModel,
   addListToDropdown,
   createDropdown,
   createLabeledInputText
@@ -202,7 +202,7 @@ class WebAreaLinkit extends Plugin {
 
     items.add( {
       type: 'button',
-      model: new Model( {
+      model: new ViewModel( {
         withText: true,
         label: this.locale.t('Your internal links'),
         tooltip: this.locale.t('Search within your web areas only.'),
@@ -212,7 +212,7 @@ class WebAreaLinkit extends Plugin {
 
     items.add( {
       type: 'button',
-      model: new Model( {
+      model: new ViewModel( {
         withText: true,
         label: this.locale.t('No filter: all WebCMS content'),
         tooltip: this.locale.t('Search within your web areas and www.epa.gov.'),
