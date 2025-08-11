@@ -4,15 +4,12 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_text
+    - filter.format.restricted_html
     - paragraphs.paragraphs_type.tagline
   module:
-    - allowed_formats
     - custom_add_another
     - text
 third_party_settings:
-  allowed_formats:
-    allowed_formats:
-      - restricted_html
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
@@ -26,5 +23,7 @@ required: true
 translatable: true
 default_value: {  }
 default_value_callback: ''
-settings: {  }
+settings:
+  allowed_formats:
+    - restricted_html
 field_type: text_long
