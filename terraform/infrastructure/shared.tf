@@ -67,11 +67,23 @@ data "aws_ssm_parameter" "terraform_database_security_group" {
 locals {
   languages = ["en", "es"]
 
+  # Create site-language combinations
+  # dev only supports English (en), all other sites support both en and es
+  site_language_pairs = flatten([
+    for site in var.sites : [
+      for lang in (site == "dev" ? ["en"] : local.languages) : {
+        key  = "${site}-${lang}"
+        site = site
+        lang = lang
+      }
+    ]
+  ])
+
   sites = {
-    for pair in setproduct(var.sites, local.languages) :
-    "${pair[0]}-${pair[1]}" => {
-      site = pair[0]
-      lang = pair[1]
+    for pair in local.site_language_pairs :
+    pair.key => {
+      site = pair.site
+      lang = pair.lang
     }
   }
 
