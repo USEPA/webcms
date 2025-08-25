@@ -4,19 +4,16 @@ status: true
 dependencies:
   config:
     - field.storage.node.field_rule_history
+    - filter.format.filtered_html
+    - filter.format.full_html
     - node.type.regulation
   module:
-    - allowed_formats
     - custom_add_another
     - text
 third_party_settings:
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
-  allowed_formats:
-    allowed_formats:
-      - filtered_html
-      - full_html
 id: node.regulation.field_rule_history
 field_name: field_rule_history
 entity_type: node
@@ -27,5 +24,8 @@ required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
-settings: {  }
+settings:
+  allowed_formats:
+    - filtered_html
+    - full_html
 field_type: text_long

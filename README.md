@@ -1,6 +1,6 @@
 # First-Time Setup
 
-Note: this has only been tested on ddev 1.19 and above.
+Note: this has only been tested on ddev 1.24 and above.
 
 1. Clone main branch of repo:
 
@@ -20,7 +20,7 @@ Note: this has only been tested on ddev 1.19 and above.
    ddev aws-setup
    ```
 
-4. After that, please download the latest database (see https://forumone.atlassian.net/wiki/spaces/EPA/pages/1794637894/HOWTO+Import+D8+InnoDB+Cold+Backup) and put the .tar file in the `services/drupal/.ddev/db/` folder.  The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
+4. After that, please obtain the latest database (contact Michael Hessling) and put the .tar file in the `services/drupal/.ddev/db/` folder. The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
 
 5. Import the database by running [`ddev import-db`](https://ddev.readthedocs.io/en/stable/users/usage/database-management/#database-imports)
 
@@ -32,13 +32,15 @@ Note: this has only been tested on ddev 1.19 and above.
 
    If DDEV kills the import process, try connecting a MySQL command-line client directly to the container (use `ddev status` to see the forwarded MySQL port) and import that way.
 
-6. Copy `cp .env.example .env`.
+6. Copy the example `.env` file: `cp .env.example .env`.
 
 7. Install dependencies:
 
    ```
    ddev composer install
    ```
+
+   You might get an error, clear it by deleting the services/drupal/.ddev/vendor folder and clearing cache: `ddev composer clearcache`
 
 8. Install the requirements for the theme: `ddev gesso install`:
 
@@ -74,6 +76,17 @@ Note: this has only been tested on ddev 1.19 and above.
 13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin`
 
 14. Access the app at https://epa.ddev.site
+15. Note, you may get SSL cert warnings. You'll have to install mkcert:
+   ```
+   ddev stop --all
+   mkcert -install
+   ```
+
+If you want to use Firefox, you need to install nss to use HTTPS:
+   ```
+   brew install nss
+   mkcert -install
+   ```
 
 # Other READMEs
 
