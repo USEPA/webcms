@@ -11,7 +11,7 @@ variable "environment" {
 }
 
 variable "sites" {
-  description = "List of sites (e.g., dev, stage) this infrastructure covers"
+  description = "List of sites (e.g., dev, stage, devint) this infrastructure covers"
   type        = list(string)
 }
 

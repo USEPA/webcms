@@ -831,7 +831,7 @@ deploy:dev:validate:es:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
-    WEBCMS_LANG: en
+    WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
@@ -1089,7 +1089,7 @@ deploy:dev-west:validate:es:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
-    WEBCMS_LANG: en
+    WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
   environment:
@@ -1140,7 +1140,7 @@ deploy:dev-west:plan-es:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
@@ -1176,7 +1176,7 @@ deploy:dev-west:apply-en:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
@@ -1227,7 +1227,7 @@ deploy:dev-west:apply-es:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
     WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+    TF_STATE_NAME: dev-webcms-west-$WEBCMS_LANG
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-west-$WEBCMS_LANG
 
   # As mentioned in the comments on the infrastructure:preproduction job, we use a
