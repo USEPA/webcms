@@ -1,8 +1,8 @@
 version: 2
 updates:
-  - package-ecosystem: "composer"
+  - package-ecosystem: "composer" # This is the entry for your main composer.json.
     assignees:
-      - "cherrypj" # Replace with your GitHub username(s)
+      - "cherrypj" # Replace with your GitHub username
     directory: "/services/drupal"
     schedule:
       interval: "weekly"
@@ -20,3 +20,14 @@ updates:
       - "dependencies"
       - "composer"
       - "automated"
+  - package-ecosystem: "composer"
+    directory: "/services/drupal/web/modules/contrib/webform"
+    schedule:
+      interval: "weekly"
+    # This entry tells Dependabot to look at the webform module's
+    # composer.libraries.json file.
+  - package-ecosystem: "composer"
+    directory: "/services/drupal/web/modules/contrib/anchor_link/composer.libraries.json"
+    schedule:
+      interval: "weekly"
+    # This entry tells Dependabot to look at the anchor_link dependencies.    
