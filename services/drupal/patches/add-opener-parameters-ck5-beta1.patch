@@ -1,0 +1,92 @@
+diff --git a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
+index 60f787e..8985c29 100644
+--- a/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
++++ b/js/ckeditor5_plugins/embeddedParagraph/src/paragraphsembedui.js
+@@ -66,7 +66,11 @@ export default class ParagraphsEmbedUI extends Plugin {
+         buttonView.bind('isOn', 'isEnabled').to(command, 'value', 'isEnabled');
+
+         this.listenTo(buttonView, 'execute', () => {
+-          const libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
++          let libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
++
++          if (options.hasOwnProperty('openerParameters')) {
++            libraryURL += '?' + options.openerParameters;
++          }
+
+           // Open a dialog to select entity to embed.
+           Drupal.ckeditor5.openDialog(
+            
+diff --git a/src/Plugin/CKEditor5Plugin/DrupalParagraph.php b/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
+index 055e653..1360eb9 100644
+--- a/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
++++ b/src/Plugin/CKEditor5Plugin/DrupalParagraph.php
+@@ -6,7 +6,10 @@
+ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefault;
+ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
+ use Drupal\Component\Utility\Html;
+ use Drupal\Core\Access\CsrfTokenGenerator;
++use Drupal\Core\Entity\ContentEntityInterface;
++use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
++use Drupal\Core\Routing\CurrentRouteMatch;
+ use Drupal\editor\EditorInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+@@ class DrupalParagraph extends CKEditor5PluginDefault implements ContainerFactoryPluginInterface {
++  protected $currentRouteMatch;
+   protected $csrfTokenGenerator;
++  protected $entityTypeManager;
+@@ public function __construct(array $configuration,
+-                              string $plugin_id,
+-                              CKEditor5PluginDefinition $plugin_definition,
+-                              CsrfTokenGenerator $csrf_token_generator) {
++    string $plugin_id,
++    CKEditor5PluginDefinition $plugin_definition,
++    CsrfTokenGenerator $csrf_token_generator,
++    EntityTypeManagerInterface $entity_type_manager,
++    CurrentRouteMatch $current_route_match) {
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+     $this->csrfTokenGenerator = $csrf_token_generator;
++    $this->entityTypeManager = $entity_type_manager;
++    $this->currentRouteMatch = $current_route_match;
+@@ public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+-      $plugin_id,
+-      $plugin_definition,
+-      $container->get('csrf_token')
++      $plugin_id,
++      $plugin_definition,
++      $container->get('csrf_token'),
++      $container->get('entity_type.manager'),
++      $container->get('current_route_match')
+@@ public function getDynamicPluginConfig(EditorInterface $editor): array {
++    $opener_parameters = ['entity_type_id' => '', 'entity_bundle' => ''];
++    foreach ($this->currentRouteMatch->getParameters()->all() as $parameter) {
++      if ($parameter instanceof ContentEntityInterface) {
++        $opener_parameters['entity_type_id'] = $parameter->getEntityTypeId();
++        $opener_parameters['entity_bundle'] = $parameter->bundle();
++        break;
++      }
++    }
+     $dynamic_plugin_config['embeddedParagraph'] = [
+       'buttons' => $buttons,
+       'dialogSettings' => [
+         'minHeight' => '75%',
+         'maxHeight' => 'none',
+       ],
++      'openerParameters' => http_build_query($opener_parameters),
+       'previewCsrfToken' => $this->csrfTokenGenerator->get('X-Drupal-EmbedPreview-CSRF-Token'),
+     ];
+diff --git a/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js b/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
+index 5d5043a..9a1b3c6 100644
+--- a/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
++++ b/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
+@@ class ParagraphsEmbedUI extends Plugin {
+         this.listenTo(buttonView, 'execute', () => {
+-          const libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
++          let libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
++
++          if (options.hasOwnProperty('openerParameters')) {
++            libraryURL += '?' + options.openerParameters;
++          }
+
+
+ 
