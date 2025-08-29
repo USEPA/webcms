@@ -75,18 +75,6 @@ index 055e653..1360eb9 100644
 +      'openerParameters' => http_build_query($opener_parameters),
        'previewCsrfToken' => $this->csrfTokenGenerator->get('X-Drupal-EmbedPreview-CSRF-Token'),
      ];
-diff --git a/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js b/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
-index 5d5043a..9a1b3c6 100644
---- a/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
-+++ b/js/ckeditor5_plugins/embedParagraph/src/paragraphsembedui.js
-@@ class ParagraphsEmbedUI extends Plugin {
-         this.listenTo(buttonView, 'execute', () => {
--          const libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
-+          let libraryURL = this._getCurrentLibraryUrl(options) || Drupal.url('paragraph-embed/dialog/' + options.format + '/' + id);
-+
-+          if (options.hasOwnProperty('openerParameters')) {
-+            libraryURL += '?' + options.openerParameters;
-+          }
 
 
  
