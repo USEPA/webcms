@@ -748,7 +748,7 @@ deploy:dev:init:en:
   extends: .deploy
   stage: deploy:dev:init:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_LANG: en
@@ -775,7 +775,7 @@ deploy:dev:validate:en:
   extends: .deploy
   stage: deploy:dev:validate:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -794,7 +794,7 @@ deploy:dev:plan-en:
   extends: .deploy
   stage: deploy:dev:plan:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -869,7 +869,7 @@ deploy:dev:apply-en:
       when: manual
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success
 
     - when: never
@@ -1169,7 +1169,7 @@ update:dev:en:
   extends: .update
   stage: update:en
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
