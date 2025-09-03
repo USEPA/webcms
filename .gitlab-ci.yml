@@ -173,8 +173,6 @@ include:
 
     - when: never
 
-
-
 # Jobs defined in this section are template jobs (the leading dot tells GitLab to
 # unconditionally ignore them when assembling a pipeline graph). The templates are named
 # after the stage in which they execute, and serve as central locations for the
@@ -638,29 +636,6 @@ infrastructure:preproduction:apply:
   environment:
     name: infra/preproduction
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 deploy:dev:init:en:
   extends: .deploy
   stage: deploy:dev:init:en
@@ -793,12 +768,6 @@ deploy:dev:apply:en:
 
 
 #endregion
-
-
-
-
-
-
 
 .deploy:stage:init:
   extends: .deploy
@@ -936,14 +905,6 @@ deploy:dev:apply:en:
 
 #endregion
 
-
-
-
-
-
-
-
-
 update:dev:en:
   extends: .update
   stage: update:en
@@ -983,4 +944,3 @@ Artifacts:
       - ./ci
       - ./terraform/infrastructure
       - ./terraform/webcms
-
