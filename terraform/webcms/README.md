@@ -93,7 +93,7 @@ These values customize the Drupal ECS service's behavior. For instance, it deter
 - `drupal_min_capacity`: The minimum number of ECS tasks to run for Drupal. While this value defaults to 1, production deployments should use a larger value in order to supply high availability even during low-traffic scenarios.
 - `drupal_max_capacity`: The maximum number of ECS tasks to run for Drupal. This value is only limited by AWS service quotas (and your budget); plan for low values (e.g., 5) for dev environments and large (e.g., 30 or more) for production-ready deployments. Autoscaling rules will ensure this value is only used when demand requires it.
 - `drupal_csrf_origin_whitelist`: This is an optional list of origins provided to [Security Kit](https://www.drupal.org/project/seckit)'s `seckit_csrf.origin_whitelist` configuration. Security Kit checks this list when non-idemptotent (e.g., POST, PUT, DELETE, etc.) requests are sent. If the requesting origin isn't in the list (or is absent entirely), the request is rejected. Note that the value of `var.drupal_hostname` is implicitly added to this list by the module and does not need to be added manually.
-- `drupal_state`: This value exists to work around a chicken-and-egg problem when deploying Drupal for the first time. This value _must_ be one of `"run"` or `"build"`. See the next section for how these influence Drupal's behavior.
+- `drupal_state`: This value exists to work around a chicken-and-egg problem when deploying Drupal for the first time. This value _must_ be one of `"run"` or `"build"` or `"migration"`. See the next section for how these influence Drupal's behavior.
 
 ##### The `drupal_state` Variable
 
@@ -103,6 +103,7 @@ However, there is a catch to this. We cannot unconditionally enable the memcache
 
 - When the value of `drupal_state` is `"build"`, the `settings.php` file will not override Drupal's default cache. This allows an administrator to either install Drupal normally or load a database dump.
 - When the value is `"run"`, Drupal will be told to use memcached.
+- When the value is `"migration"` Drupal will circumvent several workflow automated processes from occurring (automated unpublishing). This was necessary for both running the D7->D8 migration, but is also useful for running the Snapshot as this saves us from using extra resources that aren't necessary.
 
 Note that while it is always safe to keep `drupal_state` in `"build"`, this will cause performance degradation and is **not** recommended for any environment. Once the WebCMS has been installed, set this value to `"run"` and leave it there, except in cicumstances where Drupal needs to be reinstalled or otherwise reinitialized.
 
