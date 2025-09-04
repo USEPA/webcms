@@ -10,7 +10,7 @@ variable "aws_region" {
 #region AWS ID variables
 
 variable "cloudfront_distributionid" {
-  description = "Cloudfront distribution ID to use"
+  description = "Cloudfront distribution ID to use. Set to empty string to disable CloudFront."
   type        = string
   default     = ""
 }
