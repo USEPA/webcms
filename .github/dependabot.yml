@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "composer" # This is the entry for your main composer.json.
+    assignees:
+      - "cherrypj" # Replace with your GitHub username
+    directory: "/services/drupal"
+    schedule:
+      interval: "weekly"
+    ignore:
+      - dependency-name: "drupal/core*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      drupal-core:
+        patterns:
+          - "drupal/core"
+          - "drupal/core-composer-scaffold"
+          - "drupal/core-recommended"
+          - "drupal/core-dev"
+    labels:
+      - "dependencies"
+      - "composer"
+      - "automated" 

@@ -4,18 +4,15 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_slider_caption
+    - filter.format.restricted_html
     - paragraphs.paragraphs_type.before_after_swipe_component
   module:
-    - allowed_formats
     - custom_add_another
     - text
 third_party_settings:
   custom_add_another:
     custom_add_another: ''
     custom_remove: ''
-  allowed_formats:
-    allowed_formats:
-      - restricted_html
 id: paragraph.before_after_swipe_component.field_slider_caption
 field_name: field_slider_caption
 entity_type: paragraph
@@ -26,5 +23,7 @@ required: false
 translatable: false
 default_value: {  }
 default_value_callback: ''
-settings: {  }
+settings:
+  allowed_formats:
+    - restricted_html
 field_type: text
