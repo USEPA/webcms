@@ -5,10 +5,13 @@
  * Contains epa_wysiwyg.module.
  */
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\file\IconMimeTypes;
 
 /**
  * Implements hook_library_info_alter().
@@ -87,13 +90,15 @@ function template_preprocess_epa_file_link(&$variables) {
     // Add a specific class for each and every mime type.
     'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
     // Add a more general class for groups of well known MIME types.
-    'file--' . file_icon_class($mime_type),
+    // Drupal Rector fix, 12 Sep 2025
+    'file--' . DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '10.3.0', fn() => IconMimeTypes::getIconClass($mime_type), fn() => file_icon_class($mime_type)),
   ];
 
   // Set file classes to the options array.
   $variables['attributes'] = new Attribute($variables['attributes']);
   $variables['attributes']->addClass($classes);
-  $variables['file_size'] = format_size($file->getSize());
+  // Drupal Rector fix, 12 Sep 2025
+  $variables['file_size'] = DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '10.2.0', fn() => ByteSizeMarkup::create($file->getSize()), fn() => format_size($file->getSize()));
   $variables['url'] = Url::fromUri($url, $options);
   $variables['link'] = Link::fromTextAndUrl($variables['link_text'], $variables['url'])->toRenderable();
 }
