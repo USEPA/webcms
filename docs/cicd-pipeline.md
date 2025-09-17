@@ -37,7 +37,7 @@ build:metrics:dev:
 deploy:dev:init:en:
   stage: deploy:dev:init:en
   variables:
-    WEBCMS_LANG: en
+    WEBCMS_LANG: en          # Development only supports English
     WEBCMS_SITE: dev
     WEBCMS_ENVIRONMENT: preproduction
 
@@ -53,7 +53,7 @@ deploy:dev:apply:en:
 
 update:dev:en:
   stage: update:en
-  runs: Drush database updates
+  runs: Drush database updates (English only in dev)
 ```
 
 ### Live Branch (`live`)
@@ -65,6 +65,19 @@ infrastructure:preproduction:*:
   rules: [live branch]
   when: manual
   manages: AWS infrastructure resources
+```
+
+#### Staging Deployment Jobs (Both Languages)
+
+```yaml
+deploy:stage:*:
+  parallel:
+    matrix:
+      - WEBCMS_LANG: [en, es]  # Spanish support available in staging
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: stage
+  when: manual
 ```
 
 #### Image Mirror/Supporting Jobs
