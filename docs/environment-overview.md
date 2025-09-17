@@ -3,6 +3,7 @@
 ## Model
 
 The WebCMS deployment model uses a three-level hierarchy:
+
 - Environment: preproduction, production
 - Site: dev | stage | main | live (site varies by branch/job)
 - Language: en, es

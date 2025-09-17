@@ -17,6 +17,7 @@ The GitLab CI/CD pipeline automates building, testing, and deploying the WebCMS 
 ### Development Branch (`development`)
 
 #### Docker Build Jobs
+
 ```yaml
 build:drupal:
   rules: [development branch]
@@ -31,6 +32,7 @@ build:metrics:dev:
 ```
 
 #### Deployment Jobs
+
 ```yaml
 deploy:dev:init:en:
   stage: deploy:dev:init:en
@@ -57,6 +59,7 @@ update:dev:en:
 ### Live Branch (`live`)
 
 #### Infrastructure Jobs
+
 ```yaml
 infrastructure:preproduction:*:
   rules: [live branch]
@@ -65,6 +68,7 @@ infrastructure:preproduction:*:
 ```
 
 #### Image Mirror/Supporting Jobs
+
 ```yaml
 .copy:cloudwatch:dev:
   mirrors: Amazon CloudWatch agent
@@ -76,6 +80,7 @@ infrastructure:preproduction:*:
 ## Pipeline Flow
 
 ### Development Deployment Flow
+
 ```
 1. Push to development branch
          ↓
@@ -95,6 +100,7 @@ infrastructure:preproduction:*:
 ```
 
 ### Infrastructure Deployment Flow
+
 ```
 1. Push to live branch
          ↓
@@ -110,16 +116,19 @@ infrastructure:preproduction:*:
 ## Templates and Conventions
 
 ### `.terraform` Template
+
 - Base template for all Terraform jobs
 - Sets up Terraform environment and variables
 - Handles backend configuration and tfvars
 
 ### `.kaniko` Template  
+
 - Base template for Docker builds
 - Configures Kaniko executor with ECR credentials
 - Provides caching optimization
 
 ### `.deploy` Template
+
 - Extends `.terraform` for deployment jobs
 - Sets `TF_MODULE: webcms`
 - Configures state addressing and resource_group to serialize per site/lang
@@ -127,6 +136,7 @@ infrastructure:preproduction:*:
 ## Rules and Triggers
 
 ### Automatic Deployment Rules
+
 ```yaml
 .apply:
   rules:
@@ -139,6 +149,7 @@ infrastructure:preproduction:*:
 ```
 
 ### Manual Deployment Rules  
+
 ```yaml
 .apply:
   rules:
@@ -149,13 +160,16 @@ infrastructure:preproduction:*:
 ```
 
 ## Environments and Concurrency
+
 - GitLab Environments track infra (infra/preproduction) and sites (site/dev-en)
 - `resource_group` keys (e.g., site/dev-en) prevent overlapping Terraform applies per site/lang
 
 ## Security and Scanning
+
 - SAST, Dependency Scanning, and Secret Detection templates included
 - IAM permissions scoped via AssumeRole providers per module
 
 ## Artifacts and State
+
 - Terraform plan.json is published as a GitLab artifact
 - State stored in S3 with DynamoDB locks; backends and providers injected during job setup

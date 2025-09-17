@@ -317,6 +317,7 @@ ddev restart
 ## Additional Resources
 
 - **Terraform Infrastructure**: [terraform/README.md](terraform/README.md)
+- **Documentation**: [docs/README.md](docs/README.md)
 - **CI/CD Documentation**: [docs/cicd-pipeline.md](docs/cicd-pipeline.md)
 - **Deployment Guide**: [docs/deployment-guide.md](docs/deployment-guide.md)
 - **Environment Overview**: [docs/environment-overview.md](docs/environment-overview.md)

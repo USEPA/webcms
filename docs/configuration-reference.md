@@ -18,6 +18,7 @@ This document provides a comprehensive reference for all configuration variables
 ### Environment-Specific Variables
 
 #### Development Environment
+
 ```yaml
 WEBCMS_SITE: dev
 WEBCMS_LANG: en
@@ -26,6 +27,7 @@ WEBCMS_TARGET: [drupal, nginx, drush]
 ```
 
 #### Production Environment
+
 ```yaml
 WEBCMS_SITE: prod
 WEBCMS_LANG: [en, es, fr]
@@ -54,6 +56,7 @@ WEBCMS_TARGET: [drupal, nginx, drush]
 ### Kubernetes Resources
 
 #### Namespace Naming
+
 - **Pattern**: `webcms-{site}-{lang}`
 - **Examples**:
   - `webcms-dev-en` (development)
@@ -61,6 +64,7 @@ WEBCMS_TARGET: [drupal, nginx, drush]
   - `webcms-prod-es` (production Spanish)
 
 #### Deployment Naming
+
 - **Pattern**: `{service}-{site}-{lang}`
 - **Examples**:
   - `drupal-dev-en`
@@ -70,6 +74,7 @@ WEBCMS_TARGET: [drupal, nginx, drush]
 ### Terraform State
 
 #### State Key Naming
+
 - **Pattern**: `{site}-webcms-{lang}`
 - **Examples**:
   - `dev-webcms-en.tfstate`
@@ -77,6 +82,7 @@ WEBCMS_TARGET: [drupal, nginx, drush]
   - `staging-webcms-fr.tfstate`
 
 #### State Backend Configuration
+
 ```hcl
 terraform {
   backend "s3" {
@@ -92,12 +98,14 @@ terraform {
 ### AWS Resources
 
 #### EKS Cluster Naming
+
 - **Pattern**: `webcms-{environment}-{purpose}`
 - **Examples**:
   - `webcms-preproduction-dev-cluster`
   - `webcms-production-cluster`
 
 #### ECR Repository Naming
+
 - **Pattern**: `webcms-{environment}-{service}`
 - **Examples**:
   - `webcms-preproduction-drupal`
@@ -105,12 +113,14 @@ terraform {
   - `webcms-preproduction-metrics`
 
 #### RDS Instance Naming
+
 - **Pattern**: `webcms-{environment}-{lang}-db`
 - **Examples**:
   - `webcms-preproduction-en-db`
   - `webcms-production-en-db`
 
 #### S3 Bucket Naming
+
 - **Pattern**: `webcms-{environment}-{purpose}`
 - **Examples**:
   - `webcms-preproduction-assets`
@@ -122,6 +132,7 @@ terraform {
 ### Drupal Settings
 
 #### Database Configuration
+
 ```php
 $databases['default']['default'] = [
   'database' => getenv('DB_NAME'),
@@ -135,6 +146,7 @@ $databases['default']['default'] = [
 ```
 
 #### Cache Configuration
+
 ```php
 $settings['cache']['default'] = 'cache.backend.redis';
 $settings['redis.connection']['host'] = getenv('REDIS_HOST');
@@ -142,6 +154,7 @@ $settings['redis.connection']['port'] = getenv('REDIS_PORT') ?: '6379';
 ```
 
 #### CloudFront Configuration
+
 ```php
 // CloudFront distribution ID for cache invalidation
 $settings['aws.distributionid'] = getenv('WEBCMS_CF_DISTRIBUTIONID');
@@ -151,6 +164,7 @@ $config['cloudfront_cache_path_invalidate.settings']['distribution_id'] = getenv
 ```
 
 **Environment-Specific CloudFront Settings:**
+
 - **Development**: `WEBCMS_CF_DISTRIBUTIONID=""` (disabled)
 - **Staging**: `WEBCMS_CF_DISTRIBUTIONID="E1A2B3C4D5E6F7"` (staging distribution)
 - **Production**: `WEBCMS_CF_DISTRIBUTIONID="E7F6E5D4C3B2A1"` (production distribution)
@@ -158,6 +172,7 @@ $config['cloudfront_cache_path_invalidate.settings']['distribution_id'] = getenv
 ### Environment Variables
 
 #### Required Environment Variables
+
 ```bash
 # Database
 DB_HOST=webcms-dev-en-db.cluster-xyz.us-east-1.rds.amazonaws.com
@@ -183,6 +198,7 @@ S3_REGION=us-east-1
 ### Docker Image Tags
 
 #### Tagging Strategy
+
 - **Format**: `{branch}-{commit_sha}`
 - **Examples**:
   - `development-a1b2c3d4`
@@ -190,6 +206,7 @@ S3_REGION=us-east-1
   - `main-m5n4o3p2`
 
 #### Multi-Region Tagging
+
 ```bash
 # Primary region (us-east-1)
 ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/webcms-preproduction-drupal:development-a1b2c3d4
@@ -201,6 +218,7 @@ ${AWS_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com/webcms-preproduction-drupal:devel
 ### Kubernetes Deployment Configuration
 
 #### Resource Limits
+
 ```yaml
 resources:
   requests:
@@ -212,6 +230,7 @@ resources:
 ```
 
 #### Health Checks
+
 ```yaml
 livenessProbe:
   httpGet:
@@ -275,6 +294,7 @@ variable "image_tag" {
 ## Network Configuration
 
 ### VPC Configuration
+
 - **CIDR Block**: `10.0.0.0/16`
 - **Public Subnets**: `10.0.1.0/24`, `10.0.2.0/24`
 - **Private Subnets**: `10.0.10.0/24`, `10.0.20.0/24`
@@ -283,6 +303,7 @@ variable "image_tag" {
 ### Security Groups
 
 #### EKS Node Group
+
 ```hcl
 ingress {
   from_port   = 443
@@ -300,6 +321,7 @@ ingress {
 ```
 
 #### RDS Database
+
 ```hcl
 ingress {
   from_port       = 3306
@@ -312,6 +334,7 @@ ingress {
 ## Monitoring Configuration
 
 ### CloudWatch Metrics
+
 - **Namespace**: `WebCMS/{environment}`
 - **Metrics**:
   - `drupal.response_time`
@@ -320,6 +343,7 @@ ingress {
   - `kubernetes.pod_memory_usage`
 
 ### New Relic Configuration
+
 ```yaml
 newrelic:
   license_key: ${NEW_RELIC_LICENSE_KEY}
@@ -333,6 +357,7 @@ newrelic:
 ### IAM Roles
 
 #### EKS Service Role
+
 ```json
 {
   "Version": "2012-10-17",
@@ -349,6 +374,7 @@ newrelic:
 ```
 
 #### Node Group Instance Role
+
 ```json
 {
   "Version": "2012-10-17",
@@ -367,6 +393,7 @@ newrelic:
 ### RBAC Configuration
 
 #### Service Account
+
 ```yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -380,11 +407,13 @@ metadata:
 ## Backup Configuration
 
 ### Database Backups
+
 - **Schedule**: Daily at 2:00 AM UTC
 - **Retention**: 7 days for development, 30 days for production
 - **Location**: S3 bucket `webcms-{environment}-backups`
 
 ### Application Backups
+
 - **Files**: Drupal uploaded files
 - **Schedule**: Daily at 3:00 AM UTC
 - **Location**: S3 bucket with versioning enabled

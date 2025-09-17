@@ -28,6 +28,7 @@ Note: CI/CD is GitLab; monitoring is AWS-native irrespective of CI.
 - Use CloudWatch dashboards for quick triage
 
 ## Key Metrics to Watch
+
 - Application error rate (from logs)
 - ALB 4xx/5xx rates
 - Task CPU/Memory utilization (Container Insights)
@@ -45,6 +46,7 @@ If using APM (e.g., New Relic), configure via environment variables or ini files
 ## Logs Insights Examples
 
 Error analysis:
+
 ```sql
 fields @timestamp, @message, @logStream
 | filter @message like /ERROR|CRITICAL/
@@ -53,6 +55,7 @@ fields @timestamp, @message, @logStream
 ```
 
 Latency analysis (if logged):
+
 ```sql
 fields @timestamp, @message
 | filter @message like /response_time/
@@ -82,6 +85,7 @@ fields @timestamp, @message
 
 **Alert**: Error rate > 5%
 **Investigation Steps**:
+
 1. Check error logs in CloudWatch
 2. Review New Relic error analytics
 3. Check database connectivity
@@ -89,6 +93,7 @@ fields @timestamp, @message
 5. Review recent configuration changes
 
 **Resolution Actions**:
+
 - Fix application bugs
 - Restore database connectivity
 - Rollback problematic deployments
@@ -98,6 +103,7 @@ fields @timestamp, @message
 
 **Alert**: Memory usage > 80%
 **Investigation Steps**:
+
 1. Check pod resource usage
 2. Review memory allocation patterns
 3. Check for memory leaks
@@ -105,6 +111,7 @@ fields @timestamp, @message
 5. Review application memory usage
 
 **Resolution Actions**:
+
 - Increase memory limits
 - Scale pods horizontally
 - Optimize application memory usage
@@ -113,24 +120,28 @@ fields @timestamp, @message
 ## Monitoring Best Practices
 
 ### Metric Collection
+
 - Use consistent naming conventions
 - Tag resources appropriately
 - Set appropriate collection intervals
 - Monitor both system and business metrics
 
 ### Alerting
+
 - Set meaningful thresholds
 - Use multiple evaluation periods
 - Configure appropriate notification channels
 - Include context in alert messages
 
 ### Log Management
+
 - Use structured logging
 - Include correlation IDs
 - Set appropriate retention periods
 - Implement log sampling for high-volume environments
 
 ### Dashboard Design
+
 - Focus on key metrics
 - Use meaningful visualizations
 - Include trend analysis
@@ -139,18 +150,21 @@ fields @timestamp, @message
 ## Maintenance Tasks
 
 ### Daily Tasks
+
 - Review alert notifications
 - Check dashboard health
 - Monitor resource usage trends
 - Verify backup completion
 
 ### Weekly Tasks  
+
 - Review log retention policies
 - Analyze performance trends
 - Update monitoring configurations
 - Test alert mechanisms
 
 ### Monthly Tasks
+
 - Review and optimize dashboards
 - Update monitoring documentation
 - Analyze cost optimization opportunities
