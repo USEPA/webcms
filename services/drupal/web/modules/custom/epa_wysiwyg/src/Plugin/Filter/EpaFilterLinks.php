@@ -2,10 +2,12 @@
 
 namespace Drupal\epa_wysiwyg\Plugin\Filter;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Utility\Error;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Plugin\FilterBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -121,7 +123,8 @@ class EpaFilterLinks extends FilterBase implements ContainerFactoryPluginInterfa
         }
       }
       catch (\Exception $e) {
-        watchdog_exception('epa_filter_links', $e);
+        // Drupal Rector fix, 12 Sep 2025
+        DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '10.1.0', fn() => Error::logException(\Drupal::logger('epa_filter_links'), $e), fn() => watchdog_exception('epa_filter_links', $e));
       }
     }
 
