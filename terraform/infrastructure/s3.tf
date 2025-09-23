@@ -48,6 +48,12 @@ resource "aws_s3_bucket" "uploads" {
     }
   }
 
+  # Ignore tag changes to avoid s3:PutBucketTagging permission issues
+  # TODO: Remove this lifecycle block once GitLab runner role has s3:PutBucketTagging permission
+  lifecycle {
+    ignore_changes = [tags, tags_all]
+  }
+
   # tags = var.tags
 }
 
@@ -95,6 +101,12 @@ resource "aws_s3_bucket" "elb_logs" {
         sse_algorithm = "AES256"
       }
     }
+  }
+
+  # Ignore tag changes to avoid s3:PutBucketTagging permission issues
+  # TODO: Remove this lifecycle block once GitLab runner role has s3:PutBucketTagging permission
+  lifecycle {
+    ignore_changes = [tags, tags_all]
   }
 
   # tags = var.tags
