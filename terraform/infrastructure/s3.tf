@@ -48,7 +48,7 @@ resource "aws_s3_bucket" "uploads" {
     }
   }
 
-  tags = var.tags
+  # tags = var.tags
 }
 
 # This policy allows anonymous reads to the /files/ prefix of the uploads bucket, which
@@ -97,7 +97,7 @@ resource "aws_s3_bucket" "elb_logs" {
     }
   }
 
-  tags = var.tags
+  # tags = var.tags
 }
 
 # Don't allow any public access to the ELB logging bucket
