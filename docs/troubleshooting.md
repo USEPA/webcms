@@ -7,14 +7,17 @@ Common issues and resolutions for the WebCMS CI/CD and runtime on GitLab + ECS.
 ## Pipeline Issues (GitLab)
 
 ### Image builds (Kaniko)
+
 - ECR auth failures: Ensure runner IAM role has ECR push permissions; verify repository exists
 - Insufficient disk: Check runner host disk utilization; prune caches if needed
 
 ### Terraform
+
 - State lock errors: Confirm no concurrent apply; unlock via DynamoDB only if safe
 - Provider auth: Verify AssumeRole config from SSM providers parameter
 
 ### Drush Steps
+
 - Task fails: Review CloudWatch log stream for the Drush ECS task
 - Re-run: Retry the update job (e.g., update:dev:en) in GitLab
 
@@ -61,15 +64,20 @@ Common issues and resolutions for the WebCMS CI/CD and runtime on GitLab + ECS.
 ## Useful AWS CLI Commands
 
 - Check ECS service events:
+
 ```bash
 aws ecs describe-services --cluster webcms-preproduction --services WebCMS-preproduction-dev-en
 ```
+
 - Describe tasks:
+
 ```bash
 aws ecs list-tasks --cluster webcms-preproduction --service-name WebCMS-preproduction-dev-en
 aws ecs describe-tasks --cluster webcms-preproduction --tasks <task-arn>
 ```
+
 - ALB target health:
+
 ```bash
 aws elbv2 describe-target-health --target-group-arn <arn>
 ```
