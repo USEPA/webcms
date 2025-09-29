@@ -66,7 +66,7 @@ The EPA WebCMS is a Drupal 10-based content management system for EPA.gov that u
    ddev drush user:unblock drupalwebcms-admin
    ```
 
-10. **Access Site**: Visit https://epa.ddev.site
+10. **Access Site**: Visit <https://epa.ddev.site>
 
 ## Spanish Site Configuration
 
@@ -75,11 +75,13 @@ The WebCMS supports both English and Spanish language variants with different de
 ### Environment-Specific Language Support
 
 **Development Environment (`development` branch):**
+
 - ⚠️ **English Only** - Spanish site is not deployed in dev environment
 - Only `WEBCMS_LANG=en` is configured for development deployments
 - Local development can simulate Spanish site using environment variables
 
 **Staging Environment (`live` branch):**
+
 - ✅ **Both English and Spanish** - Full multilingual deployment
 - Parallel deployment jobs for `WEBCMS_LANG: [en, es]`
 - Complete staging environment testing for both languages
@@ -87,34 +89,39 @@ The WebCMS supports both English and Spanish language variants with different de
 ### Setting Up Spanish Site Locally (Development/Testing)
 
 1. **Configure Language Environment Variable:**
+
    ```bash
    # In your .env file (for local testing)
    WEBCMS_LANG=es
    ```
 
 2. **Import Spanish Database** (if available):
+
    ```bash
    # Import Spanish-specific database dump
    ddev import-db --file=path/to/spanish_backup.sql.gz
    ```
 
 3. **Access Sites:**
-   - English site: https://epa.ddev.site
+   - English site: <https://epa.ddev.site>
    - Spanish site (local simulation): Configure via environment variables
 
 ### Language-Specific Configuration Differences
 
 **Database Differences:**
+
 - Spanish site uses separate deployment with `stage-webcms-es` state
 - Content translations managed through Drupal's multilingual system
 - Language-specific content types and fields
 
 **Theme Differences:**
+
 - Language-specific CSS and styling adjustments
 - Locale-specific date/number formatting
 - Spanish typography and spacing considerations
 
 **Content Management:**
+
 - Translation workflows for content moderation
 - Language-specific taxonomy terms
 - Multilingual menu structures
@@ -122,6 +129,7 @@ The WebCMS supports both English and Spanish language variants with different de
 ### Deployment Architecture
 
 **CI/CD Pipeline Structure:**
+
 ```yaml
 # Development (development branch) - English Only
 deploy:dev:*:en:
@@ -137,6 +145,7 @@ deploy:stage:*:
 ```
 
 **Resource Naming:**
+
 - English dev: `site/dev-en`
 - Spanish staging: `site/stage-es`
 - English staging: `site/stage-en`
@@ -146,6 +155,7 @@ deploy:stage:*:
 Since Spanish site is not deployed in dev environment:
 
 1. **Local Environment Testing:**
+
    ```bash
    # Test Spanish language features locally
    WEBCMS_LANG=es ddev gesso build
@@ -163,6 +173,7 @@ Since Spanish site is not deployed in dev environment:
 **Note:** Spanish troubleshooting primarily applies to staging/production environments.
 
 1. **Missing Spanish Content:**
+
    ```bash
    # Check language configuration (staging/prod only)
    drush config:get language.negotiation
@@ -172,6 +183,7 @@ Since Spanish site is not deployed in dev environment:
    ```
 
 2. **Translation Interface Problems:**
+
    ```bash
    # Clear translation caches
    drush locale:clear-cache
@@ -181,6 +193,7 @@ Since Spanish site is not deployed in dev environment:
    ```
 
 3. **Deployment Issues:**
+
    ```bash
    # Check Spanish deployment status (staging)
    aws ecs describe-services --cluster webcms-preproduction --services WebCMS-preproduction-stage-es
