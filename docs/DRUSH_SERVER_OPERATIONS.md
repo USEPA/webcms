@@ -51,11 +51,11 @@ The system is designed for **security, automation, and scalability** rather than
   - [Production](#production-environment-prod): `webcms-production-prod-en-drush`, `webcms-production-prod-es-drush`
 
 - Primary site URLs:
-  - [Development (EN)](#development-environment-dev): https://dev-www.epa.gov
-  - [Staging (EN)](#staging-environment-stage): https://stage-www.epa.gov
-  - [Staging (ES)](#staging-environment-stage): https://stage-espanol.epa.gov/
-  - [Production (EN)](#production-environment-prod): https://www.epa.gov
-  - [Production (ES)](#production-environment-prod): https://espanol.epa.gov/
+  - [Development (EN)](#development-environment-dev): <https://dev-www.epa.gov>
+  - [Staging (EN)](#staging-environment-stage): <https://stage-www.epa.gov>
+  - [Staging (ES)](#staging-environment-stage): <https://stage-espanol.epa.gov/>
+  - [Production (EN)](#production-environment-prod): <https://www.epa.gov>
+  - [Production (ES)](#production-environment-prod): <https://espanol.epa.gov/>
 
 ---
 
@@ -73,6 +73,7 @@ The GitLab CI/CD pipeline automatically runs Drush commands after successful dep
 | `live` | Staging | After successful deployment (manual trigger) |
 
 Note on languages:
+
 - Development environment: English (`en`) only; Spanish (`es`) is not deployed.
 - Staging and Production: English (`en`) and Spanish (`es`) run in parallel.
 
@@ -301,9 +302,11 @@ This method allows you to run Drush commands directly through the AWS Management
 2. **Find the "drupal" container** (not "drush" - this is the container name within the task)
 3. **Click on the "drupal" container** to expand its override options
 4. **In the "Command override" field**, enter your Drush command with the following format:
-   ```
+
+   ```command
    drush,--uri=$WEBCMS_SITE_URL,your-command,--option1,value1,--option2
    ```
+
    **Important**: Use **commas instead of spaces** to separate command parts
 
 ##### 7. Example Commands
@@ -362,18 +365,21 @@ This method allows you to run Drush commands directly through the AWS Management
 ##### Troubleshooting Web Interface Issues
 
 **Task Fails to Start:**
+
 - Verify correct task definition is selected
 - Check that app subnets are selected (not public/db subnets)
 - Ensure security group allows database connectivity
 - Confirm IAM permissions for task execution role
 
 **Command Fails:**
+
 - Check command formatting (commas instead of spaces)
 - Verify Drush command syntax is correct
 - Review CloudWatch logs for specific error messages
 - Ensure site URL environment variable is properly set
 
 **No Output/Logs:**
+
 - Wait for task to fully start (can take 1-2 minutes)
 - Check CloudWatch log group permissions
 - Verify log group exists for the environment/language combination
@@ -407,7 +413,7 @@ This method allows you to run Drush commands directly through the AWS Management
 ### AWS Console Access
 
 - **Purpose**: View CloudWatch logs, ECS task status, execute Drush tasks via web interface
-- **Required Roles**: 
+- **Required Roles**:
   - **Preproduction/Staging**: `www-dev` role
   - **Production**: `www-prod` role
 - **Permissions**: Read/write access to ECS services, CloudWatch, task execution
