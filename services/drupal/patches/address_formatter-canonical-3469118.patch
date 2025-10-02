@@ -1,0 +1,19 @@
+diff --git a/address_formatter.routing.yml b/address_formatter.routing.yml
+index 01d01ef..fe9b0d3 100644
+--- a/address_formatter.routing.yml
++++ b/address_formatter.routing.yml
+@@ -57,3 +57,13 @@ entity.address_formatter.disable:
+     _permission: 'administer address formatter'
+   options:
+     _admin_route: TRUE
++
++entity.address_formatter.canonical:
++  path: '/admin/config/address-formatter/{address_formatter}'
++  defaults:
++    _entity_form: 'address_formatter.edit'
++    _title: 'Edit options'
++  requirements:
++    _permission: 'administer address formatter'
++  options:
++    _admin_route: TRUE
+\ No newline at end of file
