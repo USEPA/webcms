@@ -71,13 +71,19 @@ This module defines the WebCMS' minimum VPC requirements. As mentioned in the RE
 
 **Directory:** [`infrastructure`](infrastructure) ([README](infrastructure/README.md))
 
-This module defines the WebCMS' infrastructure. This module defines environment-wide storage resources such as Aurora and Elasticache clusters, compute resources such as an ECS cluster, and some site- and language-specific resources such as CloudWatch log groups and Secrets Manager secrets.
+This module defines the WebCMS' infrastructure. This module defines environment-wide storage resources such as Elasticache clusters, compute resources such as an ECS cluster, and some site- and language-specific resources such as CloudWatch log groups and Secrets Manager secrets. **Note**: This module does NOT create the Aurora database cluster - it expects a pre-existing Aurora cluster to be provided via the `regional_cluster_endpoint` variable.
 
-### Database Initialization
+### Database Prerequisites
 
-**Directory:** [`database`](database) ([README](database/README.md))
+**Important**: The Aurora MySQL cluster must be created and configured **before** running the infrastructure module. This repository does not contain Terraform code to create the Aurora cluster itself.
 
-This module is a special database initialization module. Instead of defining an EC2-based infrastructure separate from the WebCMS' Fargate-based compute system, we instead define a Terraform module that can be run in a container to set up usernames and password for Drupal. This needs to be run in a container since it must be run inside the environment's VPC - it has to send SQL queries to the Aurora cluster, which does not have a publicly-accessible IP address. This module creates strong, random passwords for each site and language's user, and updates both the database and Secrets Manager with this information.
+**Requirements for the external Aurora cluster:**
+- Must be MySQL-compatible Aurora cluster
+- Must be accessible from the private subnets in the WebCMS VPC
+- Must have appropriate security group configuration to allow connections from the WebCMS security groups
+- The cluster endpoint must be provided via the `regional_cluster_endpoint` variable
+
+**Database Initialization**: After the Aurora cluster exists and the infrastructure module is deployed, database initialization (creating users, passwords, and Drupal-specific configuration) should be handled separately, typically through a containerized process that runs within the VPC to access the private Aurora cluster.
 
 ### WebCMS Application Deployment
 

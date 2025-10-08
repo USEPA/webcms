@@ -51,8 +51,10 @@ This module assumes two sets of subnets: private and public. The private subnets
 
 This module creates a number of security groups for the various resources in the VPC. A summary is below; see [security.tf](security.tf) for full details.
 
-- The Aurora cluster permits ingress from the RDS proxy and the Terraform startup task.
-- Elasticsearch, RDS proxy, and Elasticache permit ingress from Drupal tasks on their well-known ports (respectively: 443, 3306, and 11211).
+**Important**: The Aurora cluster itself is created externally, but this module creates the security group that should be applied to the external Aurora cluster.
+
+- The Aurora cluster security group permits ingress from Drupal tasks and database initialization processes on port 3306. This security group should be applied to the **external** Aurora cluster.
+- Elasticsearch and Elasticache permit ingress from Drupal tasks on their well-known ports (respectively: 443 and 11211).
 - The Drupal task permits ingress from the Traefik router service and from the ALB. The ALB is allowed access on ports 443 and 8080, the latter of which is the health check port.
 - Drupal is permitted egress on ports 80 and 443, as well as outbound SMTP. This reference module uses port 587, but the actual port may differ in other environments.
 - The ALB allows unlimited public ingress. Since the ALB is fronted by an NLB, the NLB forwards the IP address of the client connection.
