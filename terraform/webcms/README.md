@@ -52,7 +52,12 @@ The infrastructure module in [terraform/infrastructure](../infrastructure) needs
 
 ### Database
 
-Drupal cannot install to an empty database. We recommend the usage of the database module in [terraform/database](../database) to initialize usernames and passwords for a Drupal installation. Please see that module's [README](../database/README.md) for more information.
+Drupal cannot install to an empty database. The Aurora MySQL cluster must be created and configured **before** deploying this module. This includes:
+
+1. **Aurora Cluster**: Must exist externally (not created by WebCMS terraform modules)
+2. **Database Initialization**: Database users, passwords, and Drupal-specific databases must be created separately
+3. **Connectivity**: The Aurora cluster must be accessible from the WebCMS infrastructure via the `regional_cluster_endpoint` configured in the infrastructure module
+4. **Secrets**: Database credentials must be stored in AWS Secrets Manager at the expected paths (see Parameter Store section below)
 
 ### Terraform Backend
 
@@ -108,10 +113,10 @@ Note that while it is always safe to keep `drupal_state` in `"build"`, this will
 
 ##### Sensitive Values
 
-Database connection information is stored in Secrets Manager instead of being provided as plain text variables.
+Database connection information is stored in Secrets Manager instead of being provided as plain text variables. These secrets must be populated **before** deploying the WebCMS module, as they reference credentials for the external Aurora cluster.
 
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 8 database.
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database. While always set, this is only used in environments where a D7-to-D8 migration is run.
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 10 database on the external Aurora cluster.
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database on the external Aurora cluster. While always set, this is only used in environments where a D7-to-D10 migration is run.
 
 #### Email Variables
 
