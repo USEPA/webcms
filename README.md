@@ -415,7 +415,7 @@ services/drupal/web/
 graph TB
     CF[CloudFront CDN] --> ALB[Application Load Balancer]
     ALB --> ECS[ECS Fargate Tasks]
-    ECS --> RDS[(RDS Aurora MySQL)]
+    ECS --> RDS[("RDS Aurora MySQL<br/>(External Dependency)")]
     ECS --> S3[(S3 File Storage)]
     ECS --> ES[Elasticsearch Service]
     ECS --> EC[ElastiCache Memcached]
@@ -425,7 +425,12 @@ subgraph "CI/CD Pipeline"
         GL[GitLab CI] --> ECR[ECR Registry]
         ECR --> ECS
     end
+    
+    classDef external fill:#ffe6e6,stroke:#ff9999,stroke-width:2px
+    class RDS external
 ```
+
+**Important Note**: The Aurora MySQL database cluster is an **external dependency** that must be created and configured before deploying the WebCMS infrastructure. The Terraform modules in this repository do not create the Aurora cluster itself.
 
 ### Infrastructure Deployment Hierarchy
 
