@@ -24,13 +24,26 @@
 
 ## About
 
-This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 8 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before it can be deployed (see the next section).
+This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 10 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before it can be deployed (see the next section).
+
+**Important**: This module does **NOT** create the Aurora MySQL database cluster. The Aurora cluster must exist as an external dependency and its endpoint must be provided via the `regional_cluster_endpoint` variable.
 
 ## Prerequisites
 
 ### VPC
 
 This module assumes it will be deployed into a pre-existing VPC and will be the only module deployed into that VPC. The VPC must have, at a minimum, two types of subnets (public and private), and security groups for each of the deployed resources. We maintain a [reference module](../network) that shows an example set up, as well as the outputs it is expected to create (see [Parameter Store](#parameter-store) under "Module Inputs" below).
+
+### Aurora Database Cluster
+
+**Critical Prerequisite**: An Aurora MySQL cluster must be created and configured before deploying this infrastructure module. This module does not create the Aurora cluster itself.
+
+Requirements for the external Aurora cluster:
+- Must be MySQL-compatible Aurora cluster
+- Must be deployed in the same VPC's private subnets
+- Must be configured with appropriate security groups to allow connections from WebCMS components
+- Must be accessible via the endpoint provided in the `regional_cluster_endpoint` variable
+- Database users and permissions should be configured separately (typically via a containerized initialization process)
 
 ### TLS Certificates
 
@@ -58,10 +71,10 @@ This module expects inputs from two sources: Terraform variables and Parameter S
   - `lb_default_certificate`: The ARN of a certificate (in IAM or ACM) to attach to the load balancer.
   - `lb_extra_certificates`: An optional list of additional certificate ARNs to attach to the load balancer. This supports adding extra TLS authentication while not disrupting requests being sent to the NLB.
   - `lb_internal`: Whether or not this environment's NLB is internal. This should be `true` in ordinary AWS deployments, but can be `false` if there is some other public ingress to the WebCMS.
-- RDS & Aurora variables
-  - `db_instance_type`: A supported [instance type](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html) for the Aurora reader and writer instances.
-  - `db_instance_count`: Number of reader/writer instances. In a production environment, this should be greater than one in order to support fast failover.
-  - `regional_cluster_endpoint` : The regional Aurora endpoint that the application will point to
+- External Aurora cluster variables
+  - `db_instance_type`: **Legacy variable** - Not used by this module since Aurora cluster is external. Kept for compatibility.
+  - `db_instance_count`: **Legacy variable** - Not used by this module since Aurora cluster is external. Kept for compatibility.
+  - `regional_cluster_endpoint`: **REQUIRED** - The endpoint of the pre-existing Aurora cluster that this infrastructure will connect to. This cluster must be created separately before running this module.
 - Elasticsearch variables
   - `search_instance_type`: The [instance type](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-instance-types.html) of the Elasticsearch data nodes.
   - `search_instance_count`: The number of data nodes to deploy into the Elasticsearch cluster.
@@ -96,15 +109,17 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
 
 ### WebCMS Services
 
-The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 8 WebCMS. Most of the resources in this category are fairly straightforward:
+The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 10 WebCMS. Most of the resources in this category are fairly straightforward:
 
 - A pair of load balancers: an NLB and its [ALB target](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/application-load-balancer-target.html) ([load_balancer.tf](load_balancer.tf))
-- An Aurora cluster ([rds.tf](rds.tf))
+- Database supporting resources: subnet group and connection setup ([rds.tf](rds.tf)) - **Note: Aurora cluster itself is external**
 - An Elasticache cluster ([cache.tf](cache.tf))
 - An Elasticsearch domain ([search.tf](search.tf))
 - An ECS cluster ([cluster.tf](cluster.tf))
 
-Special mention is due to two files. We use an RDS proxy ([proxy.tf](proxy.tf)) to manage connection pooling externally. Due to PHP's request-scoped nature, database connections are difficult to persist. Instead, we rely on the proxy to handle connections to the Aurora clutser from multiple containers as well as mitigate transient connection failures due to, e.g., failover during reader-to-write promotion.
+**Important Note**: The Aurora database cluster itself is **not created** by this module. The `rds.tf` file only creates supporting resources like the DB subnet group. The actual Aurora cluster must exist as an external dependency.
+
+For database connectivity, the application connects to the Aurora cluster via the endpoint specified in the `regional_cluster_endpoint` variable. Due to PHP's request-scoped nature, database connections are difficult to persist, so connection pooling should be handled either at the Aurora cluster level or via an external RDS proxy if needed.
 
 ### WebCMS Support
 
