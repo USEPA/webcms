@@ -1,3 +1,7 @@
+# Deprecated: Buildkite Build Process
+
+This directory is deprecated. Buildkite pipelines are no longer used. All builds and deployments run in GitLab CI (.gitlab-ci.yml). This directory is retained for historical reference only. Last updated: 2025-10-09.
+
 # Buildkite Build Process
 
 ## Table of Contents
