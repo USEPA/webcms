@@ -1,3 +1,4 @@
+# DEPRECATED: Buildkite pipelines are no longer used. All builds and deployments run in GitLab CI (.gitlab-ci.yml). This file is retained for historical reference. Last updated: 2025-10-09.
 # This file performs a deployment of the WebCMS to a specific site. It covers
 # both English and Spanish, and deploys them in parallel.
 #
@@ -48,7 +49,7 @@ steps:
 
           # Execute a Kaniko-powered build.
           - docker#v3.12.0:
-              image: gcr.io/kaniko-project/executor:debug
+              image: registry.epa.gov/dso/infra/kaniko-executor:debug
               workdir: /workspace
 
               propagate-aws-auth-tokens: true

@@ -2,6 +2,11 @@
 
 Note: this has only been tested on ddev 1.24 and above.
 
+## CI/CD
+
+- GitLab CI is the active system for all builds and deployments. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
+- Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
+
 1. Clone main branch of repo:
 
    ```
@@ -91,7 +96,8 @@ If you want to use Firefox, you need to install nss to use HTTPS:
 # Other READMEs
 
 - Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
-- Builds: see [.buildkite](.buildkite/README.md).
+- CI/CD: GitLab CI is the active system. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
+- Note: Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
 
 # Troubleshooting
 
