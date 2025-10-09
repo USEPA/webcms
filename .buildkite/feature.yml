@@ -1,3 +1,4 @@
+# DEPRECATED: Buildkite pipelines are no longer used. All builds and deployments run in GitLab CI (.gitlab-ci.yml). This file is retained for historical reference. Last updated: 2025-10-09.
 # This is the feature branch pipeline. It does not update any infrastructure, but instead
 # performs sanity checks of the templates to verify that they meet minimum standards.
 
@@ -55,7 +56,7 @@ steps:
           - docker#v3.12.0:
               # Use the debug tag of the Kaniko executor: this gives us access
               # to /bin/sh (which we need to generate Kaniko's config.json).
-              image: gcr.io/kaniko-project/executor:debug
+              image: registry.epa.gov/dso/infra/kaniko-executor:debug
               workdir: /workspace
 
               # Forward AWS the authentication tokens we generated with the aws-assume-role plugin
