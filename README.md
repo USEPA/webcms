@@ -1,4 +1,4 @@
-# First-Time Setup
+﻿# First-Time Setup
 
 Note: this has only been tested on ddev 1.24 and above.
 
@@ -95,7 +95,7 @@ If you want to use Firefox, you need to install nss to use HTTPS:
 
 # Other READMEs
 
-- Terraform configuration: see [infrastructure/terraform](infrastructure/terraform/README.md).
+- Terraform configuration: see [infrastructure/terraform](terraform/infrastructure/README.md).
 - CI/CD: GitLab CI is the active system. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
 - Note: Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
 
@@ -118,7 +118,7 @@ Here is a list of helpful commands:
 * `ddev ssh` > Goes into the web container.
 * `ddev drush` > Runs any drush command.
 * `ddev import-db` > Will import a specific database.
-* `ddev export-db` > mExports a database with the current date.
+* `ddev export-db` > Exports a database with the current date.
 * `ddev aws-setup` > Sets up the requirements to get drupal file system to work
 * `ddev describe` or `ddev status` > Get a detailed description of a running DDEV project.
 * `ddev phpmyadmin` > Launch a browser with PhpMyAdmin
@@ -126,3 +126,4 @@ Here is a list of helpful commands:
 # Disclaimer
 
 The United States Environmental Protection Agency (EPA) GitHub project code is provided on an "as is" basis and the user assumes responsibility for its use.  EPA has relinquished control of the information and no longer has responsibility to protect the integrity , confidentiality, or availability of the information.  Any reference to specific commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply their endorsement, recommendation or favoring by EPA.  The EPA seal and logo shall not be used in any manner to imply endorsement of any commercial product or activity by EPA or the United States Government.
+
