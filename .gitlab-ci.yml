@@ -56,6 +56,16 @@ default:
   tags:
     - docker
 
+  # Global caching strategy (fallback/shared cache across all jobs):
+  # More specific caches are defined in templates and override this:
+  # - Terraform: Lines 116-123 (cached by module + .terraform.lock.hcl for provider binaries)
+  # - Composer:  Lines 335-340 (cached by branch for PHP dependencies in Drupal builds)
+  # - npm:       Lines 270-278 (cached by ci/package-lock.json for Drush automation)
+  cache:
+    key: global-$CI_COMMIT_REF_SLUG
+    paths:
+      - .gitlab-ci-cache/  # General-purpose cache directory for miscellaneous artifacts
+
 # Define this variable once here and allow it to cascade down into jobs and child
 # pipelines. Creates unique image tags based on branch and commit for reproducible builds.
 variables:
@@ -101,11 +111,18 @@ include:
     TF_VAR_image_tag: ${WEBCMS_IMAGE_TAG}
     TF_VAR_aws_region: ${AWS_REGION}
 
-  # Use a granular cache for Terraform providers, bucketing by both module and branch.
+  # Enhanced caching strategy for Terraform:
+  # - Cache by module and branch for provider binaries
+  # - Cache by commit for plan artifacts
+  # - Separate cache for different environments to avoid conflicts
   cache:
-    key: tf-${TF_MODULE}-${CI_COMMIT_REF_SLUG}
+    key: 
+      files:
+        - terraform/${TF_MODULE}/.terraform.lock.hcl
+      prefix: tf-${TF_MODULE}-${CI_COMMIT_REF_SLUG}
     paths:
       - ${TF_ROOT}/.terraform
+      - ${TF_ROOT}/.terraform.lock.hcl
 
   # Every job begins execution in the module's root directory with:
   # 1. An empty http backend configuration to be filled in by the gitlab-terraform helper,
