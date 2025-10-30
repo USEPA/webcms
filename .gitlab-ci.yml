@@ -139,82 +139,83 @@ include:
     - cp "$TERRAFORM_TFVARS" terraform.tfvars
 
 # Terraform Initialization Template (.init)
-# Initializes Terraform backend and downloads providers/plugins
+# Initializes Terraform backend and downloads provider plugins.
+# This template is extended by concrete infrastructure jobs that set TF_MODULE and other variables.
+# The init process configures the GitLab-managed HTTP backend for remote state storage.
 .init:
   extends: .terraform
   stage: infrastructure_preprod_init
 
   script:
-    - gitlab-terraform init -upgrade
-    - gitlab-terraform init
+    - gitlab-terraform init -upgrade  # Update provider versions to match lock file
+    - gitlab-terraform init            # Initialize backend and download providers
 
 # Terraform Validation Template (.validate)
-# Checks Terraform configuration for syntax errors and validates resource definitions
+# Validates Terraform configuration syntax and checks for logical errors.
+# This template is extended by concrete jobs that add explicit 'needs' dependencies on init jobs.
+# Validation runs independently for each module/environment combination.
 .validate:
   extends: .terraform
   stage: infrastructure_preprod_validate
-  needs: ["init"]
 
   script:
-    - gitlab-terraform validate
+    - gitlab-terraform validate  # Validate configuration syntax and internal consistency
 
 # Terraform Planning Template (.plan)
-# Generates execution plan showing what changes Terraform will make
+# Generates execution plan showing what infrastructure changes will be applied.
+# This template is extended by concrete jobs that add explicit 'needs' dependencies on validate jobs.
+# Creates both binary plan cache (for apply) and JSON report (for GitLab MR integration).
 .plan:
   extends: .terraform
   stage: infrastructure_preprod_plan
-  needs: ["validate"]
 
   script:
-    - gitlab-terraform plan
-    - gitlab-terraform plan-json
+    - gitlab-terraform plan       # Generate binary execution plan
+    - gitlab-terraform plan-json  # Generate JSON plan for GitLab integration
 
   artifacts:
-    name: plan
+    name: plan  # Generic name; concrete jobs should override with semantic naming
     paths:
-      - $TF_ROOT/plan.cache
+      - $TF_ROOT/plan.cache  # Binary plan file used by apply jobs
     reports:
-      terraform: $TF_ROOT/plan.json
+      terraform: $TF_ROOT/plan.json  # JSON plan displayed in GitLab MR widget
 
 # Terraform Apply Template (.apply)
-# Executes the Terraform plan to apply infrastructure changes
-# Includes safety rules to prevent unauthorized deployments
+# Executes the Terraform plan to apply infrastructure changes.
+# This template is extended by concrete jobs that add explicit 'needs' and 'dependencies' on plan jobs.
+# Includes safety rules to prevent unauthorized deployments to production AWS resources.
 .apply:
   extends: .terraform
-  stage: infrastructure_apply
-  needs: [".init"]
+  stage: infrastructure_preprod_apply  # Note: Concrete jobs override this for environment-specific stages
 
-  # Download the plan files from the previous step.
-  dependencies: [plan]
+  # Concrete jobs must specify dependencies to download plan artifacts from the corresponding plan job.
+  # Template cannot specify this generically as job names vary by environment.
+  dependencies: []  # Placeholder; override in concrete jobs
 
   script:
-    - gitlab-terraform apply
+    - gitlab-terraform apply  # Execute the cached plan without re-planning
 
-  # We use GitLab's rules to limit when we block the application of a Terraform module.
+  # Safety rules to control when infrastructure changes can be applied.
+  # These rules provide defense-in-depth against accidental deployments.
   #
-  # There are three rules:
-  # 1. We require approval of the infrastructure module on its tracking branches (main and
-  #    live).
-  # 2. We permit automatic application of the webcms module, since it only updates a
-  #    limited subset of ECS resources.
-  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
-  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
-  #    live AWS resources.
-  #
-  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
-  # rule does not have an `if:` condition limiting when it applies.
+  # Rule evaluation uses "first match wins" logic:
+  # 1. Infrastructure module changes require manual approval on main/live branches
+  #    (prevents accidental changes to VPC, ECS clusters, load balancers, etc.)
+  # 2. WebCMS module changes (ECS task definitions, service configs) run automatically
+  #    on integration/main/live branches as they are lower-risk and frequently updated
+  # 3. All other scenarios are denied by default (safety net for misconfigurations)
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: manual  # Require human approval for core infrastructure changes
 
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
+      when: on_success  # Auto-apply application deployment changes
 
-    - when: never
+    - when: never  # Deny all other apply attempts (safety net)
 
 # Job Template Definitions
 # These templates provide reusable configurations for different types of pipeline jobs.
