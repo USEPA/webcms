@@ -182,7 +182,7 @@ locals {
       # DB info
       { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
       { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },
-      { name = "WEBCMS_DB_NAME_D7", valueFrom = "webcms_${var.site}_${var.lang}_d7" },
+      { name = "WEBCMS_DB_NAME_D7", value = "webcms_${var.site}_${var.lang}_d7" },
 
       # Mail
       { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
