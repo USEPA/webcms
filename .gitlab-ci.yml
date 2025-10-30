@@ -1,23 +1,22 @@
 ﻿# WebCMS GitLab CI/CD Pipeline Configuration
-# This file orchestrates the complete deployment pipeline for the EPA WebCMS Drupal application.
-# It handles infrastructure provisioning, Docker image builds, security scanning, and application deployment.
+# Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
+# Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
 # See docs/cicd-pipeline.md and docs/gitlab_ci_documentation.md for detailed documentation.
 
 stages:
-  # Infrastructure Provisioning Stages (live branch only)
-  # These stages create/update AWS infrastructure using Terraform before any application deployment
+  # Infrastructure Provisioning (live branch only)
   - infrastructure_preprod_build      # Build Traefik reverse proxy image
   - infrastructure_preprod_init       # Initialize Terraform backend and providers
   - infrastructure_preprod_validate   # Validate Terraform configuration syntax
   - infrastructure_preprod_plan       # Generate Terraform execution plan
   - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
 
-  # Docker Image Build Stages (all branches)
+  # Docker Image Builds (all branches)
   - build                             # Build application Docker images (drupal, nginx, drush, metrics)
   - copy                              # Mirror third-party images to ECR (CloudWatch agent)
   - Image Scan                        # Security scan images with Prisma Cloud
 
-  # Production Deployment Stages (live branch → WEBCMS_SITE: dev)
+  # Production Deployment (live branch → WEBCMS_SITE: dev)
   - deploy:dev:init:en                # Initialize English production deployment
   - deploy:dev:validate:en            # Validate English production Terraform config
   - deploy:dev:plan:en                # Plan English production deployment
@@ -28,19 +27,19 @@ stages:
   - deploy:dev:plan:es                # Plan Spanish production deployment
   - deploy:dev:apply:es               # Apply Spanish production deployment
 
-  # Development Deployment Stages (development branch → WEBCMS_SITE: development)
+  # Development Deployment (development branch → WEBCMS_SITE: development)
   - deploy:development:init           # Initialize development deployment (English only)
   - deploy:development:validate       # Validate development Terraform config
   - deploy:development:plan           # Plan development deployment
   - deploy:development:apply          # Apply development deployment (automatic)
 
-  # Staging Deployment Stages (staging branch → WEBCMS_SITE: stage)
+  # Staging Deployment (staging branch → WEBCMS_SITE: stage)
   - deploy:stage:init                 # Initialize staging deployment (English + Spanish)
   - deploy:stage:validate             # Validate staging Terraform config
   - deploy:stage:plan                 # Plan staging deployment
   - deploy:stage:apply                # Apply staging deployment (manual approval)
 
-  # Database Update Stages (Drush operations via ECS tasks)
+  # Database Updates (Drush operations via ECS tasks)
   - update:es                         # Run Drush updates for Spanish sites
   - update:en                         # Run Drush updates for English sites
 
@@ -69,9 +68,11 @@ include:
   - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
 
 #region Templates
+# Reusable job templates that provide common configuration for pipeline jobs.
+# Concrete jobs extend these templates and override variables/stages as needed.
 
 # Base Terraform Template (.terraform)
-# Provides common configuration for all Terraform-based jobs including:
+# Provides common configuration for all Terraform jobs:
 # - Terraform CLI image and automation settings
 # - Variable mapping from GitLab to Terraform conventions
 # - Provider caching for faster builds
@@ -370,7 +371,9 @@ build:metrics:
     
  #endregion
 
- #region Docker Hub mirrors
+#region Docker Hub Mirrors
+# Mirror third-party images from Docker Hub to ECR for network isolation and availability.
+# Uses Kaniko to pull, retag, and push images without requiring Docker daemon access.
 
  # As mentioned in the comments above, this stage is for mirroring Docker Hub images. Our
  # GitLab CI/CD environment is restricted - we aren't permitted access to the Docker daemon
@@ -406,17 +409,24 @@ copy:cloudwatch:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-# Build custom Traefik image based off the 2.4 tag. Use latest tag(Keep this as "latest" Traefik tag mentions found
-# in terraform/infrastructure/traefik_service.tf.)
+# Build custom Traefik image based on version 2.4
+# Uses "latest" tag as specified in terraform/infrastructure/traefik_service.tf
 build:traefik:
   extends: .kaniko
   stage: infrastructure_preprod_build
   rules:
+    - changes:
+        - services/traefik/**/*
+        - .gitlab-ci.yml
+      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
+      when: always
     - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: always
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
