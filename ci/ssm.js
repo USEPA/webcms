@@ -50,11 +50,20 @@ async function getParameter(suffix) {
   }
 
   // Otherwise, fetch the parameter from AWS...
-  const command = new GetParameterCommand({ Name: name });
-  const response = await client.send(command);
+  try {
+    const command = new GetParameterCommand({ Name: name });
+    const response = await client.send(command);
 
-  // ... and update the cache with the returned value.
-  return (cache[name] = response.Parameter.Value);
+    // Validate that the parameter exists and has a value
+    if (!response.Parameter || !response.Parameter.Value) {
+      throw new Error(`Parameter ${name} returned empty value`);
+    }
+
+    // ... and update the cache with the returned value.
+    return (cache[name] = response.Parameter.Value);
+  } catch (error) {
+    throw new Error(`Failed to fetch parameter ${name}: ${error.message}`);
+  }
 }
 
 exports.getParameter = getParameter;
