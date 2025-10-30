@@ -213,8 +213,9 @@ include:
     TF_MODULE: infrastructure
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev
 
-# Build jobs perform a Kaniko build. We create a child pipeline due to the number of
-# images that are built (at least Drupal, nginx, and Drush).
+# Build Template (.build)
+# Triggers child pipeline for Docker image building using Kaniko
+# Builds Drupal, Nginx, Drush, and metrics container images
 .build:
   stage: build
 
@@ -222,8 +223,9 @@ include:
     include: .gitlab/docker.yml
     strategy: depend
 
-# Deploy jobs use Terraform to create/update the ECS task definitions and services that
-# make up the Drupal WebCMS.
+# Deploy Template (.deploy)
+# Manages ECS service and task definition deployments using terraform/webcms module
+# Updates application infrastructure per site/language combination
 .deploy:
   stage: deploy
   extends: .terraform
@@ -234,9 +236,9 @@ include:
     TF_MODULE: webcms
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${WEBCMS_SITE}-webcms-$WEBCMS_LANG
 
-# Update jobs invoke Drush to perform the necessary maintenance commands (drush updb,
-# drush cim) against the freshly-updated cluster. See the ci/ directory for more
-# information on the update script.
+# Update Template (.update)
+# Runs Drush database updates and configuration synchronization via ECS tasks
+# Executes maintenance operations like `drush updb` and `drush cim` after deployments
 .update:
   stage: update
 
@@ -262,12 +264,9 @@ include:
 
 #endregion
 
-# This is the template job for all Kaniko builds. Every job, regardless of what is being
-# built or copied, uses this configuration:
-# 1. Builds are executed in the latest Kaniko image,
-# 2. Builds can opt into remote layer caching by adding $KANIKO_CACHE_ARGS to their
-#    script, and
-# 3. A before_script ensures that AWS ECR is added to Kaniko's credential store.
+# Kaniko Build Template (.kaniko)
+# Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
+# Configures ECR authentication and layer caching for efficient builds
 .kaniko:
   image:
     name: registry.epa.gov/dso/infra/kaniko-executor:debug
