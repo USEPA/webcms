@@ -562,6 +562,7 @@ infrastructure:preproduction:init:
 infrastructure:preproduction:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_validate
+  needs: ["infrastructure:preproduction:init"]
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
@@ -576,6 +577,7 @@ infrastructure:preproduction:validate:
 infrastructure:preproduction:plan:
   extends: .infrastructure
   stage: infrastructure_preprod_plan
+  needs: ["infrastructure:preproduction:validate"]
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
   variables:
@@ -589,18 +591,20 @@ infrastructure:preproduction:plan:
   environment:
     name: infra/preproduction
   artifacts:
-    name: plan
+    name: terraform-plan-infrastructure-${WEBCMS_SITE}-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
+    expire_in: 7 days  # Infrastructure plans need review before manual approval
 
 infrastructure:preproduction:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_apply
+  needs: ["infrastructure:preproduction:plan"]
+  dependencies: ["infrastructure:preproduction:plan"]
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
-  dependencies: ["infrastructure:preproduction:plan"]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -611,263 +615,158 @@ infrastructure:preproduction:apply:
     name: infra/preproduction
 
 # Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
-# These jobs deploy the application to production (English and Spanish)
-# Uses resource groups to prevent concurrent deployments to the same site/language
+# Deploys application to production environment (English and Spanish)
+# Uses resource groups to prevent concurrent deployments to same site/language
 
+# Initialize Terraform for production deployments
 deploy:dev:init:en:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:init:en
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
   variables:
     WEBCMS_LANG: en
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
   resource_group: site/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
 deploy:dev:init:es:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:init:es
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
   variables:
     WEBCMS_LANG: es
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
   resource_group: site/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
 
-# Validate syntax and configuration
-# This job checks that the Terraform configuration is syntactically correct
-# and that the configuration is valid (e.g., all required variables are provided)
+# Validate Terraform configuration for production deployments
 deploy:dev:validate:en:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:validate:en
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
+  needs: ["deploy:dev:init:en"]  # Depends on init; runs in parallel with builds and other language validations
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform validate
 
-# Validate syntax and configuration
-# This job checks that the Terraform configuration is syntactically correct
-# and that the configuration is valid (e.g., all required variables are provided)
 deploy:dev:validate:es:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:validate:es
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+  needs: ["deploy:dev:init:es"]  # Depends on init; runs in parallel with builds and other language validations
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
-    WEBCMS_LANG: en
+    WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform validate
 
-# Perform a plan, uploading the plan files as GitLab artifacts.
-# This job generates a Terraform plan showing what changes will be made
-# to the infrastructure. The plan is saved as an artifact for review before apply.
+# Generate Terraform plans for production deployments
 deploy:dev:plan-en:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:plan:en
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
+  needs: ["deploy:dev:validate:en"]  # Depends on validation; runs in parallel with builds and other language plans
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
-  resource_group: site/dev-$WEBCMS_LANG
+  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-
   artifacts:
-    name: plan
+    name: terraform-plan-webcms-${WEBCMS_SITE}-en-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
+    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
 deploy:dev:plan-es:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:plan:es
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-
+  needs: ["deploy:dev:validate:es"]  # Depends on validation; runs in parallel with builds and other language plans
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
-  resource_group: site/dev-$WEBCMS_LANG
+  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-
   artifacts:
-    name: plan
+    name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
+    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
 
-# Perform an apply. Note that this is not always automatic; see the comments above the rules
-# for more.
-# This job applies the Terraform plan to create/update AWS resources.
-# It downloads the plan artifact from the previous plan job and executes it.
+# Apply Terraform plans for production deployments
 deploy:dev:apply-en:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:apply:en
-
-  # Download the plan files from the previous step.
-  dependencies: ["deploy:dev:plan-en"]
-
+  needs: ["deploy:dev:plan-en", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
+  dependencies: ["deploy:dev:plan-en"]            # Downloads plan artifact only (not build artifacts)
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
-  resource_group: site/dev-$WEBCMS_LANG
+  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent apply operations to same site/language
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - gitlab-terraform apply
-
-  # We use GitLab's rules to limit when we block the application of a Terraform module.
-  #
-  # There are three rules:
-  # 1. We require approval of the infrastructure module on its tracking branches (main and
-  #    live).
-  # 2. We permit automatic application of the webcms module, since it only updates a
-  #    limited subset of ECS resources.
-  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
-  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
-  #    live AWS resources.
-  #
-  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
-  # rule does not have an `if:` condition limiting when it applies.
+  # Override template rules to auto-apply webcms module changes (low risk)
+  # Manual approval only required for infrastructure module changes (high risk)
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
-
-    - when: never
+      when: on_success  # Auto-apply task definition and service config changes
+    - when: never       # Deny all other scenarios
 
 deploy:dev:apply-es:
-  extends: .deploy
+  extends: .deploy:production
   stage: deploy:dev:apply:es
-
-  # Download the plan files from the previous step.
+  needs: ["deploy:dev:plan-es", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
   dependencies: ["deploy:dev:plan-es"]
-
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-
-  # As mentioned in the comments on the infrastructure:preproduction job, we use a
-  # resource group to prevent overlapping Terraform runs. The environment names here are
-  # prefixed with "site/" to indicate that they're for the Drupal site instead of
-  # infrastructure.
-  resource_group: site/dev-$WEBCMS_LANG
+  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent apply operations to same site/language
   environment:
     name: site/dev-$WEBCMS_LANG
-
   script:
     - gitlab-terraform apply
-
-  # We use GitLab's rules to limit when we block the application of a Terraform module.
-  #
-  # There are three rules:
-  # 1. We require approval of the infrastructure module on its tracking branches (main and
-  #    live).
-  # 2. We permit automatic application of the webcms module, since it only updates a
-  #    limited subset of ECS resources.
-  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
-  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
-  #    live AWS resources.
-  #
-  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
-  # rule does not have an `if:` condition limiting when it applies.
+  # Override template rules to auto-apply webcms module changes (low risk)
+  # Manual approval only required for infrastructure module changes (high risk)
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
-
-    - when: never
+      when: on_success  # Auto-apply task definition and service config changes
+    - when: never       # Deny all other scenarios
 
 #endregion
 
