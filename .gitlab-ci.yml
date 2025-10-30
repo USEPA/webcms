@@ -1033,12 +1033,14 @@ artifacts:
       when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
   script:
-    - echo "Creating artifacts"
+    - echo "Creating release artifacts for ${CI_COMMIT_REF_NAME}"
   artifacts:
+    name: release-artifacts-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
     paths:
       - ./ci
       - ./terraform/infrastructure
       - ./terraform/webcms
+    expire_in: 30 days  # Release artifacts kept longer for rollback scenarios
 
 
 
