@@ -1,74 +1,81 @@
-﻿# This file is the initial entrypoint for GitLab CI/CD builds. It serves primarily as a
-# "driver" for other jobs: instead of executing build logic itself, it identifies which
-# jobs pertain to the branch being built and dispatches those. (The exception to this is
-# the Drush logic, which is encapsulated by a Node.js script in the ci/ directory.)
+﻿# WebCMS GitLab CI/CD Pipeline Configuration
+# This file orchestrates the complete deployment pipeline for the EPA WebCMS Drupal application.
+# It handles infrastructure provisioning, Docker image builds, security scanning, and application deployment.
+# See docs/cicd-pipeline.md and docs/gitlab_ci_documentation.md for detailed documentation.
 
-stages:  
-  # Applications of the infrastructure Terraform module. This has to occur first because,
-  # without it, Docker builds could attempt to push to empty ECR repositories.
-  # First step is to build the traefik module as the traefik service is created and updated in the infrastructure module
-  - infrastructure_preprod_build
-  - infrastructure_preprod_init
-  - infrastructure_preprod_validate
-  - infrastructure_preprod_plan
-  - infrastructure_preprod_apply
-  
-  
-  # Docker builds
-  - build
-  - copy
-  - Image Scan
-  
-  - deploy:dev:init:en
-  - deploy:dev:validate:en
-  - deploy:dev:plan:en
-  - deploy:dev:apply:en
+stages:
+  # Infrastructure Provisioning Stages (live branch only)
+  # These stages create/update AWS infrastructure using Terraform before any application deployment
+  - infrastructure_preprod_build      # Build Traefik reverse proxy image
+  - infrastructure_preprod_init       # Initialize Terraform backend and providers
+  - infrastructure_preprod_validate   # Validate Terraform configuration syntax
+  - infrastructure_preprod_plan       # Generate Terraform execution plan
+  - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
 
-  - deploy:dev:init:es
-  - deploy:dev:validate:es
-  - deploy:dev:plan:es
-  - deploy:dev:apply:es
-  
-  - deploy:development:init
-  - deploy:development:validate
-  - deploy:development:plan
-  - deploy:development:apply
-  
-  - deploy:stage:init
-  - deploy:stage:validate
-  - deploy:stage:plan
-  - deploy:stage:apply
+  # Docker Image Build Stages (all branches)
+  - build                             # Build application Docker images (drupal, nginx, drush, metrics)
+  - copy                              # Mirror third-party images to ECR (CloudWatch agent)
+  - Image Scan                        # Security scan images with Prisma Cloud
 
-  # Drush
-  - update:es
-  - update:en
-  
-  # Create Release
-  - artifacts
-  - release
-  
-  #Add "test" stage for Gitlab Scanners
-  - test
+  # Production Deployment Stages (live branch → WEBCMS_SITE: dev)
+  - deploy:dev:init:en                # Initialize English production deployment
+  - deploy:dev:validate:en            # Validate English production Terraform config
+  - deploy:dev:plan:en                # Plan English production deployment
+  - deploy:dev:apply:en               # Apply English production deployment
 
+  - deploy:dev:init:es                # Initialize Spanish production deployment
+  - deploy:dev:validate:es            # Validate Spanish production Terraform config
+  - deploy:dev:plan:es                # Plan Spanish production deployment
+  - deploy:dev:apply:es               # Apply Spanish production deployment
+
+  # Development Deployment Stages (development branch → WEBCMS_SITE: development)
+  - deploy:development:init           # Initialize development deployment (English only)
+  - deploy:development:validate       # Validate development Terraform config
+  - deploy:development:plan           # Plan development deployment
+  - deploy:development:apply          # Apply development deployment (automatic)
+
+  # Staging Deployment Stages (staging branch → WEBCMS_SITE: stage)
+  - deploy:stage:init                 # Initialize staging deployment (English + Spanish)
+  - deploy:stage:validate             # Validate staging Terraform config
+  - deploy:stage:plan                 # Plan staging deployment
+  - deploy:stage:apply                # Apply staging deployment (manual approval)
+
+  # Database Update Stages (Drush operations via ECS tasks)
+  - update:es                         # Run Drush updates for Spanish sites
+  - update:en                         # Run Drush updates for English sites
+
+  # Release Management
+  - artifacts                         # Create deployment artifacts
+  - release                           # Create GitLab releases
+
+  # Security Scanning (GitLab built-in)
+  - test                              # Run SAST, dependency scanning, secret detection
+
+# Global Pipeline Configuration
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
   tags:
     - docker
 
 # Define this variable once here and allow it to cascade down into jobs and child
-# pipelines.
+# pipelines. Creates unique image tags based on branch and commit for reproducible builds.
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
-#Including Gitlab scan templates
+# Include GitLab's built-in security scanning templates for comprehensive security testing
 include:
-  - template: Jobs/SAST.gitlab-ci.yml
-  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
-  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
+  - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
 
 #region Templates
 
-# This is the base template for all jobs in this pipeline.
+# Base Terraform Template (.terraform)
+# Provides common configuration for all Terraform-based jobs including:
+# - Terraform CLI image and automation settings
+# - Variable mapping from GitLab to Terraform conventions
+# - Provider caching for faster builds
+# - Backend configuration setup
 .terraform:
   image:
     name: registry.gitlab.com/gitlab-org/terraform-images/releases/0.14:latest
