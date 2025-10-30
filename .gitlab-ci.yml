@@ -256,36 +256,85 @@ include:
     TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/${WEBCMS_SITE}-webcms-$WEBCMS_LANG
 
 # Update Template (.update)
-# Runs Drush database updates and configuration synchronization via ECS tasks
-# Executes maintenance operations like `drush updb` and `drush cim` after deployments
+# Runs Drush database maintenance operations via ECS task invocation after deployments.
+# Executes operations like database updates (drush updb), config import (drush cim),
+# and cache clearing on the deployed Drupal environment.
+#
+# Uses Node.js 18 (current LTS) to run the ci/drush.js automation script which:
+# - Invokes ECS RunTask API to execute Drush commands in the drush container
+# - Streams CloudWatch logs back to the pipeline for visibility
+# - Reports success/failure based on task exit code
 .update:
-  stage: update
+  stage: update  # Note: Concrete jobs override this with language-specific stages (update:en, update:es)
 
-  # Run inside a Node.js image. At the time of writing, Node.js 14 is the latest stable
-  # version.
+  # Node.js 18 LTS (Alpine variant for smaller image size)
   image:
-    name: node:14-alpine
-    entrypoint: ['']
+    name: node:18-alpine
+    entrypoint: ['']  # Override entrypoint to allow direct command execution
 
-  # See the comments below for why the npm cache is redirected.
   script:
     - cd $CI_PROJECT_DIR/ci
-    - npm ci --production --prefer-offline --cache .npm
-    - node drush.js
+    - npm ci --production --prefer-offline --cache .npm  # Install AWS SDK and dependencies
+    - node drush.js  # Execute Drush automation via ECS RunTask API
 
-  # Per https://docs.gitlab.com/ee/ci/caching/#cache-nodejs-dependencies, GitLab doesn't
-  # support caching outside the project directory, so we have to relocate the .npm cache
-  # directory inside the project root.
+  # Cache npm dependencies using package-lock.json for precise invalidation.
+  # Significantly speeds up update jobs by avoiding repeated package downloads.
   cache:
-    key: npm-drush
+    key:
+      files:
+        - ci/package-lock.json  # Cache invalidates only when dependencies change
+      prefix: npm-drush
     paths:
-        - ci/.npm
+      - ci/node_modules/  # Cached installed packages
+      - ci/.npm           # npm's internal cache
+    policy: pull-push    # Both read and write cache (first job creates, others reuse)
+
+# Environment-Specific Deployment Templates
+# These templates reduce duplication by providing common configurations for each deployment environment
+
+# Production Environment Template (live branch → WEBCMS_SITE: dev)
+# Deploys to production environment with both English and Spanish languages
+# Requires manual approval for infrastructure changes, automatic for application updates
+.deploy:production:
+  extends: .deploy
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+
+# Staging Environment Template (staging branch → WEBCMS_SITE: stage)
+# Deploys to staging environment for final testing before production.
+# Supports both English and Spanish languages.
+# Requires manual approval to provide a testing gate before production deployment.
+.deploy:staging:
+  extends: .deploy
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
+    WEBCMS_SITE: stage                 # Logical site identifier within environment
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+      when: manual  # Manual approval enforces testing gate before production
+
+# Development Environment Template (development branch → WEBCMS_SITE: development)
+# Deploys to development environment for new feature testing
+# English-only environment with automatic deployments
+.deploy:development:
+  extends: .deploy
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: development
+    WEBCMS_LANG: en
+    TF_STATE_NAME: development-webcms
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
 #endregion
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
 # Configures ECR authentication and layer caching for efficient builds
+# Includes caching for Composer dependencies to speed up PHP builds
 .kaniko:
   image:
     name: registry.epa.gov/dso/infra/kaniko-executor:debug
