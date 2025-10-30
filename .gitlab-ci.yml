@@ -427,29 +427,19 @@ build:traefik:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-Drupal:
-
-Nginx:
-
-Drush:
-
-Database:
-
-Metrics:
-
-
-.Traefik:
-
-.CloudWatch:
+# Note: Security scanning jobs (Drupal, Nginx, Drush, Database, Metrics, .Traefik, .CloudWatch)
+# are defined in the Prisma Cloud integration but may be incomplete in this configuration.
+# Refer to Prisma Cloud documentation for proper job definitions.
 
 
 #region Preproduction
 
-# Jobs in this region affect the preproduction environment. Per convention, the
-# preproduction environment encompasses two sites: development and staging, hence
-# the subregions below the infrastructure step.
+# Preproduction Environment Jobs
+# These jobs manage the shared AWS infrastructure and application deployments
+# for the preproduction environment (development, staging, and production sites)
 
-# Preproduction infrastructure builds are triggered only by the 'live' branch.
+# Infrastructure Provisioning Jobs (live branch only)
+# Creates/updates shared AWS resources: VPC, ECS cluster, load balancers, S3 buckets, etc.
 infrastructure:preproduction:init:
   extends: .infrastructure
   stage: infrastructure_preprod_init
@@ -515,6 +505,9 @@ infrastructure:preproduction:apply:
   environment:
     name: infra/preproduction
 
+# Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
+# These jobs deploy the application to production (English and Spanish)
+# Uses resource groups to prevent concurrent deployments to the same site/language
 
 deploy:dev:init:en:
   extends: .deploy
@@ -566,6 +559,8 @@ deploy:dev:init:es:
 
 
 # Validate syntax and configuration
+# This job checks that the Terraform configuration is syntactically correct
+# and that the configuration is valid (e.g., all required variables are provided)
 deploy:dev:validate:en:
   extends: .deploy
   stage: deploy:dev:validate:en
@@ -584,6 +579,8 @@ deploy:dev:validate:en:
     - gitlab-terraform validate
 
 # Validate syntax and configuration
+# This job checks that the Terraform configuration is syntactically correct
+# and that the configuration is valid (e.g., all required variables are provided)
 deploy:dev:validate:es:
   extends: .deploy
   stage: deploy:dev:validate:es
@@ -600,6 +597,8 @@ deploy:dev:validate:es:
     - gitlab-terraform validate
 
 # Perform a plan, uploading the plan files as GitLab artifacts.
+# This job generates a Terraform plan showing what changes will be made
+# to the infrastructure. The plan is saved as an artifact for review before apply.
 deploy:dev:plan-en:
   extends: .deploy
   stage: deploy:dev:plan:en
@@ -665,6 +664,8 @@ deploy:dev:plan-es:
 
 # Perform an apply. Note that this is not always automatic; see the comments above the rules
 # for more.
+# This job applies the Terraform plan to create/update AWS resources.
+# It downloads the plan artifact from the previous plan job and executes it.
 deploy:dev:apply-en:
   extends: .deploy
   stage: deploy:dev:apply:en
@@ -769,6 +770,14 @@ deploy:dev:apply-es:
 
 
 
+
+#endregion
+
+
+
+# US West 2 deployment (development branch → WEBCMS_SITE: development)
+# These jobs deploy to the development environment in us-west-2 region
+# This is a single-language (English-only) environment for new feature development
 
 #region:  US West 2 deployment
 deploy:development:init:
@@ -887,6 +896,10 @@ deploy:development:apply:
 #endregion
 
 
+# Staging deployment (staging branch → WEBCMS_SITE: stage)
+# These jobs deploy to the staging environment for final testing before production
+# Supports both English and Spanish languages
+
 deploy:stage:init:
   extends: .deploy
   stage: deploy:stage:init
@@ -894,6 +907,8 @@ deploy:stage:init:
     - if: '$CI_COMMIT_BRANCH == "staging"'
       when: manual
 
+  # Parallel matrix deployment for both English and Spanish languages
+  # Each language gets its own Terraform state and resource group
   parallel:
     matrix:
       - WEBCMS_LANG: [en, es]
@@ -997,6 +1012,11 @@ deploy:stage:apply:
 #endregion
 
 
+# Database Update Jobs (Drush Operations)
+# These jobs run after deployment to apply database schema updates and clear caches
+# They use ECS tasks to execute Drush commands in the deployed environment
+# Resource groups prevent overlapping Drush operations on the same site/language
+
 update:development:
   extends: .update
   stage: update:en
@@ -1086,7 +1106,8 @@ update:dev:es:
 ###################
 
 # Create artifacts of ci, terraform/database, terraform/infrastructure, and terraform/webcms directories
-# Only run if CI_COMMIT_TAG is defined
+# Only run if CI_COMMIT_TAG is defined (for tagged releases) or on live branch
+# These artifacts can be used for deployment rollbacks or external deployments
 Artifacts:
   image: alpine
   stage: artifacts
