@@ -138,7 +138,7 @@ RUN set -ex \
   # images by removing theme here.
   && rm -rf node_modules
 
-# Create the final Drupal 8 image - build this by specifying "docker build --target drupal"
+# Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
 # Copy Composer-installed packages
