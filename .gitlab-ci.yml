@@ -779,239 +779,148 @@ deploy:dev:apply-es:
 
 
 
-# US West 2 deployment (development branch → WEBCMS_SITE: development)
-# These jobs deploy to the development environment in us-west-2 region
-# This is a single-language (English-only) environment for new feature development
+# Development Environment Deployment (development branch → WEBCMS_SITE: development)
+# Deploys to development environment for new feature testing (English-only)
 
-#region:  US West 2 deployment
+# Initialize Terraform for development deployment
 deploy:development:init:
-  extends: .deploy
+  extends: .deploy:development
   stage: deploy:development:init
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-
-  variables:
-    WEBCMS_LANG: en
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    TF_STATE_NAME: development-webcms
-
   resource_group: site/development
   environment:
     name: site/development
-
   script:
     - echo $TF_ADDRESS
     - gitlab-terraform init
 
-# Validate syntax and configuration
 deploy:development:validate:
-  extends: .deploy
+  extends: .deploy:development
   stage: deploy:development:validate
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    WEBCMS_LANG: en
-    TF_STATE_NAME: development-webcms
-
+  needs: ["deploy:development:init"]  # Depends on init; runs in parallel with builds
   environment:
     name: site/development
   script:
     - gitlab-terraform validate
 
-# Perform a plan, uploading the plan files as GitLab artifacts.
 deploy:development:plan:
-  extends: .deploy
+  extends: .deploy:development
   stage: deploy:development:plan
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    WEBCMS_LANG: en
-    TF_STATE_NAME: development-webcms
-
-  resource_group: site/development
+  needs: ["deploy:development:validate"]  # Depends on validation; runs in parallel with builds
+  resource_group: site/development        # Prevents concurrent plan/apply to development site
   environment:
     name: site/development
-
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-
   artifacts:
-    name: plan
+    name: terraform-plan-webcms-${WEBCMS_SITE}-${WEBCMS_LANG}-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
+    expire_in: 1 day  # Short retention; development plans applied immediately (no manual gate)
 
-# Perform an apply. Note that this is not always automatic; see the comments above the rules
-# for more.
 deploy:development:apply:
-  extends: .deploy
+  extends: .deploy:development
   stage: deploy:development:apply
-
-  # Download the plan files from the previous step.
-  dependencies: ["deploy:development:plan"]
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    WEBCMS_LANG: en
-    TF_STATE_NAME: development-webcms
-
-  resource_group: site/development
+  needs: ["deploy:development:plan", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
+  dependencies: ["deploy:development:plan"]            # Downloads plan artifact only (not build artifacts)
+  resource_group: site/development                     # Prevents concurrent apply operations
   environment:
     name: site/development
-
   script:
     - gitlab-terraform apply
-
-  # We use GitLab's rules to limit when we block the application of a Terraform module.
-  #
-  # There are three rules:
-  # 1. We require approval of the infrastructure module on its tracking branches (main and
-  #    live).
-  # 2. We permit automatic application of the webcms module, since it only updates a
-  #    limited subset of ECS resources.
-  # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
-  #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
-  #    live AWS resources.
-  #
-  # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
-  # rule does not have an `if:` condition limiting when it applies.
+  # Override template rules to auto-apply all development changes (no manual gate)
+  # Development environment is lower risk and requires fast iteration
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual
+      when: manual      # Infrastructure module still requires approval even on development branch
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success
-
-    - when: never
-
-#endregion
+      when: on_success  # Auto-apply webcms changes to development environment
+    - when: never       # Deny all other scenarios
 
 
-# Staging deployment (staging branch → WEBCMS_SITE: stage)
-# These jobs deploy to the staging environment for final testing before production
-# Supports both English and Spanish languages
+# Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
+# Deploys to staging environment for final testing before production
+# Supports both English and Spanish languages with parallel matrix builds
 
+# Initialize Terraform for staging deployments
 deploy:stage:init:
-  extends: .deploy
+  extends: .deploy:staging
   stage: deploy:stage:init
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual
-
-  # Parallel matrix deployment for both English and Spanish languages
-  # Each language gets its own Terraform state and resource group
   parallel:
     matrix:
       - WEBCMS_LANG: [en, es]
-
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-
   resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
-
   script:
     - gitlab-terraform init
 
-# Validate syntax and configuration
 deploy:stage:validate:
-  extends: .deploy
+  extends: .deploy:staging
   stage: deploy:stage:validate
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual
-
+  needs: ["deploy:stage:init"]  # Depends on init (matrix job); runs in parallel with builds
   parallel:
     matrix:
-      - WEBCMS_LANG: [en, es]
-
+      - WEBCMS_LANG: [en, es]  # Creates 2 parallel validation jobs (English + Spanish)
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-
   resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
-
   script:
     - gitlab-terraform validate
 
-# Perform a plan, uploading the plan files as GitLab artifacts.
 deploy:stage:plan:
-  extends: .deploy
+  extends: .deploy:staging
   stage: deploy:stage:plan
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual
+  needs: ["deploy:stage:validate"]  # Depends on validation (matrix job); runs in parallel with builds
   parallel:
     matrix:
-      - WEBCMS_LANG: [en, es]
-
+      - WEBCMS_LANG: [en, es]  # Creates 2 parallel plan jobs (English + Spanish)
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-
-  resource_group: site/stage-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
   environment:
     name: site/stage-$WEBCMS_LANG
-
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-
   artifacts:
-    name: plan
+    name: terraform-plan-webcms-${WEBCMS_SITE}-${WEBCMS_LANG}-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
+    expire_in: 7 days  # Longer retention; staging plans require manual approval and testing review
 
-# Perform an apply. Note that this is not always automatic; see the comments above the rules
-# for more.
 deploy:stage:apply:
-  extends: .deploy
+  extends: .deploy:staging
   stage: deploy:stage:apply
-
-  # Download the plan files from the previous step.
-  dependencies: ["deploy:stage:plan"]
-
+  needs: ["deploy:stage:plan", "build:drupal"]  # Waits for plan (matrix job) + all 3 parallel builds
+  dependencies: ["deploy:stage:plan"]            # Downloads plan artifacts from matrix jobs (en + es)
   parallel:
     matrix:
-      - WEBCMS_LANG: [en, es]
-
+      - WEBCMS_LANG: [en, es]  # Creates 2 parallel apply jobs (English + Spanish)
   variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: stage
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-
-  resource_group: site/stage-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent apply operations to same site/language
   environment:
     name: site/stage-$WEBCMS_LANG
-
   script:
     - gitlab-terraform apply
-
+  # Override template rules to always require manual approval for staging
+  # Staging serves as final testing gate before production; manual review ensures quality
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual
+      when: manual  # Always require approval for staging deployments (testing gate)
 
 #endregion
 
