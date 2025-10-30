@@ -933,6 +933,7 @@ deploy:stage:apply:
 update:development:
   extends: .update
   stage: update:en
+  needs: ["deploy:development:apply"]  # Run after deployment completes
   rules:
     - if: '$CI_COMMIT_BRANCH == "development"'
 
@@ -941,9 +942,8 @@ update:development:
     WEBCMS_SITE: development
     WEBCMS_LANG: en
 
-  # Note that while we want to prevent overlapping Drush runs, we don't also include an
-  # environment here because, like the Docker image builds, there are no inputs outside
-  # of the provided $WEBCMS_* variables.
+  # Resource group prevents overlapping Drush operations on the same site
+  # Environment tracking enables deployment status visibility
   resource_group: drush/development
   environment:
     name: site/development
@@ -952,14 +952,17 @@ update:development:
 update:stage:en:
   extends: .update
   stage: update:en
+  needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == \"staging\"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: stage
     WEBCMS_LANG: en
 
+  # Resource group prevents overlapping Drush operations on the same site
+  # Environment tracking enables deployment status visibility
   resource_group: drush/stage-en
   environment:
     name: site/stage-en
@@ -967,20 +970,24 @@ update:stage:en:
 update:stage:es:
   extends: .update
   stage: update:es
+  needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == \"staging\"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: stage
     WEBCMS_LANG: es
 
+  # Resource group prevents overlapping Drush operations on the same site
+  # Environment tracking enables deployment status visibility
   resource_group: drush/stage-es
   environment:
     name: site/stage-es
 update:dev:en:
   extends: .update
   stage: update:en
+  needs: ["deploy:dev:apply-en"]  # Run after production English deployment completes
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -989,9 +996,8 @@ update:dev:en:
     WEBCMS_SITE: dev
     WEBCMS_LANG: en
 
-  # Note that while we want to prevent overlapping Drush runs, we don't also include an
-  # environment here because, like the Docker image builds, there are no inputs outside
-  # of the provided $WEBCMS_* variables.
+  # Resource group prevents overlapping Drush operations on the same site
+  # Environment tracking enables deployment status visibility
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
@@ -999,6 +1005,7 @@ update:dev:en:
 update:dev:es:
   extends: .update
   stage: update:es
+  needs: ["deploy:dev:apply-es"]  # Run after production Spanish deployment completes
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -1007,9 +1014,8 @@ update:dev:es:
     WEBCMS_SITE: dev
     WEBCMS_LANG: es
 
-  # Note that while we want to prevent overlapping Drush runs, we don't also include an
-  # environment here because, like the Docker image builds, there are no inputs outside
-  # of the provided $WEBCMS_* variables.
+  # Resource group prevents overlapping Drush operations on the same site
+  # Environment tracking enables deployment status visibility
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
@@ -1018,10 +1024,8 @@ update:dev:es:
 # Create Releases #
 ###################
 
-# Create artifacts of ci, terraform/database, terraform/infrastructure, and terraform/webcms directories
-# Only run if CI_COMMIT_TAG is defined (for tagged releases) or on live branch
-# These artifacts can be used for deployment rollbacks or external deployments
-Artifacts:
+# Create deployment artifacts for rollback and external deployments
+artifacts:
   image: alpine
   stage: artifacts
   rules:
