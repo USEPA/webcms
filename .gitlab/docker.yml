@@ -173,7 +173,7 @@ copy:cloudwatch:
           --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
 
 # Mirror Traefik at the latest 2.4 tag. (Keep this in sync Traefik version mentions found
-# in terraform/infrastructure/traefik_service.tf and .buildkite/infrastructure.yml.)
+# in terraform/infrastructure/traefik_service.tf.)
 copy:traefik:
   extends: .kaniko
   stage: copy
@@ -188,3 +188,4 @@ copy:traefik:
           --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:2.4
 
 #endregion
+
