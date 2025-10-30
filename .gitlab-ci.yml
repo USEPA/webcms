@@ -120,6 +120,8 @@ include:
     - cp $backend_tf backend.tf
     - cp "$TERRAFORM_TFVARS" terraform.tfvars
 
+# Terraform Initialization Template (.init)
+# Initializes Terraform backend and downloads providers/plugins
 .init:
   extends: .terraform
   stage: infrastructure_preprod_init
@@ -128,6 +130,8 @@ include:
     - gitlab-terraform init -upgrade
     - gitlab-terraform init
 
+# Terraform Validation Template (.validate)
+# Checks Terraform configuration for syntax errors and validates resource definitions
 .validate:
   extends: .terraform
   stage: infrastructure_preprod_validate
@@ -136,7 +140,8 @@ include:
   script:
     - gitlab-terraform validate
 
-# Perform a plan, uploading the plan files as GitLab artifacts.
+# Terraform Planning Template (.plan)
+# Generates execution plan showing what changes Terraform will make
 .plan:
   extends: .terraform
   stage: infrastructure_preprod_plan
@@ -153,6 +158,9 @@ include:
     reports:
       terraform: $TF_ROOT/plan.json
 
+# Terraform Apply Template (.apply)
+# Executes the Terraform plan to apply infrastructure changes
+# Includes safety rules to prevent unauthorized deployments
 .apply:
   extends: .terraform
   stage: infrastructure_apply
@@ -190,35 +198,13 @@ include:
 
     - when: never
 
+# Job Template Definitions
+# These templates provide reusable configurations for different types of pipeline jobs.
+# Each template extends the base .terraform template and adds specific functionality.
 
-
-# Jobs defined in this section are template jobs (the leading dot tells GitLab to
-# unconditionally ignore them when assembling a pipeline graph). The templates are named
-# after the stage in which they execute, and serve as central locations for the
-# boilerplate that each step needs to execute. The pipelines here are not complicated in
-# the sense that there are a large _variety_ of steps involved; there is instead a large
-# _number_ of steps, and cutting down on repetitious information helps avoid visual noise
-# when reading this file.
-#
-# Each template is guaranteed to include the following items:
-# 1. The stage in which the job should execute
-# 2. The actual job logic itself (which pipeline to trigger or which script to execute).
-#
-# While some templates may have additional supporting definitions/conveniences, extensions
-# MUST provide the following:
-# 1. Which environment ($WEBCMS_ENVIRONMENT) this job applies to.
-# 2. Where applicable, the site ($WEBCMS_SITE) and language ($WEBCMS_LANG) this job
-#    applies to.
-# 3. Any throttling/parallelism limitations (e.g., the resource_group: keyword).
-# 4. Branch limitations.
-#
-# Some of this information could be automatically derived in the template, but this can
-# very easily cause confusion, so we instead mandate that jobs that extend a template
-# repeat the logic to provide clarity on when a job is executed by GitLab, and how
-# parallel it is permitted to be.
-
-# Infrastructure jobs apply the Terraform module of the same name. They always trigger
-# the Terraform pipeline with $TF_MODULE set to the same value.
+# Infrastructure Template (.infrastructure)
+# Handles AWS infrastructure provisioning using the terraform/infrastructure module
+# Creates VPC, ECS cluster, load balancers, S3 buckets, and other shared resources
 .infrastructure:
   extends: .terraform
   tags:
@@ -297,9 +283,9 @@ include:
     
 #region Image builds
 
-# We build Drupal-based images using another parallel:matrix: to cut down on the repetition
-# of the fairly long invocation of the Kaniko command line.
-
+# Drupal Application Build Job
+# Builds the main Drupal application container with PHP-FPM
+# Uses matrix build to create multiple variants (drupal, nginx, drush)
 build:drupal:
   extends: .kaniko
   stage: build
