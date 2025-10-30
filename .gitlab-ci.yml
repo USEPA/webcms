@@ -343,41 +343,60 @@ include:
   variables:
     KANIKO_CACHE_ARGS: --cache --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
 
+  # Cache Composer dependencies and other build artifacts
+  # This significantly speeds up subsequent builds by reusing downloaded packages
+  cache:
+    key: composer-$CI_COMMIT_REF_SLUG
+    paths:
+      - services/drupal/vendor/
+      - services/drupal/composer.lock
+    policy: pull  # Only pull cache, don't push (Kaniko handles layer caching)
+
   before_script:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
     
-#region Image builds
+#region Image Builds
+# Docker image build jobs using Kaniko (rootless, GitLab-compatible Docker builder).
+# Builds application containers and mirrors third-party images to ECR.
 
 # Drupal Application Build Job
 # Builds the main Drupal application container with PHP-FPM
 # Uses matrix build to create multiple variants (drupal, nginx, drush)
+# Only runs when relevant Drupal files change to optimize build times
 build:drupal:
   extends: .kaniko
   stage: build
   rules:
+    - changes:
+        - services/drupal/**/*
+        - .gitlab-ci.yml
+        - .gitlab/docker.yml
+      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
       variables:
         WEBCMS_SITE: dev
+      when: always
     - if: '$CI_COMMIT_BRANCH == "staging"'
       variables:
         WEBCMS_SITE: stage
+      when: always
     - if: '$CI_COMMIT_BRANCH == "development"'
       variables:
         WEBCMS_SITE: development
+      when: always
 
-   # These correspond to the three production targets in services/drupal/Dockerfile. The
-   # ordering here is important for builds with a limited pool of servers: by ensuring that
-   # the Drupal build is executed first, it increases the chances that expensive
-   # intermediate layers (such as building the ElastiCache client or building the theme)
-   # already exist by the time the nginx and Drush targets need to copy that data.
+   # Matrix builds three container variants from services/drupal/Dockerfile.
+   # Build order (drupal, nginx, drush) optimizes layer caching: drupal builds expensive
+   # layers first (ElastiCache client, theme compilation) which nginx/drush then reuse.
   parallel:
     matrix:
-      - WEBCMS_TARGET: [drupal, nginx, drush]
+      - WEBCMS_TARGET: [drupal, nginx, drush]  # PHP-FPM, web server, CLI containers
 
    # In addition to the shared cache arguments, we provide additional settings to tune
    # Kaniko's caching behavior. This is due to the large number of files and steps in the
@@ -413,18 +432,26 @@ build:metrics:
   extends: .kaniko
   stage: build
   rules:
+    - changes:
+        - services/metrics/**/*
+        - .gitlab-ci.yml
+      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
       variables:
         WEBCMS_SITE: dev
+      when: always
     - if: '$CI_COMMIT_BRANCH == "staging"'
       variables:
         WEBCMS_SITE: stage
+      when: always
     - if: '$CI_COMMIT_BRANCH == "development"'
       variables:
         WEBCMS_SITE: development
+      when: always
 
   script:
     - /kaniko/executor
@@ -504,16 +531,17 @@ build:traefik:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-# Note: Security scanning jobs (Drupal, Nginx, Drush, Database, Metrics, .Traefik, .CloudWatch)
-# are defined in the Prisma Cloud integration but may be incomplete in this configuration.
-# Refer to Prisma Cloud documentation for proper job definitions.
+# Note: Additional security scanning jobs for container images are configured
+# in Prisma Cloud. These jobs scan built images for vulnerabilities and may include
+# separate jobs for Drupal, Nginx, Drush, Metrics, and Traefik images.
 
 
-#region Preproduction
+#region Preproduction AWS Account
 
-# Preproduction Environment Jobs
-# These jobs manage the shared AWS infrastructure and application deployments
-# for the preproduction environment (development, staging, and production sites)
+# Preproduction AWS Account Jobs
+# These jobs manage infrastructure and application deployments in the preproduction AWS account.
+# This account hosts multiple logical environments: development site, staging site, and production (dev) site.
+# All share WEBCMS_ENVIRONMENT=preproduction but differ by WEBCMS_SITE variable.
 
 # Infrastructure Provisioning Jobs (live branch only)
 # Creates/updates shared AWS resources: VPC, ECS cluster, load balancers, S3 buckets, etc.
