@@ -719,7 +719,7 @@ deploy:dev:plan-es:
 deploy:dev:apply-en:
   extends: .deploy:production
   stage: deploy:dev:apply:en
-  needs: ["deploy:dev:plan-en", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
+  needs: ["deploy:dev:plan-en", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
   dependencies: ["deploy:dev:plan-en"]            # Downloads plan artifact only (not build artifacts)
   variables:
     WEBCMS_LANG: en
@@ -745,7 +745,7 @@ deploy:dev:apply-en:
 deploy:dev:apply-es:
   extends: .deploy:production
   stage: deploy:dev:apply:es
-  needs: ["deploy:dev:plan-es", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
+  needs: ["deploy:dev:plan-es", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
   dependencies: ["deploy:dev:plan-es"]
   variables:
     WEBCMS_LANG: es
@@ -823,7 +823,7 @@ deploy:development:plan:
 deploy:development:apply:
   extends: .deploy:development
   stage: deploy:development:apply
-  needs: ["deploy:development:plan", "build:drupal"]  # Waits for plan + all 3 parallel builds (drupal, nginx, drush)
+  needs: ["deploy:development:plan", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
   dependencies: ["deploy:development:plan"]            # Downloads plan artifact only (not build artifacts)
   resource_group: site/development                     # Prevents concurrent apply operations
   environment:
@@ -904,7 +904,7 @@ deploy:stage:plan:
 deploy:stage:apply:
   extends: .deploy:staging
   stage: deploy:stage:apply
-  needs: ["deploy:stage:plan", "build:drupal"]  # Waits for plan (matrix job) + all 3 parallel builds
+  needs: ["deploy:stage:plan", "build:drupal"]  # Waits for plan (matrix job) + build completion
   dependencies: ["deploy:stage:plan"]            # Downloads plan artifacts from matrix jobs (en + es)
   parallel:
     matrix:
