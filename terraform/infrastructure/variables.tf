@@ -82,11 +82,6 @@ variable "db_instance_count" {
   type        = number
 }
 
-#variable "proxy_target_endpoint" {
-#  description = "Name of the endpoint the proxy connects to"
-#  type = string
-#}
-
 variable "regional_cluster_endpoint" {
   description = "Endpoint of the regional cluster this instance will connect to"
   type        = string
@@ -138,7 +133,7 @@ variable "search_dedicated_node_type" {
 }
 
 variable "search_dedicated_node_count" {
-  description = "Number of dedicatd master nodes to deploy in the Elasticsearch cluster. Set to 0 to disable dedicated nodes."
+  description = "Number of dedicated master nodes to deploy in the Elasticsearch cluster. Set to 0 to disable dedicated nodes."
   type        = number
 }
 

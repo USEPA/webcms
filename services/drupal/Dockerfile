@@ -65,7 +65,7 @@ RUN set -ex \
 #   * %{system}C - system CPU percentage (i.e., time spent in system calls)
 #   * %{total}C - total CPU (same as %C by itself)
 # * %d - request duration (in seconds)
-#   * %{<format>}d - duration in <format> (seconds, miliseconds [sic], microseconds)
+# * %{<format>}d - duration in <format> (seconds, milliseconds [sic], microseconds)
 # * %{VAR}e - read $VAR from environment
 # * %f - script filename
 # * %m - HTTP method
