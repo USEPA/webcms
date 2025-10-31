@@ -491,7 +491,7 @@ function build_content_moderation_info_box(EntityInterface $entity, array &$buil
   // we really only want the link and not the extra div that comes with the
   // flag template out of the box.
   $flag_link_plugin = $flag->getLinkTypePlugin();
-  $flag_link = $flag_link_plugin->getAsFlagLink($flag, $entity);
+  $flag_link = $flag_link_plugin->getAsFlagLink($flag, $entity, 'default');
 
   $flag_link_item = [
     '#markup' => $renderer->render($flag_link),
