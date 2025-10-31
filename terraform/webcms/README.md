@@ -110,8 +110,8 @@ Note that while it is always safe to keep `drupal_state` in `"build"`, this will
 
 Database connection information is stored in Secrets Manager instead of being provided as plain text variables.
 
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 8 database.
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database. While always set, this is only used in environments where a D7-to-D8 migration is run.
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 10 database (note: identifier retained as 'd8' for backwards compatibility with existing infrastructure).
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database. While always set, this is only used in environments where a D7-to-D10 migration is run.
 
 #### Email Variables
 
@@ -176,7 +176,7 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drush`: The name of the log group for Drush runs.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drupal`: The name of the log group for Drupal application logs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 10 login credentials (note: identifier retained as 'd8' for backwards compatibility).
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.

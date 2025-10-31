@@ -24,7 +24,7 @@ resource "aws_ecs_task_definition" "drush_task" {
       # Set the default command for our task definition to be a cron-like shell
       # script loop. Busybox's crond doesn't seem to function when running as a
       # non-root user, and even if it did, we only have one scheduled task.
-      command = ["sh", "-c", "while sleep 1m; do drush \"--uri=$${WEBCMS_SITE_URL}\" cron || true; done"]
+      command = ["sh", "-c", "CRON_INTERVAL=60; while sleep ${CRON_INTERVAL}m; do echo \"$(date): Running cron\" && drush \"--uri=$${WEBCMS_SITE_URL}\" cron && echo \"$(date): Cron completed successfully\" || echo \"$(date): Cron failed with exit code $?\"; done"]
 
       workingDirectory = "/var/www/html"
 
