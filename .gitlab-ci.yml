@@ -306,7 +306,6 @@ include:
 # Staging Environment Template (staging branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production.
 # Supports both English and Spanish languages.
-# Requires manual approval to provide a testing gate before production deployment.
 .deploy:staging:
   extends: .deploy
   variables:
@@ -314,7 +313,6 @@ include:
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual  # Manual approval enforces testing gate before production
 
 # Development Environment Template (development branch → WEBCMS_SITE: development)
 # Deploys to development environment for new feature testing
@@ -917,11 +915,6 @@ deploy:stage:apply:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to always require manual approval for staging
-  # Staging serves as final testing gate before production; manual review ensures quality
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual  # Always require approval for staging deployments (testing gate)
 
 #endregion
 
