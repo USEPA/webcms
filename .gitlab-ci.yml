@@ -1,4 +1,4 @@
-﻿# WebCMS GitLab CI/CD Pipeline Configuration
+# WebCMS GitLab CI/CD Pipeline Configuration
 # Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
 # Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
 # See docs/cicd-pipeline.md and docs/gitlab_ci_documentation.md for detailed documentation.
@@ -834,6 +834,7 @@ deploy:development:apply:
         ($CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success  # Auto-apply webcms changes to development environment
     - when: never       # Deny all other scenarios
+
 #endregion
 
 #region Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
