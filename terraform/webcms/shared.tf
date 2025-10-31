@@ -114,6 +114,9 @@ data "aws_ssm_parameter" "drupal_log_group" {
 
 #region Secrets Manager ARNs
 
+# Note: "d8" and "d7" are database identifiers (not Drupal versions)
+# d8 = Drupal 10 database (naming retained for backwards compatibility)
+# d7 = Legacy Drupal 7 database (for migration purposes)
 data "aws_ssm_parameter" "db_d8_credentials" {
   name = "/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials"
 }
@@ -180,9 +183,11 @@ locals {
       { name = "WEBCMS_LOG_GROUP", value = data.aws_ssm_parameter.drupal_log_group.value },
 
       # DB info
+      # Note: "_d8" suffix is a database identifier (not Drupal version)
+      # Database naming convention retained for backwards compatibility with existing databases
       { name = "WEBCMS_DB_HOST", value = data.aws_ssm_parameter.rds_proxy_endpoint.value },
-      { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },
-      { name = "WEBCMS_DB_NAME_D7", value = "webcms_${var.site}_${var.lang}_d7" },
+      { name = "WEBCMS_DB_NAME", value = "webcms_${var.site}_${var.lang}_d8" },        # Drupal 10 database
+      { name = "WEBCMS_DB_NAME_D7", value = "webcms_${var.site}_${var.lang}_d7" },  # Legacy D7 database
 
       # Mail
       { name = "WEBCMS_MAIL_USER", value = var.email_auth_user },
