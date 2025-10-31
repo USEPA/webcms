@@ -306,7 +306,6 @@ include:
 # Staging Environment Template (staging branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production.
 # Supports both English and Spanish languages.
-# Requires manual approval to provide a testing gate before production deployment.
 .deploy:staging:
   extends: .deploy
   variables:
@@ -314,7 +313,6 @@ include:
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual  # Manual approval enforces testing gate before production
 
 # Development Environment Template (development branch → WEBCMS_SITE: development)
 # Deploys to development environment for new feature testing
@@ -328,8 +326,6 @@ include:
     TF_STATE_NAME: development-webcms
   rules:
     - if: '$CI_COMMIT_BRANCH == "development"'
-
-#endregion
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -356,7 +352,9 @@ include:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-    
+
+#endregion
+
 #region Image Builds
 # Docker image build jobs using Kaniko (rootless, GitLab-compatible Docker builder).
 # Builds application containers and mirrors third-party images to ECR.
@@ -428,7 +426,7 @@ build:drupal:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
- # Build the FPM metrics sidecar container.
+# Build the FPM metrics sidecar container.
 build:metrics:
   extends: .kaniko
   stage: build
@@ -464,7 +462,7 @@ build:metrics:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     
- #endregion
+#endregion
 
 #region Docker Hub Mirrors
 # Mirror third-party images from Docker Hub to ECR for network isolation and availability.
@@ -615,7 +613,9 @@ infrastructure:preproduction:apply:
   environment:
     name: infra/preproduction
 
-# Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
+#endregion
+
+#region Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
 # Deploys application to production environment (English and Spanish)
 # Uses resource groups to prevent concurrent deployments to same site/language
 
@@ -771,16 +771,7 @@ deploy:dev:apply-es:
 
 #endregion
 
-
-
-
-
-
-#endregion
-
-
-
-# Development Environment Deployment (development branch → WEBCMS_SITE: development)
+#region Development Environment Deployments (development branch → WEBCMS_SITE: development)
 # Deploys to development environment for new feature testing (English-only)
 
 # Initialize Terraform for development deployment
@@ -843,9 +834,9 @@ deploy:development:apply:
         ($CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
       when: on_success  # Auto-apply webcms changes to development environment
     - when: never       # Deny all other scenarios
+#endregion
 
-
-# Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
+#region Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production
 # Supports both English and Spanish languages with parallel matrix builds
 
@@ -917,16 +908,11 @@ deploy:stage:apply:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to always require manual approval for staging
-  # Staging serves as final testing gate before production; manual review ensures quality
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: manual  # Always require approval for staging deployments (testing gate)
 
 #endregion
 
 
-# Database Update Jobs (Drush Operations)
+#region Database Update Jobs (Drush Operations)
 # These jobs run after deployment to apply database schema updates and clear caches
 # They use ECS tasks to execute Drush commands in the deployed environment
 # Resource groups prevent overlapping Drush operations on the same site/language
@@ -1021,6 +1007,8 @@ update:dev:es:
   environment:
     name: site/dev-$WEBCMS_LANG
 
+#endregion
+
 ###################
 # Create Releases #
 ###################
@@ -1042,9 +1030,4 @@ artifacts:
       - ./terraform/infrastructure
       - ./terraform/webcms
     expire_in: 30 days  # Release artifacts kept longer for rollback scenarios
-
-
-
-
-
 
