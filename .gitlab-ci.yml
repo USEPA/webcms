@@ -844,6 +844,8 @@ update:dev:en:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  # Require manual approval for production database updates
+  when: manual
 
 update:dev:es:
   extends: .update
@@ -862,6 +864,8 @@ update:dev:es:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  # Require manual approval for production database updates
+  when: manual
 
 #endregion
 
