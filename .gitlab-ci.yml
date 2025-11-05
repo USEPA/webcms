@@ -5,7 +5,6 @@
 
 stages:
   # Infrastructure Provisioning (live branch only)
-  - infrastructure_preprod_build      # Build Traefik reverse proxy image
   - infrastructure_preprod_init       # Initialize Terraform backend and providers
   - infrastructure_preprod_validate   # Validate Terraform configuration syntax
   - infrastructure_preprod_plan       # Generate Terraform execution plan
@@ -26,12 +25,6 @@ stages:
   - deploy:dev:validate:es            # Validate Spanish production Terraform config
   - deploy:dev:plan:es                # Plan Spanish production deployment
   - deploy:dev:apply:es               # Apply Spanish production deployment
-
-  # Development Deployment (development branch → WEBCMS_SITE: development)
-  - deploy:development:init           # Initialize development deployment (English only)
-  - deploy:development:validate       # Validate development Terraform config
-  - deploy:development:plan           # Plan development deployment
-  - deploy:development:apply          # Apply development deployment (automatic)
 
   # Staging Deployment (staging branch → WEBCMS_SITE: stage)
   - deploy:stage:init                 # Initialize staging deployment (English + Spanish)
@@ -314,19 +307,6 @@ include:
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'
 
-# Development Environment Template (development branch → WEBCMS_SITE: development)
-# Deploys to development environment for new feature testing
-# English-only environment with automatic deployments
-.deploy:development:
-  extends: .deploy
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    WEBCMS_LANG: en
-    TF_STATE_NAME: development-webcms
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
 # Configures ECR authentication and layer caching for efficient builds
@@ -383,10 +363,6 @@ build:drupal:
     - if: '$CI_COMMIT_BRANCH == "staging"'
       variables:
         WEBCMS_SITE: stage
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "development"'
-      variables:
-        WEBCMS_SITE: development
       when: always
 
    # Matrix builds three container variants from services/drupal/Dockerfile.
@@ -447,10 +423,6 @@ build:metrics:
       variables:
         WEBCMS_SITE: stage
       when: always
-    - if: '$CI_COMMIT_BRANCH == "development"'
-      variables:
-        WEBCMS_SITE: development
-      when: always
 
   script:
     - /kaniko/executor
@@ -502,37 +474,9 @@ copy:cloudwatch:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-# Build custom Traefik image based on version 2.4
-# Uses "latest" tag as specified in terraform/infrastructure/traefik_service.tf
-build:traefik:
-  extends: .kaniko
-  stage: infrastructure_preprod_build
-  rules:
-    - changes:
-        - services/traefik/**/*
-        - .gitlab-ci.yml
-      when: always
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      when: always
-  script:
-    - /kaniko/executor
-      $KANIKO_CACHE_ARGS
-      --context=$CI_PROJECT_DIR/services/traefik
-      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
-      --build-arg GIT_TAG=$CI_COMMIT_TAG
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-traefik:latest      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-traefik:latest
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-
 # Note: Additional security scanning jobs for container images are configured
 # in Prisma Cloud. These jobs scan built images for vulnerabilities and may include
-# separate jobs for Drupal, Nginx, Drush, Metrics, and Traefik images.
+# separate jobs for Drupal, Nginx, Drush, and Metrics images.
 
 
 #region Preproduction AWS Account
@@ -771,71 +715,6 @@ deploy:dev:apply-es:
 
 #endregion
 
-#region Development Environment Deployments (development branch → WEBCMS_SITE: development)
-# Deploys to development environment for new feature testing (English-only)
-
-# Initialize Terraform for development deployment
-deploy:development:init:
-  extends: .deploy:development
-  stage: deploy:development:init
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-  resource_group: site/development
-  environment:
-    name: site/development
-  script:
-    - echo $TF_ADDRESS
-    - gitlab-terraform init
-
-deploy:development:validate:
-  extends: .deploy:development
-  stage: deploy:development:validate
-  needs: ["deploy:development:init"]  # Depends on init; runs in parallel with builds
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-  environment:
-    name: site/development
-  script:
-    - gitlab-terraform validate
-
-deploy:development:plan:
-  extends: .deploy:development
-  stage: deploy:development:plan
-  needs: ["deploy:development:validate"]  # Depends on validation; runs in parallel with builds
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-  resource_group: site/development        # Prevents concurrent plan/apply to development site
-  environment:
-    name: site/development
-  script:
-    - gitlab-terraform plan
-    - gitlab-terraform plan-json
-  artifacts:
-    name: terraform-plan-webcms-development-${CI_COMMIT_SHORT_SHA}
-    paths:
-      - $TF_ROOT/plan.cache
-    reports:
-      terraform: $TF_ROOT/plan.json
-    expire_in: 1 day  # Short retention; development plans applied immediately (no manual gate)
-
-deploy:development:apply:
-  extends: .deploy:development
-  stage: deploy:development:apply
-  needs: ["deploy:development:plan", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
-  dependencies: ["deploy:development:plan"]            # Downloads plan artifact only (not build artifacts)
-  resource_group: site/development                     # Prevents concurrent apply operations
-  environment:
-    name: site/development
-  script:
-    - gitlab-terraform apply
-  # Development deployments only run on development branch
-  # Auto-apply all changes (development environment is lower risk and requires fast iteration)
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-      when: on_success
-
-#endregion
-
 #region Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production
 # Supports both English and Spanish languages with parallel matrix builds
@@ -919,25 +798,6 @@ deploy:stage:apply:
 # These jobs run after deployment to apply database schema updates and clear caches
 # They use ECS tasks to execute Drush commands in the deployed environment
 # Resource groups prevent overlapping Drush operations on the same site/language
-
-update:development:
-  extends: .update
-  stage: update:en
-  needs: ["deploy:development:apply"]  # Run after deployment completes
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: development
-    WEBCMS_LANG: en
-
-  # Resource group prevents overlapping Drush operations on the same site
-  # Environment tracking enables deployment status visibility
-  resource_group: drush/development
-  environment:
-    name: site/development
-
 
 update:stage:en:
   extends: .update
