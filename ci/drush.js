@@ -74,7 +74,10 @@ async function main() {
   // Note that while the AWS SDK does include helpers for waiting on a task to finish,
   // we poll manually in order to output progress information to the console. (Waiters are
   // single-shot and have a maximum timeout.)
-  while (true) {
+  const maxIterations = 360; // 30 minutes at 5-second intervals
+  let iterationCount = 0;
+
+  while (iterationCount < maxIterations) {
     // We wait at the start of the loop to allow ECS' eventual consistency to "settle",
     // preventing "task not found" errors that may appear if we check the status too
     // early.
@@ -95,6 +98,13 @@ async function main() {
       lastSeenStatus = status;
       ui.log(`Drush status: ${lastSeenStatus}`);
     }
+
+    iterationCount++;
+  }
+
+  // If we exceeded the maximum iterations, throw an error
+  if (iterationCount >= maxIterations) {
+    throw new Error(`Drush task did not complete within ${maxIterations * 5 / 60} minutes`);
   }
 
   const info = util.inspectDrushStatus(finalStatus);

@@ -5,13 +5,18 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Aws\Exception\AwsException;
 
 /**
  * Implements hook_module_implements_alter().
  */
 function epa_cloudfront_module_implements_alter(&$implementations, $hook) {
-  if ($hook === 'entity_update' && isset($implementations['cloudfront_cache_path_invalidate'])) {
-    unset($implementations['cloudfront_cache_path_invalidate']);
+  // Disable the default CloudFront module's entity_update and entity_insert hooks
+  // so that we can handle them safely ourselves.
+  if (in_array($hook, ['entity_update', 'entity_insert', 'entity_delete'], TRUE)) {
+    if (isset($implementations['cloudfront_cache_path_invalidate'])) {
+      unset($implementations['cloudfront_cache_path_invalidate']);
+    }
   }
 }
 
@@ -21,17 +26,74 @@ function epa_cloudfront_module_implements_alter(&$implementations, $hook) {
  * Ensures the cache expiration is only called when a node is published or
  * unpublished, not as a result of just any edit.
  */
-function epa_cloudfront_entity_update(EntityInterface $entity) {
+function epa_cloudfront_module_entity_update(EntityInterface $entity) {
   $current_user = \Drupal::currentUser();
 
-  if (!$current_user->isAnonymous()) {
-    $entity_type = $entity->getEntityTypeId();
-    if ($entity_type == 'content_moderation_state' &&
-      $entity->content_entity_type_id->value == 'node' &&
-      in_array($entity->moderation_state->value, ['published', 'unpublished'])) {
-      if ($moderated_entity = \Drupal::entityTypeManager()->getStorage($entity->content_entity_type_id->value)->loadRevision($entity->content_entity_revision_id->value)) {
+  if ($current_user->isAnonymous()) { return; }
+
+  $entity_type = $entity->getEntityTypeId();
+  if ($entity_type === 'content_moderation_state' &&
+      $entity->content_entity_type_id->value === 'node' &&
+      in_array($entity->moderation_state->value, ['published', 'unpublished'], TRUE)) {
+
+    $storage = \Drupal::entityTypeManager()->getStorage($entity->content_entity_type_id->value);
+    $moderated_entity = $storage->loadRevision($entity->content_entity_revision_id->value);
+
+    if ($moderated_entity && function_exists('cloudfront_cache_path_invalidate_entity_update')) {
+      try {
         cloudfront_cache_path_invalidate_entity_update($moderated_entity);
       }
+      catch (AwsException $e) {
+        \Drupal::logger('epa_cloudfront_module')->warning(
+          'CloudFront invalidation failed during node update: @message',
+          ['@message' => $e->getAwsErrorMessage() ?: $e->getMessage()]
+        );
+      }
+      catch (\Exception $e) {
+        \Drupal::logger('epa_cloudfront_module')->warning(
+          'Unexpected error during CloudFront invalidation: @message',
+          ['@message' => $e->getMessage()]
+        );
+      }
     }
+  }
+}
+
+
+/**
+ * Implements hook_entity_insert().
+ *
+ * Invalidates CloudFront cache only when a node is published,
+ * and gracefully handles missing AWS credentials.
+ */
+function epa_cloudfront_module_entity_insert(EntityInterface $entity) {
+  // Only handle node entities.
+  if ($entity->getEntityTypeId() !== 'node') {
+    return;
+  }
+
+  // Only trigger invalidation for published nodes.
+  if (!$entity->isPublished()) {
+    return;
+  }
+
+  // Wrap the invalidation call to prevent AWS SDK errors from killing the request.
+  try {
+    // Call the CloudFront module’s invalidation helper for this entity.
+    if (function_exists('cloudfront_cache_path_invalidate_entity_insert')) {
+      cloudfront_cache_path_invalidate_entity_insert($entity);
+    }
+  }
+  catch (AwsException $e) {
+    \Drupal::logger('epa_cloudfront_module')->warning(
+      'CloudFront invalidation failed during node insert: @message',
+      ['@message' => $e->getAwsErrorMessage() ?: $e->getMessage()]
+    );
+  }
+  catch (\Exception $e) {
+    \Drupal::logger('epa_cloudfront_module')->warning(
+      'Unexpected error during CloudFront invalidation: @message',
+      ['@message' => $e->getMessage()]
+    );
   }
 }
