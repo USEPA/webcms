@@ -360,10 +360,6 @@ build:drupal:
       variables:
         WEBCMS_SITE: dev
       when: always
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      variables:
-        WEBCMS_SITE: stage
-      when: always
 
    # Matrix builds three container variants from services/drupal/Dockerfile.
    # Build order (drupal, nginx, drush) optimizes layer caching: drupal builds expensive
@@ -419,10 +415,6 @@ build:metrics:
       variables:
         WEBCMS_SITE: dev
       when: always
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      variables:
-        WEBCMS_SITE: stage
-      when: always
 
   script:
     - /kaniko/executor
@@ -460,7 +452,6 @@ copy:cloudwatch:
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   script:
     - mkdir -p /workspace
