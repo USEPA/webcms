@@ -778,6 +778,8 @@ deploy:dev:apply-es:
 deploy:development:init:
   extends: .deploy:development
   stage: deploy:development:init
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
   resource_group: site/development
   environment:
     name: site/development
@@ -789,6 +791,8 @@ deploy:development:validate:
   extends: .deploy:development
   stage: deploy:development:validate
   needs: ["deploy:development:init"]  # Depends on init; runs in parallel with builds
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
   environment:
     name: site/development
   script:
@@ -798,6 +802,8 @@ deploy:development:plan:
   extends: .deploy:development
   stage: deploy:development:plan
   needs: ["deploy:development:validate"]  # Depends on validation; runs in parallel with builds
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
   resource_group: site/development        # Prevents concurrent plan/apply to development site
   environment:
     name: site/development
