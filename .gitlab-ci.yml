@@ -828,18 +828,11 @@ deploy:development:apply:
     name: site/development
   script:
     - gitlab-terraform apply
-  # Override template rules to auto-apply all development changes (no manual gate)
-  # Development environment is lower risk and requires fast iteration
+  # Development deployments only run on development branch
+  # Auto-apply all changes (development environment is lower risk and requires fast iteration)
   rules:
-    - if: >-
-        $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Infrastructure module still requires approval even on development branch
-    - if: >-
-        $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success  # Auto-apply webcms changes to development environment
-    - when: never       # Deny all other scenarios
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: on_success
 
 #endregion
 
