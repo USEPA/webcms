@@ -296,7 +296,7 @@ include:
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
-# Staging Environment Template (staging branch → WEBCMS_SITE: stage)
+# Staging Environment Template (live branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production.
 # Supports both English and Spanish languages.
 .deploy:staging:
@@ -305,7 +305,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -359,10 +359,6 @@ build:drupal:
     - if: '$CI_COMMIT_BRANCH == "live"'
       variables:
         WEBCMS_SITE: dev
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      variables:
-        WEBCMS_SITE: stage
       when: always
 
    # Matrix builds three container variants from services/drupal/Dockerfile.
@@ -419,10 +415,6 @@ build:metrics:
       variables:
         WEBCMS_SITE: dev
       when: always
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-      variables:
-        WEBCMS_SITE: stage
-      when: always
 
   script:
     - /kaniko/executor
@@ -460,7 +452,6 @@ copy:cloudwatch:
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
     - if: '$CI_COMMIT_BRANCH == "live"'
-    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   script:
     - mkdir -p /workspace
@@ -674,8 +665,7 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to auto-apply webcms module changes (low risk)
-  # Manual approval only required for infrastructure module changes (high risk)
+  # Require manual approval for all production deployments
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
@@ -684,7 +674,7 @@ deploy:dev:apply-en:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success  # Auto-apply task definition and service config changes
+      when: manual      # Require manual approval for all production deployments
     - when: never       # Deny all other scenarios
 
 deploy:dev:apply-es:
@@ -700,8 +690,7 @@ deploy:dev:apply-es:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to auto-apply webcms module changes (low risk)
-  # Manual approval only required for infrastructure module changes (high risk)
+  # Require manual approval for all production deployments
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
@@ -710,7 +699,7 @@ deploy:dev:apply-es:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success  # Auto-apply task definition and service config changes
+      when: manual      # Require manual approval for all production deployments
     - when: never       # Deny all other scenarios
 
 #endregion
@@ -804,7 +793,7 @@ update:stage:en:
   stage: update:en
   needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -824,7 +813,7 @@ update:stage:es:
   stage: update:es
   needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -855,6 +844,8 @@ update:dev:en:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  # Require manual approval for production database updates
+  when: manual
 
 update:dev:es:
   extends: .update
@@ -873,6 +864,8 @@ update:dev:es:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  # Require manual approval for production database updates
+  when: manual
 
 #endregion
 
