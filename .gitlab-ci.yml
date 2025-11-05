@@ -296,7 +296,7 @@ include:
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
-# Staging Environment Template (staging branch → WEBCMS_SITE: stage)
+# Staging Environment Template (live branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production.
 # Supports both English and Spanish languages.
 .deploy:staging:
@@ -305,7 +305,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -804,7 +804,7 @@ update:stage:en:
   stage: update:en
   needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -824,7 +824,7 @@ update:stage:es:
   stage: update:es
   needs: ["deploy:stage:apply"]  # Run after staging deployment completes
   rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
