@@ -665,8 +665,7 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to auto-apply webcms module changes (low risk)
-  # Manual approval only required for infrastructure module changes (high risk)
+  # Require manual approval for all production deployments
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
@@ -675,7 +674,7 @@ deploy:dev:apply-en:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success  # Auto-apply task definition and service config changes
+      when: manual      # Require manual approval for all production deployments
     - when: never       # Deny all other scenarios
 
 deploy:dev:apply-es:
@@ -691,8 +690,7 @@ deploy:dev:apply-es:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
-  # Override template rules to auto-apply webcms module changes (low risk)
-  # Manual approval only required for infrastructure module changes (high risk)
+  # Require manual approval for all production deployments
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
@@ -701,7 +699,7 @@ deploy:dev:apply-es:
     - if: >-
         $TF_MODULE == "webcms" &&
         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: on_success  # Auto-apply task definition and service config changes
+      when: manual      # Require manual approval for all production deployments
     - when: never       # Deny all other scenarios
 
 #endregion
