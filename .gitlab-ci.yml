@@ -430,7 +430,8 @@ build:metrics:
       --context=$CI_PROJECT_DIR/services/metrics
       --build-arg GIT_COMMIT=$CI_COMMIT_SHA
       --build-arg GIT_TAG=$CI_COMMIT_TAG
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     
@@ -469,7 +470,8 @@ copy:cloudwatch:
       --context=/workspace
       --build-arg GIT_COMMIT=$CI_COMMIT_SHA
       --build-arg GIT_TAG=$CI_COMMIT_TAG
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-aws-cloudwatch
       
   variables:
     WEBCMS_ENVIRONMENT: preproduction
