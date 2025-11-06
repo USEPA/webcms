@@ -853,13 +853,11 @@ deploy:dev:apply-es:
 # Supports both English and Spanish languages with parallel matrix builds
 
 # Initialize Terraform for staging deployments
-deploy:stage:init:
+deploy:stage:init-en:
   extends: .deploy:staging
   stage: deploy:stage:init
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
   resource_group: site/stage-$WEBCMS_LANG
   environment:
@@ -867,16 +865,26 @@ deploy:stage:init:
   script:
     - gitlab-terraform init
 
-deploy:stage:validate:
+deploy:stage:init-es:
+  extends: .deploy:staging
+  stage: deploy:stage:init
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform init
+
+deploy:stage:validate-en:
   extends: .deploy:staging
   stage: deploy:stage:validate
   needs:
-    - job: "deploy:stage:init"
+    - job: "deploy:stage:init-en"
       optional: true
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel validation jobs (English + Spanish)
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
   resource_group: site/stage-$WEBCMS_LANG
   environment:
@@ -884,52 +892,105 @@ deploy:stage:validate:
   script:
     - gitlab-terraform validate
 
-deploy:stage:plan:
+deploy:stage:validate-es:
+  extends: .deploy:staging
+  stage: deploy:stage:validate
+  needs:
+    - job: "deploy:stage:init-es"
+      optional: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform validate
+
+deploy:stage:plan-en:
   extends: .deploy:staging
   stage: deploy:stage:plan
   needs:
-    - job: "deploy:stage:validate"
+    - job: "deploy:stage:validate-en"
       optional: true
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel plan jobs (English + Spanish)
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
+  resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   artifacts:
-    name: terraform-plan-webcms-${WEBCMS_SITE}-${WEBCMS_LANG}-${CI_COMMIT_SHORT_SHA}
+    name: terraform-plan-webcms-${WEBCMS_SITE}-en-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
-    expire_in: 7 days  # Longer retention; staging plans require manual approval and testing review
+    expire_in: 7 days
 
-deploy:stage:apply:
+deploy:stage:plan-es:
+  extends: .deploy:staging
+  stage: deploy:stage:plan
+  needs:
+    - job: "deploy:stage:validate-es"
+      optional: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  artifacts:
+    name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+    expire_in: 7 days
+
+deploy:stage:apply-en:
   extends: .deploy:staging
   stage: deploy:stage:apply
   needs:
-    - job: "deploy:stage:plan"
+    - job: "deploy:stage:plan-en"
       optional: true
     - job: "build:drupal"
       optional: true
-  dependencies: ["deploy:stage:plan"]            # Downloads plan artifacts from matrix jobs (en + es)
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel apply jobs (English + Spanish)
+  dependencies: ["deploy:stage:plan-en"]
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent apply operations to same site/language
+  resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
   # Temporary: Require manual approval for staging deployments during initial AWS testing
-  # This ensures no accidental changes to production environment
+  when: manual
+
+deploy:stage:apply-es:
+  extends: .deploy:staging
+  stage: deploy:stage:apply
+  needs:
+    - job: "deploy:stage:plan-es"
+      optional: true
+    - job: "build:drupal"
+      optional: true
+  dependencies: ["deploy:stage:plan-es"]
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform apply
+  # Temporary: Require manual approval for staging deployments during initial AWS testing
   when: manual
 
 #endregion
@@ -944,7 +1005,7 @@ update:stage:en:
   extends: .update
   stage: update:en
   needs:
-    - job: "deploy:stage:apply"
+    - job: "deploy:stage:apply-en"
       optional: true
   rules:
     - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
