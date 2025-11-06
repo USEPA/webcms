@@ -686,6 +686,9 @@ deploy:dev:apply-en:
     - gitlab-terraform apply
   # Require manual approval for all production deployments
   rules:
+    # Skip if WEBCMS_SITE is set to something other than dev
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+      when: never
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
@@ -715,6 +718,9 @@ deploy:dev:apply-es:
     - gitlab-terraform apply
   # Require manual approval for all production deployments
   rules:
+    # Skip if WEBCMS_SITE is set to something other than dev
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+      when: never
     - if: >-
         $TF_MODULE == "infrastructure" &&
         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
