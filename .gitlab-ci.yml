@@ -472,10 +472,125 @@ copy:cloudwatch:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-# Note: Additional security scanning jobs for container images are configured
-# in Prisma Cloud. These jobs scan built images for vulnerabilities and may include
-# separate jobs for Drupal, Nginx, Drush, and Metrics images.
+#endregion
 
+#region Prisma Cloud Image Scanning
+# Scan Docker images for vulnerabilities using Prisma Cloud (Twistlock)
+# These jobs pull images from GitLab registry and scan them using twistcli
+
+Prisma:Drupal:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Nginx:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Drush:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Metrics:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+#endregion
 
 #region Preproduction AWS Account
 
@@ -738,13 +853,11 @@ deploy:dev:apply-es:
 # Supports both English and Spanish languages with parallel matrix builds
 
 # Initialize Terraform for staging deployments
-deploy:stage:init:
+deploy:stage:init-en:
   extends: .deploy:staging
   stage: deploy:stage:init
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
   resource_group: site/stage-$WEBCMS_LANG
   environment:
@@ -752,16 +865,26 @@ deploy:stage:init:
   script:
     - gitlab-terraform init
 
-deploy:stage:validate:
+deploy:stage:init-es:
+  extends: .deploy:staging
+  stage: deploy:stage:init
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform init
+
+deploy:stage:validate-en:
   extends: .deploy:staging
   stage: deploy:stage:validate
   needs:
-    - job: "deploy:stage:init"
+    - job: "deploy:stage:init-en"
       optional: true
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel validation jobs (English + Spanish)
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
   resource_group: site/stage-$WEBCMS_LANG
   environment:
@@ -769,52 +892,105 @@ deploy:stage:validate:
   script:
     - gitlab-terraform validate
 
-deploy:stage:plan:
+deploy:stage:validate-es:
+  extends: .deploy:staging
+  stage: deploy:stage:validate
+  needs:
+    - job: "deploy:stage:init-es"
+      optional: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform validate
+
+deploy:stage:plan-en:
   extends: .deploy:staging
   stage: deploy:stage:plan
   needs:
-    - job: "deploy:stage:validate"
+    - job: "deploy:stage:validate-en"
       optional: true
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel plan jobs (English + Spanish)
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
+  resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
   artifacts:
-    name: terraform-plan-webcms-${WEBCMS_SITE}-${WEBCMS_LANG}-${CI_COMMIT_SHORT_SHA}
+    name: terraform-plan-webcms-${WEBCMS_SITE}-en-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache
     reports:
       terraform: $TF_ROOT/plan.json
-    expire_in: 7 days  # Longer retention; staging plans require manual approval and testing review
+    expire_in: 7 days
 
-deploy:stage:apply:
+deploy:stage:plan-es:
+  extends: .deploy:staging
+  stage: deploy:stage:plan
+  needs:
+    - job: "deploy:stage:validate-es"
+      optional: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  artifacts:
+    name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
+    paths:
+      - $TF_ROOT/plan.cache
+    reports:
+      terraform: $TF_ROOT/plan.json
+    expire_in: 7 days
+
+deploy:stage:apply-en:
   extends: .deploy:staging
   stage: deploy:stage:apply
   needs:
-    - job: "deploy:stage:plan"
+    - job: "deploy:stage:plan-en"
       optional: true
     - job: "build:drupal"
       optional: true
-  dependencies: ["deploy:stage:plan"]            # Downloads plan artifacts from matrix jobs (en + es)
-  parallel:
-    matrix:
-      - WEBCMS_LANG: [en, es]  # Creates 2 parallel apply jobs (English + Spanish)
+  dependencies: ["deploy:stage:plan-en"]
   variables:
+    WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG  # Prevents concurrent apply operations to same site/language
+  resource_group: site/stage-$WEBCMS_LANG
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
     - gitlab-terraform apply
   # Temporary: Require manual approval for staging deployments during initial AWS testing
-  # This ensures no accidental changes to production environment
+  when: manual
+
+deploy:stage:apply-es:
+  extends: .deploy:staging
+  stage: deploy:stage:apply
+  needs:
+    - job: "deploy:stage:plan-es"
+      optional: true
+    - job: "build:drupal"
+      optional: true
+  dependencies: ["deploy:stage:plan-es"]
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
+  resource_group: site/stage-$WEBCMS_LANG
+  environment:
+    name: site/stage-$WEBCMS_LANG
+  script:
+    - gitlab-terraform apply
+  # Temporary: Require manual approval for staging deployments during initial AWS testing
   when: manual
 
 #endregion
@@ -829,7 +1005,7 @@ update:stage:en:
   extends: .update
   stage: update:en
   needs:
-    - job: "deploy:stage:apply"
+    - job: "deploy:stage:apply-en"
       optional: true
   rules:
     - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
@@ -853,7 +1029,7 @@ update:stage:es:
   extends: .update
   stage: update:es
   needs:
-    - job: "deploy:stage:apply"
+    - job: "deploy:stage:apply-es"
       optional: true
   rules:
     - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
