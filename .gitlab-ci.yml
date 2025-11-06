@@ -832,6 +832,8 @@ update:stage:en:
     - job: "deploy:stage:apply"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -854,6 +856,8 @@ update:stage:es:
     - job: "deploy:stage:apply"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -875,6 +879,8 @@ update:dev:en:
     - job: "deploy:dev:apply-en"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -897,6 +903,8 @@ update:dev:es:
     - job: "deploy:dev:apply-es"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
