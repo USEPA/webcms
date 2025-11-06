@@ -16,8 +16,7 @@ stages:
   - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
 
   # Docker Image Builds (all branches)
-  - build                             # Build application Docker images (drupal, nginx, drush, metrics)
-  - copy                              # Mirror third-party images to ECR (CloudWatch agent)
+  - build                             # Build application Docker images (drupal, nginx, drush)
 
   # Production Deployment (live branch → WEBCMS_SITE: dev)
   - deploy:dev:init:en                # Initialize English production deployment
