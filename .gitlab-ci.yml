@@ -749,7 +749,9 @@ deploy:stage:init:
 deploy:stage:validate:
   extends: .deploy:staging
   stage: deploy:stage:validate
-  needs: ["deploy:stage:init"]  # Depends on init (matrix job); runs in parallel with builds
+  needs:
+    - job: "deploy:stage:init"
+      optional: true
   parallel:
     matrix:
       - WEBCMS_LANG: [en, es]  # Creates 2 parallel validation jobs (English + Spanish)
@@ -764,7 +766,9 @@ deploy:stage:validate:
 deploy:stage:plan:
   extends: .deploy:staging
   stage: deploy:stage:plan
-  needs: ["deploy:stage:validate"]  # Depends on validation (matrix job); runs in parallel with builds
+  needs:
+    - job: "deploy:stage:validate"
+      optional: true
   parallel:
     matrix:
       - WEBCMS_LANG: [en, es]  # Creates 2 parallel plan jobs (English + Spanish)
@@ -787,7 +791,11 @@ deploy:stage:plan:
 deploy:stage:apply:
   extends: .deploy:staging
   stage: deploy:stage:apply
-  needs: ["deploy:stage:plan", "build:drupal"]  # Waits for plan (matrix job) + build completion
+  needs:
+    - job: "deploy:stage:plan"
+      optional: true
+    - job: "build:drupal"
+      optional: true
   dependencies: ["deploy:stage:plan"]            # Downloads plan artifacts from matrix jobs (en + es)
   parallel:
     matrix:
