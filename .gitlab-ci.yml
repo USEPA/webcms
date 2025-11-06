@@ -18,7 +18,6 @@ stages:
   # Docker Image Builds (all branches)
   - build                             # Build application Docker images (drupal, nginx, drush, metrics)
   - copy                              # Mirror third-party images to ECR (CloudWatch agent)
-  - Image Scan                        # Security scan images with Prisma Cloud
 
   # Production Deployment (live branch → WEBCMS_SITE: dev)
   - deploy:dev:init:en                # Initialize English production deployment
@@ -45,7 +44,8 @@ stages:
   - artifacts                         # Create deployment artifacts
   - release                           # Create GitLab releases
 
-  # Security Scanning (GitLab built-in)
+  # Security Scanning
+  - Image Scan                        # Prisma Cloud image vulnerability scanning
   - test                              # Run SAST, dependency scanning, secret detection
 
 # Global Pipeline Configuration
