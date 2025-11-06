@@ -593,7 +593,9 @@ deploy:dev:init:es:
 deploy:dev:validate:en:
   extends: .deploy:production
   stage: deploy:dev:validate:en
-  needs: ["deploy:dev:init:en"]  # Depends on init; runs in parallel with builds and other language validations
+  needs:
+    - job: "deploy:dev:init:en"
+      optional: true
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -605,7 +607,9 @@ deploy:dev:validate:en:
 deploy:dev:validate:es:
   extends: .deploy:production
   stage: deploy:dev:validate:es
-  needs: ["deploy:dev:init:es"]  # Depends on init; runs in parallel with builds and other language validations
+  needs:
+    - job: "deploy:dev:init:es"
+      optional: true
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -618,7 +622,9 @@ deploy:dev:validate:es:
 deploy:dev:plan-en:
   extends: .deploy:production
   stage: deploy:dev:plan:en
-  needs: ["deploy:dev:validate:en"]  # Depends on validation; runs in parallel with builds and other language plans
+  needs:
+    - job: "deploy:dev:validate:en"
+      optional: true
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -639,7 +645,9 @@ deploy:dev:plan-en:
 deploy:dev:plan-es:
   extends: .deploy:production
   stage: deploy:dev:plan:es
-  needs: ["deploy:dev:validate:es"]  # Depends on validation; runs in parallel with builds and other language plans
+  needs:
+    - job: "deploy:dev:validate:es"
+      optional: true
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -662,7 +670,11 @@ deploy:dev:plan-es:
 deploy:dev:apply-en:
   extends: .deploy:production
   stage: deploy:dev:apply:en
-  needs: ["deploy:dev:plan-en", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
+  needs:
+    - job: "deploy:dev:plan-en"
+      optional: true
+    - job: "build:drupal"
+      optional: true
   dependencies: ["deploy:dev:plan-en"]            # Downloads plan artifact only (not build artifacts)
   variables:
     WEBCMS_LANG: en
@@ -687,7 +699,11 @@ deploy:dev:apply-en:
 deploy:dev:apply-es:
   extends: .deploy:production
   stage: deploy:dev:apply:es
-  needs: ["deploy:dev:plan-es", "build:drupal"]  # Waits for plan + build completion (builds run in parallel matrix)
+  needs:
+    - job: "deploy:dev:plan-es"
+      optional: true
+    - job: "build:drupal"
+      optional: true
   dependencies: ["deploy:dev:plan-es"]
   variables:
     WEBCMS_LANG: es
