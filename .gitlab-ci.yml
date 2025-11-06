@@ -294,7 +294,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE == null || $WEBCMS_SITE == "dev")'
 
 # Staging Environment Template (live branch → WEBCMS_SITE: stage)
 # Deploys to staging environment for final testing before production.
@@ -305,7 +305,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE == null || $WEBCMS_SITE == "stage")'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -347,6 +347,9 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
+    # Build for specific site if WEBCMS_SITE variable is set in pipeline
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
+      when: never
     - changes:
         - services/drupal/**/*
         - .gitlab-ci.yml
@@ -402,6 +405,9 @@ build:metrics:
   extends: .kaniko
   stage: build
   rules:
+    # Build for specific site if WEBCMS_SITE variable is set in pipeline
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
+      when: never
     - changes:
         - services/metrics/**/*
         - .gitlab-ci.yml
