@@ -1029,7 +1029,7 @@ update:stage:es:
   extends: .update
   stage: update:es
   needs:
-    - job: "deploy:stage:apply"
+    - job: "deploy:stage:apply-es"
       optional: true
   rules:
     - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
