@@ -482,9 +482,12 @@ Prisma:Drupal:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -510,9 +513,12 @@ Prisma:Nginx:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -538,9 +544,12 @@ Prisma:Drush:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -566,9 +575,12 @@ Prisma:Metrics:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:metrics"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
