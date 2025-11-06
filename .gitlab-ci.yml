@@ -822,7 +822,9 @@ deploy:stage:apply:
 update:stage:en:
   extends: .update
   stage: update:en
-  needs: ["deploy:stage:apply"]  # Run after staging deployment completes
+  needs:
+    - job: "deploy:stage:apply"
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -842,7 +844,9 @@ update:stage:en:
 update:stage:es:
   extends: .update
   stage: update:es
-  needs: ["deploy:stage:apply"]  # Run after staging deployment completes
+  needs:
+    - job: "deploy:stage:apply"
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -861,7 +865,9 @@ update:stage:es:
 update:dev:en:
   extends: .update
   stage: update:en
-  needs: ["deploy:dev:apply-en"]  # Run after production English deployment completes
+  needs:
+    - job: "deploy:dev:apply-en"
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -881,7 +887,9 @@ update:dev:en:
 update:dev:es:
   extends: .update
   stage: update:es
-  needs: ["deploy:dev:apply-es"]  # Run after production Spanish deployment completes
+  needs:
+    - job: "deploy:dev:apply-es"
+      optional: true
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
 
