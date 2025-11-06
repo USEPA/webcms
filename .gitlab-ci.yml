@@ -472,10 +472,125 @@ copy:cloudwatch:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
 
-# Note: Additional security scanning jobs for container images are configured
-# in Prisma Cloud. These jobs scan built images for vulnerabilities and may include
-# separate jobs for Drupal, Nginx, Drush, and Metrics images.
+#endregion
 
+#region Prisma Cloud Image Scanning
+# Scan Docker images for vulnerabilities using Prisma Cloud (Twistlock)
+# These jobs pull images from GitLab registry and scan them using twistcli
+
+Prisma:Drupal:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Nginx:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Drush:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+Prisma:Metrics:
+  stage: Image Scan
+  tags:
+    - twistcli
+  rules:
+    # Filter by WEBCMS_SITE if set
+    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [dev, stage]
+  variables:
+    GIT_STRATEGY: none
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+  after_script:
+    - rm -rf $CI_PROJECT_DIR
+  allow_failure: true
+
+#endregion
 
 #region Preproduction AWS Account
 
