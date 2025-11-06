@@ -388,16 +388,11 @@ build:drupal:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-    # Check if pipeline variable WEBCMS_SITE is set and different from matrix WEBCMS_SITE
+    # Check if pipeline variable WEBCMS_SITE_FILTER is set and skip non-matching sites
     - |
-      if [ -n "${CI_PIPELINE_SOURCE}" ]; then
-        # Save matrix WEBCMS_SITE to separate variable before it gets overridden
-        MATRIX_SITE="${WEBCMS_SITE}"
-        # Check if user set WEBCMS_SITE as pipeline variable
-        if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${MATRIX_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-          echo "Skipping build for site '${MATRIX_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-          exit 0
-        fi
+      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
+        echo "Skipping build for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
+        exit 0
       fi
   
   script:
