@@ -347,6 +347,9 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
+    # Build for specific site if WEBCMS_SITE variable is set in pipeline
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
+      when: never
     - changes:
         - services/drupal/**/*
         - .gitlab-ci.yml
@@ -402,6 +405,9 @@ build:metrics:
   extends: .kaniko
   stage: build
   rules:
+    # Build for specific site if WEBCMS_SITE variable is set in pipeline
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
+      when: never
     - changes:
         - services/metrics/**/*
         - .gitlab-ci.yml
