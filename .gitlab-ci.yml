@@ -350,9 +350,7 @@ build:drupal:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    # Always build on live branch, but filter by WEBCMS_SITE in matrix if set
-    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
+      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
       when: always
     - changes:
@@ -382,6 +380,19 @@ build:drupal:
    # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
+  before_script:
+    # Note: Matrix overrides WEBCMS_SITE, so we check CI_JOB_NAME to filter
+    # If pipeline variable FILTER_SITE is set, only build matching sites
+    - |
+      if [ -n "${FILTER_SITE}" ]; then
+        if echo "$CI_JOB_NAME" | grep -q "\[${FILTER_SITE},"; then
+          echo "Building for site '${WEBCMS_SITE}' (matches filter '${FILTER_SITE}')"
+        else
+          echo "Skipping build - job '${CI_JOB_NAME}' doesn't match filter '${FILTER_SITE}'"
+          exit 0
+        fi
+      fi
+  
   script:
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     - /kaniko/executor
@@ -407,9 +418,7 @@ build:metrics:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    # Always build on live branch, but filter by WEBCMS_SITE in matrix if set
-    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
+      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
       when: always
     - changes:
@@ -421,6 +430,19 @@ build:metrics:
     matrix:
       - WEBCMS_SITE: [stage, dev]  # Build metrics sidecar for both staging and production
 
+  before_script:
+    # Note: Matrix overrides WEBCMS_SITE, so we check CI_JOB_NAME to filter
+    # If pipeline variable FILTER_SITE is set, only build matching sites
+    - |
+      if [ -n "${FILTER_SITE}" ]; then
+        if echo "$CI_JOB_NAME" | grep -q "\[${FILTER_SITE},"; then
+          echo "Building for site '${WEBCMS_SITE}' (matches filter '${FILTER_SITE}')"
+        else
+          echo "Skipping build - job '${CI_JOB_NAME}' doesn't match filter '${FILTER_SITE}'"
+          exit 0
+        fi
+      fi
+  
   script:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
