@@ -347,19 +347,16 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
-    # Build for specific site if WEBCMS_SITE variable is set in pipeline
-    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      # Build for specific site if WEBCMS_SITE variable is set in pipeline
+      when: $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE ? never : always
     - changes:
         - services/drupal/**/*
         - .gitlab-ci.yml
         - .gitlab/docker.yml
-      when: always
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
       when: always
 
    # Matrix builds container variants for both sites (stage and dev) and all targets (drupal, nginx, drush).
@@ -405,18 +402,15 @@ build:metrics:
   extends: .kaniko
   stage: build
   rules:
-    # Build for specific site if WEBCMS_SITE variable is set in pipeline
-    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
-    - changes:
-        - services/metrics/**/*
-        - .gitlab-ci.yml
-      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
+      # Build for specific site if WEBCMS_SITE variable is set in pipeline
+      when: $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE ? never : always
+    - changes:
+        - services/metrics/**/*
+        - .gitlab-ci.yml
       when: always
 
   parallel:
@@ -482,9 +476,12 @@ Prisma:Drupal:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -499,7 +496,7 @@ Prisma:Drupal:
   script:
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
@@ -510,9 +507,12 @@ Prisma:Nginx:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -527,7 +527,7 @@ Prisma:Nginx:
   script:
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
@@ -538,9 +538,12 @@ Prisma:Drush:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:drupal"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -555,7 +558,7 @@ Prisma:Drush:
   script:
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
@@ -566,9 +569,12 @@ Prisma:Metrics:
   stage: Image Scan
   tags:
     - twistcli
+  needs:
+    - job: "build:metrics"
+      optional: true
   rules:
-    # Filter by WEBCMS_SITE if set
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev" && $WEBCMS_SITE != "stage"'
+    # Filter by WEBCMS_SITE if set - skip if variable set to something other than dev/stage
+    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
       when: never
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -583,7 +589,7 @@ Prisma:Metrics:
   script:
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-fpm-metrics:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   after_script:
