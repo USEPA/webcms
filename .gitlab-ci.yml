@@ -347,19 +347,16 @@ build:drupal:
   extends: .kaniko
   stage: build
   rules:
-    # Build for specific site if WEBCMS_SITE variable is set in pipeline
-    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      # Build for specific site if WEBCMS_SITE variable is set in pipeline
+      when: $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE ? never : always
     - changes:
         - services/drupal/**/*
         - .gitlab-ci.yml
         - .gitlab/docker.yml
-      when: always
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
       when: always
 
    # Matrix builds container variants for both sites (stage and dev) and all targets (drupal, nginx, drush).
@@ -405,18 +402,15 @@ build:metrics:
   extends: .kaniko
   stage: build
   rules:
-    # Build for specific site if WEBCMS_SITE variable is set in pipeline
-    - if: '$WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE'
-      when: never
-    - changes:
-        - services/metrics/**/*
-        - .gitlab-ci.yml
-      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
     - if: '$CI_COMMIT_BRANCH == "live"'
+      # Build for specific site if WEBCMS_SITE variable is set in pipeline
+      when: $WEBCMS_SITE && $CI_PARALLEL_MATRIX_WEBCMS_SITE != $WEBCMS_SITE ? never : always
+    - changes:
+        - services/metrics/**/*
+        - .gitlab-ci.yml
       when: always
 
   parallel:
