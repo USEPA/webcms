@@ -938,7 +938,7 @@ update:stage:en:
     - job: "deploy:stage:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -962,7 +962,7 @@ update:stage:es:
     - job: "deploy:stage:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "stage"'
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -985,7 +985,7 @@ update:dev:en:
     - job: "deploy:dev:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
@@ -1009,7 +1009,7 @@ update:dev:es:
     - job: "deploy:dev:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE && $WEBCMS_SITE != "dev"'
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
