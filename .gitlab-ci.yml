@@ -937,6 +937,9 @@ unlock:stage:en:
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-en
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
   script:
     - gitlab-terraform init
     - terraform force-unlock -force cd958b26-f55d-8302-1cd0-9d027a21d1ff || true
@@ -950,6 +953,9 @@ unlock:stage:es:
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: stage-webcms-es
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
   script:
     - gitlab-terraform init
     - terraform force-unlock -force <LOCK_ID> || true
@@ -963,6 +969,9 @@ unlock:dev:en:
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-en
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
   script:
     - gitlab-terraform init
     - terraform force-unlock -force <LOCK_ID> || true
@@ -976,6 +985,9 @@ unlock:dev:es:
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-es
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
   script:
     - gitlab-terraform init
     - terraform force-unlock -force <LOCK_ID> || true
