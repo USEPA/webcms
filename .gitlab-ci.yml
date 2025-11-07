@@ -930,13 +930,15 @@ deploy:stage:apply-es:
 # Use these when a job crashes and leaves a lock behind
 
 unlock:stage:en:
-  extends: .deploy:staging
   stage: deploy:stage:plan
+  image:
+    name: alpine:latest
   when: manual
   allow_failure: true
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: stage-webcms-en
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  before_script:
+    - apk add --no-cache curl
   script:
     - |
       curl --request DELETE \
@@ -945,13 +947,15 @@ unlock:stage:en:
     - echo "Attempted to unlock state for stage-webcms-en"
 
 unlock:stage:es:
-  extends: .deploy:staging
   stage: deploy:stage:plan
+  image:
+    name: alpine:latest
   when: manual
   allow_failure: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: stage-webcms-es
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  before_script:
+    - apk add --no-cache curl
   script:
     - |
       curl --request DELETE \
@@ -960,13 +964,15 @@ unlock:stage:es:
     - echo "Attempted to unlock state for stage-webcms-es"
 
 unlock:dev:en:
-  extends: .deploy:production
   stage: deploy:dev:plan:en
+  image:
+    name: alpine:latest
   when: manual
   allow_failure: true
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: dev-webcms-en
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  before_script:
+    - apk add --no-cache curl
   script:
     - |
       curl --request DELETE \
@@ -975,13 +981,15 @@ unlock:dev:en:
     - echo "Attempted to unlock state for dev-webcms-en"
 
 unlock:dev:es:
-  extends: .deploy:production
   stage: deploy:dev:plan:es
+  image:
+    name: alpine:latest
   when: manual
   allow_failure: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-es
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+  before_script:
+    - apk add --no-cache curl
   script:
     - |
       curl --request DELETE \
