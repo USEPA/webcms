@@ -930,72 +930,56 @@ deploy:stage:apply-es:
 # Use these when a job crashes and leaves a lock behind
 
 unlock:stage:en:
+  extends: .deploy:staging
   stage: deploy:stage:plan
-  image:
-    name: alpine:latest
   when: manual
   allow_failure: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-  before_script:
-    - apk add --no-cache curl
+  variables:
+    WEBCMS_LANG: en
+    TF_STATE_NAME: stage-webcms-en
   script:
-    - |
-      curl --request DELETE \
-        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/stage-webcms-en/lock" || true
-    - echo "Attempted to unlock state for stage-webcms-en"
+    - gitlab-terraform init
+    - terraform force-unlock -force cd958b26-f55d-8302-1cd0-9d027a21d1ff || true
+    - echo "Attempted to force-unlock state for stage-webcms-en"
 
 unlock:stage:es:
+  extends: .deploy:staging
   stage: deploy:stage:plan
-  image:
-    name: alpine:latest
   when: manual
   allow_failure: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-  before_script:
-    - apk add --no-cache curl
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-es
   script:
-    - |
-      curl --request DELETE \
-        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/stage-webcms-es/lock" || true
-    - echo "Attempted to unlock state for stage-webcms-es"
+    - gitlab-terraform init
+    - terraform force-unlock -force <LOCK_ID> || true
+    - echo "Attempted to force-unlock state for stage-webcms-es (replace <LOCK_ID> with actual ID)"
 
 unlock:dev:en:
+  extends: .deploy:production
   stage: deploy:dev:plan:en
-  image:
-    name: alpine:latest
   when: manual
   allow_failure: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-  before_script:
-    - apk add --no-cache curl
+  variables:
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-en
   script:
-    - |
-      curl --request DELETE \
-        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en/lock" || true
-    - echo "Attempted to unlock state for dev-webcms-en"
+    - gitlab-terraform init
+    - terraform force-unlock -force <LOCK_ID> || true
+    - echo "Attempted to force-unlock state for dev-webcms-en (replace <LOCK_ID> with actual ID)"
 
 unlock:dev:es:
+  extends: .deploy:production
   stage: deploy:dev:plan:es
-  image:
-    name: alpine:latest
   when: manual
   allow_failure: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-  before_script:
-    - apk add --no-cache curl
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-es
   script:
-    - |
-      curl --request DELETE \
-        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-es/lock" || true
-    - echo "Attempted to unlock state for dev-webcms-es"
+    - gitlab-terraform init
+    - terraform force-unlock -force <LOCK_ID> || true
+    - echo "Attempted to force-unlock state for dev-webcms-es (replace <LOCK_ID> with actual ID)"
 
 #endregion
 
