@@ -925,6 +925,71 @@ deploy:stage:apply-es:
 
 #endregion
 
+#region Terraform State Lock Management
+# Manual jobs to force-unlock stuck Terraform state locks
+# Use these when a job crashes and leaves a lock behind
+
+unlock:stage:en:
+  extends: .deploy:staging
+  stage: deploy:stage:plan
+  when: manual
+  allow_failure: true
+  variables:
+    WEBCMS_LANG: en
+    TF_STATE_NAME: stage-webcms-en
+  script:
+    - |
+      curl --request DELETE \
+        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/stage-webcms-en/lock" || true
+    - echo "Attempted to unlock state for stage-webcms-en"
+
+unlock:stage:es:
+  extends: .deploy:staging
+  stage: deploy:stage:plan
+  when: manual
+  allow_failure: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: stage-webcms-es
+  script:
+    - |
+      curl --request DELETE \
+        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/stage-webcms-es/lock" || true
+    - echo "Attempted to unlock state for stage-webcms-es"
+
+unlock:dev:en:
+  extends: .deploy:production
+  stage: deploy:dev:plan:en
+  when: manual
+  allow_failure: true
+  variables:
+    WEBCMS_LANG: en
+    TF_STATE_NAME: dev-webcms-en
+  script:
+    - |
+      curl --request DELETE \
+        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-en/lock" || true
+    - echo "Attempted to unlock state for dev-webcms-en"
+
+unlock:dev:es:
+  extends: .deploy:production
+  stage: deploy:dev:plan:es
+  when: manual
+  allow_failure: true
+  variables:
+    WEBCMS_LANG: es
+    TF_STATE_NAME: dev-webcms-es
+  script:
+    - |
+      curl --request DELETE \
+        --header "PRIVATE-TOKEN: ${CI_JOB_TOKEN}" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/dev-webcms-es/lock" || true
+    - echo "Attempted to unlock state for dev-webcms-es"
+
+#endregion
 
 #region Database Update Jobs (Drush Operations)
 # These jobs run after deployment to apply database schema updates and clear caches
