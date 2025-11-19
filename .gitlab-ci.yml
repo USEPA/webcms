@@ -459,8 +459,6 @@ Prisma:Drupal:
     - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
     - echo "DEBUG - Scan completed with exit code $?"
-  after_script:
-    - rm -rf $CI_PROJECT_DIR
   allow_failure: true
 
 Prisma:Nginx:
@@ -504,8 +502,6 @@ Prisma:Nginx:
     - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
     - echo "DEBUG - Scan completed with exit code $?"
-  after_script:
-    - rm -rf $CI_PROJECT_DIR
   allow_failure: true
 
 Prisma:Drush:
@@ -549,8 +545,6 @@ Prisma:Drush:
     - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
     - echo "DEBUG - Scan completed with exit code $?"
-  after_script:
-    - rm -rf $CI_PROJECT_DIR
   allow_failure: true
 
 #endregion
