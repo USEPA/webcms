@@ -446,12 +446,19 @@ Prisma:Drupal:
     # Use a pre-provisioned Prisma Cloud Compute access token (PRISMA_TOKEN).
     # This token must be set as a CI/CD variable and grants access for both downloading twistcli and scanning.
     # To rotate: update PRISMA_TOKEN in project/group variables; no code changes required.
+    - echo "DEBUG - Downloading twistcli..."
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - echo "DEBUG - twistcli downloaded, checking version..."
+    - ./twistcli --version || echo "WARNING - twistcli version check failed with exit code $?"
     # Login to GitLab container registry to pull the built image
+    - echo "DEBUG - Logging into GitLab registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "DEBUG - Pulling Docker image..."
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
     # Scan the Drupal image using twistcli with the PRISMA_TOKEN (non-interactive, no username/password prompts)
+    - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    - echo "DEBUG - Scan completed with exit code $?"
   after_script:
     - rm -rf $CI_PROJECT_DIR
   allow_failure: true
@@ -484,12 +491,19 @@ Prisma:Nginx:
     # Use a pre-provisioned Prisma Cloud Compute access token (PRISMA_TOKEN).
     # This token must be set as a CI/CD variable and grants access for both downloading twistcli and scanning.
     # To rotate: update PRISMA_TOKEN in project/group variables; no code changes required.
+    - echo "DEBUG - Downloading twistcli..."
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - echo "DEBUG - twistcli downloaded, checking version..."
+    - ./twistcli --version || echo "WARNING - twistcli version check failed with exit code $?"
     # Login to GitLab container registry to pull the built image
+    - echo "DEBUG - Logging into GitLab registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "DEBUG - Pulling Docker image..."
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
     # Scan the Nginx image using twistcli with the PRISMA_TOKEN (non-interactive, no username/password prompts)
+    - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    - echo "DEBUG - Scan completed with exit code $?"
   after_script:
     - rm -rf $CI_PROJECT_DIR
   allow_failure: true
@@ -522,12 +536,19 @@ Prisma:Drush:
     # Use a pre-provisioned Prisma Cloud Compute access token (PRISMA_TOKEN).
     # This token must be set as a CI/CD variable and grants access for both downloading twistcli and scanning.
     # To rotate: update PRISMA_TOKEN in project/group variables; no code changes required.
+    - echo "DEBUG - Downloading twistcli..."
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - echo "DEBUG - twistcli downloaded, checking version..."
+    - ./twistcli --version || echo "WARNING - twistcli version check failed with exit code $?"
     # Login to GitLab container registry to pull the built image
+    - echo "DEBUG - Logging into GitLab registry..."
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - echo "DEBUG - Pulling Docker image..."
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
     # Scan the Drush image using twistcli with the PRISMA_TOKEN (non-interactive, no username/password prompts)
+    - echo "DEBUG - Starting Prisma scan..."
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    - echo "DEBUG - Scan completed with exit code $?"
   after_script:
     - rm -rf $CI_PROJECT_DIR
   allow_failure: true
