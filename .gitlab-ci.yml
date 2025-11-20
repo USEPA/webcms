@@ -458,7 +458,6 @@ Prisma:Drupal:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
     # Scan the Drupal image using twistcli with username/password authentication
-    # Note: The scan command requires --user and --password flags, not --token
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
   allow_failure: true
 
@@ -502,7 +501,6 @@ Prisma:Nginx:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
     # Scan the Nginx image using twistcli with username/password authentication
-    # Note: The scan command requires --user and --password flags, not --token
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
   allow_failure: true
 
@@ -546,7 +544,6 @@ Prisma:Drush:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
     # Scan the Drush image using twistcli with username/password authentication
-    # Note: The scan command requires --user and --password flags, not --token
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
   allow_failure: true
 
