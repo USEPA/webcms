@@ -445,13 +445,21 @@ Prisma:Drupal:
   script:
     # Authenticate with Prisma Cloud API to generate a session token
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    # Validate that token was generated successfully
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Failed to generate Prisma Cloud authentication token"
+        exit 1
+      fi
+    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan the Drupal image using twistcli with the generated token
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    # Scan the Drupal image using twistcli - use environment variable instead of flag
+    - export TWISTLOCK_TOKEN="$PRISMA_CI_TOKEN"
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details
   allow_failure: true
 
 Prisma:Nginx:
@@ -481,13 +489,21 @@ Prisma:Nginx:
   script:
     # Authenticate with Prisma Cloud API to generate a session token
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    # Validate that token was generated successfully
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Failed to generate Prisma Cloud authentication token"
+        exit 1
+      fi
+    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    # Scan the Nginx image using twistcli with the generated token
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    # Scan the Nginx image using twistcli - use environment variable instead of flag
+    - export TWISTLOCK_TOKEN="$PRISMA_CI_TOKEN"
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details
   allow_failure: true
 
 Prisma:Drush:
@@ -517,13 +533,21 @@ Prisma:Drush:
   script:
     # Authenticate with Prisma Cloud API to generate a session token
     - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    # Validate that token was generated successfully
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Failed to generate Prisma Cloud authentication token"
+        exit 1
+      fi
+    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    # Scan the Drush image using twistcli with the generated token
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    # Scan the Drush image using twistcli - use environment variable instead of flag
+    - export TWISTLOCK_TOKEN="$PRISMA_CI_TOKEN"
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details
   allow_failure: true
 
 #endregion
