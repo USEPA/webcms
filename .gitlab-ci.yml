@@ -9,14 +9,18 @@
 #   Leave unset to build and deploy both sites
 
 stages:
+  # Docker Image Builds (all branches) - Build first to enable testing
+  - build                             # Build application Docker images (drupal, nginx, drush)
+
+  # Security Scanning (run before deployments for early feedback)
+  - test                              # Run SAST, dependency scanning, secret detection
+  - Image Scan                        # Prisma Cloud image vulnerability scanning
+
   # Infrastructure Provisioning (live branch only)
   - infrastructure_preprod_init       # Initialize Terraform backend and providers
   - infrastructure_preprod_validate   # Validate Terraform configuration syntax
   - infrastructure_preprod_plan       # Generate Terraform execution plan
   - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
-
-  # Docker Image Builds (all branches)
-  - build                             # Build application Docker images (drupal, nginx, drush)
 
   # Production Deployment (live branch → WEBCMS_SITE: dev)
   - deploy:dev:init:en                # Initialize English production deployment
@@ -39,13 +43,9 @@ stages:
   - update:es                         # Run Drush updates for Spanish sites
   - update:en                         # Run Drush updates for English sites
 
-  # Release Management
+  # Release Management (create artifacts after successful deployment)
   - artifacts                         # Create deployment artifacts
   - release                           # Create GitLab releases
-
-  # Security Scanning
-  - Image Scan                        # Prisma Cloud image vulnerability scanning
-  - test                              # Run SAST, dependency scanning, secret detection
 
 # Global Pipeline Configuration
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
