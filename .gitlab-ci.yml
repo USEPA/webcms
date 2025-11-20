@@ -451,7 +451,7 @@ Prisma:Drupal:
         echo "ERROR: Failed to generate Prisma Cloud authentication token"
         exit 1
       fi
-    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
+      echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
@@ -495,7 +495,7 @@ Prisma:Nginx:
         echo "ERROR: Failed to generate Prisma Cloud authentication token"
         exit 1
       fi
-    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
+      echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
@@ -539,7 +539,7 @@ Prisma:Drush:
         echo "ERROR: Failed to generate Prisma Cloud authentication token"
         exit 1
       fi
-    - echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
+      echo "Token generated successfully (length: ${#PRISMA_CI_TOKEN})"
     # Download twistcli using the generated token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the built image
