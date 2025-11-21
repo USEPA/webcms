@@ -457,8 +457,8 @@ Prisma:Drupal:
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan the Drupal image using twistcli with username/password authentication
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details -u "$PRISMA_CI_USERNAME" -p "$PRISMA_CI_PASSWORD"
+    # Scan the Drupal image using twistcli with token authentication
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token="$PRISMA_CI_TOKEN"
   allow_failure: true
 
 Prisma:Nginx:
@@ -500,8 +500,8 @@ Prisma:Nginx:
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    # Scan the Nginx image using twistcli with username/password authentication
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details -u "$PRISMA_CI_USERNAME" -p "$PRISMA_CI_PASSWORD"
+    # Scan the Nginx image using twistcli with token authentication
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token="$PRISMA_CI_TOKEN"
   allow_failure: true
 
 Prisma:Drush:
@@ -543,8 +543,8 @@ Prisma:Drush:
     # Login to GitLab container registry to pull the built image
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    # Scan the Drush image using twistcli with username/password authentication
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details -u "$PRISMA_CI_USERNAME" -p "$PRISMA_CI_PASSWORD"
+    # Scan the Drush image using twistcli with token authentication
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token="$PRISMA_CI_TOKEN"
   allow_failure: true
 
 #endregion
