@@ -934,7 +934,7 @@ deploy:stage:apply-es:
 
 update:stage:en:
   extends: .update
-  stage: update
+  stage: Update
   needs:
     - job: "deploy:stage:apply-en"
       optional: true
@@ -958,7 +958,7 @@ update:stage:en:
 
 update:stage:es:
   extends: .update
-  stage: update
+  stage: Update
   needs:
     - job: "deploy:stage:apply-es"
       optional: true
@@ -981,7 +981,7 @@ update:stage:es:
   when: manual
 update:dev:en:
   extends: .update
-  stage: update
+  stage: Update
   needs:
     - job: "deploy:dev:apply-en"
       optional: true
@@ -1005,7 +1005,7 @@ update:dev:en:
 
 update:dev:es:
   extends: .update
-  stage: update
+  stage: Update
   needs:
     - job: "deploy:dev:apply-es"
       optional: true
