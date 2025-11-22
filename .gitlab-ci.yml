@@ -122,8 +122,8 @@ include:
   #    reference to a path in a temporary directory, so we copy it in order to allow
   #    Terraform to see it automatically.)
   #
-  # We do not explicitly invoke `gitlab-terraform init` because the helper script does
-  # this automatically as needed.
+  # Note: The gitlab-terraform helper automatically runs init as needed, so init stages
+  # are the only jobs that should explicitly call `gitlab-terraform init`.
   before_script:
     - cd $TF_ROOT
     - cp $backend_tf backend.tf
@@ -133,6 +133,9 @@ include:
 # Initializes Terraform backend and downloads provider plugins.
 # This template is extended by concrete infrastructure jobs that set TF_MODULE and other variables.
 # The init process configures the GitLab-managed HTTP backend for remote state storage.
+#
+# Note: This is the ONLY stage that should explicitly call `gitlab-terraform init`.
+# All subsequent stages (validate, plan, apply) rely on cached initialization.
 .init:
   extends: .terraform
   stage: infrastructure_preprod_init
