@@ -68,6 +68,16 @@ include:
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
   - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
 
+# Override stage for GitLab-provided security scanning jobs to use capitalized stage names
+sast:
+  stage: Test
+
+dependency_scanning:
+  stage: Test
+
+secret_detection:
+  stage: Test
+
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
 # Concrete jobs extend these templates and override variables/stages as needed.
