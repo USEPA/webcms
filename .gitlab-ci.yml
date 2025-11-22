@@ -1035,19 +1035,19 @@ update:dev:es:
 
 # Create deployment artifacts for rollback and external deployments
 artifacts:
-  image: alpine
+  image: alpine  # Minimal image sufficient for file packaging
   stage: artifacts
   rules:
-    - if: $CI_COMMIT_TAG != ""
+    - if: $CI_COMMIT_TAG != ""  # Run on tagged releases
       when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch deployments
   script:
     - echo "Creating release artifacts for ${CI_COMMIT_REF_NAME}"
   artifacts:
     name: release-artifacts-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
     paths:
-      - ./ci
-      - ./terraform/infrastructure
-      - ./terraform/webcms
-    expire_in: 30 days  # Release artifacts kept longer for rollback scenarios
+      - ./ci                        # Drush automation scripts
+      - ./terraform/infrastructure  # Infrastructure Terraform configs
+      - ./terraform/webcms          # Application Terraform configs
+    expire_in: 30 days  # Keep longer for rollback scenarios
 
