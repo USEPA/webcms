@@ -787,7 +787,7 @@ deploy:dev:apply-es:
 # Initialize Terraform for staging deployments
 deploy:stage:init-en:
   extends: .deploy:staging
-  stage: deploy:stage:init
+  stage: Deploy:Stage:Init
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
@@ -799,7 +799,7 @@ deploy:stage:init-en:
 
 deploy:stage:init-es:
   extends: .deploy:staging
-  stage: deploy:stage:init
+  stage: Deploy:Stage:Init
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
@@ -811,7 +811,7 @@ deploy:stage:init-es:
 
 deploy:stage:validate-en:
   extends: .deploy:staging
-  stage: deploy:stage:validate
+  stage: Deploy:Stage:Validate
   needs:
     - job: "deploy:stage:init-en"
       optional: true
@@ -826,7 +826,7 @@ deploy:stage:validate-en:
 
 deploy:stage:validate-es:
   extends: .deploy:staging
-  stage: deploy:stage:validate
+  stage: Deploy:Stage:Validate
   needs:
     - job: "deploy:stage:init-es"
       optional: true
@@ -841,7 +841,7 @@ deploy:stage:validate-es:
 
 deploy:stage:plan-en:
   extends: .deploy:staging
-  stage: deploy:stage:plan
+  stage: Deploy:Stage:Plan
   needs:
     - job: "deploy:stage:validate-en"
       optional: true  # Allow manual validation triggering
@@ -864,7 +864,7 @@ deploy:stage:plan-en:
 
 deploy:stage:plan-es:
   extends: .deploy:staging
-  stage: deploy:stage:plan
+  stage: Deploy:Stage:Plan
   needs:
     - job: "deploy:stage:validate-es"
       optional: true  # Allow manual validation triggering
@@ -887,7 +887,7 @@ deploy:stage:plan-es:
 
 deploy:stage:apply-en:
   extends: .deploy:staging
-  stage: deploy:stage:apply
+  stage: Deploy:Stage:Apply
   needs:
     - job: "deploy:stage:plan-en"
       optional: true  # Allow manual plan triggering
@@ -907,7 +907,7 @@ deploy:stage:apply-en:
 
 deploy:stage:apply-es:
   extends: .deploy:staging
-  stage: deploy:stage:apply
+  stage: Deploy:Stage:Apply
   needs:
     - job: "deploy:stage:plan-es"
       optional: true  # Allow manual plan triggering
