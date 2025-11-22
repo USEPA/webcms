@@ -398,18 +398,23 @@ build:drupal:
   script:
     # Copy Composer authentication credentials for private package access
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
-    # Build Docker image with Kaniko (rootless builder)
+    # Build Docker image with Kaniko (rootless builder) with optimizations:
+    # - Layer caching for faster builds
+    # - Skip unused Dockerfile stages
+    # - Fast snapshot mode (redo) for better performance
+    # - Experimental new run detection (up to 75% faster)
+    # - Push to both ECR and GitLab registries
     - /kaniko/executor
-      $KANIKO_CACHE_ARGS                # Enable layer caching for faster builds
-      --skip-unused-stages              # Skip Dockerfile stages not needed for target
-      --snapshotMode=redo               # Fast snapshot mode (assumes file changes trigger cache busting)
-      --use-new-run                     # Experimental: Better RUN instruction detection (up to 75% faster)
+      $KANIKO_CACHE_ARGS
+      --skip-unused-stages
+      --snapshotMode=redo
+      --use-new-run
       --context=$CI_PROJECT_DIR/services/drupal
-      --build-arg GIT_COMMIT=$CI_COMMIT_SHA    # Embed commit SHA in image
-      --build-arg GIT_TAG=$CI_COMMIT_TAG       # Embed tag in image (if tagged build)
-      --target=$WEBCMS_TARGET           # Build specific target (drupal, nginx, or drush)
-      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG      # Push to ECR
-      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG     # Push to GitLab registry
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
+      --target=$WEBCMS_TARGET
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
       
   variables:
     WEBCMS_ENVIRONMENT: preproduction
