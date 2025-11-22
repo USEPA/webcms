@@ -10,36 +10,36 @@
 
 stages:
   # Docker Image Builds (all branches) - Build first to enable testing
-  - build                             # Build application Docker images (drupal, nginx, drush)
+  - Build                             # Build application Docker images (drupal, nginx, drush)
 
   # Security Scanning (run before deployments for early feedback)
-  - test                              # Run SAST, dependency scanning, secret detection
-  - Image Scan                        # Prisma Cloud image vulnerability scanning
+  - Test                              # Run SAST, dependency scanning, secret detection
+  - Scan                              # Prisma Cloud image vulnerability scanning
 
   # Infrastructure Provisioning (live branch only)
-  - infrastructure_preprod_init       # Initialize Terraform backend and providers
-  - infrastructure_preprod_validate   # Validate Terraform configuration syntax
-  - infrastructure_preprod_plan       # Generate Terraform execution plan
-  - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
+  - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
+  - Infrastructure:Preprod:Validate   # Validate Terraform configuration syntax
+  - Infrastructure:Preprod:Plan       # Generate Terraform execution plan
+  - Infrastructure:Preprod:Apply      # Apply infrastructure changes (manual approval required)
 
   # Production Deployment (live branch → WEBCMS_SITE: dev)
-  - deploy:dev:init                   # Initialize production deployment (English + Spanish parallel)
-  - deploy:dev:validate               # Validate production Terraform config (English + Spanish parallel)
-  - deploy:dev:plan                   # Plan production deployment (English + Spanish parallel)
-  - deploy:dev:apply                  # Apply production deployment (English + Spanish parallel)
+  - Deploy:Dev:Init                   # Initialize production deployment (English + Spanish parallel)
+  - Deploy:Dev:Validate               # Validate production Terraform config (English + Spanish parallel)
+  - Deploy:Dev:Plan                   # Plan production deployment (English + Spanish parallel)
+  - Deploy:Dev:Apply                  # Apply production deployment (English + Spanish parallel)
 
   # Staging Deployment (staging branch → WEBCMS_SITE: stage)
-  - deploy:stage:init                 # Initialize staging deployment (English + Spanish parallel)
-  - deploy:stage:validate             # Validate staging Terraform config (English + Spanish parallel)
-  - deploy:stage:plan                 # Plan staging deployment (English + Spanish parallel)
-  - deploy:stage:apply                # Apply staging deployment (English + Spanish parallel)
+  - Deploy:Stage:Init                 # Initialize staging deployment (English + Spanish parallel)
+  - Deploy:Stage:Validate             # Validate staging Terraform config (English + Spanish parallel)
+  - Deploy:Stage:Plan                 # Plan staging deployment (English + Spanish parallel)
+  - Deploy:Stage:Apply                # Apply staging deployment (English + Spanish parallel)
 
   # Database Updates (Drush operations via ECS tasks)
-  - update                            # Run Drush updates for all sites (parallel by site/language)
+  - Update                            # Run Drush updates for all sites (parallel by site/language)
 
   # Release Management (create artifacts after successful deployment)
-  - artifacts                         # Create deployment artifacts
-  - release                           # Create GitLab releases
+  - Artifacts                         # Create deployment artifacts
+  - Release                           # Create GitLab releases
 
 # Global Pipeline Configuration
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
