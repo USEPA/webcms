@@ -421,7 +421,7 @@ build:drupal:
 # These jobs pull images from GitLab registry and scan them using twistcli
 
 Prisma:Drupal:
-  stage: Image Scan
+  stage: Scan
   tags:
     - twistcli  # Requires runner with Docker and twistcli support
   needs:
@@ -456,7 +456,7 @@ Prisma:Drupal:
   allow_failure: true
 
 Prisma:Nginx:
-  stage: Image Scan
+  stage: Scan
   tags:
     - twistcli
   needs:
@@ -491,7 +491,7 @@ Prisma:Nginx:
   allow_failure: true  # Don't block pipeline on scan failures
 
 Prisma:Drush:
-  stage: Image Scan
+  stage: Scan
   tags:
     - twistcli
   needs:
