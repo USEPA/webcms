@@ -611,7 +611,7 @@ infrastructure:preproduction:apply:
 # Initialize Terraform for production deployments
 deploy:dev:init:en:
   extends: .deploy:production
-  stage: deploy:dev:init
+  stage: Deploy:Dev:Init
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -624,7 +624,7 @@ deploy:dev:init:en:
 
 deploy:dev:init:es:
   extends: .deploy:production
-  stage: deploy:dev:init
+  stage: Deploy:Dev:Init
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -639,7 +639,7 @@ deploy:dev:init:es:
 # Validate Terraform configuration for production deployments
 deploy:dev:validate:en:
   extends: .deploy:production
-  stage: deploy:dev:validate
+  stage: Deploy:Dev:Validate
   needs:
     - job: "deploy:dev:init:en"
       optional: true
@@ -653,7 +653,7 @@ deploy:dev:validate:en:
 
 deploy:dev:validate:es:
   extends: .deploy:production
-  stage: deploy:dev:validate
+  stage: Deploy:Dev:Validate
   needs:
     - job: "deploy:dev:init:es"
       optional: true
@@ -668,7 +668,7 @@ deploy:dev:validate:es:
 # Generate Terraform plans for production deployments
 deploy:dev:plan-en:
   extends: .deploy:production
-  stage: deploy:dev:plan
+  stage: Deploy:Dev:Plan
   needs:
     - job: "deploy:dev:validate:en"
       optional: true
@@ -691,7 +691,7 @@ deploy:dev:plan-en:
 
 deploy:dev:plan-es:
   extends: .deploy:production
-  stage: deploy:dev:plan
+  stage: Deploy:Dev:Plan
   needs:
     - job: "deploy:dev:validate:es"
       optional: true
@@ -716,7 +716,7 @@ deploy:dev:plan-es:
 # Apply Terraform plans for production deployments
 deploy:dev:apply-en:
   extends: .deploy:production
-  stage: deploy:dev:apply
+  stage: Deploy:Dev:Apply
   needs:
     - job: "deploy:dev:plan-en"
       optional: true  # Allow manual plan triggering
@@ -748,7 +748,7 @@ deploy:dev:apply-en:
 
 deploy:dev:apply-es:
   extends: .deploy:production
-  stage: deploy:dev:apply
+  stage: Deploy:Dev:Apply
   needs:
     - job: "deploy:dev:plan-es"
       optional: true  # Allow manual plan triggering
