@@ -540,68 +540,65 @@ infrastructure:preproduction:init:
   extends: .infrastructure
   stage: infrastructure_preprod_init
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (production deployments)
   variables:
     WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
+    TF_STATE_NAME: dev  # Shared state for preproduction infrastructure
   script:
-    - gitlab-terraform init -upgrade
-    - gitlab-terraform init
+    - gitlab-terraform init -upgrade  # Upgrade providers to match lock file
+    - gitlab-terraform init           # Initialize backend and download providers
   environment:
     name: infra/preproduction
 
 infrastructure:preproduction:validate:
   extends: .infrastructure
   stage: infrastructure_preprod_validate
-  needs: ["infrastructure:preproduction:init"]
+  needs: ["infrastructure:preproduction:init"]  # Wait for init to complete
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
-    - gitlab-terraform init -upgrade
-    - gitlab-terraform validate
+    - gitlab-terraform validate  # Validate configuration syntax
   environment:
     name: infra/preproduction
 
 infrastructure:preproduction:plan:
   extends: .infrastructure
   stage: infrastructure_preprod_plan
-  needs: ["infrastructure:preproduction:validate"]
+  needs: ["infrastructure:preproduction:validate"]  # Wait for validation to pass
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
-    - gitlab-terraform init -upgrade
-    - gitlab-terraform plan
-    - gitlab-terraform plan-json
-  timeout: 24h
+    - gitlab-terraform plan       # Generate execution plan
+    - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
+  timeout: 24h  # Long timeout for complex infrastructure planning
   environment:
     name: infra/preproduction
   artifacts:
     name: terraform-plan-infrastructure-${WEBCMS_SITE}-${CI_COMMIT_SHORT_SHA}
     paths:
-      - $TF_ROOT/plan.cache
+      - $TF_ROOT/plan.cache  # Binary plan used by apply job
     reports:
-      terraform: $TF_ROOT/plan.json
+      terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
     expire_in: 7 days  # Infrastructure plans need review before manual approval
 
 infrastructure:preproduction:apply:
   extends: .infrastructure
   stage: infrastructure_preprod_apply
-  needs: ["infrastructure:preproduction:plan"]
-  dependencies: ["infrastructure:preproduction:plan"]
+  needs: ["infrastructure:preproduction:plan"]         # Wait for plan to complete
+  dependencies: ["infrastructure:preproduction:plan"]  # Download plan.cache artifact
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
   script:
-    - gitlab-terraform init -upgrade
-    - gitlab-terraform apply
+    - gitlab-terraform apply  # Execute the cached plan
   environment:
     name: infra/preproduction
 
