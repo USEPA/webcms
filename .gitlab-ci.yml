@@ -23,25 +23,19 @@ stages:
   - infrastructure_preprod_apply      # Apply infrastructure changes (manual approval required)
 
   # Production Deployment (live branch → WEBCMS_SITE: dev)
-  - deploy:dev:init:en                # Initialize English production deployment
-  - deploy:dev:validate:en            # Validate English production Terraform config
-  - deploy:dev:plan:en                # Plan English production deployment
-  - deploy:dev:apply:en               # Apply English production deployment
-
-  - deploy:dev:init:es                # Initialize Spanish production deployment
-  - deploy:dev:validate:es            # Validate Spanish production Terraform config
-  - deploy:dev:plan:es                # Plan Spanish production deployment
-  - deploy:dev:apply:es               # Apply Spanish production deployment
+  - deploy:dev:init                   # Initialize production deployment (English + Spanish parallel)
+  - deploy:dev:validate               # Validate production Terraform config (English + Spanish parallel)
+  - deploy:dev:plan                   # Plan production deployment (English + Spanish parallel)
+  - deploy:dev:apply                  # Apply production deployment (English + Spanish parallel)
 
   # Staging Deployment (staging branch → WEBCMS_SITE: stage)
-  - deploy:stage:init                 # Initialize staging deployment (English + Spanish)
-  - deploy:stage:validate             # Validate staging Terraform config
-  - deploy:stage:plan                 # Plan staging deployment
-  - deploy:stage:apply                # Apply staging deployment (manual approval)
+  - deploy:stage:init                 # Initialize staging deployment (English + Spanish parallel)
+  - deploy:stage:validate             # Validate staging Terraform config (English + Spanish parallel)
+  - deploy:stage:plan                 # Plan staging deployment (English + Spanish parallel)
+  - deploy:stage:apply                # Apply staging deployment (English + Spanish parallel)
 
   # Database Updates (Drush operations via ECS tasks)
-  - update:es                         # Run Drush updates for Spanish sites
-  - update:en                         # Run Drush updates for English sites
+  - update                            # Run Drush updates for all sites (parallel by site/language)
 
   # Release Management (create artifacts after successful deployment)
   - artifacts                         # Create deployment artifacts
