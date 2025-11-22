@@ -230,7 +230,7 @@ include:
 # Triggers child pipeline for Docker image building using Kaniko
 # Builds Drupal, Nginx, Drush, and metrics container images
 .build:
-  stage: build
+  stage: Build
 
   trigger:
     include: .gitlab/docker.yml
@@ -259,7 +259,7 @@ include:
 # - Streams CloudWatch logs back to the pipeline for visibility
 # - Reports success/failure based on task exit code
 .update:
-  stage: update  # All update jobs run in parallel within this stage
+  stage: Update  # All update jobs run in parallel within this stage
 
   # Node.js 18 LTS (Alpine variant for smaller image size)
   image:
