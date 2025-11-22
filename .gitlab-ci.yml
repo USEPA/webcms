@@ -259,7 +259,7 @@ include:
 # - Streams CloudWatch logs back to the pipeline for visibility
 # - Reports success/failure based on task exit code
 .update:
-  stage: update  # Note: Concrete jobs override this with language-specific stages (update:en, update:es)
+  stage: update  # All update jobs run in parallel within this stage
 
   # Node.js 18 LTS (Alpine variant for smaller image size)
   image:
@@ -934,7 +934,7 @@ deploy:stage:apply-es:
 
 update:stage:en:
   extends: .update
-  stage: update:en
+  stage: update
   needs:
     - job: "deploy:stage:apply-en"
       optional: true
@@ -958,7 +958,7 @@ update:stage:en:
 
 update:stage:es:
   extends: .update
-  stage: update:es
+  stage: update
   needs:
     - job: "deploy:stage:apply-es"
       optional: true
@@ -981,7 +981,7 @@ update:stage:es:
   when: manual
 update:dev:en:
   extends: .update
-  stage: update:en
+  stage: update
   needs:
     - job: "deploy:dev:apply-en"
       optional: true
@@ -1005,7 +1005,7 @@ update:dev:en:
 
 update:dev:es:
   extends: .update
-  stage: update:es
+  stage: update
   needs:
     - job: "deploy:dev:apply-es"
       optional: true
