@@ -538,7 +538,7 @@ Prisma:Drush:
 # Creates/updates shared AWS resources: VPC, ECS cluster, load balancers, S3 buckets, etc.
 infrastructure:preproduction:init:
   extends: .infrastructure
-  stage: infrastructure_preprod_init
+  stage: Infrastructure:Preprod:Init
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (production deployments)
   variables:
@@ -552,7 +552,7 @@ infrastructure:preproduction:init:
 
 infrastructure:preproduction:validate:
   extends: .infrastructure
-  stage: infrastructure_preprod_validate
+  stage: Infrastructure:Preprod:Validate
   needs: ["infrastructure:preproduction:init"]  # Wait for init to complete
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
@@ -566,7 +566,7 @@ infrastructure:preproduction:validate:
 
 infrastructure:preproduction:plan:
   extends: .infrastructure
-  stage: infrastructure_preprod_plan
+  stage: Infrastructure:Preprod:Plan
   needs: ["infrastructure:preproduction:validate"]  # Wait for validation to pass
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
@@ -589,7 +589,7 @@ infrastructure:preproduction:plan:
 
 infrastructure:preproduction:apply:
   extends: .infrastructure
-  stage: infrastructure_preprod_apply
+  stage: Infrastructure:Preprod:Apply
   needs: ["infrastructure:preproduction:plan"]         # Wait for plan to complete
   dependencies: ["infrastructure:preproduction:plan"]  # Download plan.cache artifact
   rules:
