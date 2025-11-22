@@ -138,7 +138,7 @@ include:
 # All subsequent stages (validate, plan, apply) rely on cached initialization.
 .init:
   extends: .terraform
-  stage: infrastructure_preprod_init
+  stage: Infrastructure:Preprod:Init
 
   script:
     - gitlab-terraform init -upgrade  # Update provider versions to match lock file
@@ -150,7 +150,7 @@ include:
 # Validation runs independently for each module/environment combination.
 .validate:
   extends: .terraform
-  stage: infrastructure_preprod_validate
+  stage: Infrastructure:Preprod:Validate
 
   script:
     - gitlab-terraform validate  # Validate configuration syntax and internal consistency
@@ -161,7 +161,7 @@ include:
 # Creates both binary plan cache (for apply) and JSON report (for GitLab MR integration).
 .plan:
   extends: .terraform
-  stage: infrastructure_preprod_plan
+  stage: Infrastructure:Preprod:Plan
 
   script:
     - gitlab-terraform plan       # Generate binary execution plan
@@ -180,7 +180,7 @@ include:
 # Includes safety rules to prevent unauthorized deployments to production AWS resources.
 .apply:
   extends: .terraform
-  stage: infrastructure_preprod_apply  # Note: Concrete jobs override this for environment-specific stages
+  stage: Infrastructure:Preprod:Apply  # Note: Concrete jobs override this for environment-specific stages
 
   # Concrete jobs must specify dependencies to download plan artifacts from the corresponding plan job.
   # Template cannot specify this generically as job names vary by environment.
