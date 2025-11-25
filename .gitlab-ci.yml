@@ -1,7 +1,7 @@
 # WebCMS GitLab CI/CD Pipeline Configuration
 # Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
 # Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
-# See docs/cicd-pipeline.md and docs/gitlab_ci_documentation.md for detailed documentation.
+# See docs/cicd-pipeline.md for detailed documentation.
 #
 # Pipeline Variables:
 # - WEBCMS_SITE_FILTER: Set to 'stage' or 'dev' to filter which site's jobs run in the pipeline
@@ -63,10 +63,12 @@ variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 # Include GitLab's built-in security scanning templates for comprehensive security testing
+# and Slack notifications for pipeline events
 include:
   - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
   - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
   - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
+  - local: .gitlab/slack-notifications.yml            # Slack webhook notifications
 
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
 sast:
