@@ -1,0 +1,475 @@
+# Slack Notifications for GitLab CI/CD Pipeline Events
+#
+# This file provides reusable templates for sending Slack notifications at various
+# pipeline stages. Notifications include contextual information about the pipeline
+# state, environment, and relevant links.
+#
+# Required CI/CD Variables (set in GitLab project settings):
+# - SLACK_WEBHOOK_URL: The incoming webhook URL for your Slack channel
+#
+# Optional Variables:
+# - SLACK_CHANNEL: Override the default channel (e.g., "#webcms-deployments")
+# - SLACK_USERNAME: Override the default bot username (default: "GitLab CI")
+
+.slack_notify:
+  image: curlimages/curl:latest
+  variables:
+    SLACK_USERNAME: "GitLab CI"
+    SLACK_ICON: ":gitlab:"
+  before_script:
+    # Set color based on job status
+    - |
+      if [ "$CI_JOB_STATUS" = "success" ]; then
+        export SLACK_COLOR="good"
+        export STATUS_EMOJI=":white_check_mark:"
+      elif [ "$CI_JOB_STATUS" = "failed" ]; then
+        export SLACK_COLOR="danger"
+        export STATUS_EMOJI=":x:"
+      else
+        export SLACK_COLOR="warning"
+        export STATUS_EMOJI=":warning:"
+      fi
+    # Format environment display
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Commit",
+              "value": "<$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>",
+              "short": true
+            },
+            {
+              "title": "Author",
+              "value": "$GITLAB_USER_NAME",
+              "short": true
+            },
+            {
+              "title": "Message",
+              "value": "${CI_COMMIT_MESSAGE%%$'\n'*}",
+              "short": false
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - when: on_success
+
+# Pipeline Started Notification
+notify:pipeline:started:
+  extends: .slack_notify
+  stage: .pre
+  variables:
+    NOTIFICATION_TITLE: "Pipeline Started"
+  before_script:
+    - export SLACK_COLOR="warning"
+    - export STATUS_EMOJI=":rocket:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"'
+      when: always
+
+# Build Stage Success
+notify:build:success:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Completed Successfully"
+  needs:
+    - job: build:drupal
+      artifacts: false
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Build Stage Failure
+notify:build:failed:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Failed"
+  before_script:
+    - export SLACK_COLOR="danger"
+    - export STATUS_EMOJI=":x:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_JOB_URL",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Failed Job",
+              "value": "<$CI_JOB_URL|View Logs>",
+              "short": false
+            },
+            {
+              "title": "Commit",
+              "value": "<$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>",
+              "short": true
+            },
+            {
+              "title": "Author",
+              "value": "$GITLAB_USER_NAME",
+              "short": true
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  needs:
+    - job: build:drupal
+      artifacts: false
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - when: on_failure
+
+# Manual Action Required
+notify:manual:required:
+  extends: .slack_notify
+  stage: Infrastructure:Preprod:Plan
+  variables:
+    NOTIFICATION_TITLE: "Manual Approval Required"
+  before_script:
+    - export SLACK_COLOR="#0000FF"
+    - export STATUS_EMOJI=":hand:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - Infrastructure Apply",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "text": "Infrastructure changes are ready to apply. Manual approval required before proceeding.",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Action Required",
+              "value": "<$CI_PIPELINE_URL|Review and Approve>",
+              "short": false
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Started
+notify:deploy:started:
+  extends: .slack_notify
+  stage: Deploy:Stage:Init
+  variables:
+    NOTIFICATION_TITLE: "Deployment Started"
+  before_script:
+    - export SLACK_COLOR="warning"
+    - export STATUS_EMOJI=":ship:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Success
+notify:deploy:success:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Deployment Completed Successfully"
+  before_script:
+    - export SLACK_COLOR="good"
+    - export STATUS_EMOJI=":tada:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Commit",
+              "value": "<$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>",
+              "short": true
+            },
+            {
+              "title": "Duration",
+              "value": "${CI_PIPELINE_DURATION}s",
+              "short": true
+            },
+            {
+              "title": "Image Tag",
+              "value": "$WEBCMS_IMAGE_TAG",
+              "short": false
+            },
+            {
+              "title": "Deployed By",
+              "value": "$GITLAB_USER_NAME",
+              "short": true
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Failure
+notify:deploy:failed:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Deployment Failed"
+  before_script:
+    - export SLACK_COLOR="danger"
+    - export STATUS_EMOJI=":fire:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "text": "<!channel> Deployment to $ENV_DISPLAY has failed. Immediate attention required.",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Failed Stage",
+              "value": "<$CI_PIPELINE_URL|View Pipeline>",
+              "short": false
+            },
+            {
+              "title": "Commit",
+              "value": "<$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA|${CI_COMMIT_SHORT_SHA}>",
+              "short": true
+            },
+            {
+              "title": "Author",
+              "value": "$GITLAB_USER_NAME",
+              "short": true
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+
+# Security Scan Issues Found
+notify:security:issues:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Security Scan Detected Issues"
+  before_script:
+    - export SLACK_COLOR="danger"
+    - export STATUS_EMOJI=":warning:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "text": "Security vulnerabilities or secrets detected. Review the security report.",
+          "fields": [
+            {
+              "title": "Branch",
+              "value": "$CI_COMMIT_REF_NAME",
+              "short": true
+            },
+            {
+              "title": "Security Report",
+              "value": "<$CI_PROJECT_URL/-/pipelines/$CI_PIPELINE_ID/security|View Report>",
+              "short": false
+            }
+          ],
+          "footer": "Pipeline #$CI_PIPELINE_IID",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  needs:
+    - job: secret_detection
+      optional: true
+    - job: dependency_scanning
+      optional: true
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+
+# Pipeline Completed (Summary)
+notify:pipeline:completed:
+  extends: .slack_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Pipeline Completed"
+  before_script:
+    - export SLACK_COLOR="good"
+    - export STATUS_EMOJI=":checkered_flag:"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "username": "$SLACK_USERNAME",
+        "icon_emoji": "$SLACK_ICON",
+        "attachments": [{
+          "color": "$SLACK_COLOR",
+          "fallback": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+          "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+          "title_link": "$CI_PIPELINE_URL",
+          "text": "All pipeline stages completed successfully.",
+          "fields": [
+            {
+              "title": "Environment",
+              "value": "$ENV_DISPLAY",
+              "short": true
+            },
+            {
+              "title": "Total Duration",
+              "value": "${CI_PIPELINE_DURATION}s",
+              "short": true
+            },
+            {
+              "title": "View Pipeline",
+              "value": "<$CI_PIPELINE_URL|Pipeline #$CI_PIPELINE_IID>",
+              "short": false
+            }
+          ],
+          "footer": "Completed at $(date -u +%Y-%m-%dT%H:%M:%SZ)",
+          "ts": $(date +%s)
+        }]
+      }
+      EOF
+  rules:
+    - if: '$SLACK_WEBHOOK_URL == null'
+      when: never
+    - when: on_success
