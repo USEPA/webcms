@@ -19,8 +19,15 @@
 #    export GITLAB_TOKEN="your-token-here"
 
 # Default to development branch (hardcoded for safety)
-BRANCH="development"
-GITLAB_TOKEN="${1:-$GITLAB_TOKEN}"
+BRANCH="${1:-development}"
+GITLAB_TOKEN="${2:-$GITLAB_TOKEN}"
+
+# Only allow development branch
+if [ "$BRANCH" != "development" ]; then
+  echo "❌ Error: This script only triggers pipelines for the development branch"
+  echo "Current branch: $BRANCH"
+  exit 1
+fi
 
 # EPA GitLab Configuration
 GITLAB_URL="https://gitlab.epa.gov"
