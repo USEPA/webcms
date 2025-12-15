@@ -388,13 +388,18 @@ build:drupal:
         - .gitlab/docker.yml
       when: always
 
-   # Matrix builds container variants for both sites (stage and dev) and all targets (drupal, nginx, drush).
-   # Build order (drupal, nginx, drush) optimizes layer caching: drupal builds expensive
-   # layers first (ElastiCache client, theme compilation) which nginx/drush then reuse.
+   # Matrix builds container variants:
+   # - Development branch: Only build dev site (faster)
+   # - Live branch: Build both stage and dev sites
+   # Build order (drupal, nginx, drush) optimizes layer caching
   parallel:
     matrix:
+      - WEBCMS_SITE: [dev]
+        WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_BRANCH: [development]
       - WEBCMS_SITE: [stage, dev]
-        WEBCMS_TARGET: [drupal, nginx, drush]  # PHP-FPM, web server, CLI containers
+        WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_BRANCH: [live]
 
    # In addition to the shared cache arguments, we provide additional settings to tune
    # Kaniko's caching behavior. This is due to the large number of files and steps in the
@@ -410,6 +415,12 @@ build:drupal:
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
   before_script:
+    # Skip build if branch doesn't match WEBCMS_BRANCH variable
+    - |
+      if [ "$WEBCMS_BRANCH" != "$CI_COMMIT_BRANCH" ]; then
+        echo "Skipping build: branch $CI_COMMIT_BRANCH doesn't match $WEBCMS_BRANCH"
+        exit 0
+      fi
     # Configure Kaniko to use ECR credential helper for AWS authentication
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
