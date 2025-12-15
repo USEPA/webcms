@@ -2,11 +2,6 @@
 # Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
 # Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
 # See docs/cicd-pipeline.md for detailed documentation.
-#
-# Pipeline Variables:
-# - WEBCMS_SITE_FILTER: Set to 'stage' or 'dev' to filter which site's jobs run in the pipeline
-#   Example: WEBCMS_SITE_FILTER=stage will only build and deploy stage site
-#   Leave unset to build and deploy both sites
 
 stages:
   # Docker Image Builds (all branches) - Build first to enable testing
@@ -402,13 +397,6 @@ build:drupal:
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     # Display the target image URL for debugging
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-    # Skip this build if WEBCMS_SITE_FILTER is set and doesn't match current site
-    # This allows building only dev or stage images when needed (e.g., WEBCMS_SITE_FILTER=stage)
-    - |
-      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-        echo "Skipping build for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-        exit 0
-      fi
   
   script:
     # Copy Composer authentication credentials for private package access
