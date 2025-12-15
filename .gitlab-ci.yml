@@ -59,13 +59,13 @@ variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 # Include GitLab's built-in security scanning templates for comprehensive security testing
-# and Slack notifications for pipeline events
+# and Microsoft Teams notifications for pipeline events
 # TEMPORARY: Security scanning templates disabled - RE-ENABLE BEFORE MERGING TO PRODUCTION
 include:
   # - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
   # - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
   # - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
-  - local: .gitlab/slack-notifications.yml            # Slack webhook notifications
+  - local: .gitlab/teams-notifications.yml            # Microsoft Teams webhook notifications
 
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
 # TEMPORARY: Disabled for testing - RE-ENABLE THESE JOBS BEFORE MERGING TO PRODUCTION
@@ -748,16 +748,16 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply  # Execute the cached plan
-  # Require manual approval for all dev site deployments
+  # Automatic deployment for dev site on development branch
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
         $CI_COMMIT_BRANCH == "development"
-      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
+      when: manual      # Still require approval for VPC, ECS cluster, load balancer changes
     - if: >-
         $TF_MODULE == "webcms" &&
         $CI_COMMIT_BRANCH == "development"
-      when: manual      # Require manual approval for all dev site deployments
+      when: on_success  # Automatic deployment for dev site application updates
     - when: never       # Deny all other scenarios
 
 # Spanish apply job - disabled (see note above deploy:dev:init:es)
