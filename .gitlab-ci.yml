@@ -296,8 +296,8 @@ include:
 # Environment-Specific Deployment Templates
 # These templates reduce duplication by providing common configurations for each deployment environment
 
-# Production Environment Template (live branch → WEBCMS_SITE: dev)
-# Deploys to production environment with both English and Spanish languages
+# Dev Site Template (development branch → WEBCMS_SITE: dev)
+# Deploys to dev site from development branch
 # Requires manual approval for infrastructure changes, automatic for application updates
 .deploy:production:
   extends: .deploy
@@ -305,10 +305,10 @@ include:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
-# Staging Environment Template (live branch → WEBCMS_SITE: stage)
-# Deploys to staging environment for final testing before production.
+# Stage Site Template (live branch → WEBCMS_SITE: stage)
+# Deploys to stage site from live branch for final testing before production.
 # Supports both English and Spanish languages.
 .deploy:staging:
   extends: .deploy
@@ -316,7 +316,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "stage")'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
