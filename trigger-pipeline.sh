@@ -61,9 +61,6 @@ echo "Project: $PROJECT_PATH"
 echo "Branch: $BRANCH (development only)"
 echo "GitLab: $GITLAB_URL"
 echo ""
-echo "⚠️  Make sure you synced the mirror first!"
-echo "   https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
-echo ""
 
 # Step 1: Get project ID from project path
 echo "📡 Looking up project ID..."
