@@ -643,18 +643,22 @@ deploy:dev:init:en:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
     - gitlab-terraform init  # Initialize Terraform and download providers
 
-deploy:dev:init:es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Init
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent operations on this site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - echo $TF_ADDRESS  # Display state backend URL for debugging
-    - gitlab-terraform init  # Initialize Terraform and download providers
+# NOTE: Spanish (es) deployment for dev environment is disabled.
+# This functionality is preserved for future use if needed.
+# To re-enable, uncomment all dev-es jobs (init, validate, plan, apply).
+
+# deploy:dev:init:es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Init
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent operations on this site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - echo $TF_ADDRESS  # Display state backend URL for debugging
+#     - gitlab-terraform init  # Initialize Terraform and download providers
 
 
 # Validate Terraform configuration for production deployments
@@ -672,19 +676,20 @@ deploy:dev:validate:en:
   script:
     - gitlab-terraform validate
 
-deploy:dev:validate:es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Validate
-  needs:
-    - job: "deploy:dev:init:es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
+# Spanish validation job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:validate:es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Validate
+#   needs:
+#     - job: "deploy:dev:init:es"
+#       optional: true
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform validate
 
 # Generate Terraform plans for production deployments
 deploy:dev:plan-en:
@@ -710,28 +715,29 @@ deploy:dev:plan-en:
       terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
     expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
-deploy:dev:plan-es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Plan
-  needs:
-    - job: "deploy:dev:validate:es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform plan       # Generate execution plan
-    - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
-  artifacts:
-    name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
-    paths:
-      - $TF_ROOT/plan.cache  # Binary plan used by apply job
-    reports:
-      terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
-    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
+# Spanish plan job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:plan-es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Plan
+#   needs:
+#     - job: "deploy:dev:validate:es"
+#       optional: true
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform plan       # Generate execution plan
+#     - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
+#   artifacts:
+#     name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
+#     paths:
+#       - $TF_ROOT/plan.cache  # Binary plan used by apply job
+#     reports:
+#       terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
+#     expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
 
 # Apply Terraform plans for production deployments
@@ -767,37 +773,38 @@ deploy:dev:apply-en:
       when: manual      # Require manual approval for all production deployments
     - when: never       # Deny all other scenarios
 
-deploy:dev:apply-es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Apply
-  needs:
-    - job: "deploy:dev:plan-es"
-      optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
-      optional: true  # Images may already exist from prior builds
-  dependencies: ["deploy:dev:plan-es"]  # Download plan.cache artifact only (not build artifacts)
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent apply operations to same site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform apply  # Execute the cached plan
-  # Require manual approval for all production deployments
-  rules:
-    # Skip if WEBCMS_SITE_FILTER is set to something other than dev
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: >-
-        $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
-    - if: >-
-        $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require manual approval for all production deployments
-    - when: never       # Deny all other scenarios
+# Spanish apply job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:apply-es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Apply
+#   needs:
+#     - job: "deploy:dev:plan-es"
+#       optional: true  # Allow manual plan triggering
+#     - job: "build:drupal"
+#       optional: true  # Images may already exist from prior builds
+#   dependencies: ["deploy:dev:plan-es"]  # Download plan.cache artifact only (not build artifacts)
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent apply operations to same site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform apply  # Execute the cached plan
+#   # Require manual approval for all production deployments
+#   rules:
+#     # Skip if WEBCMS_SITE_FILTER is set to something other than dev
+#     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
+#       when: never
+#     - if: >-
+#         $TF_MODULE == "infrastructure" &&
+#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#       when: manual      # Require approval for VPC, ECS cluster, load balancer changes
+#     - if: >-
+#         $TF_MODULE == "webcms" &&
+#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#       when: manual      # Require manual approval for all production deployments
+#     - when: never       # Deny all other scenarios
 
 #endregion
 
