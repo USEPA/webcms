@@ -615,11 +615,11 @@ infrastructure:preproduction:apply:
 
 #endregion
 
-#region Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
-# Deploys application to production environment (English and Spanish)
+#region Dev Site Deployment Jobs (development branch → WEBCMS_SITE: dev)
+# Deploys application to dev site (English only, Spanish disabled)
 # Uses resource groups to prevent concurrent deployments to same site/language
 
-# Initialize Terraform for production deployments
+# Initialize Terraform for dev site deployments
 deploy:dev:init:en:
   extends: .deploy:production
   stage: Deploy:Dev:Init
@@ -651,7 +651,7 @@ deploy:dev:init:en:
 #     - gitlab-terraform init  # Initialize Terraform and download providers
 
 
-# Validate Terraform configuration for production deployments
+# Validate Terraform configuration for dev site deployments
 deploy:dev:validate:en:
   extends: .deploy:production
   stage: Deploy:Dev:Validate
@@ -681,7 +681,7 @@ deploy:dev:validate:en:
 #   script:
 #     - gitlab-terraform validate
 
-# Generate Terraform plans for production deployments
+# Generate Terraform plans for dev site deployments
 deploy:dev:plan-en:
   extends: .deploy:production
   stage: Deploy:Dev:Plan
@@ -730,7 +730,7 @@ deploy:dev:plan-en:
 #     expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
 
-# Apply Terraform plans for production deployments
+# Apply Terraform plans for dev site deployments
 deploy:dev:apply-en:
   extends: .deploy:production
   stage: Deploy:Dev:Apply
@@ -748,19 +748,16 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply  # Execute the cached plan
-  # Require manual approval for all production deployments
+  # Require manual approval for all dev site deployments
   rules:
-    # Skip if WEBCMS_SITE_FILTER is set to something other than dev
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        $CI_COMMIT_BRANCH == "development"
       when: manual      # Require approval for VPC, ECS cluster, load balancer changes
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require manual approval for all production deployments
+        $CI_COMMIT_BRANCH == "development"
+      when: manual      # Require manual approval for all dev site deployments
     - when: never       # Deny all other scenarios
 
 # Spanish apply job - disabled (see note above deploy:dev:init:es)
@@ -798,11 +795,11 @@ deploy:dev:apply-en:
 
 #endregion
 
-#region Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
-# Deploys to staging environment for final testing before production
+#region Stage Site Deployment (live branch → WEBCMS_SITE: stage)
+# Deploys to stage site from live branch for final testing before production
 # Supports both English and Spanish languages with parallel matrix builds
 
-# Initialize Terraform for staging deployments
+# Initialize Terraform for stage site deployments
 deploy:stage:init-en:
   extends: .deploy:staging
   stage: Deploy:Stage:Init
@@ -957,8 +954,6 @@ update:stage:en:
     - job: "deploy:stage:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
-      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -981,8 +976,6 @@ update:stage:es:
     - job: "deploy:stage:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
-      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -1004,9 +997,7 @@ update:dev:en:
     - job: "deploy:dev:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -1028,9 +1019,7 @@ update:dev:es:
     - job: "deploy:dev:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
