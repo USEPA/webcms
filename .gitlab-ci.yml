@@ -7,10 +7,9 @@ stages:
   # Docker Image Builds (all branches) - Build first to enable testing
   - Build                             # Build application Docker images (drupal, nginx, drush)
 
-  # Security Scanning (run before deployments for early feedback)
-  # TEMPORARY: Disabled for testing - RE-ENABLE THESE STAGES BEFORE MERGING TO PRODUCTION
-  # - Test                              # Run SAST, dependency scanning, secret detection
-  # - Scan                              # Prisma Cloud image vulnerability scanning
+  # Security Scanning (live branch only - stage deployments)
+  - Test                              # Run SAST, dependency scanning, secret detection
+  - Scan                              # Prisma Cloud image vulnerability scanning
 
   # Infrastructure Provisioning (live branch only)
   - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
@@ -36,6 +35,18 @@ stages:
   # Release Management (create artifacts after successful deployment)
   - Artifacts                         # Create deployment artifacts
   - Release                           # Create GitLab releases
+
+# Workflow Rules - Control when pipelines are created
+# Ensures pipelines run for mirror updates from GitHub
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'        # Run on push (includes mirror updates)
+    - if: '$CI_PIPELINE_SOURCE == "web"'         # Run on manual trigger via UI
+    - if: '$CI_PIPELINE_SOURCE == "api"'         # Run on API trigger
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'     # Run on pipeline trigger
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'    # Run on scheduled pipelines
+    - if: '$CI_COMMIT_TAG'                       # Run on tag creation
+    - when: never                                 # Don't run for any other sources
 
 # Global Pipeline Configuration
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
