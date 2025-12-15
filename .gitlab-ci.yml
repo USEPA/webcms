@@ -71,23 +71,28 @@ variables:
 
 # Include GitLab's built-in security scanning templates for comprehensive security testing
 # and Microsoft Teams notifications for pipeline events
-# TEMPORARY: Security scanning templates disabled - RE-ENABLE BEFORE MERGING TO PRODUCTION
 include:
-  # - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
-  # - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
-  # - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
+  - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
+  - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
   - local: .gitlab/teams-notifications.yml            # Microsoft Teams webhook notifications
 
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
-# TEMPORARY: Disabled for testing - RE-ENABLE THESE JOBS BEFORE MERGING TO PRODUCTION
-# sast:
-#   stage: Test
+# and restrict to live branch only (stage deployments)
+sast:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
 
-# dependency_scanning:
-#   stage: Test
+dependency_scanning:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
 
-# secret_detection:
-#   stage: Test
+secret_detection:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
