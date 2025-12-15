@@ -88,7 +88,24 @@ fi
 echo "✓ Found project ID: $PROJECT_ID"
 echo ""
 
-# Step 2: Trigger the pipeline
+# Step 2: Trigger mirror sync
+echo "🔄 Syncing GitHub mirror to GitLab..."
+SYNC_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/mirror/pull" \
+  --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}")
+
+SYNC_HTTP_CODE=$(echo "$SYNC_RESPONSE" | tail -n 1)
+
+if [ "$SYNC_HTTP_CODE" = "200" ] || [ "$SYNC_HTTP_CODE" = "204" ]; then
+  echo "✓ Mirror sync initiated"
+  echo "⏳ Waiting for mirror sync to complete (5 seconds)..."
+  sleep 5
+else
+  echo "⚠️  Mirror sync returned HTTP $SYNC_HTTP_CODE (continuing anyway...)"
+fi
+echo ""
+
+# Step 3: Trigger the pipeline
 echo "🔨 Triggering pipeline..."
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
   "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}" \
