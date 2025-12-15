@@ -658,12 +658,11 @@ deploy:dev:init:en:
 
 
 # Validate Terraform configuration for dev site deployments
+# Validation runs in parallel with init to save time
 deploy:dev:validate:en:
   extends: .deploy:production
   stage: Deploy:Dev:Validate
-  needs:
-    - job: "deploy:dev:init:en"
-      optional: true
+  needs: []  # No dependencies - run immediately in parallel
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -688,10 +687,13 @@ deploy:dev:validate:en:
 #     - gitlab-terraform validate
 
 # Generate Terraform plans for dev site deployments
+# Plan-json is skipped for dev to save time (only needed for MR review)
 deploy:dev:plan-en:
   extends: .deploy:production
   stage: Deploy:Dev:Plan
   needs:
+    - job: "deploy:dev:init:en"
+      optional: true
     - job: "deploy:dev:validate:en"
       optional: true
   variables:
@@ -701,15 +703,12 @@ deploy:dev:plan-en:
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
-    - gitlab-terraform plan       # Generate execution plan
-    - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
+    - gitlab-terraform plan       # Generate execution plan only (skip json for speed)
   artifacts:
     name: terraform-plan-webcms-${WEBCMS_SITE}-en-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache  # Binary plan used by apply job
-    reports:
-      terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
-    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
+    expire_in: 1 day  # Shorter retention for fast-moving dev deployments
 
 # Spanish plan job - disabled (see note above deploy:dev:init:es)
 # deploy:dev:plan-es:
@@ -737,15 +736,17 @@ deploy:dev:plan-en:
 
 
 # Apply Terraform plans for dev site deployments
+# Optimized for speed: parallel execution where safe
 deploy:dev:apply-en:
   extends: .deploy:production
   stage: Deploy:Dev:Apply
   needs:
     - job: "deploy:dev:plan-en"
-      optional: true  # Allow manual plan triggering
+      artifacts: true  # Download plan.cache
     - job: "build:drupal"
-      optional: true  # Images may already exist from prior builds
-  dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only (not build artifacts)
+      artifacts: false  # Don't wait for build artifacts
+      optional: true
+  dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
