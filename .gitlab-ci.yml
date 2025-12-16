@@ -387,33 +387,30 @@ gemnasium-dependency_scanning:
 build:drupal:
   extends: .kaniko
   stage: Build
+
+   # Matrix builds container variants based on branch:
+   # - Development branch: Only build dev site (3 jobs: drupal, nginx, drush)
+   # - Live branch: Build both stage and dev sites (6 jobs total)
+  parallel:
+    matrix:
+      # Development branch builds
+      - WEBCMS_SITE: dev
+        WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_BRANCH: development
+      # Live branch builds
+      - WEBCMS_SITE: [stage, dev]
+        WEBCMS_TARGET: [drupal, nginx, drush]
+        WEBCMS_BRANCH: live
+  
   rules:
+    # Only create jobs if branch matches WEBCMS_BRANCH from matrix
+    - if: '$CI_COMMIT_BRANCH == $WEBCMS_BRANCH'
+      when: always
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
       when: always
-    - if: '$CI_COMMIT_BRANCH == "development"'
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
-      when: always
-    - changes:
-        - services/drupal/**/*
-        - .gitlab-ci.yml
-        - .gitlab/docker.yml
-      when: always
-
-   # Matrix builds container variants:
-   # - Development branch: Only build dev site (faster)
-   # - Live branch: Build both stage and dev sites
-   # Build order (drupal, nginx, drush) optimizes layer caching
-  parallel:
-    matrix:
-      - WEBCMS_SITE: [dev]
-        WEBCMS_TARGET: [drupal, nginx, drush]
-        WEBCMS_BRANCH: [development]
-      - WEBCMS_SITE: [stage, dev]
-        WEBCMS_TARGET: [drupal, nginx, drush]
-        WEBCMS_BRANCH: [live]
+    - when: never  # Skip if branch doesn't match
 
    # In addition to the shared cache arguments, we provide additional settings to tune
    # Kaniko's caching behavior. This is due to the large number of files and steps in the
@@ -429,12 +426,6 @@ build:drupal:
    #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
    #   improve build performance by 75%".
   before_script:
-    # Skip build if branch doesn't match WEBCMS_BRANCH variable
-    - |
-      if [ "$WEBCMS_BRANCH" != "$CI_COMMIT_BRANCH" ]; then
-        echo "Skipping build: branch $CI_COMMIT_BRANCH doesn't match $WEBCMS_BRANCH"
-        exit 0
-      fi
     # Configure Kaniko to use ECR credential helper for AWS authentication
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
@@ -1066,10 +1057,13 @@ artifacts:
   image: alpine  # Minimal image sufficient for file packaging
   stage: Artifacts
   rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'  # Skip on development branch
+      when: never
     - if: $CI_COMMIT_TAG != ""  # Run on tagged releases
       when: always
     - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch deployments
-    - when: never  # Don't run on development branch
+      when: always
+    - when: never  # Don't run on any other branches
   script:
     - echo "Creating release artifacts for ${CI_COMMIT_REF_NAME}"
   artifacts:
