@@ -107,8 +107,8 @@ notify:pipeline:started:
     - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"'
       when: always
 
-# Build Stage Success
-notify:build:success:
+# Build Stage Success - Development
+notify:build:success:dev:
   extends: .teams_notify
   stage: .post
   variables:
@@ -116,17 +116,31 @@ notify:build:success:
   needs:
     - job: build:drupal:dev
       artifacts: false
-      optional: true
-    - job: build:drupal:stage
-      artifacts: false
-      optional: true
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - when: on_success
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: on_success
+    - when: never
 
-# Build Stage Failure
-notify:build:failed:
+# Build Stage Success - Live
+notify:build:success:stage:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Completed Successfully"
+  needs:
+    - job: build:drupal:stage
+      artifacts: false
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+    - when: never
+
+# Build Stage Failure - Development
+notify:build:failed:dev:
   extends: .teams_notify
   stage: .post
   variables:
@@ -191,14 +205,85 @@ notify:build:failed:
   needs:
     - job: build:drupal:dev
       artifacts: false
-      optional: true
-    - job: build:drupal:stage
-      artifacts: false
-      optional: true
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - when: on_failure
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: on_failure
+    - when: never
+
+# Build Stage Failure - Live
+notify:build:failed:stage:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Failed"
+  before_script:
+    - export TEAMS_COLOR="DC3545"
+    - export STATUS_EMOJI="❌"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Author:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Logs",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_JOB_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  needs:
+    - job: build:drupal:stage
+      artifacts: false
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+    - when: never
 
 # Manual Action Required
 notify:manual:required:
