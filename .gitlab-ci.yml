@@ -403,14 +403,19 @@ build:drupal:
         WEBCMS_BRANCH: live
   
   rules:
-    # Only create jobs if branch matches WEBCMS_BRANCH from matrix
-    - if: '$CI_COMMIT_BRANCH == $WEBCMS_BRANCH'
+    # Development branch: only run jobs with WEBCMS_BRANCH=development
+    - if: '$CI_COMMIT_BRANCH == "development" && $WEBCMS_BRANCH == "development"'
       when: always
+    # Live branch: only run jobs with WEBCMS_BRANCH=live
+    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_BRANCH == "live"'
+      when: always
+    # Tags
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
       when: always
-    - when: never  # Skip if branch doesn't match
+    # Skip all other combinations
+    - when: never
 
    # In addition to the shared cache arguments, we provide additional settings to tune
    # Kaniko's caching behavior. This is due to the large number of files and steps in the
