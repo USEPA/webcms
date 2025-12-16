@@ -68,6 +68,10 @@ default:
 # pipelines. Creates unique image tags based on branch and commit for reproducible builds.
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+  # Control dev deployment from live branch
+  # Set DEPLOY_TO_DEV=true when manually triggering pipeline to also deploy to dev site
+  # By default, live branch only deploys to stage
+  DEPLOY_TO_DEV: "false"
 
 # Include GitLab's built-in security scanning templates for comprehensive security testing
 # and Microsoft Teams notifications for pipeline events
@@ -327,7 +331,7 @@ gemnasium-dependency_scanning:
 # These templates reduce duplication by providing common configurations for each deployment environment
 
 # Dev Site Template (development branch → WEBCMS_SITE: dev)
-# Deploys to dev site from development branch
+# Also deploys from live branch when DEPLOY_TO_DEV=true
 # Requires manual approval for infrastructure changes, automatic for application updates
 .deploy:production:
   extends: .deploy
@@ -336,6 +340,7 @@ gemnasium-dependency_scanning:
     WEBCMS_SITE: dev
   rules:
     - if: '$CI_COMMIT_BRANCH == "development"'
+    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true"'
 
 # Stage Site Template (live branch → WEBCMS_SITE: stage)
 # Deploys to stage site from live branch for final testing before production.
@@ -416,7 +421,8 @@ build:drupal:dev:
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
       --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
 
-# Live branch builds - both stage and dev sites
+# Live branch builds - stage (and optionally dev)
+# By default only builds stage, set DEPLOY_TO_DEV=true to also build dev
 build:drupal:stage:
   extends: .kaniko
   stage: Build
@@ -430,11 +436,20 @@ build:drupal:stage:
     - when: never
   parallel:
     matrix:
-      - WEBCMS_SITE: [stage, dev]
+      - WEBCMS_SITE: stage
         WEBCMS_TARGET: [drupal, nginx, drush]
+      - WEBCMS_SITE: dev
+        WEBCMS_TARGET: [drupal, nginx, drush]
+        DEPLOY_TO_DEV_REQUIRED: "true"  # This job only runs if DEPLOY_TO_DEV=true
   variables:
     WEBCMS_ENVIRONMENT: preproduction
   before_script:
+    # Skip dev builds unless DEPLOY_TO_DEV=true
+    - |
+      if [ "$DEPLOY_TO_DEV_REQUIRED" = "true" ] && [ "$DEPLOY_TO_DEV" != "true" ]; then
+        echo "Skipping dev build (DEPLOY_TO_DEV=${DEPLOY_TO_DEV})"
+        exit 0
+      fi
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
@@ -747,6 +762,9 @@ deploy:dev:apply-en:
     - job: "build:drupal:dev"
       artifacts: false  # Don't wait for build artifacts
       optional: true
+    - job: "build:drupal:stage"  # For live branch builds
+      artifacts: false
+      optional: true
   dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only
   variables:
     WEBCMS_LANG: en
@@ -756,16 +774,24 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply  # Execute the cached plan
-  # Automatic deployment for dev site on development branch
+  # Deployment rules for dev site
   rules:
+    # Infrastructure changes require manual approval
     - if: >-
         $TF_MODULE == "infrastructure" &&
         $CI_COMMIT_BRANCH == "development"
-      when: manual      # Still require approval for VPC, ECS cluster, load balancer changes
+      when: manual
+    # Development branch: automatic deployment for application updates
     - if: >-
         $TF_MODULE == "webcms" &&
         $CI_COMMIT_BRANCH == "development"
-      when: on_success  # Automatic deployment for dev site application updates
+      when: on_success
+    # Live branch: manual deployment when DEPLOY_TO_DEV=true
+    - if: >-
+        $TF_MODULE == "webcms" &&
+        $CI_COMMIT_BRANCH == "live" &&
+        $DEPLOY_TO_DEV == "true"
+      when: manual
     - when: never       # Deny all other scenarios
 
 # Spanish apply job - disabled (see note above deploy:dev:init:es)
