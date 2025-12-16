@@ -402,6 +402,12 @@ build:drupal:
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     # Display the target image URL for debugging
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+    # Skip dev builds on live branch unless DEPLOY_TO_DEV=true
+    - |
+      if [ "$CI_COMMIT_BRANCH" = "live" ] && [ "${WEBCMS_SITE}" = "dev" ] && [ "$DEPLOY_TO_DEV" != "true" ]; then
+        echo "Skipping dev build on live branch (DEPLOY_TO_DEV=${DEPLOY_TO_DEV})"
+        exit 0
+      fi
     # Skip this build if WEBCMS_SITE_FILTER is set and doesn't match current site
     # This allows building only dev or stage images when needed (e.g., WEBCMS_SITE_FILTER=stage)
     - |
