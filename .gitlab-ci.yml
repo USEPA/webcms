@@ -1020,27 +1020,31 @@ update:dev:en:
   # Require manual approval for production database updates
   when: manual
 
-update:dev:es:
-  extends: .update
-  stage: Update
-  needs:
-    - job: "deploy:dev:apply-es"
-      optional: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
+# NOTE: Spanish (es) deployment for dev environment is disabled.
+# This update job is commented out to match the disabled deploy:dev:apply-es job.
+# To re-enable, uncomment this job and the corresponding deploy jobs.
 
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    WEBCMS_SITE: dev
-    WEBCMS_LANG: es
-
-  # Resource group prevents overlapping Drush operations on the same site
-  # Environment tracking enables deployment status visibility
-  resource_group: drush/dev-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  # Require manual approval for production database updates
-  when: manual
+# update:dev:es:
+#   extends: .update
+#   stage: Update
+#   needs:
+#     - job: "deploy:dev:apply-es"
+#       optional: true
+#   rules:
+#     - if: '$CI_COMMIT_BRANCH == "development"'
+#
+#   variables:
+#     WEBCMS_ENVIRONMENT: preproduction
+#     WEBCMS_SITE: dev
+#     WEBCMS_LANG: es
+#
+#   # Resource group prevents overlapping Drush operations on the same site
+#   # Environment tracking enables deployment status visibility
+#   resource_group: drush/dev-$WEBCMS_LANG
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   # Require manual approval for production database updates
+#   when: manual
 
 #endregion
 
