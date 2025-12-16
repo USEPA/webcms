@@ -384,68 +384,26 @@ gemnasium-dependency_scanning:
 # Builds the main Drupal application container with PHP-FPM
 # Uses matrix build to create multiple variants (drupal, nginx, drush)
 # Only runs when relevant Drupal files change to optimize build times
-build:drupal:
+# Development branch builds - only dev site
+build:drupal:dev:
   extends: .kaniko
   stage: Build
-
-   # Matrix builds container variants based on branch:
-   # - Development branch: Only build dev site (3 jobs: drupal, nginx, drush)
-   # - Live branch: Build both stage and dev sites (6 jobs total)
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: always
+    - when: never
   parallel:
     matrix:
-      # Development branch builds
       - WEBCMS_SITE: dev
         WEBCMS_TARGET: [drupal, nginx, drush]
-        WEBCMS_BRANCH: development
-      # Live branch builds
-      - WEBCMS_SITE: [stage, dev]
-        WEBCMS_TARGET: [drupal, nginx, drush]
-        WEBCMS_BRANCH: live
-  
-  rules:
-    # Development branch: only run jobs with WEBCMS_BRANCH=development
-    - if: '$CI_COMMIT_BRANCH == "development" && $WEBCMS_BRANCH == "development"'
-      when: always
-    # Live branch: only run jobs with WEBCMS_BRANCH=live
-    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_BRANCH == "live"'
-      when: always
-    # Tags
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-      when: always
-    # Skip all other combinations
-    - when: never
-
-   # In addition to the shared cache arguments, we provide additional settings to tune
-   # Kaniko's caching behavior. This is due to the large number of files and steps in the
-   # WebCMS Dockerfile:
-   #
-   # - We skip stages that don't apply to this build target.
-   #
-   # - We use the faster but less accurate redo snapshot mode, under the assumption that
-   #   changes in files like composer.json or custom modules will be sufficient to disrupt
-   #   the metadata cache.
-   #
-   # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
-   #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
-   #   improve build performance by 75%".
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
   before_script:
-    # Configure Kaniko to use ECR credential helper for AWS authentication
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
-    # Display the target image URL for debugging
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-  
   script:
-    # Copy Composer authentication credentials for private package access
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
-    # Build Docker image with Kaniko (rootless builder) with optimizations:
-    # - Layer caching for faster builds
-    # - Skip unused Dockerfile stages
-    # - Fast snapshot mode (redo) for better performance
-    # - Experimental new run detection (up to 75% faster)
-    # - Push to both ECR and GitLab registries
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
@@ -457,9 +415,42 @@ build:drupal:
       --target=$WEBCMS_TARGET
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
       --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-      
+
+# Live branch builds - both stage and dev sites
+build:drupal:stage:
+  extends: .kaniko
+  stage: Build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: always
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+      when: always
+    - when: never
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [stage, dev]
+        WEBCMS_TARGET: [drupal, nginx, drush]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+    - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+  script:
+    - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --skip-unused-stages
+      --snapshotMode=redo
+      --use-new-run
+      --context=$CI_PROJECT_DIR/services/drupal
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
+      --target=$WEBCMS_TARGET
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
 
 #endregion
 
@@ -473,7 +464,7 @@ Prisma:Drupal:
   tags:
     - twistcli  # Requires runner with Docker and twistcli support
   needs:
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true  # Run even if build skipped (for tagged releases)
   rules:
     - if: '$CI_COMMIT_TAG'  # Run on tagged releases
@@ -501,7 +492,7 @@ Prisma:Nginx:
   tags:
     - twistcli
   needs:
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true
   rules:
     - if: '$CI_COMMIT_TAG'
@@ -529,7 +520,7 @@ Prisma:Drush:
   tags:
     - twistcli
   needs:
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true
   rules:
     - if: '$CI_COMMIT_TAG'
@@ -753,7 +744,7 @@ deploy:dev:apply-en:
   needs:
     - job: "deploy:dev:plan-en"
       artifacts: true  # Download plan.cache
-    - job: "build:drupal"
+    - job: "build:drupal:dev"
       artifacts: false  # Don't wait for build artifacts
       optional: true
   dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only
@@ -923,7 +914,7 @@ deploy:stage:apply-en:
   needs:
     - job: "deploy:stage:plan-en"
       optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true  # Images may already exist from prior builds
   dependencies: ["deploy:stage:plan-en"]  # Download plan.cache artifact only (not build artifacts)
   variables:
@@ -943,7 +934,7 @@ deploy:stage:apply-es:
   needs:
     - job: "deploy:stage:plan-es"
       optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true  # Images may already exist from prior builds
   dependencies: ["deploy:stage:plan-es"]  # Download plan.cache artifact only (not build artifacts)
   variables:
