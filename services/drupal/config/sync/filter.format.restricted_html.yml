@@ -4,7 +4,6 @@ status: true
 dependencies:
   module:
     - epa_wysiwyg
-    - media_inline_embed
     - pathologic
     - token_filter
 name: 'Restricted HTML'
@@ -42,19 +41,11 @@ filters:
       local_settings:
         protocol_style: full
         local_paths: ''
-  media_inline_embed:
-    id: media_inline_embed
-    provider: media_inline_embed
-    status: false
-    weight: 100
-    settings:
-      default_view_mode: default
-      allowed_media_types: {  }
-      allowed_view_modes: {  }
+        keep_language_prefix: false
   token_filter:
     id: token_filter
     provider: token_filter
     status: false
     weight: 0
     settings:
-      replace_empty: '0'
+      replace_empty: false

@@ -643,9 +643,13 @@ deploy:dev:init:en:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
     - gitlab-terraform init  # Initialize Terraform and download providers
 
+# NOTE: Spanish (es) deployment for dev site is DISABLED
+# This job is kept for reference but will never run due to rules
 deploy:dev:init:es:
   extends: .deploy:production
   stage: Deploy:Dev:Init
+  rules:
+    - when: never  # Explicitly disabled - Spanish not supported for dev site
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -675,6 +679,8 @@ deploy:dev:validate:en:
 deploy:dev:validate:es:
   extends: .deploy:production
   stage: Deploy:Dev:Validate
+  rules:
+    - when: never  # Explicitly disabled - Spanish not supported for dev site
   needs:
     - job: "deploy:dev:init:es"
       optional: true
@@ -713,6 +719,8 @@ deploy:dev:plan-en:
 deploy:dev:plan-es:
   extends: .deploy:production
   stage: Deploy:Dev:Plan
+  rules:
+    - when: never  # Explicitly disabled - Spanish not supported for dev site
   needs:
     - job: "deploy:dev:validate:es"
       optional: true
@@ -770,6 +778,8 @@ deploy:dev:apply-en:
 deploy:dev:apply-es:
   extends: .deploy:production
   stage: Deploy:Dev:Apply
+  rules:
+    - when: never  # Explicitly disabled - Spanish not supported for dev site
   needs:
     - job: "deploy:dev:plan-es"
       optional: true  # Allow manual plan triggering
@@ -784,20 +794,6 @@ deploy:dev:apply-es:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply  # Execute the cached plan
-  # Require manual approval for all production deployments
-  rules:
-    # Skip if WEBCMS_SITE_FILTER is set to something other than dev
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: >-
-        $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
-    - if: >-
-        $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require manual approval for all production deployments
-    - when: never       # Deny all other scenarios
 
 #endregion
 
