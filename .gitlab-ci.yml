@@ -355,14 +355,14 @@ include:
 # Docker image build jobs using Kaniko (rootless, GitLab-compatible Docker builder).
 # Builds application containers and mirrors third-party images to ECR.
 
-# Drupal Application Build Job
-# Builds the main Drupal application container with PHP-FPM
-# Uses matrix build to create multiple variants (drupal, nginx, drush)
-# Only runs when relevant Drupal files change to optimize build times
+# Live branch builds - stage (and optionally dev)
+# By default only builds stage, set DEPLOY_TO_DEV=true to also build dev
 build:drupal:
   extends: .kaniko
   stage: Build
   rules:
+    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_SITE == "dev" && $DEPLOY_TO_DEV != "true"'
+      when: never  # Skip dev builds unless DEPLOY_TO_DEV=true
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
@@ -375,56 +375,22 @@ build:drupal:
         - .gitlab/docker.yml
       when: always
 
-   # Matrix builds container variants for both sites (stage and dev) and all targets (drupal, nginx, drush).
-   # Build order (drupal, nginx, drush) optimizes layer caching: drupal builds expensive
-   # layers first (ElastiCache client, theme compilation) which nginx/drush then reuse.
+  # Matrix builds container variants
+  # Stage builds always run, dev builds only when DEPLOY_TO_DEV=true
   parallel:
     matrix:
-      - WEBCMS_SITE: [stage, dev]
-        WEBCMS_TARGET: [drupal, nginx, drush]  # PHP-FPM, web server, CLI containers
-
-   # In addition to the shared cache arguments, we provide additional settings to tune
-   # Kaniko's caching behavior. This is due to the large number of files and steps in the
-   # WebCMS Dockerfile:
-   #
-   # - We skip stages that don't apply to this build target.
-   #
-   # - We use the faster but less accurate redo snapshot mode, under the assumption that
-   #   changes in files like composer.json or custom modules will be sufficient to disrupt
-   #   the metadata cache.
-   #
-   # - We opt in to the (experimental) "new run" system to detect when to re-execute RUN
-   #   instructions. According to the Kaniko documentation, "[i]n some cases, this may
-   #   improve build performance by 75%".
+      - WEBCMS_SITE: stage
+        WEBCMS_TARGET: [drupal, nginx, drush]
+      - WEBCMS_SITE: dev
+        WEBCMS_TARGET: [drupal, nginx, drush]
+  
   before_script:
-    # Configure Kaniko to use ECR credential helper for AWS authentication
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
-    # Display the target image URL for debugging
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-    # Skip dev builds on live branch unless DEPLOY_TO_DEV=true
-    - |
-      if [ "$CI_COMMIT_BRANCH" = "live" ] && [ "${WEBCMS_SITE}" = "dev" ] && [ "$DEPLOY_TO_DEV" != "true" ]; then
-        echo "Skipping dev build on live branch (DEPLOY_TO_DEV=${DEPLOY_TO_DEV})"
-        exit 0
-      fi
-    # Skip this build if WEBCMS_SITE_FILTER is set and doesn't match current site
-    # This allows building only dev or stage images when needed (e.g., WEBCMS_SITE_FILTER=stage)
-    - |
-      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-        echo "Skipping build for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-        exit 0
-      fi
   
   script:
-    # Copy Composer authentication credentials for private package access
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
-    # Build Docker image with Kaniko (rootless builder) with optimizations:
-    # - Layer caching for faster builds
-    # - Skip unused Dockerfile stages
-    # - Fast snapshot mode (redo) for better performance
-    # - Experimental new run detection (up to 75% faster)
-    # - Push to both ECR and GitLab registries
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
