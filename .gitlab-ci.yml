@@ -2,20 +2,14 @@
 # Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
 # Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
 # See docs/cicd-pipeline.md for detailed documentation.
-#
-# Pipeline Variables:
-# - WEBCMS_SITE_FILTER: Set to 'stage' or 'dev' to filter which site's jobs run in the pipeline
-#   Example: WEBCMS_SITE_FILTER=stage will only build and deploy stage site
-#   Leave unset to build and deploy both sites
 
 stages:
   # Docker Image Builds (all branches) - Build first to enable testing
   - Build                             # Build application Docker images (drupal, nginx, drush)
 
-  # Security Scanning (run before deployments for early feedback)
-  # TEMPORARY: Disabled for testing - RE-ENABLE THESE STAGES BEFORE MERGING TO PRODUCTION
-  # - Test                              # Run SAST, dependency scanning, secret detection
-  # - Scan                              # Prisma Cloud image vulnerability scanning
+  # Security Scanning (live branch only - stage deployments)
+  - Test                              # Run SAST, dependency scanning, secret detection
+  - Scan                              # Prisma Cloud image vulnerability scanning
 
   # Infrastructure Provisioning (live branch only)
   - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
@@ -42,6 +36,18 @@ stages:
   - Artifacts                         # Create deployment artifacts
   - Release                           # Create GitLab releases
 
+# Workflow Rules - Control when pipelines are created
+# Ensures pipelines run for mirror updates from GitHub
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'        # Run on push (includes mirror updates)
+    - if: '$CI_PIPELINE_SOURCE == "web"'         # Run on manual trigger via UI
+    - if: '$CI_PIPELINE_SOURCE == "api"'         # Run on API trigger
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'     # Run on pipeline trigger
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'    # Run on scheduled pipelines
+    - if: '$CI_COMMIT_TAG'                       # Run on tag creation
+    - when: never                                 # Don't run for any other sources
+
 # Global Pipeline Configuration
 # Our GitLab runner environment is Docker-based, so we apply this tag to every step.
 default:
@@ -64,24 +70,43 @@ variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
 
 # Include GitLab's built-in security scanning templates for comprehensive security testing
-# and Teams notifications for pipeline events
-# TEMPORARY: Security scanning templates disabled - RE-ENABLE BEFORE MERGING TO PRODUCTION
+# and Microsoft Teams notifications for pipeline events
 include:
-  # - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
-  # - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
-  # - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
-  - local: .gitlab/teams-notifications.yml            # Teams webhook notifications
+  - template: Jobs/SAST.gitlab-ci.yml              # Static Application Security Testing
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml  # Scan for vulnerable dependencies
+  - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
+  - local: .gitlab/teams-notifications.yml            # Microsoft Teams webhook notifications
 
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
-# TEMPORARY: Disabled for testing - RE-ENABLE THESE JOBS BEFORE MERGING TO PRODUCTION
-# sast:
-#   stage: Test
+# and restrict to live branch only (stage deployments)
+sast:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
 
-# dependency_scanning:
-#   stage: Test
+dependency_scanning:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
 
-# secret_detection:
-#   stage: Test
+secret_detection:
+  stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
+
+# Override all SAST sub-jobs to prevent them from running on development branch
+semgrep-sast:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
+
+gemnasium-dependency_scanning:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
@@ -301,8 +326,8 @@ include:
 # Environment-Specific Deployment Templates
 # These templates reduce duplication by providing common configurations for each deployment environment
 
-# Production Environment Template (live branch → WEBCMS_SITE: dev)
-# Deploys to production environment with both English and Spanish languages
+# Dev Site Template (development branch → WEBCMS_SITE: dev)
+# Deploys to dev site from development branch
 # Requires manual approval for infrastructure changes, automatic for application updates
 .deploy:production:
   extends: .deploy
@@ -310,10 +335,10 @@ include:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
-# Staging Environment Template (live branch → WEBCMS_SITE: stage)
-# Deploys to staging environment for final testing before production.
+# Stage Site Template (live branch → WEBCMS_SITE: stage)
+# Deploys to stage site from live branch for final testing before production.
 # Supports both English and Spanish languages.
 .deploy:staging:
   extends: .deploy
@@ -321,7 +346,7 @@ include:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "stage")'
+    - if: '$CI_COMMIT_BRANCH == "live"'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -355,40 +380,28 @@ include:
 # Docker image build jobs using Kaniko (rootless, GitLab-compatible Docker builder).
 # Builds application containers and mirrors third-party images to ECR.
 
-# Live branch builds - stage (and optionally dev)
-# By default only builds stage, set DEPLOY_TO_DEV=true to also build dev
-build:drupal:
+# Drupal Application Build Job
+# Builds the main Drupal application container with PHP-FPM
+# Uses matrix build to create multiple variants (drupal, nginx, drush)
+# Only runs when relevant Drupal files change to optimize build times
+# Development branch builds - only dev site
+build:drupal:dev:
   extends: .kaniko
   stage: Build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && $WEBCMS_SITE == "dev" && $DEPLOY_TO_DEV != "true"'
-      when: never  # Skip dev builds unless DEPLOY_TO_DEV=true
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "development"'
       when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'
-      when: always
-    - changes:
-        - services/drupal/**/*
-        - .gitlab-ci.yml
-        - .gitlab/docker.yml
-      when: always
-
-  # Matrix builds container variants
-  # Stage builds always run, dev builds only when DEPLOY_TO_DEV=true
+    - when: never
   parallel:
     matrix:
-      - WEBCMS_SITE: stage
-        WEBCMS_TARGET: [drupal, nginx, drush]
       - WEBCMS_SITE: dev
         WEBCMS_TARGET: [drupal, nginx, drush]
-  
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
   before_script:
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-  
   script:
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     - /kaniko/executor
@@ -402,121 +415,133 @@ build:drupal:
       --target=$WEBCMS_TARGET
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
       --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
-      
+
+# Live branch builds - both stage and dev sites
+build:drupal:stage:
+  extends: .kaniko
+  stage: Build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: always
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+      when: always
+    - when: never
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [stage, dev]
+        WEBCMS_TARGET: [drupal, nginx, drush]
   variables:
     WEBCMS_ENVIRONMENT: preproduction
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
+    - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+  script:
+    - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
+    - /kaniko/executor
+      $KANIKO_CACHE_ARGS
+      --skip-unused-stages
+      --snapshotMode=redo
+      --use-new-run
+      --context=$CI_PROJECT_DIR/services/drupal
+      --build-arg GIT_COMMIT=$CI_COMMIT_SHA
+      --build-arg GIT_TAG=$CI_COMMIT_TAG
+      --target=$WEBCMS_TARGET
+      --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
+      --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
 
 #endregion
 
 #region Prisma Cloud Image Scanning
 # Scan Docker images for vulnerabilities using Prisma Cloud (Twistlock)
 # These jobs pull images from GitLab registry and scan them using twistcli
-# TEMPORARY: All Prisma scanning jobs disabled for testing - RE-ENABLE BEFORE MERGING TO PRODUCTION
+# Only runs on live branch (stage deployments)
 
-# Prisma:Drupal:
-#   stage: Scan
-#   tags:
-#     - twistcli  # Requires runner with Docker and twistcli support
-#   needs:
-#     - job: "build:drupal"
-#       optional: true  # Run even if build skipped (for tagged releases)
-#   rules:
-#     - if: '$CI_COMMIT_TAG'  # Run on tagged releases
-#       variables:
-#         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG  # Use tag as image tag
-#     - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch
-#   parallel:
-#     matrix:
-#       - WEBCMS_SITE: [dev, stage]  # Scan images for both sites in parallel
-#   variables:
-#     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
-#     WEBCMS_ENVIRONMENT: preproduction
-#   before_script:
-#     # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
-#     - |
-#       if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-#         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-#         exit 0
-#       fi
-#   script:
-#     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-#     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-#     # Login to GitLab container registry to pull the image for scanning
-#     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-#     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-#     # Scan image for vulnerabilities and send results to Prisma Cloud
-#     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
-#   allow_failure: true
+Prisma:Drupal:
+  stage: Scan
+  tags:
+    - twistcli  # Requires runner with Docker and twistcli support
+  needs:
+    - job: "build:drupal:stage"
+      optional: true  # Run even if build skipped (for tagged releases)
+  rules:
+    - if: '$CI_COMMIT_TAG'  # Run on tagged releases
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG  # Use tag as image tag
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
+  variables:
+    GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Login to GitLab container registry to pull the image for scanning
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+  allow_failure: true
 
-# Prisma:Nginx:
-#   stage: Scan
-#   tags:
-#     - twistcli
-#   needs:
-#     - job: "build:drupal"
-#       optional: true
-#   rules:
-#     - if: '$CI_COMMIT_TAG'
-#       variables:
-#         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-#     - if: '$CI_COMMIT_BRANCH == "live"'
-#   parallel:
-#     matrix:
-#       - WEBCMS_SITE: [dev, stage]
-#   variables:
-#     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
-#     WEBCMS_ENVIRONMENT: preproduction
-#   before_script:
-#     # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
-#     - |
-#       if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-#         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-#         exit 0
-#       fi
-#   script:
-#     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-#     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-#     # Login to GitLab container registry to pull the image for scanning
-#     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-#     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-#     # Scan image for vulnerabilities and send results to Prisma Cloud
-#     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
-#   allow_failure: true  # Don't block pipeline on scan failures
+Prisma:Nginx:
+  stage: Scan
+  tags:
+    - twistcli
+  needs:
+    - job: "build:drupal:stage"
+      optional: true
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
+  variables:
+    GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Login to GitLab container registry to pull the image for scanning
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+  allow_failure: true  # Don't block pipeline on scan failures
 
-# Prisma:Drush:
-#   stage: Scan
-#   tags:
-#     - twistcli
-#   needs:
-#     - job: "build:drupal"
-#       optional: true
-#   rules:
-#     - if: '$CI_COMMIT_TAG'
-#       variables:
-#         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-#     - if: '$CI_COMMIT_BRANCH == "live"'
-#   parallel:
-#     matrix:
-#       - WEBCMS_SITE: [dev, stage]
-#   variables:
-#     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
-#     WEBCMS_ENVIRONMENT: preproduction
-#   before_script:
-#     # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
-#     - |
-#       if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-#         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-#         exit 0
-#       fi
-#   script:
-#     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-#     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-#     # Login to GitLab container registry to pull the image for scanning
-#     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-#     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-#     # Scan image for vulnerabilities and send results to Prisma Cloud
-#     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
-#   allow_failure: true  # Don't block pipeline on scan failures
+Prisma:Drush:
+  stage: Scan
+  tags:
+    - twistcli
+  needs:
+    - job: "build:drupal:stage"
+      optional: true
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      variables:
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+  parallel:
+    matrix:
+      - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
+  variables:
+    GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
+    WEBCMS_ENVIRONMENT: preproduction
+  script:
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Login to GitLab container registry to pull the image for scanning
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+  allow_failure: true  # Don't block pipeline on scan failures
 
 #endregion
 
@@ -597,11 +622,11 @@ infrastructure:preproduction:apply:
 
 #endregion
 
-#region Production Deployment Jobs (live branch → WEBCMS_SITE: dev)
-# Deploys application to production environment (English and Spanish)
+#region Dev Site Deployment Jobs (development branch → WEBCMS_SITE: dev)
+# Deploys application to dev site (English only, Spanish disabled)
 # Uses resource groups to prevent concurrent deployments to same site/language
 
-# Initialize Terraform for production deployments
+# Initialize Terraform for dev site deployments
 deploy:dev:init:en:
   extends: .deploy:production
   stage: Deploy:Dev:Init
@@ -615,31 +640,30 @@ deploy:dev:init:en:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
     - gitlab-terraform init  # Initialize Terraform and download providers
 
-# NOTE: Spanish (es) deployment for dev site is DISABLED
-# This job is kept for reference but will never run due to rules
-deploy:dev:init:es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Init
-  rules:
-    - when: never  # Explicitly disabled - Spanish not supported for dev site
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent operations on this site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - echo $TF_ADDRESS  # Display state backend URL for debugging
-    - gitlab-terraform init  # Initialize Terraform and download providers
+# NOTE: Spanish (es) deployment for dev environment is disabled.
+# This functionality is preserved for future use if needed.
+# To re-enable, uncomment all dev-es jobs (init, validate, plan, apply).
+
+# deploy:dev:init:es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Init
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent operations on this site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - echo $TF_ADDRESS  # Display state backend URL for debugging
+#     - gitlab-terraform init  # Initialize Terraform and download providers
 
 
-# Validate Terraform configuration for production deployments
+# Validate Terraform configuration for dev site deployments
+# Validation runs in parallel with init to save time
 deploy:dev:validate:en:
   extends: .deploy:production
   stage: Deploy:Dev:Validate
-  needs:
-    - job: "deploy:dev:init:en"
-      optional: true
+  needs: []  # No dependencies - run immediately in parallel
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -648,27 +672,29 @@ deploy:dev:validate:en:
   script:
     - gitlab-terraform validate
 
-deploy:dev:validate:es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Validate
-  rules:
-    - when: never  # Explicitly disabled - Spanish not supported for dev site
-  needs:
-    - job: "deploy:dev:init:es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
+# Spanish validation job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:validate:es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Validate
+#   needs:
+#     - job: "deploy:dev:init:es"
+#       optional: true
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform validate
 
-# Generate Terraform plans for production deployments
+# Generate Terraform plans for dev site deployments
+# Plan-json is skipped for dev to save time (only needed for MR review)
 deploy:dev:plan-en:
   extends: .deploy:production
   stage: Deploy:Dev:Plan
   needs:
+    - job: "deploy:dev:init:en"
+      optional: true
     - job: "deploy:dev:validate:en"
       optional: true
   variables:
@@ -678,52 +704,50 @@ deploy:dev:plan-en:
   environment:
     name: site/dev-$WEBCMS_LANG
   script:
-    - gitlab-terraform plan       # Generate execution plan
-    - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
+    - gitlab-terraform plan       # Generate execution plan only (skip json for speed)
   artifacts:
     name: terraform-plan-webcms-${WEBCMS_SITE}-en-${CI_COMMIT_SHORT_SHA}
     paths:
       - $TF_ROOT/plan.cache  # Binary plan used by apply job
-    reports:
-      terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
-    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
+    expire_in: 1 day  # Shorter retention for fast-moving dev deployments
 
-deploy:dev:plan-es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Plan
-  rules:
-    - when: never  # Explicitly disabled - Spanish not supported for dev site
-  needs:
-    - job: "deploy:dev:validate:es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform plan       # Generate execution plan
-    - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
-  artifacts:
-    name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
-    paths:
-      - $TF_ROOT/plan.cache  # Binary plan used by apply job
-    reports:
-      terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
-    expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
+# Spanish plan job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:plan-es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Plan
+#   needs:
+#     - job: "deploy:dev:validate:es"
+#       optional: true
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform plan       # Generate execution plan
+#     - gitlab-terraform plan-json  # Generate JSON for GitLab MR widget
+#   artifacts:
+#     name: terraform-plan-webcms-${WEBCMS_SITE}-es-${CI_COMMIT_SHORT_SHA}
+#     paths:
+#       - $TF_ROOT/plan.cache  # Binary plan used by apply job
+#     reports:
+#       terraform: $TF_ROOT/plan.json  # Displayed in GitLab merge request
+#     expire_in: 3 days  # Short retention; deployment plans applied quickly after approval
 
 
-# Apply Terraform plans for production deployments
+# Apply Terraform plans for dev site deployments
+# Optimized for speed: parallel execution where safe
 deploy:dev:apply-en:
   extends: .deploy:production
   stage: Deploy:Dev:Apply
   needs:
     - job: "deploy:dev:plan-en"
-      optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
-      optional: true  # Images may already exist from prior builds
-  dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only (not build artifacts)
+      artifacts: true  # Download plan.cache
+    - job: "build:drupal:dev"
+      artifacts: false  # Don't wait for build artifacts
+      optional: true
+  dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
@@ -732,48 +756,58 @@ deploy:dev:apply-en:
     name: site/dev-$WEBCMS_LANG
   script:
     - gitlab-terraform apply  # Execute the cached plan
-  # Require manual approval for all production deployments
+  # Automatic deployment for dev site on development branch
   rules:
-    # Skip if WEBCMS_SITE_FILTER is set to something other than dev
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require approval for VPC, ECS cluster, load balancer changes
+        $CI_COMMIT_BRANCH == "development"
+      when: manual      # Still require approval for VPC, ECS cluster, load balancer changes
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
-      when: manual      # Require manual approval for all production deployments
+        $CI_COMMIT_BRANCH == "development"
+      when: on_success  # Automatic deployment for dev site application updates
     - when: never       # Deny all other scenarios
 
-deploy:dev:apply-es:
-  extends: .deploy:production
-  stage: Deploy:Dev:Apply
-  rules:
-    - when: never  # Explicitly disabled - Spanish not supported for dev site
-  needs:
-    - job: "deploy:dev:plan-es"
-      optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
-      optional: true  # Images may already exist from prior builds
-  dependencies: ["deploy:dev:plan-es"]  # Download plan.cache artifact only (not build artifacts)
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent apply operations to same site/language
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  script:
-    - gitlab-terraform apply  # Execute the cached plan
+# Spanish apply job - disabled (see note above deploy:dev:init:es)
+# deploy:dev:apply-es:
+#   extends: .deploy:production
+#   stage: Deploy:Dev:Apply
+#   needs:
+#     - job: "deploy:dev:plan-es"
+#       optional: true  # Allow manual plan triggering
+#     - job: "build:drupal"
+#       optional: true  # Images may already exist from prior builds
+#   dependencies: ["deploy:dev:plan-es"]  # Download plan.cache artifact only (not build artifacts)
+#   variables:
+#     WEBCMS_LANG: es
+#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
+#   resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent apply operations to same site/language
+#   environment:
+#     name: site/dev-$WEBCMS_LANG
+#   script:
+#     - gitlab-terraform apply  # Execute the cached plan
+#   # Require manual approval for all production deployments
+#   rules:
+#     # Skip if WEBCMS_SITE_FILTER is set to something other than dev
+#     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
+#       when: never
+#     - if: >-
+#         $TF_MODULE == "infrastructure" &&
+#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#       when: manual      # Require approval for VPC, ECS cluster, load balancer changes
+#     - if: >-
+#         $TF_MODULE == "webcms" &&
+#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#       when: manual      # Require manual approval for all production deployments
+#     - when: never       # Deny all other scenarios
 
 #endregion
 
-#region Staging Environment Deployment (staging branch → WEBCMS_SITE: stage)
-# Deploys to staging environment for final testing before production
+#region Stage Site Deployment (live branch → WEBCMS_SITE: stage)
+# Deploys to stage site from live branch for final testing before production
 # Supports both English and Spanish languages with parallel matrix builds
 
-# Initialize Terraform for staging deployments
+# Initialize Terraform for stage site deployments
 deploy:stage:init-en:
   extends: .deploy:staging
   stage: Deploy:Stage:Init
@@ -880,7 +914,7 @@ deploy:stage:apply-en:
   needs:
     - job: "deploy:stage:plan-en"
       optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true  # Images may already exist from prior builds
   dependencies: ["deploy:stage:plan-en"]  # Download plan.cache artifact only (not build artifacts)
   variables:
@@ -900,7 +934,7 @@ deploy:stage:apply-es:
   needs:
     - job: "deploy:stage:plan-es"
       optional: true  # Allow manual plan triggering
-    - job: "build:drupal"
+    - job: "build:drupal:stage"
       optional: true  # Images may already exist from prior builds
   dependencies: ["deploy:stage:plan-es"]  # Download plan.cache artifact only (not build artifacts)
   variables:
@@ -928,8 +962,6 @@ update:stage:en:
     - job: "deploy:stage:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
-      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -952,8 +984,6 @@ update:stage:es:
     - job: "deploy:stage:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
-      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -975,9 +1005,7 @@ update:dev:en:
     - job: "deploy:dev:apply-en"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -999,9 +1027,7 @@ update:dev:es:
     - job: "deploy:dev:apply-es"
       optional: true
   rules:
-    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "development"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -1027,9 +1053,13 @@ artifacts:
   image: alpine  # Minimal image sufficient for file packaging
   stage: Artifacts
   rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'  # Skip on development branch
+      when: never
     - if: $CI_COMMIT_TAG != ""  # Run on tagged releases
       when: always
     - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch deployments
+      when: always
+    - when: never  # Don't run on any other branches
   script:
     - echo "Creating release artifacts for ${CI_COMMIT_REF_NAME}"
   artifacts:
