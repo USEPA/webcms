@@ -114,13 +114,16 @@ notify:build:success:
   variables:
     NOTIFICATION_TITLE: "Build Completed Successfully"
   needs:
-    - job: build:drupal
+    - job: build:drupal:dev
       artifacts: false
+      optional: true
+    - job: build:drupal:stage
+      artifacts: false
+      optional: true
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
-      when: on_success
+    - when: on_success
 
 # Build Stage Failure
 notify:build:failed:
@@ -186,8 +189,12 @@ notify:build:failed:
       }
       EOF
   needs:
-    - job: build:drupal
+    - job: build:drupal:dev
       artifacts: false
+      optional: true
+    - job: build:drupal:stage
+      artifacts: false
+      optional: true
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
