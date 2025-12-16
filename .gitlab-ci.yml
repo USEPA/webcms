@@ -7,6 +7,9 @@ stages:
   # Docker Image Builds (all branches) - Build first to enable testing
   - Build                             # Build application Docker images (drupal, nginx, drush)
 
+  # One-time cleanup (manual trigger only)
+  - Cleanup                           # Manual cleanup tasks
+
   # Security Scanning (live branch only - stage deployments)
   - Test                              # Run SAST, dependency scanning, secret detection
   - Scan                              # Prisma Cloud image vulnerability scanning
@@ -1071,6 +1074,42 @@ update:dev:en:
 #     name: site/dev-$WEBCMS_LANG
 #   # Require manual approval for production database updates
 #   when: manual
+
+#endregion
+
+#region One-Time Cleanup Jobs
+# Manual cleanup jobs for resolving config import conflicts
+# These should only be run when needed, not as part of regular pipeline
+
+cleanup:webforms:dev:
+  stage: Cleanup
+  image:
+    name: node:18-alpine
+    entrypoint: ['']
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: manual  # Only run when manually triggered
+    - when: never
+  variables:
+    WEBCMS_ENVIRONMENT: preproduction
+    WEBCMS_SITE: dev
+    WEBCMS_LANG: en
+  script:
+    - cd $CI_PROJECT_DIR/ci
+    - npm ci --production --prefer-offline --cache .npm
+    - node cleanup-webforms.js
+  cache:
+    key:
+      files:
+        - ci/package-lock.json
+      prefix: npm-drush
+    paths:
+      - ci/node_modules/
+      - ci/.npm
+    policy: pull-push
+  resource_group: drush/dev-en  # Prevent conflicts with regular update jobs
+  environment:
+    name: site/dev-en
 
 #endregion
 
