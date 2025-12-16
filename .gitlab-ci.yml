@@ -83,16 +83,30 @@ sast:
   stage: Test
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
 
 dependency_scanning:
   stage: Test
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
 
 secret_detection:
   stage: Test
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - when: never  # Explicitly never run otherwise
+
+# Override all SAST sub-jobs to prevent them from running on development branch
+semgrep-sast:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
+
+gemnasium-dependency_scanning:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
@@ -1055,6 +1069,7 @@ artifacts:
     - if: $CI_COMMIT_TAG != ""  # Run on tagged releases
       when: always
     - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch deployments
+    - when: never  # Don't run on development branch
   script:
     - echo "Creating release artifacts for ${CI_COMMIT_REF_NAME}"
   artifacts:
