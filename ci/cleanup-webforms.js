@@ -7,10 +7,11 @@ const ui = require("./ui");
 const util = require("./util");
 
 const cleanupScript = `
-  echo "Deleting all webform submissions..."
-  drush --uri="$WEBCMS_SITE_URL" entity:delete webform_submission --all -y
-  echo "Deleting all webforms..."
-  drush --uri="$WEBCMS_SITE_URL" entity:delete webform --all -y
+  echo "Deleting all webform submissions and webforms..."
+  drush --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM webform_submission"
+  drush --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM webform_submission_data"
+  drush --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM config WHERE name LIKE 'webform.webform.%'"
+  drush --uri="$WEBCMS_SITE_URL" cache:rebuild
   echo "Cleanup complete!"
 `;
 
