@@ -113,9 +113,6 @@ notify:build:success:dev:
   stage: .post
   variables:
     NOTIFICATION_TITLE: "Build Completed Successfully"
-  needs:
-    - job: build:drupal:dev
-      artifacts: false
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
@@ -129,9 +126,6 @@ notify:build:success:stage:
   stage: .post
   variables:
     NOTIFICATION_TITLE: "Build Completed Successfully"
-  needs:
-    - job: build:drupal:stage
-      artifacts: false
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
@@ -202,9 +196,6 @@ notify:build:failed:dev:
         }]
       }
       EOF
-  needs:
-    - job: build:drupal:dev
-      artifacts: false
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
@@ -275,9 +266,6 @@ notify:build:failed:stage:
         }]
       }
       EOF
-  needs:
-    - job: build:drupal:stage
-      artifacts: false
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
