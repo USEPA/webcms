@@ -95,8 +95,8 @@ SYNC_HTTP_CODE=$(echo "$SYNC_RESPONSE" | tail -n 1)
 
 if [ "$SYNC_HTTP_CODE" = "200" ] || [ "$SYNC_HTTP_CODE" = "204" ]; then
   echo "✓ Mirror sync initiated"
-  echo "⏳ Waiting for mirror sync to complete (5 seconds)..."
-  sleep 5
+  echo "⏳ Waiting for mirror sync to complete (10 seconds)..."
+  sleep 10
 else
   echo "⚠️  Mirror sync returned HTTP $SYNC_HTTP_CODE (continuing anyway...)"
 fi
