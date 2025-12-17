@@ -1,136 +1,100 @@
-﻿# First-Time Setup
+# EPA WebCMS
 
-Note: this has only been tested on ddev 1.24 and above.
+The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.
+
+## Quick Start
+
+```bash
+# Clone repository
+git clone -b main git@github.com:USEPA/webcms.git
+cd webcms/services/drupal
+
+# Start development environment
+ddev start
+
+# Complete setup
+ddev aws-setup
+ddev import-db
+ddev composer install
+ddev gesso install
+ddev gesso build
+ddev drush deploy -y
+```
+
+Access the site at: <https://epa.ddev.site>
+
+## Documentation
+
+- **[Contributing Guide](CONTRIBUTING.md)** - Complete setup instructions, development workflows, and deployment guide
+- **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
+- **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
+- **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
+
+## Key Features
+
+- **Fast Deployments** - Skip-build mode reduces deployment time from 15 minutes to 3-5 minutes
+- **Zero-Downtime Deployments** - Rolling ECS deployments with health checks
+- **Infrastructure as Code** - Complete AWS infrastructure managed via Terraform
+- **Automated Testing** - Security scanning with Prisma Cloud and GitLab SAST
+- **Multi-Environment** - Separate dev, stage, and production environments
+
+## Development Workflow
+
+### Daily Development
+```bash
+# Start local environment
+cd services/drupal
+ddev start
+ddev gesso watch
+
+# Make changes, then deploy to dev environment
+git add .
+git commit -m "feat: Your feature description"
+git push origin development
+
+# Full build (first deployment of day)
+./push-dev.sh
+
+# Fast deployment (code changes only)
+./push-dev.sh --skip-build
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide.
+
+## Architecture
+
+- **Platform:** Drupal 10 on PHP 8.1+
+- **Infrastructure:** AWS ECS (Fargate), RDS (PostgreSQL), S3, CloudFront
+- **CI/CD:** GitLab CI/CD with GitHub mirror
+- **Containers:** Multi-stage Docker builds with Kaniko
+- **IaC:** Terraform for infrastructure and application deployment
+
+## Quick Commands
+
+| Command | Description |
+|---------|-------------|
+| `ddev start` | Start development environment |
+| `ddev drush cr` | Clear Drupal cache |
+| `ddev drush deploy -y` | Run deployment updates |
+| `ddev gesso watch` | Watch and rebuild theme assets |
+| `./push-dev.sh` | Deploy to dev (full build) |
+| `./push-dev.sh --skip-build` | Deploy to dev (fast, no rebuild) |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command reference.
 
 ## CI/CD
 
-- GitLab CI is the active system for all builds and deployments. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
-- Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
+- **Active System:** GitLab CI (`.gitlab-ci.yml` and `.gitlab/docker.yml`)
+- **Deprecated:** Buildkite pipelines (`.buildkite/`) - retained for historical reference only
+- **Deployment Pipeline:** GitHub → GitLab Mirror → Docker Build → AWS ECS
 
-1. Clone main branch of repo:
+## Requirements
 
-   ```bash
-   git clone -b main git@github.com:USEPA/webcms.git
-   ```
-
-2. Then, start the project:
-
-   ```bash
-   cd services/drupal && ddev start
-   ```
-
-3. Next, create the S3 bucket for s3fs:
-
-   ```bash
-   ddev aws-setup
-   ```
-
-4. After that, please obtain the latest database (contact Michael Hessling) and put the .tar file in the `services/drupal/.ddev/db/` folder. The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
-
-5. Import the database by running [`ddev import-db`](https://ddev.readthedocs.io/en/stable/users/usage/database-management/#database-imports)
-
-   ```bash
-   ddev import-db [--file=path/to/backup.sql.gz]
-   ```
-
-   Note that for very large dumps this may time out. Sometimes, DDEV lets the import process run in the background (verify this by watching the CPU and I/O activity of `docker stats`).
-
-   If DDEV kills the import process, try connecting a MySQL command-line client directly to the container (use `ddev status` to see the forwarded MySQL port) and import that way.
-
-6. Copy the example `.env` file: `cp .env.example .env`.
-
-7. Install dependencies:
-
-   ```bash
-   ddev composer install
-   ```
-
-   You might get an error, clear it by deleting the services/drupal/.ddev/vendor folder and clearing cache: `ddev composer clearcache`
-
-8. Install the requirements for the theme: `ddev gesso install`:
-
-   ```bash
-   ddev gesso install
-   ```
-
-9. Building/watching the CSS and Pattern Lab:
-    1. to build
-
-      ```bash
-      ddev gesso build
-      ```
-
-    2. to watch:
-
-      ```bash
-      ddev gesso watch
-      ```
-
-10. Install Drupal from config (or restore a backup).  You can install from config by running:
-
-    **Note**: Do not run this command if starting from a new installation. This will wipe the database out, instead skip to #11.
-
-   ```bash
-   ddev drush si --existing-config
-   ```
-
-11. Ensure the latest configuration has been fully applied and clear cache:
-
-   ```bash
-   ddev drush deploy -y
-   ```
-
-12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of memcached caching.
-
-13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin`
-
-14. Access the app at <https://epa.ddev.site>
-15. Note, you may get SSL cert warnings. You'll have to install mkcert:
-
-   ```bash
-   ddev stop --all
-   mkcert -install
-   ```
-
-If you want to use Firefox, you need to install nss to use HTTPS:
-
-   ```bash
-   brew install nss
-   mkcert -install
-   ```
-
-## Other READMEs
-
-- Terraform configuration: see [infrastructure/terraform](terraform/infrastructure/README.md).
-- CI/CD: GitLab CI is the active system. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
-- Note: Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
-
-### Troubleshooting
-
-### Elasticsearch
-
-If you run into an error trying to use `elasticsearch`. Please run the following command:
-
-```bash
-ddev poweroff && docker volume rm ddev-epa-ddev_elasticsearch && ddev start
-```
-
-You will need to `re-index`.
-
-## Helpful commands
-
-Here is a list of helpful commands:
-
-- `ddev gesso install` > Installs the node modules needed for `epa_core`.
-- `ddev gesso build` > Builds the current assets for CSS & PatternLab.
-- `ddev gesso watch` > Same thing as build but will watch for changes.
-- `ddev ssh` > Goes into the web container.
-- `ddev drush` > Runs any drush command.
-- `ddev import-db` > Will import a specific database.
-- `ddev export-db` > Exports a database with the current date.
-- `ddev aws-setup` > Sets up the requirements to get drupal file system to work
-- `ddev describe` or `ddev status` > Get a detailed description of a running DDEV project.
-- `ddev phpmyadmin` > Launch a browser with PhpMyAdmin
+- DDEV 1.24 or higher
+- Docker Desktop
+- Git
+- Composer
+- Node.js and npm
 
 ## Disclaimer
 
