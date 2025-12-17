@@ -55,18 +55,84 @@ function epa_core_requirements($phase) {
   $requirements = array();
 
   if ($phase == 'runtime') {
-    $release = getenv('GIT_COMMIT');
-    if ($tag = getenv('GIT_TAG')) {
-      $release = $tag;
+    // Get deployment information from environment variables
+    $git_commit = getenv('GIT_COMMIT');
+    $git_tag = getenv('GIT_TAG');
+    $webcms_environment = getenv('WEBCMS_ENVIRONMENT');
+    $webcms_site = getenv('WEBCMS_SITE');
+    $webcms_lang = getenv('WEBCMS_LANG');
+    
+    // Build release version display
+    $release = $git_commit ?: 'Not set';
+    if (!empty($git_tag)) {
+      $release = $git_tag . ' (' . substr($git_commit, 0, 7) . ')';
     }
-    if (empty($release)) {
-      $release = 'Neither the GIT_TAG nor GIT_COMMIT environment variables have been set.';
+    elseif (!empty($git_commit)) {
+      $release = substr($git_commit, 0, 7);
     }
+    
+    // Basic release version requirement
     $requirements['epa_core_release_version'] = array(
-      'title' => t('EPA Drupal WebCMS Release Version'),
+      'title' => t('EPA WebCMS Release Version'),
       'value' => $release,
+      'description' => !empty($git_commit) ? t('Full commit SHA: @sha', ['@sha' => $git_commit]) : t('No deployment information available.'),
       'severity' => REQUIREMENT_OK,
     );
+    
+    // Detailed deployment information
+    if (!empty($git_commit)) {
+      $deployment_details = [];
+      
+      // Build deployment details list
+      if (!empty($webcms_environment)) {
+        $deployment_details[] = t('<strong>Environment:</strong> @env', ['@env' => $webcms_environment]);
+      }
+      if (!empty($webcms_site)) {
+        $deployment_details[] = t('<strong>Site:</strong> @site', ['@site' => $webcms_site]);
+      }
+      if (!empty($webcms_lang)) {
+        $deployment_details[] = t('<strong>Language:</strong> @lang', ['@lang' => strtoupper($webcms_lang)]);
+      }
+      
+      // Add GitLab pipeline information hint
+      if (!empty($git_tag)) {
+        $deployment_details[] = t('<strong>Deploy Type:</strong> Tagged Release');
+      }
+      else {
+        $deployment_details[] = t('<strong>Deploy Type:</strong> Branch Build');
+      }
+      
+      // Build image tag format
+      $image_tag = 'Unknown';
+      if (!empty($git_tag)) {
+        $image_tag = $git_tag;
+      }
+      elseif (!empty($git_commit)) {
+        // Typical format: development-<sha> or live-<sha>
+        $branch = 'development'; // Default assumption
+        if ($webcms_site === 'stage') {
+          $branch = 'live';
+        }
+        $image_tag = $branch . '-' . substr($git_commit, 0, 7);
+      }
+      $deployment_details[] = t('<strong>Image Tag:</strong> @tag', ['@tag' => $image_tag]);
+      
+      $requirements['epa_core_deployment_info'] = array(
+        'title' => t('GitLab Deployment Information'),
+        'value' => Markup::create(implode('<br>', $deployment_details)),
+        'description' => t('Detailed information about the current deployment from GitLab CI/CD pipeline. These values are set during the Docker image build process.'),
+        'severity' => REQUIREMENT_INFO,
+      );
+    }
+    else {
+      // Running in local development environment
+      $requirements['epa_core_deployment_info'] = array(
+        'title' => t('GitLab Deployment Information'),
+        'value' => t('Local Development Environment'),
+        'description' => t('This appears to be a local development environment (DDEV). Deployment information is only available in deployed environments (dev, stage, production).'),
+        'severity' => REQUIREMENT_INFO,
+      );
+    }
   }
 
   return $requirements;
