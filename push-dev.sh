@@ -1,9 +1,18 @@
 #!/bin/bash
 # Wrapper script to push to development and automatically trigger GitLab pipeline
 #
-# Usage: ./push-dev.sh [git push options]
-# Example: ./push-dev.sh
-# Example: ./push-dev.sh -f (force push)
+# Usage: ./push-dev.sh [options] [git push options]
+# Examples:
+#   ./push-dev.sh                    # Full build + deploy
+#   ./push-dev.sh --skip-build       # Deploy only (reuse existing images)
+#   ./push-dev.sh --skip-build -f    # Deploy only with force push
+
+# Parse --skip-build flag
+SKIP_BUILD_FLAG="false"
+if [ "$1" == "--skip-build" ]; then
+  SKIP_BUILD_FLAG="true"
+  shift  # Remove --skip-build from arguments
+fi
 
 # Check if we're on the development branch
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -16,6 +25,12 @@ if [ "$CURRENT_BRANCH" != "development" ]; then
   exit 1
 fi
 
+if [ "$SKIP_BUILD_FLAG" == "true" ]; then
+  echo "⚡ SKIP_BUILD mode enabled - will deploy without rebuilding Docker images"
+  echo "   (reusing existing :development-latest images)"
+  echo ""
+fi
+
 echo "📤 Pushing development branch to GitHub..."
 echo ""
 
@@ -25,9 +40,15 @@ if git push "$@"; then
   echo "✅ Push successful!"
   echo ""
   
-  # Trigger the GitLab pipeline
+  # Trigger the GitLab pipeline with SKIP_BUILD variable if needed
   if [ -f "./trigger-pipeline.sh" ]; then
-    bash ./trigger-pipeline.sh "development"
+    if [ "$SKIP_BUILD_FLAG" == "true" ]; then
+      echo "🚀 Triggering DEPLOY-ONLY pipeline (skipping Docker builds)..."
+      SKIP_BUILD=true bash ./trigger-pipeline.sh "development"
+    else
+      echo "🚀 Triggering FULL BUILD pipeline..."
+      bash ./trigger-pipeline.sh "development"
+    fi
   else
     echo "⚠️  Warning: trigger-pipeline.sh not found in current directory"
   fi
