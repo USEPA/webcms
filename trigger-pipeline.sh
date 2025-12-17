@@ -106,19 +106,28 @@ echo ""
 # Step 3: Trigger the pipeline
 echo "🔨 Triggering pipeline..."
 
-# Build pipeline variables query string
-VARIABLES=""
+# Build pipeline variables JSON body
+VARIABLES_JSON=""
 if [ "$SKIP_BUILD" == "true" ]; then
-  VARIABLES="&variables[SKIP_BUILD]=true"
+  VARIABLES_JSON='{"variables": [{"key": "SKIP_BUILD", "value": "true"}]}'
   echo "   Mode: DEPLOY-ONLY (SKIP_BUILD=true)"
 else
   echo "   Mode: FULL BUILD + DEPLOY"
 fi
 echo ""
 
-RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}${VARIABLES}" \
-  --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}")
+# Trigger pipeline with proper JSON body for variables
+if [ -n "$VARIABLES_JSON" ]; then
+  RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+    "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}" \
+    --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+    --header "Content-Type: application/json" \
+    --data "$VARIABLES_JSON")
+else
+  RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+    "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}" \
+    --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}")
+fi
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
 BODY=$(echo "$RESPONSE" | sed '$d')
