@@ -105,8 +105,19 @@ echo ""
 
 # Step 3: Trigger the pipeline
 echo "🔨 Triggering pipeline..."
+
+# Build pipeline variables query string
+VARIABLES=""
+if [ "$SKIP_BUILD" == "true" ]; then
+  VARIABLES="&variables[SKIP_BUILD]=true"
+  echo "   Mode: DEPLOY-ONLY (SKIP_BUILD=true)"
+else
+  echo "   Mode: FULL BUILD + DEPLOY"
+fi
+echo ""
+
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
-  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}" \
+  "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/pipeline?ref=${BRANCH}${VARIABLES}" \
   --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}")
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
