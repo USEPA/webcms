@@ -127,11 +127,26 @@ if [ "$SYNC_HTTP_CODE" = "200" ] || [ "$SYNC_HTTP_CODE" = "204" ]; then
   done
   
   if [ "$FOUND" = "false" ]; then
-    echo "⚠️  Commit not found after ${MAX_ATTEMPTS} attempts (continuing anyway...)"
-    echo "   The pipeline may use an older version of the code"
+    echo "❌ Failed to confirm mirror sync after ${MAX_ATTEMPTS} attempts (~$((MAX_ATTEMPTS * 2)) seconds)"
+    echo ""
+    echo "Possible issues:"
+    echo "  - GitHub to GitLab mirror is not syncing"
+    echo "  - Network connectivity issues"
+    echo "  - GitLab mirror is disabled or misconfigured"
+    echo ""
+    echo "Please verify the mirror status at:"
+    echo "  https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
+    echo ""
+    echo "NOT triggering pipeline to prevent deployment of stale code."
+    exit 1
   fi
 else
-  echo "⚠️  Mirror sync returned HTTP $SYNC_HTTP_CODE (continuing anyway...)"
+  echo "❌ Mirror sync failed (HTTP $SYNC_HTTP_CODE)"
+  echo ""
+  echo "Cannot trigger pipeline without confirming mirror sync."
+  echo "Please check mirror configuration at:"
+  echo "  https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
+  exit 1
 fi
 echo ""
 
