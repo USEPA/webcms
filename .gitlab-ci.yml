@@ -1054,8 +1054,6 @@ update:stage:en:
   resource_group: drush/stage-en
   environment:
     name: site/stage-en
-  # Temporary: Require manual approval during initial AWS testing
-  when: manual
 
 update:stage:es:
   extends: .update
@@ -1076,8 +1074,6 @@ update:stage:es:
   resource_group: drush/stage-es
   environment:
     name: site/stage-es
-  # Temporary: Require manual approval during initial AWS testing
-  when: manual
 update:dev:en:
   extends: .update
   stage: Update
@@ -1097,8 +1093,6 @@ update:dev:en:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
-  # Require manual approval for production database updates
-  when: manual
 
 # NOTE: Spanish (es) deployment for dev environment is disabled.
 # This update job is commented out to match the disabled deploy:dev:apply-es job.
