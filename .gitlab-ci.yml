@@ -695,11 +695,10 @@ deploy:dev:init:en:
 
 
 # Validate Terraform configuration for dev site deployments
-# Validation runs in parallel with init to save time
 deploy:dev:validate:en:
   extends: .deploy:production
   stage: Deploy:Dev:Validate
-  needs: []  # No dependencies - run immediately in parallel
+  needs: ["deploy:dev:init:en"]  # Wait for init to complete
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
