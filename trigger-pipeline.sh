@@ -102,51 +102,76 @@ if [ "$SYNC_HTTP_CODE" = "200" ] || [ "$SYNC_HTTP_CODE" = "204" ]; then
   echo "   Local commit: ${LOCAL_COMMIT:0:7}"
   
   # Poll GitLab to check if the commit is available
-  MAX_ATTEMPTS=30  # 30 attempts = up to 60 seconds
+  # Will wait up to 5 minutes (150 attempts x 2 seconds)
+  MAX_ATTEMPTS=150
   ATTEMPT=1
-  FOUND=false
   
-  while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+  while true; do
     # Check if the commit exists in GitLab
     COMMIT_CHECK=$(curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
       "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/repository/commits/${LOCAL_COMMIT}" 2>/dev/null)
     
     if echo "$COMMIT_CHECK" | grep -q '"id"'; then
       echo "✓ Commit ${LOCAL_COMMIT:0:7} found in GitLab (took ${ATTEMPT} attempts, ~$((ATTEMPT * 2)) seconds)"
-      FOUND=true
       break
     fi
     
-    # Show progress every 5 attempts
+    # Show progress every 5 attempts (every 10 seconds)
     if [ $((ATTEMPT % 5)) -eq 0 ]; then
-      echo "   Still waiting... (${ATTEMPT}/${MAX_ATTEMPTS} checks)"
+      echo "   Still waiting... (~$((ATTEMPT * 2))s elapsed)"
+    fi
+    
+    # Safety timeout after 5 minutes
+    if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
+      echo ""
+      echo "⚠️  Mirror sync taking longer than expected (5 minutes)"
+      echo "   This may indicate an issue with the GitHub → GitLab mirror."
+      echo ""
+      echo "   Continuing to wait... (Press Ctrl+C to cancel)"
+      echo "   You can check mirror status at:"
+      echo "   https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
+      echo ""
     fi
     
     sleep 2
     ATTEMPT=$((ATTEMPT + 1))
   done
-  
-  if [ "$FOUND" = "false" ]; then
-    echo "❌ Failed to confirm mirror sync after ${MAX_ATTEMPTS} attempts (~$((MAX_ATTEMPTS * 2)) seconds)"
-    echo ""
-    echo "Possible issues:"
-    echo "  - GitHub to GitLab mirror is not syncing"
-    echo "  - Network connectivity issues"
-    echo "  - GitLab mirror is disabled or misconfigured"
-    echo ""
-    echo "Please verify the mirror status at:"
-    echo "  https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
-    echo ""
-    echo "NOT triggering pipeline to prevent deployment of stale code."
-    exit 1
-  fi
 else
-  echo "❌ Mirror sync failed (HTTP $SYNC_HTTP_CODE)"
+  echo "⚠️  Mirror sync returned HTTP $SYNC_HTTP_CODE"
+  echo "   Continuing anyway and will poll for commit..."
   echo ""
-  echo "Cannot trigger pipeline without confirming mirror sync."
-  echo "Please check mirror configuration at:"
-  echo "  https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository"
-  exit 1
+  
+  # Even if sync request failed, still try to poll for the commit
+  # Get the current commit SHA from local git
+  LOCAL_COMMIT=$(git rev-parse HEAD)
+  echo "   Local commit: ${LOCAL_COMMIT:0:7}"
+  echo "   Waiting for commit to appear in GitLab..."
+  
+  MAX_ATTEMPTS=150
+  ATTEMPT=1
+  
+  while true; do
+    COMMIT_CHECK=$(curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+      "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/repository/commits/${LOCAL_COMMIT}" 2>/dev/null)
+    
+    if echo "$COMMIT_CHECK" | grep -q '"id"'; then
+      echo "✓ Commit ${LOCAL_COMMIT:0:7} found in GitLab (took ${ATTEMPT} attempts, ~$((ATTEMPT * 2)) seconds)"
+      break
+    fi
+    
+    if [ $((ATTEMPT % 5)) -eq 0 ]; then
+      echo "   Still waiting... (~$((ATTEMPT * 2))s elapsed)"
+    fi
+    
+    if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
+      echo ""
+      echo "⚠️  Mirror sync taking longer than expected (5 minutes)"
+      echo "   Continuing to wait... (Press Ctrl+C to cancel)"
+    fi
+    
+    sleep 2
+    ATTEMPT=$((ATTEMPT + 1))
+  done
 fi
 echo ""
 
