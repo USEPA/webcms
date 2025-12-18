@@ -662,6 +662,16 @@ deploy:dev:init:en:
   resource_group: site/dev-$WEBCMS_LANG  # Prevent concurrent operations on this site/language
   environment:
     name: site/dev-$WEBCMS_LANG
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
+    - cp "$TERRAFORM_TFVARS" terraform.tfvars
+    # Override image tag when SKIP_BUILD=true to use stable :development-latest tag
+    - |
+      if [ "$SKIP_BUILD" = "true" ]; then
+        export TF_VAR_image_tag="development-latest"
+        echo "ℹ️ SKIP_BUILD enabled - using image tag: development-latest"
+      fi
   script:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
     - gitlab-terraform init  # Initialize Terraform and download providers
@@ -695,6 +705,16 @@ deploy:dev:validate:en:
     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
+    - cp "$TERRAFORM_TFVARS" terraform.tfvars
+    # Override image tag when SKIP_BUILD=true to use stable :development-latest tag
+    - |
+      if [ "$SKIP_BUILD" = "true" ]; then
+        export TF_VAR_image_tag="development-latest"
+        echo "ℹ️ SKIP_BUILD enabled - using image tag: development-latest"
+      fi
   script:
     - gitlab-terraform validate
 
@@ -729,6 +749,16 @@ deploy:dev:plan-en:
   resource_group: site/dev-$WEBCMS_LANG  # Prevents concurrent plan/apply to same site/language
   environment:
     name: site/dev-$WEBCMS_LANG
+  before_script:
+    - cd $TF_ROOT
+    - cp $backend_tf backend.tf
+    - cp "$TERRAFORM_TFVARS" terraform.tfvars
+    # Override image tag when SKIP_BUILD=true to use stable :development-latest tag
+    - |
+      if [ "$SKIP_BUILD" = "true" ]; then
+        export TF_VAR_image_tag="development-latest"
+        echo "ℹ️ SKIP_BUILD enabled - using image tag: development-latest"
+      fi
   script:
     - gitlab-terraform plan       # Generate execution plan only (skip json for speed)
   artifacts:
