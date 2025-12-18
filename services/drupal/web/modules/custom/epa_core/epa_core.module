@@ -162,7 +162,11 @@ function epa_core_requirements($phase) {
       $deployment_details[] = '<br><strong style="font-size: 1.1em;">AWS Infrastructure</strong>';
       
       $aws_region = getenv('AWS_REGION') ?: getenv('AWS_DEFAULT_REGION') ?: 'us-east-1';
-      $deployment_details[] = t('<strong>AWS Region:</strong> @region', ['@region' => $aws_region]);
+      $aws_console_url = "https://console.aws.amazon.com/?region={$aws_region}";
+      $deployment_details[] = t('<strong>AWS Region:</strong> <a href="@url" target="_blank">@region</a>', [
+        '@url' => $aws_console_url,
+        '@region' => $aws_region
+      ]);
       
       // ECS Cluster
       $cluster_name = "webcms-{$webcms_environment}";
@@ -206,7 +210,17 @@ function epa_core_requirements($phase) {
       // Database
       $db_host = getenv('WEBCMS_DB_HOST');
       if (!empty($db_host) && $db_host !== 'mysql') {
-        $deployment_details[] = t('<strong>Database Host:</strong> @host', ['@host' => $db_host]);
+        // Check if it's an RDS endpoint and make it a link
+        if (strpos($db_host, 'rds.amazonaws.com') !== false) {
+          $rds_url = "https://console.aws.amazon.com/rds/home?region={$aws_region}#databases:";
+          $deployment_details[] = t('<strong>Database Host:</strong> <a href="@url" target="_blank">@host</a>', [
+            '@url' => $rds_url,
+            '@host' => $db_host
+          ]);
+        }
+        else {
+          $deployment_details[] = t('<strong>Database Host:</strong> @host', ['@host' => $db_host]);
+        }
       }
       
       // ===== CACHE & SERVICES =====
@@ -242,7 +256,16 @@ function epa_core_requirements($phase) {
       // Elasticsearch
       $search_host = getenv('WEBCMS_SEARCH_HOST');
       if (!empty($search_host) && $search_host !== 'http://elasticsearch:9200') {
-        $deployment_details[] = t('<strong>Search:</strong> @host', ['@host' => $search_host]);
+        // If it's a URL, make it clickable
+        if (strpos($search_host, 'http') === 0) {
+          $deployment_details[] = t('<strong>Search:</strong> <a href="@url" target="_blank">@host</a>', [
+            '@url' => $search_host,
+            '@host' => $search_host
+          ]);
+        }
+        else {
+          $deployment_details[] = t('<strong>Search:</strong> @host', ['@host' => $search_host]);
+        }
       }
       
       // ===== MONITORING & LOGS =====
@@ -263,7 +286,6 @@ function epa_core_requirements($phase) {
         'title' => t('Deployment & Infrastructure Information'),
         'value' => Markup::create(implode('<br>', $deployment_details)),
         'description' => t('Comprehensive information about the current deployment, infrastructure, and services. Click links to view resources in GitLab and AWS Console.'),
-        'severity' => REQUIREMENT_OK,
       );
     }
     else {
@@ -272,7 +294,6 @@ function epa_core_requirements($phase) {
         'title' => t('Deployment & Infrastructure Information'),
         'value' => t('Local Development Environment (DDEV)'),
         'description' => t('Detailed deployment and infrastructure information is only available in deployed AWS environments (dev, stage, production).'),
-        'severity' => REQUIREMENT_OK,
       );
     }
   }
