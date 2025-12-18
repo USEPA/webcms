@@ -95,9 +95,41 @@ SYNC_HTTP_CODE=$(echo "$SYNC_RESPONSE" | tail -n 1)
 
 if [ "$SYNC_HTTP_CODE" = "200" ] || [ "$SYNC_HTTP_CODE" = "204" ]; then
   echo "✓ Mirror sync initiated"
-  echo "⏳ Waiting for mirror sync to complete (20 seconds)..."
-  echo "   GitLab needs time to fetch from GitHub and process CI configuration"
-  sleep 20
+  echo "⏳ Waiting for mirror to sync latest commit..."
+  
+  # Get the current commit SHA from local git
+  LOCAL_COMMIT=$(git rev-parse HEAD)
+  echo "   Local commit: ${LOCAL_COMMIT:0:7}"
+  
+  # Poll GitLab to check if the commit is available
+  MAX_ATTEMPTS=30  # 30 attempts = up to 60 seconds
+  ATTEMPT=1
+  FOUND=false
+  
+  while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+    # Check if the commit exists in GitLab
+    COMMIT_CHECK=$(curl -s --header "PRIVATE-TOKEN: ${GITLAB_TOKEN}" \
+      "${GITLAB_URL}/api/v4/projects/${PROJECT_ID}/repository/commits/${LOCAL_COMMIT}" 2>/dev/null)
+    
+    if echo "$COMMIT_CHECK" | grep -q '"id"'; then
+      echo "✓ Commit ${LOCAL_COMMIT:0:7} found in GitLab (took ${ATTEMPT} attempts, ~$((ATTEMPT * 2)) seconds)"
+      FOUND=true
+      break
+    fi
+    
+    # Show progress every 5 attempts
+    if [ $((ATTEMPT % 5)) -eq 0 ]; then
+      echo "   Still waiting... (${ATTEMPT}/${MAX_ATTEMPTS} checks)"
+    fi
+    
+    sleep 2
+    ATTEMPT=$((ATTEMPT + 1))
+  done
+  
+  if [ "$FOUND" = "false" ]; then
+    echo "⚠️  Commit not found after ${MAX_ATTEMPTS} attempts (continuing anyway...)"
+    echo "   The pipeline may use an older version of the code"
+  fi
 else
   echo "⚠️  Mirror sync returned HTTP $SYNC_HTTP_CODE (continuing anyway...)"
 fi
