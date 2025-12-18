@@ -263,7 +263,7 @@ function epa_core_requirements($phase) {
         'title' => t('Deployment & Infrastructure Information'),
         'value' => Markup::create(implode('<br>', $deployment_details)),
         'description' => t('Comprehensive information about the current deployment, infrastructure, and services. Click links to view resources in GitLab and AWS Console.'),
-        'severity' => REQUIREMENT_INFO,
+        'severity' => REQUIREMENT_OK,
       );
     }
     else {
@@ -272,7 +272,7 @@ function epa_core_requirements($phase) {
         'title' => t('Deployment & Infrastructure Information'),
         'value' => t('Local Development Environment (DDEV)'),
         'description' => t('Detailed deployment and infrastructure information is only available in deployed AWS environments (dev, stage, production).'),
-        'severity' => REQUIREMENT_INFO,
+        'severity' => REQUIREMENT_OK,
       );
     }
   }
