@@ -7,21 +7,19 @@
 
 use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\file\IconMimeTypes;
 
 /**
  * Implements hook_library_info_alter().
  */
-function epa_wysiwyg_library_info_alter(&$libraries, $extension) {
-  // Add CKEditor overrides JS file to CKEditor library.
-  if ($extension == 'ckeditor' && isset($libraries['drupal.ckeditor'])) {
+function epa_wysiwyg_library_info_alter(array &$libraries, $extension) {
+  if ($extension === 'ckeditor' && isset($libraries['drupal.ckeditor'])) {
     $module_path = \Drupal::service('extension.list.module')->getPath('epa_wysiwyg');
-    $js_path = "/$module_path/js/ckeditor-overrides.js";
-    $libraries['drupal.ckeditor']['js'][$js_path] = [];
+    $libraries['drupal.ckeditor']['js']["/$module_path/js/ckeditor-overrides.js"] = [];
   }
 }
 
@@ -33,185 +31,92 @@ function epa_wysiwyg_page_attachments(array &$attachments) {
 }
 
 /**
- *
- */
-function epa_wysiwyg_pathologic_alter(&$url_params, $parts, $settings) {
-  // Do not rewrite links to minio container.  This is necessary because
-  // Pathologic does not respect ports when matching host names.
-  if (isset($parts['port']) && isset($parts['host']) && $parts['port'] === 8888 && $parts['host'] === 'localhost') {
-    $url_params['options']['use_original'] = TRUE;
-  }
-}
-
-/**
  * Implements hook_theme().
  */
 function epa_wysiwyg_theme() {
   return [
     'epa_file_link' => [
-      'variables' => ['file' => NULL, 'link_text' => NULL, 'attributes' => [], 'media_accessibility' => NULL],
+      'variables' => [
+        'file' => NULL,
+        'link_text' => NULL,
+        'attributes' => [],
+        'media_accessibility' => NULL,
+      ],
     ],
   ];
 }
 
 /**
- * Prepares variables for epa file link templates.
- *
- * Default template: epa-file-link.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - file: A File entity to which the link will be created.
- *   - icon_directory: (optional) A path to a directory of icons to be used for
- *     files. Defaults to the value of the "icon.directory" variable.
- *   - description: A description to be displayed instead of the filename.
- *   - attributes: An associative array of attributes to be placed in the a tag.
+ * Preprocess for epa file link templates.
  */
-function template_preprocess_epa_file_link(&$variables) {
+function template_preprocess_epa_file_link(array &$variables) {
   $file = $variables['file'];
-  $options = [];
-
-  // @todo Wrap in file_url_transform_relative(). This is currently
-  // impossible. As a work-around, we currently add the 'url.site' cache context
-  // to ensure different file URLs are generated for different sites in a
-  // multisite setup, including HTTP and HTTPS versions of the same site.
-  // Fix in https://www.drupal.org/node/2646744.
   $url = $file->createFileUrl(FALSE);
+
   $variables['#cache']['contexts'][] = 'url.site';
 
   $mime_type = $file->getMimeType();
-  // Set options as per anchor format described at
-  // http://microformats.org/wiki/file-format-examples
-  $options['attributes']['type'] = $mime_type . '; length=' . $file->getSize();
 
-  // Classes to add to the file field for icons.
   $classes = [
     'file',
-    // Add a specific class for each and every mime type.
     'file--mime-' . strtr($mime_type, ['/' => '-', '.' => '-']),
-    // Add a more general class for groups of well known MIME types.
-    // Drupal Rector fix, 12 Sep 2025
-    'file--' . DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '10.3.0', fn() => IconMimeTypes::getIconClass($mime_type), fn() => file_icon_class($mime_type)),
+    'file--' . DeprecationHelper::backwardsCompatibleCall(
+      \Drupal::VERSION,
+      '10.3.0',
+      fn() => IconMimeTypes::getIconClass($mime_type),
+      fn() => file_icon_class($mime_type)
+    ),
   ];
 
-  // Set file classes to the options array.
   $variables['attributes'] = new Attribute($variables['attributes']);
   $variables['attributes']->addClass($classes);
-  // Drupal Rector fix, 12 Sep 2025
-  $variables['file_size'] = DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '10.2.0', fn() => ByteSizeMarkup::create($file->getSize()), fn() => format_size($file->getSize()));
+
+  $variables['file_size'] = DeprecationHelper::backwardsCompatibleCall(
+    \Drupal::VERSION,
+    '10.2.0',
+    fn() => ByteSizeMarkup::create($file->getSize()),
+    fn() => format_size($file->getSize())
+  );
+
+  $options['attributes']['type'] = $mime_type . '; length=' . $file->getSize();
   $variables['url'] = Url::fromUri($url, $options);
   $variables['link'] = Link::fromTextAndUrl($variables['link_text'], $variables['url'])->toRenderable();
 }
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * Editor link dialog (Linkit).
  */
-function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Attach our custom javascript library.
+function epa_wysiwyg_form_editor_link_dialog_alter(
+  array &$form,
+  FormStateInterface $form_state,
+  $form_id
+) {
+  // Attach JS that switches Linkit profiles dynamically.
   $form['#attached']['library'][] = 'epa_wysiwyg/epa-wysiwyg-linkit';
 
-  // Provide a fieldset for switching the profile.
-  $form['attributes']['select-profile'] = [
+  // Add profile selector.
+  $form['attributes']['select_profile'] = [
     '#title' => t('Filter search results'),
     '#type' => 'radios',
     '#options' => [
-      'web_area_content' => t('Your internal links'),
       'default' => t('No filter: all WebCMS content'),
+      'web_area_content' => t('Your internal links'),
     ],
-    'web_area_content' => [
-      '#description' => t('Search within your web areas only.'),
-    ],
-    'default' => [
-      '#description' => t('Search within your web areas and www.epa.gov'),
-    ],
-    '#weight' => -20,
     '#default_value' => 'default',
+    '#weight' => -20,
   ];
 
-  // Add states to disable and hide the default linkit input unless the default
-  // profile is selected.
-  $form['attributes']['href_default'] = array_merge($form['attributes']['href'], [
-    '#type' => 'linkit',
-    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
-    '#autocomplete_route_name' => 'linkit.autocomplete',
-    '#autocomplete_route_parameters' => [
+  // Ensure the href field is Linkit and starts with default profile.
+  if (isset($form['attributes']['href'])) {
+    $form['attributes']['href']['#type'] = 'linkit';
+    $form['attributes']['href']['#autocomplete_route_name'] = 'linkit.autocomplete';
+    $form['attributes']['href']['#autocomplete_route_parameters'] = [
       'linkit_profile_id' => 'default',
-    ],
-    "#weight" => -10,
-    '#default_value' => $input['href'] ?? '',
-    '#states' => [
-      'visible' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
-      ],
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
-      ],
-    ],
-  ]);
+    ];
 
-  // Provide a second linkit input that uses the web_area_content linkit profile
-  // and is disabled and hidden unless the web_area_content profile is selected.
-  $form['attributes']['href_web_area_content'] = array_merge($form['attributes']['href'], [
-    '#type' => 'linkit',
-    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
-    '#autocomplete_route_name' => 'linkit.autocomplete',
-    '#autocomplete_route_parameters' => [
-      'linkit_profile_id' => 'web_area_content',
-    ],
-    "#weight" => -10,
-    '#default_value' => $input['href'] ?? '',
-    '#states' => [
-      'visible' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
-      ],
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
-      ],
-    ],
-  ]);
-
-  $form['attributes']['href'] = array_merge($form['attributes']['href'], [
-    '#states' => [
-      'invisible' => [
-        ':input[name="attributes[select-profile]"]' => [
-          ['value' => 'web_area_content'],
-          'or',
-          ['value' => 'default'],
-        ],
-      ],
-    ],
-  ]);
-
-  array_unshift($form['#validate'], '_epa_wysiwyg_populate_href');
-}
-
-/**
- * Custom logic to accommodate the additional href_default and
- * href_web_area_content attributes.
- */
-function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state) {
-  $href_profile_fields = [
-    'href_default',
-    'href_web_area_content',
-  ];
-
-  $href_value = $form_state->getValue(['attributes', 'href']);
-
-  foreach ($href_profile_fields as $field_name) {
-    // The href attribute is reset to empty when the form is initialized. If the
-    // attribute has a value when the form is submitted, then another module
-    // (i.e. anchor) updated it. Let's set our linkit profile inputs to match.
-    if (!empty($href_value)) {
-      $form_state->setValue(['attributes', $field_name], $href_value);
-    }
-    // The href attribute is empty so we want to populate it with the value from
-    // the linkit profile attribute that has a value.
-    else {
-      $value = $form_state->getValue(['attributes', $field_name]);
-      if (!empty($value)) {
-        $form_state->setValue(['attributes', 'href'], $value);
-      }
-    }
-
+    // Used by JS to locate the field reliably.
+    $form['attributes']['href']['#attributes']['data-linkit-profile'] = 'default';
   }
 }

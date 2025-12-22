@@ -3,30 +3,45 @@
  * EPA Linkit customizations.
  */
 
-(function (Drupal, $, once) {
+(function (Drupal, once) {
+  Drupal.behaviors.epaWysiwygLinkitProfileSwitch = {
+    attach(context) {
+      once('epa-linkit-profile-switch', 'form.editor-link-dialog', context)
+        .forEach((form) => {
 
-  Drupal.behaviors.epaWysiwygLinkit = {
-    attach: function (context) {
-      const $webAreaInput = $('[name="attributes[href_web_area_content]"]');
-      const $defaultInput = $('[name="attributes[href_default]"]');
-      const $hrefInput = $('[name="attributes[href]"]');
+          const radios = form.querySelectorAll(
+            'input[name="attributes[select_profile]"]'
+          );
+          const linkInput = form.querySelector(
+            'input[data-drupal-selector="edit-attributes-href"]'
+          );
 
-      // Populate the defaultInput with the value of hrefInput on load, if there
-      // is one.
-      $(once('epaWysiwygLinkitInitInput', '[name="attributes[href]"]', context)).each(function() {
-        if ($hrefInput.val() != '') {
-          $defaultInput.val($hrefInput.val());
-          $hrefInput.val('');
-        }
-      });
+          if (!radios.length || !linkInput) {
+            return;
+          }
 
-      // Clear the linkit input values when the profile is changed to reset the
-      // autocomplete results.
-      $(once('epaWysiwygLinkitResetInput', '[name="attributes[select-profile]"]', context)).change(function() {
-        $defaultInput.val('');
-        $webAreaInput.val('');
-      });
+          radios.forEach((radio) => {
+            radio.addEventListener('change', () => {
+              const profile = radio.value;
+
+              // Build new autocomplete URL
+              const url = Drupal.url(
+                `linkit/autocomplete/${profile}`
+              );
+
+              // Remove existing autocomplete
+              if (linkInput.autocomplete) {
+                linkInput.autocomplete.destroy();
+              }
+
+              // Update attribute
+              linkInput.setAttribute('data-autocomplete-path', url);
+
+              // Reattach Drupal autocomplete
+              Drupal.autocomplete.attach(context, linkInput);
+            });
+          });
+        });
     }
   };
-
-})(Drupal, jQuery, once);
+})(Drupal, once);
