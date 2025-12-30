@@ -37,19 +37,21 @@ epa-edit-media-ckeditor5:
   dependencies:
     - ckeditor5/ckeditor5
 
-webAreaLinkit:
-  ckeditor5:
-    plugins:
-      - WebAreaLinkit
-  drupal:
-    label: 'Web Area Linkit'
+epa_wysiwyg_linkit:
   js:
-    js/build/webAreaLinkit.js: { preprocess: false, minified: true }
+    js/epa_wysiwyg_linkit.js: {}
   dependencies:
-    - ckeditor5/ckeditor5
-    - core/ckeditor5
     - core/drupal
     - core/once
+
+web-area-linkit-ckeditor5:
+  js:
+    js/build/webAreaLinkit.js: { preprocess: false, minified: true }
+  css:
+    component:
+      css/epaWysiwygLinkit.css: { minified: false }
+  dependencies:
+    - ckeditor5/ckeditor5
     - linkit/ckeditor5
 
 epa-add-definition-ckeditor5:
