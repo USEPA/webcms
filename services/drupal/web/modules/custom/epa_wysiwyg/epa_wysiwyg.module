@@ -7,9 +7,9 @@
 
 use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\file\IconMimeTypes;
 
@@ -20,8 +20,7 @@ function epa_wysiwyg_library_info_alter(&$libraries, $extension) {
   // Add CKEditor overrides JS file to CKEditor library.
   if ($extension == 'ckeditor' && isset($libraries['drupal.ckeditor'])) {
     $module_path = \Drupal::service('extension.list.module')->getPath('epa_wysiwyg');
-    $js_path = "/$module_path/js/ckeditor-overrides.js";
-    $libraries['drupal.ckeditor']['js'][$js_path] = [];
+    $libraries['drupal.ckeditor']['js']["/$module_path/js/ckeditor-overrides.js"] = [];
   }
 }
 
@@ -49,7 +48,12 @@ function epa_wysiwyg_pathologic_alter(&$url_params, $parts, $settings) {
 function epa_wysiwyg_theme() {
   return [
     'epa_file_link' => [
-      'variables' => ['file' => NULL, 'link_text' => NULL, 'attributes' => [], 'media_accessibility' => NULL],
+      'variables' => [
+        'file' => NULL,
+        'link_text' => NULL,
+        'attributes' => [],
+        'media_accessibility' => NULL,
+      ],
     ],
   ];
 }
@@ -105,113 +109,70 @@ function template_preprocess_epa_file_link(&$variables) {
 
 /**
  * Implements hook_form_FORM_ID_alter().
+ *
+ * Editor link dialog (Linkit).
  */
-function epa_wysiwyg_form_editor_link_dialog_alter(&$form, FormStateInterface $form_state, $form_id) {
-  // Attach our custom javascript library.
-  $form['#attached']['library'][] = 'epa_wysiwyg/epa-wysiwyg-linkit';
+function epa_wysiwyg_form_editor_link_dialog_alter(
+  array &$form,
+  FormStateInterface $form_state,
+  $form_id
+) {
+  // Attach the JS that controls the UI switching.
+  $form['#attached']['library'][] = 'epa_wysiwyg/epa_wysiwyg_linkit';
 
-  // Provide a fieldset for switching the profile.
-  $form['attributes']['select-profile'] = [
-    '#title' => t('Filter search results'),
+  // Determine active profile (default fallback).
+  $active_profile = $form_state->get('epa_linkit_profile') ?? 'default';
+
+  // Profile selector radios.
+  $form['attributes']['epa_linkit_profile'] = [
     '#type' => 'radios',
+    '#title' => t('Filter scope'),
     '#options' => [
-      'web_area_content' => t('Your internal links'),
       'default' => t('No filter: all WebCMS content'),
+      'web_area_content' => t('Your group links'),
     ],
-    'web_area_content' => [
-      '#description' => t('Search within your web areas only.'),
-    ],
-    'default' => [
-      '#description' => t('Search within your web areas and www.epa.gov'),
-    ],
+    '#default_value' => $active_profile,
     '#weight' => -20,
-    '#default_value' => 'default',
+    '#ajax' => [
+      'callback' => 'epa_wysiwyg_linkit_profile_ajax',
+      'wrapper' => 'epa-linkit-wrapper',
+    ],
   ];
 
-  // Add states to disable and hide the default linkit input unless the default
-  // profile is selected.
-  $form['attributes']['href_default'] = array_merge($form['attributes']['href'], [
-    '#type' => 'linkit',
-    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
-    '#autocomplete_route_name' => 'linkit.autocomplete',
-    '#autocomplete_route_parameters' => [
-      'linkit_profile_id' => 'default',
-    ],
-    "#weight" => -10,
-    '#default_value' => $input['href'] ?? '',
-    '#states' => [
-      'visible' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
-      ],
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
-      ],
-    ],
-  ]);
+  // Wrap the Linkit field so it can be rebuilt.
+  $form['attributes']['href']['#prefix'] = '<div id="epa-linkit-wrapper">';
+  $form['attributes']['href']['#suffix'] = '</div>';
 
-  // Provide a second linkit input that uses the web_area_content linkit profile
-  // and is disabled and hidden unless the web_area_content profile is selected.
-  $form['attributes']['href_web_area_content'] = array_merge($form['attributes']['href'], [
-    '#type' => 'linkit',
-    '#description' => t('Type the page title, paste in a complete external URL, or add an email address or phone number.'),
-    '#autocomplete_route_name' => 'linkit.autocomplete',
-    '#autocomplete_route_parameters' => [
-      'linkit_profile_id' => 'web_area_content',
-    ],
-    "#weight" => -10,
-    '#default_value' => $input['href'] ?? '',
-    '#states' => [
-      'visible' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'web_area_content'],
-      ],
-      'disabled' => [
-        ':input[name="attributes[select-profile]"]' => ['value' => 'default'],
-      ],
-    ],
-  ]);
+  // Force Linkit field + selected profile.
+  $form['attributes']['href']['#type'] = 'linkit';
+  $form['attributes']['href']['#autocomplete_route_name'] = 'linkit.autocomplete';
+  $form['attributes']['href']['#autocomplete_route_parameters'] = [
+    'linkit_profile_id' => $active_profile,
+  ];
 
-  $form['attributes']['href'] = array_merge($form['attributes']['href'], [
-    '#states' => [
-      'invisible' => [
-        ':input[name="attributes[select-profile]"]' => [
-          ['value' => 'web_area_content'],
-          'or',
-          ['value' => 'default'],
-        ],
-      ],
-    ],
-  ]);
-
-  array_unshift($form['#validate'], '_epa_wysiwyg_populate_href');
+  // Persist selection on submit.
+  $form['#submit'][] = 'epa_wysiwyg_linkit_profile_submit';
 }
 
 /**
- * Custom logic to accommodate the additional href_default and
- * href_web_area_content attributes.
+ * AJAX callback to rebuild the Linkit field when profile changes.
  */
-function _epa_wysiwyg_populate_href(array &$form, FormStateInterface $form_state) {
-  $href_profile_fields = [
-    'href_default',
-    'href_web_area_content',
-  ];
+function epa_wysiwyg_linkit_profile_ajax(array &$form, FormStateInterface $form_state) {
+  $profile = $form_state->getValue(['attributes', 'epa_linkit_profile']);
+  $form_state->set('epa_linkit_profile', $profile);
+  $form_state->setRebuild(TRUE);
 
-  $href_value = $form_state->getValue(['attributes', 'href']);
+  return $form['attributes']['href'];
+}
 
-  foreach ($href_profile_fields as $field_name) {
-    // The href attribute is reset to empty when the form is initialized. If the
-    // attribute has a value when the form is submitted, then another module
-    // (i.e. anchor) updated it. Let's set our linkit profile inputs to match.
-    if (!empty($href_value)) {
-      $form_state->setValue(['attributes', $field_name], $href_value);
-    }
-    // The href attribute is empty so we want to populate it with the value from
-    // the linkit profile attribute that has a value.
-    else {
-      $value = $form_state->getValue(['attributes', $field_name]);
-      if (!empty($value)) {
-        $form_state->setValue(['attributes', 'href'], $value);
-      }
-    }
-
+/**
+ * Submit handler to store selected profile.
+ */
+function epa_wysiwyg_linkit_profile_submit(array &$form, FormStateInterface $form_state) {
+  if ($form_state->hasValue(['attributes', 'epa_linkit_profile'])) {
+    $form_state->set(
+      'epa_linkit_profile',
+      $form_state->getValue(['attributes', 'epa_linkit_profile'])
+    );
   }
 }
