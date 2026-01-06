@@ -171,24 +171,38 @@ class WebAreaLinkit extends Plugin {
         linkFormView.children.add(saveButton);
         linkFormView.children.add(cancelButton);
 
-      // Listen for changes to the dropdown.
-      // Show/hide one of the URL fields based on chosen element.
-      this.listenTo( linkFormView.linkitProfileSelect, 'execute', (evt) => {
-        // evt.source is everything that's in our model and additional items.
-        if (evt.source.linkitAll === true) {
-          // Show the "No filter: all WebCMS content".
-          linkFormView.urlInputView.element.style.display = 'block';
-          linkFormView.myWebAreasLinkField.element.style.display = 'none';
-        }
-        else {
-          // Show the "Your internal links".
-          linkFormView.urlInputView.element.style.display = 'none';
-          linkFormView.myWebAreasLinkField.element.style.display = 'block';
-        }
+        // Listen for changes to the dropdown.
+        // Show/hide one of the URL fields based on chosen element.
+        this.listenTo( linkFormView.linkitProfileSelect, 'execute', (evt) => {
+          // evt.source is everything that's in our model and additional items.
+          const linkCommand = editor.commands.get('link');
+          const isAll = evt.source.linkitAll === true;
 
-        // Set the shown option as the dropdown's label.
-        linkFormView.linkitProfileSelect.buttonView.label = evt.source.label;
-      } );
+          // Clear values of both inputs
+          linkFormView.urlInputView.fieldView.element.value = '';
+          linkFormView.myWebAreasLinkField.fieldView.element.value = '';
+
+          // Reset Link command extra data
+          this.set('entityType', null);
+          this.set('entityUuid', null);
+          this.set('entitySubstitution', null);
+
+          // Clear plugin stored path too (used in selectHandler)
+          linkCommand.myWebAreasLinkField = '';
+
+          if (isAll) {
+            // Show the "No filter: all WebCMS content".
+            linkFormView.urlInputView.element.style.display = 'block';
+            linkFormView.myWebAreasLinkField.element.style.display = 'none';
+          } else {
+            // Show the "Your internal links".
+            linkFormView.urlInputView.element.style.display = 'none';
+            linkFormView.myWebAreasLinkField.element.style.display = 'block';
+          }
+
+          // Update dropdown button label
+          linkFormView.linkitProfileSelect.buttonView.label = evt.source.label;
+        } );
     });
   }
 
@@ -252,7 +266,7 @@ class WebAreaLinkit extends Plugin {
       };
       // Stop the execution of the link command caused by closing the form.
       // Inject the extra attribute value. The highest priority listener here
-      // injects the argument (here below 👇).
+      // injects the argument (here below).
       // - The high priority listener in
       //   _addExtraAttributeOnLinkCommandExecute() gets that argument and sets
       //   the extra attribute.

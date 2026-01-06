@@ -22,7 +22,7 @@
 
       // Clear the linkit input values when the profile is changed to reset the
       // autocomplete results.
-      $(once('epaWysiwygLinkitResetInput', '[name="attributes[select-profile]"]', context)).change(function() {
+      $(once('epaWysiwygLinkitResetInput', '[name="attributes[epa_linkit_profile]"]', context)).change(function() {
         $defaultInput.val('');
         $webAreaInput.val('');
       });
