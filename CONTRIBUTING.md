@@ -484,14 +484,90 @@ git push origin live
 
 ## Git Workflow
 
-### Branch Strategy
+Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment model.
 
-- **`main`** - Stable release branch (matches production)
-- **`live`** - Pre-production branch (deploys to stage)
-- **`development`** - Active development branch (deploys to dev)
-- **`feature/*`** - Feature branches (local development only)
-- **`bugfix/*`** - Bug fix branches (local development only)
-- **`hotfix/*`** - Urgent fixes (fast-track to production)
+### Goals
+
+1. Keep `main` always releasable and aligned with production.
+2. Ensure every change is validated in the dev environment (`development` branch) before moving to stage/production.
+3. Provide a lightweight, repeatable promotion path: **feature → development → live → main**.
+4. Support urgent hotfixes without blocking regular feature work.
+
+### Branch Roles
+
+| Branch | Purpose | Deployment Target | Notes |
+|--------|---------|-------------------|-------|
+| `main` | Production source of truth | Production (future) | Locked except for release merges and hotfixes. |
+| `live` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
+| `development` | Active integration branch | Dev environment | Triggers the standard dev pipeline (`push-dev.sh`). |
+| `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `main` and open PRs into `development`. |
+| `hotfix/*` | Urgent fixes for prod | Main & live | Created from `main`, merged back to all branches after release. |
+
+### Standard Feature Flow
+
+1. **Sync main**
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+2. **Branch from `main`**
+   ```bash
+   git checkout -b feature/<short-description>
+   ```
+3. **Develop & validate locally**
+   - Use DDEV & Gesso commands in this guide.
+   - Follow Conventional Commits and keep commits focused.
+4. **PR into `development`**
+   - Target branch: `development`.
+   - Run local checks; after merge trigger `./push-dev.sh --skip-build` for fast validation.
+   - Resolve review feedback and merge (squash or rebase preferred).
+5. **Promote to Stage (`live`)**
+   - On release cadence, merge `development` → `live`.
+   - Push to `live` to run full stage pipeline (security scans included).
+6. **Promote to Production (`main`)**
+   - After stage sign-off, merge `live` → `main`.
+   - Tag the release (e.g., `vYYYY.MM.DD`); production deploy pipeline will consume `main`.
+7. **Back-merge**
+   - Fast-forward `development` from `main` to keep history linear.
+
+### Hotfix Flow
+
+1. `git checkout -b hotfix/<issue> main`
+2. Implement fix and open PR targeting `main` (bypasses `development` to minimize risk).
+3. After merging into `main`, cherry-pick/merge into `live` and `development` so branches stay in sync.
+4. Deploy via stage → production promotion path as usual.
+
+### Why Branch From `main`?
+
+- Guarantees every feature starts from production-quality code.
+- Prevents long-lived divergence between feature work and production.
+- Keeps `development` focused on integration testing rather than acting as the single source of truth.
+
+### Release Cadence & Coordination
+
+- **Daily Dev Deploys:** Merge PRs into `development` as they’re approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
+- **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `live`, let the stage pipeline run, and perform QA.
+- **Production Deploys:** After stage validation, merge `live` → `main`, tag the release, and trigger production deployment when available.
+
+### Pull Request Guidelines
+
+- Target branches: Feature work → `development`, hotfixes → `main`.
+- Keep PRs reviewable (< ~1 day of work). Use draft PRs for early feedback.
+- Run `ddev composer phpcs`, `phpstan`, theme builds, and relevant tests before requesting review.
+- Require at least one maintainer approval.
+
+### Merge Strategy
+
+- **Feature PRs:** Squash or rebase onto `development` to maintain a clean history.
+- **Promotions (`development` → `live`, `live` → `main`):** Use merge commits so a release corresponds to a single identifiable merge.
+- **Back-merges:** After promoting, fast-forward lower environments (e.g., rebase `development` on `main`) to avoid drift.
+
+### FAQs
+
+- **Why keep `development` if we branch from `main`?** It’s the integration branch that powers the dev environment and CI; multiple features can be validated together before release.
+- **Can I deploy from a feature branch?** No. Only `development` (dev) and `live` (stage) trigger deployments.
+- **What if a feature spans multiple sprints?** Rebase frequently on `main`, and merge working slices behind feature flags so code keeps flowing through the pipeline.
+- **How do freeze periods work?** Pause merges into `development`, finish testing on `live`, promote to `main`, then fast-forward `development` from `main` when the freeze lifts.
 
 ### Commit Message Convention
 
@@ -505,33 +581,14 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 <footer>
 ```
 
-**Types:**
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `docs:` - Documentation changes
-- `style:` - Code style changes (formatting, etc.)
-- `refactor:` - Code refactoring
-- `perf:` - Performance improvements
-- `test:` - Adding or updating tests
-- `chore:` - Maintenance tasks
+Common types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
 
-**Examples:**
+Examples:
 ```bash
-git commit -m "feat(workflow): Add new approval step for content editors"
-git commit -m "fix(theme): Correct responsive menu breakpoint"
-git commit -m "docs: Update deployment guide with skip-build instructions"
-git commit -m "chore: Update Drupal core to 10.2.3"
+git commit -m "feat(workflow): add approval step for content editors"
+git commit -m "fix(theme): correct responsive menu breakpoint"
+git commit -m "docs: update deployment guide with skip-build instructions"
 ```
-
-### Pull Request Process
-
-1. Create feature branch from `development`
-2. Make your changes and commit
-3. Push branch to GitHub
-4. Create Pull Request targeting `development`
-5. Request review from team members
-6. Address review feedback
-7. Merge when approved (squash and merge preferred)
 
 ---
 
