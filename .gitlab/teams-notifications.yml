@@ -1,0 +1,611 @@
+# Microsoft Teams Notifications for GitLab CI/CD Pipeline Events
+#
+# This file provides reusable templates for sending Microsoft Teams notifications at various
+# pipeline stages. Notifications include contextual information about the pipeline
+# state, environment, and relevant links.
+#
+# Required CI/CD Variables (set in GitLab project settings):
+# - TEAMS_WEBHOOK_URL: The incoming webhook URL for your Microsoft Teams channel
+#
+# Optional Variables:
+# - TEAMS_TITLE: Override the default bot title (default: "GitLab CI")
+
+.teams_notify:
+  image: curlimages/curl:latest
+  variables:
+    TEAMS_TITLE: "GitLab CI"
+  before_script:
+    # Set color based on job status
+    - |
+      if [ "$CI_JOB_STATUS" = "success" ]; then
+        export TEAMS_COLOR="28A745"
+        export STATUS_EMOJI="✅"
+      elif [ "$CI_JOB_STATUS" = "failed" ]; then
+        export TEAMS_COLOR="DC3545"
+        export STATUS_EMOJI="❌"
+      else
+        export TEAMS_COLOR="FFC107"
+        export STATUS_EMOJI="⚠️"
+      fi
+    # Format environment display
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Author:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Message:",
+              "value": "${CI_COMMIT_MESSAGE%%$'\n'*}"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Pipeline",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - when: on_success
+
+# Pipeline Started Notification
+notify:pipeline:started:
+  extends: .teams_notify
+  stage: .pre
+  variables:
+    NOTIFICATION_TITLE: "Pipeline Started"
+  before_script:
+    - export TEAMS_COLOR="FFC107"
+    - export STATUS_EMOJI="🚀"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"'
+      when: always
+
+# Build Stage Success - Development
+notify:build:success:dev:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Completed Successfully"
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: on_success
+    - when: never
+
+# Build Stage Success - Live
+notify:build:success:stage:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Completed Successfully"
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+    - when: never
+
+# Build Stage Failure - Development
+notify:build:failed:dev:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Failed"
+  before_script:
+    - export TEAMS_COLOR="DC3545"
+    - export STATUS_EMOJI="❌"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Author:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Logs",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_JOB_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "development"'
+      when: on_failure
+    - when: never
+
+# Build Stage Failure - Live
+notify:build:failed:stage:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Build Failed"
+  before_script:
+    - export TEAMS_COLOR="DC3545"
+    - export STATUS_EMOJI="❌"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Author:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Logs",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_JOB_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+    - when: never
+
+# Manual Action Required
+notify:manual:required:
+  extends: .teams_notify
+  stage: Infrastructure:Preprod:Plan
+  variables:
+    NOTIFICATION_TITLE: "Manual Approval Required"
+  before_script:
+    - export TEAMS_COLOR="0000FF"
+    - export STATUS_EMOJI="✋"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - Infrastructure Apply",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "text": "Infrastructure changes are ready to apply. Manual approval required before proceeding.",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "Review and Approve",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Started
+notify:deploy:started:
+  extends: .teams_notify
+  stage: Deploy:Stage:Init
+  variables:
+    NOTIFICATION_TITLE: "Deployment Started"
+  before_script:
+    - export TEAMS_COLOR="FFC107"
+    - export STATUS_EMOJI="🚢"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Success
+notify:deploy:success:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Deployment Completed Successfully"
+  before_script:
+    - export TEAMS_COLOR="28A745"
+    - export STATUS_EMOJI="🎉"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Duration:",
+              "value": "${CI_PIPELINE_DURATION}s"
+            },
+            {
+              "name": "Image Tag:",
+              "value": "$WEBCMS_IMAGE_TAG"
+            },
+            {
+              "name": "Deployed By:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Pipeline",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_success
+
+# Deployment Failure
+notify:deploy:failed:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Deployment Failed"
+  before_script:
+    - export TEAMS_COLOR="DC3545"
+    - export STATUS_EMOJI="🔥"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "text": "⚠️ Deployment to $ENV_DISPLAY has failed. Immediate attention required.",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Commit:",
+              "value": "${CI_COMMIT_SHORT_SHA}"
+            },
+            {
+              "name": "Author:",
+              "value": "$GITLAB_USER_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Pipeline",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Commit",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+
+# Security Scan Issues Found
+notify:security:issues:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Security Scan Detected Issues"
+  before_script:
+    - export TEAMS_COLOR="DC3545"
+    - export STATUS_EMOJI="⚠️"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "text": "Security vulnerabilities or secrets detected. Review the security report.",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Branch:",
+              "value": "$CI_COMMIT_REF_NAME"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Security Report",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PROJECT_URL/-/pipelines/$CI_PIPELINE_ID/security"
+          }]
+        },
+        {
+          "@type": "OpenUri",
+          "name": "View Pipeline",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        }]
+      }
+      EOF
+  needs:
+    - job: secret_detection
+      optional: true
+    - job: dependency_scanning
+      optional: true
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "live"'
+      when: on_failure
+
+# Pipeline Completed (Summary)
+notify:pipeline:completed:
+  extends: .teams_notify
+  stage: .post
+  variables:
+    NOTIFICATION_TITLE: "Pipeline Completed"
+  before_script:
+    - export TEAMS_COLOR="28A745"
+    - export STATUS_EMOJI="🏁"
+    - export ENV_DISPLAY="${WEBCMS_ENVIRONMENT:-unknown}/${WEBCMS_SITE:-all}"
+  script:
+    - |
+      curl -X POST "$TEAMS_WEBHOOK_URL" \
+        -H 'Content-Type: application/json' \
+        -d @- <<EOF
+      {
+        "@type": "MessageCard",
+        "@context": "https://schema.org/extensions",
+        "summary": "$NOTIFICATION_TITLE - $ENV_DISPLAY",
+        "themeColor": "$TEAMS_COLOR",
+        "title": "$STATUS_EMOJI $NOTIFICATION_TITLE",
+        "text": "All pipeline stages completed successfully.",
+        "sections": [{
+          "facts": [
+            {
+              "name": "Environment:",
+              "value": "$ENV_DISPLAY"
+            },
+            {
+              "name": "Total Duration:",
+              "value": "${CI_PIPELINE_DURATION}s"
+            },
+            {
+              "name": "Completed:",
+              "value": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            },
+            {
+              "name": "Pipeline:",
+              "value": "#$CI_PIPELINE_IID"
+            }
+          ]
+        }],
+        "potentialAction": [{
+          "@type": "OpenUri",
+          "name": "View Pipeline",
+          "targets": [{
+            "os": "default",
+            "uri": "$CI_PIPELINE_URL"
+          }]
+        }]
+      }
+      EOF
+  rules:
+    - if: '$TEAMS_WEBHOOK_URL == null'
+      when: never
+    - when: on_success

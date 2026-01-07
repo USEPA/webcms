@@ -55,18 +55,247 @@ function epa_core_requirements($phase) {
   $requirements = array();
 
   if ($phase == 'runtime') {
-    $release = getenv('GIT_COMMIT');
-    if ($tag = getenv('GIT_TAG')) {
-      $release = $tag;
+    // Get deployment information from environment variables
+    $git_commit = getenv('GIT_COMMIT');
+    $git_tag = getenv('GIT_TAG');
+    $webcms_environment = getenv('WEBCMS_ENVIRONMENT');
+    $webcms_site = getenv('WEBCMS_SITE');
+    $webcms_lang = getenv('WEBCMS_LANG');
+    
+    // Build release version display
+    $release = $git_commit ?: 'Not set';
+    if (!empty($git_tag)) {
+      $release = $git_tag . ' (' . substr($git_commit, 0, 7) . ')';
     }
-    if (empty($release)) {
-      $release = 'Neither the GIT_TAG nor GIT_COMMIT environment variables have been set.';
+    elseif (!empty($git_commit)) {
+      $release = substr($git_commit, 0, 7);
     }
+    
+    // Basic release version requirement
     $requirements['epa_core_release_version'] = array(
-      'title' => t('EPA Drupal WebCMS Release Version'),
+      'title' => t('EPA WebCMS Release Version'),
       'value' => $release,
+      'description' => !empty($git_commit) ? t('Full commit SHA: @sha', ['@sha' => $git_commit]) : t('No deployment information available.'),
       'severity' => REQUIREMENT_OK,
     );
+    
+    // Detailed deployment information
+    if (!empty($git_commit)) {
+      $deployment_details = [];
+      
+      // ===== DEPLOYMENT METADATA =====
+      $deployment_details[] = '<strong style="font-size: 1.1em;">Deployment Metadata</strong>';
+      
+      if (!empty($webcms_environment)) {
+        $deployment_details[] = t('<strong>Environment:</strong> @env', ['@env' => ucfirst($webcms_environment)]);
+      }
+      if (!empty($webcms_site)) {
+        $deployment_details[] = t('<strong>Site:</strong> @site', ['@site' => strtoupper($webcms_site)]);
+      }
+      if (!empty($webcms_lang)) {
+        $deployment_details[] = t('<strong>Language:</strong> @lang', ['@lang' => strtoupper($webcms_lang)]);
+      }
+      
+      // Deployment type and method
+      if (!empty($git_tag)) {
+        $deployment_details[] = t('<strong>Deploy Type:</strong> Tagged Release');
+        $deploy_method = 'Full Build (Tagged)';
+      }
+      else {
+        $deployment_details[] = t('<strong>Deploy Type:</strong> Branch Build');
+        // Try to detect if skip-build was used by checking image tag pattern
+        $deploy_method = 'Full Build';
+      }
+      $deployment_details[] = t('<strong>Deploy Method:</strong> @method', ['@method' => $deploy_method]);
+      
+      // ===== GITLAB CI/CD INFORMATION =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">GitLab CI/CD</strong>';
+      
+      // Construct GitLab URLs
+      $gitlab_base = 'https://gitlab.epa.gov/drupalcloud/drupalclouddeployment';
+      $commit_url = $gitlab_base . '/-/commit/' . $git_commit;
+      $deployment_details[] = t('<strong>Commit:</strong> <a href="@url" target="_blank">@sha</a>', [
+        '@url' => $commit_url,
+        '@sha' => substr($git_commit, 0, 7)
+      ]);
+      
+      // Pipeline URL (estimate - actual pipeline ID not available)
+      $pipelines_url = $gitlab_base . '/-/pipelines?ref=development';
+      if ($webcms_site === 'stage') {
+        $pipelines_url = $gitlab_base . '/-/pipelines?ref=live';
+      }
+      $deployment_details[] = t('<strong>Pipelines:</strong> <a href="@url" target="_blank">View Recent Pipelines</a>', [
+        '@url' => $pipelines_url
+      ]);
+      
+      // ===== DOCKER IMAGE INFORMATION =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">Docker Images</strong>';
+      
+      // Build image tag and ECR URI
+      if (!empty($git_tag)) {
+        $image_tag = $git_tag;
+      }
+      else {
+        $branch = 'development';
+        if ($webcms_site === 'stage') {
+          $branch = 'live';
+        }
+        $image_tag = $branch . '-' . substr($git_commit, 0, 7);
+      }
+      
+      // ECR repository base
+      $ecr_base = '665817092260.dkr.ecr.us-east-1.amazonaws.com';
+      $image_prefix = "webcms-{$webcms_environment}-{$webcms_site}";
+      
+      $deployment_details[] = t('<strong>Image Tag:</strong> <code>@tag</code>', ['@tag' => $image_tag]);
+      $deployment_details[] = t('<strong>Drupal Image:</strong> <code style="font-size: 0.85em;">@uri</code>', [
+        '@uri' => "{$ecr_base}/{$image_prefix}-drupal:{$image_tag}"
+      ]);
+      $deployment_details[] = t('<strong>Nginx Image:</strong> <code style="font-size: 0.85em;">@uri</code>', [
+        '@uri' => "{$ecr_base}/{$image_prefix}-nginx:{$image_tag}"
+      ]);
+      $deployment_details[] = t('<strong>Drush Image:</strong> <code style="font-size: 0.85em;">@uri</code>', [
+        '@uri' => "{$ecr_base}/{$image_prefix}-drush:{$image_tag}"
+      ]);
+      
+      // ===== AWS INFRASTRUCTURE =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">AWS Infrastructure</strong>';
+      
+      $aws_region = getenv('AWS_REGION') ?: getenv('AWS_DEFAULT_REGION') ?: 'us-east-1';
+      $aws_console_url = "https://console.aws.amazon.com/?region={$aws_region}";
+      $deployment_details[] = t('<strong>AWS Region:</strong> <a href="@url" target="_blank">@region</a>', [
+        '@url' => $aws_console_url,
+        '@region' => $aws_region
+      ]);
+      
+      // ECS Cluster
+      $cluster_name = "webcms-{$webcms_environment}";
+      $ecs_cluster_url = "https://console.aws.amazon.com/ecs/v2/clusters/{$cluster_name}/services?region={$aws_region}";
+      $deployment_details[] = t('<strong>ECS Cluster:</strong> <a href="@url" target="_blank">@name</a>', [
+        '@url' => $ecs_cluster_url,
+        '@name' => $cluster_name
+      ]);
+      
+      // ECS Service
+      $service_name = "webcms-{$webcms_environment}-{$webcms_site}-{$webcms_lang}";
+      $ecs_service_url = "https://console.aws.amazon.com/ecs/v2/clusters/{$cluster_name}/services/{$service_name}?region={$aws_region}";
+      $deployment_details[] = t('<strong>ECS Service:</strong> <a href="@url" target="_blank">@name</a>', [
+        '@url' => $ecs_service_url,
+        '@name' => $service_name
+      ]);
+      
+      // ===== DATA STORAGE =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">Data Storage</strong>';
+      
+      // S3 Bucket
+      $s3_bucket = getenv('WEBCMS_S3_BUCKET');
+      if (!empty($s3_bucket)) {
+        $s3_url = "https://s3.console.aws.amazon.com/s3/buckets/{$s3_bucket}?region={$aws_region}";
+        $deployment_details[] = t('<strong>S3 Bucket:</strong> <a href="@url" target="_blank">@bucket</a>', [
+          '@url' => $s3_url,
+          '@bucket' => $s3_bucket
+        ]);
+      }
+      
+      // CloudFront Distribution
+      $cf_dist_id = getenv('WEBCMS_CF_DISTRIBUTIONID');
+      if (!empty($cf_dist_id) && $cf_dist_id !== 'abcdef') {
+        $cf_url = "https://console.aws.amazon.com/cloudfront/v3/home?region={$aws_region}#/distributions/{$cf_dist_id}";
+        $deployment_details[] = t('<strong>CloudFront:</strong> <a href="@url" target="_blank">@id</a>', [
+          '@url' => $cf_url,
+          '@id' => $cf_dist_id
+        ]);
+      }
+      
+      // Database
+      $db_host = getenv('WEBCMS_DB_HOST');
+      if (!empty($db_host) && $db_host !== 'mysql') {
+        // Check if it's an RDS endpoint and make it a link
+        if (strpos($db_host, 'rds.amazonaws.com') !== false) {
+          $rds_url = "https://console.aws.amazon.com/rds/home?region={$aws_region}#databases:";
+          $deployment_details[] = t('<strong>Database Host:</strong> <a href="@url" target="_blank">@host</a>', [
+            '@url' => $rds_url,
+            '@host' => $db_host
+          ]);
+        }
+        else {
+          $deployment_details[] = t('<strong>Database Host:</strong> @host', ['@host' => $db_host]);
+        }
+      }
+      
+      // ===== CACHE & SERVICES =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">Cache & Services</strong>';
+      
+      // Memcached
+      $cache_host = getenv('WEBCMS_CACHE_HOST');
+      if (!empty($cache_host)) {
+        // Try to connect to memcached to verify it's working
+        $cache_status = 'Unknown';
+        if (class_exists('\Memcached')) {
+          try {
+            $memcached = new \Memcached();
+            $memcached->addServer($cache_host, 11211);
+            $stats = $memcached->getStats();
+            if (!empty($stats)) {
+              $cache_status = '<span style="color: green;">✓ Connected</span>';
+            }
+            else {
+              $cache_status = '<span style="color: orange;">⚠ Not responding</span>';
+            }
+          }
+          catch (\Exception $e) {
+            $cache_status = '<span style="color: red;">✗ Error</span>';
+          }
+        }
+        $deployment_details[] = t('<strong>Memcached:</strong> @host (@status)', [
+          '@host' => $cache_host,
+          '@status' => $cache_status
+        ]);
+      }
+      
+      // Elasticsearch
+      $search_host = getenv('WEBCMS_SEARCH_HOST');
+      if (!empty($search_host) && $search_host !== 'http://elasticsearch:9200') {
+        // If it's a URL, make it clickable
+        if (strpos($search_host, 'http') === 0) {
+          $deployment_details[] = t('<strong>Search:</strong> <a href="@url" target="_blank">@host</a>', [
+            '@url' => $search_host,
+            '@host' => $search_host
+          ]);
+        }
+        else {
+          $deployment_details[] = t('<strong>Search:</strong> @host', ['@host' => $search_host]);
+        }
+      }
+      
+      // ===== MONITORING & LOGS =====
+      $deployment_details[] = '<br><strong style="font-size: 1.1em;">Monitoring & Logs</strong>';
+      
+      // CloudWatch Logs
+      $log_group = getenv('WEBCMS_LOG_GROUP');
+      if (!empty($log_group) && $log_group !== '/webcms-local/app-drupal') {
+        $encoded_log_group = str_replace('/', '$252F', $log_group);
+        $cw_url = "https://console.aws.amazon.com/cloudwatch/home?region={$aws_region}#logsV2:log-groups/log-group/{$encoded_log_group}";
+        $deployment_details[] = t('<strong>CloudWatch Logs:</strong> <a href="@url" target="_blank">@group</a>', [
+          '@url' => $cw_url,
+          '@group' => $log_group
+        ]);
+      }
+      
+      $requirements['epa_core_deployment_info'] = array(
+        'title' => t('Deployment & Infrastructure Information'),
+        'value' => Markup::create(implode('<br>', $deployment_details)),
+        'description' => t('Comprehensive information about the current deployment, infrastructure, and services. Click links to view resources in GitLab and AWS Console.'),
+      );
+    }
+    else {
+      // Running in local development environment
+      $requirements['epa_core_deployment_info'] = array(
+        'title' => t('Deployment & Infrastructure Information'),
+        'value' => t('Local Development Environment (DDEV)'),
+        'description' => t('Detailed deployment and infrastructure information is only available in deployed AWS environments (dev, stage, production).'),
+      );
+    }
   }
 
   return $requirements;

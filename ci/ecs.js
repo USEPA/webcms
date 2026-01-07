@@ -126,6 +126,11 @@ async function startDrushTask(script) {
     throw new Error(aggregateFailures(response.failures));
   }
 
+  // Validate that at least one task was created
+  if (!response.tasks || response.tasks.length === 0) {
+    throw new Error("ECS did not create any tasks");
+  }
+
   // We always know we only started one task, so we can shortcut to just the ARN.
   return response.tasks[0].taskArn;
 }

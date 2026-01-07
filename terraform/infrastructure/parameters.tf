@@ -199,6 +199,9 @@ resource "aws_ssm_parameter" "drupal_log_group" {
 
 #region Secrets Manager ARNs
 
+# Note: "d8" and "d7" are database identifiers (not Drupal versions)
+# d8 = Drupal 10 database (naming retained for backwards compatibility)
+# d7 = Legacy Drupal 7 database (for migration support)
 resource "aws_ssm_parameter" "db_d8_credentials" {
   for_each = local.sites
 

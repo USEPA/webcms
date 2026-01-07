@@ -20,14 +20,15 @@ resource "aws_secretsmanager_secret_version" "db_root_credentials" {
     username = "root"
     password = random_password.rds_root_password.result
   })
-
   lifecycle {
     ignore_changes = [secret_string, version_stages]
   }
 }
 
-# The D8 and D7 credentials are populated by the database initialization task on its first
-# run.
+# Note: "d8" and "d7" are database identifiers (not Drupal versions)
+# d8 = Drupal 10 database (naming retained for backwards compatibility with deployed AWS resources)
+# d7 = Legacy Drupal 7 database (for migration support)
+# The D8 and D7 credentials are populated by the database initialization task on its first run.
 
 resource "aws_secretsmanager_secret" "db_d8_credentials" {
   for_each = local.sites
