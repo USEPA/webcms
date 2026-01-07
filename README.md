@@ -13,12 +13,14 @@ cd webcms/services/drupal
 ddev start
 
 # Complete setup
-ddev aws-setup
-ddev import-db
+ddev aws-setup                    # Create local S3 bucket
+ddev import-db                    # Import database (place .tar in .ddev/db/)
+cp .env.example .env              # Copy environment configuration
 ddev composer install
-ddev gesso install
-ddev gesso build
-ddev drush deploy -y
+ddev gesso install                # Install theme dependencies
+ddev gesso build                  # Build theme assets
+ddev drush deploy -y              # Run deployment workflow
+ddev drush user:unblock drupalwebcms-admin
 ```
 
 Access the site at: <https://epa.ddev.site>
@@ -26,7 +28,11 @@ Access the site at: <https://epa.ddev.site>
 ## Documentation
 
 - **[Contributing Guide](CONTRIBUTING.md)** - Complete setup instructions, development workflows, and deployment guide
+- **[WARP.md](WARP.md)** - AI agent guidance for working with this repository
+- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching and release process
 - **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
+- **[Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md)** - Step-by-step deployment process
+- **[Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md)** - Performance optimization details
 - **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
 - **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
 
