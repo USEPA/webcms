@@ -139,13 +139,159 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command ref
 - **Deprecated:** Buildkite pipelines (`.buildkite/`) - retained for historical reference only
 - **Deployment Pipeline:** GitHub → GitLab Mirror → Docker Build → AWS ECS
 
+### Deploying Dev from the `live` Branch
+
+By default, pipelines on `live` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
+
+**Steps:**
+1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
+2. Select the `live` branch.
+3. Add a CI/CD variable:
+   - **Key:** `DEPLOY_TO_DEV`
+   - **Value:** `true`
+4. Click **Run pipeline**, then approve the manual `deploy:dev:apply-en` job when it appears.
+
+**What happens:**
+- The `build:drupal:stage` job builds images for both `stage` and `dev` (dev builds are skipped unless `DEPLOY_TO_DEV=true`).
+- Stage deploy jobs run automatically (with full Test/Scan stages).
+- The dev deploy job stays **manual** when triggered from `live`, so you must click the play button after stage validation.
+
+Notes:
+- `DEPLOY_TO_DEV` is ignored on the `development` branch (dev deploys always happen there).
+- Use this flow sparingly—every dev deploy from `live` requires manual approval and will reuse the `live` branch artifacts.
+
+## Repository Structure
+
+```
+webcms/
+├── .gitlab-ci.yml              # CI/CD pipeline configuration
+├── .gitlab/                    # Pipeline includes & documentation
+├── services/
+│   ├── drupal/                 # Main Drupal application
+│   │   ├── .ddev/              # DDEV configuration & commands
+│   │   ├── config/             # Drupal configuration management
+│   │   ├── web/                # Drupal webroot
+│   │   │   ├── modules/custom/ # EPA custom modules (26+ modules)
+│   │   │   └── themes/         # epa_theme (Gesso USWDS), epa_claro
+│   │   ├── composer.json       # PHP dependencies
+│   │   └── Dockerfile          # Multi-stage Docker build
+│   ├── drush/                  # Drush container for ECS tasks
+│   ├── minio/                  # Local S3 emulation
+│   └── simplesaml/             # SAML authentication
+├── terraform/                  # Infrastructure as code
+├── ci/                         # CI automation scripts
+├── push-dev.sh                 # Deploy to dev helper script
+└── trigger-pipeline.sh         # Manual pipeline trigger
+```
+
+### Custom Modules
+
+The application includes 26+ EPA-specific custom modules in `services/drupal/web/modules/custom/`:
+- **Core functionality:** epa_core, epa_workflow, epa_web_areas, epa_forms
+- **Content features:** epa_clone, epa_content_tracker, epa_metatag, epa_node_export
+- **Media/Assets:** epa_media, epa_media_s3fs, epa_s3fs, epa_wysiwyg
+- **Search/Navigation:** epa_elasticsearch, epa_breadcrumbs, epa_viewsreference
+- **AWS Integration:** epa_cloudfront, epa_cloudwatch, epa_snapshot
+- **Authentication:** f1_sso, epa_es_auth
+- **Utilities:** epa_alerts, epa_layouts, epa_links, epa_rss
+
+## Configuration Management
+
+**Critical Rule:** Never commit configuration in both code and database simultaneously. Always choose one source of truth.
+
+```bash
+# Export configuration after UI changes
+ddev drush cex
+
+# Import configuration when pulling changes
+ddev drush cim -y
+```
+
+### Key Environment Variables
+
+Most runtime configuration lives in `.env` (see `services/drupal/.env.example`). The most important variables are:
+- `WEBCMS_SITE` – environment name (`local`, `dev`, `stage`, `prod`) used to load site-specific settings.
+- `WEBCMS_LANG` – language code (`en`, `es`) so each ECS service can read the correct configs and secrets.
+- `WEBCMS_ENV_STATE` – set to `build` before installing or importing data, and switch to `run` once caches (memcached/Redis) should be enabled.
+
+Copy `.env.example` to `.env` before editing; never commit actual secrets or site-specific values.
+
+## Coding Standards
+
+### PHP/Drupal
+- Follow Drupal Coding Standards
+- PHP 8.2+ features preferred
+- Type hint all parameters and return values
+- Run `ddev composer phpcs` before committing
+- Auto-fix with `ddev composer phpcbf`
+
+### Theme/Frontend
+- BEM naming convention for CSS
+- Mobile-first responsive design
+- WCAG 2.1 AA accessibility compliance
+- ES6+ JavaScript (no `var`)
+- Lint with `ddev gesso lint`
+
+### Git Workflow
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation
+- `style:` - Formatting
+- `refactor:` - Code restructuring
+- `chore:` - Maintenance
+
+**Branch Strategy:**
+- `main` - Stable release (matches production)
+- `live` - Pre-production (deploys to stage)
+- `development` - Active development (deploys to dev)
+- `feature/*`, `bugfix/*`, `hotfix/*` - Feature branches
+
+## Troubleshooting
+
+### Common Issues
+
+**Elasticsearch Errors:**
+```bash
+ddev poweroff
+docker volume rm ddev-epa-ddev_elasticsearch
+ddev start
+ddev drush search-api:reindex
+```
+
+**Composer Install Fails:**
+```bash
+rm -rf services/drupal/.ddev/vendor
+ddev composer clearcache
+ddev composer install
+```
+
+**Database Import Timeout:**
+```bash
+ddev status  # Get MySQL port
+mysql -h 127.0.0.1 -P <port> -u db -pdb db < backup.sql
+```
+
+**Skip-Build Deployment Fails:**
+```bash
+# Run full build first to create :development-latest images
+./push-dev.sh
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#troubleshooting) for more troubleshooting steps.
+
+## Local Environment URLs
+- Main site: <https://epa.ddev.site>
+- PhpMyAdmin: <https://epa.ddev.site:8036>
+- MailHog: <https://epa.ddev.site:8025>
+
 ## Requirements
 
 - DDEV 1.24 or higher
 - Docker Desktop
 - Git
 - Composer
-- Node.js and npm
+- Node.js >=16 and npm
 
 ## Disclaimer
 
