@@ -69,22 +69,67 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide.
 
 ## Architecture
 
-- **Platform:** Drupal 10 on PHP 8.1+
+- **Platform:** Drupal 10 on PHP 8.2
+- **Theme:** Gesso USWDS (Pattern Lab + USWDS 3.9.0)
 - **Infrastructure:** AWS ECS (Fargate), RDS (PostgreSQL), S3, CloudFront
 - **CI/CD:** GitLab CI/CD with GitHub mirror
-- **Containers:** Multi-stage Docker builds with Kaniko
+- **Containers:** Multi-stage Docker builds with Kaniko (drupal, nginx, drush)
 - **IaC:** Terraform for infrastructure and application deployment
+- **Multi-site:** English and Spanish sites share the same codebase and infrastructure; each site/language pair is its own ECS service.
+- **Authentication:** SimpleSAMLphp service backs production SSO; local development uses the mock IdP in `services/simplesaml/` so contributors can test SAML flows without external access.
+
+### Deployment Pipeline
+
+```
+Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
+```
+
+**Branch to Environment Mapping:**
+- `development` → Dev site (automatic deployment)
+- `live` → Stage site (manual trigger, includes security scans)
+- `live` → Production (manual trigger, future)
+
+**Pipeline Stages:**
+- Development branch: Build → Deploy → Update (~10-15 min)
+- Live branch: Build → Test → Scan → Deploy → Update (~25-35 min)
 
 ## Quick Commands
+
+### Local Development
 
 | Command | Description |
 |---------|-------------|
 | `ddev start` | Start development environment |
 | `ddev drush cr` | Clear Drupal cache |
-| `ddev drush deploy -y` | Run deployment updates |
+| `ddev drush deploy -y` | Run deployment workflow (updb + cim + cr) |
+| `ddev drush cex` | Export configuration |
+| `ddev drush cim -y` | Import configuration |
+| `ddev drush uli` | Generate one-time login URL |
 | `ddev gesso watch` | Watch and rebuild theme assets |
+| `ddev gesso build` | One-time theme build |
+| `ddev composer phpcs` | Run PHP Code Sniffer |
+| `ddev composer phpcbf` | Auto-fix coding standards |
+| `ddev composer phpstan` | Run PHPStan static analysis |
+> Theme artifacts are intentionally not committed—after pulling any theme changes, rerun `ddev gesso build` (or `ddev gesso watch`) so CSS/JS output stays fresh.
+
+### Deployment
+
+| Command | Description |
+|---------|-------------|
 | `./push-dev.sh` | Deploy to dev (full build) |
 | `./push-dev.sh --skip-build` | Deploy to dev (fast, no rebuild) |
+| `./push-dev.sh --skip-build -f` | Fast deployment with force push |
+| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+
+**When to use `--skip-build`:**
+- ✅ Changed PHP code in `services/drupal/web/`
+- ✅ Changed custom modules or themes
+- ✅ Changed configuration files
+- ✅ Need to quickly deploy a hotfix
+- ❌ Changed `composer.json` or `composer.lock`
+- ❌ Changed Dockerfile or Nginx configs
+- ❌ First deployment of the day
+- ❌ Added/updated system packages
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command reference.
 
