@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine AS base
+FROM public.ecr.aws/docker/library/php:8.3.29-fpm-alpine3.22 AS base
 
 # Bump system packages
 RUN apk upgrade

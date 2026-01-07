@@ -415,6 +415,7 @@ build:drupal:dev:
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
   script:
+    # Copy Composer authentication credentials for private package access
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     # Enhanced caching and tag :development-latest for reuse in skip-build mode
     - /kaniko/executor
@@ -1041,6 +1042,8 @@ update:stage:en:
     - job: "deploy:stage:apply-en"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -1092,6 +1095,8 @@ update:dev:en:
   resource_group: drush/dev-$WEBCMS_LANG
   environment:
     name: site/dev-$WEBCMS_LANG
+  # Require manual approval for production database updates
+  when: manual
 
 # NOTE: Spanish (es) deployment for dev environment is disabled.
 # This update job is commented out to match the disabled deploy:dev:apply-es job.
