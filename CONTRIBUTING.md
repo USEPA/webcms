@@ -525,11 +525,14 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 5. **Promote to Stage (`live`)**
    - On release cadence, merge `development` → `live`.
    - Push to `live` to run full stage pipeline (security scans included).
+   - **EPA staff only** (Jeremy Cerda).
 6. **Promote to Production (`main`)**
    - After stage sign-off, merge `live` → `main`.
    - Tag the release (e.g., `vYYYY.MM.DD`); production deploy pipeline will consume `main`.
-7. **Back-merge**
-   - Fast-forward `development` from `main` to keep history linear.
+   - **EPA staff only** (Jeremy Cerda).
+7. **Back-merge to development**
+   - After production release, merge `main` → `development` to sync any hotfixes or production adjustments.
+   - This keeps `development` up-to-date with production state.
 
 ### Hotfix Flow
 
@@ -565,10 +568,10 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 ### FAQs
 
-- **Why keep `development` if we branch from `main`?** It’s the integration branch that powers the dev environment and CI; multiple features can be validated together before release.
+- **Why not branch from `main` directly?** Branching from `main` causes feature branches to diverge from active development work. By the time a feature is ready, it's missing weeks of changes merged to `development`, leading to late-stage conflicts.
 - **Can I deploy from a feature branch?** No. Only `development` (dev) and `live` (stage) trigger deployments.
-- **What if a feature spans multiple sprints?** Rebase frequently on `main`, and merge working slices behind feature flags so code keeps flowing through the pipeline.
-- **How do freeze periods work?** Pause merges into `development`, finish testing on `live`, promote to `main`, then fast-forward `development` from `main` when the freeze lifts.
+- **What if a feature spans multiple sprints?** Periodically rebase on `development` to stay current with integrated work. Use feature flags for incomplete functionality.
+- **How do freeze periods work?** Pause merges into `development`, finish testing on `live`, promote to `main`, then merge `main` → `development` when the freeze lifts to sync any last-minute hotfixes.
 
 ### Commit Message Convention
 
