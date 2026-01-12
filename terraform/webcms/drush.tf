@@ -8,8 +8,8 @@ resource "aws_ecs_task_definition" "drush_task" {
 
   requires_compatibilities = ["FARGATE"]
 
-  cpu    = 1024
-  memory = 2048
+  cpu    = var.drush_cpu
+  memory = var.drush_memory
 
   runtime_platform {
     operating_system_family = "LINUX"
