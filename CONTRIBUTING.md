@@ -541,17 +541,20 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 3. After merging into `main`, cherry-pick/merge into `live` and `development` so branches stay in sync.
 4. Deploy via stage → production promotion path as usual.
 
-### Why Branch From `main`?
+### Why Branch From `development`?
 
-- Guarantees every feature starts from production-quality code.
-- Prevents long-lived divergence between feature work and production.
-- Keeps `development` focused on integration testing rather than acting as the single source of truth.
+- **Industry standard (Git Flow):** Features integrate continuously in the active development branch.
+- **Early conflict detection:** Features see each other immediately, catching integration issues during development rather than at PR time.
+- **Simplified workflow:** Eliminates need for developers to manually rebase against `development` as it diverges from `main`.
+- **Natural integration:** Multiple features can be tested together in the dev environment before promotion.
+- **Aligned with deployment model:** The branch you develop in is the branch that deploys to dev.
 
 ### Release Cadence & Coordination
 
-- **Daily Dev Deploys:** Merge PRs into `development` as they’re approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
+- **Daily Dev Deploys:** Merge PRs into `development` as they're approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
 - **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `live`, let the stage pipeline run, and perform QA.
 - **Production Deploys:** After stage validation, merge `live` → `main`, tag the release, and trigger production deployment when available.
+- **Back-merge:** After each production release, immediately merge `main` → `development` to sync production state back to active development.
 
 ### Pull Request Guidelines
 
