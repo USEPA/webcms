@@ -198,9 +198,9 @@ webcms/
 cd services/drupal
 ddev start
 
-# Pull latest changes from main branch
-git checkout main
-git pull origin main
+# Pull latest changes from development branch
+git checkout development
+git pull origin development
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
@@ -327,8 +327,7 @@ Skip-build mode allows you to deploy code changes **without rebuilding Docker im
 ```bash
 # 9:00 AM - First deployment of the day (full build)
 git checkout development
-git pull origin main
-git merge main
+git pull origin development
 git push origin development
 ./push-dev.sh
 
@@ -499,24 +498,26 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 |--------|---------|-------------------|-------|
 | `main` | Production source of truth | Production (future) | Locked except for release merges and hotfixes. |
 | `live` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
-| `development` | Active integration branch | Dev environment | Triggers the standard dev pipeline (`push-dev.sh`). |
-| `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `main` and open PRs into `development`. |
+| `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`push-dev.sh`). |
+| `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `development` and open PRs back into `development`. |
 | `hotfix/*` | Urgent fixes for prod | Main & live | Created from `main`, merged back to all branches after release. |
 
 ### Standard Feature Flow
 
-1. **Sync main**
+1. **Sync development**
    ```bash
-   git checkout main
-   git pull origin main
+   git checkout development
+   git pull origin development
    ```
-2. **Branch from `main`**
+2. **Branch from `development`**
    ```bash
    git checkout -b feature/<short-description>
    ```
+   Include ticket number in branch name if applicable.
 3. **Develop & validate locally**
    - Use DDEV & Gesso commands in this guide.
    - Follow Conventional Commits and keep commits focused.
+   - Periodically sync with latest changes: `git fetch origin && git rebase origin/development`
 4. **PR into `development`**
    - Target branch: `development`.
    - Run local checks; after merge trigger `./push-dev.sh --skip-build` for fast validation.
