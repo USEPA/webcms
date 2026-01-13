@@ -141,7 +141,7 @@ variable "drush_cpu" {
 variable "drush_memory" {
   description = "Memory in MB for the Drush task. Must be a valid value for the specified CPU."
   type        = number
-  default     = 2048
+  default     = 4096
 }
 
 #end region
