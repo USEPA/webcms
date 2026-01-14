@@ -214,7 +214,7 @@ class CloudWatch implements LoggerInterface {
   /**
    * Determines the log stream name to use.
    *
-   * @return string The CloudWatch log stream name
+   * @return string|null The CloudWatch log stream name, or NULL if unavailable
    */
   protected function getLogStream() {
     if (isset($this->logStream)) {
@@ -229,8 +229,9 @@ class CloudWatch implements LoggerInterface {
       return $this->logStream;
     }
 
-    // If we can't determine a log stream name, throw an exception.
-    throw new \Exception('Unable to determine log stream name.');
+    // If we can't determine a log stream name, return NULL.
+    // This commonly happens in Drush contexts where ECS metadata is unavailable.
+    return NULL;
   }
 
   /**
@@ -259,6 +260,13 @@ class CloudWatch implements LoggerInterface {
   public function flushLogEvents() {
     $all_events = self::$log_events;
     if (empty($all_events)) {
+      return;
+    }
+
+    // If we can't determine a log stream (e.g., running in Drush), skip CloudWatch
+    // logging and just clear the buffer. Logs will still appear in stdout/stderr.
+    if ($this->getLogStream() === NULL) {
+      self::$log_events = [];
       return;
     }
 
