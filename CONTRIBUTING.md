@@ -525,11 +525,11 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 5. **Promote to Stage (`live`)**
    - On release cadence, merge `development` → `live`.
    - Push to `live` to run full stage pipeline (security scans included).
-   - **EPA staff only** (Jeremy Cerda).
+   - **EPA staff only**
 6. **Promote to Production (`main`)**
    - After stage sign-off, merge `live` → `main`.
    - Tag the release (e.g., `vYYYY.MM.DD`); production deploy pipeline will consume `main`.
-   - **EPA staff only** (Jeremy Cerda).
+   - **EPA staff only**
 7. **Back-merge to development**
    - After production release, merge `main` → `development` to sync any hotfixes or production adjustments.
    - This keeps `development` up-to-date with production state.
@@ -559,9 +559,11 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 ### Pull Request Guidelines
 
 - Target branches: Feature work → `development`, hotfixes → `main`.
+- Write well-documented PRs, following the template generated when creating a new PR.
 - Keep PRs reviewable (< ~1 day of work). Use draft PRs for early feedback.
-- Run `ddev composer phpcs`, `phpstan`, theme builds, and relevant tests before requesting review.
+- Run `ddev drush updb`, `ddev drush cex`, `ddev composer phpcs`, `phpstan`, theme builds, and relevant tests before creating PR and requesting review.
 - Require at least one maintainer approval.
+- Do NOT bundle multiple module updates into one PR, unless they're related (like metatag and metatag_schema).
 
 ### Merge Strategy
 
