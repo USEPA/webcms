@@ -1,0 +1,62 @@
+From 4389fffc3bbd31a2895e2ea0af473a1e723d423c Mon Sep 17 00:00:00 2001
+From: Dafydd Owen <dafydd@orphans.co.uk>
+Date: Wed, 5 Nov 2025 12:33:51 +0000
+Subject: [PATCH] Issue #3556175: Use Database API in update 8100 to prevent
+ timeouts on large redirect tables
+
+---
+ redirect_metrics.install | 38 ++++++++++++++++++++++----------------
+ 1 file changed, 22 insertions(+), 16 deletions(-)
+
+diff --git a/redirect_metrics.install b/redirect_metrics.install
+index 1e06e40..4cc1c55 100644
+--- a/redirect_metrics.install
++++ b/redirect_metrics.install
+@@ -8,24 +8,30 @@
+ /**
+  * Set last_access to null for redirects that have never been accessed.
+  */
+-function redirect_metrics_update_8100() {
+-  $storage = \Drupal::entityTypeManager()->getStorage('redirect');
+-  $rids = $storage->getQuery()
+-    ->accessCheck(TRUE)
+-    ->execute();
++function redirect_metrics_update_8100(&$sandbox) {
++  $database = \Drupal::database();
++  $schema = $database->schema();
++  $table = 'redirect';
++
++  if (!$schema->tableExists($table)) {
++    return t('Redirect table does not exist. Skipping update.');
++  }
+ 
+-  $redirects = $storage->loadMultiple($rids);
++  if (!$schema->fieldExists($table, 'last_access')) {
++    return t('Field last_access does not exist. Skipping update.');
++  }
+ 
+-  foreach ($redirects as $redirect) {
+-    if (!$redirect) {
+-      continue;
+-    }
+-    if ($redirect->hasField('access_count') && $redirect->get('access_count')->value === '0') {
+-      if ($redirect->hasField('last_access') && !$redirect->get('last_access')->isEmpty()) {
+-        $redirect->set('last_access', NULL);
+-        $redirect->save();
+-      }
+-    }
++  if (!$schema->fieldExists($table, 'access_count')) {
++    return t('Field access_count does not exist. Skipping update.');
+   }
+ 
++  // Execute a single UPDATE query to set last_access to NULL
++  // where access_count is 0 and last_access is not already NULL.
++  $affected = $database->update($table)
++    ->fields(['last_access' => NULL])
++    ->condition('access_count', 0)
++    ->isNotNull('last_access')
++    ->execute();
++
++  return t('Updated @count redirects.', ['@count' => $affected]);
+ }
+-- 
