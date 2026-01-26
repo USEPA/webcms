@@ -369,14 +369,10 @@ gemnasium-dependency_scanning:
   variables:
     KANIKO_CACHE_ARGS: --cache --cache-repo=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-cache
 
-  # Cache Composer dependencies and other build artifacts
-  # This significantly speeds up subsequent builds by reusing downloaded packages
-  cache:
-    key: composer-$CI_COMMIT_REF_SLUG
-    paths:
-      - services/drupal/vendor/
-      - services/drupal/composer.lock
-    policy: pull-push  # Allow cache population on first build, reuse on subsequent builds
+  # Composer cache disabled - composer.lock must be regenerated on each build
+  # to prevent constraint mismatch errors when dependencies are updated
+  # Kaniko's layer cache provides sufficient build speed optimization
+  cache: {}
 
   before_script:
     - mkdir -p /kaniko/.docker
@@ -411,6 +407,8 @@ build:drupal:dev:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
   before_script:
+    # Clear GitLab runner cache to prevent stale composer.lock issues
+    - rm -rf services/drupal/vendor/ services/drupal/composer.lock
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
@@ -462,6 +460,8 @@ build:drupal:stage:
         echo "Skipping dev build (DEPLOY_TO_DEV=${DEPLOY_TO_DEV})"
         exit 0
       fi
+    # Clear GitLab runner cache to prevent stale composer.lock issues
+    - rm -rf services/drupal/vendor/ services/drupal/composer.lock
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
