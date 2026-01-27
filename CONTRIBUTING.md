@@ -270,26 +270,78 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 
 ---
 
-## Skip-Build Deployments
+## Automatic Build Detection & Skip-Build Deployments
 
-Skip-build mode allows you to deploy code changes **without rebuilding Docker images**, reducing deployment time from ~15 minutes to ~3-5 minutes.
+### Automatic Build Detection (Default Behavior)
 
-### When to Use Skip-Build
+Starting with the enhanced `push-dev.sh` script, **build detection is now automatic**. The script analyzes your changed files and intelligently determines whether a full Docker rebuild is needed.
 
-✅ **Use skip-build when:**
-- You only changed Drupal PHP code (`services/drupal/web/`)
-- You only changed configuration files
-- You only changed custom modules or themes
-- You need to quickly deploy a hotfix
-- You're iterating on the same feature multiple times per day
+```bash
+# Simply run push-dev.sh - it will auto-detect!
+./push-dev.sh
+```
 
-❌ **DO NOT use skip-build when:**
-- You changed `composer.json` or `composer.lock` (PHP dependencies)
-- You changed the `Dockerfile`
-- You changed Nginx configuration files
-- You changed system packages or libraries
-- This is your **first deployment of the day**
-- You haven't deployed in several days
+The script will:
+1. Compare your local `HEAD` with `origin/development`
+2. List all changed files
+3. Determine if any files require a full build
+4. Show you the decision and reasoning
+5. Trigger the appropriate pipeline (full build or deploy-only)
+
+### Files Requiring Full Build (Auto-Detected)
+
+The script automatically detects these file patterns and triggers a full build:
+
+**PHP/Composer Dependencies:**
+- `composer.json`, `composer.lock`, `composer.patches.json`
+- `services/drupal/composer.json`, `composer.lock`, `composer.patches.json`
+- Files in `services/drupal/patches/`
+
+**Theme/NPM Dependencies:**
+- `services/drupal/web/themes/epa_theme/package.json`
+- `services/drupal/web/themes/epa_theme/package-lock.json`
+- `*.scss` or `*.js` files in `epa_theme/`
+- Files in `services/drupal/web/themes/epa_theme/source/`
+- Gulp configuration files
+- Files in `services/drupal/web/themes/epa_claro/`
+
+**Docker & CI/CD:**
+- Any `Dockerfile` in `services/`
+- Files in `services/drupal/scripts/`
+- `docker-compose*` files
+- `.gitlab-ci.yml`
+
+### Files NOT Requiring Build (Deploy-Only)
+
+Changes to these files can be deployed quickly without rebuilding Docker images:
+
+✅ **Deploy-only files:**
+- Custom Drupal modules: `services/drupal/web/modules/custom/**`
+- Drupal configuration: `services/drupal/config/**`
+- Drush commands: `services/drupal/drush/**`
+- Custom theme PHP/Twig templates (non-compiled)
+- Documentation: `*.md` files
+- Git/GitHub configs: `.github/**`, `.gitignore`
+
+**Deployment time:**
+- Full build: ~12-17 minutes
+- Deploy-only: ~3-5 minutes (60-70% faster!)
+
+### Manual Override Flags
+
+You can override the automatic detection when needed:
+
+**Force skip build:**
+```bash
+./push-dev.sh --skip-build
+```
+Use when you know existing Docker images are compatible but the script detects a build is needed.
+
+**Force full build:**
+```bash
+./push-dev.sh --force-build
+```
+Use when you want to rebuild everything (e.g., to pick up base image updates) even if no build-requiring files changed.
 
 ### How It Works
 
@@ -323,45 +375,48 @@ Skip-build mode allows you to deploy code changes **without rebuilding Docker im
 
 ### Usage Examples
 
-#### Example 1: Typical Daily Workflow
+#### Example 1: Typical Daily Workflow (with Auto-Detection)
 ```bash
-# 9:00 AM - First deployment of the day (full build)
+# 9:00 AM - First deployment of the day
 git checkout development
 git pull origin development
 git push origin development
-./push-dev.sh
+./push-dev.sh  # Auto-detects: no code changes = full build
 
 # 10:30 AM - Bug fix in custom module
 # (edit services/drupal/web/modules/custom/epa_workflow/src/Plugin/WorkflowType/MyPlugin.php)
 git add .
 git commit -m "fix: Correct workflow validation logic"
 git push origin development
-./push-dev.sh --skip-build  # Fast deployment!
+./push-dev.sh  # Auto-detects: custom module only = deploy-only! 🚀
+# Output: "✅ Build NOT required - changes are deployment-only"
 
-# 2:00 PM - Another iteration
+# 2:00 PM - Another iteration on theme template
 # (edit services/drupal/web/themes/custom/epa_theme/templates/node.html.twig)
 git add .
 git commit -m "style: Update node template layout"
 git push origin development
-./push-dev.sh --skip-build  # Fast deployment!
+./push-dev.sh  # Auto-detects: template only = deploy-only! 🚀
 
 # 4:00 PM - Added a new Composer dependency
 # (edit composer.json, run ddev composer update)
 git add composer.json composer.lock
 git commit -m "chore: Add new library dependency"
 git push origin development
-./push-dev.sh  # Full build required!
+./push-dev.sh  # Auto-detects: composer.json = FULL BUILD required! 🔨
+# Output: "🔨 Build REQUIRED - detected change in: composer.json"
 ```
 
 #### Example 2: Hotfix Deployment
 ```bash
 # Critical bug found in production, need fast fix
 git checkout development
-# (fix the bug)
+# (fix the bug in custom module)
 git add .
 git commit -m "fix: Critical security patch for XSS vulnerability"
 git push origin development
-./push-dev.sh --skip-build  # Deploy ASAP without waiting for build
+./push-dev.sh  # Auto-detects: code-only change = deploy-only! Fast!
+# Deploys in ~3-5 minutes instead of ~15 minutes
 ```
 
 #### Example 3: Force Push with Skip-Build
@@ -758,13 +813,14 @@ After deploying to dev environment:
 
 ### Deployment Commands
 
-| Command | Description |
-|---------|-------------|
-| `./push-dev.sh` | Full build and deploy to dev |
-| `./push-dev.sh --skip-build` | Fast deploy to dev (reuse images) |
-| `./push-dev.sh -f` | Force push with full build |
-| `./push-dev.sh --skip-build -f` | Force push with skip-build |
-| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| Command | Description |
+||---------|-------------|
+|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./push-dev.sh --force-build` | Force full build even if not detected |
+|| `./push-dev.sh -f` | Force push with auto-detection |
+|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
 ---
 
