@@ -86,24 +86,25 @@ include:
   - local: .gitlab/teams-notifications.yml            # Microsoft Teams webhook notifications
 
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
-# and restrict to live branch only (stage deployments)
+# Security scanning is enabled for live branch (stage deployments) only
+# Development branch skips security scanning for faster iteration
 sast:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
-    - when: never  # Explicitly never run otherwise
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
+    - when: never  # Explicitly never run on development branch
 
 dependency_scanning:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
-    - when: never  # Explicitly never run otherwise
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
+    - when: never  # Explicitly never run on development branch
 
 secret_detection:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
-    - when: never  # Explicitly never run otherwise
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
+    - when: never  # Explicitly never run on development branch
 
 # Override all SAST sub-jobs to prevent them from running on development branch
 semgrep-sast:
