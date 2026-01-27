@@ -2,6 +2,11 @@
 # Orchestrates complete deployment pipeline for EPA WebCMS Drupal application.
 # Handles infrastructure provisioning, Docker builds, security scanning, and deployments.
 # See docs/cicd-pipeline.md for detailed documentation.
+#
+# Pipeline Variables:
+# - WEBCMS_SITE_FILTER: Set to 'stage' or 'dev' to filter which site's jobs run in the pipeline
+#   Example: WEBCMS_SITE_FILTER=stage will only build and deploy stage site
+#   Leave unset to build and deploy both sites
 
 stages:
   # Docker Image Builds (all branches) - Build first to enable testing
@@ -344,8 +349,8 @@ gemnasium-dependency_scanning:
     WEBCMS_ENVIRONMENT: preproduction
     WEBCMS_SITE: dev
   rules:
-    - if: '$CI_COMMIT_BRANCH == "development"'
-    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true"'
+    - if: '$CI_COMMIT_BRANCH == "development" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
+    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
 
 # Stage Site Template (live branch → WEBCMS_SITE: stage)
 # Deploys to stage site from live branch for final testing before production.
@@ -356,7 +361,7 @@ gemnasium-dependency_scanning:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "stage")'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -494,13 +499,20 @@ Prisma:Drupal:
     - if: '$CI_COMMIT_TAG'  # Run on tagged releases
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG  # Use tag as image tag
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
   variables:
     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
     WEBCMS_ENVIRONMENT: preproduction
+  before_script:
+    # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
+    - |
+      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
+        echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
+        exit 0
+      fi
   script:
     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
@@ -522,13 +534,20 @@ Prisma:Nginx:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
   variables:
     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
     WEBCMS_ENVIRONMENT: preproduction
+  before_script:
+    # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
+    - |
+      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
+        echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
+        exit 0
+      fi
   script:
     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
@@ -550,13 +569,20 @@ Prisma:Drush:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only
+    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
   variables:
     GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
     WEBCMS_ENVIRONMENT: preproduction
+  before_script:
+    # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
+    - |
+      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
+        echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
+        exit 0
+      fi
   script:
     # Download twistcli scanner from Prisma Cloud using pre-provisioned token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
@@ -1063,6 +1089,8 @@ update:stage:es:
     - job: "deploy:stage:apply-es"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "live"'
 
   variables:
@@ -1084,7 +1112,10 @@ update:dev:en:
     - job: "deploy:dev:apply-en"
       optional: true
   rules:
+    - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
+      when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
+    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
