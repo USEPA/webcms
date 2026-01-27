@@ -534,6 +534,47 @@ git push origin live
 # (No script needed - push triggers workflow)
 ```
 
+### Advanced Pipeline Variables
+
+#### WEBCMS_SITE_FILTER - Selective Site Deployment
+
+Use `WEBCMS_SITE_FILTER` to deploy to only one site when triggering pipelines on the `live` branch. This is particularly useful for:
+- **Spanish site fixes:** Deploy changes only to the Spanish stage site without affecting English
+- **Emergency hotfixes:** Apply fixes to one environment without triggering unnecessary builds/deploys
+- **Testing isolation:** Validate changes on a single site before full rollout
+
+**Usage:**
+
+1. Navigate to: https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new
+2. Select branch: `live`
+3. Click "Add variable"
+   - Key: `WEBCMS_SITE_FILTER`
+   - Value: `stage` (for stage site only) or `dev` (for dev site only when combined with `DEPLOY_TO_DEV=true`)
+4. Click "Run pipeline"
+
+**Behavior:**
+- `WEBCMS_SITE_FILTER=stage` - Only stage site jobs execute (both English and Spanish)
+- `WEBCMS_SITE_FILTER=dev` - Only dev site jobs execute (when `DEPLOY_TO_DEV=true` is also set)
+- Unset (default) - All sites deploy normally
+
+**Example: Spanish Stage Site Hotfix**
+```bash
+# 1. Make fix and push to live branch
+git checkout live
+# ... make changes ...
+git push origin live
+
+# 2. Trigger pipeline with filter via GitLab UI
+# Set WEBCMS_SITE_FILTER=stage
+# Only stage-en and stage-es jobs will run
+```
+
+**Note:** This variable is ignored on the `development` branch - dev site always deploys there.
+
+#### DEPLOY_TO_DEV - Deploy to Dev from Live Branch
+
+See [README.md Advanced Pipeline Variables](README.md#advanced-pipeline-variables) for full documentation on `DEPLOY_TO_DEV`.
+
 ---
 
 ## Git Workflow
