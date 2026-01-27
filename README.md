@@ -151,7 +151,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command ref
 - **Deprecated:** Buildkite pipelines (`.buildkite/`) - retained for historical reference only
 - **Deployment Pipeline:** GitHub → GitLab Mirror → Docker Build → AWS ECS
 
-### Deploying Dev from the `live` Branch
+### Advanced Pipeline Variables
+
+#### Deploying Dev from the `live` Branch
 
 By default, pipelines on `live` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
 
@@ -171,6 +173,32 @@ By default, pipelines on `live` build images and deploy only to the stage enviro
 Notes:
 - `DEPLOY_TO_DEV` is ignored on the `development` branch (dev deploys always happen there).
 - Use this flow sparingly—every dev deploy from `live` requires manual approval and will reuse the `live` branch artifacts.
+
+#### Filtering Deployments by Site
+
+Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `live` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
+
+**Steps:**
+1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
+2. Select the `live` branch.
+3. Add a CI/CD variable:
+   - **Key:** `WEBCMS_SITE_FILTER`
+   - **Value:** `stage` (to deploy only stage) or `dev` (to deploy only dev when combined with `DEPLOY_TO_DEV=true`)
+4. Click **Run pipeline**.
+
+**What happens:**
+- When `WEBCMS_SITE_FILTER=stage`: Only stage site jobs run (English and Spanish)
+- When `WEBCMS_SITE_FILTER=dev` with `DEPLOY_TO_DEV=true`: Only dev site jobs run (English only)
+- All other site deployments, security scans, and update jobs are skipped
+
+**Common use cases:**
+- **Spanish site hotfix:** Set `WEBCMS_SITE_FILTER=stage` to deploy only to stage Spanish site
+- **Emergency stage fix:** Deploy to stage without affecting dev environment
+- **Isolated testing:** Test changes on one site before rolling out to both
+
+Notes:
+- Leave `WEBCMS_SITE_FILTER` unset for normal deployments to all sites
+- This variable is ignored on the `development` branch (dev site always deploys)
 
 ## Repository Structure
 
