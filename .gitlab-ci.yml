@@ -407,8 +407,6 @@ build:drupal:dev:
   variables:
     WEBCMS_ENVIRONMENT: preproduction
   before_script:
-    # Clear GitLab runner cache to prevent stale composer.lock issues
-    - rm -rf services/drupal/vendor/ services/drupal/composer.lock
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
@@ -460,8 +458,6 @@ build:drupal:stage:
         echo "Skipping dev build (DEPLOY_TO_DEV=${DEPLOY_TO_DEV})"
         exit 0
       fi
-    # Clear GitLab runner cache to prevent stale composer.lock issues
-    - rm -rf services/drupal/vendor/ services/drupal/composer.lock
     - mkdir -p /kaniko/.docker
     - echo '{"credsStore":"ecr-login"}' >/kaniko/.docker/config.json
     - echo $WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
