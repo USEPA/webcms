@@ -38,7 +38,7 @@ Access the site at: <https://epa.ddev.site>
 
 ## Key Features
 
-- **Fast Deployments** - Skip-build mode reduces deployment time from 15 minutes to 3-5 minutes
+- **Smart Deployments** - Automatic build detection analyzes changed files; deploy-only mode reduces time from 15 minutes to 3-5 minutes
 - **Zero-Downtime Deployments** - Rolling ECS deployments with health checks
 - **Infrastructure as Code** - Complete AWS infrastructure managed via Terraform
 - **Automated Testing** - Security scanning with Prisma Cloud and GitLab SAST
@@ -58,10 +58,10 @@ git add .
 git commit -m "feat: Your feature description"
 git push origin development
 
-# Full build (first deployment of day)
+# Auto-detect if build is needed (recommended)
 ./push-dev.sh
 
-# Fast deployment (code changes only)
+# Or manually override: force skip build for faster deployment
 ./push-dev.sh --skip-build
 ```
 
@@ -114,22 +114,34 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 
 ### Deployment
 
-| Command | Description |
-|---------|-------------|
-| `./push-dev.sh` | Deploy to dev (full build) |
-| `./push-dev.sh --skip-build` | Deploy to dev (fast, no rebuild) |
-| `./push-dev.sh --skip-build -f` | Fast deployment with force push |
-| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| Command | Description |
+||---------|-------------|
+|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./push-dev.sh --force-build` | Force full build even if not detected |
+|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
-**When to use `--skip-build`:**
-- ✅ Changed PHP code in `services/drupal/web/`
-- ✅ Changed custom modules or themes
-- ✅ Changed configuration files
-- ✅ Need to quickly deploy a hotfix
-- ❌ Changed `composer.json` or `composer.lock`
-- ❌ Changed Dockerfile or Nginx configs
-- ❌ First deployment of the day
-- ❌ Added/updated system packages
+**Automatic Build Detection:**
+By default, `push-dev.sh` analyzes changed files and automatically determines if a full build is required.
+
+**Files requiring full build (auto-detected):**
+- ❌ `composer.json` or `composer.lock` (module dependencies)
+- ❌ `package.json` or `package-lock.json` (theme dependencies)
+- ❌ Theme source files (`.scss`, `.js` in `epa_theme/`)
+- ❌ `Dockerfile` or build scripts
+- ❌ `.gitlab-ci.yml` or CI/CD configuration
+
+**Files NOT requiring build (deploy-only):**
+- ✅ Custom modules in `web/modules/custom/`
+- ✅ Custom theme templates (`.twig`, `.php`)
+- ✅ Configuration files in `config/`
+- ✅ Drush commands
+- ✅ Documentation files
+
+**Manual Override Flags:**
+- Use `--skip-build` to force skip when you know images are compatible
+- Use `--force-build` to force rebuild (e.g., base image updates)
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command reference.
 
