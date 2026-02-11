@@ -1,0 +1,49 @@
+uuid: 9fd5ea2a-1de8-4482-bbda-6f2b7faade03
+langcode: en
+status: true
+dependencies:
+  config:
+    - facets.facet.language
+    - facets.facet.press_office
+    - facets.facet.release_date
+    - facets.facet.subject
+  module:
+    - block_in_page_403
+    - block_in_page_not_found
+    - facets_form
+    - system
+  theme:
+    - epa_theme
+id: epa_theme_facetformviewduplicateofsearchnewsreleasesdisplaypage
+theme: epa_theme
+region: content
+weight: 0
+provider: null
+plugin: 'facets_form:search_api:views_page__duplicate_of_search_news_releases__page_1'
+settings:
+  id: 'facets_form:search_api:views_page__duplicate_of_search_news_releases__page_1'
+  label: 'Filter News Releases'
+  label_display: visible
+  provider: facets_form
+  button:
+    label:
+      submit: Search
+      reset: Reset
+  facets:
+    - language
+    - press_office
+    - release_date
+    - subject
+visibility:
+  page_403:
+    id: page_403
+    negate: false
+    page_403: 0
+  page_not_found_request:
+    id: page_not_found_request
+    negate: false
+    page_not_found: false
+  request_path:
+    id: request_path
+    negate: false
+    pages: "/newsreleases/search-test/*\r\n/newsreleases/search-test"
