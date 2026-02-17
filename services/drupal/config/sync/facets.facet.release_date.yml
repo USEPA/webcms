@@ -9,7 +9,7 @@ dependencies:
     - search_api
 id: release_date
 name: 'Release Date'
-weight: 0
+weight: -3
 min_count: 1
 missing: false
 missing_label: others
@@ -54,17 +54,17 @@ processor_configs:
       granularity: 6
       date_format: 'Y'
       hierarchy: true
+  display_value_widget_order:
+    processor_id: display_value_widget_order
+    weights:
+      sort: 40
+    settings:
+      sort: DESC
   hierarchy_processor:
     processor_id: hierarchy_processor
     weights:
       build: 4
     settings: {  }
-  raw_value_widget_order:
-    processor_id: raw_value_widget_order
-    weights:
-      sort: 50
-    settings:
-      sort: ASC
   url_processor_handler:
     processor_id: url_processor_handler
     weights:
