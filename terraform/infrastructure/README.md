@@ -24,7 +24,7 @@
 
 ## About
 
-This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 8 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before it can be deployed (see the next section).
+This directory contains a Terraform module that deploys the infrastructure resources necessary to run the EPA's Drupal 10 WebCMS. Due to security constraints across various AWS environments, this module assumes it will be provided certain prerequisites before it can be deployed (see the next section).
 
 ## Prerequisites
 
@@ -96,7 +96,7 @@ Parameters are namespaced under `/webcms/${var.environment}/` - we make use of P
 
 ### WebCMS Services
 
-The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 8 WebCMS. Most of the resources in this category are fairly straightforward:
+The majority of the resources created by this module are deployments of AWS services consumed by the Drupal 10 WebCMS. Most of the resources in this category are fairly straightforward:
 
 - A pair of load balancers: an NLB and its [ALB target](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/application-load-balancer-target.html) ([load_balancer.tf](load_balancer.tf))
 - An Aurora cluster ([rds.tf](rds.tf))

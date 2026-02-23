@@ -94,6 +94,10 @@ These values customize the Drupal ECS service's behavior. For instance, it deter
 - `drupal_max_capacity`: The maximum number of ECS tasks to run for Drupal. This value is only limited by AWS service quotas (and your budget); plan for low values (e.g., 5) for dev environments and large (e.g., 30 or more) for production-ready deployments. Autoscaling rules will ensure this value is only used when demand requires it.
 - `drupal_csrf_origin_whitelist`: This is an optional list of origins provided to [Security Kit](https://www.drupal.org/project/seckit)'s `seckit_csrf.origin_whitelist` configuration. Security Kit checks this list when non-idemptotent (e.g., POST, PUT, DELETE, etc.) requests are sent. If the requesting origin isn't in the list (or is absent entirely), the request is rejected. Note that the value of `var.drupal_hostname` is implicitly added to this list by the module and does not need to be added manually.
 - `drupal_state`: This value exists to work around a chicken-and-egg problem when deploying Drupal for the first time. This value _must_ be one of `"run"` or `"build"`. See the next section for how these influence Drupal's behavior.
+- `drupal_cpu`: The CPU units allocated to the Drupal task (1024 = 1 vCPU). Defaults to 1024. Must be a valid Fargate CPU value.
+- `drupal_memory`: The memory in MB allocated to the Drupal task. Defaults to 2048 MB. Must be a valid value for the specified CPU.
+- `drush_cpu`: The CPU units allocated to the Drush task (1024 = 1 vCPU). Defaults to 1024. Must be a valid Fargate CPU value.
+- `drush_memory`: The memory in MB allocated to the Drush task. Defaults to 2048 MB. Must be a valid value for the specified CPU.
 
 ##### The `drupal_state` Variable
 
@@ -106,12 +110,54 @@ However, there is a catch to this. We cannot unconditionally enable the memcache
 
 Note that while it is always safe to keep `drupal_state` in `"build"`, this will cause performance degradation and is **not** recommended for any environment. Once the WebCMS has been installed, set this value to `"run"` and leave it there, except in cicumstances where Drupal needs to be reinstalled or otherwise reinitialized.
 
+##### Overriding CPU and Memory Allocation
+
+By default, both Drupal and Drush tasks are allocated 1 vCPU (1024 CPU units) and 2 GB (2048 MB) of memory. These defaults are suitable for most development and staging environments. However, you may need to increase these allocations for:
+
+- High-traffic environments (production)
+- Memory-intensive operations (large imports, complex queries)
+- Performance testing scenarios
+- Environments with resource-heavy modules or customizations
+
+To override these values, add the following variables to your environment's `.tfvars` file:
+
+```hcl
+# Example: Allocate 2 vCPUs and 4 GB memory to Drupal tasks
+drupal_cpu    = 2048
+drupal_memory = 4096
+
+# Example: Allocate 1 vCPU and 3 GB memory to Drush tasks
+drush_cpu    = 1024
+drush_memory = 3072
+```
+
+**Important:** AWS Fargate requires specific CPU and memory combinations. The table below shows valid pairings:
+
+| CPU Value (units) | vCPUs | Memory Range (MB)      |
+|-------------------|-------|------------------------|
+| 256               | 0.25  | 512, 1024, 2048        |
+| 512               | 0.5   | 1024 to 4096 (1 GB increments) |
+| 1024              | 1     | 2048 to 8192 (1 GB increments) |
+| 2048              | 2     | 4096 to 16384 (1 GB increments) |
+| 4096              | 4     | 8192 to 30720 (1 GB increments) |
+| 8192              | 8     | 16384 to 61440 (4 GB increments) |
+| 16384             | 16    | 32768 to 122880 (8 GB increments) |
+
+Invalid combinations will cause Terraform to fail during deployment. For the complete list of valid combinations, see the [AWS Fargate task size documentation](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html).
+
+**Recommendations:**
+
+- **Development/Test environments:** Use the defaults (1024/2048) or slightly higher (1024/4096) if running memory-intensive operations
+- **Staging environments:** Start with 2048/4096 and adjust based on load testing results
+- **Production environments:** Begin with 2048/8192 for Drupal and let autoscaling handle traffic spikes; adjust based on monitoring data
+- **Drush tasks:** Usually require less than Drupal tasks unless performing large data operations (migrations, bulk operations)
+
 ##### Sensitive Values
 
 Database connection information is stored in Secrets Manager instead of being provided as plain text variables.
 
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 8 database.
-- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database. While always set, this is only used in environments where a D7-to-D8 migration is run.
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the Drupal 10 database (note: identifier retained as 'd8' for backwards compatibility with existing infrastructure).
+- `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials` - A JSON-formatted object of `{ username, password }` containing login credentials for the legacy Drupal 7 database. While always set, this is only used in environments where a D7-to-D10 migration is run.
 
 #### Email Variables
 
@@ -176,7 +222,7 @@ As with the infrastructure and database modules, this module assumes that certai
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drush`: The name of the log group for Drush runs.
   - `/webcms/${var.environment}/${var.site}/${var.lang}log-groups/drupal`: The name of the log group for Drupal application logs.
 - Finally, Secrets Manager ARNs are read from Parameter Store. More information on how these are used can be read
-  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 8 login credentials.
+  - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d8-credentials`: The ARN of the Drupal 10 login credentials (note: identifier retained as 'd8' for backwards compatibility).
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/db-d7-credentials`: The ARN of the legacy Drupal 7 login credentials.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/drupal-hash-salt`: The ARN of the Drupal hash salt secret.
   - `/webcms/${var.environment}/${var.site}/${var.lang}/secrets/mail-password`: The ARN of the SMTP password.

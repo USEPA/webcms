@@ -12,6 +12,7 @@ dependencies:
     - core.entity_view_mode.media.thumbnail
   module:
     - editor
+    - embedded_content
     - entity_embed
     - epa_wysiwyg
     - linkit
@@ -28,76 +29,88 @@ filters:
     id: editor_file_reference
     provider: editor
     status: false
-    weight: -36
+    weight: -37
+    settings: {  }
+  embedded_content:
+    id: embedded_content
+    provider: embedded_content
+    status: false
+    weight: 15
     settings: {  }
   entity_embed:
     id: entity_embed
     provider: entity_embed
     status: false
-    weight: -33
+    weight: -34
     settings: {  }
   epa_filter_empty_paragraphs:
     id: epa_filter_empty_paragraphs
     provider: epa_wysiwyg
     status: true
-    weight: -43
+    weight: -44
     settings: {  }
   epa_filter_links:
     id: epa_filter_links
     provider: epa_wysiwyg
     status: true
-    weight: -42
+    weight: -43
     settings: {  }
   filter_align:
     id: filter_align
     provider: filter
     status: true
-    weight: -47
+    weight: -48
     settings: {  }
   filter_autop:
     id: filter_autop
     provider: filter
     status: false
-    weight: -35
+    weight: -36
     settings: {  }
   filter_caption:
     id: filter_caption
     provider: filter
     status: true
-    weight: -48
+    weight: -49
     settings: {  }
   filter_html:
     id: filter_html
     provider: filter
     status: true
-    weight: -49
+    weight: -50
     settings:
-      allowed_html: '<a id target rel class="ck-anchor" hreflang occurrence href aria-label data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <blockquote class="pull-quote u-align-left u-align-right" cite> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <span class="warning"> <mark class="mark"> <small class="small"> <table class="usa-table usa-table--striped usa-table--unstyled usa-table--borderless usa-table--stacked usa-table--stacked-header" summary width height> <article> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <section> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <map name> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <details open> <form action method> <fieldset disabled form> <label for form> <input checked size type value disabled placeholder required readonly autocomplete autofocus> <textarea rows cols disabled placeholder required readonly autocomplete autofocus> <meter min max low high optimum form value> <select multiple size> <optgroup disabled label> <option value> <output for form> <button value> <keygen autofocus challenge disabled form keytype> <progress max value> <img alt crossorigin height longdesc src width usemap> <embed height src type width> <object form height type usemap width> <param value> <iframe sandbox seamless srcdoc src height width name tabindex title allowfullscreen> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas height width> <area alt coords href hreflang media rel shape target type> <use href> <th headers height scope width rowspan colspan> <td headers scope width height rowspan colspan> <drupal-paragraph drupal-paragraph data-embed-button data-entity-label data-paragraph-id data-paragraph-revision-id> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-caption data-align> <abbr title> <div class="raw-html-embed"> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode><* accesskey aria-* class id role tabindex title data data-* name hidden>'
+      allowed_html: '<a id target rel class="ck-anchor" hreflang occurrence href aria-label data-entity-type data-entity-uuid data-entity-substitution> <br> <p> <h2 class="highlight"> <h3 class="highlight"> <h4 class="highlight"> <h5 class="highlight"> <h6 class="highlight"> <blockquote class="pull-quote u-align-left u-align-right" cite> <ul class="list list--clean list--pipeline list--roomy" type> <ol class="list list--roomy" type reversed start> <span class="warning"> <mark class="mark"> <small class="small"> <table class="usa-table usa-table--striped usa-table--unstyled usa-table--borderless usa-table--stacked usa-table--stacked-header" summary width height> <article> <figure> <figcaption> <dl> <dt> <dd> <address> <hgroup> <i> <b> <section> <cite> <dfn> <var> <samp> <kbd> <wbr> <bdi> <ruby> <rt> <rp> <summary> <legend> <datalist> <map> <svg> <title> <q cite> <del cite datetime> <time datetime pubdate> <bdo dir> <colgroup span> <col span> <details open> <form action method> <fieldset disabled form> <label for form> <input checked size type value disabled placeholder required readonly autocomplete autofocus> <textarea rows cols disabled placeholder required readonly autocomplete autofocus> <meter min max low high optimum form value> <select multiple size> <optgroup disabled label> <option value> <output for form> <button value> <keygen autofocus challenge disabled form keytype> <progress max value> <img alt crossorigin height longdesc src width usemap> <embed height src type width> <object form height type usemap width> <param value> <iframe sandbox seamless srcdoc src height width name tabindex title allowfullscreen> <video autoplay buffered controls crossorigin height loop muted played preload poster src width> <audio autoplay buffered controls loop muted played preloadsrc> <source media src type> <track default kind label src srclang> <canvas height width> <area alt coords href hreflang media rel shape target type> <use href> <th headers height width rowspan colspan> <td headers scope width height rowspan colspan> <drupal-paragraph drupal-paragraph data-embed-button data-entity-label data-paragraph-id data-paragraph-revision-id> <strong> <em> <sub> <sup> <li> <hr> <tr> <thead> <tbody> <tfoot> <caption> <drupal-media data-entity-type data-entity-uuid alt data-view-mode data-caption data-align> <abbr title> <div class="raw-html-embed"> <ins class="new" data-date> <drupal-inline-media data-entity-type data-entity-uuid alt data-view-mode><* accesskey aria-* class id role tabindex title data data-* name hidden>'
       filter_html_help: true
       filter_html_nofollow: false
   filter_html_escape:
     id: filter_html_escape
     provider: filter
     status: false
-    weight: -37
+    weight: -38
     settings: {  }
   filter_html_image_secure:
     id: filter_html_image_secure
     provider: filter
     status: false
-    weight: -34
+    weight: -35
     settings: {  }
   filter_htmlcorrector:
     id: filter_htmlcorrector
     provider: filter
     status: false
-    weight: -39
+    weight: -40
+    settings: {  }
+  filter_image_lazy_load:
+    id: filter_image_lazy_load
+    provider: filter
+    status: false
+    weight: -33
     settings: {  }
   filter_pathologic:
     id: filter_pathologic
     provider: pathologic
     status: true
-    weight: -46
+    weight: -47
     settings:
       settings_source: global
       local_settings:
@@ -108,21 +121,22 @@ filters:
     id: filter_url
     provider: filter
     status: false
-    weight: -38
+    weight: -39
     settings:
       filter_url_length: 72
   linkit:
     id: linkit
     provider: linkit
-    status: false
-    weight: -40
+    status: true
+    weight: -41
     settings:
-      title: true
+      title: false
+      media_substitution: metadata
   media_embed:
     id: media_embed
     provider: media
     status: true
-    weight: -45
+    weight: -46
     settings:
       default_view_mode: large
       allowed_view_modes:
@@ -139,7 +153,7 @@ filters:
     id: media_inline_embed
     provider: media_inline_embed
     status: true
-    weight: -44
+    weight: -45
     settings:
       default_view_mode: link_with_metadata
       allowed_media_types:
@@ -154,7 +168,7 @@ filters:
     id: paragraphs_entity_embed
     provider: paragraphs_entity_embed
     status: true
-    weight: -41
+    weight: -42
     settings: {  }
   token_filter:
     id: token_filter

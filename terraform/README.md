@@ -17,7 +17,7 @@
 
 ## About
 
-This directory houses a number of modules that are used to deploy the Drupal 8 WebCMS. The modules are organized by a combination of function and security boundary; due to the nature of the security contexts in which the WebCMS' templates are executed, we must divide different pieces up to be run at separate times.
+This directory houses a number of modules that are used to deploy the Drupal 10 WebCMS. The modules are organized by a combination of function and security boundary; due to the nature of the security contexts in which the WebCMS' templates are executed, we must divide different pieces up to be run at separate times.
 
 ## Conventions
 

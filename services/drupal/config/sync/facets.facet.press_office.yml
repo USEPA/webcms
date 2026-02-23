@@ -1,0 +1,74 @@
+uuid: 74723429-b6cc-4fb2-8d2f-9ea7a196d0c3
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.news_releases
+    - views.view.duplicate_of_search_news_releases
+  module:
+    - search_api
+id: press_office
+name: 'Press Office'
+weight: -1
+min_count: 1
+missing: false
+missing_label: others
+url_alias: press_office
+facet_source_id: 'search_api:views_page__duplicate_of_search_news_releases__page_1'
+field_identifier: field_press_office
+query_operator: or
+hard_limit: 0
+exclude: false
+use_hierarchy: true
+keep_hierarchy_parents_active: false
+hierarchy:
+  type: taxonomy
+  config: {  }
+expand_hierarchy: false
+enable_parent_when_child_gets_disabled: true
+widget:
+  type: facets_form_dropdown
+  config:
+    show_numbers: true
+    disabled_on_empty: false
+    default_option_label: Choose
+    child_items_prefix: '-'
+empty_behavior:
+  behavior: none
+only_visible_when_facet_source_is_visible: false
+show_only_one_result: false
+show_title: true
+processor_configs:
+  active_widget_order:
+    processor_id: active_widget_order
+    weights:
+      sort: 20
+    settings:
+      sort: ASC
+  display_value_widget_order:
+    processor_id: display_value_widget_order
+    weights:
+      sort: 40
+    settings:
+      sort: ASC
+  hierarchy_processor:
+    processor_id: hierarchy_processor
+    weights:
+      build: 100
+    settings: {  }
+  list_item:
+    processor_id: list_item
+    weights:
+      build: 5
+    settings: {  }
+  translate_entity:
+    processor_id: translate_entity
+    weights:
+      build: 5
+    settings: {  }
+  url_processor_handler:
+    processor_id: url_processor_handler
+    weights:
+      pre_query: 50
+      build: 15
+    settings: {  }
