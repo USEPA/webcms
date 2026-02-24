@@ -95,7 +95,7 @@ include:
 # Development branch skips security scanning for faster iteration
 sast:
   stage: Test
-    rules:
+  rules:
     - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
     - when: never  # Explicitly never run on development branch
 
