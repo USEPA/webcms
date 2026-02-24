@@ -93,17 +93,17 @@ include:
 # Override stage for GitLab-provided security scanning jobs to use capitalized stage names
 # Security scanning is enabled for live branch (stage deployments) only
 # Development branch skips security scanning for faster iteration
-sast:
-  stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
-    - when: never  # Explicitly never run on development branch
+#sast:
+#  stage: Test
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
+#    - when: never  # Explicitly never run on development branch
 
-dependency_scanning:
-  stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
-    - when: never  # Explicitly never run on development branch
+#dependency_scanning:
+#  stage: Test
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
+#    - when: never  # Explicitly never run on development branch
 
 secret_detection:
   stage: Test
