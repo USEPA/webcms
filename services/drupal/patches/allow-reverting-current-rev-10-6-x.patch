@@ -1,0 +1,61 @@
+diff --git a/core/modules/node/src/Controller/NodeController.php b/core/modules/node/src/Controller/NodeController.php
+index 87c9586..XXXXXXX 100644
+--- a/core/modules/node/src/Controller/NodeController.php
++++ b/core/modules/node/src/Controller/NodeController.php
+@@ -248,6 +248,29 @@ public function revisionOverview(NodeInterface $node) {
+         if ($is_current_revision) {
+           $row[] = [
+             'data' => [
+               '#prefix' => '<em>',
+               '#markup' => $this->t('Current revision'),
+               '#suffix' => '</em>',
+             ],
+           ];
+
++          // Add operations for current revision if it is not the latest.
++          $links = [];
++          if ($revision->access('revert revision') && !$revision->isLatestRevision()) {
++            $links['revert'] = [
++              'title' => $this->t('Copy as latest revision'),
++              'url' => $has_translations
++                ? Url::fromRoute('node.revision_revert_translation_confirm', [
++                    'node' => $node->id(),
++                    'node_revision' => $vid,
++                    'langcode' => $langcode,
++                  ])
++                : Url::fromRoute('node.revision_revert_confirm', [
++                    'node' => $node->id(),
++                    'node_revision' => $vid,
++                  ]),
++            ];
++          }
++
++          $row[] = [
++            'data' => [
++              '#type' => 'operations',
++              '#links' => $links,
++            ],
++          ];
+
+           $rows[] = [
+             'data' => $row,
+             'class' => ['revision-current'],
+           ];
+         }
+
+diff --git a/core/modules/node/src/NodeAccessControlHandler.php b/core/modules/node/src/NodeAccessControlHandler.php
+index eee87b9359..XXXXXXX 100644
+--- a/core/modules/node/src/NodeAccessControlHandler.php
++++ b/core/modules/node/src/NodeAccessControlHandler.php
+@@ -207,8 +207,8 @@ protected function checkAccess(EntityInterface $node, $operation, AccountInterfa
+
+       // If this is the default revision, return access denied for delete
+       // operation.
+-      if ($node->isDefaultRevision() && ($operation === 'revert revision' || $operation === 'delete revision')) {
+-        return AccessResult::forbidden()->addCacheableDependency($node);
++      if ($node->isDefaultRevision() && $operation === 'delete revision') {
++        return AccessResult::forbidden()->addCacheableDependency($cacheability);
+       }
+       elseif ($account->hasPermission('administer nodes')) {
+         return AccessResult::allowed()->addCacheableDependency($cacheability);
+       }
