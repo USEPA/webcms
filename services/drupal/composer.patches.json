@@ -8,7 +8,7 @@
       "Don't strip view mode from embedded media just because selected view mode matches default": "https://www.drupal.org/files/issues/2023-03-23/3109289-68.patch",
       "Views RSS feeds have validation issues": "https://www.drupal.org/files/issues/2025-02-03/1337894-51.patch",
       "Do not crash when an entity is missing from a views relationship (this may need to be just papering over an underlying problem)": "https://www.drupal.org/files/issues/2020-09-08/get_cache_tags_null-3169694-2.patch",
-      "Validation for views datetime filter": "patches/views-exposed-datetime-validation-2.patch",
+      "Validation for views datetime filter": "patches/views-exposed-datetime-validation-3.patch",
       "Avoid exception that blocks page rendering when image file is missing from disk": "https://www.drupal.org/files/issues/2024-03-18/responsive_image-remove_missing_response_image_width_exception-2827921-22.patch",
       "Allow referencing unpublished nodes if user has access to them": "https://www.drupal.org/files/issues/2024-10-16/2845144-102.patch",
       "Action on embedded form improperly set https://www.drupal.org/project/drupal/issues/2840283": "https://www.drupal.org/files/issues/2021-08-10/linked-display-2840283-48.patch",
@@ -17,7 +17,7 @@
       "Fix aria-describedby in radios and checkboxes.": "https://www.drupal.org/files/issues/2020-09-08/2839344_0.patch",
       "Allow overriding of which view is used for Media Library": "patches/drupal-switch-media-library-view-2971209.patch",
       "Improve consistency of revision terminology labeling in revision UI": "https://www.drupal.org/files/issues/2021-12-03/2899719-D9_2-36.patch",
-      "Allow reverting current revision": "https://www.drupal.org/files/issues/2021-12-10/allow-reverting-current-rev-3252521-D9_4-5.patch",
+      "Allow reverting current revision": "patches/allow-node-reverting-current-rev-drupal-10.6.x.patch",
       "Prevent reverting latest revision (custom patch so that it plays nicely with our patches for 3252521 and 2899719)": "patches/disallow-reverting-latest-rev-3252540-D9_4-5-custom.patch",
       "Use EPA-preferred terminology for revision reversion operation. This patch needs to be applied on top of the patches for 3252521, 2899719, and 3252540": "patches/rename-revision-revert-operation-button-9.3.x.patch",
       "Improve layout builder performance by reducing number of calls to checkRequirements": "patches/drupal-layout-builder-performance-3186116-11.patch",
@@ -32,7 +32,7 @@
       "Background colour of UI widgets get overridden on Ajax load.": "https://www.drupal.org/files/issues/2023-08-29/3383631-7_0.patch",
       "Provides a link to the latest revision": "https://www.drupal.org/files/issues/2025-02-20/2906455-45.patch",
       ".ck-balloon-panel (link balloon, media balloon …) not visible for CKE5 instances in a Drupal dialog" : "https://www.drupal.org/files/issues/2024-04-02/cke-balloon-panel-tooltip-z-index-3351603-29.patch",
-      "EPAD8-2672 Adjusting media library plugin button title": "patches/EPAD8-2672-media-library-d10.6.2.patch"
+      "EPAD8-2672 Adjusting media library plugin button title": "patches/EPAD8-2672-media-library-src-only.patch"
     },
     "drupal/group": {
       "Get a token of a node's parent group to create a pathauto pattern": "https://www.drupal.org/files/issues/2020-02-21/group-gnode_tokens-2774827-62.patch",
@@ -193,7 +193,6 @@
       "Drupal 10 compatibility": "patches/content-moderation-revert-d10.patch"
     },
     "drupal/access_unpublished": {
-      "Support Group content": "https://git.drupalcode.org/project/access_unpublished/-/merge_requests/6.patch",
       "Permission by role for generating a AU token" : "https://git.drupalcode.org/project/access_unpublished/-/merge_requests/14.diff"
     },
     "drupal/address_formatter": {
