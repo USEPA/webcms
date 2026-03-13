@@ -4,7 +4,14 @@
  * Theme override for a main view template.
  */
 #}
-
+<style>
+.block__content #facets-form .form-item label {
+  font-weight: bold;
+}
+.block__content #facets-form .form-item select option:checked {
+  background-color: #aacdec;
+}
+</style>
 {% set admin_info %}
   {{ drupal_block('system_messages_block', wrapper=false) }}
   {{ drupal_block('local_tasks_block', wrapper=false) }}
@@ -24,21 +31,15 @@
 {% set intro %}
 {% endset %}
 
-{% set search %}
-  {{ drupal_entity('block', 'exposedformsearch_news_releasespage_1', check_access=false) }}
-{% endset %}
-
 {% set sidebar %}
   {%- set accordion_content -%}
-    {{ drupal_entity('block', 'news_releases_year', check_access=false) }}
-    {{ drupal_entity('block', 'news_releases_facet_subject', check_access=false) }}
-    {{ drupal_entity('block', 'news_releases_press_office', check_access=false) }}
-    {{ drupal_entity('block', 'news_releases_geographic_locations', check_access=false) }}
-    {{ drupal_entity('block', 'news_releases_language', check_access=false) }}
   {%- endset -%}
 
   {{ drupal_entity('block', 'news_releases_right_column_text', check_access=false) }}
-  <h2 class="h3">{{ 'Filter By:'|t }}</h2>
+  <h2 class="h3">{{ 'Search:'|t }}</h2>
+  {{ drupal_entity('block', 'exposedformsearch_news_releasespage_1', check_access=false) }}
+  <h2 class="h3">{{ 'Filter:'|t }}</h2>
+  {{ drupal_entity('block', 'epa_theme_facetformviewduplicateofsearchnewsreleasesdisplaypage', check_access=false) }}
   {% include '@uswds/accordion/accordion.twig' with {
     'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
     'is_multi_selectable': true,
@@ -69,7 +70,6 @@
   'admin_info': admin_info,
   'show_admin_info': show_admin_info,
   'intro': intro,
-  'search': search,
   'filters': filters,
   'body': body,
   'sidebar': sidebar,
