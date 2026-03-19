@@ -115,6 +115,9 @@ dependency_scanning:
 
 secret_detection:
   stage: Test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
 
 # Restrict actual analyzer sub-jobs to live branch only
 # Development branch skips security scanning for faster iteration
@@ -124,11 +127,6 @@ semgrep-sast:
     - when: never
 
 gemnasium-dependency_scanning:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
-    - when: never
-
-secret-detection:
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
     - when: never
