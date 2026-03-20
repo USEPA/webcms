@@ -90,28 +90,37 @@ include:
   - template: Jobs/Secret-Detection.gitlab-ci.yml     # Detect exposed secrets in code
   - local: .gitlab/teams-notifications.yml            # Microsoft Teams webhook notifications
 
-# Override stage for GitLab-provided security scanning jobs to use capitalized stage names
-# Security scanning is enabled for live branch (stage deployments) only
-# Development branch skips security scanning for faster iteration
+# Security Scanning Configuration
+# --------------------------------
+# The GitLab-provided security scanning templates (SAST, Dependency Scanning, Secret Detection)
+# define parent jobs (sast, dependency_scanning, secret_detection) that are "configuration-only"
+# — they have no script and exist solely to propagate settings to analyzer sub-jobs.
+#
+# IMPORTANT: Do NOT override `rules:` on these parent jobs. Doing so removes their built-in
+# `when: never` rule, causing GitLab to attempt to execute them as real jobs. This results in
+# the error: "(job) is used for configuration only, and its script should not be executed."
+# This has been the case since GitLab 13.4. See:
+# https://docs.gitlab.com/user/application_security/troubleshooting_application_security/
+#
+# Instead, override `rules:` on the specific analyzer sub-jobs to control when scanning runs.
+# We restrict security scanning to the live branch only (stage deployments) to keep the
+# development branch pipeline fast.
+
+# Override stage assignment on parent config jobs (stage override is safe; rules override is not)
 sast:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
-    - when: never  # Explicitly never run on development branch
 
 dependency_scanning:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
-    - when: never  # Explicitly never run on development branch
 
 secret_detection:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (stage site)
-    - when: never  # Explicitly never run on development branch
+    - if: '$CI_COMMIT_BRANCH == "live"'
+    - when: never
 
-# Override all SAST sub-jobs to prevent them from running on development branch
+# Restrict actual analyzer sub-jobs to live branch only
+# Development branch skips security scanning for faster iteration
 semgrep-sast:
   rules:
     - if: '$CI_COMMIT_BRANCH == "live"'
