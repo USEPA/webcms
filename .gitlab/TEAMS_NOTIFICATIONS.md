@@ -1,10 +1,10 @@
-# GitLab CI/CD Slack Notifications
+# GitLab CI/CD Microsoft Teams Notifications
 
-Automated Slack notifications for the WebCMS GitLab pipeline.
+Automated Microsoft Teams notifications for the WebCMS GitLab pipeline.
 
 ## Overview
 
-The pipeline sends Slack notifications for major events:
+The pipeline sends Microsoft Teams notifications for major events:
 
 - **Pipeline Started** 🚀 - When a new pipeline begins
 - **Build Success/Failure** ✅❌ - After Docker image builds
@@ -15,18 +15,18 @@ The pipeline sends Slack notifications for major events:
 
 ## Setup
 
-### 1. Create Slack Incoming Webhook
+### 1. Create Microsoft Teams Incoming Webhook
 
-1. Go to your Slack workspace → **Apps & Integrations**
-2. Search for and add **Incoming Webhooks**
-3. Choose channel (e.g., `#webcms-deployments`)
-4. Copy webhook URL: `https://hooks.slack.com/services/T.../B.../XXX...`
+1. Go to your Microsoft Teams channel → **⋯ (More options)** → **Connectors**
+2. Search for and configure **Incoming Webhook**
+3. Provide a name (e.g., "GitLab CI/CD") and optionally upload an image
+4. Copy webhook URL: `https://outlook.office.com/webhook/...`
 
 ### 2. Add to GitLab
 
 1. Go to GitLab project → **Settings → CI/CD → Variables**
 2. Click **Add Variable**:
-   - **Key**: `SLACK_WEBHOOK_URL`
+   - **Key**: `TEAMS_WEBHOOK_URL`
    - **Value**: (paste webhook URL)
    - **Flags**: ✅ Protected, ✅ Masked
 3. Click **Add Variable**
@@ -35,7 +35,7 @@ The pipeline sends Slack notifications for major events:
 
 ```bash
 # Test with curl
-curl -X POST "$SLACK_WEBHOOK_URL" \
+curl -X POST "$TEAMS_WEBHOOK_URL" \
   -H 'Content-Type: application/json' \
   -d '{"text":"✅ Test from GitLab CI setup"}'
 ```
@@ -43,8 +43,8 @@ curl -X POST "$SLACK_WEBHOOK_URL" \
 Or use the test script:
 ```bash
 cd .gitlab
-chmod +x test-slack-webhook.sh
-./test-slack-webhook.sh "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+chmod +x test-teams-webhook.sh
+./test-teams-webhook.sh "https://outlook.office.com/webhook/YOUR/WEBHOOK/URL"
 ```
 
 ## Notification Details
@@ -83,7 +83,7 @@ chmod +x test-slack-webhook.sh
 - **When**: Deployment fails
 - **Branch**: `live` only
 - **Color**: Red
-- **Alert**: Includes `@channel` mention
+- **Alert**: Includes urgent warning message
 - **Info**: Failed stage, commit author
 
 ### Security Scan Issues
@@ -100,14 +100,14 @@ chmod +x test-slack-webhook.sh
 ## Message Format
 
 All notifications include:
-- Color-coded attachment (🟢 success, 🔴 failure, 🟠 warning, 🔵 action)
+- Color-coded card (🟢 success, 🔴 failure, 🟠 warning, 🔵 action)
 - Emoji status indicator
-- Clickable title → pipeline URL
+- Actionable buttons for relevant links
 - Environment (preproduction/dev or preproduction/stage)
 - Branch name
-- Commit SHA (clickable → commit view)
+- Commit SHA with link to commit view
 - Author/Deployer name
-- Pipeline number & timestamp
+- Pipeline number
 
 ## Configuration
 
@@ -117,21 +117,20 @@ Override defaults in GitLab CI/CD Variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SLACK_USERNAME` | Bot display name | `GitLab CI` |
-| `SLACK_ICON` | Bot emoji icon | `:gitlab:` |
+| `TEAMS_TITLE` | Notification title prefix | `GitLab CI` |
 
 ### Customize Notifications
 
-Edit `.gitlab/slack-notifications.yml` to:
+Edit `.gitlab/teams-notifications.yml` to:
 - Change notification triggers (modify `rules:` sections)
 - Add custom fields to messages
-- Create new notification types (extend `.slack_notify`)
+- Create new notification types (extend `.teams_notify`)
 
 Example - Only notify on `live` branch:
 ```yaml
 notify:build:success:
   rules:
-    - if: '$SLACK_WEBHOOK_URL == null'
+    - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
     - if: '$CI_COMMIT_BRANCH == "live"'  # Removed "main" check
       when: on_success
@@ -144,43 +143,43 @@ notify:build:success:
 **Check webhook URL:**
 ```bash
 # Test webhook directly
-curl -X POST "$SLACK_WEBHOOK_URL" \
+curl -X POST "$TEAMS_WEBHOOK_URL" \
   -H 'Content-Type: application/json' \
   -d '{"text":"Test"}'
 ```
 
-Expected response: `ok`
+Expected response: `1` or success status
 - `404`: Invalid URL
-- `403`: Webhook disabled/deleted
+- `400`: Invalid payload format
 - Timeout: Network/firewall issue
 
 **Check GitLab:**
 1. Go to **Settings → CI/CD → Variables**
-2. Verify `SLACK_WEBHOOK_URL` exists and is enabled
+2. Verify `TEAMS_WEBHOOK_URL` exists and is enabled
 3. Check notification job logs in pipeline for curl errors
 
-**Check Slack:**
-- Ensure bot can post to target channel
-- Verify channel not archived
+**Check Microsoft Teams:**
+- Ensure webhook connector is enabled in the channel
+- Verify channel still exists
 - Check webhook configured for correct channel
 
 ### Notifications Too Frequent
 
-Edit notification `rules:` in `.gitlab/slack-notifications.yml` to filter by branch, environment, or custom conditions.
+Edit notification `rules:` in `.gitlab/teams-notifications.yml` to filter by branch, environment, or custom conditions.
 
 ### Job Not Running
 
 If notification jobs don't appear in pipeline:
-1. Check `SLACK_WEBHOOK_URL` is set (jobs skip if not configured)
+1. Check `TEAMS_WEBHOOK_URL` is set (jobs skip if not configured)
 2. Verify branch matches `rules:` conditions
 3. Check job `needs:` dependencies succeeded
 
 ## Security
 
 ✅ **DO**:
-- Use "Masked" flag for `SLACK_WEBHOOK_URL`
+- Use "Masked" flag for `TEAMS_WEBHOOK_URL`
 - Use "Protected" flag for production webhooks
-- Rotate webhook if exposed
+- Rotate webhook if exposed (reconfigure connector in Teams)
 
 ❌ **DON'T**:
 - Commit webhook URLs to git

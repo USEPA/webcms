@@ -1,136 +1,337 @@
-﻿# First-Time Setup
+# EPA WebCMS
 
-Note: this has only been tested on ddev 1.24 and above.
+The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.
+
+## Quick Start
+
+```bash
+# Clone repository
+git clone -b main git@github.com:USEPA/webcms.git
+cd webcms/services/drupal
+
+# Start development environment
+ddev start
+
+# Complete setup
+ddev aws-setup                    # Create local S3 bucket
+ddev import-db                    # Import database (place .tar in .ddev/db/)
+cp .env.example .env              # Copy environment configuration
+ddev composer install
+ddev gesso install                # Install theme dependencies
+ddev gesso build                  # Build theme assets
+ddev drush deploy -y              # Run deployment workflow
+ddev drush user:unblock drupalwebcms-admin
+```
+
+Access the site at: <https://epa.ddev.site>
+
+## Documentation
+
+- **[Contributing Guide](CONTRIBUTING.md)** - Complete setup instructions, development workflows, and deployment guide
+- **[WARP.md](WARP.md)** - AI agent guidance for working with this repository
+- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching and release process
+- **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
+- **[Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md)** - Step-by-step deployment process
+- **[Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md)** - Performance optimization details
+- **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
+- **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
+
+## Key Features
+
+- **Smart Deployments** - Automatic build detection analyzes changed files; deploy-only mode reduces time from 15 minutes to 3-5 minutes
+- **Zero-Downtime Deployments** - Rolling ECS deployments with health checks
+- **Infrastructure as Code** - Complete AWS infrastructure managed via Terraform
+- **Automated Testing** - Security scanning with Prisma Cloud and GitLab SAST
+- **Multi-Environment** - Separate dev, stage, and production environments
+
+## Development Workflow
+
+### Daily Development
+```bash
+# Start local environment
+cd services/drupal
+ddev start
+ddev gesso watch
+
+# Make changes, then deploy to dev environment
+git add .
+git commit -m "feat: Your feature description"
+git push origin development
+
+# Auto-detect if build is needed (recommended)
+./push-dev.sh
+
+# Or manually override: force skip build for faster deployment
+./push-dev.sh --skip-build
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide.
+
+## Architecture
+
+- **Platform:** Drupal 10 on PHP 8.2
+- **Theme:** Gesso USWDS (Pattern Lab + USWDS 3.9.0)
+- **Infrastructure:** AWS ECS (Fargate), RDS (PostgreSQL), S3, CloudFront
+- **CI/CD:** GitLab CI/CD with GitHub mirror
+- **Containers:** Multi-stage Docker builds with Kaniko (drupal, nginx, drush)
+- **IaC:** Terraform for infrastructure and application deployment
+- **Multi-site:** English and Spanish sites share the same codebase and infrastructure; each site/language pair is its own ECS service.
+- **Authentication:** SimpleSAMLphp service backs production SSO; local development uses the mock IdP in `services/simplesaml/` so contributors can test SAML flows without external access.
+
+### Deployment Pipeline
+
+```
+Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
+```
+
+**Branch to Environment Mapping:**
+- `development` → Dev site (automatic deployment)
+- `live` → Stage site (manual trigger, includes security scans)
+- `live` → Production (manual trigger, future)
+
+**Pipeline Stages:**
+- Development branch: Build → Deploy → Update (~10-15 min)
+- Live branch: Build → Test → Scan → Deploy → Update (~25-35 min)
+
+## Quick Commands
+
+### Local Development
+
+| Command | Description |
+|---------|-------------|
+| `ddev start` | Start development environment |
+| `ddev drush cr` | Clear Drupal cache |
+| `ddev drush deploy -y` | Run deployment workflow (updb + cim + cr) |
+| `ddev drush cex` | Export configuration |
+| `ddev drush cim -y` | Import configuration |
+| `ddev drush uli` | Generate one-time login URL |
+| `ddev gesso watch` | Watch and rebuild theme assets |
+| `ddev gesso build` | One-time theme build |
+| `ddev composer phpcs` | Run PHP Code Sniffer |
+| `ddev composer phpcbf` | Auto-fix coding standards |
+| `ddev composer phpstan` | Run PHPStan static analysis |
+> Theme artifacts are intentionally not committed—after pulling any theme changes, rerun `ddev gesso build` (or `ddev gesso watch`) so CSS/JS output stays fresh.
+
+### Deployment
+
+|| Command | Description |
+||---------|-------------|
+|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./push-dev.sh --force-build` | Force full build even if not detected |
+|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+
+**Automatic Build Detection:**
+By default, `push-dev.sh` analyzes changed files and automatically determines if a full build is required.
+
+**Files requiring full build (auto-detected):**
+- ❌ `composer.json` or `composer.lock` (module dependencies)
+- ❌ `package.json` or `package-lock.json` (theme dependencies)
+- ❌ Theme source files (`.scss`, `.js` in `epa_theme/`)
+- ❌ `Dockerfile` or build scripts
+- ❌ `.gitlab-ci.yml` or CI/CD configuration
+
+**Files NOT requiring build (deploy-only):**
+- ✅ Custom modules in `web/modules/custom/`
+- ✅ Custom theme templates (`.twig`, `.php`)
+- ✅ Configuration files in `config/`
+- ✅ Drush commands
+- ✅ Documentation files
+
+**Manual Override Flags:**
+- Use `--skip-build` to force skip when you know images are compatible
+- Use `--force-build` to force rebuild (e.g., base image updates)
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command reference.
 
 ## CI/CD
 
-- GitLab CI is the active system for all builds and deployments. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
-- Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
+- **Active System:** GitLab CI (`.gitlab-ci.yml` and `.gitlab/docker.yml`)
+- **Deprecated:** Buildkite pipelines (`.buildkite/`) - retained for historical reference only
+- **Deployment Pipeline:** GitHub → GitLab Mirror → Docker Build → AWS ECS
 
-1. Clone main branch of repo:
+### Advanced Pipeline Variables
 
-   ```bash
-   git clone -b main git@github.com:USEPA/webcms.git
-   ```
+#### Deploying Dev from the `live` Branch
 
-2. Then, start the project:
+By default, pipelines on `live` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
 
-   ```bash
-   cd services/drupal && ddev start
-   ```
+**Steps:**
+1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
+2. Select the `live` branch.
+3. Add a CI/CD variable:
+   - **Key:** `DEPLOY_TO_DEV`
+   - **Value:** `true`
+4. Click **Run pipeline**, then approve the manual `deploy:dev:apply-en` job when it appears.
 
-3. Next, create the S3 bucket for s3fs:
+**What happens:**
+- The `build:drupal:stage` job builds images for both `stage` and `dev` (dev builds are skipped unless `DEPLOY_TO_DEV=true`).
+- Stage deploy jobs run automatically (with full Test/Scan stages).
+- The dev deploy job stays **manual** when triggered from `live`, so you must click the play button after stage validation.
 
-   ```bash
-   ddev aws-setup
-   ```
+Notes:
+- `DEPLOY_TO_DEV` is ignored on the `development` branch (dev deploys always happen there).
+- Use this flow sparingly—every dev deploy from `live` requires manual approval and will reuse the `live` branch artifacts.
 
-4. After that, please obtain the latest database (contact Michael Hessling) and put the .tar file in the `services/drupal/.ddev/db/` folder. The filename isn't important; you will be prompted to select the DB you wish to import during the next step.
+#### Filtering Deployments by Site
 
-5. Import the database by running [`ddev import-db`](https://ddev.readthedocs.io/en/stable/users/usage/database-management/#database-imports)
+Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `live` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
 
-   ```bash
-   ddev import-db [--file=path/to/backup.sql.gz]
-   ```
+**Steps:**
+1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
+2. Select the `live` branch.
+3. Add a CI/CD variable:
+   - **Key:** `WEBCMS_SITE_FILTER`
+   - **Value:** `stage` (to deploy only stage) or `dev` (to deploy only dev when combined with `DEPLOY_TO_DEV=true`)
+4. Click **Run pipeline**.
 
-   Note that for very large dumps this may time out. Sometimes, DDEV lets the import process run in the background (verify this by watching the CPU and I/O activity of `docker stats`).
+**What happens:**
+- When `WEBCMS_SITE_FILTER=stage`: Only stage site jobs run (English and Spanish)
+- When `WEBCMS_SITE_FILTER=dev` with `DEPLOY_TO_DEV=true`: Only dev site jobs run (English only)
+- All other site deployments, security scans, and update jobs are skipped
 
-   If DDEV kills the import process, try connecting a MySQL command-line client directly to the container (use `ddev status` to see the forwarded MySQL port) and import that way.
+**Common use cases:**
+- **Spanish site hotfix:** Set `WEBCMS_SITE_FILTER=stage` to deploy only to stage Spanish site
+- **Emergency stage fix:** Deploy to stage without affecting dev environment
+- **Isolated testing:** Test changes on one site before rolling out to both
 
-6. Copy the example `.env` file: `cp .env.example .env`.
+Notes:
+- Leave `WEBCMS_SITE_FILTER` unset for normal deployments to all sites
+- This variable is ignored on the `development` branch (dev site always deploys)
 
-7. Install dependencies:
+## Repository Structure
 
-   ```bash
-   ddev composer install
-   ```
-
-   You might get an error, clear it by deleting the services/drupal/.ddev/vendor folder and clearing cache: `ddev composer clearcache`
-
-8. Install the requirements for the theme: `ddev gesso install`:
-
-   ```bash
-   ddev gesso install
-   ```
-
-9. Building/watching the CSS and Pattern Lab:
-    1. to build
-
-      ```bash
-      ddev gesso build
-      ```
-
-    2. to watch:
-
-      ```bash
-      ddev gesso watch
-      ```
-
-10. Install Drupal from config (or restore a backup).  You can install from config by running:
-
-    **Note**: Do not run this command if starting from a new installation. This will wipe the database out, instead skip to #11.
-
-   ```bash
-   ddev drush si --existing-config
-   ```
-
-11. Ensure the latest configuration has been fully applied and clear cache:
-
-   ```bash
-   ddev drush deploy -y
-   ```
-
-12. Edit your `services/drupal/.env` file and change the line that reads `ENV_STATE=build` to read `ENV_STATE=run` -- without this change you will not make use of memcached caching.
-
-13. To unblock the user run  `ddev drush user:unblock drupalwebcms-admin`
-
-14. Access the app at <https://epa.ddev.site>
-15. Note, you may get SSL cert warnings. You'll have to install mkcert:
-
-   ```bash
-   ddev stop --all
-   mkcert -install
-   ```
-
-If you want to use Firefox, you need to install nss to use HTTPS:
-
-   ```bash
-   brew install nss
-   mkcert -install
-   ```
-
-## Other READMEs
-
-- Terraform configuration: see [infrastructure/terraform](terraform/infrastructure/README.md).
-- CI/CD: GitLab CI is the active system. See `.gitlab-ci.yml` and `.gitlab/docker.yml`.
-- Note: Buildkite pipelines under `.buildkite/` are deprecated and retained for historical reference only.
-
-### Troubleshooting
-
-### Elasticsearch
-
-If you run into an error trying to use `elasticsearch`. Please run the following command:
-
-```bash
-ddev poweroff && docker volume rm ddev-epa-ddev_elasticsearch && ddev start
+```
+webcms/
+├── .gitlab-ci.yml              # CI/CD pipeline configuration
+├── .gitlab/                    # Pipeline includes & documentation
+├── services/
+│   ├── drupal/                 # Main Drupal application
+│   │   ├── .ddev/              # DDEV configuration & commands
+│   │   ├── config/             # Drupal configuration management
+│   │   ├── web/                # Drupal webroot
+│   │   │   ├── modules/custom/ # EPA custom modules (26+ modules)
+│   │   │   └── themes/         # epa_theme (Gesso USWDS), epa_claro
+│   │   ├── composer.json       # PHP dependencies
+│   │   └── Dockerfile          # Multi-stage Docker build
+│   ├── drush/                  # Drush container for ECS tasks
+│   ├── minio/                  # Local S3 emulation
+│   └── simplesaml/             # SAML authentication
+├── terraform/                  # Infrastructure as code
+├── ci/                         # CI automation scripts
+├── push-dev.sh                 # Deploy to dev helper script
+└── trigger-pipeline.sh         # Manual pipeline trigger
 ```
 
-You will need to `re-index`.
+### Custom Modules
 
-## Helpful commands
+The application includes 26+ EPA-specific custom modules in `services/drupal/web/modules/custom/`:
+- **Core functionality:** epa_core, epa_workflow, epa_web_areas, epa_forms
+- **Content features:** epa_clone, epa_content_tracker, epa_metatag, epa_node_export
+- **Media/Assets:** epa_media, epa_media_s3fs, epa_s3fs, epa_wysiwyg
+- **Search/Navigation:** epa_elasticsearch, epa_breadcrumbs, epa_viewsreference
+- **AWS Integration:** epa_cloudfront, epa_cloudwatch, epa_snapshot
+- **Authentication:** f1_sso, epa_es_auth
+- **Utilities:** epa_alerts, epa_layouts, epa_links, epa_rss
 
-Here is a list of helpful commands:
+## Configuration Management
 
-- `ddev gesso install` > Installs the node modules needed for `epa_core`.
-- `ddev gesso build` > Builds the current assets for CSS & PatternLab.
-- `ddev gesso watch` > Same thing as build but will watch for changes.
-- `ddev ssh` > Goes into the web container.
-- `ddev drush` > Runs any drush command.
-- `ddev import-db` > Will import a specific database.
-- `ddev export-db` > Exports a database with the current date.
-- `ddev aws-setup` > Sets up the requirements to get drupal file system to work
-- `ddev describe` or `ddev status` > Get a detailed description of a running DDEV project.
-- `ddev phpmyadmin` > Launch a browser with PhpMyAdmin
+**Critical Rule:** Never commit configuration in both code and database simultaneously. Always choose one source of truth.
+
+```bash
+# Export configuration after UI changes
+ddev drush cex
+
+# Import configuration when pulling changes
+ddev drush cim -y
+```
+
+### Key Environment Variables
+
+Most runtime configuration lives in `.env` (see `services/drupal/.env.example`). The most important variables are:
+- `WEBCMS_SITE` – environment name (`local`, `dev`, `stage`, `prod`) used to load site-specific settings.
+- `WEBCMS_LANG` – language code (`en`, `es`) so each ECS service can read the correct configs and secrets.
+- `WEBCMS_ENV_STATE` – set to `build` before installing or importing data, and switch to `run` once caches (memcached/Redis) should be enabled.
+
+Copy `.env.example` to `.env` before editing; never commit actual secrets or site-specific values.
+
+## Coding Standards
+
+### PHP/Drupal
+- Follow Drupal Coding Standards
+- PHP 8.2+ features preferred
+- Type hint all parameters and return values
+- Run `ddev composer phpcs` before committing
+- Auto-fix with `ddev composer phpcbf`
+
+### Theme/Frontend
+- BEM naming convention for CSS
+- Mobile-first responsive design
+- WCAG 2.1 AA accessibility compliance
+- ES6+ JavaScript (no `var`)
+- Lint with `ddev gesso lint`
+
+### Git Workflow
+Follow [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` - New feature
+- `fix:` - Bug fix
+- `docs:` - Documentation
+- `style:` - Formatting
+- `refactor:` - Code restructuring
+- `chore:` - Maintenance
+
+**Branch Strategy:**
+- `main` - Stable release (matches production)
+- `live` - Pre-production (deploys to stage)
+- `development` - Active development (deploys to dev)
+- `feature/*`, `bugfix/*`, `hotfix/*` - Feature branches
+
+## Troubleshooting
+
+### Common Issues
+
+**Elasticsearch Errors:**
+```bash
+ddev poweroff
+docker volume rm ddev-epa-ddev_elasticsearch
+ddev start
+ddev drush search-api:reindex
+```
+
+**Composer Install Fails:**
+```bash
+rm -rf services/drupal/.ddev/vendor
+ddev composer clearcache
+ddev composer install
+```
+
+**Database Import Timeout:**
+```bash
+ddev status  # Get MySQL port
+mysql -h 127.0.0.1 -P <port> -u db -pdb db < backup.sql
+```
+
+**Skip-Build Deployment Fails:**
+```bash
+# Run full build first to create :development-latest images
+./push-dev.sh
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md#troubleshooting) for more troubleshooting steps.
+
+## Local Environment URLs
+- Main site: <https://epa.ddev.site>
+- PhpMyAdmin: <https://epa.ddev.site:8036>
+- MailHog: <https://epa.ddev.site:8025>
+
+## Requirements
+
+- DDEV 1.24 or higher
+- Docker Desktop
+- Git
+- Composer
+- Node.js >=16 and npm
 
 ## Disclaimer
 
