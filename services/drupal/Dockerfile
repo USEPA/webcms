@@ -65,7 +65,7 @@ RUN set -ex \
 #   * %{system}C - system CPU percentage (i.e., time spent in system calls)
 #   * %{total}C - total CPU (same as %C by itself)
 # * %d - request duration (in seconds)
-#   * %{<format>}d - duration in <format> (seconds, miliseconds [sic], microseconds)
+# * %{<format>}d - duration in <format> (seconds, milliseconds [sic], microseconds)
 # * %{VAR}e - read $VAR from environment
 # * %f - script filename
 # * %m - HTTP method
@@ -138,7 +138,7 @@ RUN set -ex \
   # images by removing theme here.
   && rm -rf node_modules
 
-# Create the final Drupal 8 image - build this by specifying "docker build --target drupal"
+# Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
 # Copy Composer-installed packages
@@ -184,6 +184,10 @@ ARG GIT_COMMIT=""
 
 ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
+# Health check for FPM ping endpoint
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost/ping || exit 1
+
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
 FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
@@ -205,6 +209,10 @@ COPY scripts/ecs/nginx-entrypoint.sh /webcms-entrypoint
 
 ENTRYPOINT [ "/webcms-entrypoint" ]
 CMD [ "nginx", "-g", "daemon off;" ]
+
+# Health check for nginx service
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f https://localhost/ping || exit 1
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.

@@ -19,7 +19,7 @@ const consoleUrl = `https://${vars.region}.console.aws.amazon.com`;
 /**
  * Amount of time, in milliseconds, to wait in between checking Drush's status in ECS.
  */
-const pollInterval = 5_000;
+const POLL_INTERVAL_MS = 5_000;
 
 /**
  * Returns a `Promise` that waits for a fixed polling interval.
@@ -28,7 +28,7 @@ const pollInterval = 5_000;
  */
 async function delay() {
   return new Promise((resolve) => {
-    setTimeout(resolve, pollInterval);
+    setTimeout(resolve, POLL_INTERVAL_MS);
   });
 }
 

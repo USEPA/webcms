@@ -90,6 +90,37 @@ resource "aws_ecr_lifecycle_policy" "drush" {
   policy = local.default_tag_policy
 }
 
+# Create FPM metrics sidecar container repository for monitoring PHP-FPM performance
+resource "aws_ecr_repository" "fpm_metrics" {
+  for_each = toset(var.sites)
+
+  name = "webcms-${var.environment}-${each.key}-fpm-metrics"
+
+  tags = var.tags
+}
+
+resource "aws_ecr_lifecycle_policy" "fpm_metrics" {
+  for_each = toset(var.sites)
+
+  repository = aws_ecr_repository.fpm_metrics[each.key].name
+
+  policy = local.default_tag_policy
+}
+
+# Create repository for AWS CloudWatch agent (mirrored from Docker Hub)
+# This is a shared resource (not per-site) used for log collection and metrics
+resource "aws_ecr_repository" "cloudwatch" {
+  name = "webcms-${var.environment}-aws-cloudwatch"
+
+  tags = var.tags
+}
+
+resource "aws_ecr_lifecycle_policy" "cloudwatch" {
+  repository = aws_ecr_repository.cloudwatch.name
+
+  policy = local.default_tag_policy
+}
+
 # Finally, we create a cache repository for Kaniko-based builds. This repository has some
 # lifecycle policies that aggressively expire images in order to avoid an arbitrarily large
 # cache from building up (see below).

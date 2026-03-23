@@ -12,8 +12,8 @@ resource "aws_ecs_task_definition" "drupal_task" {
   # Setting reservations at the task level lets Docker be more flexible in how the
   # resources are used (mainly, it allows Drupal to soak up as much CPU capacity as it
   # needs)
-  cpu    = 1024
-  memory = 2048
+  cpu    = var.drupal_cpu
+  memory = var.drupal_memory
 
   runtime_platform {
     operating_system_family = "LINUX"

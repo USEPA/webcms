@@ -1,5 +1,5 @@
 name: epa
-type: drupal9
+type: drupal10
 docroot: web
 php_version: "8.3"
 webserver_type: nginx-fpm
@@ -15,7 +15,16 @@ nfs_mount_enabled: false
 mutagen_enabled: false
 use_dns_when_possible: true
 composer_version: "2"
-web_environment: []
+web_environment:
+  - AWS_ACCESS_KEY_ID=minio_access
+  - AWS_SECRET_ACCESS_KEY=minio_secret
+  - AWS_DEFAULT_REGION=us-east-1
+  - WEBCMS_CF_DISTRIBUTIONID=local-cf-distribution-id
+  # Redirect all AWS SDK HTTP calls to the local WireMock container instead
+  # of the real CloudFront API. Supported natively by AWS SDK for PHP v3.257+.
+  # Remove or leave unset in production — the SDK will route to real AWS
+  # when this variable is absent.
+  - AWS_ENDPOINT_URL=http://cloudfront-mock:8080
 hooks:
   post-start:
     - exec: "user=$(whoami) && group=$(groups) && sudo chown -R $user:$group /var/www/html/web/sites/default/files"

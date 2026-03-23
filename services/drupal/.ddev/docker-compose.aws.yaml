@@ -4,7 +4,6 @@ services:
   aws:
     image: xueshanf/awscli
     container_name: ddev-${DDEV_SITENAME}-aws
-    #command: "aws s3 mb s3://drupal"
     networks: [default, ddev_default]
     depends_on:
       - minio
@@ -18,6 +17,27 @@ services:
       - ".:/mnt/ddev_config"
     command: "'sleep 2073600'"
     entrypoint: /bin/sh -c
-    #entrypoint:
-    #  - aws
-    #  - --endpoint-url=http://minio:9000/
+
+  # WireMock CloudFront invalidation mock server.
+  # LocalStack Community does not support CloudFront (Pro tier only).
+  # WireMock intercepts the AWS SDK HTTP call and returns a valid 201
+  # response so the full Drupal → SDK → HTTP call chain is verifiable
+  # locally without a real AWS account.
+  #
+  # NOTE: The stub mappings directory is intentionally placed at
+  # .wiremock/ in the project root rather than inside .ddev/. DDEV
+  # treats .ddev/ specially and its subdirectory contents are not
+  # reliably synced through Mutagen into Docker volumes declared in
+  # secondary compose files. Project root directories sync normally.
+  cloudfront-mock:
+    image: wiremock/wiremock:3.3.1
+    container_name: ddev-${DDEV_SITENAME}-cloudfront-mock
+    networks: [default, ddev_default]
+    volumes:
+      # Mount from project root, not from .ddev/, to ensure Mutagen
+      # syncs the directory contents into the container correctly.
+      - ${DDEV_APPROOT}/.wiremock:/wiremock-root:ro
+    command:
+      - "--root-dir=/wiremock-root"
+      - "--verbose"
+      - "--port=8080"

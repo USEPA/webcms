@@ -93,7 +93,7 @@ variable "drupal_state" {
   type        = string
 
   validation {
-    condition     = contains(["run", "build"], var.drupal_state)
+    condition     = contains(["run", "build", "migration"], var.drupal_state)
     error_message = "The Drupal state must be either 'build' or 'run'. Please see the README for more information."
   }
 }
@@ -102,6 +102,18 @@ variable "drupal_csrf_origin_whitelist" {
   description = "A list of domains considered trustworthy by Drupal's Security Kit module. Each should be of the form PROTOCOL://DOMAIN[:PORT], such as http://example.com or https://example.net:123. The site's own domain is already part of this list."
   type        = list(string)
   default     = []
+}
+
+variable "drupal_cpu" {
+  description = "CPU units for the Drupal task (1024 = 1 vCPU). Must be a valid Fargate CPU value."
+  type        = number
+  default     = 1024
+}
+
+variable "drupal_memory" {
+  description = "Memory in MB for the Drupal task. Must be a valid value for the specified CPU."
+  type        = number
+  default     = 2048
 }
 
 variable "drupal_en_snapshot_bucket" {
@@ -118,6 +130,18 @@ variable "drush_tasks" {
   description = "The number of drush tasks to implement per site.  There will be a default value of 1.  The intent is to only have to specify this if you want something other than the default 1 task."
   type        = number
   default     = 1
+}
+
+variable "drush_cpu" {
+  description = "CPU units for the Drush task (1024 = 1 vCPU). Must be a valid Fargate CPU value."
+  type        = number
+  default     = 1024
+}
+
+variable "drush_memory" {
+  description = "Memory in MB for the Drush task. Must be a valid value for the specified CPU."
+  type        = number
+  default     = 4096
 }
 
 #end region
