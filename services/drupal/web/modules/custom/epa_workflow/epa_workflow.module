@@ -798,60 +798,97 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter() for revision_overview_form.
+ *
+ * Adds custom EPA workflow messaging to the node revision overview table.
  */
 function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add a visual prefix to the operations of the latest revision.
   $form['node_revisions_table'][0]['operations']['#prefix'] = '<strong>Latest revision</strong><br>';
 
-  $current_revision = $form_state->getBuildInfo()['args'][0];
+  // Retrieve the current revision from the form build info arguments.
+  $build_info = $form_state->getBuildInfo();
+  $current_revision = $build_info['args'][0] ?? NULL;
 
-  $latest_vid = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->getLatestRevisionId($current_revision->id());
-  $latest_revision = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->loadRevision($latest_vid);
+  if (!$current_revision instanceof NodeInterface) {
+    return;
+  }
+
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $node_storage = $entity_type_manager->getStorage('node');
+
+  // Load the absolute latest revision of the current node.
+  $latest_vid = $node_storage->getLatestRevisionId($current_revision->id());
+  $latest_revision = $node_storage->loadRevision($latest_vid);
 
   if ($latest_revision instanceof NodeInterface && !$latest_revision->isNew()) {
     $timezone = date_default_timezone_get();
     $date_formatter = \Drupal::service('date.formatter');
-    // If latest revision and has a Publish Date set.
-    if (isset($latest_revision->field_publish_date->value)) {
-      $latest_revision_moderation_state = $latest_revision->moderation_state->value;
+    
+    // Check if the latest revision has a Publish Date set.
+    // BEST PRACTICE: Use ->isEmpty() instead of isset() for entity fields.
+    if (!$latest_revision->get('field_publish_date')->isEmpty()) {
+      $latest_revision_moderation_state = $latest_revision->get('moderation_state')->value;
+      $message = NULL;
 
       $latest_formatted_date_time = $date_formatter->format(
-        $latest_revision->field_publish_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+        $latest_revision->get('field_publish_date')->date->getTimestamp(), 
+        'custom', 
+        'F d, Y \a\t h:i a T', 
+        $timezone
       );
 
-      // Is in the “Draft, approved” state.
+      // Determine the messaging based on the current moderation state.
       if ($latest_revision_moderation_state == 'draft_approved') {
-        $message = t('<br>The revision will publish on %date.',['%date' => $latest_formatted_date_time]);
-        $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
+        $message = t('<br>The revision will publish on %date.', ['%date' => $latest_formatted_date_time]);
       }
-      // Is in any other draft state.
-      elseif ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
-        // If publish date is in the future give user some guidance.
-        if ($latest_revision->field_publish_date->date->getTimestamp() > time()) {
+      elseif (in_array($latest_revision_moderation_state, ['draft', 'draft_needs_review'])) {
+        if ($latest_revision->get('field_publish_date')->date->getTimestamp() > time()) {
           $message = t('<br>The revision is scheduled to publish on %date, but will only do so if this draft is approved. Currently, the draft is NOT approved.', ['%date' => $latest_formatted_date_time]);
         }
-        // If publish date is in the past indicate the draft will publish immediately.
         else {
           $message = t('<br>Since the scheduled publish date has already passed, this draft will publish immediately if it is approved. Remove or change the publish date if you do not wish for that to occur.');
         }
-        $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
+      }
+
+      // THE FIX: Safely bundle the existing TranslatableMarkup and your new message into a render array.
+      if ($message) {
+        $existing_message = $form['node_revisions_table'][0]['revision']['#context']['message'] ?? '';
+        
+        $form['node_revisions_table'][0]['revision']['#context']['message'] = [
+          // Keep the original data intact.
+          'original' => is_array($existing_message) ? $existing_message : ['#markup' => $existing_message],
+          // Append our new custom workflow message.
+          'epa_workflow' => ['#markup' => $message],
+        ];
       }
     }
-    // If the current revision is published and has a Sunset Date set.
-    if ($current_revision->status->value && isset($current_revision->field_expiration_date->value)) {
+
+    // Check if the current revision is published and has a Sunset Date set.
+    if ($current_revision->isPublished() && !$current_revision->get('field_expiration_date')->isEmpty()) {
       $current_formatted_date_time = $date_formatter->format(
-        $current_revision->field_expiration_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+        $current_revision->get('field_expiration_date')->date->getTimestamp(), 
+        'custom', 
+        'F d, Y \a\t h:i a T', 
+        $timezone
       );
 
-      $message = '<br>This content will automatically sunset, and be unpublished, on ' . $current_formatted_date_time . '.';
-      // Search for current revision.
-      foreach ($form['node_revisions_table'] as $delta => $revision) {
-        if (isset($revision['#attributes']) && in_array('revision-current', $revision['#attributes']['class'])) {
-          $form['node_revisions_table'][$delta]['revision']['#context']['message']['#markup'] .= $message;
+      $sunset_message = t('<br>This content will automatically sunset, and be unpublished, on %date.', ['%date' => $current_formatted_date_time]);
+      
+      // THE FIX: Use Element::children() to safely iterate over render arrays. 
+      // This prevents accidental iteration over render properties like '#theme'.
+      foreach (\Drupal\Core\Render\Element::children($form['node_revisions_table']) as $delta) {
+        $revision_row = $form['node_revisions_table'][$delta];
+
+        if (isset($revision_row['#attributes']['class']) && in_array('revision-current', $revision_row['#attributes']['class'])) {
+          
+          $existing_message = $form['node_revisions_table'][$delta]['revision']['#context']['message'] ?? '';
+          
+          // Apply the same safe array bundling here.
+          $form['node_revisions_table'][$delta]['revision']['#context']['message'] = [
+            'original' => is_array($existing_message) ? $existing_message : ['#markup' => $existing_message],
+            'epa_workflow_sunset' => ['#markup' => $sunset_message],
+          ];
         }
       }
     }
