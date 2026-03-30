@@ -129,3 +129,53 @@ function epa_revision_update_10006() {
 
   return implode(' ', $messages);
 }
+
+/**
+ * Re-checks media revision tables for leftover bundle columns.
+ */
+function epa_revision_update_10007() {
+  $targets = [
+    'media_revision' => 'bundle',
+    'media_field_revision' => 'bundle',
+  ];
+
+  $messages = [];
+
+  foreach ($targets as $table => $column) {
+    $messages[] = _epa_revision_drop_column_if_exists($table, $column);
+  }
+
+  return implode(' ', $messages);
+}
+
+/**
+ * Final normalization of leftover custom revision-table columns.
+ */
+function epa_revision_update_10008() {
+  $targets = [
+    'paragraphs_item_revision' => 'type',
+    'paragraphs_item_revision_field_data' => 'type',
+    'node_revision' => 'type',
+    'node_field_revision' => 'type',
+    'block_content_revision' => 'type',
+    'block_content_field_revision' => 'type',
+    'crop_revision' => 'type',
+    'crop_field_revision' => 'type',
+    'groups_revision' => 'type',
+    'groups_field_revision' => 'type',
+    'media_revision' => 'bundle',
+    'media_field_revision' => 'bundle',
+    'menu_link_content_revision' => 'bundle',
+    'menu_link_content_field_revision' => 'bundle',
+    'taxonomy_term_field_revision' => 'vid',
+    'taxonomy_term_revision' => 'vid',
+  ];
+
+  $messages = [];
+
+  foreach ($targets as $table => $column) {
+    $messages[] = _epa_revision_drop_column_if_exists($table, $column);
+  }
+
+  return implode(' ', $messages);
+}
