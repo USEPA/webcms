@@ -288,9 +288,11 @@ function _add_ckeditor5_settings(&$settings, mixed $setting, GroupInterface $gro
     }
 
     if ($key == 'drupalInlineMedia') {
-      $url = $value['libraryURL'];
-      $new_url = _media_library_opener_parameters_alter($url, $group);
-      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      if (isset($value['libraryURL'])) {
+        $url = $value['libraryURL'];
+        $new_url = _media_library_opener_parameters_alter($url, $group);
+        $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      }
     }
 
     // Add group ID as query parameter for embeddedParagraph plugin.
