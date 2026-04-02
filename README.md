@@ -33,6 +33,8 @@ Access the site at: <https://epa.ddev.site>
 - **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
 - **[Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md)** - Step-by-step deployment process
 - **[Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md)** - Performance optimization details
+- **[Security Scanning Troubleshooting](.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md)** - Root cause, debugging steps, and mitigation for GitLab security template override failures
+- **[Drupal Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md)** - Proper module uninstall, config export, Composer update, and deployment-safe workflow
 - **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
 - **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
 

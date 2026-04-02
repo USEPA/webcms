@@ -789,6 +789,13 @@ After deploying to dev environment:
   ```bash
   ddev drush cex
   ```
+- **When removing a module, uninstall it in Drupal before touching Composer or deleting code**
+  - Uninstall the module first, then export config, then update Composer or remove the custom code.
+  - Never remove a module from `composer.json` alone and assume deployment will sort it out.
+  - See [Drupal Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) for the full sequence.
+
+- **Never edit `core.extension.yml` by hand**
+  - Let Drupal update active config through uninstall/install operations, then export with `ddev drush cex`.
 
 - **Never commit configuration in code and database simultaneously**
 - **Test configuration imports in clean environment**

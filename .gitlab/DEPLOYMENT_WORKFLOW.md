@@ -159,6 +159,15 @@ git push origin development
 - Wait for current pipeline to finish
 - Cancel old pipeline if stuck
 
+### Pipeline Fails Before Jobs Start
+
+If GitLab rejects `.gitlab-ci.yml` during validation and no jobs run, the problem may be in the merged CI configuration rather than in raw YAML syntax.
+
+- For GitLab security template override issues, see `.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md`
+- Common symptoms include:
+  - `job is used for configuration only, and its script should not be executed`
+  - a locally defined job with `rules:` but no `script:`, `trigger:`, or `extends:`
+
 ### Deployment Fails
 Check the pipeline logs:
 1. Go to the pipeline URL
