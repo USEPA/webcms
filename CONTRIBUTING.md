@@ -2,6 +2,15 @@
 
 Thank you for contributing to the EPA WebCMS project! This guide will help you set up your development environment and understand our development workflows.
 
+Note that a good pull request has the following characteristics:
+
+- The code works, and you are confident that it works. Your job is to deliver code that works.
+- The change is small enough to be reviewed efficiently without inflicting too much additional cognitive load on the reviewer. Several small PRs beats one big one, and splitting code into separate commits is easy with a coding agent to do the Git finagling for you.
+- The PR includes additional context to help explain the change. What's the higher level goal that the change serves? Linking to relevant issues or specifications is useful here.
+- Agents write convincing looking pull request descriptions. You need to review these too! It's rude to expect someone else to read text that you haven't read and validated yourself.
+
+Given how easy it is to dump unreviewed code on other people, please include some form of evidence that you've put that extra work in yourself. Notes on how you manually tested it, comments on specific implementation choices or even screenshots and video of the feature working go a long way to demonstrating that a reviewer's time will not be wasted digging into the details.
+
 ## Table of Contents
 
 - [First-Time Setup](#first-time-setup)
