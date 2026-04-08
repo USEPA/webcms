@@ -1,28 +1,28 @@
-uuid: 474cc8ff-54b4-49de-8e1b-02f99dfcf0ae
+uuid: 78b017ec-a2b1-47c4-936b-63859ffce1df
 langcode: en
 status: true
 dependencies:
   config:
     - search_api.index.news_releases
-    - views.view.duplicate_of_search_news_releases
+    - views.view.search_news_releases
   module:
     - search_api
-id: release_date
-name: 'Release Date'
-weight: 1
+id: news_releases_facets_form_subjects
+name: 'News Releases Facets Form Subjects'
+weight: -2
 min_count: 1
 missing: false
 missing_label: others
-url_alias: release_date
-facet_source_id: 'search_api:views_page__duplicate_of_search_news_releases__page_1'
-field_identifier: field_release
+url_alias: news_releases_facets_form_subjects
+facet_source_id: 'search_api:views_page__search_news_releases__page_1'
+field_identifier: field_subjects
 query_operator: or
 hard_limit: 0
 exclude: false
-use_hierarchy: true
+use_hierarchy: false
 keep_hierarchy_parents_active: false
 hierarchy:
-  type: date_items
+  type: taxonomy
   config: {  }
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
@@ -44,30 +44,26 @@ processor_configs:
     weights:
       sort: 20
     settings:
-      sort: ASC
-  date_item:
-    processor_id: date_item
-    weights:
-      build: 35
-    settings:
-      date_display: actual_date
-      granularity: 6
-      date_format: 'Y'
-      hierarchy: true
+      sort: DESC
   display_value_widget_order:
     processor_id: display_value_widget_order
     weights:
       sort: 40
     settings:
-      sort: DESC
+      sort: ASC
   hierarchy_processor:
     processor_id: hierarchy_processor
     weights:
-      build: 4
+      build: 100
+    settings: {  }
+  translate_entity:
+    processor_id: translate_entity
+    weights:
+      build: 5
     settings: {  }
   url_processor_handler:
     processor_id: url_processor_handler
     weights:
       pre_query: 50
-      build: -4
+      build: 15
     settings: {  }
