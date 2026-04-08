@@ -39,13 +39,7 @@
   <h2 class="h3">{{ 'Search:'|t }}</h2>
   {{ drupal_entity('block', 'exposedformsearch_news_releasespage_1', check_access=false) }}
   <h2 class="h3">{{ 'Filter:'|t }}</h2>
-  {{ drupal_entity('block', 'epa_theme_facetformviewduplicateofsearchnewsreleasesdisplaypage', check_access=false) }}
-  {% include '@uswds/accordion/accordion.twig' with {
-    'modifier_classes': 'usa-accordion--bordered margin-bottom-4',
-    'is_multi_selectable': true,
-    'accordion_id': 'facets',
-    'accordion_content': accordion_content,
-  } %}
+  {{ drupal_entity('block', 'exposedfacetsformfilter_news_releasespage', check_access=false) }}
 {% endset %}
 
 {% set filters %}

@@ -296,6 +296,7 @@ display:
         - user.permissions
       tags:
         - 'config:search_api.index.news_releases'
+        - 'search_api_list:news_releases'
   feed_1:
     id: feed_1
     display_title: Feed
@@ -733,11 +734,12 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -750,6 +752,7 @@ display:
         - 'config:field.storage.node.field_press_office'
         - 'config:field.storage.node.field_release'
         - 'config:search_api.index.news_releases'
+        - 'search_api_list:news_releases'
         - taxonomy_term_list
   page_1:
     id: page_1
@@ -757,6 +760,8 @@ display:
     display_plugin: page
     position: 2
     display_options:
+      cache:
+        type: search_api_none
       style:
         type: epa_core_uswds_collection
         options:
@@ -768,7 +773,7 @@ display:
             'entity:node':
               news_release: teaser
       defaults:
-        cache: true
+        cache: false
         style: false
         row: false
       exposed_block: true
@@ -777,7 +782,7 @@ display:
           ajax_get: false
       path: newsreleases/search
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_interface'
         - url
@@ -785,10 +790,5 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:facets.facet.news_releases_geographic_locations'
-        - 'config:facets.facet.news_releases_language'
-        - 'config:facets.facet.news_releases_press_office'
-        - 'config:facets.facet.news_releases_subjects'
-        - 'config:facets.facet.news_releases_year'
         - 'config:search_api.index.news_releases'
-        - taxonomy_term_list
+        - 'search_api_list:news_releases'
