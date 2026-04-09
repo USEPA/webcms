@@ -275,7 +275,7 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 |--------|-------------|---------|-------------------|
 | `development` | Dev site | Active development | Automatic via `push-dev.sh` |
 | `live` | Stage site | Pre-production testing | Manual trigger |
-| `live` | Production | Live public site | Manual trigger (future) |
+| `main` | Production | Live public site | Manual pipeline trigger |
 
 ---
 
@@ -601,7 +601,7 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 | Branch | Purpose | Deployment Target | Notes |
 |--------|---------|-------------------|-------|
-| `main` | Production source of truth | Production (future) | Locked except for release merges and hotfixes. |
+| `main` | Production source of truth | Production (manual pipeline trigger) | Locked; release merges and hotfixes only. See [Branch Protection](#branch-protection-configuration). |
 | `live` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
 | `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`push-dev.sh`). |
 | `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `development` and open PRs back into `development`. |

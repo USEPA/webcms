@@ -89,7 +89,7 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 **Branch to Environment Mapping:**
 - `development` → Dev site (automatic deployment)
 - `live` → Stage site (manual trigger, includes security scans)
-- `live` → Production (manual trigger, future)
+- `main` → Production (manual pipeline trigger)
 
 **Pipeline Stages:**
 - Development branch: Build → Deploy → Update (~10-15 min)
