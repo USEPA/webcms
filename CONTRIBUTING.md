@@ -633,8 +633,8 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
    - **EPA staff only**
 6. **Promote to Production (`main`)**
    - After stage sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist).
-   - Merge `staging` → `main` via PR (merge commit).
-   - Michael Hessling tags the release (see [Release Tagging Process](#release-tagging-process)) and triggers the production pipeline.
+   - Michael Hessling tags the release on `staging` (see [Release Tagging Process](#release-tagging-process)).
+   - Merge `staging` → `main` via PR (merge commit), then trigger the production pipeline.
    - The production pipeline **does not rebuild images** — it promotes the same images tested on stage (build once, deploy many).
    - **EPA staff only**
 7. **Back-merge to development**
@@ -695,7 +695,7 @@ Hotfixes bypass the normal `development → staging → main` promotion path to 
 
 - **Daily Dev Deploys:** Merge PRs into `development` as they're approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
 - **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `staging`, let the stage pipeline run, and perform QA.
-- **Production Deploys:** After stage QA sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist). Michael Hessling tags the release and triggers the production pipeline on GitLab.
+- **Production Deploys:** After stage QA sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist). Michael Hessling tags the release on `staging` and triggers the production pipeline on GitLab after merging to `main`.
 - **Back-merge:** After each production release, immediately merge `main` → `development` (merge commit). An automated CI job opens this PR; see [Automated Back-Merge](#automated-back-merge).
 
 ### Pull Request Guidelines
@@ -722,21 +722,21 @@ Hotfixes bypass the normal `development → staging → main` promotion path to 
 
 ### Release Tagging Process
 
-Michael Hessling creates the release tag before triggering the production deployment pipeline.
+Michael Hessling creates the release tag on `staging` **before** merging to `main`. The tag marks the exact commit whose Docker images were built and tested on stage — this is the audit trail linking what was tested to what gets deployed.
 
 **Tag format:** `vYYYY.MM.DD` (e.g., `v2026.04.09`). For multiple same-day releases, append a sequence number: `v2026.04.09.2`.
 
 **Steps:**
 1. Confirm stage QA is complete and sign-off is received.
-2. Merge `staging` → `main` via PR (merge commit).
-3. Tag the merge commit on `main`:
+2. Tag the release on `staging`:
    ```bash
-   git checkout main
-   git pull origin main
+   git checkout staging
+   git pull origin staging
    git tag -a vYYYY.MM.DD -m "Release vYYYY.MM.DD: <brief summary>"
    git push origin vYYYY.MM.DD
    ```
-4. Trigger the production pipeline manually on GitLab (`main` branch).
+3. Merge `staging` → `main` via PR (merge commit).
+4. Sync GitLab mirror and trigger the production pipeline on GitLab (`main` branch). The production pipeline promotes the images built from the tagged staging commit — no rebuild.
 
 ### Freeze Protocol
 
@@ -772,11 +772,11 @@ Follow this checklist when promoting from stage to production. **All steps are E
 - [ ] Announce planned production deployment in #webcms-dev
 
 **Promotion:**
+- [ ] Michael Hessling tags the release on `staging` (see [Release Tagging Process](#release-tagging-process))
 - [ ] Create PR: `staging` → `main` on GitHub
 - [ ] Review PR — verify it contains only the expected changes
 - [ ] Merge PR using a merge commit (do not squash)
-- [ ] Michael Hessling tags the release on `main` (see [Release Tagging Process](#release-tagging-process))
-- [ ] Sync GitLab mirror (manual sync recommended; do not rely on 30-min auto-sync)
+- [ ] Sync GitLab mirror
 - [ ] Trigger production pipeline manually on GitLab (`main` branch)
 - [ ] Monitor pipeline to completion
 
