@@ -650,10 +650,37 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 ### Hotfix Flow
 
-1. `git checkout -b hotfix/<issue> main`
-2. Implement fix and open PR targeting `main` (bypasses `development` to minimize risk).
-3. After merging into `main`, cherry-pick/merge into `live` and `development` so branches stay in sync.
-4. Deploy via stage → production promotion path as usual.
+Hotfixes bypass the normal `development → live → main` promotion path to get urgent fixes into production quickly. **EPA staff only** for merge and deploy steps.
+
+1. **Branch from `main`**
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b hotfix/<issue-description>
+   ```
+2. **Implement and validate locally**
+   - Fix the issue and test with `ddev drush deploy -y` and `ddev drush config:status`.
+   - Follow the same code quality checks as any other PR.
+3. **Open PR targeting `main`**
+   - Requires at least one maintainer approval.
+   - PR description should explain the urgency and what is broken in production.
+4. **Merge into `main`** (merge commit, do not squash)
+5. **Tag and deploy to production**
+   - Michael Hessling tags the hotfix on `main` (see [Release Tagging Process](#release-tagging-process)).
+   - Sync GitLab mirror (manual sync — do not wait for auto-sync).
+   - Trigger the production pipeline manually on GitLab (`main` branch).
+   - Monitor pipeline to completion and verify the production site.
+6. **Sync the fix to `live` and `development`**
+   - Cherry-pick or merge the hotfix into `live`:
+     ```bash
+     git checkout live
+     git pull origin live
+     git cherry-pick <hotfix-merge-commit-sha>
+     git push origin live
+     ```
+   - The automated back-merge CI job will open a PR from `main` → `development`. If it doesn't cover the fix (e.g., due to conflicts), cherry-pick into `development` manually.
+   - **All three branches (`main`, `live`, `development`) must contain the hotfix before the next sprint cycle.**
+7. **Communicate** — announce the hotfix and its deployment in #webcms-dev.
 
 ### Why Branch From `development`?
 
