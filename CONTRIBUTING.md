@@ -797,7 +797,7 @@ To prevent `development` from drifting behind `main`, a GitLab CI job automatica
 3. If none exists, it creates a PR from `main` → `development` via the GitHub API.
 4. The team reviews and merges the PR. If there are conflicts, a developer resolves them manually.
 
-**GitLab CI job** (add to `.gitlab-ci.yml`):
+**GitLab CI job** (implemented in `.gitlab-ci.yml`):
 
 ```yaml
 open-backmerge-pr:

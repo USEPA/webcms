@@ -1193,3 +1193,41 @@ artifacts:
       - ./terraform/webcms          # Application Terraform configs
     expire_in: 30 days  # Keep longer for rollback scenarios
 
+#endregion
+
+#region Automated Back-Merge (main branch only)
+# After a production release lands on main, automatically open a GitHub PR
+# to merge main back into development so the next sprint starts from a
+# clean, production-aligned baseline.
+
+open-backmerge-pr:
+  stage: .post
+  image: alpine:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    - |
+      # Check if an open back-merge PR already exists
+      EXISTING=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        "https://api.github.com/repos/USEPA/webcms/pulls?head=USEPA:main&base=development&state=open" \
+        | jq length)
+      if [ "$EXISTING" -gt 0 ]; then
+        echo "Back-merge PR already exists, skipping."
+        exit 0
+      fi
+      # Create the back-merge PR
+      curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://api.github.com/repos/USEPA/webcms/pulls" \
+        -d '{
+          "title": "chore: back-merge main into development",
+          "body": "Automated back-merge to sync production state into development after release.",
+          "head": "main",
+          "base": "development"
+        }'
+  allow_failure: true
+
+#endregion
+
