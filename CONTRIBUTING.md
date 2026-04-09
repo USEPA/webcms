@@ -632,12 +632,21 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
    - Push to `live` to run full stage pipeline (security scans included).
    - **EPA staff only**
 6. **Promote to Production (`main`)**
-   - After stage sign-off, merge `live` → `main`.
-   - Tag the release (e.g., `vYYYY.MM.DD`); production deploy pipeline will consume `main`.
+   - After stage sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist).
+   - Merge `live` → `main` via PR (merge commit).
+   - Michael Hessling tags the release (see [Release Tagging Process](#release-tagging-process)) and triggers the production pipeline.
    - **EPA staff only**
 7. **Back-merge to development**
-   - After production release, merge `main` → `development` to sync any hotfixes or production adjustments.
-   - This keeps `development` up-to-date with production state.
+   - After production release, merge `main` → `development` using a **merge commit** (not rebase).
+   - An automated CI job opens this PR; see [Automated Back-Merge](#automated-back-merge).
+   - If the auto-PR has conflicts, resolve manually:
+   ```bash
+   git checkout development
+   git pull origin development
+   git merge origin/main
+   # Resolve conflicts, then push
+   git push origin development
+   ```
 
 ### Hotfix Flow
 
@@ -658,8 +667,8 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 - **Daily Dev Deploys:** Merge PRs into `development` as they're approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
 - **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `live`, let the stage pipeline run, and perform QA.
-- **Production Deploys:** After stage validation, merge `live` → `main`, tag the release, and trigger production deployment when available.
-- **Back-merge:** After each production release, immediately merge `main` → `development` to sync production state back to active development.
+- **Production Deploys:** After stage QA sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist). Michael Hessling tags the release and triggers the production pipeline on GitLab.
+- **Back-merge:** After each production release, immediately merge `main` → `development` (merge commit). An automated CI job opens this PR; see [Automated Back-Merge](#automated-back-merge).
 
 ### Pull Request Guidelines
 
@@ -674,14 +683,159 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 - **Feature PRs:** Squash or rebase onto `development` to maintain a clean history.
 - **Promotions (`development` → `live`, `live` → `main`):** Use merge commits so a release corresponds to a single identifiable merge.
-- **Back-merges:** After promoting, fast-forward lower environments (e.g., rebase `development` on `main`) to avoid drift.
+- **Back-merges (`main` → `development`):** Use a **merge commit**, not rebase or fast-forward. This preserves commit hashes on `development` so no one's local branch is invalidated. The merge commit also serves as an audit trail for when production state was synced back.
 
 ### FAQs
 
 - **Why not branch from `main` directly?** Branching from `main` causes feature branches to diverge from active development work. By the time a feature is ready, it's missing weeks of changes merged to `development`, leading to late-stage conflicts.
-- **Can I deploy from a feature branch?** No. Only `development` (dev) and `live` (stage) trigger deployments.
+- **Can I deploy from a feature branch?** No. Only `development` (dev) and `live` (stage) trigger automatic deployments. Production deploys from `main` via manual pipeline trigger.
 - **What if a feature spans multiple sprints?** Periodically rebase on `development` to stay current with integrated work. Use feature flags for incomplete functionality.
-- **How do freeze periods work?** Pause merges into `development`, finish testing on `live`, promote to `main`, then merge `main` → `development` when the freeze lifts to sync any last-minute hotfixes.
+- **How do freeze periods work?** See [Freeze Protocol](#freeze-protocol) for the full process.
+
+### Release Tagging Process
+
+Michael Hessling creates the release tag before triggering the production deployment pipeline.
+
+**Tag format:** `vYYYY.MM.DD` (e.g., `v2026.04.09`). For multiple same-day releases, append a sequence number: `v2026.04.09.2`.
+
+**Steps:**
+1. Confirm stage QA is complete and sign-off is received.
+2. Merge `live` → `main` via PR (merge commit).
+3. Tag the merge commit on `main`:
+   ```bash
+   git checkout main
+   git pull origin main
+   git tag -a vYYYY.MM.DD -m "Release vYYYY.MM.DD: <brief summary>"
+   git push origin vYYYY.MM.DD
+   ```
+4. Trigger the production pipeline manually on GitLab (`main` branch).
+
+### Freeze Protocol
+
+A code freeze restricts merges to stabilize the codebase before a production release.
+
+**Initiating a Freeze:**
+1. Release manager (Michael Hessling) announces the freeze in #webcms-dev Slack with the expected duration and target release date.
+2. During the freeze, **no new PRs are merged into `development`** except:
+   - Critical bug fixes required for the release
+   - Documentation-only changes
+3. In-progress feature branches should be rebased on `development` but held until the freeze lifts.
+
+**During the Freeze:**
+1. QA and validation happen on the `live` (stage) environment.
+2. Critical fixes follow the hotfix flow: branch from `main` or `live`, fix, PR, merge.
+3. All hotfixes merged during the freeze must be communicated in #webcms-dev.
+
+**Lifting the Freeze:**
+1. Production release is deployed and verified.
+2. Back-merge `main` → `development` (merge commit) to incorporate freeze-period hotfixes.
+3. Release manager announces the freeze is lifted in #webcms-dev.
+4. Held PRs can resume merging into `development`.
+
+### Stage-to-Production Promotion Checklist
+
+Follow this checklist when promoting from stage to production. **All steps are EPA staff only.**
+
+**Pre-Promotion:**
+- [ ] Stage QA is complete
+- [ ] Stakeholder sign-off received
+- [ ] No outstanding critical bugs on stage
+- [ ] If a freeze is needed, initiate the [Freeze Protocol](#freeze-protocol)
+- [ ] Announce planned production deployment in #webcms-dev
+
+**Promotion:**
+- [ ] Create PR: `live` → `main` on GitHub
+- [ ] Review PR — verify it contains only the expected changes
+- [ ] Merge PR using a merge commit (do not squash)
+- [ ] Michael Hessling tags the release on `main` (see [Release Tagging Process](#release-tagging-process))
+- [ ] Sync GitLab mirror (manual sync recommended; do not rely on 30-min auto-sync)
+- [ ] Trigger production pipeline manually on GitLab (`main` branch)
+- [ ] Monitor pipeline to completion
+
+**Post-Promotion:**
+- [ ] Verify production site is healthy (smoke test key pages and workflows)
+- [ ] Confirm ECS service updated in AWS Console
+- [ ] Merge the automated back-merge PR (`main` → `development`); resolve conflicts if any
+- [ ] Announce deployment complete in #webcms-dev
+- [ ] If a freeze was in effect, lift it
+
+### Automated Back-Merge
+
+To prevent `development` from drifting behind `main`, a GitLab CI job automatically opens a GitHub PR from `main` → `development` after any push to `main`.
+
+**How it works:**
+1. When the GitLab mirror syncs a new commit on `main`, the `open-backmerge-pr` CI job runs.
+2. The job checks for an existing open back-merge PR to avoid duplicates.
+3. If none exists, it creates a PR from `main` → `development` via the GitHub API.
+4. The team reviews and merges the PR. If there are conflicts, a developer resolves them manually.
+
+**GitLab CI job** (add to `.gitlab-ci.yml`):
+
+```yaml
+open-backmerge-pr:
+  stage: .post
+  image: alpine:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    - |
+      EXISTING=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        "https://api.github.com/repos/USEPA/webcms/pulls?head=USEPA:main&base=development&state=open" \
+        | jq length)
+      if [ "$EXISTING" -gt 0 ]; then
+        echo "Back-merge PR already exists, skipping."
+        exit 0
+      fi
+      curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://api.github.com/repos/USEPA/webcms/pulls" \
+        -d '{
+          "title": "chore: back-merge main into development",
+          "body": "Automated back-merge to sync production state into development after release.",
+          "head": "main",
+          "base": "development"
+        }'
+  allow_failure: true
+```
+
+**Required setup:**
+- Add `GITHUB_TOKEN` as a protected, masked CI/CD variable in GitLab (Settings → CI/CD → Variables) with `repo` scope.
+
+### Branch Protection Configuration
+
+GitHub branch protection rules for this repository. Audit these periodically to ensure they remain in effect.
+
+**To configure:** GitHub → Repository Settings → Branches → Branch protection rules.
+
+#### `main` (production)
+- ✅ Require a pull request before merging
+  - Required approvals: **1** (maintainer)
+  - Dismiss stale pull request approvals when new commits are pushed
+- ✅ Require status checks to pass before merging
+- ✅ Require branches to be up to date before merging
+- ✅ Do not allow force pushes
+- ✅ Do not allow deletions
+- ✅ Restrict who can push: EPA staff / repository maintainers only
+
+#### `live` (stage)
+- ✅ Require a pull request before merging
+  - Required approvals: **1** (maintainer)
+- ✅ Require status checks to pass before merging
+- ✅ Do not allow force pushes
+- ✅ Do not allow deletions
+- ✅ Restrict who can push: EPA staff / repository maintainers only
+
+#### `development` (dev)
+- ✅ Require a pull request before merging
+  - Required approvals: **1**
+- ✅ Do not allow force pushes
+
+#### Feature branches (`feature/*`, `bugfix/*`, `hotfix/*`)
+- No branch protection rules required
+- Developers manage their own branches
+- Delete branches after merge
 
 ### Commit Message Convention
 
