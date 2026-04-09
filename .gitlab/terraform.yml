@@ -162,24 +162,24 @@ apply:
   #
   # There are three rules:
   # 1. We require approval of the infrastructure module on its tracking branches (main and
-  #    live).
+  #    staging).
   # 2. We permit automatic application of the webcms module, since it only updates a
   #    limited subset of ECS resources.
   # 3. Any other attempt to apply a Terraform plan is explicitly denied. This is provided
   #    as a safety net to keep misconfigured trigger jobs from accidentally clobbering
-  #    live AWS resources.
+  #    staging/production AWS resources.
   #
   # NB. GitLab uses a "first match wins" order of rule evaluation, which is why the third
   # rule does not have an `if:` condition limiting when it applies.
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
       when: manual
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
       when: on_success
 
     - when: never

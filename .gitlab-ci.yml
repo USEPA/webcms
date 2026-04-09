@@ -12,17 +12,17 @@ stages:
   # Docker Image Builds (all branches) - Build first to enable testing
   - Build                             # Build application Docker images (drupal, nginx, drush)
 
-  # Security Scanning (live branch only - stage deployments)
+  # Security Scanning (staging branch only - stage deployments)
   - Test                              # Run SAST, dependency scanning, secret detection
   - Scan                              # Prisma Cloud image vulnerability scanning
 
-  # Infrastructure Provisioning (live branch only)
+  # Infrastructure Provisioning (staging branch only)
   - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
   - Infrastructure:Preprod:Validate   # Validate Terraform configuration syntax
   - Infrastructure:Preprod:Plan       # Generate Terraform execution plan
   - Infrastructure:Preprod:Apply      # Apply infrastructure changes (manual approval required)
 
-  # Production Deployment (live branch → WEBCMS_SITE: dev)
+  # Production Deployment (staging branch → WEBCMS_SITE: dev)
   - Deploy:Dev:Init                   # Initialize production deployment (English + Spanish parallel)
   - Deploy:Dev:Validate               # Validate production Terraform config (English + Spanish parallel)
   - Deploy:Dev:Plan                   # Plan production deployment (English + Spanish parallel)
@@ -73,9 +73,9 @@ default:
 # pipelines. Creates unique image tags based on branch and commit for reproducible builds.
 variables:
   WEBCMS_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
-  # Control dev deployment from live branch
+  # Control dev deployment from staging branch
   # Set DEPLOY_TO_DEV=true when manually triggering pipeline to also deploy to dev site
-  # By default, live branch only deploys to stage
+  # By default, staging branch only deploys to stage
   DEPLOY_TO_DEV: "false"
   # Skip Docker image builds and reuse existing :development-latest images
   # Set SKIP_BUILD=true to deploy code changes without rebuilding containers
@@ -103,7 +103,7 @@ include:
 # https://docs.gitlab.com/user/application_security/troubleshooting_application_security/
 #
 # Instead, override `rules:` on the specific analyzer sub-jobs to control when scanning runs.
-# We restrict security scanning to the live branch only (stage deployments) to keep the
+# We restrict security scanning to the staging branch only (stage deployments) to keep the
 # development branch pipeline fast.
 
 # Override stage assignment on parent config jobs (stage override is safe; rules override is not)
@@ -116,19 +116,19 @@ dependency_scanning:
 secret_detection:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 
-# Restrict actual analyzer sub-jobs to live branch only
+# Restrict actual analyzer sub-jobs to staging branch only
 # Development branch skips security scanning for faster iteration
 semgrep-sast:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 
 gemnasium-dependency_scanning:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 
 #region Templates
@@ -256,20 +256,20 @@ gemnasium-dependency_scanning:
   # These rules provide defense-in-depth against accidental deployments.
   #
   # Rule evaluation uses "first match wins" logic:
-  # 1. Infrastructure module changes require manual approval on main/live branches
+  # 1. Infrastructure module changes require manual approval on main/staging branches
   #    (prevents accidental changes to VPC, ECS clusters, load balancers, etc.)
   # 2. WebCMS module changes (ECS task definitions, service configs) run automatically
-  #    on integration/main/live branches as they are lower-risk and frequently updated
+  #    on integration/main/staging branches as they are lower-risk and frequently updated
   # 3. All other scenarios are denied by default (safety net for misconfigurations)
   rules:
     - if: >-
         $TF_MODULE == "infrastructure" &&
-        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
       when: manual  # Require human approval for core infrastructure changes
 
     - if: >-
         $TF_MODULE == "webcms" &&
-        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+        ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
       when: on_success  # Auto-apply application deployment changes
 
     - when: never  # Deny all other apply attempts (safety net)
@@ -350,7 +350,7 @@ gemnasium-dependency_scanning:
 # These templates reduce duplication by providing common configurations for each deployment environment
 
 # Dev Site Template (development branch → WEBCMS_SITE: dev)
-# Also deploys from live branch when DEPLOY_TO_DEV=true
+# Also deploys from staging branch when DEPLOY_TO_DEV=true
 # Requires manual approval for infrastructure changes, automatic for application updates
 .deploy:production:
   extends: .deploy
@@ -359,10 +359,10 @@ gemnasium-dependency_scanning:
     WEBCMS_SITE: dev
   rules:
     - if: '$CI_COMMIT_BRANCH == "development" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
-    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
+    - if: '$CI_COMMIT_BRANCH == "staging" && $DEPLOY_TO_DEV == "true" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "dev")'
 
-# Stage Site Template (live branch → WEBCMS_SITE: stage)
-# Deploys to stage site from live branch for final testing before production.
+# Stage Site Template (staging branch → WEBCMS_SITE: stage)
+# Deploys to stage site from staging branch for final testing before production.
 # Supports both English and Spanish languages.
 .deploy:staging:
   extends: .deploy
@@ -370,7 +370,7 @@ gemnasium-dependency_scanning:
     WEBCMS_ENVIRONMENT: preproduction  # AWS account tier (same as dev/production)
     WEBCMS_SITE: stage                 # Logical site identifier within environment
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "stage")'
+    - if: '$CI_COMMIT_BRANCH == "staging" && ($WEBCMS_SITE_FILTER == null || $WEBCMS_SITE_FILTER == "stage")'
 
 # Kaniko Build Template (.kaniko)
 # Base template for all Docker image builds using Kaniko (GitLab-compatible Docker builder)
@@ -444,13 +444,13 @@ build:drupal:dev:
       --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:development-latest
       --destination=$CI_REGISTRY_IMAGE/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-$WEBCMS_TARGET:$WEBCMS_IMAGE_TAG
 
-# Live branch builds - stage (and optionally dev)
+# Staging branch builds - stage (and optionally dev)
 # By default only builds stage, set DEPLOY_TO_DEV=true to also build dev
 build:drupal:stage:
   extends: .kaniko
   stage: Build
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: always
     - if: '$CI_COMMIT_TAG'
       variables:
@@ -495,7 +495,7 @@ build:drupal:stage:
 #region Prisma Cloud Image Scanning
 # Scan Docker images for vulnerabilities using Prisma Cloud (Twistlock)
 # These jobs pull images from GitLab registry and scan them using twistcli
-# Only runs on live branch (stage deployments)
+# Only runs on staging branch (stage deployments)
 
 Prisma:Drupal:
   stage: Scan
@@ -508,7 +508,7 @@ Prisma:Drupal:
     - if: '$CI_COMMIT_TAG'  # Run on tagged releases
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG  # Use tag as image tag
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Run on staging branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
@@ -543,7 +543,7 @@ Prisma:Nginx:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Run on staging branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
@@ -578,7 +578,7 @@ Prisma:Drush:
     - if: '$CI_COMMIT_TAG'
       variables:
         WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch only (stage site)
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Run on staging branch only (stage site)
   parallel:
     matrix:
       - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
@@ -611,13 +611,13 @@ Prisma:Drush:
 # This account hosts multiple logical environments: development site, staging site, and production (dev) site.
 # All share WEBCMS_ENVIRONMENT=preproduction but differ by WEBCMS_SITE variable.
 
-# Infrastructure Provisioning Jobs (live branch only)
+# Infrastructure Provisioning Jobs (staging branch only)
 # Creates/updates shared AWS resources: VPC, ECS cluster, load balancers, S3 buckets, etc.
 infrastructure:preproduction:init:
   extends: .infrastructure
   stage: Infrastructure:Preprod:Init
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch (production deployments)
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch (production deployments)
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev  # Shared state for preproduction infrastructure
@@ -632,7 +632,7 @@ infrastructure:preproduction:validate:
   stage: Infrastructure:Preprod:Validate
   needs: ["infrastructure:preproduction:init"]  # Wait for init to complete
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -646,7 +646,7 @@ infrastructure:preproduction:plan:
   stage: Infrastructure:Preprod:Plan
   needs: ["infrastructure:preproduction:validate"]  # Wait for validation to pass
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -670,7 +670,7 @@ infrastructure:preproduction:apply:
   needs: ["infrastructure:preproduction:plan"]         # Wait for plan to complete
   dependencies: ["infrastructure:preproduction:plan"]  # Download plan.cache artifact
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Only run on live branch
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
   variables:
     WEBCMS_ENVIRONMENT: preproduction
     TF_STATE_NAME: dev
@@ -835,7 +835,7 @@ deploy:dev:apply-en:
     - job: "build:drupal:dev"
       artifacts: false  # Don't wait for build artifacts
       optional: true
-    - job: "build:drupal:stage"  # For live branch builds
+    - job: "build:drupal:stage"  # For staging branch builds
       artifacts: false
       optional: true
   dependencies: ["deploy:dev:plan-en"]  # Download plan.cache artifact only
@@ -872,10 +872,10 @@ deploy:dev:apply-en:
         $TF_MODULE == "webcms" &&
         $CI_COMMIT_BRANCH == "development"
       when: on_success
-    # Live branch: manual deployment when DEPLOY_TO_DEV=true
+    # Staging branch: manual deployment when DEPLOY_TO_DEV=true
     - if: >-
         $TF_MODULE == "webcms" &&
-        $CI_COMMIT_BRANCH == "live" &&
+        $CI_COMMIT_BRANCH == "staging" &&
         $DEPLOY_TO_DEV == "true"
       when: manual
     - when: never       # Deny all other scenarios
@@ -905,18 +905,18 @@ deploy:dev:apply-en:
 #       when: never
 #     - if: >-
 #         $TF_MODULE == "infrastructure" &&
-#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#         ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
 #       when: manual      # Require approval for VPC, ECS cluster, load balancer changes
 #     - if: >-
 #         $TF_MODULE == "webcms" &&
-#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "live")
+#         ($CI_COMMIT_BRANCH == "integration" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging")
 #       when: manual      # Require manual approval for all production deployments
 #     - when: never       # Deny all other scenarios
 
 #endregion
 
-#region Stage Site Deployment (live branch → WEBCMS_SITE: stage)
-# Deploys to stage site from live branch for final testing before production
+#region Stage Site Deployment (staging branch → WEBCMS_SITE: stage)
+# Deploys to stage site from staging branch for final testing before production
 # Supports both English and Spanish languages with parallel matrix builds
 
 # Initialize Terraform for stage site deployments
@@ -1076,7 +1076,7 @@ update:stage:en:
   rules:
     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -1100,7 +1100,7 @@ update:stage:es:
   rules:
     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -1124,7 +1124,7 @@ update:dev:en:
     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "dev"'
       when: never
     - if: '$CI_COMMIT_BRANCH == "development"'
-    - if: '$CI_COMMIT_BRANCH == "live" && $DEPLOY_TO_DEV == "true"'
+    - if: '$CI_COMMIT_BRANCH == "staging" && $DEPLOY_TO_DEV == "true"'
 
   variables:
     WEBCMS_ENVIRONMENT: preproduction
@@ -1180,7 +1180,7 @@ artifacts:
       when: never
     - if: $CI_COMMIT_TAG != ""  # Run on tagged releases
       when: always
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Run on live branch deployments
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Run on staging branch deployments
       when: always
     - when: never  # Don't run on any other branches
   script:
