@@ -88,12 +88,13 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 
 **Branch to Environment Mapping:**
 - `development` → Dev site (automatic deployment)
-- `live` → Stage site (manual trigger, includes security scans)
+- `staging` → Stage site (manual trigger, includes security scans)
 - `main` → Production (manual pipeline trigger)
 
 **Pipeline Stages:**
 - Development branch: Build → Deploy → Update (~10-15 min)
-- Live branch: Build → Test → Scan → Deploy → Update (~25-35 min)
+- Staging branch: Build → Test → Scan → Deploy → Update (~25-35 min)
+- Main branch: Promote (re-tag images) → Deploy → Update (~5-10 min) — no rebuild, uses stage-tested images
 
 ## Quick Commands
 
@@ -155,13 +156,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command ref
 
 ### Advanced Pipeline Variables
 
-#### Deploying Dev from the `live` Branch
+#### Deploying Dev from the `staging` Branch
 
-By default, pipelines on `live` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
+By default, pipelines on `staging` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
 
 **Steps:**
 1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
-2. Select the `live` branch.
+2. Select the `staging` branch.
 3. Add a CI/CD variable:
    - **Key:** `DEPLOY_TO_DEV`
    - **Value:** `true`
@@ -170,19 +171,19 @@ By default, pipelines on `live` build images and deploy only to the stage enviro
 **What happens:**
 - The `build:drupal:stage` job builds images for both `stage` and `dev` (dev builds are skipped unless `DEPLOY_TO_DEV=true`).
 - Stage deploy jobs run automatically (with full Test/Scan stages).
-- The dev deploy job stays **manual** when triggered from `live`, so you must click the play button after stage validation.
+- The dev deploy job stays **manual** when triggered from `staging`, so you must click the play button after stage validation.
 
 Notes:
 - `DEPLOY_TO_DEV` is ignored on the `development` branch (dev deploys always happen there).
-- Use this flow sparingly—every dev deploy from `live` requires manual approval and will reuse the `live` branch artifacts.
+- Use this flow sparingly—every dev deploy from `staging` requires manual approval and will reuse the `staging` branch artifacts.
 
 #### Filtering Deployments by Site
 
-Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `live` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
+Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `staging` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
 
 **Steps:**
 1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
-2. Select the `live` branch.
+2. Select the `staging` branch.
 3. Add a CI/CD variable:
    - **Key:** `WEBCMS_SITE_FILTER`
    - **Value:** `stage` (to deploy only stage) or `dev` (to deploy only dev when combined with `DEPLOY_TO_DEV=true`)
@@ -285,7 +286,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Branch Strategy:**
 - `main` - Stable release (matches production)
-- `live` - Pre-production (deploys to stage)
+- `staging` - Pre-production (deploys to stage)
 - `development` - Active development (deploys to dev)
 - `feature/*`, `bugfix/*`, `hotfix/*` - Feature branches
 

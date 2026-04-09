@@ -6,7 +6,7 @@ This is the class of issue that is easy to misread because GitLab can point at a
 
 ## What Broke
 
-I was trying to keep security scanning restricted to the `live` branch while still using GitLab's built-in templates:
+I was trying to keep security scanning restricted to the `staging` branch while still using GitLab's built-in templates:
 
 - `Jobs/SAST.gitlab-ci.yml`
 - `Jobs/Dependency-Scanning.gitlab-ci.yml`
@@ -45,7 +45,7 @@ If I write this:
 ```yaml
 secret-detection:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 ```
 
@@ -58,7 +58,7 @@ The correct override is:
 ```yaml
 secret_detection:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 ```
 
@@ -173,7 +173,7 @@ That is useful for runtime troubleshooting, but I should remove it afterward bec
 What I want in this repo is:
 
 - keep the parent jobs for stage overrides only
-- restrict runnable analyzers to `live`
+- restrict runnable analyzers to `staging`
 - override Secret Detection using the real job name
 
 This is the safe shape:
@@ -188,17 +188,17 @@ dependency_scanning:
 secret_detection:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 
 semgrep-sast:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 
 gemnasium-dependency_scanning:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
     - when: never
 ```
 
@@ -215,14 +215,14 @@ This avoids both failure modes:
 sast:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 ```
 
 ```yaml
 dependency_scanning:
   stage: Test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 ```
 
 These look reasonable, but they can cause GitLab to try to run configuration-only jobs.
@@ -232,7 +232,7 @@ These look reasonable, but they can cause GitLab to try to run configuration-onl
 ```yaml
 secret-detection:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
 ```
 
 This creates a new invalid job instead of overriding the built-in Secret Detection job.

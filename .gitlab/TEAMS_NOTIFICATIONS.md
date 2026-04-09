@@ -57,38 +57,38 @@ chmod +x test-teams-webhook.sh
 
 ### Build Success/Failure
 - **When**: After `build:drupal` completes
-- **Branch**: `live` only
+- **Branch**: `staging` only
 - **Color**: Green (success) / Red (failure)
 - **Info**: Environment, commit, job logs (failure)
 
 ### Manual Approval Required
 - **When**: After infrastructure plan completes
-- **Branch**: `live` only  
+- **Branch**: `staging` only  
 - **Color**: Blue
 - **Info**: Direct link to approve
 
 ### Deployment Started
 - **When**: Deployment begins
-- **Branch**: `live` only
+- **Branch**: `staging` only
 - **Color**: Orange
 - **Info**: Environment, site, language
 
 ### Deployment Success
 - **When**: Deployment completes successfully
-- **Branch**: `live` only
+- **Branch**: `staging` only
 - **Color**: Green
 - **Info**: Duration, image tag, deployer
 
 ### Deployment Failure
 - **When**: Deployment fails
-- **Branch**: `live` only
+- **Branch**: `staging` only
 - **Color**: Red
 - **Alert**: Includes urgent warning message
 - **Info**: Failed stage, commit author
 
 ### Security Scan Issues
 - **When**: SAST/dependency/secret detection fails
-- **Branch**: `live` only
+- **Branch**: `staging` only
 - **Color**: Red
 - **Info**: Link to security report
 
@@ -126,13 +126,13 @@ Edit `.gitlab/teams-notifications.yml` to:
 - Add custom fields to messages
 - Create new notification types (extend `.teams_notify`)
 
-Example - Only notify on `live` branch:
+Example - Only notify on `staging` branch:
 ```yaml
 notify:build:success:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Removed "main" check
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Removed "main" check
       when: on_success
 ```
 
