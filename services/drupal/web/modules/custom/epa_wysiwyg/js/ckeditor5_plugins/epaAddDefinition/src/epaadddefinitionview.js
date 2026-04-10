@@ -1,5 +1,5 @@
-import { icons } from "ckeditor5/src/core";
-import { ButtonView, View, submitHandler } from "ckeditor5/src/ui";
+import { ButtonView, View, submitHandler } from 'ckeditor5/src/ui';
+import { IconCheck, IconCancel } from 'ckeditor5/src/icons';
 import "./dialog.css";
 import MatchListView from "./views/matchlistview";
 
@@ -14,7 +14,7 @@ export default class EpaAddDefinitionView extends View {
 
     this.submitButton = this._createButton(
       "Save",
-      icons.check,
+      IconCheck,
       "ck-button-save"
     );
 
@@ -22,7 +22,7 @@ export default class EpaAddDefinitionView extends View {
 
     this.cancelButton = this._createButton(
       "Cancel",
-      icons.cancel,
+      IconCancel,
       "ck-button-cancel"
     );
 
