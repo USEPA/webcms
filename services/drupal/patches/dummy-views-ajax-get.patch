@@ -1,0 +1,19 @@
+diff --git a/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php b/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
+index abcdef..123456 100644
+--- a/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
++++ b/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
+@@ -40,8 +40,14 @@
+    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+    *   Thrown if $plugin_id is invalid and $exception_on_invalid is TRUE.
+    */
+   protected function doGetDefinition(array $definitions, $plugin_id, $exception_on_invalid) {
++    // Temporary bypass: return the 'default' extender as a stand-in for the
++    // removed views_ajax_get plugin so the factory can instantiate something
++    // valid and the site does not crash.
++    if ($plugin_id === 'views_ajax_get') {
++      return isset($definitions['default']) ? $definitions['default'] : NULL;
++    }
+     // Avoid using a ternary that would create a copy of the array.
+     if (isset($definitions[$plugin_id])) {
+       return $definitions[$plugin_id];
+     }
