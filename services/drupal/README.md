@@ -23,8 +23,7 @@ After that you can create the project:
 composer create-project drupal-composer/drupal-project:10.x-dev some-dir --no-interaction
 ```
 
-With `composer require ...` you can download new dependencies to your
-installation.
+With `composer require ...` you can download new dependencies to your installation.
 
 ```bash
 cd some-dir
