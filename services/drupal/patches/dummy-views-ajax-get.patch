@@ -1,7 +1,11 @@
-diff --git a/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php b/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
---- a/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
-+++ b/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
-@@ -43,6 +43,12 @@ trait DiscoveryTrait {
+diff --git a/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php b/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
+index abcdef..123456 100644
+--- a/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
++++ b/core/lib/Drupal/Component/Plugin/Discovery/DiscoveryTrait.php
+@@ -40,8 +40,14 @@
+    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+    *   Thrown if $plugin_id is invalid and $exception_on_invalid is TRUE.
+    */
    protected function doGetDefinition(array $definitions, $plugin_id, $exception_on_invalid) {
 +    // Temporary bypass: return the 'default' extender as a stand-in for the
 +    // removed views_ajax_get plugin so the factory can instantiate something
