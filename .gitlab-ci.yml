@@ -1094,9 +1094,12 @@ update:stage:en:
 update:stage:es:
   extends: .update
   stage: Update
-  needs:
-    - job: "deploy:stage:apply-es"
-      optional: true
+  # NOTE: No explicit `needs:` on `deploy:stage:apply-es`.
+  # That job is `when: manual` — if it's never clicked, an explicit
+  # `needs:` (even with `optional: true`) leaves this job blocked and
+  # ultimately marked as skipped at pipeline end. Relying on stage
+  # ordering (Update runs after Deploy:Stage:Apply) lets this job be
+  # triggered manually whether or not the apply was run.
   rules:
     - if: '$WEBCMS_SITE_FILTER && $WEBCMS_SITE_FILTER != "stage"'
       when: never
@@ -1114,6 +1117,7 @@ update:stage:es:
     name: site/stage-es
   # Temporary: Require manual approval during initial AWS testing
   when: manual
+
 update:dev:en:
   extends: .update
   stage: Update
