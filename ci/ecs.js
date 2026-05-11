@@ -204,6 +204,55 @@ async function getDrushStatus(task) {
   return { stopCode, stopReason: stoppedReason, exitCode, exitReason: reason };
 }
 
+/**
+ * Fetches the image tag currently configured in the ACTIVE revision of the Drush task
+ * definition for this site/language. This is used by `drush.js` to detect drift between
+ * the build tag that triggered the Drush update and the image tag that is actually
+ * deployed in ECS — useful for catching cases where Drush is being run against a stale
+ * deployment (for example, when `update:stage:es` is triggered without first applying
+ * `deploy:stage:apply-es`).
+ *
+ * The returned string is the portion of the container image URL after the final `:`,
+ * which matches the convention used by `$WEBCMS_IMAGE_TAG` in `.gitlab-ci.yml`.
+ *
+ * Returns `undefined` (rather than throwing) when the tag cannot be determined, since
+ * this information is advisory only and the surrounding Drush run should not be blocked
+ * by a transient AWS error.
+ *
+ * @return {Promise<string | undefined>}
+ *
+ * @public
+ */
+async function getDeployedImageTag() {
+  const taskDefinition = `webcms-${vars.environment}-${vars.site}-${vars.lang}-drush`;
+
+  try {
+    const command = new ECS.DescribeTaskDefinitionCommand({ taskDefinition });
+    const response = await client.send(command);
+
+    const drushContainer = response.taskDefinition?.containerDefinitions?.find(
+      (c) => c.name === "drush"
+    );
+
+    if (!drushContainer || !drushContainer.image) {
+      return undefined;
+    }
+
+    // Image URLs are of the form `<registry>/<repo>:<tag>`. Split on the last `:` to
+    // tolerate registries that include a port (e.g., `host:5000/repo:tag`).
+    const lastColon = drushContainer.image.lastIndexOf(":");
+    if (lastColon === -1) {
+      return undefined;
+    }
+
+    return drushContainer.image.slice(lastColon + 1);
+  } catch {
+    // Advisory only — swallow errors so they don't abort the Drush run.
+    return undefined;
+  }
+}
+
 exports.stopRunningTasks = stopRunningTasks;
 exports.startDrushTask = startDrushTask;
 exports.getDrushStatus = getDrushStatus;
+exports.getDeployedImageTag = getDeployedImageTag;
