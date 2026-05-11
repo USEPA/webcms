@@ -5,6 +5,7 @@ const dedent = require("dedent");
 const ecs = require("./ecs");
 const ui = require("./ui");
 const util = require("./util");
+const vars = require("./vars");
 
 /**
  * The Drush update script to run in ECS.
@@ -30,6 +31,33 @@ const drushScript = dedent`
  * @function
  */
 async function main() {
+  // Image-tag drift check. Compare the tag currently deployed in the ECS Drush task
+  // definition against the tag this CI build was produced from. A mismatch usually means
+  // the Drush update is being triggered without a fresh `deploy:*:apply-*` job (for
+  // example, when `update:stage:es` is run before `deploy:stage:apply-es` has been
+  // applied). This is advisory only — the Drush run continues either way.
+  ui.logHeading("ecs", "Verifying deployed image tag");
+
+  const deployedTag = await ecs.getDeployedImageTag();
+  if (!deployedTag) {
+    ui.log(
+      "⚠️  Could not determine the deployed image tag from ECS; skipping drift check."
+    );
+  } else if (deployedTag === vars.imageTag) {
+    ui.log(`Deployed tag matches build tag (${vars.imageTag}).`);
+  } else {
+    ui.log("⚠️  WARNING: Deployed image tag does not match this build's tag.");
+    ui.log(`    Build tag:    ${vars.imageTag}`);
+    ui.log(`    Deployed tag: ${deployedTag}`);
+    ui.log(
+      "    Drush will run against the currently-deployed image. If this is unexpected,"
+    );
+    ui.log(
+      `    re-run the corresponding deploy:${vars.site}:apply-${vars.lang} job first.`
+    );
+  }
+  ui.log();
+
   // Wipe the running Drupal tasks since they're most likely stale. See the documentation
   // for `stopRunningTasks` for why.
   ui.logHeading("ecs", "Stopping Drupal tasks");
