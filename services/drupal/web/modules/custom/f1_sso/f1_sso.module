@@ -21,6 +21,8 @@ function f1_sso_user_login($account) {
   // Only overwrite destination if we don't already have one set.
   if (empty(\Drupal::service('request_stack')->getCurrentRequest()->query->get('destination'))) {
     $url = \Drupal\Core\Url::fromUserInput('/admin/content/my-web-areas');
+    
+    //Generate absolute URL, setting to TRUE collect bubbleable metadata
     $generatedUrl = $url->toString(TRUE);
 
     $cacheability = new Drupal\Core\Cache\CacheableMetadata();
