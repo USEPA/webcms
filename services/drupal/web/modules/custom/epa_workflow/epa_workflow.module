@@ -562,37 +562,6 @@ function epa_workflow_node_presave(NodeInterface $node) {
     return;
   }
 
-  $storage = \Drupal::entityTypeManager()->getStorage('node');
-  $original = $node->original;
-  if ($original) {
-    $default_revision_id = $original->get('vid')->value;
-    $latest_revision_id = $storage->getLatestRevisionId($node->id());
-    $loaded_rev_id = $node->getLoadedRevisionId();
-    $moderation_state = $node->moderation_state->value;
-    $moderation_info = \Drupal::service('content_moderation.moderation_information');
-    $workflow = $moderation_info->getWorkflowForEntity($node);
-    $workflow_states = $workflow->get('type_settings')['states'];
-
-    // Only leapfrog to reset latest revision if the following is true:
-    // - Revision undergoing transition is the default revision AND
-    // - there's a different latest revision AND
-    // - we are transitioning the current revision to another state that will make
-    // it the "default" revision AND
-    // - this is not a "syncing" save (a save that is meant to happen more-or-less
-    // transparently on a revision just to update field data)
-    if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
-      $node->leapfrog = $latest_revision_id;
-    }
-
-    // Set the "last_revision" property to fool the content_moderation_notifications
-    // module into properly detecting which transition we are firing since it
-    // does not expect us to be transitioning a non-latest revision.
-    // So if we're doing a save on the default revision and there's a different
-    // latest revision, we need to set the "last_revision" as the current revision.
-    if (!$node->isSyncing() && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
-      $node->last_revision = $original;
-    }
-  }
 
   // Update the log message for revisions created through bulk operations.
   $request = \Drupal::request();
@@ -629,29 +598,6 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 }
 
-/**
- * Implements hook_ENTITY_TYPE_update().
- */
-function epa_workflow_node_update(NodeInterface $node) {
-  if (isset($node->leapfrog)) {
-    // If the revision being saved was the default, but was not the latest, then
-    // we have a forward revision and we need to leap frog it to the front so
-    // the user doesn't get confused by their "latest revision" disappearing.
-    $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $last_revision = $storage->loadRevision($node->leapfrog);
-    $last_revision->setNewRevision();
-    // If our default revision is not published then this leapfrogged revision
-    // should also take over the default revision spot. This follows the model
-    // of what core does. If the default revision IS published then our leapfrog
-    // revision is only the latest revision and does not take over the default.
-    $last_revision->isDefaultRevision(!$node->isPublished());
-    $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
-    $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
-    $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.', ['%vid' => $node->leapfrog]));
-    $last_revision->setSyncing(TRUE);
-    $last_revision->save();
-  }
-}
 
 /**
  * Helper function to add compliance checkboxes to some forms.
