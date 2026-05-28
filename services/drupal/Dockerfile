@@ -201,7 +201,10 @@ COPY --from=drupal /var/www/html /var/www/html
 # Copy nginx configuration
 COPY status.conf *.map /etc/nginx/conf.d/
 
-# Copy configuration templates
+# Copy configuration templates and the shared FastCGI parameter snippet.
+# fastcgi-drupal.conf is referenced via `include fastcgi-drupal.conf` from
+# default.conf.template, so it must land in nginx's default search path.
+COPY fastcgi-drupal.conf /etc/nginx/
 COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Copy nginx startup script
