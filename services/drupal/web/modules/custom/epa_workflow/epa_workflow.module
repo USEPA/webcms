@@ -600,6 +600,40 @@ function epa_workflow_node_presave(NodeInterface $node) {
 
 
 /**
+ * Implements hook_node_update().
+ *
+ * Redirects users to the "Latest Revision" tab after saving a node that has a pending revision under content moderation.
+ */
+function epa_workflow_node_update(NodeInterface $node) {
+  // Load the content moderation service to check moderation state.	
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+
+  // Ignore if the node is not under content moderation workflow
+  if (!$moderation_info->isModeratedEntity($node)) {
+    return;
+  }
+
+  // Ignore if there is no pending revision. Which means the latest revision is the published one.
+  if (!$moderation_info->hasPendingRevision($node)) {
+    return;
+  }
+
+  // Prevent this response from being cached by Drupal's page cache.
+  \Drupal::service('page_cache_kill_switch')->trigger();
+
+  /*
+   * Generate the URL to the "Latest Revision" tab for this node
+   * toString(TRUE) returns a GeneratedURL object instead of a string,
+   * which tells Drupal we're handling cacheability and suppresses the "leaked cache metadata" warning.
+   * A similar issue was resolved in WEBCMS-294 ticket, check hook_user_login implemenation in f1_sso.module
+   * which actually bubbles cacheablity metadata.
+   * * */
+  $generated = Url::fromRoute('entity.node.latest_version', ['node' => $node->id(),])->toString(TRUE);
+  \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', $generated->getGeneratedUrl());
+}
+
+
+/**
  * Helper function to add compliance checkboxes to some forms.
  *
  * @param $form
