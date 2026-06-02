@@ -184,9 +184,11 @@ ARG GIT_COMMIT=""
 
 ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
-# Health check for FPM ping endpoint
+# Health check using the nginx status server's /ping endpoint.
+# All containers in an ECS task share a network namespace, so this container
+# can reach nginx's port-8080 status server over localhost.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost/ping || exit 1
+  CMD curl -f http://localhost:8080/ping || exit 1
 
 # Build an nginx container that has the same view into the Drupal filesystem
 # as well as its configuration file.
@@ -210,9 +212,10 @@ COPY scripts/ecs/nginx-entrypoint.sh /webcms-entrypoint
 ENTRYPOINT [ "/webcms-entrypoint" ]
 CMD [ "nginx", "-g", "daemon off;" ]
 
-# Health check for nginx service
+# Health check for nginx service. The /ping endpoint is served by status.conf
+# on port 8080 over plain HTTP — not on the main TLS port 443.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f https://localhost/ping || exit 1
+  CMD curl -f http://localhost:8080/ping || exit 1
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
 # and ssh that are inappropriate for a server container image.
