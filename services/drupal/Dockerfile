@@ -203,10 +203,12 @@ COPY --from=drupal /var/www/html /var/www/html
 # Copy nginx configuration
 COPY status.conf *.map /etc/nginx/conf.d/
 
-# Copy configuration templates and the shared FastCGI parameter snippet.
-# fastcgi-drupal.conf is referenced via `include fastcgi-drupal.conf` from
-# default.conf.template, so it must land in nginx's default search path.
-COPY fastcgi-drupal.conf /etc/nginx/
+# Copy configuration templates.
+# fastcgi-drupal.conf contains $WEBCMS_DOMAIN which must be substituted at
+# container startup. Copy it into the templates directory so the nginx Docker
+# entrypoint (docker-entrypoint.sh) runs envsubst on it, producing
+# /etc/nginx/conf.d/fastcgi-drupal.conf alongside the processed default.conf.
+COPY fastcgi-drupal.conf /etc/nginx/templates/fastcgi-drupal.conf.template
 COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Copy nginx startup script
