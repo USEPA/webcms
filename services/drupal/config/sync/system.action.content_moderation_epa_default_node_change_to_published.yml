@@ -1,0 +1,17 @@
+uuid: ab4c91c5-370e-4f5c-9d15-d5c6e0a0d579
+langcode: en
+status: true
+dependencies:
+  config:
+    - workflows.workflow.epa_default
+  module:
+    - content_moderation
+    - node
+id: content_moderation_epa_default_node_change_to_published
+label: 'Change moderation state to Published'
+type: node
+plugin: 'moderation_state_change:node'
+configuration:
+  workflow: epa_default
+  state: published
+  revision_log_message: 'Change moderation state to Published'
