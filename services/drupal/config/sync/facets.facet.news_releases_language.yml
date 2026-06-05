@@ -17,7 +17,7 @@ url_alias: news_releases_language
 facet_source_id: 'search_api:views_page__search_news_releases__page_1'
 field_identifier: field_language
 query_operator: or
-hard_limit: 10
+hard_limit: 0
 exclude: false
 use_hierarchy: false
 keep_hierarchy_parents_active: false
@@ -27,16 +27,12 @@ hierarchy:
 expand_hierarchy: false
 enable_parent_when_child_gets_disabled: true
 widget:
-  type: checkbox
+  type: facets_form_dropdown
   config:
     show_numbers: true
-    soft_limit: 0
-    show_reset_link: false
-    reset_text: 'Show all'
-    hide_reset_when_no_selection: false
-    soft_limit_settings:
-      show_less_label: 'Show less'
-      show_more_label: 'Show more'
+    disabled_on_empty: false
+    default_option_label: Choose
+    child_items_prefix: '-'
 empty_behavior:
   behavior: none
 only_visible_when_facet_source_is_visible: false

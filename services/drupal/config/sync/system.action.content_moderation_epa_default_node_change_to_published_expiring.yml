@@ -1,0 +1,17 @@
+uuid: d8ac2d2e-0b19-481b-b8f9-603a99ec5848
+langcode: en
+status: true
+dependencies:
+  config:
+    - workflows.workflow.epa_default
+  module:
+    - content_moderation
+    - node
+id: content_moderation_epa_default_node_change_to_published_expiring
+label: 'Change moderation state to Published, expiring within 1 week'
+type: node
+plugin: 'moderation_state_change:node'
+configuration:
+  workflow: epa_default
+  state: published_expiring
+  revision_log_message: 'Change moderation state to Published, expiring within 1 week'
