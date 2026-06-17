@@ -36,11 +36,7 @@ use Drupal\node\NodeInterface;
 
 function epa_web_areas_entity_insert(EntityInterface $entity) {
   $request = \Drupal::request();
-  $message = "In hook_node_insert";
-  \Drupal::logger('epa_web_areas')->notice($message);
   if ($request->hasSession() && $entity instanceof NodeInterface) {
-    $message = "In hook_node_insert under condition";
-    \Drupal::logger('epa_web_areas')->notice($message);
     $session = $request->getSession();
     $target_id = $session->get('epa_web_areas.saved_group_id');
     $session->remove('epa_web_areas.saved_group_id');
@@ -76,8 +72,6 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
       $session = $request->getSession();
       $target_id = $group->id(); 
       $session->set('epa_web_areas.saved_group_id', $target_id);
-      $message = "In hook_node_form_alter Session set with Target ID: ".$target_id;
-      \Drupal::logger('epa_web_areas')->notice($message);
     }
 
     // Add group label to form.
