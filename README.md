@@ -28,13 +28,14 @@ Access the site at: <https://epa.ddev.site>
 ## Documentation
 
 - **[Contributing Guide](CONTRIBUTING.md)** - Complete setup instructions, development workflows, and deployment guide
-- **[WARP.md](WARP.md)** - AI agent guidance for working with this repository
-- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching and release process
-- **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
+- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching, merging, promotion, and release process
+- **[CI/CD Pipeline](docs/cicd-pipeline.md)** - Pipeline architecture, stages, and variables (configuration: [`.gitlab-ci.yml`](.gitlab-ci.yml))
 - **[Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md)** - Step-by-step deployment process
 - **[Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md)** - Performance optimization details
 - **[Security Scanning Troubleshooting](.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md)** - Root cause, debugging steps, and mitigation for GitLab security template override failures
 - **[Drupal Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md)** - Proper module uninstall, config export, Composer update, and deployment-safe workflow
+- **[Security Policy](SECURITY.md)** - How to report a vulnerability
+- **[License](LICENSE.md)** - MIT License
 - **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
 - **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
 
@@ -289,6 +290,9 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `staging` - Pre-production (deploys to stage)
 - `development` - Active development (deploys to dev)
 - `feature/*`, `bugfix/*`, `hotfix/*` - Feature branches
+
+See the [Git Workflow](docs/GIT_WORKFLOW.md) for the full branching, merging,
+promotion, hotfix, freeze, and release-tagging process.
 
 ## Troubleshooting
 

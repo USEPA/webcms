@@ -5,11 +5,11 @@ Thank you for contributing to the EPA WebCMS project! This guide will help you s
 Note that a good pull request has the following characteristics:
 
 - The code works, and you are confident that it works. Your job is to deliver code that works.
-- The change is small enough to be reviewed efficiently without inflicting too much additional cognitive load on the reviewer. Several small PRs beats one big one, and splitting code into separate commits is easy with a coding agent to do the Git finagling for you.
-- The PR includes additional context to help explain the change. What's the higher level goal that the change serves? Linking to relevant issues or specifications is useful here.
-- Agents write convincing looking pull request descriptions. You need to review these too! It's rude to expect someone else to read text that you haven't read and validated yourself.
+- The change is small enough to be reviewed efficiently without inflicting too much additional cognitive load on the reviewer. Several small PRs beat one big one, and splitting work into separate, focused commits is straightforward with `git add -p` and an interactive rebase.
+- The PR includes additional context to help explain the change. What's the higher-level goal that the change serves? Linking to relevant issues or specifications is useful here.
+- A convincing-looking pull request description still has to be accurate. Read and validate your own description before you ask anyone else to read it — it's rude to expect a reviewer to work through text you haven't checked yourself.
 
-Given how easy it is to dump unreviewed code on other people, please include some form of evidence that you've put that extra work in yourself. Notes on how you manually tested it, comments on specific implementation choices or even screenshots and video of the feature working go a long way to demonstrating that a reviewer's time will not be wasted digging into the details.
+Given how easy it is to hand unreviewed code to a reviewer, please include some form of evidence that you've put that extra work in yourself. Notes on how you manually tested it, comments on specific implementation choices, or even screenshots and video of the feature working go a long way toward demonstrating that a reviewer's time will not be wasted digging into the details.
 
 ## Table of Contents
 
@@ -588,20 +588,29 @@ See [README.md Advanced Pipeline Variables](README.md#advanced-pipeline-variable
 
 ## Git Workflow
 
-Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment model.
+Our process adapts **GitHub Flow** to the EPA WebCMS multi-environment
+deployment model: **feature → development → staging → main**. Code is hosted on
+GitHub and deployed through a GitLab mirror into AWS ECS.
+
+> **The full branching, merging, and release reference lives in
+> [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).** It is the single source of
+> truth for branch protection, the promotion and hotfix flows, the freeze
+> protocol, release tagging, the automated back-merge, and roles &
+> responsibilities. The summary below is the quick reference for day-to-day work.
 
 ### Goals
 
 1. Keep `main` always releasable and aligned with production.
-2. Ensure every change is validated in the dev environment (`development` branch) before moving to stage/production.
-3. Provide a lightweight, repeatable promotion path: **feature → development → staging → main**.
+2. Validate every change in the dev environment (`development`) before it moves
+   to stage or production.
+3. Provide a lightweight, repeatable promotion path.
 4. Support urgent hotfixes without blocking regular feature work.
 
 ### Branch Roles
 
 | Branch | Purpose | Deployment Target | Notes |
 |--------|---------|-------------------|-------|
-| `main` | Production source of truth | Production (manual pipeline trigger) | Locked; release merges and hotfixes only. See [Branch Protection](#branch-protection-configuration). |
+| `main` | Production source of truth | Production (manual pipeline trigger) | Locked; release merges and hotfixes only. |
 | `staging` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
 | `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`push-dev.sh`). |
 | `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `development` and open PRs back into `development`. |
@@ -609,261 +618,51 @@ Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment mod
 
 ### Standard Feature Flow
 
-1. **Sync development**
-   ```bash
-   git checkout development
-   git pull origin development
-   ```
-2. **Branch from `development`**
-   ```bash
-   git checkout -b feature/<short-description>
-   ```
-   Include ticket number in branch name if applicable.
-3. **Develop & validate locally**
-   - Use DDEV & Gesso commands in this guide.
-   - Follow Conventional Commits and keep commits focused.
-   - Periodically sync with latest changes: `git fetch origin && git rebase origin/development`
-4. **PR into `development`**
-   - Target branch: `development`.
-   - Run local checks; after merge trigger `./push-dev.sh --skip-build` for fast validation.
-   - Resolve review feedback and merge (squash or rebase preferred).
-5. **Promote to Stage (`staging`)**
-   - On release cadence, merge `development` → `staging`.
-   - Push to `staging` to run full stage pipeline (security scans included).
-   - **EPA staff only**
-6. **Promote to Production (`main`)**
-   - After stage sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist).
-   - Michael Hessling tags the release on `staging` (see [Release Tagging Process](#release-tagging-process)).
-   - Merge `staging` → `main` via PR (merge commit), then trigger the production pipeline.
-   - The production pipeline **does not rebuild images** — it promotes the same images tested on stage (build once, deploy many).
-   - **EPA staff only**
-7. **Back-merge to development**
-   - After production release, merge `main` → `development` using a **merge commit** (not rebase).
-   - An automated CI job opens this PR; see [Automated Back-Merge](#automated-back-merge).
-   - If the auto-PR has conflicts, resolve manually:
-   ```bash
-   git checkout development
-   git pull origin development
-   git merge origin/main
-   # Resolve conflicts, then push
-   git push origin development
-   ```
+1. **Sync `development`** — `git checkout development && git pull origin development`
+2. **Branch from `development`** — `git checkout -b feature/<short-description>`
+   (include the ticket number if applicable).
+3. **Develop & validate locally** — follow [Conventional Commits](#commit-message-convention),
+   keep commits focused, and periodically `git fetch origin && git rebase origin/development`.
+   Run the local quality gates before opening a PR: `ddev drush updb -y`,
+   `ddev drush cex`, `ddev composer phpcs`, `ddev composer phpstan`, and
+   `ddev gesso build` if you touched theme source.
+4. **Open a PR into `development`** — fill out the
+   [pull request template](.github/pull_request_template.md), then trigger
+   `./push-dev.sh --skip-build` for fast validation after merge.
+5. **Promote to Stage (`staging`)** — *EPA staff only*; merge `development` →
+   `staging` on the release cadence and let the full stage pipeline run.
+6. **Promote to Production (`main`)** — *EPA staff only*; follow the
+   [Stage-to-Production Promotion Checklist](docs/GIT_WORKFLOW.md#stage-to-production-promotion-checklist).
+   Production promotes the same images tested on stage — no rebuild.
+7. **Back-merge to `development`** — merge `main` → `development` with a merge
+   commit after each release (an automated CI job opens this PR).
 
-### Hotfix Flow
-
-Hotfixes bypass the normal `development → staging → main` promotion path to get urgent fixes into production quickly. **EPA staff only** for merge and deploy steps.
-
-1. **Branch from `main`**
-   ```bash
-   git checkout main
-   git pull origin main
-   git checkout -b hotfix/<issue-description>
-   ```
-2. **Implement and validate locally**
-   - Fix the issue and test with `ddev drush deploy -y` and `ddev drush config:status`.
-   - Follow the same code quality checks as any other PR.
-3. **Open PR targeting `main`**
-   - Requires at least one maintainer approval.
-   - PR description should explain the urgency and what is broken in production.
-4. **Merge into `main`** (merge commit, do not squash)
-5. **Tag and deploy to production**
-   - Michael Hessling tags the hotfix on `main` (see [Release Tagging Process](#release-tagging-process)).
-   - Sync GitLab mirror (manual sync — do not wait for auto-sync).
-   - Trigger the production pipeline manually on GitLab (`main` branch).
-   - Monitor pipeline to completion and verify the production site.
-6. **Sync the fix to `staging` and `development`**
-   - Cherry-pick or merge the hotfix into `staging`:
-     ```bash
-     git checkout staging
-     git pull origin staging
-     git cherry-pick <hotfix-merge-commit-sha>
-     git push origin staging
-     ```
-   - The automated back-merge CI job will open a PR from `main` → `development`. If it doesn't cover the fix (e.g., due to conflicts), cherry-pick into `development` manually.
-   - **All three branches (`main`, `staging`, `development`) must contain the hotfix before the next sprint cycle.**
-7. **Communicate** — announce the hotfix and its deployment in #webcms-dev.
-
-### Why Branch From `development`?
-
-- **Industry standard (Git Flow):** Features integrate continuously in the active development branch.
-- **Early conflict detection:** Features see each other immediately, catching integration issues during development rather than at PR time.
-- **Simplified workflow:** Eliminates need for developers to manually rebase against `development` as it diverges from `main`.
-- **Natural integration:** Multiple features can be tested together in the dev environment before promotion.
-- **Aligned with deployment model:** The branch you develop in is the branch that deploys to dev.
-
-### Release Cadence & Coordination
-
-- **Daily Dev Deploys:** Merge PRs into `development` as they're approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
-- **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `staging`, let the stage pipeline run, and perform QA.
-- **Production Deploys:** After stage QA sign-off, follow the [Stage-to-Production Promotion Checklist](#stage-to-production-promotion-checklist). Michael Hessling tags the release on `staging` and triggers the production pipeline on GitLab after merging to `main`.
-- **Back-merge:** After each production release, immediately merge `main` → `development` (merge commit). An automated CI job opens this PR; see [Automated Back-Merge](#automated-back-merge).
-
-### Pull Request Guidelines
-
-- Target branches: Feature work → `development`, hotfixes → `main`.
-- Write well-documented PRs, following the template generated when creating a new PR.
-- Keep PRs reviewable (< ~1 day of work). Use draft PRs for early feedback.
-- Run `ddev drush updb`, `ddev drush cex`, `ddev composer phpcs`, `phpstan`, theme builds, and relevant tests before creating PR and requesting review.
-- Require at least one maintainer approval.
-- Do NOT bundle multiple module updates into one PR, unless they're related (like metatag and metatag_schema).
+For the **hotfix flow**, the **freeze protocol**, **release tagging**, the
+**automated back-merge** job, and **branch protection settings**, see
+[docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
 
 ### Merge Strategy
 
-- **Feature PRs:** Squash or rebase onto `development` to maintain a clean history.
-- **Promotions (`development` → `staging`, `staging` → `main`):** Use merge commits so a release corresponds to a single identifiable merge.
-- **Back-merges (`main` → `development`):** Use a **merge commit**, not rebase or fast-forward. This preserves commit hashes on `development` so no one's local branch is invalidated. The merge commit also serves as an audit trail for when production state was synced back.
+- **Feature/bugfix PRs → `development`:** squash or rebase (clean history).
+- **Promotions (`development` → `staging`, `staging` → `main`):** merge commits,
+  so each release is one identifiable merge.
+- **Hotfix → `main`:** merge commit (never squash), so commits can be
+  cherry-picked to `staging`/`development`.
+- **Back-merges (`main` → `development`):** merge commit (not rebase/fast-forward),
+  to preserve commit hashes and provide an audit trail.
 
-### FAQs
+### Pull Request Guidelines
 
-- **Why not branch from `main` directly?** Branching from `main` causes feature branches to diverge from active development work. By the time a feature is ready, it's missing weeks of changes merged to `development`, leading to late-stage conflicts.
-- **Can I deploy from a feature branch?** No. Only `development` (dev) and `staging` (stage) trigger automatic deployments. Production deploys from `main` via manual pipeline trigger.
-- **What if a feature spans multiple sprints?** Periodically rebase on `development` to stay current with integrated work. Use feature flags for incomplete functionality.
-- **How do freeze periods work?** See [Freeze Protocol](#freeze-protocol) for the full process.
-
-### Release Tagging Process
-
-Michael Hessling creates the release tag on `staging` **before** merging to `main`. The tag marks the exact commit whose Docker images were built and tested on stage — this is the audit trail linking what was tested to what gets deployed.
-
-**Tag format:** `vYYYY.MM.DD` (e.g., `v2026.04.09`). For multiple same-day releases, append a sequence number: `v2026.04.09.2`.
-
-**Steps:**
-1. Confirm stage QA is complete and sign-off is received.
-2. Tag the release on `staging`:
-   ```bash
-   git checkout staging
-   git pull origin staging
-   git tag -a vYYYY.MM.DD -m "Release vYYYY.MM.DD: <brief summary>"
-   git push origin vYYYY.MM.DD
-   ```
-3. Merge `staging` → `main` via PR (merge commit).
-4. Sync GitLab mirror and trigger the production pipeline on GitLab (`main` branch). The production pipeline promotes the images built from the tagged staging commit — no rebuild.
-
-### Freeze Protocol
-
-A code freeze restricts merges to stabilize the codebase before a production release.
-
-**Initiating a Freeze:**
-1. Release manager (Michael Hessling) announces the freeze in #webcms-dev Slack with the expected duration and target release date.
-2. During the freeze, **no new PRs are merged into `development`** except:
-   - Critical bug fixes required for the release
-   - Documentation-only changes
-3. In-progress feature branches should be rebased on `development` but held until the freeze lifts.
-
-**During the Freeze:**
-1. QA and validation happen on the `staging` (stage) environment.
-2. Critical fixes follow the hotfix flow: branch from `main` or `staging`, fix, PR, merge.
-3. All hotfixes merged during the freeze must be communicated in #webcms-dev.
-
-**Lifting the Freeze:**
-1. Production release is deployed and verified.
-2. Back-merge `main` → `development` (merge commit) to incorporate freeze-period hotfixes.
-3. Release manager announces the freeze is lifted in #webcms-dev.
-4. Held PRs can resume merging into `development`.
-
-### Stage-to-Production Promotion Checklist
-
-Follow this checklist when promoting from stage to production. **All steps are EPA staff only.**
-
-**Pre-Promotion:**
-- [ ] Stage QA is complete
-- [ ] Stakeholder sign-off received
-- [ ] No outstanding critical bugs on stage
-- [ ] If a freeze is needed, initiate the [Freeze Protocol](#freeze-protocol)
-- [ ] Announce planned production deployment in #webcms-dev
-
-**Promotion:**
-- [ ] Michael Hessling tags the release on `staging` (see [Release Tagging Process](#release-tagging-process))
-- [ ] Create PR: `staging` → `main` on GitHub
-- [ ] Review PR — verify it contains only the expected changes
-- [ ] Merge PR using a merge commit (do not squash)
-- [ ] Sync GitLab mirror
-- [ ] Trigger production pipeline manually on GitLab (`main` branch)
-- [ ] Monitor pipeline to completion
-
-**Post-Promotion:**
-- [ ] Verify production site is healthy (smoke test key pages and workflows)
-- [ ] Confirm ECS service updated in AWS Console
-- [ ] Merge the automated back-merge PR (`main` → `development`); resolve conflicts if any
-- [ ] Announce deployment complete in #webcms-dev
-- [ ] If a freeze was in effect, lift it
-
-### Automated Back-Merge
-
-To prevent `development` from drifting behind `main`, a GitLab CI job automatically opens a GitHub PR from `main` → `development` after any push to `main`.
-
-**How it works:**
-1. When the GitLab mirror syncs a new commit on `main`, the `open-backmerge-pr` CI job runs.
-2. The job checks for an existing open back-merge PR to avoid duplicates.
-3. If none exists, it creates a PR from `main` → `development` via the GitHub API.
-4. The team reviews and merges the PR. If there are conflicts, a developer resolves them manually.
-
-**GitLab CI job** (implemented in `.gitlab-ci.yml`):
-
-```yaml
-open-backmerge-pr:
-  stage: .post
-  image: alpine:latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-  before_script:
-    - apk add --no-cache curl jq
-  script:
-    - |
-      EXISTING=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-        "https://api.github.com/repos/USEPA/webcms/pulls?head=USEPA:main&base=development&state=open" \
-        | jq length)
-      if [ "$EXISTING" -gt 0 ]; then
-        echo "Back-merge PR already exists, skipping."
-        exit 0
-      fi
-      curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
-        -H "Content-Type: application/json" \
-        "https://api.github.com/repos/USEPA/webcms/pulls" \
-        -d '{
-          "title": "chore: back-merge main into development",
-          "body": "Automated back-merge to sync production state into development after release.",
-          "head": "main",
-          "base": "development"
-        }'
-  allow_failure: true
-```
-
-**Required setup:**
-- Add `GITHUB_TOKEN` as a protected, masked CI/CD variable in GitLab (Settings → CI/CD → Variables) with `repo` scope.
-
-### Branch Protection Configuration
-
-GitHub branch protection rules for this repository. Audit these periodically to ensure they remain in effect.
-
-**To configure:** GitHub → Repository Settings → Branches → Branch protection rules.
-
-#### `main` (production)
-- ✅ Require a pull request before merging
-  - Required approvals: **1** (maintainer)
-  - Dismiss stale pull request approvals when new commits are pushed
-- ✅ Require status checks to pass before merging
-- ✅ Require branches to be up to date before merging
-- ✅ Do not allow force pushes
-- ✅ Do not allow deletions
-- ✅ Restrict who can push: EPA staff / repository maintainers only
-
-#### `staging` (stage)
-- ✅ Require a pull request before merging
-  - Required approvals: **1** (maintainer)
-- ✅ Require status checks to pass before merging
-- ✅ Do not allow force pushes
-- ✅ Do not allow deletions
-- ✅ Restrict who can push: EPA staff / repository maintainers only
-
-#### `development` (dev)
-- ✅ Require a pull request before merging
-  - Required approvals: **1**
-- ✅ Do not allow force pushes
-
-#### Feature branches (`feature/*`, `bugfix/*`, `hotfix/*`)
-- No branch protection rules required
-- Developers manage their own branches
-- Delete branches after merge
+- Target branches: feature/bugfix work → `development`; hotfixes → `main`.
+- Keep PRs reviewable (roughly less than a day of work); use draft PRs for early
+  feedback.
+- Require at least one maintainer approval.
+- Do **not** bundle unrelated module updates into one PR, unless they're coupled
+  (like `metatag` and `metatag_schema`).
+- Configuration changes travel with code — never commit config in code and
+  database simultaneously, and follow the
+  [Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) when adding or
+  removing modules.
 
 ### Commit Message Convention
 
@@ -1197,25 +996,43 @@ ddev restart
 
 - **Slack:** #webcms-dev channel
 - **Email:** webcms-team@epa.gov
-- **GitLab Issues:** https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/issues
-- **Documentation:** See `docs/` directory
+- **Issue tracking (Jira):** WebCMS work is tracked in Jira under the **`WEBCMS`** project — `https://jira.epa.gov/browse/WEBCMS`. This is the system of record for bugs and features; branches, commits, and PRs reference the WEBCMS key.
+- **Deployment pipeline issues (GitLab):** https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/issues
+- **Documentation:** See the [`docs/`](docs/) directory and the [Additional Resources](#additional-resources) below
 
 ---
 
 ## Additional Resources
 
-- [CI/CD Pipeline Documentation](docs/cicd-pipeline.md)
+**Project documentation**
+
+- [Git Workflow](docs/GIT_WORKFLOW.md) — branching, merging, promotion, and release process
+- [CI/CD Pipeline](docs/cicd-pipeline.md) — pipeline architecture, stages, and variables
+- [Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md) — step-by-step manual deployment
+- [Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md) — dev vs. stage performance tuning
+- [Security Scanning Troubleshooting](.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md) — GitLab security template gotchas
+- [Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) — safe module add/remove and config export
+- [Teams Notifications](.gitlab/TEAMS_NOTIFICATIONS.md) — pipeline notification setup
 - [Terraform Infrastructure](terraform/infrastructure/README.md)
 - [Terraform WebCMS Deployment](terraform/webcms/README.md)
 - [Docker Build Configuration](.gitlab/docker.yml)
+- [Security Policy](SECURITY.md) — reporting vulnerabilities
+
+**External documentation**
+
 - [Drupal Documentation](https://www.drupal.org/docs)
 - [DDEV Documentation](https://ddev.readthedocs.io/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
 
 ---
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+This project is released under the MIT License; see [`LICENSE.md`](LICENSE.md).
+The bundled Drupal application code carries its own GNU General Public License v2
+(or later); see [`services/drupal/LICENSE`](services/drupal/LICENSE). As a work
+of the United States Government, EPA-authored content is generally not subject to
+domestic copyright protection (see the [Disclaimer](#disclaimer) below).
 
 ## Disclaimer
 
