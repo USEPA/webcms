@@ -154,7 +154,12 @@ Guidelines:
    - Resolve review feedback. Merge with **squash or rebase** to keep
      `development` history clean.
 5. **Promote to Stage (`staging`)** — *EPA staff only*
-   - On the release cadence, merge `development` → `staging`.
+   - On the release cadence, update the theme library versions to match the new version string (pattern `vYYYY.MM.DD`). Do this to all libraries in `epa_theme.libraries.yml` except for the `svgxuse` library.
+   -- We do this step to have more granular control over the versioning of the theme CSS & JS.
+   - Merge `development` → `staging`.
+   - Create a new tag with the following pattern `vYYYY.MM.DD`.
+   - [Create a new Release](https://github.com/USEPA/webcms/releases), leaving the release notes as default to pull in all the commit messages merged to staging.
+   -- Check the `Set as pre-release` checkbox and uncheck the `Set as the latest release` checkbox.
    - Push to `staging` to run the full stage pipeline (security scans included).
 6. **Promote to Production (`main`)** — *EPA staff only*
    - After stage sign-off, follow the
