@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.3.31-fpm-alpine3.23 AS base
+FROM public.ecr.aws/docker/library/php:8.3.29-fpm-alpine3.22 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -121,7 +121,7 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:node-v24-php-8.3 AS gesso
+FROM forumone/gesso:node-v18-php-8.1 AS gesso
 
 WORKDIR /app
 
