@@ -121,7 +121,8 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:node-v18-php-8.1 AS gesso
+# Node 24 LTS + PHP 8.3 build image (bumped from EOL Node 18 / PHP 8.1); build-time only
+FROM forumone/gesso:node-v24-php-8.3 AS gesso
 
 WORKDIR /app
 
