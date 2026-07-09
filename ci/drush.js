@@ -174,7 +174,17 @@ async function main() {
     ui.log(`  NOTE: Drush exited from signal ${info.signal}`);
   }
 
-  // Output a blank line before outputting the logs link
+  // HARDENING #4 — surface a direct CloudWatch "Task logs" deep-link.
+  //   WHY:  This CI job only prints ECS status transitions and the final exit code
+  //         — NOT Drush's actual `--debug` output. When a deploy failed, operators
+  //         had to hand-navigate CloudWatch (find the log group, then the stream)
+  //         to see the real error, which is slow and a big reason failures felt
+  //         "fraught."
+  //   WHAT: Print a clickable CloudWatch Logs URL for this exact Drush task, on
+  //         both success and failure.
+  //   HOW:  `util.getLogsUrl(task)` builds the console deep-link from the task
+  //         ARN's hex id (log stream `drush/drush/<id>`) and the log-group name
+  //         stored in SSM Parameter Store.
   ui.log();
 
   const logsUrl =  await util.getLogsUrl(task);
