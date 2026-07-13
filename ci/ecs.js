@@ -205,6 +205,11 @@ async function getDrushStatus(task) {
 }
 
 /**
+ * HARDENING #3 (engine) — this function powers the image-tag drift check in
+ * `drush.js` (see that file for the full WHY/WHAT/HOW). In short, it lets the
+ * Drush Update detect when it is about to run against a stale, not-yet-applied
+ * image.
+ *
  * Fetches the image tag currently configured in the ACTIVE revision of the Drush task
  * definition for this site/language. This is used by `drush.js` to detect drift between
  * the build tag that triggered the Drush update and the image tag that is actually
