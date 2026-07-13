@@ -5,6 +5,7 @@ const dedent = require("dedent");
 const ecs = require("./ecs");
 const ui = require("./ui");
 const util = require("./util");
+const vars = require("./vars");
 
 /**
  * The Drush update script to run in ECS.
@@ -12,6 +13,25 @@ const util = require("./util");
  * (This is defined here instead of ecs.js since it is the most likely thing to change, so
  * we provide it here at the entry point of the script rather than accidentally hide it in
  * ecs.js.)
+ *
+ * HARDENING #1 — bootstrap-free maintenance mode (via `drush sql:query`)
+ * HARDENING #2 — no leading `drush cr`
+ *   WHY:  During a deploy the site may be mid-migration, or the freshly deployed
+ *         image may not yet match the database schema. Any command that needs a
+ *         full Drupal *bootstrap* (`drush cr`, `drush state:set`/`sset`) can throw
+ *         a fatal in that window — the container exits 255 and, because the task
+ *         runs under `sh -exc` (fail-fast), the script aborts. Older revisions
+ *         opened with `drush cr` and toggled maintenance mode with `sset`, so they
+ *         could die on the FIRST line — before maintenance mode was even set —
+ *         stranding the site and failing the deploy.
+ *   WHAT: Toggle `system.maintenance_mode` by writing straight to Drupal's
+ *         `key_value` table with `drush sql:query`, and do not run a pre-emptive
+ *         `drush cr`.
+ *   HOW:  `sql:query` needs only a database connection, not a working bootstrap,
+ *         so it still works when the app is unhealthy. `'i:1;'`/`'i:0;'` are the
+ *         PHP-serialized integers Drupal's State API stores for maintenance mode.
+ *         Cache rebuild is handled by `drush deploy` (its final step is
+ *         `cache:rebuild`), so a separate leading `cr` is redundant and risky.
  */
 
 const drushScript = dedent`
@@ -30,6 +50,41 @@ const drushScript = dedent`
  * @function
  */
 async function main() {
+  // HARDENING #3 — deployed image-tag drift check.
+  //   WHY:  If the Drush Update runs without a fresh `deploy:*:apply-*` (e.g.
+  //         someone triggers the update before/without the apply), Drush runs
+  //         against a STALE image — running new migrations against old code (or
+  //         vice versa). That is one of the most common and most confusing causes
+  //         of a failed or inconsistent deploy.
+  //   WHAT: Before doing anything else, compare the image tag baked into the
+  //         currently-deployed ECS Drush task definition against the tag this
+  //         pipeline built.
+  //   HOW:  `ecs.getDeployedImageTag()` reads the live task definition; we compare
+  //         it to `vars.imageTag`. This is ADVISORY ONLY — on mismatch we print a
+  //         loud warning telling the operator to re-run the matching apply job, but
+  //         we do NOT abort (a transient AWS read error must not fail a good deploy).
+  ui.logHeading("ecs", "Verifying deployed image tag");
+
+  const deployedTag = await ecs.getDeployedImageTag();
+  if (!deployedTag) {
+    ui.log(
+      "⚠️  Could not determine the deployed image tag from ECS; skipping drift check."
+    );
+  } else if (deployedTag === vars.imageTag) {
+    ui.log(`Deployed tag matches build tag (${vars.imageTag}).`);
+  } else {
+    ui.log("⚠️  WARNING: Deployed image tag does not match this build's tag.");
+    ui.log(`    Build tag:    ${vars.imageTag}`);
+    ui.log(`    Deployed tag: ${deployedTag}`);
+    ui.log(
+      "    Drush will run against the currently-deployed image. If this is unexpected,"
+    );
+    ui.log(
+      `    re-run the corresponding deploy:${vars.site}:apply-${vars.lang} job first.`
+    );
+  }
+  ui.log();
+
   // Wipe the running Drupal tasks since they're most likely stale. See the documentation
   // for `stopRunningTasks` for why.
   ui.logHeading("ecs", "Stopping Drupal tasks");
@@ -72,6 +127,12 @@ async function main() {
   // Note that while the AWS SDK does include helpers for waiting on a task to finish,
   // we poll manually in order to output progress information to the console. (Waiters are
   // single-shot and have a maximum timeout.)
+  //
+  // HARDENING #5 — bounded polling with a hard timeout.
+  //   WHY:  An unbounded `while (true)` poll can hang a pipeline indefinitely if a
+  //         Drush task never reaches STOPPED, tying up a runner and hiding failures.
+  //   WHAT/HOW: Cap the loop at `maxIterations` (360 × 5s = 30 min) and throw a
+  //         clear timeout error if exceeded, so the job fails fast and visibly.
   const maxIterations = 360; // 30 minutes at 5-second intervals
   let iterationCount = 0;
 
@@ -113,7 +174,17 @@ async function main() {
     ui.log(`  NOTE: Drush exited from signal ${info.signal}`);
   }
 
-  // Output a blank line before outputting the logs link
+  // HARDENING #4 — surface a direct CloudWatch "Task logs" deep-link.
+  //   WHY:  This CI job only prints ECS status transitions and the final exit code
+  //         — NOT Drush's actual `--debug` output. When a deploy failed, operators
+  //         had to hand-navigate CloudWatch (find the log group, then the stream)
+  //         to see the real error, which is slow and a big reason failures felt
+  //         "fraught."
+  //   WHAT: Print a clickable CloudWatch Logs URL for this exact Drush task, on
+  //         both success and failure.
+  //   HOW:  `util.getLogsUrl(task)` builds the console deep-link from the task
+  //         ARN's hex id (log stream `drush/drush/<id>`) and the log-group name
+  //         stored in SSM Parameter Store.
   ui.log();
 
   const logsUrl =  await util.getLogsUrl(task);

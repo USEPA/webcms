@@ -1,0 +1,159 @@
+<?php
+
+use Drupal\Core\Database\Database;
+use Drupal\Core\Utility\UpdateException;
+
+/**
+ * Removes leftover custom 'type' column from paragraphs_item_revision.
+ */
+function epa_revision_update_10002() {
+  $connection = Database::getConnection();
+  $schema = $connection->schema();
+
+  if (!$schema->tableExists('paragraphs_item_revision')) {
+    return 'Table paragraphs_item_revision does not exist. No changes made.';
+  }
+
+  if (!$schema->fieldExists('paragraphs_item_revision', 'type')) {
+    return "Column 'type' does not exist on paragraphs_item_revision. No changes made.";
+  }
+
+  try {
+    $indexes = $connection->query("
+      SELECT INDEX_NAME
+      FROM information_schema.statistics
+      WHERE table_schema = DATABASE()
+        AND table_name = :table
+        AND column_name = :column
+    ", [
+      ':table' => 'paragraphs_item_revision',
+      ':column' => 'type',
+    ])->fetchCol();
+
+    foreach ($indexes as $index_name) {
+      if ($index_name !== 'PRIMARY') {
+        $connection->query("ALTER TABLE {paragraphs_item_revision} DROP INDEX `$index_name`");
+      }
+    }
+  }
+  catch (\Exception $e) {
+    // Continue and try to drop the column anyway.
+  }
+
+  try {
+    $connection->query("ALTER TABLE {paragraphs_item_revision} DROP COLUMN `type`");
+  }
+  catch (\Exception $e) {
+    throw new UpdateException('Failed to drop paragraphs_item_revision.type: ' . $e->getMessage());
+  }
+
+  return "Removed leftover 'type' column from paragraphs_item_revision.";
+}
+
+/**
+ * Removes leftover custom 'type' column from paragraphs_item_revision_field_data.
+ */
+function epa_revision_update_10003() {
+    $connection = \Drupal::database();
+    $schema = $connection->schema();
+  
+    if (!$schema->tableExists('paragraphs_item_revision_field_data')) {
+      return 'Table paragraphs_item_revision_field_data does not exist. No changes made.';
+    }
+  
+    if (!$schema->fieldExists('paragraphs_item_revision_field_data', 'type')) {
+      return "Column 'type' does not exist on paragraphs_item_revision_field_data. No changes made.";
+    }
+  
+    try {
+      $indexes = $connection->query("
+        SELECT INDEX_NAME
+        FROM information_schema.statistics
+        WHERE table_schema = DATABASE()
+          AND table_name = :table
+          AND column_name = :column
+      ", [
+        ':table' => 'paragraphs_item_revision_field_data',
+        ':column' => 'type',
+      ])->fetchCol();
+  
+      foreach ($indexes as $index_name) {
+        if ($index_name !== 'PRIMARY') {
+          $connection->query("ALTER TABLE {paragraphs_item_revision_field_data} DROP INDEX `$index_name`");
+        }
+      }
+    }
+    catch (\Exception $e) {
+      // Continue and try to drop the column anyway.
+    }
+  
+    try {
+      $connection->query("ALTER TABLE {paragraphs_item_revision_field_data} DROP COLUMN `type`");
+    }
+    catch (\Exception $e) {
+      throw new \Drupal\Core\Utility\UpdateException('Failed to drop paragraphs_item_revision_field_data.type: ' . $e->getMessage());
+    }
+  
+    return "Removed leftover type column from paragraphs_item_revision_field_data.";
+  }
+
+  /**
+ * Removes leftover custom type columns from revision tables.
+ */
+function epa_revision_update_10004() {
+    $connection = \Drupal::database();
+    $schema = $connection->schema();
+  
+    $tables = [
+      'paragraphs_item_revision',
+      'paragraphs_item_revision_field_data',
+      'node_revision',
+      'node_field_revision',
+    ];
+  
+    $messages = [];
+  
+    foreach ($tables as $table) {
+      if (!$schema->tableExists($table)) {
+        $messages[] = "Table $table does not exist.";
+        continue;
+      }
+  
+      if (!$schema->fieldExists($table, 'type')) {
+        $messages[] = "Column type does not exist on $table.";
+        continue;
+      }
+  
+      try {
+        $indexes = $connection->query("
+          SELECT INDEX_NAME
+          FROM information_schema.statistics
+          WHERE table_schema = DATABASE()
+            AND table_name = :table
+            AND column_name = :column
+        ", [
+          ':table' => $table,
+          ':column' => 'type',
+        ])->fetchCol();
+  
+        foreach ($indexes as $index_name) {
+          if ($index_name !== 'PRIMARY') {
+            $connection->query("ALTER TABLE {" . $table . "} DROP INDEX `$index_name`");
+          }
+        }
+      }
+      catch (\Exception $e) {
+        // Continue and try dropping the column.
+      }
+  
+      try {
+        $connection->query("ALTER TABLE {" . $table . "} DROP COLUMN `type`");
+        $messages[] = "Removed type column from $table.";
+      }
+      catch (\Exception $e) {
+        throw new \Drupal\Core\Utility\UpdateException('Failed to drop ' . $table . '.type: ' . $e->getMessage());
+      }
+    }
+  
+    return implode(' ', $messages);
+  }

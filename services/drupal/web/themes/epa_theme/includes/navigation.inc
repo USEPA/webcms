@@ -13,10 +13,16 @@ function epa_theme_menu_active_item(&$items) {
   $current_path = \Drupal::request()->getRequestUri();
   foreach ($items as $key => $item) {
     // If path is current path, set active to li.
-    if ($item['url']->toString() == $current_path) {
-      // Add active link.
-      $items[$key]['current'] = TRUE;
+    try {
+      if ($item['url']->toString() == $current_path) {
+        // Add active link.
+        $items[$key]['current'] = TRUE;
+      }
     }
+    catch (\Exception $e) {
+      // If the URL requires missing parameters (e.g. group context), ignore it.
+    }
+    
     if (!empty($items[$key]['below'])) {
       epa_theme_menu_active_item($items[$key]['below']);
     }
@@ -57,16 +63,29 @@ function epa_theme_preprocess_menu(&$vars) {
  */
 function epa_theme_preprocess_menu_local_tasks(&$variables) {
   foreach (['primary', 'secondary'] as $type) {
+    if (!isset($variables[$type])) {
+      continue;
+    }
+    
     $tabs = [];
 
     // Sort the tabs by #weight.
     uasort($variables[$type], ['Drupal\Component\Utility\SortArray', 'sortByWeightProperty']);
 
     foreach (array_keys($variables[$type]) as $key) {
+      try {
+        $url_string = $variables[$type][$key]['#link']['url']->toString();
+      }
+      catch (\Exception $e) {
+        // If a local task has missing parameters, we cannot link to it. 
+        // Skip it.
+        continue;
+      }
+
       // Add the tab to a new array.
       $tabs[$key] = [
         'active' => $variables[$type][$key]['#active'],
-        'url' => $variables[$type][$key]['#link']['url']->toString(),
+        'url' => $url_string,
         'text' => Html::escape($variables[$type][$key]['#link']['title']),
       ];
 

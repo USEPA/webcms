@@ -1,0 +1,17 @@
+uuid: 822040db-1088-4d73-b62a-e363a9898d91
+langcode: en
+status: true
+dependencies:
+  config:
+    - workflows.workflow.epa_default
+  module:
+    - content_moderation
+    - node
+id: content_moderation_epa_default_node_change_to_draft
+label: 'Change moderation state to Draft'
+type: node
+plugin: 'moderation_state_change:node'
+configuration:
+  workflow: epa_default
+  state: draft
+  revision_log_message: 'Change moderation state to Draft'

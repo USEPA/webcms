@@ -19,6 +19,31 @@ use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\media_library\MediaLibraryState;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\node\NodeInterface;
+
+
+/**
+ * Implements hook_entity_insert
+ * https://jira.epa.gov/browse/WEBCMS-307
+ * Resolves the issue where Web area association is not being maintained.
+ * The problem is that the group shown in the node add form on a new node
+ * is just a link. It is not associated with an actual group.
+ * This hook_entity_insert resolves the issue by associating the group with
+ * the entity being created. The group id passed from hook_form_alter in a session variable.
+ *
+ */
+
+function epa_web_areas_entity_insert(EntityInterface $entity) {
+  $request = \Drupal::request();
+  if ($request->hasSession() && $entity instanceof NodeInterface) {
+    $session = $request->getSession();
+    $target_id = $session->get('epa_web_areas.saved_group_id');
+    $session->remove('epa_web_areas.saved_group_id');
+    $group = Group::load($target_id);
+    $group->addContent($entity,'group_node:'.$entity->bundle()); 
+  }
+}
 
 /**
  * Implements hook_form_FORM_BASE_ID_alter().
@@ -38,6 +63,15 @@ function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_sta
     }
     elseif (isset($form_state->getStorage()['group'])) {
       $group = $form_state->getStorage()['group'];
+    }
+
+    //Only for newly created nodes, create a session id and pass group id.
+    //The group id is used in hook_entity_insert.
+    $request = \Drupal::request();
+    if ($request->hasSession() && $entity->hasField('entitygroupfield') && $entity->isNew()) {
+      $session = $request->getSession();
+      $target_id = $group->id(); 
+      $session->set('epa_web_areas.saved_group_id', $target_id);
     }
 
     // Add group label to form.
@@ -288,9 +322,11 @@ function _add_ckeditor5_settings(&$settings, mixed $setting, GroupInterface $gro
     }
 
     if ($key == 'drupalInlineMedia') {
-      $url = $value['libraryURL'];
-      $new_url = _media_library_opener_parameters_alter($url, $group);
-      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      if (isset($value['libraryURL'])) {
+        $url = $value['libraryURL'];
+        $new_url = _media_library_opener_parameters_alter($url, $group);
+        $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      }
     }
 
     // Add group ID as query parameter for embeddedParagraph plugin.

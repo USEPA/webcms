@@ -60,6 +60,45 @@ export default class DrupalInlineMediaEditing extends Plugin {
   }
 
   /**
+   * Upcast `drupalMediaIsImage` from Drupal Media metadata.
+   *
+   * @param {module:engine/model/node~ModelNode} modelElement
+   *   The `drupalMedia` model element.
+   */
+  upcastDrupalMediaIsImage(modelElement) {
+    const { model, plugins } = this.editor;
+    const metadataRepository = plugins.get("DrupalMediaMetadataRepository");
+
+    metadataRepository
+      .getMetadata(modelElement)
+      .then((metadata) => {
+        if (!modelElement) {
+          return;
+        }
+        model.enqueueChange({ isUndoable: false }, (writer) => {
+          writer.setAttribute(
+            "drupalMediaIsImage",
+            !!metadata.imageSourceMetadata,
+            modelElement
+          );
+        });
+      })
+      .catch((e) => {
+        if (!modelElement) {
+          return;
+        }
+        console.warn(e.toString());
+        model.enqueueChange({ isUndoable: false }, (writer) => {
+          writer.setAttribute(
+            "drupalMediaIsImage",
+            "Error",
+            modelElement
+          );
+        });
+      });
+  }
+
+  /**
    * Registers drupalInlineMedia as a block element in the DOM converter.
    *
    * @private

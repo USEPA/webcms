@@ -1,5 +1,5 @@
-import { Plugin } from "ckeditor5/src/core";
-import { ButtonView, Notification } from "ckeditor5/src/ui";
+import { Plugin } from 'ckeditor5/src/core';
+import { ButtonView, Notification } from 'ckeditor5/src/ui';
 import icon from "../../../../icons/book.svg";
 import EpaAddDefinitionView from "./epaadddefinitionview";
 import { IncompleteDefinitionError, MultipleParagraphError } from "./errors";

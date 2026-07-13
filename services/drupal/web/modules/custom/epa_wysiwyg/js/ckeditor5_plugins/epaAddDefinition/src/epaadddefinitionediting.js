@@ -1,5 +1,5 @@
-import { Plugin } from "ckeditor5/src/core";
-import { Widget, toWidget } from "ckeditor5/src/widget";
+import { Plugin } from 'ckeditor5/src/core';
+import { Widget, toWidget } from 'ckeditor5/src/widget';
 
 // Space-separated list of CSS classes to apply to various template elements.
 // Used in both downcast (editor->HTML) and upcast (HTML->editor) conversions.

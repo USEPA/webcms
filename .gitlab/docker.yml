@@ -128,13 +128,13 @@ build:metrics:
           --context=$CI_PROJECT_DIR/services/metrics
           --destination=$WEBCMS_REPO_URL/webcms-$WEBCMS_ENVIRONMENT-$WEBCMS_SITE-fpm-metrics:$WEBCMS_IMAGE_TAG
 
-# On the main and live branches (the tracking branches for the AWS environments), we also
+# On the main and staging branches (the tracking branches for the AWS environments), we also
 # build the database Terraform container. See the terraform/database/ directory for more
 # information.
 build:database:
   extends: .kaniko
   stage: build
-  only: [main, live]
+  only: [main, staging]
 
   script:
     - >-
@@ -156,13 +156,13 @@ build:database:
 # This bypasses the need for the `docker pull` and `docker push` commands.
 
 # Jobs in this stage will almost always only execute on branches that track AWS
-# infrastructure: this typically means that we mirror only on the main and live branches.
+# infrastructure: this typically means that we mirror only on the main and staging branches.
 
 # Mirror the AWS CloudWatch agent image using the latest tag.
 copy:cloudwatch:
   extends: .kaniko
   stage: copy
-  only: [main, live]
+  only: [main, staging]
 
   script:
     - mkdir -p /workspace
@@ -177,7 +177,7 @@ copy:cloudwatch:
 copy:traefik:
   extends: .kaniko
   stage: copy
-  only: [main, live]
+  only: [main, staging]
 
   script:
     - mkdir -p /workspace
