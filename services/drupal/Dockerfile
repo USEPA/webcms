@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.3.29-fpm-alpine3.22 AS base
+FROM public.ecr.aws/docker/library/php:8.3.31-fpm-alpine3.22 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -121,7 +121,8 @@ RUN composer install \
 RUN rm auth.json
 
 # Build Gesso, the WebCMS' theme
-FROM forumone/gesso:node-v18-php-8.1 AS gesso
+# Node 24 LTS + PHP 8.3 build image (bumped from EOL Node 18 / PHP 8.1); build-time only
+FROM forumone/gesso:node-v24-php-8.3 AS gesso
 
 WORKDIR /app
 
@@ -226,7 +227,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # and ssh that are inappropriate for a server container image.
 # IMPORTANT: keep this PHP version in sync with the base FPM image above so that Drush
 # and the web container run identical language semantics against the same Drupal codebase.
-FROM public.ecr.aws/docker/library/php:8.3-cli-alpine AS drush
+FROM public.ecr.aws/docker/library/php:8.3.31-cli-alpine3.22 AS drush
 
 # Bump system packages
 RUN apk upgrade
