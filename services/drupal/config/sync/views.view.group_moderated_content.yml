@@ -2405,11 +2405,11 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        type_1:
-          id: type_1
-          table: node_field_revision
+        type:
+          id: type
+          table: node_field_data
           field: type
-          relationship: none
+          relationship: nid_1
           group_type: group
           admin_label: ''
           entity_type: node
@@ -2420,26 +2420,29 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: type_1_op
-            label: 'Content type'
+            operator_id: type_op
+            label: Type
             description: ''
             use_operator: false
-            operator: type_1_op
+            operator: type_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: type_1
+            identifier: type
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -2671,11 +2674,75 @@ display:
         groups:
           1: AND
       defaults:
-        relationships: true
+        relationships: false
         fields: false
         arguments: false
         filters: false
         filter_groups: false
+      relationships:
+        nid:
+          id: nid
+          table: node_field_revision
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: 'Get the actual content from a content revision.'
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+          required: false
+        group_content:
+          id: group_content
+          table: node_field_data
+          field: group_content
+          relationship: nid
+          group_type: group
+          admin_label: 'Content group content'
+          entity_type: node
+          plugin_id: group_content_to_entity_reverse
+          required: true
+          group_content_plugins:
+            'group_node:event': '0'
+            'group_node:faq': '0'
+            'group_node:news_release': '0'
+            'group_node:page': '0'
+            'group_node:public_notice': '0'
+            'group_node:regulation': '0'
+            'group_node:webform': '0'
+            'group_node:web_area': '0'
+        uid:
+          id: uid
+          table: node_field_revision
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: User
+          entity_type: node
+          entity_field: uid
+          plugin_id: standard
+          required: false
+        uid_1:
+          id: uid_1
+          table: node_field_revision
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: 'Revision User'
+          entity_type: node
+          entity_field: uid
+          plugin_id: standard
+          required: false
+        nid_1:
+          id: nid_1
+          table: node_field_revision
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: nid
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+          required: false
       display_description: ''
       display_extenders:
         views_ajax_get:
@@ -3424,10 +3491,10 @@ display:
       redirect_path: '/group/[view:argument-1]'
       export_method: batch
       export_batch_size: 1000
+      export_filesystem: private
       custom_redirect_path: true
       redirect_to_display: none
       include_query_params: true
-      export_filesystem: private
     cache_metadata:
       max-age: -1
       contexts:
@@ -3478,3 +3545,4 @@ display:
         - 'config:field.storage.node.field_owning_office'
         - 'config:field.storage.user.field_full_name'
         - 'config:workflow_list'
+
