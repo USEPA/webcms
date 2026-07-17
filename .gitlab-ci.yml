@@ -127,15 +127,15 @@ secret_detection:
 
 # Restrict actual analyzer sub-jobs to staging branch only
 # Development branch skips security scanning for faster iteration
-semgrep-sast:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+#semgrep-sast:
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "staging"'
+#    - when: never
 
-gemnasium-dependency_scanning:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+#gemnasium-dependency_scanning:
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "staging"'
+#    - when: never
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
