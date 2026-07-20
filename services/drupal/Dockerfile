@@ -234,15 +234,13 @@ RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Install base PHP extensions for Drupal as well as tools needed for Drush CLI operations
+# Install bundled PHP extensions and system tools (no external PECL dependency; stable layer)
 RUN set -ex \
   && install-php-extensions \
     gd \
     opcache \
     pdo_mysql \
     zip \
-    igbinary \
-    memcached \
   && apk add --no-cache \
     mysql-client \
     openssh \
@@ -251,6 +249,10 @@ RUN set -ex \
   && { \
     echo 'memory_limit=-1'; \
   } > /usr/local/etc/php/php-cli.ini
+
+# Install PECL-dependent extensions in a separate layer to isolate pecl.php.net failures.
+# igbinary must precede memcached (memcached is compiled with igbinary serializer support).
+RUN install-php-extensions igbinary memcached
 
 ENV PATH=${PATH}:/var/www/html/vendor/bin
 WORKDIR /var/www/html
