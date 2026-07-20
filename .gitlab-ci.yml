@@ -109,21 +109,21 @@ include:
 # Override stage assignment on parent config jobs (stage override is safe; rules override is not)
 sast:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 dependency_scanning:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 secret_detection:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 # Restrict actual analyzer sub-jobs to staging branch only
 # Development branch skips security scanning for faster iteration
