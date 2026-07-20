@@ -109,33 +109,33 @@ include:
 # Override stage assignment on parent config jobs (stage override is safe; rules override is not)
 sast:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 dependency_scanning:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 secret_detection:
   stage: Test
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+  #rules:
+  #  - if: '$CI_COMMIT_BRANCH == "staging"'
+  #  - when: never
 
 # Restrict actual analyzer sub-jobs to staging branch only
 # Development branch skips security scanning for faster iteration
-semgrep-sast:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+#semgrep-sast:
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "staging"'
+#    - when: never
 
-gemnasium-dependency_scanning:
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'
-    - when: never
+#gemnasium-dependency_scanning:
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "staging"'
+#    - when: never
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
@@ -529,15 +529,13 @@ Prisma:Drupal:
         exit 0
       fi
   script:
-    # Authenticate with Prisma Cloud API to obtain a bearer token for downloading twistcli
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    # Download the twistcli utility using the bearer token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan the Drupal image using twistcli
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
   allow_failure: true
 
 Prisma:Nginx:
@@ -566,16 +564,15 @@ Prisma:Nginx:
         exit 0
       fi
   script:
-    # Authenticate with Prisma Cloud API to obtain a bearer token for downloading twistcli
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    # Download the twistcli utility using the bearer token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    # Scan the Nginx image using twistcli
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
+
 
 Prisma:Drush:
   stage: Scan
@@ -603,15 +600,13 @@ Prisma:Drush:
         exit 0
       fi
   script:
-    # Authenticate with Prisma Cloud API to obtain a bearer token for downloading twistcli
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    # Download the twistcli utility using the bearer token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    # Scan the Drush image using twistcli
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
+    # Scan image for vulnerabilities and send results to Prisma Cloud
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
 
 #endregion
