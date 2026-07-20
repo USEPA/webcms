@@ -48,7 +48,13 @@ resource "aws_s3_bucket" "uploads" {
     }
   }
 
-  tags = var.tags
+  # Ignore tag changes to avoid s3:PutBucketTagging permission issues
+  # TODO: Remove this lifecycle block once GitLab runner role has s3:PutBucketTagging permission
+  lifecycle {
+    ignore_changes = [tags, tags_all]
+  }
+
+  # tags = var.tags
 }
 
 # This policy allows anonymous reads to the /files/ prefix of the uploads bucket, which
@@ -97,7 +103,13 @@ resource "aws_s3_bucket" "elb_logs" {
     }
   }
 
-  tags = var.tags
+  # Ignore tag changes to avoid s3:PutBucketTagging permission issues
+  # TODO: Remove this lifecycle block once GitLab runner role has s3:PutBucketTagging permission
+  lifecycle {
+    ignore_changes = [tags, tags_all]
+  }
+
+  # tags = var.tags
 }
 
 # Don't allow any public access to the ELB logging bucket
