@@ -701,11 +701,12 @@ deploy:dev:init:en:
       fi
   script:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
-    - gitlab-terraform init  # Initialize Terraform and download providers
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 # NOTE: Spanish (es) deployment for dev environment is disabled.
 # This functionality is preserved for future use if needed.
-# To re-enable, uncomment all dev-es jobs (init, validate, plan, apply).
+# To re-enable, uncomment all dev-es jobs (init, plan, apply).
 
 # deploy:dev:init:es:
 #   extends: .deploy:production
@@ -718,45 +719,7 @@ deploy:dev:init:en:
 #     name: site/dev-$WEBCMS_LANG
 #   script:
 #     - echo $TF_ADDRESS  # Display state backend URL for debugging
-#     - gitlab-terraform init  # Initialize Terraform and download providers
-
-
-# Validate Terraform configuration for dev site deployments
-deploy:dev:validate:en:
-  extends: .deploy:production
-  stage: Deploy:Dev:Validate
-  needs: ["deploy:dev:init:en"]  # Wait for init to complete
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  before_script:
-    - cd $TF_ROOT
-    - cp $backend_tf backend.tf
-    - cp "$TERRAFORM_TFVARS" terraform.tfvars
-    # Override image tag when SKIP_BUILD=true to use stable :development-latest tag
-    - |
-      if [ "$SKIP_BUILD" = "true" ]; then
-        export TF_VAR_image_tag="development-latest"
-        echo "ℹ️ SKIP_BUILD enabled - using image tag: development-latest"
-      fi
-  script:
-    - gitlab-terraform validate
-
-# Spanish validation job - disabled (see note above deploy:dev:init:es)
-# deploy:dev:validate:es:
-#   extends: .deploy:production
-#   stage: Deploy:Dev:Validate
-#   needs:
-#     - job: "deploy:dev:init:es"
-#       optional: true
-#   variables:
-#     WEBCMS_LANG: es
-#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-#   environment:
-#     name: site/dev-$WEBCMS_LANG
-#   script:
+#     - gitlab-terraform init
 #     - gitlab-terraform validate
 
 # Generate Terraform plans for dev site deployments
@@ -766,8 +729,6 @@ deploy:dev:plan-en:
   stage: Deploy:Dev:Plan
   needs:
     - job: "deploy:dev:init:en"
-      optional: true
-    - job: "deploy:dev:validate:en"
       optional: true
   variables:
     WEBCMS_LANG: en
