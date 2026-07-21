@@ -180,8 +180,9 @@ webcms/
 │   ├── infrastructure/         # AWS infrastructure
 │   └── webcms/                 # Application deployment
 ├── ci/                         # CI automation scripts
-├── push-dev.sh                 # Deploy to development
-└── trigger-pipeline.sh         # Manual pipeline trigger
+└── scripts/                    # Helper scripts
+    ├── push-dev.sh             # Deploy to development
+    └── trigger-pipeline.sh     # Manual pipeline trigger
 ```
 
 ### Key Technologies

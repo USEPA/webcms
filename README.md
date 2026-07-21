@@ -224,8 +224,9 @@ webcms/
 │   └── simplesaml/             # SAML authentication
 ├── terraform/                  # Infrastructure as code
 ├── ci/                         # CI automation scripts
-├── push-dev.sh                 # Deploy to dev helper script
-└── trigger-pipeline.sh         # Manual pipeline trigger
+└── scripts/                    # Helper scripts
+    ├── push-dev.sh             # Deploy to dev helper script
+    └── trigger-pipeline.sh     # Manual pipeline trigger
 ```
 
 ### Custom Modules
