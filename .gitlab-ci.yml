@@ -885,7 +885,8 @@ deploy:stage:init-en:
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
-    - gitlab-terraform init  # Initialize Terraform and download providers
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 deploy:stage:init-es:
   extends: .deploy:staging
@@ -897,44 +898,15 @@ deploy:stage:init-es:
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
-    - gitlab-terraform init  # Initialize Terraform and download providers
-
-deploy:stage:validate-en:
-  extends: .deploy:staging
-  stage: Deploy:Stage:Validate
-  needs:
-    - job: "deploy:stage:init-en"
-      optional: true
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG
-  environment:
-    name: site/stage-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
-
-deploy:stage:validate-es:
-  extends: .deploy:staging
-  stage: Deploy:Stage:Validate
-  needs:
-    - job: "deploy:stage:init-es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG
-  environment:
-    name: site/stage-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 deploy:stage:plan-en:
   extends: .deploy:staging
   stage: Deploy:Stage:Plan
   needs:
-    - job: "deploy:stage:validate-en"
-      optional: true  # Allow manual validation triggering
+    - job: "deploy:stage:init-en"
+      optional: true  # Allow manual init triggering
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
@@ -956,8 +928,8 @@ deploy:stage:plan-es:
   extends: .deploy:staging
   stage: Deploy:Stage:Plan
   needs:
-    - job: "deploy:stage:validate-es"
-      optional: true  # Allow manual validation triggering
+    - job: "deploy:stage:init-es"
+      optional: true  # Allow manual init triggering
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
