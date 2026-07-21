@@ -17,20 +17,17 @@ stages:
   - Scan                              # Prisma Cloud image vulnerability scanning
 
   # Infrastructure Provisioning (staging branch only)
-  - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
-  - Infrastructure:Preprod:Validate   # Validate Terraform configuration syntax
+  - Infrastructure:Preprod:Init       # Initialize and validate Terraform backend and providers
   - Infrastructure:Preprod:Plan       # Generate Terraform execution plan
   - Infrastructure:Preprod:Apply      # Apply infrastructure changes (manual approval required)
 
   # Production Deployment (staging branch → WEBCMS_SITE: dev)
-  - Deploy:Dev:Init                   # Initialize production deployment (English + Spanish parallel)
-  - Deploy:Dev:Validate               # Validate production Terraform config (English + Spanish parallel)
+  - Deploy:Dev:Init                   # Initialize and validate production deployment (English + Spanish parallel)
   - Deploy:Dev:Plan                   # Plan production deployment (English + Spanish parallel)
   - Deploy:Dev:Apply                  # Apply production deployment (English + Spanish parallel)
 
   # Staging Deployment (staging branch → WEBCMS_SITE: stage)
-  - Deploy:Stage:Init                 # Initialize staging deployment (English + Spanish parallel)
-  - Deploy:Stage:Validate             # Validate staging Terraform config (English + Spanish parallel)
+  - Deploy:Stage:Init                 # Initialize and validate staging deployment (English + Spanish parallel)
   - Deploy:Stage:Plan                 # Plan staging deployment (English + Spanish parallel)
   - Deploy:Stage:Apply                # Apply staging deployment (English + Spanish parallel)
 
@@ -127,15 +124,19 @@ secret_detection:
 
 # Restrict actual analyzer sub-jobs to staging branch only
 # Development branch skips security scanning for faster iteration
-#semgrep-sast:
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "staging"'
-#    - when: never
+# Semgrep SAST runs on staging only — full scan including vendor/contrib/node_modules
+# because all third-party code enters our system here and production is not scanned.
+# Development branch intentionally skips SAST to keep iteration fast;
+# staging serves as the security gate before any code reaches production.
+semgrep-sast:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - when: never
 
-#gemnasium-dependency_scanning:
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "staging"'
-#    - when: never
+gemnasium-dependency_scanning:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "staging"'
+    - when: never
 
 #region Templates
 # Reusable job templates that provide common configuration for pipeline jobs.
@@ -528,14 +529,18 @@ Prisma:Drupal:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
+    # Dynamically obtain a fresh JWT token from Prisma Cloud.
+    # Using username+password auth avoids silent failures from expired static tokens.
+    # Requires PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD CI/CD variables (same as IntraCMS).
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
-    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner using fresh token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan image for vulnerabilities and send results to Prisma Cloud
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true
 
 Prisma:Nginx:
@@ -563,14 +568,15 @@ Prisma:Nginx:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
-    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner using fresh token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    # Scan image for vulnerabilities and send results to Prisma Cloud
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
 
 
@@ -599,14 +605,15 @@ Prisma:Drush:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
-    # Download twistcli scanner from Prisma Cloud using pre-provisioned token
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    # Download twistcli scanner using fresh token
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    # Scan image for vulnerabilities and send results to Prisma Cloud
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
+    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
 
 #endregion
@@ -631,27 +638,14 @@ infrastructure:preproduction:init:
   script:
     - gitlab-terraform init -upgrade  # Upgrade providers to match lock file
     - gitlab-terraform init           # Initialize backend and download providers
-  environment:
-    name: infra/preproduction
-
-infrastructure:preproduction:validate:
-  extends: .infrastructure
-  stage: Infrastructure:Preprod:Validate
-  needs: ["infrastructure:preproduction:init"]  # Wait for init to complete
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
-  script:
-    - gitlab-terraform validate  # Validate configuration syntax
+    - gitlab-terraform validate       # Validate configuration syntax (combined with init to reduce stage hops)
   environment:
     name: infra/preproduction
 
 infrastructure:preproduction:plan:
   extends: .infrastructure
   stage: Infrastructure:Preprod:Plan
-  needs: ["infrastructure:preproduction:validate"]  # Wait for validation to pass
+  needs: ["infrastructure:preproduction:init"]  # Wait for init+validate to complete
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
   variables:
@@ -714,11 +708,12 @@ deploy:dev:init:en:
       fi
   script:
     - echo $TF_ADDRESS  # Display state backend URL for debugging
-    - gitlab-terraform init  # Initialize Terraform and download providers
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 # NOTE: Spanish (es) deployment for dev environment is disabled.
 # This functionality is preserved for future use if needed.
-# To re-enable, uncomment all dev-es jobs (init, validate, plan, apply).
+# To re-enable, uncomment all dev-es jobs (init, plan, apply).
 
 # deploy:dev:init:es:
 #   extends: .deploy:production
@@ -731,45 +726,7 @@ deploy:dev:init:en:
 #     name: site/dev-$WEBCMS_LANG
 #   script:
 #     - echo $TF_ADDRESS  # Display state backend URL for debugging
-#     - gitlab-terraform init  # Initialize Terraform and download providers
-
-
-# Validate Terraform configuration for dev site deployments
-deploy:dev:validate:en:
-  extends: .deploy:production
-  stage: Deploy:Dev:Validate
-  needs: ["deploy:dev:init:en"]  # Wait for init to complete
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-  environment:
-    name: site/dev-$WEBCMS_LANG
-  before_script:
-    - cd $TF_ROOT
-    - cp $backend_tf backend.tf
-    - cp "$TERRAFORM_TFVARS" terraform.tfvars
-    # Override image tag when SKIP_BUILD=true to use stable :development-latest tag
-    - |
-      if [ "$SKIP_BUILD" = "true" ]; then
-        export TF_VAR_image_tag="development-latest"
-        echo "ℹ️ SKIP_BUILD enabled - using image tag: development-latest"
-      fi
-  script:
-    - gitlab-terraform validate
-
-# Spanish validation job - disabled (see note above deploy:dev:init:es)
-# deploy:dev:validate:es:
-#   extends: .deploy:production
-#   stage: Deploy:Dev:Validate
-#   needs:
-#     - job: "deploy:dev:init:es"
-#       optional: true
-#   variables:
-#     WEBCMS_LANG: es
-#     TF_STATE_NAME: dev-webcms-$WEBCMS_LANG
-#   environment:
-#     name: site/dev-$WEBCMS_LANG
-#   script:
+#     - gitlab-terraform init
 #     - gitlab-terraform validate
 
 # Generate Terraform plans for dev site deployments
@@ -779,8 +736,6 @@ deploy:dev:plan-en:
   stage: Deploy:Dev:Plan
   needs:
     - job: "deploy:dev:init:en"
-      optional: true
-    - job: "deploy:dev:validate:en"
       optional: true
   variables:
     WEBCMS_LANG: en
@@ -937,7 +892,8 @@ deploy:stage:init-en:
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
-    - gitlab-terraform init  # Initialize Terraform and download providers
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 deploy:stage:init-es:
   extends: .deploy:staging
@@ -949,44 +905,15 @@ deploy:stage:init-es:
   environment:
     name: site/stage-$WEBCMS_LANG
   script:
-    - gitlab-terraform init  # Initialize Terraform and download providers
-
-deploy:stage:validate-en:
-  extends: .deploy:staging
-  stage: Deploy:Stage:Validate
-  needs:
-    - job: "deploy:stage:init-en"
-      optional: true
-  variables:
-    WEBCMS_LANG: en
-    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG
-  environment:
-    name: site/stage-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
-
-deploy:stage:validate-es:
-  extends: .deploy:staging
-  stage: Deploy:Stage:Validate
-  needs:
-    - job: "deploy:stage:init-es"
-      optional: true
-  variables:
-    WEBCMS_LANG: es
-    TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
-  resource_group: site/stage-$WEBCMS_LANG
-  environment:
-    name: site/stage-$WEBCMS_LANG
-  script:
-    - gitlab-terraform validate
+    - gitlab-terraform init      # Initialize Terraform and download providers
+    - gitlab-terraform validate  # Validate configuration syntax (combined with init to reduce stage hops)
 
 deploy:stage:plan-en:
   extends: .deploy:staging
   stage: Deploy:Stage:Plan
   needs:
-    - job: "deploy:stage:validate-en"
-      optional: true  # Allow manual validation triggering
+    - job: "deploy:stage:init-en"
+      optional: true  # Allow manual init triggering
   variables:
     WEBCMS_LANG: en
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG
@@ -1008,8 +935,8 @@ deploy:stage:plan-es:
   extends: .deploy:staging
   stage: Deploy:Stage:Plan
   needs:
-    - job: "deploy:stage:validate-es"
-      optional: true  # Allow manual validation triggering
+    - job: "deploy:stage:init-es"
+      optional: true  # Allow manual init triggering
   variables:
     WEBCMS_LANG: es
     TF_STATE_NAME: stage-webcms-$WEBCMS_LANG

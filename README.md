@@ -62,10 +62,10 @@ git commit -m "feat: Your feature description"
 git push origin development
 
 # Auto-detect if build is needed (recommended)
-./push-dev.sh
+./scripts/push-dev.sh
 
 # Or manually override: force skip build for faster deployment
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide.
@@ -120,14 +120,14 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 
 || Command | Description |
 ||---------|-------------|
-|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
-|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
-|| `./push-dev.sh --force-build` | Force full build even if not detected |
-|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
-|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| `./scripts/push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./scripts/push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./scripts/push-dev.sh --force-build` | Force full build even if not detected |
+|| `./scripts/push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./scripts/trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
 **Automatic Build Detection:**
-By default, `push-dev.sh` analyzes changed files and automatically determines if a full build is required.
+By default, `scripts/push-dev.sh` analyzes changed files and automatically determines if a full build is required.
 
 **Files requiring full build (auto-detected):**
 - ❌ `composer.json` or `composer.lock` (module dependencies)
@@ -224,8 +224,9 @@ webcms/
 │   └── simplesaml/             # SAML authentication
 ├── terraform/                  # Infrastructure as code
 ├── ci/                         # CI automation scripts
-├── push-dev.sh                 # Deploy to dev helper script
-└── trigger-pipeline.sh         # Manual pipeline trigger
+└── scripts/                    # Helper scripts
+    ├── push-dev.sh             # Deploy to dev helper script
+    └── trigger-pipeline.sh     # Manual pipeline trigger
 ```
 
 ### Custom Modules
@@ -322,7 +323,7 @@ mysql -h 127.0.0.1 -P <port> -u db -pdb db < backup.sql
 **Skip-Build Deployment Fails:**
 ```bash
 # Run full build first to create :development-latest images
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#troubleshooting) for more troubleshooting steps.
