@@ -17,20 +17,17 @@ stages:
   - Scan                              # Prisma Cloud image vulnerability scanning
 
   # Infrastructure Provisioning (staging branch only)
-  - Infrastructure:Preprod:Init       # Initialize Terraform backend and providers
-  - Infrastructure:Preprod:Validate   # Validate Terraform configuration syntax
+  - Infrastructure:Preprod:Init       # Initialize and validate Terraform backend and providers
   - Infrastructure:Preprod:Plan       # Generate Terraform execution plan
   - Infrastructure:Preprod:Apply      # Apply infrastructure changes (manual approval required)
 
   # Production Deployment (staging branch → WEBCMS_SITE: dev)
-  - Deploy:Dev:Init                   # Initialize production deployment (English + Spanish parallel)
-  - Deploy:Dev:Validate               # Validate production Terraform config (English + Spanish parallel)
+  - Deploy:Dev:Init                   # Initialize and validate production deployment (English + Spanish parallel)
   - Deploy:Dev:Plan                   # Plan production deployment (English + Spanish parallel)
   - Deploy:Dev:Apply                  # Apply production deployment (English + Spanish parallel)
 
   # Staging Deployment (staging branch → WEBCMS_SITE: stage)
-  - Deploy:Stage:Init                 # Initialize staging deployment (English + Spanish parallel)
-  - Deploy:Stage:Validate             # Validate staging Terraform config (English + Spanish parallel)
+  - Deploy:Stage:Init                 # Initialize and validate staging deployment (English + Spanish parallel)
   - Deploy:Stage:Plan                 # Plan staging deployment (English + Spanish parallel)
   - Deploy:Stage:Apply                # Apply staging deployment (English + Spanish parallel)
 
