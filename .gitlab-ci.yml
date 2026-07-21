@@ -631,27 +631,14 @@ infrastructure:preproduction:init:
   script:
     - gitlab-terraform init -upgrade  # Upgrade providers to match lock file
     - gitlab-terraform init           # Initialize backend and download providers
-  environment:
-    name: infra/preproduction
-
-infrastructure:preproduction:validate:
-  extends: .infrastructure
-  stage: Infrastructure:Preprod:Validate
-  needs: ["infrastructure:preproduction:init"]  # Wait for init to complete
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
-  variables:
-    WEBCMS_ENVIRONMENT: preproduction
-    TF_STATE_NAME: dev
-  script:
-    - gitlab-terraform validate  # Validate configuration syntax
+    - gitlab-terraform validate       # Validate configuration syntax (combined with init to reduce stage hops)
   environment:
     name: infra/preproduction
 
 infrastructure:preproduction:plan:
   extends: .infrastructure
   stage: Infrastructure:Preprod:Plan
-  needs: ["infrastructure:preproduction:validate"]  # Wait for validation to pass
+  needs: ["infrastructure:preproduction:init"]  # Wait for init+validate to complete
   rules:
     - if: '$CI_COMMIT_BRANCH == "staging"'  # Only run on staging branch
   variables:
