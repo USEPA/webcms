@@ -5,7 +5,7 @@
 # 1. Go to GitLab: https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository
 # 2. Find "Mirroring repositories" section
 # 3. Click "Update now" button next to the GitHub mirror
-# 4. Run this script: ./trigger-pipeline.sh
+# 4. Run this script: ./scripts/trigger-pipeline.sh
 #
 # One-time Setup:
 # 1. Create a Personal Access Token in GitLab:
@@ -51,7 +51,7 @@ if [ -z "$GITLAB_TOKEN" ]; then
   echo "   Click 'Update now' next to the GitHub mirror"
   echo ""
   echo "4. Run this script:"
-  echo "   ./trigger-pipeline.sh"
+  echo "   ./scripts/trigger-pipeline.sh"
   exit 1
 fi
 
