@@ -274,7 +274,7 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 
 | Branch | Environment | Purpose | Deployment Method |
 |--------|-------------|---------|-------------------|
-| `development` | Dev site | Active development | Automatic via `push-dev.sh` |
+| `development` | Dev site | Active development | Automatic via `scripts/push-dev.sh` |
 | `staging` | Stage site | Pre-production testing | Manual trigger |
 | `main` | Production | Live public site | Manual pipeline trigger |
 
@@ -284,11 +284,11 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 
 ### Automatic Build Detection (Default Behavior)
 
-Starting with the enhanced `push-dev.sh` script, **build detection is now automatic**. The script analyzes your changed files and intelligently determines whether a full Docker rebuild is needed.
+Starting with the enhanced `scripts/push-dev.sh` script, **build detection is now automatic**. The script analyzes your changed files and intelligently determines whether a full Docker rebuild is needed.
 
 ```bash
-# Simply run push-dev.sh - it will auto-detect!
-./push-dev.sh
+# Simply run scripts/push-dev.sh - it will auto-detect!
+./scripts/push-dev.sh
 ```
 
 The script will:
@@ -343,13 +343,13 @@ You can override the automatic detection when needed:
 
 **Force skip build:**
 ```bash
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 Use when you know existing Docker images are compatible but the script detects a build is needed.
 
 **Force full build:**
 ```bash
-./push-dev.sh --force-build
+./scripts/push-dev.sh --force-build
 ```
 Use when you want to rebuild everything (e.g., to pick up base image updates) even if no build-requiring files changed.
 
@@ -357,7 +357,7 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 
 #### Full Build Mode (Default)
 ```bash
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 **Pipeline stages:**
@@ -373,7 +373,7 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 
 #### Skip-Build Mode (Fast)
 ```bash
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 
 **Pipeline stages:**
@@ -391,14 +391,14 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 git checkout development
 git pull origin development
 git push origin development
-./push-dev.sh  # Auto-detects: no code changes = full build
+./scripts/push-dev.sh  # Auto-detects: no code changes = full build
 
 # 10:30 AM - Bug fix in custom module
 # (edit services/drupal/web/modules/custom/epa_workflow/src/Plugin/WorkflowType/MyPlugin.php)
 git add .
 git commit -m "fix: Correct workflow validation logic"
 git push origin development
-./push-dev.sh  # Auto-detects: custom module only = deploy-only! 🚀
+./scripts/push-dev.sh  # Auto-detects: custom module only = deploy-only! 🚀
 # Output: "✅ Build NOT required - changes are deployment-only"
 
 # 2:00 PM - Another iteration on theme template
@@ -406,14 +406,14 @@ git push origin development
 git add .
 git commit -m "style: Update node template layout"
 git push origin development
-./push-dev.sh  # Auto-detects: template only = deploy-only! 🚀
+./scripts/push-dev.sh  # Auto-detects: template only = deploy-only! 🚀
 
 # 4:00 PM - Added a new Composer dependency
 # (edit composer.json, run ddev composer update)
 git add composer.json composer.lock
 git commit -m "chore: Add new library dependency"
 git push origin development
-./push-dev.sh  # Auto-detects: composer.json = FULL BUILD required! 🔨
+./scripts/push-dev.sh  # Auto-detects: composer.json = FULL BUILD required! 🔨
 # Output: "🔨 Build REQUIRED - detected change in: composer.json"
 ```
 
@@ -425,14 +425,14 @@ git checkout development
 git add .
 git commit -m "fix: Critical security patch for XSS vulnerability"
 git push origin development
-./push-dev.sh  # Auto-detects: code-only change = deploy-only! Fast!
+./scripts/push-dev.sh  # Auto-detects: code-only change = deploy-only! Fast!
 # Deploys in ~3-5 minutes instead of ~15 minutes
 ```
 
 #### Example 3: Force Push with Skip-Build
 ```bash
 # Need to force push and deploy quickly
-./push-dev.sh --skip-build -f
+./scripts/push-dev.sh --skip-build -f
 ```
 
 ### Manual Pipeline Trigger with Skip-Build
@@ -490,14 +490,14 @@ git checkout development
 git pull origin main
 
 # Push to GitHub and trigger full CI/CD pipeline
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 ### What Happens During Full Build
 
 1. **GitHub Push**
    - Code pushed to `development` branch on GitHub
-   - `push-dev.sh` script triggers GitLab pipeline via API
+   - `scripts/scripts/push-dev.sh` script triggers GitLab pipeline via API
 
 2. **GitLab Mirror Sync**
    - GitLab pulls latest code from GitHub mirror
@@ -613,7 +613,7 @@ GitHub and deployed through a GitLab mirror into AWS ECS.
 |--------|---------|-------------------|-------|
 | `main` | Production source of truth | Production (manual pipeline trigger) | Locked; release merges and hotfixes only. |
 | `staging` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
-| `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`push-dev.sh`). |
+| `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`scripts/push-dev.sh`). |
 | `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `development` and open PRs back into `development`. |
 | `hotfix/*` | Urgent fixes for prod | Main & staging | Created from `main`, merged back to all branches after release. |
 
@@ -629,7 +629,7 @@ GitHub and deployed through a GitLab mirror into AWS ECS.
    `ddev gesso build` if you touched theme source.
 4. **Open a PR into `development`** — fill out the
    [pull request template](.github/pull_request_template.md), then trigger
-   `./push-dev.sh --skip-build` for fast validation after merge.
+   `./scripts/push-dev.sh --skip-build` for fast validation after merge.
 5. **Promote to Stage (`staging`)** — *EPA staff only*; merge `development` →
    `staging` on the release cadence and let the full stage pipeline run.
 6. **Promote to Production (`main`)** — *EPA staff only*; follow the
@@ -854,12 +854,12 @@ After deploying to dev environment:
 
 || Command | Description |
 ||---------|-------------|
-|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
-|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
-|| `./push-dev.sh --force-build` | Force full build even if not detected |
-|| `./push-dev.sh -f` | Force push with auto-detection |
-|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
-|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| `./scripts/push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./scripts/push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./scripts/push-dev.sh --force-build` | Force full build even if not detected |
+|| `./scripts/push-dev.sh -f` | Force push with auto-detection |
+|| `./scripts/push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./scripts/trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
 ---
 
@@ -933,7 +933,7 @@ ddev start
 
 **Solution:** Run a full build first:
 ```bash
-./push-dev.sh  # Without --skip-build
+./scripts/push-dev.sh  # Without --skip-build
 ```
 
 #### Changes Not Visible After Deployment
@@ -954,7 +954,7 @@ drush status
 
 #### GitLab Pipeline Fails to Trigger
 
-**Problem:** `push-dev.sh` completes but pipeline doesn't start.
+**Problem:** `scripts/scripts/push-dev.sh` completes but pipeline doesn't start.
 
 **Causes:**
 1. GitLab token expired or invalid
