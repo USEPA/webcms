@@ -193,15 +193,17 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/ping || exit 1
 
-# Build an nginx container that has the same view into the Drupal filesystem
-# as well as its configuration file.
+# Build an nginx container for serving static assets and proxying PHP requests.
 FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
 
 # Bump system packages
 RUN apk upgrade
 
-# Copy the Drupal filesystem into this image
-COPY --from=drupal /var/www/html /var/www/html
+# Copy only the web directory from the drupal stage.
+# Nginx serves static assets from web/ and proxies PHP requests to PHP-FPM;
+# vendor/, config/, drush/ etc. are PHP-runtime concerns only the drupal
+# container needs. Scoping this COPY to web/ reduces image size and build time.
+COPY --from=drupal /var/www/html/web /var/www/html/web
 
 # Copy nginx configuration
 COPY status.conf *.map /etc/nginx/conf.d/
