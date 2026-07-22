@@ -545,11 +545,9 @@ Prisma:Drupal:
   variables:
     GIT_STRATEGY: none
     WEBCMS_ENVIRONMENT: preproduction
-  <<: *prisma_scan_steps
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    IMAGE_TARGET: drupal
+  before_script: *prisma_before
+  script: *prisma_script_common
   allow_failure: true
 
 Prisma:Nginx:
@@ -570,11 +568,9 @@ Prisma:Nginx:
   variables:
     GIT_STRATEGY: none
     WEBCMS_ENVIRONMENT: preproduction
-  <<: *prisma_scan_steps
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    IMAGE_TARGET: nginx
+  before_script: *prisma_before
+  script: *prisma_script_common
   allow_failure: true
 
 Prisma:Drush:
@@ -595,11 +591,9 @@ Prisma:Drush:
   variables:
     GIT_STRATEGY: none
     WEBCMS_ENVIRONMENT: preproduction
-  <<: *prisma_scan_steps
-  script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
+    IMAGE_TARGET: drush
+  before_script: *prisma_before
+  script: *prisma_script_common
   allow_failure: true
 #region Preproduction AWS Account
 
