@@ -505,9 +505,8 @@ build:drupal:stage:
 # Only runs on staging branch (stage deployments)
 
 # Shared script anchor for Prisma scan steps — used by all three jobs.
-# PRISMA_TOKEN: the CI Integration token from Prisma Cloud Console:
-#   Compute → Manage → System → (copy the access token)
-# Store it as PRISMA_TOKEN in GitLab CI/CD variables for this project.
+# Generates a fresh JWT each run using PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD
+# (GitLab CI/CD variables). No static token required.
 .prisma_scan_steps: &prisma_scan_steps
   before_script:
     - |
