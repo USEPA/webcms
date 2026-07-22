@@ -142,6 +142,19 @@ RUN set -ex \
 # Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
+# Install additional certificates early so this layer can be cached
+# independently of application code changes (web, config, drush).
+# The TLS certs and RDS bundle rarely change, so moving them before the
+# frequently-changing COPY operations allows Kaniko to cache this layer.
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
 # Copy Composer-installed packages
 COPY --from=deps /app/web web
 COPY --from=deps /app/vendor vendor
@@ -162,17 +175,6 @@ COPY web web
 COPY config config
 COPY drush drush
 
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
-COPY tls /usr/share/ca-certificates/extra
-RUN \
-  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
-    echo "$cert" >> /etc/ca-certificates.conf; \
-  done \
-  && update-ca-certificates \
-  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
-  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
-
 
 # Add build metadata to the image. We expose two optional build args:
 # * GIT_TAG, the named Git tag being built.
@@ -191,15 +193,17 @@ ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/ping || exit 1
 
-# Build an nginx container that has the same view into the Drupal filesystem
-# as well as its configuration file.
+# Build an nginx container for serving static assets and proxying PHP requests.
 FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
 
 # Bump system packages
 RUN apk upgrade
 
-# Copy the Drupal filesystem into this image
-COPY --from=drupal /var/www/html /var/www/html
+# Copy only the web directory from the drupal stage.
+# Nginx serves static assets from web/ and proxies PHP requests to PHP-FPM;
+# vendor/, config/, drush/ etc. are PHP-runtime concerns only the drupal
+# container needs. Scoping this COPY to web/ reduces image size and build time.
+COPY --from=drupal /var/www/html/web /var/www/html/web
 
 # Copy nginx configuration
 COPY status.conf *.map /etc/nginx/conf.d/
@@ -277,11 +281,8 @@ RUN set -ex \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-cli.ini
 
-# Same as nginx: copy the built Drupal filesystem
-COPY --from=drupal /var/www/html /var/www/html
-
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
+# Install additional certificates early (same pattern as drupal stage) so
+# this layer can be cached independently of the Drupal filesystem copy.
 COPY tls /usr/share/ca-certificates/extra
 RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
@@ -289,6 +290,10 @@ RUN \
   done \
   && update-ca-certificates \
   && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
+# Copy the full Drupal filesystem (drush needs vendor/, config/, etc.
+# unlike nginx which only needs web/)
+COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
