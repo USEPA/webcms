@@ -516,7 +516,11 @@ build:drupal:stage:
 # Common Prisma script steps: token generation, twistcli download, docker login/pull.
 # IMAGE_TARGET must be set per-job (drupal, nginx, or drush).
 .prisma_script_common: &prisma_script_common
-  - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v34.04/authenticate | jq -r .token)'
+  # Compute Console auth endpoint — generates a token twistcli accepts.
+  # Using /api/v1/authenticate (Compute Console native) rather than the
+  # Platform API (/api/v34.04/authenticate) which returns a Platform token
+  # that twistcli images scan does not accept.
+  - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v1/authenticate | jq -r .token)'
   - |
     if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
       echo "ERROR: Failed to generate Prisma token. Check PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD."
