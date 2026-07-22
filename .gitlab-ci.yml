@@ -529,11 +529,11 @@ Prisma:Drupal:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
-    # Dynamically obtain a fresh JWT token from Prisma Cloud.
-    # Using username+password auth avoids silent failures from expired static tokens.
-    # Requires PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD CI/CD variables (same as IntraCMS).
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
+    # Authenticate with Prisma Cloud to obtain a fresh JWT token.
+    # Requires PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD CI/CD variables (same as IntraCMS).
+    - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
     # Download twistcli scanner using fresh token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
@@ -568,8 +568,9 @@ Prisma:Nginx:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
+    - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
     # Download twistcli scanner using fresh token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
@@ -605,8 +606,9 @@ Prisma:Drush:
         echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
-    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
   script:
+    - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
+    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
     # Download twistcli scanner using fresh token
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
     # Login to GitLab container registry to pull the image for scanning
