@@ -439,7 +439,7 @@ build:drupal:dev:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
-      --snapshotMode=redo
+      --snapshot-mode=redo
       --use-new-run
       --cache-ttl=168h
       --cache-copy-layers=true
@@ -488,7 +488,7 @@ build:drupal:stage:
     - /kaniko/executor
       $KANIKO_CACHE_ARGS
       --skip-unused-stages
-      --snapshotMode=redo
+      --snapshot-mode=redo
       --use-new-run
       --context=$CI_PROJECT_DIR/services/drupal
       --build-arg GIT_COMMIT=$CI_COMMIT_SHA
