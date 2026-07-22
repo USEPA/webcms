@@ -504,46 +504,51 @@ build:drupal:stage:
 # These jobs pull images from GitLab registry and scan them using twistcli
 # Only runs on staging branch (stage deployments)
 
+# Shared script anchor for Prisma scan steps — used by all three jobs.
+# PRISMA_TOKEN: the CI Integration token from Prisma Cloud Console:
+#   Compute → Manage → System → (copy the access token)
+# Store it as PRISMA_TOKEN in GitLab CI/CD variables for this project.
+.prisma_scan_steps: &prisma_scan_steps
+  before_script:
+    - |
+      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
+        echo "Skipping scan for site '${WEBCMS_SITE}' - filter is '${WEBCMS_SITE_FILTER}'"
+        exit 0
+      fi
+    - |
+      if [ -z "$PRISMA_TOKEN" ]; then
+        echo "ERROR: PRISMA_TOKEN is not set. Get the token from Prisma Cloud: Compute > Manage > System."
+        exit 1
+      fi
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+
 Prisma:Drupal:
   stage: Scan
   tags:
-    - twistcli  # Requires runner with Docker and twistcli support
+    - twistcli
   needs:
     - job: "build:drupal:stage"
-      optional: true  # Run even if build skipped (for tagged releases)
+      optional: true
   rules:
-    - if: '$CI_COMMIT_TAG'  # Run on tagged releases
+    - if: '$CI_COMMIT_TAG'
       variables:
-        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG  # Use tag as image tag
-    - if: '$CI_COMMIT_BRANCH == "staging"'  # Run on staging branch only (stage site)
+        WEBCMS_IMAGE_TAG: $CI_COMMIT_TAG
+    - if: '$CI_COMMIT_BRANCH == "staging"'
   parallel:
     matrix:
-      - WEBCMS_SITE: [stage]  # Scan stage site only (not dev)
+      - WEBCMS_SITE: [stage]
   variables:
-    GIT_STRATEGY: none  # Don't clone repo (only need to pull Docker image)
+    GIT_STRATEGY: none
     WEBCMS_ENVIRONMENT: preproduction
-  before_script:
-    # Skip scan if WEBCMS_SITE_FILTER is set and doesn't match current site
-    - |
-      if [ -n "${WEBCMS_SITE_FILTER}" ] && [ "${WEBCMS_SITE}" != "${WEBCMS_SITE_FILTER}" ]; then
-        echo "Skipping scan for site '${WEBCMS_SITE}' - doesn't match filter '${WEBCMS_SITE_FILTER}'"
-        exit 0
-      fi
+  <<: *prisma_scan_steps
   script:
-    # Validate credentials are set before attempting download/scan
-    - |
-      if [ -z "$PRISMA_CI_USERNAME" ] || [ -z "$PRISMA_CI_PASSWORD" ]; then
-        echo "ERROR: PRISMA_CI_USERNAME or PRISMA_CI_PASSWORD is not set in GitLab CI/CD variables."
-        exit 1
-      fi
-    # Download twistcli using credentials directly (avoids JWT token intermediary issues)
-    - 'curl --progress-bar -L -k --user "$PRISMA_CI_USERNAME:$PRISMA_CI_PASSWORD" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
-    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --user=$PRISMA_CI_USERNAME --password=$PRISMA_CI_PASSWORD
+    - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_TOKEN
   allow_failure: true
+
+Prisma:Nginx:
+  stage: Scan
   tags:
     - twistcli
   needs:
