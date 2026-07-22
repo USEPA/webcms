@@ -142,6 +142,19 @@ RUN set -ex \
 # Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
+# Install additional certificates early so this layer can be cached
+# independently of application code changes (web, config, drush).
+# The TLS certs and RDS bundle rarely change, so moving them before the
+# frequently-changing COPY operations allows Kaniko to cache this layer.
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
 # Copy Composer-installed packages
 COPY --from=deps /app/web web
 COPY --from=deps /app/vendor vendor
@@ -161,17 +174,6 @@ COPY load.environment.php ./
 COPY web web
 COPY config config
 COPY drush drush
-
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
-COPY tls /usr/share/ca-certificates/extra
-RUN \
-  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
-    echo "$cert" >> /etc/ca-certificates.conf; \
-  done \
-  && update-ca-certificates \
-  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
-  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 
 # Add build metadata to the image. We expose two optional build args:
