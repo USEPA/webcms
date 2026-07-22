@@ -281,11 +281,8 @@ RUN set -ex \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-cli.ini
 
-# Same as nginx: copy the built Drupal filesystem
-COPY --from=drupal /var/www/html /var/www/html
-
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
+# Install additional certificates early (same pattern as drupal stage) so
+# this layer can be cached independently of the Drupal filesystem copy.
 COPY tls /usr/share/ca-certificates/extra
 RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
@@ -293,6 +290,10 @@ RUN \
   done \
   && update-ca-certificates \
   && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
+# Copy the full Drupal filesystem (drush needs vendor/, config/, etc.
+# unlike nginx which only needs web/)
+COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate
