@@ -533,13 +533,14 @@ Prisma:Drupal:
     # Authenticate with Prisma Cloud to obtain a fresh JWT token.
     # Requires PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD CI/CD variables (same as IntraCMS).
     - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
-    # Download twistcli scanner using fresh token
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."
+        exit 1
+      fi
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG
-    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drupal:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true
 
@@ -570,13 +571,14 @@ Prisma:Nginx:
       fi
   script:
     - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
-    # Download twistcli scanner using fresh token
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."
+        exit 1
+      fi
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG
-    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-nginx:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
 
@@ -608,13 +610,14 @@ Prisma:Drush:
       fi
   script:
     - 'PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v32.01/authenticate | jq -r .token)'
-    - if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."; exit 1; fi
-    # Download twistcli scanner using fresh token
+    - |
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Prisma token is empty. Ensure PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD are set in GitLab CI/CD variables."
+        exit 1
+      fi
     - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
-    # Login to GitLab container registry to pull the image for scanning
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG
-    # Scan image — twistcli outputs findings and a direct link to Prisma Cloud console on success
     - ./twistcli images scan $CI_REGISTRY_IMAGE/webcms-${WEBCMS_ENVIRONMENT}-${WEBCMS_SITE}-drush:$WEBCMS_IMAGE_TAG --address=https://prismacloud.epa.gov --details --token=$PRISMA_CI_TOKEN
   allow_failure: true  # Don't block pipeline on scan failures
 
