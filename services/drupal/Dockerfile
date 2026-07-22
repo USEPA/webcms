@@ -235,9 +235,10 @@ RUN apk upgrade
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install bundled PHP extensions and system tools (no external PECL dependency; stable layer)
+# Note: gd is intentionally excluded — the drush container is CLI-only (drush updb, cim, cr)
+# and has no need for image processing. GD lives in the drupal/base target.
 RUN set -ex \
   && install-php-extensions \
-    gd \
     opcache \
     pdo_mysql \
     zip \
