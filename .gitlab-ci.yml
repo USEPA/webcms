@@ -515,12 +515,13 @@ build:drupal:stage:
         echo "Skipping scan for site '${WEBCMS_SITE}' - filter is '${WEBCMS_SITE_FILTER}'"
         exit 0
       fi
+    - 'export PRISMA_CI_TOKEN=$(curl -kH "Content-Type: application/json" -d "{\"username\":\"$PRISMA_CI_USERNAME\", \"password\":\"$PRISMA_CI_PASSWORD\"}" https://prismacloud.epa.gov/api/v34.04/authenticate | jq -r .token)'
     - |
-      if [ -z "$PRISMA_TOKEN" ]; then
-        echo "ERROR: PRISMA_TOKEN is not set. Get the token from Prisma Cloud: Compute > Manage > System."
+      if [ -z "$PRISMA_CI_TOKEN" ] || [ "$PRISMA_CI_TOKEN" = "null" ]; then
+        echo "ERROR: Failed to generate Prisma token. Check PRISMA_CI_USERNAME and PRISMA_CI_PASSWORD."
         exit 1
       fi
-    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
+    - 'curl --progress-bar -L -k --header "Authorization: Bearer $PRISMA_CI_TOKEN" https://prismacloud.epa.gov/api/v1/util/twistcli > twistcli; chmod a+x twistcli;'
 
 Prisma:Drupal:
   stage: Scan
