@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.3.31-fpm-alpine3.22 AS base
+FROM public.ecr.aws/docker/library/php:8.3.32-fpm-alpine3.22 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -228,10 +228,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8080/ping || exit 1
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
-# and ssh that are inappropriate for a server container image.
+# that are inappropriate for a server container image.
 # IMPORTANT: keep this PHP version in sync with the base FPM image above so that Drush
 # and the web container run identical language semantics against the same Drupal codebase.
-FROM public.ecr.aws/docker/library/php:8.3.31-cli-alpine3.22 AS drush
+FROM public.ecr.aws/docker/library/php:8.3.32-cli-alpine3.22 AS drush
 
 # Bump system packages
 RUN apk upgrade
@@ -248,8 +248,6 @@ RUN set -ex \
     zip \
   && apk add --no-cache \
     mysql-client \
-    openssh \
-    rsync \
     bash \
   && { \
     echo 'memory_limit=-1'; \
