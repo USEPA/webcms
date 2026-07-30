@@ -1,0 +1,85 @@
+diff --git a/src/Controller/PluginRevisionController.php b/src/Controller/PluginRevisionController.php
+index b266591..e500934 100644
+--- a/src/Controller/PluginRevisionController.php
++++ b/src/Controller/PluginRevisionController.php
+@@ -168,10 +168,13 @@ class PluginRevisionController extends ControllerBase {
+ 
+     // Build the layout filter.
+     $build['controls']['diff_layout'] = [
+-      '#type' => 'item',
++      '#theme' => 'item_list',
++      '#type' => 'ul',
+       '#title' => $this->t('Layout'),
+       '#wrapper_attributes' => ['class' => ['diff-controls__item']],
+-      'filter' => $this->buildLayoutNavigation($entity, $left_revision->getRevisionId(), $right_revision->getRevisionId(), $filter),
++      '#prefix' => '<div class="diff-controls--layout">',
++      '#suffix' => '</div>',
++      '#items' => $this->buildLayoutNavigation($entity, $left_revision->getRevisionId(), $right_revision->getRevisionId(), $filter),
+     ];
+ 
+     // Perform comparison only if both entity revisions loaded successfully.
+@@ -209,8 +212,9 @@ class PluginRevisionController extends ControllerBase {
+     $layouts = $this->diffLayoutManager->getPluginOptions();
+     foreach ($layouts as $key => $value) {
+       $links[$key] = [
+-        'title' => $value,
+-        'url' => $this->diffRoute($entity, $left_revision_id, $right_revision_id, $key),
++        '#type' => 'link',
++        '#title' => $value,
++        '#url' => $this->diffRoute($entity, $left_revision_id, $right_revision_id, $key),
+       ];
+     }
+ 
+@@ -219,12 +223,12 @@ class PluginRevisionController extends ControllerBase {
+     unset($links[$active_filter]);
+     array_unshift($links, $filter);
+ 
+-    $filter = [
+-      '#type' => 'operations',
+-      '#links' => $links,
+-    ];
++//    $filter = [
++//      '#type' => 'operations',
++//      '#links' => $links,
++//    ];
+ 
+-    return $filter;
++    return $links;
+   }
+ 
+   /**
+diff --git a/src/Plugin/diff/Layout/VisualInlineDiffLayout.php b/src/Plugin/diff/Layout/VisualInlineDiffLayout.php
+index e8c5552..c3a832b 100644
+--- a/src/Plugin/diff/Layout/VisualInlineDiffLayout.php
++++ b/src/Plugin/diff/Layout/VisualInlineDiffLayout.php
+@@ -155,8 +155,9 @@ class VisualInlineDiffLayout extends DiffLayoutBase {
+         continue;
+       }
+       $options[$view_mode] = [
+-        'title' => $view_mode_info,
+-        'url' => PluginRevisionController::diffRoute($entity,
++        '#type' => 'link',
++        '#title' => $view_mode_info,
++        '#url' => PluginRevisionController::diffRoute($entity,
+           $left_revision->getRevisionId(),
+           $right_revision->getRevisionId(),
+           'visual_inline',
+@@ -182,13 +183,13 @@ class VisualInlineDiffLayout extends DiffLayoutBase {
+     array_unshift($options, $filter);
+ 
+     $build['controls']['view_mode'] = [
+-      '#type' => 'item',
++      '#theme' => 'item_list',
++      '#type' => 'ul',
++      '#items' => $options,
+       '#title' => $this->t('View mode'),
++      '#prefix' => '<div class="diff-controls--view-mode">',
++      '#suffix' => '</div>',
+       '#wrapper_attributes' => ['class' => ['diff-controls__item']],
+-      'filter' => [
+-        '#type' => 'operations',
+-        '#links' => $options,
+-      ],
+     ];
+ 
+     $view_builder = $this->entityTypeManager->getViewBuilder($entity->getEntityTypeId());
