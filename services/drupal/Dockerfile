@@ -120,25 +120,6 @@ RUN composer install \
 # Remove any Composer authentication file if present.
 RUN rm auth.json
 
-# Build Gesso, the WebCMS' theme
-# Node 24 LTS + PHP 8.3 build image (bumped from EOL Node 18 / PHP 8.1); build-time only
-FROM forumone/gesso:node-v24-php-8.3 AS gesso
-
-WORKDIR /app
-
-# Install base npm dependencies (npm ci = npm clean-install)
-COPY web/themes/epa_theme/package*.json ./
-RUN npm ci
-
-# Copy theme source files and perform a build
-COPY web/themes/epa_theme ./
-RUN set -ex \
-  # Build theme
-  && npx gulp build \
-  # Remove node_modules - these are only needed for the build, so we save some size in the
-  # images by removing theme here.
-  && rm -rf node_modules
-
 # Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
 
@@ -162,9 +143,6 @@ COPY --from=deps /app/scripts scripts
 
 # Copy composer.json files
 COPY --from=deps /app/composer.json /app/composer.lock /app/composer.patches.json ./
-
-# Copy the built theme
-COPY --from=gesso /app web/themes/epa_theme
 
 # Copy the environment loader
 COPY load.environment.php ./
