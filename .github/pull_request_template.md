@@ -64,7 +64,7 @@ helpful.
 - [ ] Documented what's new
 - [ ] Added in-code documentation (wherever needed)
 - [ ] Wrote tests for new components/features
-- [ ] Ran the linter (`ddev composer phpcs`, `ddev gesso lint`) to ensure style guidelines were followed
+- [ ] Ran the linter (`ddev composer phpcs`) to ensure style guidelines were followed
 - [ ] Ran static analysis (`ddev composer phpstan`)
 - [ ] Created a demo
 - [ ] Read and validated this description and the diff myself
