@@ -1,6 +1,6 @@
 # EPA WebCMS
 
-The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.
+The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.6.x.
 
 ## Quick Start
 
