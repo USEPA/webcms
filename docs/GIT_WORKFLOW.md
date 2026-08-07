@@ -129,7 +129,7 @@ Guidelines:
    ```
    Include the ticket number in the branch name if applicable.
 3. **Develop & validate locally**
-   - Use the DDEV and Gesso commands documented in
+   - Use the DDEV commands documented in
      [CONTRIBUTING.md](../CONTRIBUTING.md).
    - Follow [Conventional Commits](#commit-message-convention) and keep commits
      focused.
@@ -143,7 +143,6 @@ Guidelines:
      ddev drush cex          # export config you changed
      ddev composer phpcs
      ddev composer phpstan
-     ddev gesso build        # if you touched theme source
      ```
 4. **Open a PR into `development`**
    - Target branch: `development`.

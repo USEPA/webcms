@@ -84,23 +84,7 @@ Given how easy it is to hand unreviewed code to a reviewer, please include some 
 
    > If you encounter errors, delete `services/drupal/.ddev/vendor` and run: `ddev composer clearcache`
 
-8. **Install theme requirements:**
-
-   ```bash
-   ddev gesso install
-   ```
-
-9. **Build theme assets:**
-
-   ```bash
-   # One-time build
-   ddev gesso build
-
-   # Or watch for changes during development
-   ddev gesso watch
-   ```
-
-10. **Apply latest configuration:**
+8. **Apply latest configuration:**
 
     **⚠️ Warning:** Skip this if starting from a fresh database import—it will wipe your database!
 
@@ -109,13 +93,13 @@ Given how easy it is to hand unreviewed code to a reviewer, please include some 
     ddev drush si --existing-config
     ```
 
-11. **Run deployment updates:**
+9. **Run deployment updates:**
 
     ```bash
     ddev drush deploy -y
     ```
 
-12. **Enable runtime caching:**
+10. **Enable runtime caching:**
 
     Edit `services/drupal/.env` and change:
     ```
@@ -126,13 +110,13 @@ Given how easy it is to hand unreviewed code to a reviewer, please include some 
     ENV_STATE=run
     ```
 
-13. **Unblock admin user:**
+11. **Unblock admin user:**
 
     ```bash
     ddev drush user:unblock drupalwebcms-admin
     ```
 
-14. **Install SSL certificates (first time only):**
+12. **Install SSL certificates (first time only):**
 
     ```bash
     ddev stop --all
@@ -145,7 +129,7 @@ Given how easy it is to hand unreviewed code to a reviewer, please include some 
     mkcert -install
     ```
 
-15. **Access the site:**
+13. **Access the site:**
 
     Open <https://epa.ddev.site> in your browser.
 
@@ -214,10 +198,6 @@ git pull origin development
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
-
-# Start watching theme changes
-ddev gesso watch
-```
 
 ### 2. Make Your Changes
 
@@ -625,8 +605,7 @@ GitHub and deployed through a GitLab mirror into AWS ECS.
 3. **Develop & validate locally** — follow [Conventional Commits](#commit-message-convention),
    keep commits focused, and periodically `git fetch origin && git rebase origin/development`.
    Run the local quality gates before opening a PR: `ddev drush updb -y`,
-   `ddev drush cex`, `ddev composer phpcs`, `ddev composer phpstan`, and
-   `ddev gesso build` if you touched theme source.
+   `ddev drush cex`, `ddev composer phpcs`, `ddev composer phpstan`.
 4. **Open a PR into `development`** — fill out the
    [pull request template](.github/pull_request_template.md), then trigger
    `./scripts/push-dev.sh --skip-build` for fast validation after merge.
@@ -830,15 +809,6 @@ After deploying to dev environment:
 | `ddev drush uli` | Generate one-time login link |
 | `ddev drush user:unblock <username>` | Unblock a user account |
 | `ddev drush sqlq "SELECT * FROM users"` | Run SQL query |
-
-### Gesso Theme Commands
-
-| Command | Description |
-|---------|-------------|
-| `ddev gesso install` | Install node modules for theme |
-| `ddev gesso build` | Build CSS and Pattern Lab |
-| `ddev gesso watch` | Watch for changes and rebuild |
-| `ddev gesso lint` | Lint CSS and JavaScript |
 
 ### Composer Commands
 
