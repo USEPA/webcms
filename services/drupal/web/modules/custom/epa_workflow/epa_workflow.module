@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Site\Settings;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
@@ -252,12 +253,21 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     _epa_workflow_add_compliance_checkboxes($form);
   }
 
-  if ($form_id == 'revision_overview_form') {
+  if ($form_id === 'revision_overview_form') {
     $form['#attached']['library'][] = 'epa_workflow/revision_list';
-    foreach ($form['node_revisions_table'] as $key => $row) {
-      // Add some text to the row if the revision is the published rev.
-      if (is_numeric($key) && in_array('is-published', $row['#attributes']['class'])) {
-        $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = "<strong>Currently published revision</strong>";
+    
+    // Element::children() ensures we only iterate over the actual row arrays,
+    // safely ignoring render properties like #header or #empty.
+    foreach (Element::children($form['node_revisions_table']) as $key) {
+      $row = $form['node_revisions_table'][$key];
+      
+      // Because we used Element::children(), we are guaranteed that $row is an array.
+      // We can now safely check for attributes and classes.
+      $classes = $row['#attributes']['class'] ?? [];
+      
+      if (is_array($classes) && in_array('is-published', $classes, TRUE)) {
+        // Use t() for all user-facing strings to ensure they can be translated.
+        $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = '<strong>' . t('Currently published revision') . '</strong>';
       }
     }
   }

@@ -1,6 +1,6 @@
 # EPA WebCMS
 
-The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.
+The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.6.x.
 
 ## Quick Start
 
@@ -17,8 +17,6 @@ ddev aws-setup                    # Create local S3 bucket
 ddev import-db                    # Import database (place .tar in .ddev/db/)
 cp .env.example .env              # Copy environment configuration
 ddev composer install
-ddev gesso install                # Install theme dependencies
-ddev gesso build                  # Build theme assets
 ddev drush deploy -y              # Run deployment workflow
 ddev drush user:unblock drupalwebcms-admin
 ```
@@ -54,7 +52,6 @@ Access the site at: <https://epa.ddev.site>
 # Start local environment
 cd services/drupal
 ddev start
-ddev gesso watch
 
 # Make changes, then deploy to dev environment
 git add .
@@ -109,12 +106,9 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 | `ddev drush cex` | Export configuration |
 | `ddev drush cim -y` | Import configuration |
 | `ddev drush uli` | Generate one-time login URL |
-| `ddev gesso watch` | Watch and rebuild theme assets |
-| `ddev gesso build` | One-time theme build |
 | `ddev composer phpcs` | Run PHP Code Sniffer |
 | `ddev composer phpcbf` | Auto-fix coding standards |
 | `ddev composer phpstan` | Run PHPStan static analysis |
-> Theme artifacts are intentionally not committed—after pulling any theme changes, rerun `ddev gesso build` (or `ddev gesso watch`) so CSS/JS output stays fresh.
 
 ### Deployment
 
@@ -275,7 +269,6 @@ Copy `.env.example` to `.env` before editing; never commit actual secrets or sit
 - Mobile-first responsive design
 - WCAG 2.1 AA accessibility compliance
 - ES6+ JavaScript (no `var`)
-- Lint with `ddev gesso lint`
 
 ### Git Workflow
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
