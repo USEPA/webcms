@@ -329,12 +329,6 @@ function _add_ckeditor5_settings(&$settings, mixed $setting, GroupInterface $gro
       }
     }
 
-    // Add group ID as query parameter for embeddedParagraph plugin.
-    if ($key == 'embeddedParagraph') {
-      $opener_params = $value['openerParameters'];
-      $opener_params .= '&group=' . $group->id();
-      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['openerParameters'] = $opener_params;
-    }
   }
 }
 
