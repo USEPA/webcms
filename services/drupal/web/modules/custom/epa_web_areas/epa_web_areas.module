@@ -34,56 +34,89 @@ use Drupal\node\NodeInterface;
  *
  */
 
-function epa_web_areas_entity_insert(EntityInterface $entity) {
+function epa_web_areas_entity_insert(EntityInterface $entity): void {
+  // Only process Node entities.
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+
   $request = \Drupal::request();
-  if ($request->hasSession() && $entity instanceof NodeInterface) {
-    $session = $request->getSession();
-    $target_id = $session->get('epa_web_areas.saved_group_id');
+  if (!$request->hasSession()) {
+    return;
+  }
+
+  $session = $request->getSession();
+
+  // Retrieve target group ID if set in the session.
+  $target_id = $session->get('epa_web_areas.saved_group_id');
+
+  // Always clean up session state to avoid stale data on subsequent requests.
+  if ($session->has('epa_web_areas.saved_group_id')) {
     $session->remove('epa_web_areas.saved_group_id');
+  }
+
+  // Defensively verify target_id exists before calling Group::load().
+  if (!empty($target_id)) {
     $group = Group::load($target_id);
-    $group->addContent($entity,'group_node:'.$entity->bundle()); 
+
+    // Ensure we loaded a valid Group entity.
+    if ($group instanceof GroupInterface) {
+      $group->addContent($entity, 'group_node:' . $entity->bundle());
+    }
   }
 }
 
 /**
- * Implements hook_form_FORM_BASE_ID_alter().
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
  *
- * - Used to hide field_hublinks if content belongs to group using
- * sidebar navigation as its navigation style.
+ * - Hides field_hublinks if content belongs to a group using sidebar navigation.
+ * - Stores group association ID in user session for new nodes.
  */
-function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_state->getFormObject() instanceof EntityForm) {
-    // Get group node is associated with.
-    $entity = $form_state->getformObject()->getEntity();
-    if ($entity->id()) {
-      $group_contents = GroupContent::loadByEntity($entity);
-      foreach ($group_contents as $group_content) {
-        $group = $group_content->getGroup();
+function epa_web_areas_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  $form_object = $form_state->getFormObject();
+
+  if (!$form_object instanceof EntityForm) {
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface $entity */
+  $entity = $form_object->getEntity();
+  $group = NULL;
+
+  // Retrieve group for existing entities.
+  if (!$entity->isNew()) {
+    $group_contents = GroupContent::loadByEntity($entity);
+    foreach ($group_contents as $group_content) {
+      $group = $group_content->getGroup();
+      if ($group instanceof GroupInterface) {
+        break;
       }
     }
-    elseif (isset($form_state->getStorage()['group'])) {
-      $group = $form_state->getStorage()['group'];
+  }
+  // Retrieve group for new entities passed via form state context.
+  elseif (isset($form_state->getStorage()['group'])) {
+    $storage_group = $form_state->getStorage()['group'];
+    if ($storage_group instanceof GroupInterface) {
+      $group = $storage_group;
     }
+  }
 
-    //Only for newly created nodes, create a session id and pass group id.
-    //The group id is used in hook_entity_insert.
-    $request = \Drupal::request();
-    if ($request->hasSession() && $entity->hasField('entitygroupfield') && $entity->isNew()) {
-      $session = $request->getSession();
-      $target_id = $group->id(); 
-      $session->set('epa_web_areas.saved_group_id', $target_id);
-    }
+  // Only pass group ID to session if a valid group entity was resolved.
+  $request = \Drupal::request();
+  if ($group instanceof GroupInterface && $request->hasSession() && $entity->hasField('entitygroupfield') && $entity->isNew()) {
+    $session = $request->getSession();
+    $session->set('epa_web_areas.saved_group_id', $group->id());
+  }
 
-    // Add group label to form.
-    if (!empty($group)) {
-      $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
-    }
+  // Add group label to form display if available.
+  if ($group instanceof GroupInterface) {
+    $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(null, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
+  }
 
-    // Hide group field from users who do not have the permission to reassign content.
-    if (isset($form['entitygroupfield'])) {
-      $user = \Drupal::currentUser();
-      $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
-    }
+  // Hide group field from users without reassign permissions.
+  if (isset($form['entitygroupfield'])) {
+    $user = \Drupal::currentUser();
+    $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
   }
 }
 
