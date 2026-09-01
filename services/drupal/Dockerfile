@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.3.29-fpm-alpine3.22 AS base
+FROM public.ecr.aws/docker/library/php:8.3.32-fpm-alpine3.24 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -120,26 +120,21 @@ RUN composer install \
 # Remove any Composer authentication file if present.
 RUN rm auth.json
 
-# Build Gesso, the WebCMS' theme
-FROM forumone/gesso:node-v18-php-8.1 AS gesso
-
-WORKDIR /app
-
-# Install base npm dependencies (npm ci = npm clean-install)
-COPY web/themes/epa_theme/package*.json ./
-RUN npm ci
-
-# Copy theme source files and perform a build
-COPY web/themes/epa_theme ./
-RUN set -ex \
-  # Build theme
-  && npx gulp build \
-  # Remove node_modules - these are only needed for the build, so we save some size in the
-  # images by removing theme here.
-  && rm -rf node_modules
-
 # Create the final Drupal 10 image - build this by specifying "docker build --target drupal"
 FROM base AS drupal
+
+# Install additional certificates early so this layer can be cached
+# independently of application code changes (web, config, drush).
+# The TLS certs and RDS bundle rarely change, so moving them before the
+# frequently-changing COPY operations allows Kaniko to cache this layer.
+COPY tls /usr/share/ca-certificates/extra
+RUN \
+  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
+    echo "$cert" >> /etc/ca-certificates.conf; \
+  done \
+  && update-ca-certificates \
+  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
+  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 # Copy Composer-installed packages
 COPY --from=deps /app/web web
@@ -149,9 +144,6 @@ COPY --from=deps /app/scripts scripts
 # Copy composer.json files
 COPY --from=deps /app/composer.json /app/composer.lock /app/composer.patches.json ./
 
-# Copy the built theme
-COPY --from=gesso /app web/themes/epa_theme
-
 # Copy the environment loader
 COPY load.environment.php ./
 
@@ -160,17 +152,6 @@ COPY load.environment.php ./
 COPY web web
 COPY config config
 COPY drush drush
-
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
-COPY tls /usr/share/ca-certificates/extra
-RUN \
-  for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
-    echo "$cert" >> /etc/ca-certificates.conf; \
-  done \
-  && update-ca-certificates \
-  # Append AWS' RDS certificate bundle to the bundle we verify in settings.php
-  && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
 
 
 # Add build metadata to the image. We expose two optional build args:
@@ -184,24 +165,33 @@ ARG GIT_COMMIT=""
 
 ENV GIT_TAG=${GIT_TAG} GIT_COMMIT=${GIT_COMMIT}
 
-# Health check for FPM ping endpoint
+# Health check using the nginx status server's /ping endpoint.
+# All containers in an ECS task share a network namespace, so this container
+# can reach nginx's port-8080 status server over localhost.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost/ping || exit 1
+  CMD curl -f http://localhost:8080/ping || exit 1
 
-# Build an nginx container that has the same view into the Drupal filesystem
-# as well as its configuration file.
+# Build an nginx container for serving static assets and proxying PHP requests.
 FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
 
 # Bump system packages
 RUN apk upgrade
 
-# Copy the Drupal filesystem into this image
-COPY --from=drupal /var/www/html /var/www/html
+# Copy only the web directory from the drupal stage.
+# Nginx serves static assets from web/ and proxies PHP requests to PHP-FPM;
+# vendor/, config/, drush/ etc. are PHP-runtime concerns only the drupal
+# container needs. Scoping this COPY to web/ reduces image size and build time.
+COPY --from=drupal /var/www/html/web /var/www/html/web
 
 # Copy nginx configuration
 COPY status.conf *.map /etc/nginx/conf.d/
 
-# Copy configuration templates
+# Copy configuration templates.
+# fastcgi-drupal.conf contains $WEBCMS_DOMAIN which must be substituted at
+# container startup. Copy it into the templates directory so the nginx Docker
+# entrypoint (docker-entrypoint.sh) runs envsubst on it, producing
+# /etc/nginx/conf.d/fastcgi-drupal.conf alongside the processed default.conf.
+COPY fastcgi-drupal.conf /etc/nginx/templates/fastcgi-drupal.conf.template
 COPY default.conf /etc/nginx/templates/default.conf.template
 
 # Copy nginx startup script
@@ -210,36 +200,40 @@ COPY scripts/ecs/nginx-entrypoint.sh /webcms-entrypoint
 ENTRYPOINT [ "/webcms-entrypoint" ]
 CMD [ "nginx", "-g", "daemon off;" ]
 
-# Health check for nginx service
+# Health check for nginx service. The /ping endpoint is served by status.conf
+# on port 8080 over plain HTTP — not on the main TLS port 443.
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f https://localhost/ping || exit 1
+  CMD curl -f http://localhost:8080/ping || exit 1
 
 # Build a drush-specific image: this image includes command-line utilities such as mysql
-# and ssh that are inappropriate for a server container image.
-FROM public.ecr.aws/docker/library/php:8.2-cli-alpine AS drush
+# that are inappropriate for a server container image.
+# IMPORTANT: keep this PHP version in sync with the base FPM image above so that Drush
+# and the web container run identical language semantics against the same Drupal codebase.
+FROM public.ecr.aws/docker/library/php:8.3.32-cli-alpine3.24 AS drush
 
 # Bump system packages
 RUN apk upgrade
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-# Install base PHP extensions for Drupal as well as tools needed for Drush CLI operations
+# Install bundled PHP extensions and system tools (no external PECL dependency; stable layer)
+# Note: gd is intentionally excluded — the drush container is CLI-only (drush updb, cim, cr)
+# and has no need for image processing. GD lives in the drupal/base target.
 RUN set -ex \
   && install-php-extensions \
-    gd \
     opcache \
     pdo_mysql \
     zip \
-    igbinary \
-    memcached \
   && apk add --no-cache \
     mysql-client \
-    openssh \
-    rsync \
     bash \
   && { \
     echo 'memory_limit=-1'; \
   } > /usr/local/etc/php/php-cli.ini
+
+# Install PECL-dependent extensions in a separate layer to isolate pecl.php.net failures.
+# igbinary must precede memcached (memcached is compiled with igbinary serializer support).
+RUN install-php-extensions igbinary memcached
 
 ENV PATH=${PATH}:/var/www/html/vendor/bin
 WORKDIR /var/www/html
@@ -263,11 +257,8 @@ RUN set -ex \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-cli.ini
 
-# Same as nginx: copy the built Drupal filesystem
-COPY --from=drupal /var/www/html /var/www/html
-
-# Copy additional certificates for use by Drupal and bundle them into the system
-# certificates
+# Install additional certificates early (same pattern as drupal stage) so
+# this layer can be cached independently of the Drupal filesystem copy.
 COPY tls /usr/share/ca-certificates/extra
 RUN \
   for cert in $(cd /usr/share/ca-certificates; echo extra/*); do \
@@ -275,6 +266,10 @@ RUN \
   done \
   && update-ca-certificates \
   && curl -fsSL https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem >> /etc/ssl/cert.pem
+
+# Copy the full Drupal filesystem (drush needs vendor/, config/, etc.
+# unlike nginx which only needs web/)
+COPY --from=drupal /var/www/html /var/www/html
 
 # Copy the migration script into /usr/local/bin as a command
 COPY scripts/ecs/drush-migrate.sh /usr/local/bin/drush-migrate

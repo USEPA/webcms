@@ -2,6 +2,15 @@
 
 Thank you for contributing to the EPA WebCMS project! This guide will help you set up your development environment and understand our development workflows.
 
+Note that a good pull request has the following characteristics:
+
+- The code works, and you are confident that it works. Your job is to deliver code that works.
+- The change is small enough to be reviewed efficiently without inflicting too much additional cognitive load on the reviewer. Several small PRs beat one big one, and splitting work into separate, focused commits is straightforward with `git add -p` and an interactive rebase.
+- The PR includes additional context to help explain the change. What's the higher-level goal that the change serves? Linking to relevant issues or specifications is useful here.
+- A convincing-looking pull request description still has to be accurate. Read and validate your own description before you ask anyone else to read it — it's rude to expect a reviewer to work through text you haven't checked yourself.
+
+Given how easy it is to hand unreviewed code to a reviewer, please include some form of evidence that you've put that extra work in yourself. Notes on how you manually tested it, comments on specific implementation choices, or even screenshots and video of the feature working go a long way toward demonstrating that a reviewer's time will not be wasted digging into the details.
+
 ## Table of Contents
 
 - [First-Time Setup](#first-time-setup)
@@ -75,23 +84,7 @@ Thank you for contributing to the EPA WebCMS project! This guide will help you s
 
    > If you encounter errors, delete `services/drupal/.ddev/vendor` and run: `ddev composer clearcache`
 
-8. **Install theme requirements:**
-
-   ```bash
-   ddev gesso install
-   ```
-
-9. **Build theme assets:**
-
-   ```bash
-   # One-time build
-   ddev gesso build
-
-   # Or watch for changes during development
-   ddev gesso watch
-   ```
-
-10. **Apply latest configuration:**
+8. **Apply latest configuration:**
 
     **⚠️ Warning:** Skip this if starting from a fresh database import—it will wipe your database!
 
@@ -100,13 +93,13 @@ Thank you for contributing to the EPA WebCMS project! This guide will help you s
     ddev drush si --existing-config
     ```
 
-11. **Run deployment updates:**
+9. **Run deployment updates:**
 
     ```bash
     ddev drush deploy -y
     ```
 
-12. **Enable runtime caching:**
+10. **Enable runtime caching:**
 
     Edit `services/drupal/.env` and change:
     ```
@@ -117,13 +110,13 @@ Thank you for contributing to the EPA WebCMS project! This guide will help you s
     ENV_STATE=run
     ```
 
-13. **Unblock admin user:**
+11. **Unblock admin user:**
 
     ```bash
     ddev drush user:unblock drupalwebcms-admin
     ```
 
-14. **Install SSL certificates (first time only):**
+12. **Install SSL certificates (first time only):**
 
     ```bash
     ddev stop --all
@@ -136,7 +129,7 @@ Thank you for contributing to the EPA WebCMS project! This guide will help you s
     mkcert -install
     ```
 
-15. **Access the site:**
+13. **Access the site:**
 
     Open <https://epa.ddev.site> in your browser.
 
@@ -171,8 +164,9 @@ webcms/
 │   ├── infrastructure/         # AWS infrastructure
 │   └── webcms/                 # Application deployment
 ├── ci/                         # CI automation scripts
-├── push-dev.sh                 # Deploy to development
-└── trigger-pipeline.sh         # Manual pipeline trigger
+└── scripts/                    # Helper scripts
+    ├── push-dev.sh             # Deploy to development
+    └── trigger-pipeline.sh     # Manual pipeline trigger
 ```
 
 ### Key Technologies
@@ -204,10 +198,6 @@ git pull origin development
 
 # Create a feature branch
 git checkout -b feature/your-feature-name
-
-# Start watching theme changes
-ddev gesso watch
-```
 
 ### 2. Make Your Changes
 
@@ -264,9 +254,9 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 
 | Branch | Environment | Purpose | Deployment Method |
 |--------|-------------|---------|-------------------|
-| `development` | Dev site | Active development | Automatic via `push-dev.sh` |
-| `live` | Stage site | Pre-production testing | Manual trigger |
-| `live` | Production | Live public site | Manual trigger (future) |
+| `development` | Dev site | Active development | Automatic via `scripts/push-dev.sh` |
+| `staging` | Stage site | Pre-production testing | Manual trigger |
+| `main` | Production | Live public site | Manual pipeline trigger |
 
 ---
 
@@ -274,11 +264,11 @@ Developer → GitHub (development branch) → GitLab Mirror → CI/CD Pipeline �
 
 ### Automatic Build Detection (Default Behavior)
 
-Starting with the enhanced `push-dev.sh` script, **build detection is now automatic**. The script analyzes your changed files and intelligently determines whether a full Docker rebuild is needed.
+Starting with the enhanced `scripts/push-dev.sh` script, **build detection is now automatic**. The script analyzes your changed files and intelligently determines whether a full Docker rebuild is needed.
 
 ```bash
-# Simply run push-dev.sh - it will auto-detect!
-./push-dev.sh
+# Simply run scripts/push-dev.sh - it will auto-detect!
+./scripts/push-dev.sh
 ```
 
 The script will:
@@ -333,13 +323,13 @@ You can override the automatic detection when needed:
 
 **Force skip build:**
 ```bash
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 Use when you know existing Docker images are compatible but the script detects a build is needed.
 
 **Force full build:**
 ```bash
-./push-dev.sh --force-build
+./scripts/push-dev.sh --force-build
 ```
 Use when you want to rebuild everything (e.g., to pick up base image updates) even if no build-requiring files changed.
 
@@ -347,7 +337,7 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 
 #### Full Build Mode (Default)
 ```bash
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 **Pipeline stages:**
@@ -363,7 +353,7 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 
 #### Skip-Build Mode (Fast)
 ```bash
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 
 **Pipeline stages:**
@@ -381,14 +371,14 @@ Use when you want to rebuild everything (e.g., to pick up base image updates) ev
 git checkout development
 git pull origin development
 git push origin development
-./push-dev.sh  # Auto-detects: no code changes = full build
+./scripts/push-dev.sh  # Auto-detects: no code changes = full build
 
 # 10:30 AM - Bug fix in custom module
 # (edit services/drupal/web/modules/custom/epa_workflow/src/Plugin/WorkflowType/MyPlugin.php)
 git add .
 git commit -m "fix: Correct workflow validation logic"
 git push origin development
-./push-dev.sh  # Auto-detects: custom module only = deploy-only! 🚀
+./scripts/push-dev.sh  # Auto-detects: custom module only = deploy-only! 🚀
 # Output: "✅ Build NOT required - changes are deployment-only"
 
 # 2:00 PM - Another iteration on theme template
@@ -396,14 +386,14 @@ git push origin development
 git add .
 git commit -m "style: Update node template layout"
 git push origin development
-./push-dev.sh  # Auto-detects: template only = deploy-only! 🚀
+./scripts/push-dev.sh  # Auto-detects: template only = deploy-only! 🚀
 
 # 4:00 PM - Added a new Composer dependency
 # (edit composer.json, run ddev composer update)
 git add composer.json composer.lock
 git commit -m "chore: Add new library dependency"
 git push origin development
-./push-dev.sh  # Auto-detects: composer.json = FULL BUILD required! 🔨
+./scripts/push-dev.sh  # Auto-detects: composer.json = FULL BUILD required! 🔨
 # Output: "🔨 Build REQUIRED - detected change in: composer.json"
 ```
 
@@ -415,14 +405,14 @@ git checkout development
 git add .
 git commit -m "fix: Critical security patch for XSS vulnerability"
 git push origin development
-./push-dev.sh  # Auto-detects: code-only change = deploy-only! Fast!
+./scripts/push-dev.sh  # Auto-detects: code-only change = deploy-only! Fast!
 # Deploys in ~3-5 minutes instead of ~15 minutes
 ```
 
 #### Example 3: Force Push with Skip-Build
 ```bash
 # Need to force push and deploy quickly
-./push-dev.sh --skip-build -f
+./scripts/push-dev.sh --skip-build -f
 ```
 
 ### Manual Pipeline Trigger with Skip-Build
@@ -480,14 +470,14 @@ git checkout development
 git pull origin main
 
 # Push to GitHub and trigger full CI/CD pipeline
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 ### What Happens During Full Build
 
 1. **GitHub Push**
    - Code pushed to `development` branch on GitHub
-   - `push-dev.sh` script triggers GitLab pipeline via API
+   - `scripts/scripts/push-dev.sh` script triggers GitLab pipeline via API
 
 2. **GitLab Mirror Sync**
    - GitLab pulls latest code from GitHub mirror
@@ -521,14 +511,14 @@ git pull origin main
 
 ### Deployment to Stage (Pre-Production)
 
-Stage deployments are only triggered from the `live` branch:
+Stage deployments are triggered from the `staging` branch. The staging pipeline **builds the Docker images** that will also be used for production (build once, deploy many):
 
 ```bash
-# Merge development into live
-git checkout live
-git pull origin live
+# Merge development into staging
+git checkout staging
+git pull origin staging
 git merge development
-git push origin live
+git push origin staging
 
 # GitLab CI automatically triggers stage deployment
 # (No script needed - push triggers workflow)
@@ -538,7 +528,7 @@ git push origin live
 
 #### WEBCMS_SITE_FILTER - Selective Site Deployment
 
-Use `WEBCMS_SITE_FILTER` to deploy to only one site when triggering pipelines on the `live` branch. This is particularly useful for:
+Use `WEBCMS_SITE_FILTER` to deploy to only one site when triggering pipelines on the `staging` branch. This is particularly useful for:
 - **Spanish site fixes:** Deploy changes only to the Spanish stage site without affecting English
 - **Emergency hotfixes:** Apply fixes to one environment without triggering unnecessary builds/deploys
 - **Testing isolation:** Validate changes on a single site before full rollout
@@ -546,7 +536,7 @@ Use `WEBCMS_SITE_FILTER` to deploy to only one site when triggering pipelines on
 **Usage:**
 
 1. Navigate to: https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new
-2. Select branch: `live`
+2. Select branch: `staging`
 3. Click "Add variable"
    - Key: `WEBCMS_SITE_FILTER`
    - Value: `stage` (for stage site only) or `dev` (for dev site only when combined with `DEPLOY_TO_DEV=true`)
@@ -559,10 +549,10 @@ Use `WEBCMS_SITE_FILTER` to deploy to only one site when triggering pipelines on
 
 **Example: Spanish Stage Site Hotfix**
 ```bash
-# 1. Make fix and push to live branch
-git checkout live
+# 1. Make fix and push to staging branch
+git checkout staging
 # ... make changes ...
-git push origin live
+git push origin staging
 
 # 2. Trigger pipeline with filter via GitLab UI
 # Set WEBCMS_SITE_FILTER=stage
@@ -571,7 +561,7 @@ git push origin live
 
 **Note:** This variable is ignored on the `development` branch - dev site always deploys there.
 
-#### DEPLOY_TO_DEV - Deploy to Dev from Live Branch
+#### DEPLOY_TO_DEV - Deploy to Dev from Staging Branch
 
 See [README.md Advanced Pipeline Variables](README.md#advanced-pipeline-variables) for full documentation on `DEPLOY_TO_DEV`.
 
@@ -579,100 +569,80 @@ See [README.md Advanced Pipeline Variables](README.md#advanced-pipeline-variable
 
 ## Git Workflow
 
-Our process adapts GitHub Flow to EPA WebCMS’ multi-environment deployment model.
+Our process adapts **GitHub Flow** to the EPA WebCMS multi-environment
+deployment model: **feature → development → staging → main**. Code is hosted on
+GitHub and deployed through a GitLab mirror into AWS ECS.
+
+> **The full branching, merging, and release reference lives in
+> [docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).** It is the single source of
+> truth for branch protection, the promotion and hotfix flows, the freeze
+> protocol, release tagging, the automated back-merge, and roles &
+> responsibilities. The summary below is the quick reference for day-to-day work.
 
 ### Goals
 
 1. Keep `main` always releasable and aligned with production.
-2. Ensure every change is validated in the dev environment (`development` branch) before moving to stage/production.
-3. Provide a lightweight, repeatable promotion path: **feature → development → live → main**.
+2. Validate every change in the dev environment (`development`) before it moves
+   to stage or production.
+3. Provide a lightweight, repeatable promotion path.
 4. Support urgent hotfixes without blocking regular feature work.
 
 ### Branch Roles
 
 | Branch | Purpose | Deployment Target | Notes |
 |--------|---------|-------------------|-------|
-| `main` | Production source of truth | Production (future) | Locked except for release merges and hotfixes. |
-| `live` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
-| `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`push-dev.sh`). |
+| `main` | Production source of truth | Production (manual pipeline trigger) | Locked; release merges and hotfixes only. |
+| `staging` | Stage/staging code | Stage environment | Mirrors upcoming production; runs full security scans. |
+| `development` | Active integration branch | Dev environment | All feature work branches from here. Triggers the standard dev pipeline (`scripts/push-dev.sh`). |
 | `feature/*`, `bugfix/*` | Short-lived work branches | None directly | Always branch from `development` and open PRs back into `development`. |
-| `hotfix/*` | Urgent fixes for prod | Main & live | Created from `main`, merged back to all branches after release. |
+| `hotfix/*` | Urgent fixes for prod | Main & staging | Created from `main`, merged back to all branches after release. |
 
 ### Standard Feature Flow
 
-1. **Sync development**
-   ```bash
-   git checkout development
-   git pull origin development
-   ```
-2. **Branch from `development`**
-   ```bash
-   git checkout -b feature/<short-description>
-   ```
-   Include ticket number in branch name if applicable.
-3. **Develop & validate locally**
-   - Use DDEV & Gesso commands in this guide.
-   - Follow Conventional Commits and keep commits focused.
-   - Periodically sync with latest changes: `git fetch origin && git rebase origin/development`
-4. **PR into `development`**
-   - Target branch: `development`.
-   - Run local checks; after merge trigger `./push-dev.sh --skip-build` for fast validation.
-   - Resolve review feedback and merge (squash or rebase preferred).
-5. **Promote to Stage (`live`)**
-   - On release cadence, merge `development` → `live`.
-   - Push to `live` to run full stage pipeline (security scans included).
-   - **EPA staff only**
-6. **Promote to Production (`main`)**
-   - After stage sign-off, merge `live` → `main`.
-   - Tag the release (e.g., `vYYYY.MM.DD`); production deploy pipeline will consume `main`.
-   - **EPA staff only**
-7. **Back-merge to development**
-   - After production release, merge `main` → `development` to sync any hotfixes or production adjustments.
-   - This keeps `development` up-to-date with production state.
+1. **Sync `development`** — `git checkout development && git pull origin development`
+2. **Branch from `development`** — `git checkout -b feature/<short-description>`
+   (include the ticket number if applicable).
+3. **Develop & validate locally** — follow [Conventional Commits](#commit-message-convention),
+   keep commits focused, and periodically `git fetch origin && git rebase origin/development`.
+   Run the local quality gates before opening a PR: `ddev drush updb -y`,
+   `ddev drush cex`, `ddev composer phpcs`, `ddev composer phpstan`.
+4. **Open a PR into `development`** — fill out the
+   [pull request template](.github/pull_request_template.md), then trigger
+   `./scripts/push-dev.sh --skip-build` for fast validation after merge.
+5. **Promote to Stage (`staging`)** — *EPA staff only*; merge `development` →
+   `staging` on the release cadence and let the full stage pipeline run.
+6. **Promote to Production (`main`)** — *EPA staff only*; follow the
+   [Stage-to-Production Promotion Checklist](docs/GIT_WORKFLOW.md#stage-to-production-promotion-checklist).
+   Production promotes the same images tested on stage — no rebuild.
+7. **Back-merge to `development`** — merge `main` → `development` with a merge
+   commit after each release (an automated CI job opens this PR).
 
-### Hotfix Flow
-
-1. `git checkout -b hotfix/<issue> main`
-2. Implement fix and open PR targeting `main` (bypasses `development` to minimize risk).
-3. After merging into `main`, cherry-pick/merge into `live` and `development` so branches stay in sync.
-4. Deploy via stage → production promotion path as usual.
-
-### Why Branch From `development`?
-
-- **Industry standard (Git Flow):** Features integrate continuously in the active development branch.
-- **Early conflict detection:** Features see each other immediately, catching integration issues during development rather than at PR time.
-- **Simplified workflow:** Eliminates need for developers to manually rebase against `development` as it diverges from `main`.
-- **Natural integration:** Multiple features can be tested together in the dev environment before promotion.
-- **Aligned with deployment model:** The branch you develop in is the branch that deploys to dev.
-
-### Release Cadence & Coordination
-
-- **Daily Dev Deploys:** Merge PRs into `development` as they're approved. Use skip-build for quick iterations; run one full build per day or after dependency changes.
-- **Stage Deploys:** At least once per sprint (or as needed). Merge `development` → `live`, let the stage pipeline run, and perform QA.
-- **Production Deploys:** After stage validation, merge `live` → `main`, tag the release, and trigger production deployment when available.
-- **Back-merge:** After each production release, immediately merge `main` → `development` to sync production state back to active development.
-
-### Pull Request Guidelines
-
-- Target branches: Feature work → `development`, hotfixes → `main`.
-- Write well-documented PRs, following the template generated when creating a new PR.
-- Keep PRs reviewable (< ~1 day of work). Use draft PRs for early feedback.
-- Run `ddev drush updb`, `ddev drush cex`, `ddev composer phpcs`, `phpstan`, theme builds, and relevant tests before creating PR and requesting review.
-- Require at least one maintainer approval.
-- Do NOT bundle multiple module updates into one PR, unless they're related (like metatag and metatag_schema).
+For the **hotfix flow**, the **freeze protocol**, **release tagging**, the
+**automated back-merge** job, and **branch protection settings**, see
+[docs/GIT_WORKFLOW.md](docs/GIT_WORKFLOW.md).
 
 ### Merge Strategy
 
-- **Feature PRs:** Squash or rebase onto `development` to maintain a clean history.
-- **Promotions (`development` → `live`, `live` → `main`):** Use merge commits so a release corresponds to a single identifiable merge.
-- **Back-merges:** After promoting, fast-forward lower environments (e.g., rebase `development` on `main`) to avoid drift.
+- **Feature/bugfix PRs → `development`:** squash or rebase (clean history).
+- **Promotions (`development` → `staging`, `staging` → `main`):** merge commits,
+  so each release is one identifiable merge.
+- **Hotfix → `main`:** merge commit (never squash), so commits can be
+  cherry-picked to `staging`/`development`.
+- **Back-merges (`main` → `development`):** merge commit (not rebase/fast-forward),
+  to preserve commit hashes and provide an audit trail.
 
-### FAQs
+### Pull Request Guidelines
 
-- **Why not branch from `main` directly?** Branching from `main` causes feature branches to diverge from active development work. By the time a feature is ready, it's missing weeks of changes merged to `development`, leading to late-stage conflicts.
-- **Can I deploy from a feature branch?** No. Only `development` (dev) and `live` (stage) trigger deployments.
-- **What if a feature spans multiple sprints?** Periodically rebase on `development` to stay current with integrated work. Use feature flags for incomplete functionality.
-- **How do freeze periods work?** Pause merges into `development`, finish testing on `live`, promote to `main`, then merge `main` → `development` when the freeze lifts to sync any last-minute hotfixes.
+- Target branches: feature/bugfix work → `development`; hotfixes → `main`.
+- Keep PRs reviewable (roughly less than a day of work); use draft PRs for early
+  feedback.
+- Require at least one maintainer approval.
+- Do **not** bundle unrelated module updates into one PR, unless they're coupled
+  (like `metatag` and `metatag_schema`).
+- Configuration changes travel with code — never commit config in code and
+  database simultaneously, and follow the
+  [Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) when adding or
+  removing modules.
 
 ### Commit Message Convention
 
@@ -789,6 +759,13 @@ After deploying to dev environment:
   ```bash
   ddev drush cex
   ```
+- **When removing a module, uninstall it in Drupal before touching Composer or deleting code**
+  - Uninstall the module first, then export config, then update Composer or remove the custom code.
+  - Never remove a module from `composer.json` alone and assume deployment will sort it out.
+  - See [Drupal Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) for the full sequence.
+
+- **Never edit `core.extension.yml` by hand**
+  - Let Drupal update active config through uninstall/install operations, then export with `ddev drush cex`.
 
 - **Never commit configuration in code and database simultaneously**
 - **Test configuration imports in clean environment**
@@ -833,15 +810,6 @@ After deploying to dev environment:
 | `ddev drush user:unblock <username>` | Unblock a user account |
 | `ddev drush sqlq "SELECT * FROM users"` | Run SQL query |
 
-### Gesso Theme Commands
-
-| Command | Description |
-|---------|-------------|
-| `ddev gesso install` | Install node modules for theme |
-| `ddev gesso build` | Build CSS and Pattern Lab |
-| `ddev gesso watch` | Watch for changes and rebuild |
-| `ddev gesso lint` | Lint CSS and JavaScript |
-
 ### Composer Commands
 
 | Command | Description |
@@ -856,12 +824,12 @@ After deploying to dev environment:
 
 || Command | Description |
 ||---------|-------------|
-|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
-|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
-|| `./push-dev.sh --force-build` | Force full build even if not detected |
-|| `./push-dev.sh -f` | Force push with auto-detection |
-|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
-|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| `./scripts/push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./scripts/push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./scripts/push-dev.sh --force-build` | Force full build even if not detected |
+|| `./scripts/push-dev.sh -f` | Force push with auto-detection |
+|| `./scripts/push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./scripts/trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
 ---
 
@@ -935,7 +903,7 @@ ddev start
 
 **Solution:** Run a full build first:
 ```bash
-./push-dev.sh  # Without --skip-build
+./scripts/push-dev.sh  # Without --skip-build
 ```
 
 #### Changes Not Visible After Deployment
@@ -956,7 +924,7 @@ drush status
 
 #### GitLab Pipeline Fails to Trigger
 
-**Problem:** `push-dev.sh` completes but pipeline doesn't start.
+**Problem:** `scripts/scripts/push-dev.sh` completes but pipeline doesn't start.
 
 **Causes:**
 1. GitLab token expired or invalid
@@ -999,25 +967,43 @@ ddev restart
 
 - **Slack:** #webcms-dev channel
 - **Email:** webcms-team@epa.gov
-- **GitLab Issues:** https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/issues
-- **Documentation:** See `docs/` directory
+- **Issue tracking (Jira):** WebCMS work is tracked in Jira under the **`WEBCMS`** project — `https://jira.epa.gov/browse/WEBCMS`. This is the system of record for bugs and features; branches, commits, and PRs reference the WEBCMS key.
+- **Deployment pipeline issues (GitLab):** https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/issues
+- **Documentation:** See the [`docs/`](docs/) directory and the [Additional Resources](#additional-resources) below
 
 ---
 
 ## Additional Resources
 
-- [CI/CD Pipeline Documentation](docs/cicd-pipeline.md)
+**Project documentation**
+
+- [Git Workflow](docs/GIT_WORKFLOW.md) — branching, merging, promotion, and release process
+- [CI/CD Pipeline](docs/cicd-pipeline.md) — pipeline architecture, stages, and variables
+- [Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md) — step-by-step manual deployment
+- [Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md) — dev vs. stage performance tuning
+- [Security Scanning Troubleshooting](.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md) — GitLab security template gotchas
+- [Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md) — safe module add/remove and config export
+- [Teams Notifications](.gitlab/TEAMS_NOTIFICATIONS.md) — pipeline notification setup
 - [Terraform Infrastructure](terraform/infrastructure/README.md)
 - [Terraform WebCMS Deployment](terraform/webcms/README.md)
 - [Docker Build Configuration](.gitlab/docker.yml)
+- [Security Policy](SECURITY.md) — reporting vulnerabilities
+
+**External documentation**
+
 - [Drupal Documentation](https://www.drupal.org/docs)
 - [DDEV Documentation](https://ddev.readthedocs.io/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
 
 ---
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+This project is released under the MIT License; see [`LICENSE.md`](LICENSE.md).
+The bundled Drupal application code carries its own GNU General Public License v2
+(or later); see [`services/drupal/LICENSE`](services/drupal/LICENSE). As a work
+of the United States Government, EPA-authored content is generally not subject to
+domestic copyright protection (see the [Disclaimer](#disclaimer) below).
 
 ## Disclaimer
 

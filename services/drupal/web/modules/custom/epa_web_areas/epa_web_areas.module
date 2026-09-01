@@ -19,37 +19,104 @@ use Drupal\group\Entity\GroupContent;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\media_library\MediaLibraryState;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\node\NodeInterface;
+
 
 /**
- * Implements hook_form_FORM_BASE_ID_alter().
+ * Implements hook_entity_insert
+ * https://jira.epa.gov/browse/WEBCMS-307
+ * Resolves the issue where Web area association is not being maintained.
+ * The problem is that the group shown in the node add form on a new node
+ * is just a link. It is not associated with an actual group.
+ * This hook_entity_insert resolves the issue by associating the group with
+ * the entity being created. The group id passed from hook_form_alter in a session variable.
  *
- * - Used to hide field_hublinks if content belongs to group using
- * sidebar navigation as its navigation style.
  */
-function epa_web_areas_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_state->getFormObject() instanceof EntityForm) {
-    // Get group node is associated with.
-    $entity = $form_state->getformObject()->getEntity();
-    if ($entity->id()) {
-      $group_contents = GroupContent::loadByEntity($entity);
-      foreach ($group_contents as $group_content) {
-        $group = $group_content->getGroup();
+
+function epa_web_areas_entity_insert(EntityInterface $entity): void {
+  // Only process Node entities.
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+
+  $request = \Drupal::request();
+  if (!$request->hasSession()) {
+    return;
+  }
+
+  $session = $request->getSession();
+
+  // Retrieve target group ID if set in the session.
+  $target_id = $session->get('epa_web_areas.saved_group_id');
+
+  // Always clean up session state to avoid stale data on subsequent requests.
+  if ($session->has('epa_web_areas.saved_group_id')) {
+    $session->remove('epa_web_areas.saved_group_id');
+  }
+
+  // Defensively verify target_id exists before calling Group::load().
+  if (!empty($target_id)) {
+    $group = Group::load($target_id);
+
+    // Ensure we loaded a valid Group entity.
+    if ($group instanceof GroupInterface) {
+      $group->addContent($entity, 'group_node:' . $entity->bundle());
+    }
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ *
+ * - Hides field_hublinks if content belongs to a group using sidebar navigation.
+ * - Stores group association ID in user session for new nodes.
+ */
+function epa_web_areas_form_node_form_alter(array &$form, FormStateInterface $form_state, string $form_id): void {
+  $form_object = $form_state->getFormObject();
+
+  if (!$form_object instanceof EntityForm) {
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface $entity */
+  $entity = $form_object->getEntity();
+  $group = NULL;
+
+  // Retrieve group for existing entities.
+  if (!$entity->isNew()) {
+    $group_contents = GroupContent::loadByEntity($entity);
+    foreach ($group_contents as $group_content) {
+      $group = $group_content->getGroup();
+      if ($group instanceof GroupInterface) {
+        break;
       }
     }
-    elseif (isset($form_state->getStorage()['group'])) {
-      $group = $form_state->getStorage()['group'];
+  }
+  // Retrieve group for new entities passed via form state context.
+  elseif (isset($form_state->getStorage()['group'])) {
+    $storage_group = $form_state->getStorage()['group'];
+    if ($storage_group instanceof GroupInterface) {
+      $group = $storage_group;
     }
+  }
 
-    // Add group label to form.
-    if (!empty($group)) {
-      $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(NULL, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
-    }
+  // Only pass group ID to session if a valid group entity was resolved.
+  $request = \Drupal::request();
+  if ($group instanceof GroupInterface && $request->hasSession() && $entity->hasField('entitygroupfield') && $entity->isNew()) {
+    $session = $request->getSession();
+    $session->set('epa_web_areas.saved_group_id', $group->id());
+  }
 
-    // Hide group field from users who do not have the permission to reassign content.
-    if (isset($form['entitygroupfield'])) {
-      $user = \Drupal::currentUser();
-      $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
-    }
+  // Add group label to form display if available.
+  if ($group instanceof GroupInterface) {
+    $form['group_info']['#markup'] = '<strong>Web Area: </strong> ' . $group->toLink(null, 'canonical', ['attributes' => ['target' => '_blank']])->toString();
+  }
+
+  // Hide group field from users without reassign permissions.
+  if (isset($form['entitygroupfield'])) {
+    $user = \Drupal::currentUser();
+    $form['entitygroupfield']['#access'] = $user->hasPermission('reassign group content');
   }
 }
 
@@ -288,17 +355,13 @@ function _add_ckeditor5_settings(&$settings, mixed $setting, GroupInterface $gro
     }
 
     if ($key == 'drupalInlineMedia') {
-      $url = $value['libraryURL'];
-      $new_url = _media_library_opener_parameters_alter($url, $group);
-      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      if (isset($value['libraryURL'])) {
+        $url = $value['libraryURL'];
+        $new_url = _media_library_opener_parameters_alter($url, $group);
+        $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['libraryURL'] = $new_url;
+      }
     }
 
-    // Add group ID as query parameter for embeddedParagraph plugin.
-    if ($key == 'embeddedParagraph') {
-      $opener_params = $value['openerParameters'];
-      $opener_params .= '&group=' . $group->id();
-      $settings['editor']['formats'][$format]['editorSettings']['config'][$key]['openerParameters'] = $opener_params;
-    }
   }
 }
 

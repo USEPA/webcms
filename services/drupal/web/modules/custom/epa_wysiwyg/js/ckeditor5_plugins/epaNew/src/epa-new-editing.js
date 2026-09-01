@@ -1,6 +1,29 @@
-import { Plugin } from 'ckeditor5/src/core';
+import { Plugin, Command } from 'ckeditor5/src/core';
 import { Widget } from 'ckeditor5/src/widget';
-import AttributeCommand from '@ckeditor/ckeditor5-basic-styles/src/attributecommand';
+
+class AttributeCommand extends Command {
+    constructor( editor, attributeKey ) {
+        super( editor );
+        this.attributeKey = attributeKey;
+    }
+    refresh() {
+        const model = this.editor.model;
+        const selection = model.document.selection;
+        this.value = selection.hasAttribute( this.attributeKey ) ? selection.getAttribute( this.attributeKey ) : undefined;
+        this.isEnabled = model.schema.checkAttributeInSelection( selection, this.attributeKey );
+    }
+    execute( options = {} ) {
+        const model = this.editor.model;
+        const selection = model.document.selection;
+        model.change( writer => {
+            if ( options.forceValue === false ) {
+                writer.removeAttribute( this.attributeKey, selection.getFirstRange() );
+            } else {
+                writer.setAttribute( this.attributeKey, options.value || true, selection.getFirstRange() );
+            }
+        } );
+    }
+}
 
 
 /**
@@ -53,11 +76,11 @@ export default class EpaNewEditing extends Plugin {
     // We effectively want this to be treated like the "Bold" or "Italic" button.
     // Following how the bold element is implemented leads to a bit simpler
     // structure.
-    schema.extend('$text', { allowAttributes: EPANEW } );
-    schema.setAttributeProperties( EPANEW, {
+    schema.extend('$text', { allowAttributes: EPANEW });
+    schema.setAttributeProperties(EPANEW, {
       isFormatting: true,
       copyOnEnter: true
-    } );
+    });
 
   }
 
@@ -69,7 +92,7 @@ export default class EpaNewEditing extends Plugin {
     // Converters are registered via the central editor object.
     const { conversion } = this.editor;
 
-    const  d = new Date();
+    const d = new Date();
     let month = d.getMonth() + 1;
     let day = d.getDate();
     let year = d.getFullYear();
@@ -89,7 +112,7 @@ export default class EpaNewEditing extends Plugin {
       },
     });
 
-    conversion.attributeToElement( {
+    conversion.attributeToElement({
       model: EPANEW,
       view: {
         name: 'ins',
@@ -98,6 +121,6 @@ export default class EpaNewEditing extends Plugin {
           'data-date': date
         }
       }
-    } );
+    });
   }
 }

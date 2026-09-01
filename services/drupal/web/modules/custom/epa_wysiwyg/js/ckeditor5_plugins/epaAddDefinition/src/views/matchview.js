@@ -1,4 +1,4 @@
-import { View, Template } from "ckeditor5/src/ui";
+import { View, Template } from 'ckeditor5/src/ui';
 import createId from "./createid";
 
 /**

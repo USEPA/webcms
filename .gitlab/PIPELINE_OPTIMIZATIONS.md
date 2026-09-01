@@ -6,7 +6,7 @@ This document describes the performance optimizations implemented to speed up de
 
 The pipeline is now optimized with two distinct paths:
 - **Development branch**: Fast, automated deployments to dev environment (no testing/scanning)
-- **Live branch**: Full security testing and scanning before stage deployments
+- **Staging branch**: Full security testing and scanning before stage deployments
 
 ## Development Branch Optimizations
 
@@ -16,7 +16,7 @@ The pipeline is now optimized with two distinct paths:
 - **Before**: Built 6 images (dev + stage sites × 3 targets each)
 - **After**: Builds only 3 images (dev site × 3 targets)
 - **Time saved**: ~5-8 minutes per build
-- **Safety**: Stage images built separately on live branch
+- **Safety**: Stage images built separately on staging branch
 
 ### 2. **Parallel Terraform Validation** (30-60 seconds saved)
 **Location**: `.gitlab-ci.yml` line 653
@@ -54,7 +54,7 @@ The pipeline is now optimized with two distinct paths:
 **Location**: `.gitlab-ci.yml` lines 70-83
 
 - **Development branch**: Skips SAST, dependency scanning, secret detection
-- **Live branch**: Full security scanning enabled
+- **Staging branch**: Full security scanning enabled
 - **Time saved**: 3-5 minutes
 - **Safety**: Security scans run on stage before production
 
@@ -62,13 +62,13 @@ The pipeline is now optimized with two distinct paths:
 **Location**: `.gitlab-ci.yml` lines 438-520
 
 - **Development branch**: Skips Prisma Cloud scanning
-- **Live branch**: Full Prisma scanning for stage images
+- **Staging branch**: Full Prisma scanning for stage images
 - **Time saved**: 2-4 minutes
 - **Safety**: Comprehensive scanning happens before stage deployment
 
-## Live Branch (Stage) - Full Security
+## Staging Branch - Full Security
 
-The live branch maintains all security controls:
+The staging branch maintains all security controls:
 
 ### Security Testing (Test Stage)
 - ✅ SAST (Static Application Security Testing)
@@ -98,7 +98,7 @@ The live branch maintains all security controls:
 | Environment | Before | After | Improvement |
 |-------------|--------|-------|-------------|
 | Development | ~25-35 min | ~10-15 min | **40-60% faster** |
-| Stage (live) | ~25-35 min | ~25-35 min | No change (full security) |
+| Stage (staging) | ~25-35 min | ~25-35 min | No change (full security) |
 
 ## Safety Guarantees
 
@@ -121,7 +121,7 @@ parallel:
       WEBCMS_BRANCH: [development]  # Only for dev branch
     - WEBCMS_SITE: [stage, dev]
       WEBCMS_TARGET: [drupal, nginx, drush]
-      WEBCMS_BRANCH: [live]  # Both sites for stage
+      WEBCMS_BRANCH: [staging]  # Both sites for stage
 ```
 
 ### Branch-based Execution
@@ -135,15 +135,15 @@ fi
 ```yaml
 sast:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Live branch only
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Staging branch only
 
 dependency_scanning:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Live branch only
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Staging branch only
 
 secret_detection:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "live"'  # Live branch only
+    - if: '$CI_COMMIT_BRANCH == "staging"'  # Staging branch only
 ```
 
 ## Additional Recommendations
@@ -169,7 +169,7 @@ If optimizations cause issues, revert by:
 1. **Re-enable security for dev**:
    ```yaml
    rules:
-     - if: '$CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "live"'
+     - if: '$CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "staging"'
    ```
 
 2. **Build both sites always**:

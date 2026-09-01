@@ -843,6 +843,8 @@ switch ($env_state) {
   case 'migration':
     $config['purge.plugins']['queuers'] = [['plugin_id'=> 'coretags', 'status' => false]];
     $config['auto_entitylabel.settings.node.faq']['status'] = 0;
+    // Intentional fall through: 'migration' also needs the 'run' memcache/cache
+    // backend setup below, so we deliberately omit a break here.
   case 'run':
     // Convert the comma-separated list of ElastiCache endpoints to memcache's expected server format
     $memcached_nodes = getenv('WEBCMS_CACHE_HOSTS');

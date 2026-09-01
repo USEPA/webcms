@@ -1,6 +1,6 @@
 # EPA WebCMS
 
-The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.
+The United States Environmental Protection Agency's Web Content Management System, built on Drupal 10.6.x.
 
 ## Quick Start
 
@@ -17,8 +17,6 @@ ddev aws-setup                    # Create local S3 bucket
 ddev import-db                    # Import database (place .tar in .ddev/db/)
 cp .env.example .env              # Copy environment configuration
 ddev composer install
-ddev gesso install                # Install theme dependencies
-ddev gesso build                  # Build theme assets
 ddev drush deploy -y              # Run deployment workflow
 ddev drush user:unblock drupalwebcms-admin
 ```
@@ -28,11 +26,14 @@ Access the site at: <https://epa.ddev.site>
 ## Documentation
 
 - **[Contributing Guide](CONTRIBUTING.md)** - Complete setup instructions, development workflows, and deployment guide
-- **[WARP.md](WARP.md)** - AI agent guidance for working with this repository
-- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching and release process
-- **[CI/CD Pipeline](.gitlab-ci.yml)** - GitLab CI configuration for automated deployments
+- **[Git Workflow](docs/GIT_WORKFLOW.md)** - Branching, merging, promotion, and release process
+- **[CI/CD Pipeline](docs/cicd-pipeline.md)** - Pipeline architecture, stages, and variables (configuration: [`.gitlab-ci.yml`](.gitlab-ci.yml))
 - **[Deployment Workflow](.gitlab/DEPLOYMENT_WORKFLOW.md)** - Step-by-step deployment process
 - **[Pipeline Optimizations](.gitlab/PIPELINE_OPTIMIZATIONS.md)** - Performance optimization details
+- **[Security Scanning Troubleshooting](.gitlab/SECURITY_SCANNING_TROUBLESHOOTING.md)** - Root cause, debugging steps, and mitigation for GitLab security template override failures
+- **[Drupal Config Sync Workflow](services/drupal/CONFIG_SYNC_WORKFLOW.md)** - Proper module uninstall, config export, Composer update, and deployment-safe workflow
+- **[Security Policy](SECURITY.md)** - How to report a vulnerability
+- **[License](LICENSE.md)** - MIT License
 - **[Terraform Infrastructure](terraform/infrastructure/README.md)** - AWS infrastructure provisioning
 - **[Terraform WebCMS](terraform/webcms/README.md)** - Application deployment configuration
 
@@ -51,7 +52,6 @@ Access the site at: <https://epa.ddev.site>
 # Start local environment
 cd services/drupal
 ddev start
-ddev gesso watch
 
 # Make changes, then deploy to dev environment
 git add .
@@ -59,10 +59,10 @@ git commit -m "feat: Your feature description"
 git push origin development
 
 # Auto-detect if build is needed (recommended)
-./push-dev.sh
+./scripts/push-dev.sh
 
 # Or manually override: force skip build for faster deployment
-./push-dev.sh --skip-build
+./scripts/push-dev.sh --skip-build
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for complete development guide.
@@ -86,12 +86,13 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 
 **Branch to Environment Mapping:**
 - `development` → Dev site (automatic deployment)
-- `live` → Stage site (manual trigger, includes security scans)
-- `live` → Production (manual trigger, future)
+- `staging` → Stage site (manual trigger, includes security scans)
+- `main` → Production (manual pipeline trigger)
 
 **Pipeline Stages:**
 - Development branch: Build → Deploy → Update (~10-15 min)
-- Live branch: Build → Test → Scan → Deploy → Update (~25-35 min)
+- Staging branch: Build → Test → Scan → Deploy → Update (~25-35 min)
+- Main branch: Promote (re-tag images) → Deploy → Update (~5-10 min) — no rebuild, uses stage-tested images
 
 ## Quick Commands
 
@@ -105,25 +106,22 @@ Developer → GitHub (branch) → GitLab Mirror → CI/CD → AWS ECS
 | `ddev drush cex` | Export configuration |
 | `ddev drush cim -y` | Import configuration |
 | `ddev drush uli` | Generate one-time login URL |
-| `ddev gesso watch` | Watch and rebuild theme assets |
-| `ddev gesso build` | One-time theme build |
 | `ddev composer phpcs` | Run PHP Code Sniffer |
 | `ddev composer phpcbf` | Auto-fix coding standards |
 | `ddev composer phpstan` | Run PHPStan static analysis |
-> Theme artifacts are intentionally not committed—after pulling any theme changes, rerun `ddev gesso build` (or `ddev gesso watch`) so CSS/JS output stays fresh.
 
 ### Deployment
 
 || Command | Description |
 ||---------|-------------|
-|| `./push-dev.sh` | Auto-detect build need & deploy to dev |
-|| `./push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
-|| `./push-dev.sh --force-build` | Force full build even if not detected |
-|| `./push-dev.sh --skip-build -f` | Force push with skip-build |
-|| `./trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
+|| `./scripts/push-dev.sh` | Auto-detect build need & deploy to dev |
+|| `./scripts/push-dev.sh --skip-build` | Force skip build (fast, reuse images) |
+|| `./scripts/push-dev.sh --force-build` | Force full build even if not detected |
+|| `./scripts/push-dev.sh --skip-build -f` | Force push with skip-build |
+|| `./scripts/trigger-pipeline.sh development` | Manually trigger GitLab pipeline |
 
 **Automatic Build Detection:**
-By default, `push-dev.sh` analyzes changed files and automatically determines if a full build is required.
+By default, `scripts/push-dev.sh` analyzes changed files and automatically determines if a full build is required.
 
 **Files requiring full build (auto-detected):**
 - ❌ `composer.json` or `composer.lock` (module dependencies)
@@ -153,13 +151,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md#helpful-commands) for complete command ref
 
 ### Advanced Pipeline Variables
 
-#### Deploying Dev from the `live` Branch
+#### Deploying Dev from the `staging` Branch
 
-By default, pipelines on `live` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
+By default, pipelines on `staging` build images and deploy only to the stage environment. Use `DEPLOY_TO_DEV=true` when you need the stage build running in dev as well—for example, to reproduce a stage-only bug with dev tooling, keep dev aligned during a stage freeze, or validate infrastructure fixes before reopening `development`.
 
 **Steps:**
 1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
-2. Select the `live` branch.
+2. Select the `staging` branch.
 3. Add a CI/CD variable:
    - **Key:** `DEPLOY_TO_DEV`
    - **Value:** `true`
@@ -168,19 +166,19 @@ By default, pipelines on `live` build images and deploy only to the stage enviro
 **What happens:**
 - The `build:drupal:stage` job builds images for both `stage` and `dev` (dev builds are skipped unless `DEPLOY_TO_DEV=true`).
 - Stage deploy jobs run automatically (with full Test/Scan stages).
-- The dev deploy job stays **manual** when triggered from `live`, so you must click the play button after stage validation.
+- The dev deploy job stays **manual** when triggered from `staging`, so you must click the play button after stage validation.
 
 Notes:
 - `DEPLOY_TO_DEV` is ignored on the `development` branch (dev deploys always happen there).
-- Use this flow sparingly—every dev deploy from `live` requires manual approval and will reuse the `live` branch artifacts.
+- Use this flow sparingly—every dev deploy from `staging` requires manual approval and will reuse the `staging` branch artifacts.
 
 #### Filtering Deployments by Site
 
-Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `live` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
+Use `WEBCMS_SITE_FILTER` to selectively deploy to only one site when running pipelines on the `staging` branch. This is useful for debugging site-specific issues (e.g., Spanish site configuration) or deploying emergency fixes to a single environment.
 
 **Steps:**
 1. Open the GitLab pipeline form: `https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/pipelines/new`
-2. Select the `live` branch.
+2. Select the `staging` branch.
 3. Add a CI/CD variable:
    - **Key:** `WEBCMS_SITE_FILTER`
    - **Value:** `stage` (to deploy only stage) or `dev` (to deploy only dev when combined with `DEPLOY_TO_DEV=true`)
@@ -220,8 +218,9 @@ webcms/
 │   └── simplesaml/             # SAML authentication
 ├── terraform/                  # Infrastructure as code
 ├── ci/                         # CI automation scripts
-├── push-dev.sh                 # Deploy to dev helper script
-└── trigger-pipeline.sh         # Manual pipeline trigger
+└── scripts/                    # Helper scripts
+    ├── push-dev.sh             # Deploy to dev helper script
+    └── trigger-pipeline.sh     # Manual pipeline trigger
 ```
 
 ### Custom Modules
@@ -270,7 +269,6 @@ Copy `.env.example` to `.env` before editing; never commit actual secrets or sit
 - Mobile-first responsive design
 - WCAG 2.1 AA accessibility compliance
 - ES6+ JavaScript (no `var`)
-- Lint with `ddev gesso lint`
 
 ### Git Workflow
 Follow [Conventional Commits](https://www.conventionalcommits.org/):
@@ -283,9 +281,12 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 **Branch Strategy:**
 - `main` - Stable release (matches production)
-- `live` - Pre-production (deploys to stage)
+- `staging` - Pre-production (deploys to stage)
 - `development` - Active development (deploys to dev)
 - `feature/*`, `bugfix/*`, `hotfix/*` - Feature branches
+
+See the [Git Workflow](docs/GIT_WORKFLOW.md) for the full branching, merging,
+promotion, hotfix, freeze, and release-tagging process.
 
 ## Troubleshooting
 
@@ -315,7 +316,7 @@ mysql -h 127.0.0.1 -P <port> -u db -pdb db < backup.sql
 **Skip-Build Deployment Fails:**
 ```bash
 # Run full build first to create :development-latest images
-./push-dev.sh
+./scripts/push-dev.sh
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md#troubleshooting) for more troubleshooting steps.

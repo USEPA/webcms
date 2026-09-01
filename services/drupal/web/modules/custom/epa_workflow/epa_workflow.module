@@ -14,6 +14,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\Core\Site\Settings;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Link;
@@ -252,12 +253,21 @@ function epa_workflow_form_alter(array &$form, FormStateInterface $form_state, $
     _epa_workflow_add_compliance_checkboxes($form);
   }
 
-  if ($form_id == 'revision_overview_form') {
+  if ($form_id === 'revision_overview_form') {
     $form['#attached']['library'][] = 'epa_workflow/revision_list';
-    foreach ($form['node_revisions_table'] as $key => $row) {
-      // Add some text to the row if the revision is the published rev.
-      if (is_numeric($key) && in_array('is-published', $row['#attributes']['class'])) {
-        $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = "<strong>Currently published revision</strong>";
+    
+    // Element::children() ensures we only iterate over the actual row arrays,
+    // safely ignoring render properties like #header or #empty.
+    foreach (Element::children($form['node_revisions_table']) as $key) {
+      $row = $form['node_revisions_table'][$key];
+      
+      // Because we used Element::children(), we are guaranteed that $row is an array.
+      // We can now safely check for attributes and classes.
+      $classes = $row['#attributes']['class'] ?? [];
+      
+      if (is_array($classes) && in_array('is-published', $classes, TRUE)) {
+        // Use t() for all user-facing strings to ensure they can be translated.
+        $form['node_revisions_table'][$key]['operations']['current-revision']['#markup'] = '<strong>' . t('Currently published revision') . '</strong>';
       }
     }
   }
@@ -562,37 +572,6 @@ function epa_workflow_node_presave(NodeInterface $node) {
     return;
   }
 
-  $storage = \Drupal::entityTypeManager()->getStorage('node');
-  $original = $node->original;
-  if ($original) {
-    $default_revision_id = $original->get('vid')->value;
-    $latest_revision_id = $storage->getLatestRevisionId($node->id());
-    $loaded_rev_id = $node->getLoadedRevisionId();
-    $moderation_state = $node->moderation_state->value;
-    $moderation_info = \Drupal::service('content_moderation.moderation_information');
-    $workflow = $moderation_info->getWorkflowForEntity($node);
-    $workflow_states = $workflow->get('type_settings')['states'];
-
-    // Only leapfrog to reset latest revision if the following is true:
-    // - Revision undergoing transition is the default revision AND
-    // - there's a different latest revision AND
-    // - we are transitioning the current revision to another state that will make
-    // it the "default" revision AND
-    // - this is not a "syncing" save (a save that is meant to happen more-or-less
-    // transparently on a revision just to update field data)
-    if (!$node->isSyncing() && isset($workflow_states[$moderation_state]) && $workflow_states[$moderation_state]['default_revision'] && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
-      $node->leapfrog = $latest_revision_id;
-    }
-
-    // Set the "last_revision" property to fool the content_moderation_notifications
-    // module into properly detecting which transition we are firing since it
-    // does not expect us to be transitioning a non-latest revision.
-    // So if we're doing a save on the default revision and there's a different
-    // latest revision, we need to set the "last_revision" as the current revision.
-    if (!$node->isSyncing() && $loaded_rev_id == $default_revision_id && $loaded_rev_id != $latest_revision_id) {
-      $node->last_revision = $original;
-    }
-  }
 
   // Update the log message for revisions created through bulk operations.
   $request = \Drupal::request();
@@ -629,29 +608,40 @@ function epa_workflow_node_presave(NodeInterface $node) {
   }
 }
 
+
 /**
- * Implements hook_ENTITY_TYPE_update().
+ * Implements hook_node_update().
+ *
+ * Redirects users to the "Latest Revision" tab after saving a node that has a pending revision under content moderation.
  */
 function epa_workflow_node_update(NodeInterface $node) {
-  if (isset($node->leapfrog)) {
-    // If the revision being saved was the default, but was not the latest, then
-    // we have a forward revision and we need to leap frog it to the front so
-    // the user doesn't get confused by their "latest revision" disappearing.
-    $storage = \Drupal::entityTypeManager()->getStorage('node');
-    $last_revision = $storage->loadRevision($node->leapfrog);
-    $last_revision->setNewRevision();
-    // If our default revision is not published then this leapfrogged revision
-    // should also take over the default revision spot. This follows the model
-    // of what core does. If the default revision IS published then our leapfrog
-    // revision is only the latest revision and does not take over the default.
-    $last_revision->isDefaultRevision(!$node->isPublished());
-    $last_revision->setRevisionCreationTime(\Drupal::time()->getRequestTime());
-    $last_revision->setChangedTime(\Drupal::time()->getRequestTime());
-    $last_revision->setRevisionLogMessage(t('Restoring the latest revision (based on revision %vid) after a transition occurred to the current revision.', ['%vid' => $node->leapfrog]));
-    $last_revision->setSyncing(TRUE);
-    $last_revision->save();
+  // Load the content moderation service to check moderation state.	
+  $moderation_info = \Drupal::service('content_moderation.moderation_information');
+
+  // Ignore if the node is not under content moderation workflow
+  if (!$moderation_info->isModeratedEntity($node)) {
+    return;
   }
+
+  // Ignore if there is no pending revision. Which means the latest revision is the published one.
+  if (!$moderation_info->hasPendingRevision($node)) {
+    return;
+  }
+
+  // Prevent this response from being cached by Drupal's page cache.
+  \Drupal::service('page_cache_kill_switch')->trigger();
+
+  /*
+   * Generate the URL to the "Latest Revision" tab for this node
+   * toString(TRUE) returns a GeneratedURL object instead of a string,
+   * which tells Drupal we're handling cacheability and suppresses the "leaked cache metadata" warning.
+   * A similar issue was resolved in WEBCMS-294 ticket, check hook_user_login implemenation in f1_sso.module
+   * which actually bubbles cacheablity metadata.
+   * * */
+  $generated = Url::fromRoute('entity.node.latest_version', ['node' => $node->id(),])->toString(TRUE);
+  \Drupal::service('request_stack')->getCurrentRequest()->query->set('destination', $generated->getGeneratedUrl());
 }
+
 
 /**
  * Helper function to add compliance checkboxes to some forms.
@@ -798,60 +788,97 @@ function epa_workflow_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter() for revision_overview_form.
+ *
+ * Adds custom EPA workflow messaging to the node revision overview table.
  */
 function epa_workflow_form_revision_overview_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Add a visual prefix to the operations of the latest revision.
   $form['node_revisions_table'][0]['operations']['#prefix'] = '<strong>Latest revision</strong><br>';
 
-  $current_revision = $form_state->getBuildInfo()['args'][0];
+  // Retrieve the current revision from the form build info arguments.
+  $build_info = $form_state->getBuildInfo();
+  $current_revision = $build_info['args'][0] ?? NULL;
 
-  $latest_vid = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->getLatestRevisionId($current_revision->id());
-  $latest_revision = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->loadRevision($latest_vid);
+  if (!$current_revision instanceof NodeInterface) {
+    return;
+  }
+
+  $entity_type_manager = \Drupal::entityTypeManager();
+  $node_storage = $entity_type_manager->getStorage('node');
+
+  // Load the absolute latest revision of the current node.
+  $latest_vid = $node_storage->getLatestRevisionId($current_revision->id());
+  $latest_revision = $node_storage->loadRevision($latest_vid);
 
   if ($latest_revision instanceof NodeInterface && !$latest_revision->isNew()) {
     $timezone = date_default_timezone_get();
     $date_formatter = \Drupal::service('date.formatter');
-    // If latest revision and has a Publish Date set.
-    if (isset($latest_revision->field_publish_date->value)) {
-      $latest_revision_moderation_state = $latest_revision->moderation_state->value;
+    
+    // Check if the latest revision has a Publish Date set.
+    // BEST PRACTICE: Use ->isEmpty() instead of isset() for entity fields.
+    if (!$latest_revision->get('field_publish_date')->isEmpty()) {
+      $latest_revision_moderation_state = $latest_revision->get('moderation_state')->value;
+      $message = NULL;
 
       $latest_formatted_date_time = $date_formatter->format(
-        $latest_revision->field_publish_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+        $latest_revision->get('field_publish_date')->date->getTimestamp(), 
+        'custom', 
+        'F d, Y \a\t h:i a T', 
+        $timezone
       );
 
-      // Is in the “Draft, approved” state.
+      // Determine the messaging based on the current moderation state.
       if ($latest_revision_moderation_state == 'draft_approved') {
-        $message = t('<br>The revision will publish on %date.',['%date' => $latest_formatted_date_time]);
-        $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
+        $message = t('<br>The revision will publish on %date.', ['%date' => $latest_formatted_date_time]);
       }
-      // Is in any other draft state.
-      elseif ($latest_revision_moderation_state == 'draft' || $latest_revision_moderation_state == 'draft_needs_review') {
-        // If publish date is in the future give user some guidance.
-        if ($latest_revision->field_publish_date->date->getTimestamp() > time()) {
+      elseif (in_array($latest_revision_moderation_state, ['draft', 'draft_needs_review'])) {
+        if ($latest_revision->get('field_publish_date')->date->getTimestamp() > time()) {
           $message = t('<br>The revision is scheduled to publish on %date, but will only do so if this draft is approved. Currently, the draft is NOT approved.', ['%date' => $latest_formatted_date_time]);
         }
-        // If publish date is in the past indicate the draft will publish immediately.
         else {
           $message = t('<br>Since the scheduled publish date has already passed, this draft will publish immediately if it is approved. Remove or change the publish date if you do not wish for that to occur.');
         }
-        $form['node_revisions_table'][0]['revision']['#context']['message']['#markup'] .= $message;
+      }
+
+      // THE FIX: Safely bundle the existing TranslatableMarkup and your new message into a render array.
+      if ($message) {
+        $existing_message = $form['node_revisions_table'][0]['revision']['#context']['message'] ?? '';
+        
+        $form['node_revisions_table'][0]['revision']['#context']['message'] = [
+          // Keep the original data intact.
+          'original' => is_array($existing_message) ? $existing_message : ['#markup' => $existing_message],
+          // Append our new custom workflow message.
+          'epa_workflow' => ['#markup' => $message],
+        ];
       }
     }
-    // If the current revision is published and has a Sunset Date set.
-    if ($current_revision->status->value && isset($current_revision->field_expiration_date->value)) {
+
+    // Check if the current revision is published and has a Sunset Date set.
+    if ($current_revision->isPublished() && !$current_revision->get('field_expiration_date')->isEmpty()) {
       $current_formatted_date_time = $date_formatter->format(
-        $current_revision->field_expiration_date->date->getTimestamp(), 'custom', 'F d, Y \a\t h:i a T', $timezone
+        $current_revision->get('field_expiration_date')->date->getTimestamp(), 
+        'custom', 
+        'F d, Y \a\t h:i a T', 
+        $timezone
       );
 
-      $message = '<br>This content will automatically sunset, and be unpublished, on ' . $current_formatted_date_time . '.';
-      // Search for current revision.
-      foreach ($form['node_revisions_table'] as $delta => $revision) {
-        if (isset($revision['#attributes']) && in_array('revision-current', $revision['#attributes']['class'])) {
-          $form['node_revisions_table'][$delta]['revision']['#context']['message']['#markup'] .= $message;
+      $sunset_message = t('<br>This content will automatically sunset, and be unpublished, on %date.', ['%date' => $current_formatted_date_time]);
+      
+      // THE FIX: Use Element::children() to safely iterate over render arrays. 
+      // This prevents accidental iteration over render properties like '#theme'.
+      foreach (\Drupal\Core\Render\Element::children($form['node_revisions_table']) as $delta) {
+        $revision_row = $form['node_revisions_table'][$delta];
+
+        if (isset($revision_row['#attributes']['class']) && in_array('revision-current', $revision_row['#attributes']['class'])) {
+          
+          $existing_message = $form['node_revisions_table'][$delta]['revision']['#context']['message'] ?? '';
+          
+          // Apply the same safe array bundling here.
+          $form['node_revisions_table'][$delta]['revision']['#context']['message'] = [
+            'original' => is_array($existing_message) ? $existing_message : ['#markup' => $existing_message],
+            'epa_workflow_sunset' => ['#markup' => $sunset_message],
+          ];
         }
       }
     }

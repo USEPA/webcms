@@ -56,6 +56,7 @@ getDirectories('./js/ckeditor5_plugins').forEach((dir) => {
         scope: 'ckeditor5/src',
         name: 'CKEditor5.dll',
       }),
+      
     ],
     module: {
       rules: [

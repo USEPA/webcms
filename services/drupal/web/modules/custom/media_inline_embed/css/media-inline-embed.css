@@ -2,3 +2,21 @@
 .drupal-inline-media .file {
   padding: 0;
 }
+
+/* Force inline display for embedded media fields to prevent stacking */
+.drupal-inline-media {
+  display: inline;
+}
+
+.drupal-inline-media > div,
+.drupal-inline-media .field,
+.drupal-inline-media .field__item,
+.drupal-inline-media .media {
+  display: inline;
+}
+
+/* If layout builder or other field wrappers are present */
+.drupal-inline-media .field > div,
+.drupal-inline-media .field__item > div {
+  display: inline;
+}

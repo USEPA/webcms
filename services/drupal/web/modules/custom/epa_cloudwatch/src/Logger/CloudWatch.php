@@ -25,6 +25,12 @@ use Drupal\epa_cloudwatch\Exception\RetryExceededException;
  *   already exist.
  * * epa_cloudwatch.log_stream (optional) - Sets the name of the log stream directly.
  *   Intended for local development (where the ECS metadata service is not available).
+ *
+ * Note on sequenceToken: AWS deprecated the sequenceToken parameter for PutLogEvents in
+ * 2023. Log groups using the current CloudWatch Logs resource policy model do not require
+ * sequence tokens. This class does not submit a sequence token.
+ *
+ * @see https://docs.aws.amazon.com/AmazonCloudWatchLogs/latest/APIReference/API_PutLogEvents.html
  */
 class CloudWatch implements LoggerInterface {
   use RfcLoggerTrait;
@@ -71,14 +77,6 @@ class CloudWatch implements LoggerInterface {
    * @var \Aws\CloudWatchLogs\CloudWatchLogsClient
    */
   protected $client;
-
-  /**
-   * The CloudWatch logs sequence token. This token is used to ensure log events are sent
-   * in the correct order to AWS; see the putLogMessage() method for usage.
-   *
-   * @var string|null
-   */
-  protected $sequenceToken;
 
   /**
    * The name of the log group to write to.
@@ -205,7 +203,19 @@ class CloudWatch implements LoggerInterface {
     }
 
     // Use the Docker container ID as the stream name, same as the ECS logs agent.
-    $metadata = json_decode($json, FALSE, 512, JSON_THROW_ON_ERROR);
+    try {
+      $metadata = json_decode($json, FALSE, 512, JSON_THROW_ON_ERROR);
+    }
+    catch (\JsonException $e) {
+      // The metadata endpoint returned malformed JSON. Fall back gracefully
+      // rather than propagating a fatal error into the request.
+      return FALSE;
+    }
+
+    // Guard against a null decode result or a missing DockerId field.
+    if ($metadata === NULL || !isset($metadata->DockerId)) {
+      return FALSE;
+    }
 
     $this->logStream = $metadata->DockerId;
     return TRUE;
@@ -326,18 +336,25 @@ class CloudWatch implements LoggerInterface {
   }
 
   /**
-   * Send a log message to CloudWatch. This method will lazily create the log stream it
-   * should send to as well as attempt to recover from sequence token issues with the log
-   * stream.
+   * Send a batch of log events to CloudWatch Logs.
+   *
+   * sequenceToken is intentionally omitted: AWS deprecated this parameter in 2023.
+   * Log groups on the current API no longer require or honour it. Submitting a stale
+   * token can cause InvalidSequenceTokenException errors on log groups that have
+   * migrated to the new model, so we let the API manage ordering itself.
+   *
+   * On DataAlreadyAcceptedException (the batch was already received, e.g. from a
+   * retry after a transient network error) we silently succeed — the events are
+   * already in CloudWatch.
    *
    * @param array $log_events
-   *   A batch of log events.
+   *   A batch of log events in the format expected by PutLogEvents.
    * @param int $tries
    *   The number of retry attempts remaining.
    */
   protected function putLogEvents(array $log_events, $tries = 3) {
     if ($tries <= 0) {
-      throw new RetryExceededException('Failed to retry sending logs after 3 attempts');
+      throw new RetryExceededException('Failed to send logs to CloudWatch after 3 attempts');
     }
 
     $logGroup = $this->getLogGroup();
@@ -349,39 +366,28 @@ class CloudWatch implements LoggerInterface {
       'logStreamName' => $logStream,
     ];
 
-    // We don't have a sequence token initially. This _can_ be acceptable to AWS in some
-    // circumstances (for example, when we create a new log stream).
-    if (isset($this->sequenceToken)) {
-      $args['sequenceToken'] = $this->sequenceToken;
-    }
-
     try {
-      $result = $this->client->putLogEvents($args);
+      $this->client->putLogEvents($args);
     }
     catch (CloudWatchLogsException $e) {
       switch ($e->getAwsErrorCode()) {
-        // If AWS rejected our sequence token (either because we didn't have one and
-        // needed it, or someone else wrote to the log stream before we did), then fetch
-        // the expected token from the exception and try again.
-        case 'InvalidSequenceTokenException':
-          $this->sequenceToken = $e->get('expectedSequenceToken');
-          return $this->putLogEvents($log_events, $tries - 1);
+        // The batch was already accepted by CloudWatch (e.g., a retry after a
+        // transient network error delivered it twice). Nothing to do.
+        case 'DataAlreadyAcceptedException':
+          return;
 
-        // Exceptions here are thrown if the log group or log stream don't exist. We
-        // currently assume the log group will have already been created, so we simply
-        // attempt to create a new log stream and try again.
+        // The log group or stream does not yet exist. Create the stream and
+        // try again. We assume the log group has already been provisioned by
+        // Terraform; if not, createLogStream() will handle it.
         case 'ResourceNotFoundException':
           $this->createLogStream();
           return $this->putLogEvents($log_events, $tries - 1);
 
-        // Re-throw any other exceptions we encounter.
+        // Re-throw any other exceptions (e.g., bad IAM permissions).
         default:
           throw $e;
       }
     }
-
-    // Save the next sequence token.
-    $this->sequenceToken = $result['sequenceToken'];
   }
 
   /**
@@ -408,7 +414,7 @@ class CloudWatch implements LoggerInterface {
           $this->createLogStream();
           break;
 
-        // If we were not the only request attempting to request this log
+        // If we were not the only request attempting to create this log
         // stream, then AWS will inform us that it already exists. We ignore
         // that error, but re-throw all others - this gives us safe logic for
         // lazy log stream creation while not shadowing other problems (such as

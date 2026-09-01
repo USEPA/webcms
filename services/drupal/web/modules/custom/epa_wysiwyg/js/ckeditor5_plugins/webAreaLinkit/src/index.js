@@ -1,13 +1,6 @@
-import {
-  DropdownButtonView,
-  LabeledFieldView,
-  ViewModel,
-  addListToDropdown,
-  createDropdown,
-  createLabeledInputText
-} from 'ckeditor5/src/ui';
-import { Plugin, icons } from 'ckeditor5/src/core';
+import { Plugin } from 'ckeditor5/src/core';
 import { Collection } from 'ckeditor5/src/utils';
+import { DropdownButtonView, LabeledFieldView, ViewModel, addListToDropdown, createDropdown, createLabeledInputText } from 'ckeditor5/src/ui';
 import initializeAutocomplete from "../../../../../../contrib/linkit/js/ckeditor5_plugins/linkit/src/autocomplete";
 
 /**
@@ -34,7 +27,7 @@ class WebAreaLinkit extends Plugin {
   init() {
     this.locale = this.editor.locale;
     // @todo: See about passing URL via PHP settings.
-    this.options = {...this.editor.config.get('linkit'), autocompleteUrl: "/linkit/autocomplete/web_area_content" };
+    this.options = { ...this.editor.config.get('linkit'), autocompleteUrl: "/linkit/autocomplete/web_area_content" };
     // TRICKY: Work-around until the CKEditor team offers a better solution:
     // force the ContextualBalloon to get instantiated early thanks to
     // DrupalImage not yet being optimized like
@@ -67,18 +60,18 @@ class WebAreaLinkit extends Plugin {
 
         // Create a new dropdown field that we'll use to let the content author switch between profiles
         if (typeof linkFormView.linkitProfileSelect === 'undefined') {
-          const dropdownView = createDropdown( this.locale, DropdownButtonView );
+          const dropdownView = createDropdown(this.locale, DropdownButtonView);
           const itemList = this._buildLinkitProfileList();
           addListToDropdown(dropdownView, itemList);
-          dropdownView.buttonView.set( itemList.get(1).model );
+          dropdownView.buttonView.set(itemList.get(1).model);
 
-          dropdownView.extendTemplate( {
+          dropdownView.extendTemplate({
             attributes: {
               class: [
                 'ck-epa-web-area-linkit-dropdown'
               ]
             }
-          } );
+          });
 
           linkFormView.children.add(dropdownView, 0);
           linkFormView._focusables.add(dropdownView, 0);
@@ -171,25 +164,25 @@ class WebAreaLinkit extends Plugin {
         linkFormView.children.add(saveButton);
         linkFormView.children.add(cancelButton);
 
-      // Listen for changes to the dropdown.
-      // Show/hide one of the URL fields based on chosen element.
-      this.listenTo( linkFormView.linkitProfileSelect, 'execute', (evt) => {
-        // evt.source is everything that's in our model and additional items.
-        if (evt.source.linkitAll === true) {
-          // Show the "No filter: all WebCMS content".
-          linkFormView.urlInputView.element.style.display = 'block';
-          linkFormView.myWebAreasLinkField.element.style.display = 'none';
-        }
-        else {
-          // Show the "Your internal links".
-          linkFormView.urlInputView.element.style.display = 'none';
-          linkFormView.myWebAreasLinkField.element.style.display = 'block';
-        }
+        // Listen for changes to the dropdown.
+        // Show/hide one of the URL fields based on chosen element.
+        this.listenTo(linkFormView.linkitProfileSelect, 'execute', (evt) => {
+          // evt.source is everything that's in our model and additional items.
+          if (evt.source.linkitAll === true) {
+            // Show the "No filter: all WebCMS content".
+            linkFormView.urlInputView.element.style.display = 'block';
+            linkFormView.myWebAreasLinkField.element.style.display = 'none';
+          }
+          else {
+            // Show the "Your internal links".
+            linkFormView.urlInputView.element.style.display = 'none';
+            linkFormView.myWebAreasLinkField.element.style.display = 'block';
+          }
 
-        // Set the shown option as the dropdown's label.
-        linkFormView.linkitProfileSelect.buttonView.label = evt.source.label;
-      } );
-    });
+          // Set the shown option as the dropdown's label.
+          linkFormView.linkitProfileSelect.buttonView.label = evt.source.label;
+        });
+      });
   }
 
   /**
@@ -200,25 +193,25 @@ class WebAreaLinkit extends Plugin {
   _buildLinkitProfileList() {
     const items = new Collection();
 
-    items.add( {
+    items.add({
       type: 'button',
-      model: new ViewModel( {
+      model: new ViewModel({
         withText: true,
         label: this.locale.t('Your internal links'),
         tooltip: this.locale.t('Search within your web areas only.'),
         linkitAll: false,
-      } )
-    } );
+      })
+    });
 
-    items.add( {
+    items.add({
       type: 'button',
-      model: new ViewModel( {
+      model: new ViewModel({
         withText: true,
         label: this.locale.t('No filter: all WebCMS content'),
         tooltip: this.locale.t('Search within your web areas and www.epa.gov.'),
         linkitAll: true,
-      } )
-    } );
+      })
+    });
 
     return items;
 
@@ -232,9 +225,9 @@ class WebAreaLinkit extends Plugin {
    */
   _createUrlInput() {
     const t = this.locale.t;
-    const labeledInput = new LabeledFieldView( this.locale, createLabeledInputText );
+    const labeledInput = new LabeledFieldView(this.locale, createLabeledInputText);
 
-    labeledInput.label = t( 'Link URL' );
+    labeledInput.label = t('Link URL');
 
     return labeledInput;
   }

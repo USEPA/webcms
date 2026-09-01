@@ -129,7 +129,7 @@ notify:build:success:stage:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_success
     - when: never
 
@@ -269,7 +269,7 @@ notify:build:failed:stage:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_failure
     - when: never
 
@@ -324,7 +324,7 @@ notify:manual:required:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_success
 
 # Deployment Started
@@ -340,7 +340,7 @@ notify:deploy:started:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_success
 
 # Deployment Success
@@ -417,7 +417,7 @@ notify:deploy:success:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_success
 
 # Deployment Failure
@@ -487,7 +487,7 @@ notify:deploy:failed:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_failure
 
 # Security Scan Issues Found
@@ -550,7 +550,7 @@ notify:security:issues:
   rules:
     - if: '$TEAMS_WEBHOOK_URL == null'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "live"'
+    - if: '$CI_COMMIT_BRANCH == "staging"'
       when: on_failure
 
 # Pipeline Completed (Summary)

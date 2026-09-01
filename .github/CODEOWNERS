@@ -1,0 +1,37 @@
+# CODEOWNERS — EPA WebCMS
+#
+# Code owners are automatically requested for review when a pull request changes
+# matching files. See:
+# https://docs.github.com/en/repositories/managing-your-repositories-growth/customizing-your-repository/about-code-owners
+#
+# The last matching pattern takes precedence. Patterns follow .gitignore syntax.
+#
+# NOTE: Owners must be real GitHub users (or teams) with write access to this
+# repository. The accounts below are repository maintainers. To route reviews to
+# a team instead of individuals, create a GitHub team (for example,
+# @USEPA/webcms-maintainers) and replace the individual handles below.
+
+# Default owners for everything in the repository.
+*                               @cherrypj @jmcerda-epa
+
+# Documentation and contributor-facing guidance.
+/CONTRIBUTING.md                @cherrypj @jmcerda-epa
+/README.md                      @cherrypj @jmcerda-epa
+/SECURITY.md                    @cherrypj @jmcerda-epa
+/CHANGELOG.md                   @cherrypj @jmcerda-epa
+/docs/                          @cherrypj @jmcerda-epa
+
+# CI/CD pipeline and deployment automation — changes here affect every
+# environment and require maintainer review.
+/.gitlab-ci.yml                 @cherrypj @jmcerda-epa
+/.gitlab/                       @cherrypj @jmcerda-epa
+/ci/                            @cherrypj @jmcerda-epa
+/push-dev.sh                    @cherrypj @jmcerda-epa
+/trigger-pipeline.sh            @cherrypj @jmcerda-epa
+/.github/                       @cherrypj @jmcerda-epa
+
+# Infrastructure as code — production-affecting; maintainer review required.
+/terraform/                     @cherrypj @jmcerda-epa
+
+# Drupal configuration — config and code must move together; review carefully.
+/services/drupal/config/        @cherrypj @jmcerda-epa
