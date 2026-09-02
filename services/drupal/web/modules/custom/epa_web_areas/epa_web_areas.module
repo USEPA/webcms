@@ -570,4 +570,26 @@ function epa_web_areas_views_data_alter(array &$data) {
     $data["search_api_index_media"]["gid"]["filter"]['entity_type'] = 'group_content';
     $data["search_api_index_media"]["gid"]["filter"]['id'] = 'search_api_entity_reference';
   }
+ 
+  // Correct Group module's own declaration of the "gid" base field so
+  // Views treats it as an entity reference to "group" again, restoring
+  // the "Use Autocomplete" widget option on any exposed filter using it.
+  // Group's group.views.inc currently declares this field with filter
+  // plugin "numeric", which does not support the autocomplete widget -
+  // Views silently falls back to a plain textfield when that mismatch
+  // happens, with no visible error anywhere.
+  // Short-term fix for the removal of "Add Views autocomplete filter for 
+  // all entity reference fields" patch 
+  // (https://www.drupal.org/files/issues/2024-08-19/2429699-546-10.3.x.patch)
+  // in https://github.com/USEPA/webcms/pull/1822.
+  // Any view whose exported config says plugin_id: entity_reference for a filter
+  // is affected by the below.
+  if (isset($data['group_content_field_data']['gid'])) {
+    $data['group_content_field_data']['gid']['filter']['id'] = 'entity_reference';
+    // Ensure the entity type/target settings Views' EntityReference filter
+    // plugin needs are present, since Group's base declaration doesn't
+    // set these (it was never expecting to be used as an entity reference
+    // filter in the first place).
+    $data['group_content_field_data']['gid']['entity field'] = 'gid';
+  }
 }
