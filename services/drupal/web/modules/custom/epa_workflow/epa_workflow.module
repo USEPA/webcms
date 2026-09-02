@@ -26,8 +26,7 @@ use Drupal\paragraphs\Entity\Paragraph;
  */
 function epa_workflow_entity_base_field_info(EntityTypeInterface $entity_type) {
   $fields = [];
-  $config_syncing = \Drupal::isConfigSyncing();
-  if ($entity_type->id() == 'node' && !$config_syncing) {
+  if ($entity_type->id() == 'node') {
     $fields['epa_revision_automated'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Moderation automated'))
       ->setDescription(t('When true current moderation state is automated.'))
