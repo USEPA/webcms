@@ -120,9 +120,22 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
             $query->$revisionLimiter();
             $entities = $query->execute();
             foreach ($entities as $entityRevision => $entityId) {
-              $entity = $this->entityTypeManager->getStorage($entityType)
-                ->loadRevision($entityRevision);
-              $this->updateEntityField($entity, $scheduledField);
+              try {
+                $entity = $this->entityTypeManager->getStorage($entityType)
+                  ->loadRevision($entityRevision);
+                $this->updateEntityField($entity, $scheduledField);
+              }
+              catch (\Exception $e) {
+                // Log and continue so a single failed save (e.g. a
+                // transient database lock timeout) doesn't prevent other
+                // eligible entities from being processed in this run.
+                $this->logger->get('epa_workflow')->error('Failed to process scheduled transition for @type @id (revision @revision): @message', [
+                  '@type' => $entityType,
+                  '@id' => $entityId,
+                  '@revision' => $entityRevision,
+                  '@message' => $e->getMessage(),
+                ]);
+              }
             }
           }
         }
