@@ -192,3 +192,18 @@ function epa_core_update_9007() {
 function epa_core_update_9008() {
   \Drupal::database()->truncate('cache_container');
 }
+
+/**
+ * Ensure system.image.toolkit is set to gd.
+ *
+ * On some environments the active system.image config has an empty
+ * "toolkit" value, which causes a PluginNotFoundException ("The \"\"
+ * plugin does not exist") whenever an entity with an image field is
+ * saved, e.g. during the epa_workflow scheduled publish cron run.
+ */
+function epa_core_update_9009() {
+  $config = \Drupal::configFactory()->getEditable('system.image');
+  if (empty($config->get('toolkit'))) {
+    $config->set('toolkit', 'gd')->save();
+  }
+}
