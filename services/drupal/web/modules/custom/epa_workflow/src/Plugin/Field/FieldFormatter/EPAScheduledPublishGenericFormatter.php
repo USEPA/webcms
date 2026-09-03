@@ -36,7 +36,7 @@ class EPAScheduledPublishGenericFormatter extends ScheduledPublishGenericFormatt
    * {@inheritdoc}
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, LoggerChannelFactoryInterface $logger_channel_factory, EntityTypeManager $entity_type_manager, ModerationInformationInterface $moderation_information) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $logger_channel_factory, $entity_type_manager);
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $logger_channel_factory, $entity_type_manager, $moderation_information);
     $this->moderationInformation = $moderation_information;
   }
 
