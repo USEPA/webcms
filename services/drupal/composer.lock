@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "12952206d34032ca26fa5a956dedfa7c",
+    "content-hash": "f2558bc0cc87ecb109d1f1dd0b459b21",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -4985,24 +4985,27 @@
         },
         {
             "name": "drupal/entity_usage",
-            "version": "2.0.0-beta24",
+            "version": "2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/entity_usage.git",
-                "reference": "8.x-2.0-beta24"
+                "reference": "8.x-2.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/entity_usage-8.x-2.0-beta24.zip",
-                "reference": "8.x-2.0-beta24",
-                "shasum": "063cf50d2b5cf7c99bb86a818c03fcfef2082151"
+                "url": "https://ftp.drupal.org/files/projects/entity_usage-8.x-2.3.zip",
+                "reference": "8.x-2.3",
+                "shasum": "8e47e9d3140b55ae3a08e010a79c226545f8bfd2"
             },
             "require": {
-                "drupal/core": "^10.2 || ^11"
+                "drupal/core": "^10.3 || ^11"
+            },
+            "conflict": {
+                "drupal/trash": "< 3.0.30"
             },
             "require-dev": {
                 "drupal/block_field": "~1.0",
-                "drupal/dynamic_entity_reference": "~1.0 || ^2.0 || ^4.0",
+                "drupal/dynamic_entity_reference": "^3.0",
                 "drupal/entity_browser": "~2.0",
                 "drupal/entity_browser_block": "~1.0 || ^2.0",
                 "drupal/entity_embed": "^1.7",
@@ -5010,16 +5013,18 @@
                 "drupal/inline_entity_form": "^1.0@RC || ^3.0@RC",
                 "drupal/paragraphs": "~1.0",
                 "drupal/redirect": "^1.11",
-                "drupal/webform": "^6.0.0-alpha4"
+                "drupal/trash": "~3.0",
+                "drupal/webform": "^6.0.0",
+                "drush/drush": "^12.0 || ^13.0 || ^14.0"
             },
             "type": "drupal-module",
             "extra": {
                 "drupal": {
-                    "version": "8.x-2.0-beta24",
-                    "datestamp": "1743745774",
+                    "version": "8.x-2.3",
+                    "datestamp": "1789472341",
                     "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Beta releases are not covered by Drupal security advisories."
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
                     }
                 },
                 "drush": {
@@ -5033,6 +5038,10 @@
                 "GPL-2.0+"
             ],
             "authors": [
+                {
+                    "name": "alexpott",
+                    "homepage": "https://www.drupal.org/user/157725"
+                },
                 {
                     "name": "lullabot",
                     "homepage": "https://www.drupal.org/user/3815489"
@@ -5552,27 +5561,30 @@
         },
         {
             "name": "drupal/fixed_block_content",
-            "version": "dev-1.x",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://git.drupalcode.org/project/fixed_block_content.git",
-                "reference": "cf8cb8db2a8a87c224e10e6475fddba21a85e42a"
+                "reference": "8.x-1.4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/fixed_block_content-8.x-1.4.zip",
+                "reference": "8.x-1.4",
+                "shasum": "bf5035846418156857bd94bc6139aea339a884bb"
             },
             "require": {
-                "drupal/core": "^9 || ^10",
+                "drupal/core": "^9 || ^10 || ^11",
                 "drupal/hal": "^1.0 || ^2.0"
             },
             "type": "drupal-module",
             "extra": {
-                "branch-alias": {
-                    "dev-1.x": "1.x-dev"
-                },
                 "drupal": {
-                    "version": "8.x-1.2+1-dev",
-                    "datestamp": "1691229356",
+                    "version": "8.x-1.4",
+                    "datestamp": "1743628825",
                     "security-coverage": {
-                        "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
                     }
                 }
             },
@@ -25313,7 +25325,6 @@
         "drupal/editor_advanced_link": 20,
         "drupal/elasticsearch_connector": 15,
         "drupal/entity_clone": 10,
-        "drupal/entity_usage": 10,
         "drupal/entitygroupfield": 20,
         "drupal/gcontent_moderation": 20,
         "drupal/inline_entity_form": 5,
