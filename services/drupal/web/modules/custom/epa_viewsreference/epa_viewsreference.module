@@ -2,6 +2,7 @@
 
 /**
  * @file
+ * Custom functionality and widget alterations for Views Reference fields.
  */
 
 use Drupal\Core\Form\FormStateInterface;
@@ -9,33 +10,32 @@ use Drupal\Core\Form\FormStateInterface;
 /**
  * Implements hook_field_widget_complete_form_alter().
  *
- * Currently there appears to be a bug with how ajax is submitting data back to
- * the ViewsReferenceExposedFilters plugin that is causing the normally boolean
- * value for the show/hide exposed form to be returned a string "true" or "false".
- *
- * This causes issues as the plugin is expecting this to be a boolean value
- * @see \Drupal\viewsreference_filter\Plugin\ViewsReferenceSetting\ViewsReferenceExposedFilters::alterView()
+ * Alters the Views Reference select widget to refine exposed filter UI elements
+ * and supply custom default sort settings for specific view displays.
  */
-function epa_viewsreference_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context) {
+function epa_viewsreference_field_widget_complete_form_alter(array &$element, FormStateInterface $form_state, array $context): void {
   $plugin_id = $context['widget']->getPluginId();
 
   if ($plugin_id === 'viewsreference_select') {
+    // Custom limit configuration for the viewsreference field widget.
     if (!empty($element['widget'][0]['options']['limit'])) {
       $element['widget'][0]['options']['limit']['#title'] = t('Number of results (results per page if using a pager).');
       $element['widget'][0]['options']['limit']['#type'] = 'number';
       $element['widget'][0]['options']['limit']['#description'] = t('Please enter a value between 1 and 100');
       $element['widget'][0]['options']['limit']['#min'] = 1;
       $element['widget'][0]['options']['limit']['#max'] = 100;
+
       if (empty($element['widget'][0]['options']['limit']['#default_value'])) {
         $element['widget'][0]['options']['limit']['#default_value'] = 5;
       }
     }
 
-    // Use "details" containers since they are themed better in layout builder UI.
+    // Use "details" containers since they are themed better in Layout Builder UI.
     if (isset($element['widget'][0]['options']['exposed_filters']['#type'])) {
       $element['widget'][0]['options']['exposed_filters']['#type'] = 'details';
       $element['widget'][0]['options']['exposed_filters']['#open'] = TRUE;
     }
+
     if (isset($element['widget'][0]['options']['exposed_sorts']['#type'])) {
       $element['widget'][0]['options']['exposed_sorts']['#type'] = 'details';
       $element['widget'][0]['options']['exposed_sorts']['#open'] = TRUE;
@@ -46,15 +46,35 @@ function epa_viewsreference_field_widget_complete_form_alter(array &$element, Fo
       $element['widget'][0]['options']['exposed_filters']['vr_exposed_filters_visible']['#access'] = FALSE;
     }
 
-    // Make "DESC" be the default sort order for Perspectives and FAQ List.
-    $view_types = ['dynamic_faq_list', 'dynamic_list_perspectives', 'dynamic_list_speeches_and_remarks'];
-    if (in_array($element['widget'][0]['target_id']['#default_value'], $view_types)) {
-      $data = $context['items'][0]->getValue('data');
-      if ($data) {
-        $data_values = unserialize($data['data']);
-        $sort_order = $data_values['exposed_sorts']['sort_order'];
-        if (empty($sort_order)) {
-          $element['widget'][0]['options']['exposed_sorts']['sort_order']['#default_value'] = 'DESC';
+    // Specify targeted view displays that require "DESC" default sort ordering.
+    $view_types = [
+      'dynamic_faq_list',
+      'dynamic_list_perspectives',
+      'dynamic_list_speeches_and_remarks',
+    ];
+
+    // Safely retrieve target_id value using null coalescing.
+    $target_id = $element['widget'][0]['target_id']['#default_value'] ?? NULL;
+
+    if ($target_id && in_array($target_id, $view_types, TRUE)) {
+      // Ensure the field item exists before retrieving values.
+      if (!empty($context['items'][0])) {
+        $data = $context['items'][0]->getValue('data');
+
+        if (!empty($data['data']) && is_string($data['data'])) {
+          // Unserialize the saved options array securely.
+          $data_values = @unserialize($data['data'], ['allowed_classes' => FALSE]);
+
+          if (is_array($data_values)) {
+            // Safely navigate multi-dimensional keys using null coalescing operators.
+            $sort_order = $data_values['exposed_sorts']['sort_order'] ?? NULL;
+
+            // Apply 'DESC' default only if no existing sort order value is present
+            // and the corresponding form element is rendered in the widget form.
+            if (empty($sort_order) && isset($element['widget'][0]['options']['exposed_sorts']['sort_order'])) {
+              $element['widget'][0]['options']['exposed_sorts']['sort_order']['#default_value'] = 'DESC';
+            }
+          }
         }
       }
     }
