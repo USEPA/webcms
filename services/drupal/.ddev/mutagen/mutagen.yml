@@ -13,17 +13,26 @@ sync:
       paths:
       # The top-level .git directory is ignored because where possible it's mounted
       # into the container with a traditional docker bind-mount
-      - "/.git"
-
-      - "/.tarballs"
-      - "/.ddev/db_snapshots"
-      - "/.ddev/.importdb*"
-      - ".DS_Store"
-      - ".idea"
-
-      - "/web/sites/default/files/"
-      - "/.ddev/db/"
-
+        - "/.git"
+        - "/.tarballs"
+        - "/.ddev/db_snapshots"
+        - "/.ddev/.importdb*"
+        - ".DS_Store"
+        - ".idea"
+        - "/web/sites/default/files"
+        - "/.ddev/db"
+        # Direct folder names match recursively at any depth in Mutagen
+        - "node_modules"
+        - ".sass-cache"
+        - "bower_components"
+        # Ignore all compressed database dumps in the repository tree
+        - "*.sql"
+        - "*.sql.gz"
+        # Ignore compiled CSS/JS asset caches if generated dynamically
+        - "/web/sites/default/files/php"
+        - "/web/sites/default/files/styles"
+        - "/web/sites/default/files/js"
+        - "/web/sites/default/files/css"
       # You can also exclude other directories from mutagen-syncing
       # For example /var/www/html/var does not need to sync in TYPO3
       # so you can add:
