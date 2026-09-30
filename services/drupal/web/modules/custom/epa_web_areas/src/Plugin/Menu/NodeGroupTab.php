@@ -16,9 +16,9 @@ class NodeGroupTab extends LocalTaskDefault implements ContainerFactoryPluginInt
 
 
   /**
-   * GroupContent storage.
+   * GroupRelationship storage.
    *
-   * @var \Drupal\group\Entity\Storage\GroupContentStorageInterface
+   * @var \Drupal\group\Entity\Storage\GroupRelationshipStorageInterface
    */
   protected $groupStorage;
 
@@ -60,7 +60,7 @@ class NodeGroupTab extends LocalTaskDefault implements ContainerFactoryPluginInt
     if ($node instanceof NodeInterface) {
       /*
        * Nodes don't have a relationship to a Group, but when content is made in
-       * a Group it creates a GroupContent entity which serves the purpose of
+       * a Group it creates a GroupRelationship entity which serves the purpose of
        * creating a reference between an entity and a group.
        */
       $gc = $this->groupStorage->loadByEntity($node);

@@ -2,7 +2,7 @@
 
 namespace Drupal\epa_web_areas\Plugin\Action;
 
-use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupRelationship;
 
 /**
  * Provides the 'Update Group Association' action.

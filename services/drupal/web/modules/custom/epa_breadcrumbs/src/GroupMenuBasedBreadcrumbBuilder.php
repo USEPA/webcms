@@ -18,7 +18,7 @@ use Drupal\Core\Routing\AdminContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupRelationship;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\group_content_menu\GroupContentMenuInterface;
 use Drupal\menu_link_content\Plugin\Menu\MenuLinkContent;
@@ -192,7 +192,7 @@ class GroupMenuBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
       ->getCurrentLanguage(LanguageInterface::TYPE_CONTENT)->getId();
 
     // Get the group from the current node.
-    $group_content = GroupContent::loadByEntity($node_object);
+    $group_content = GroupRelationship::loadByEntity($node_object);
 
     if (!empty($group_content)) {
       $group_content = reset($group_content);

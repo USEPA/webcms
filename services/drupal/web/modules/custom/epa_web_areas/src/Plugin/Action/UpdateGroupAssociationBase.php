@@ -13,7 +13,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\group\Entity\Group;
-use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupRelationship;
 use Drupal\group\GroupMembershipLoaderInterface;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Plugin\search_api\datasource\ContentEntityTrackingManager;
@@ -199,10 +199,10 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
     }
 
     // Check if the object we're updating has a group associated with it, i.e
-    // GroupContent entity. If it does not then we need to check if the current
+    // GroupRelationship entity. If it does not then we need to check if the current
     // user is an admin or system_webmaster as those are the only users to allow
     // associated 'orphaned' content with a new Web Area.
-    $group_contents = GroupContent::loadByEntity($object);
+    $group_contents = GroupRelationship::loadByEntity($object);
     $allowed_roles = ['administrator', 'system_webmaster'];
 
     if ($group_contents || array_intersect($account->getRoles(), $allowed_roles)) {
@@ -224,8 +224,8 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
    * {@inheritdoc}
    */
   public function execute($entity = NULL) {
-    // Get the GroupContent from the node and update it using the new group from the 'updated_group' configuration.
-    $group_contents = GroupContent::loadByEntity($entity);
+    // Get the GroupRelationship from the node and update it using the new group from the 'updated_group' configuration.
+    $group_contents = GroupRelationship::loadByEntity($entity);
     if ($group_contents) {
       foreach ($group_contents as $group_content) {
         $group_content->get('gid')->setValue($this->configuration['updated_group']);
@@ -251,7 +251,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
         'label' =>  $entity->getEntityTypeId() == 'node' ? $entity->getTitle() : $entity->getName(),
       ];
       // Means it was never associated with a group
-      $group_content = GroupContent::create($values)->save();
+      $group_content = GroupRelationship::create($values)->save();
       $title = $entity instanceof NodeInterface ? $entity->getTitle() : $entity->getName();
 
       // Trigger an update on the entity's relevant search index.
