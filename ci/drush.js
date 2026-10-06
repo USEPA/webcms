@@ -32,13 +32,34 @@ const vars = require("./vars");
  *         PHP-serialized integers Drupal's State API stores for maintenance mode.
  *         Cache rebuild is handled by `drush deploy` (its final step is
  *         `cache:rebuild`), so a separate leading `cr` is redundant and risky.
+ *
+ * CUSTOM DRUSH ORDER SUPPORT:
+ *   Set DRUSH_ORDER="updb-first" to run database updates before config import.
+ *   This runs `drush updb` before `drush cim` instead of using `drush deploy`.
  */
 
-const drushScript = dedent`
+const defaultDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
   drush --debug --uri="$WEBCMS_SITE_URL" deploy -y
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
+
+const updbFirstDrushScript = dedent`
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
+  drush --debug --uri="$WEBCMS_SITE_URL" updb -y
+  drush --debug --uri="$WEBCMS_SITE_URL" cim -y
+  drush --debug --uri="$WEBCMS_SITE_URL" cr
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
+`;
+
+// Select drush script based on DRUSH_ORDER environment variable
+const drushOrder = process.env.DRUSH_ORDER || "default";
+const drushScript = drushOrder === "updb-first" ? updbFirstDrushScript : defaultDrushScript;
+
+if (drushOrder === "updb-first") {
+  ui.log("⚠️  Using custom drush order: UPDB BEFORE CONFIG IMPORT");
+  ui.log();
+}
 
 /**
  * The main function for Drush updates. This function coordinates the three steps needed
