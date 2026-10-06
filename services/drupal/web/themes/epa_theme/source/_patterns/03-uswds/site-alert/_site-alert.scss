@@ -1,12 +1,19 @@
 @use '../../00-config' as *;
 
 .usa-site-alert {
+  z-index: 1;
+
   .usa-alert {
     margin-bottom: 0;
     overflow: visible;
 
     .usa-alert__body {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
       max-width: 100%;
+      padding-right: rem(gesso-spacing(3));
     }
   }
 
@@ -16,9 +23,8 @@
     }
   }
 
-  .usa-alert__body {
-    display: flex;
-    justify-content: space-between;
+  .usa-alert__content {
+    flex-grow: 1;
   }
 }
 
