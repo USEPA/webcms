@@ -15,7 +15,7 @@ use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\group\Entity\Group;
-use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupRelationship;
 use Drupal\group\Entity\GroupInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 use Drupal\media_library\MediaLibraryState;
@@ -85,7 +85,7 @@ function epa_web_areas_form_node_form_alter(array &$form, FormStateInterface $fo
 
   // Retrieve group for existing entities.
   if (!$entity->isNew()) {
-    $group_contents = GroupContent::loadByEntity($entity);
+    $group_contents = GroupRelationship::loadByEntity($entity);
     foreach ($group_contents as $group_content) {
       $group = $group_content->getGroup();
       if ($group instanceof GroupInterface) {
@@ -202,7 +202,7 @@ function epa_web_areas_field_widget_complete_form_alter($element, FormStateInter
     // e.g. group/{group_id}/{entity}/add.
     $entity = $form_state->getformObject()->getEntity();
     if ($entity->id() && $entity instanceof ContentEntityInterface) {
-      $group_contents = GroupContent::loadByEntity($entity);
+      $group_contents = GroupRelationship::loadByEntity($entity);
       foreach ($group_contents as $group_content) {
         $group = $group_content->getGroup();
       }
@@ -288,7 +288,7 @@ function epa_web_areas_editor_js_settings_alter(&$settings) {
         else {
           $entity = $parameter;
         }
-        $group_contents = GroupContent::loadByEntity($entity);
+        $group_contents = GroupRelationship::loadByEntity($entity);
         foreach ($group_contents as $group_content) {
           $group = $group_content->getGroup();
         }

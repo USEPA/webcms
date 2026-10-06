@@ -5,28 +5,28 @@ namespace Drupal\epa_web_areas\Controller;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\group\Entity\Controller\GroupContentController;
+use Drupal\group\Entity\Controller\GroupRelationshipController;
 use Drupal\group\Entity\GroupInterface;
-use Drupal\group\Plugin\GroupContentEnablerManagerInterface;
+use Drupal\group\Plugin\GroupRelationTypeManagerInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Returns responses for 'group_node' GroupContent routes.
+ * Returns responses for 'group_node' GroupRelationship routes.
  */
-class EpaWebAreasGroupNodeController extends GroupContentController {
+class EpaWebAreasGroupNodeController extends GroupRelationshipController {
 
   /**
    * The group content plugin manager.
    *
-   * @var \Drupal\group\Plugin\GroupContentEnablerManagerInterface
+   * @var \Drupal\group\Plugin\GroupRelationTypeManagerInterface
    */
   protected $pluginManager;
 
   /**
    * Constructs a new GroupNodeController.
    *
-   * @param \Drupal\group\Plugin\GroupContentEnablerManagerInterface $plugin_manager
+   * @param \Drupal\group\Plugin\GroupRelationTypeManagerInterface $plugin_manager
    *   The group content plugin manager.
    * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
    *   The private store factory.
@@ -37,7 +37,7 @@ class EpaWebAreasGroupNodeController extends GroupContentController {
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
-  public function __construct(GroupContentEnablerManagerInterface $plugin_manager, PrivateTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer) {
+  public function __construct(GroupRelationTypeManagerInterface $plugin_manager, PrivateTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer) {
     parent::__construct($temp_store_factory, $entity_type_manager, $entity_form_builder, $renderer);
     $this->pluginManager = $plugin_manager;
   }
@@ -47,7 +47,7 @@ class EpaWebAreasGroupNodeController extends GroupContentController {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.group_content_enabler'),
+      $container->get('group_relation_type.manager'),
       $container->get('tempstore.private'),
       $container->get('entity_type.manager'),
       $container->get('entity.form_builder'),
@@ -73,8 +73,8 @@ class EpaWebAreasGroupNodeController extends GroupContentController {
     foreach ($this->addPageBundles($group, $create_mode) as $plugin_id => $bundle_name) {
       if (!empty($build['#bundles'][$bundle_name])) {
         $plugin = $group->getGroupType()->getContentPlugin($plugin_id);
-        $bundle_label = $storage_handler->load($plugin->getEntityBundle())->label();
-        $description = $storage_handler->load($plugin->getEntityBundle())->getDescription();
+        $bundle_label = $storage_handler->load($plugin->getRelationType()->getEntityBundle())->label();
+        $description = $storage_handler->load($plugin->getRelationType()->getEntityBundle())->getDescription();
 
         $build['#bundles'][$bundle_name]['label'] = $bundle_label;
         $build['#bundles'][$bundle_name]['add_link']->setText($bundle_label);
@@ -110,7 +110,7 @@ class EpaWebAreasGroupNodeController extends GroupContentController {
     $storage = $this->entityTypeManager->getStorage('group_content_type');
     $properties = ['group_type' => $group->bundle(), 'content_plugin' => $plugin_ids];
     foreach ($storage->loadByProperties($properties) as $bundle => $group_content_type) {
-      /** @var \Drupal\group\Entity\GroupContentTypeInterface $group_content_type */
+      /** @var \Drupal\group\Entity\GroupRelationshipTypeInterface $group_content_type */
       $bundles[$group_content_type->getContentPluginId()] = $bundle;
     }
 
