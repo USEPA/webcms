@@ -50,7 +50,6 @@ const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE key_value SET value = 'i:9202;' WHERE collection = 'system.schema' AND name = 'group'"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "DROP TABLE IF EXISTS tmp_0125c6group_relationship_field_data, tmp_68b7fegroup_relationship_field_data"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "SELECT * FROM group_content_field_data WHERE entity_id IS NULL"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM group_content_field_data WHERE entity_id IS NULL"
   drush --debug --uri="$WEBCMS_SITE_URL" updb -y
   drush --debug --uri="$WEBCMS_SITE_URL" cim -y
   drush --debug --uri="$WEBCMS_SITE_URL" cr
