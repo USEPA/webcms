@@ -46,6 +46,8 @@ const defaultDrushScript = dedent`
 
 const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM group_content WHERE entity_id IS NULL"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM key_value WHERE collection = 'system.schema' AND name IN ('ckeditor', 'ckeditor5_embedded_content', 'gmedia', 'jquery_ui_menu', 'variationcache')"
   drush --debug --uri="$WEBCMS_SITE_URL" updb -y
   drush --debug --uri="$WEBCMS_SITE_URL" cim -y
   drush --debug --uri="$WEBCMS_SITE_URL" cr
