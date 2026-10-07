@@ -154,7 +154,7 @@ async function main() {
   //         Drush task never reaches STOPPED, tying up a runner and hiding failures.
   //   WHAT/HOW: Cap the loop at `maxIterations` (360 × 5s = 30 min) and throw a
   //         clear timeout error if exceeded, so the job fails fast and visibly.
-  const maxIterations = 360; // 30 minutes at 5-second intervals
+  const maxIterations = 1440; // 2 hours at 5-second intervals (increased for Group 2.x migration)
   let iterationCount = 0;
 
   while (iterationCount < maxIterations) {
