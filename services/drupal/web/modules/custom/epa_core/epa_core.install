@@ -2,208 +2,39 @@
 
 /**
  * @file
+ * Install, update and uninstall functions for the EPA Core module.
  */
-
-use Drupal\redirect\Entity\Redirect;
-use Drupal\taxonomy\Entity\Term;
 
 /**
- * Implements hook_install.
+ * Clean up orphaned group_content records and missing module schema entries for Group 2.x migration.
  */
-function epa_core_install() {
-  _epa_core_create_news_release_type_term();
-
-  // Add index.
-  \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
-}
-
-/**
- * Create News Release type term.
- */
-function epa_core_update_8001() {
-  _epa_core_create_news_release_type_term();
-}
-
-/**
- * Add an index to node_field_revision table for changed.
- */
-function epa_core_update_8002() {
-  // Add index.
-  \Drupal::database()->query("ALTER TABLE {node_field_revision} ADD INDEX epa_node__changed (changed)");
-}
-
-/**
- * Remove redundant redirects.
- */
-function epa_core_update_9001() {
-  // Finds all redirects that exactly match an existing alias.
-  $rows = \Drupal::database()->query('SELECT rid, alias
-FROM {path_alias} p
-LEFT JOIN {redirect} r
-    ON CONCAT(\'internal:\', p.path) = r.redirect_redirect__uri
-WHERE CONCAT(\'/\',r.redirect_source__path) = p.alias')->fetchAllKeyed();
-
-  $redirects = Redirect::loadMultiple(array_keys($rows));
-
-  foreach ($redirects as $redirect) {
-    // Double-check that there's no query string on the source of this redirect
-    // by comparing it to the alias.
-    if ($rows[$redirect->id()] == $redirect->getSourcePathWithQuery()) {
-      $redirect->delete();
+function epa_core_update_10001() {
+  // Delete orphaned group_content records with NULL entity_id.
+  $database = \Drupal::database();
+  $num_deleted = $database->delete('group_content')
+    ->isNull('entity_id')
+    ->execute();
+  
+  \Drupal::messenger()->addStatus("Deleted {$num_deleted} orphaned group_content records with NULL entity_id.");
+  
+  // Clean up missing module schema entries.
+  $missing_modules = ['ckeditor', 'ckeditor5_embedded_content', 'gmedia', 'jquery_ui_menu', 'variationcache'];
+  \Drupal::keyValue('system.schema')->deleteMultiple($missing_modules);
+  
+  \Drupal::messenger()->addStatus('Cleaned up schema entries for missing modules: ' . implode(', ', $missing_modules));
+  
+  // Remove missing modules from core.extension config.
+  $config = \Drupal::configFactory()->getEditable('core.extension');
+  $modules = $config->get('module');
+  
+  foreach (['gmedia', 'variationcache'] as $module) {
+    if (isset($modules[$module])) {
+      unset($modules[$module]);
     }
   }
-}
-
-/**
- * Disable Akamai purge processor before disabling the module to avoid an error
- * about a non-existent service.
- */
-function epa_core_update_9002() {
-  $purge_purgers = \Drupal::service('purge.purgers');
-  $enabled = $purge_purgers->getPluginsEnabled();
-  $id = 'akamai_tag';
-  if (in_array($id, $enabled)) {
-    foreach ($enabled as $i => $plugin_id) {
-      if ($id === $plugin_id) {
-        unset($enabled[$i]);
-      }
-    }
-    $purge_purgers->setPluginsEnabled($enabled);
-  }
-}
-
-/**
- * Set existing card body fields to use our new more restrictive input format.
- */
-function epa_core_update_9003() {
-  $database = \Drupal::database();
-  foreach (['paragraph__field_body', 'paragraph_revision__field_body'] as $table) {
-    if ($database->schema()->tableExists($table)) {
-      $database->update($table)
-        ->condition('bundle', 'card')
-        ->fields(['field_body_format' => 'restricted_html_no_links'])
-        ->execute();
-    }
-  }
-}
-
-/**
- * Create the new News Release term with 730 day review cycle.
- */
-function _epa_core_create_news_release_type_term() {
-  $term = Term::create([
-    'name' => 'News Release',
-    'vid' => 'type',
-  ]);
-  $term->field_term_days_til_review = 730;
-  $term->save();
-}
-
-/**
- * As part of https://forumone.atlassian.net/browse/EPAD8-1962 to set cardinality
- * of the Press Office field to 1 we will remove records where delta is greater
- * than the minimum delta value.
- */
-function epa_core_update_9004() {
-  $database = \Drupal::database();
-  foreach (['node__field_press_office', 'node_revision__field_press_office'] as $table) {
-    if ($database->schema()->tableExists($table)) {
-      // UPDATE node__field_press_office as node
-      // LEFT JOIN (SELECT revision_id, MIN(delta) as delta
-      // FROM node__field_press_office GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta
-      // SET node.delta = 0
-      // WHERE min_delta.delta > 0;.
-      $database->query("UPDATE {$table} AS node LEFT JOIN (SELECT revision_id, MIN(delta) AS delta FROM {$table} GROUP BY revision_id) AS min_delta ON node.revision_id = min_delta.revision_id AND min_delta.delta = node.delta SET node.delta = 0 WHERE min_delta.delta > 0");
-
-      // Now delete all rows that are greater than that minimum delta.
-      // DELETE FROM {$table} WHERE delta > 0;.
-      $database->delete($table)
-        ->condition('delta', 0, '>')
-        ->execute();
-    }
-  }
-}
-
-/**
- * No longer needed, but was implemented in earlier development so we need the
- * update hook to still exist.
- */
-function epa_core_update_9005() {
-}
-
-/**
- * Sets all field_language values to set correct chinese language keys
- */
-function epa_core_update_9006() {
-  $database = \Drupal::database();
-  $tables = [
-    'node__field_language',
-    'node_revision__field_language',
-  ];
-
-  foreach ($tables as $table) {
-    $database->update($table)
-      ->fields([
-        'field_language_value' => 'zh_Hans'
-      ])
-      ->condition('field_language_value', 'zh_CN')
-      ->execute();
-
-    $database->update($table)
-      ->fields([
-        'field_language_value' => 'zh_Hant'
-      ])
-      ->condition('field_language_value', 'zh_TW')
-      ->execute();
-  }
-}
-
-/**
- * Sets all field_language values to set correct chinese language keys
- */
-function epa_core_update_9007() {
-  $database = \Drupal::database();
-  $tables = [
-    'node__field_language',
-    'node_revision__field_language',
-  ];
-
-  foreach ($tables as $table) {
-    $database->update($table)
-      ->fields([
-        'field_language_value' => 'zh-hans'
-      ])
-      ->condition('field_language_value', 'zh_Hans')
-      ->execute();
-
-    $database->update($table)
-      ->fields([
-        'field_language_value' => 'zh-hant'
-      ])
-      ->condition('field_language_value', 'zh_Hant')
-      ->execute();
-  }
-}
-
-/**
- * Disabling gcontent_moderation module (submodule of Groups from old patch) so
- * that we can enable the separate contrib module.
- */
-function epa_core_update_9008() {
-  \Drupal::database()->truncate('cache_container');
-}
-
-/**
- * Ensure system.image.toolkit is set to gd.
- *
- * On some environments the active system.image config has an empty
- * "toolkit" value, which causes a PluginNotFoundException ("The \"\"
- * plugin does not exist") whenever an entity with an image field is
- * saved, e.g. during the epa_workflow scheduled publish cron run.
- */
-function epa_core_update_9009() {
-  $config = \Drupal::configFactory()->getEditable('system.image');
-  if (empty($config->get('toolkit'))) {
-    $config->set('toolkit', 'gd')->save();
-  }
+  
+  $config->set('module', $modules)->save();
+  \Drupal::messenger()->addStatus('Removed gmedia and variationcache from core.extension config.');
+  
+  return 'Cleaned up orphaned data to prepare for Group 2.x migration.';
 }
