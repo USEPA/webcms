@@ -51,7 +51,6 @@ const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE config SET data = REPLACE(data, ',\"variationcache\":9999', '') WHERE name = 'core.extension'"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
   drush --debug --uri="$WEBCMS_SITE_URL" updb -y
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
 
