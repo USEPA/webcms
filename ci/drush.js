@@ -46,6 +46,11 @@ const defaultDrushScript = dedent`
 
 const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "INSERT INTO key_value (collection, name, value) VALUES ('system.schema', 'flexible_permissions', 's:5:\"10300\";') ON DUPLICATE KEY UPDATE value = 's:5:\"10300\";'"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE config SET data = CONCAT(SUBSTRING_INDEX(data, '\"module\":{', 1), '\"module\":{\"flexible_permissions\":0,', SUBSTRING_INDEX(data, '\"module\":{', -1)) WHERE name = 'core.extension' AND data NOT LIKE '%flexible_permissions%'"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_bootstrap"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_config"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
 `;
 
 // Select drush script based on DRUSH_ORDER environment variable
