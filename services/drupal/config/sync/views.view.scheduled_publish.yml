@@ -719,7 +719,20 @@ display:
           query_tags: {  }
       relationships: {  }
       use_ajax: true
-      header: {  }
+      header:
+        area:
+          id: area
+          table: views
+          field: area
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text
+          empty: true
+          content:
+            value: "<div class=\"action-links\">\r\n  <a href=\"[site:url]/admin/content/scheduled-publish/add\" class=\"button button-action button--primary button--small\">Add bulk scheduled publishing entries</a>\r\n</div>"
+            format: rich_html
+          tokenize: false
       footer: {  }
       display_extenders: {  }
     cache_metadata:
@@ -732,7 +745,7 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_scheduled_transition'
+        - node_list
   block_1:
     id: block_1
     display_title: Block
@@ -750,4 +763,4 @@ display:
         - 'user.node_grants:view'
         - user.permissions
       tags:
-        - 'config:field.storage.node.field_scheduled_transition'
+        - node_list

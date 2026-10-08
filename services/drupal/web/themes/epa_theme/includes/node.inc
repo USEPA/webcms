@@ -5,7 +5,7 @@
  */
 
 use Drupal\Core\Link;
-use Drupal\group\Entity\GroupRelationship;
+use Drupal\group\Entity\GroupContent;
 
 /**
  * Implements hook_preprocess_node().
@@ -236,9 +236,9 @@ function _add_regions_to_node($allowed_regions, &$variables) {
  * @throws \Drupal\Core\Entity\EntityMalformedException
  */
 function _add_webarea_contact_link($entity, &$variables) {
-  $group_contents = GroupRelationship::loadByEntity($entity);
+  $group_contents = GroupContent::loadByEntity($entity);
   if (!empty($group_contents)) {
-    /** @var \Drupal\group\Entity\GroupRelationship $group_content */
+    /** @var \Drupal\group\Entity\GroupContent $group_content */
     $group_content = reset($group_contents);
     $group = $group_content->getGroup();
     /** @var \Drupal\node\Entity\Node[] $webform */

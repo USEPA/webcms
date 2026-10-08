@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\group\Entity\GroupRelationship;
+use Drupal\group\Entity\GroupContent;
 use Drupal\group\GroupMembershipLoader;
 use Drupal\linkit\Plugin\Linkit\Matcher\NodeMatcher;
 use Drupal\linkit\SubstitutionManagerInterface;
@@ -165,7 +165,7 @@ class WebareaNodeMatcher extends NodeMatcher {
 
       $entity = $this->entityRepository->getTranslationFromContext($entity);
       // Get the group ids for groups the entity is a member of.
-      $entity_groups = GroupRelationship::loadByEntity($entity);
+      $entity_groups = GroupContent::loadByEntity($entity);
       $entity_group_ids = array_map(
         function ($group) {
           return $group->getGroup()->id();

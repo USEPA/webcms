@@ -4,7 +4,7 @@ namespace Drupal\epa_web_areas\Utility;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\group\Entity\Group;
-use Drupal\group\Entity\GroupRelationshipType;
+use Drupal\group\Entity\GroupContentType;
 
 /**
  * Class WebAreasHelper.
@@ -38,7 +38,7 @@ class WebAreasHelper {
     $plugin_id = 'group_node:' . $node->bundle();
 
     // Only act if there are group content types for this node type.
-    $group_content_types = GroupRelationshipType::loadByPluginId($plugin_id);
+    $group_content_types = GroupContentType::loadByContentPluginId($plugin_id);
     if (empty($group_content_types) || empty($node->id())) {
       return [];
     }
@@ -59,7 +59,7 @@ class WebAreasHelper {
     /** @var \Drupal\group\Entity\GroupInterface[] $groups */
     $groups = [];
     foreach ($group_contents as $group_content) {
-      /** @var \Drupal\group\Entity\GroupRelationshipInterface $group_content */
+      /** @var \Drupal\group\Entity\GroupContentInterface $group_content */
       $group = $group_content->getGroup();
       $groups[$group->id()] = $group;
     }
