@@ -46,22 +46,6 @@ const defaultDrushScript = dedent`
 
 const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "DELETE FROM key_value WHERE collection = 'system.schema' AND name IN ('ckeditor', 'ckeditor5_embedded_content', 'gmedia', 'jquery_ui_menu', 'variationcache')"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE config SET data = REPLACE(data, '\"gmedia\":9999,', '') WHERE name = 'core.extension'"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE config SET data = REPLACE(data, ',\"variationcache\":9999', '') WHERE name = 'core.extension'"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_bootstrap"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_config"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_data"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_default"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_discovery"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_dynamic_page_cache"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_entity"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_menu"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_page"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_render"
-  drush --debug --uri="$WEBCMS_SITE_URL" updb -y
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
 
 // Select drush script based on DRUSH_ORDER environment variable
