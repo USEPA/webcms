@@ -437,7 +437,7 @@ build:drupal:dev:
     - cp $auth_json $CI_PROJECT_DIR/services/drupal/auth.json
     # Enhanced caching and tag :development-latest for reuse in skip-build mode
     - /kaniko/executor
-      --no-cache
+      --cache=false
       --skip-unused-stages
       --snapshot-mode=redo
       --use-new-run
