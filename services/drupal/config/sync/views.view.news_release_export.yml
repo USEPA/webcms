@@ -16,7 +16,6 @@ dependencies:
     - node
     - rest
     - serialization
-    - text
     - user
     - views_data_export
 id: news_release_export
@@ -344,7 +343,7 @@ display:
           empty_zero: false
           hide_alter_empty: true
           click_sort_column: target_id
-          type: text_default
+          type: entity_reference_revisions_entity_view
           settings:
             view_mode: default
           group_column: ''
@@ -414,6 +413,7 @@ display:
         type: full
         options:
           offset: 0
+          pagination_heading_level: h4
           items_per_page: 50
           total_pages: null
           id: 0
@@ -431,7 +431,6 @@ display:
             offset: false
             offset_label: Offset
           quantity: 9
-          pagination_heading_level: h4
       exposed_form:
         type: basic
         options:
@@ -682,10 +681,10 @@ display:
       export_method: batch
       export_batch_size: 200
       export_limit: 0
+      export_filesystem: private
       custom_redirect_path: false
       redirect_to_display: page_1
       include_query_params: true
-      export_filesystem: private
     cache_metadata:
       max-age: -1
       contexts:

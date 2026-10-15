@@ -802,6 +802,7 @@ display:
         type: mini
         options:
           offset: 0
+          pagination_heading_level: h4
           items_per_page: 50
           total_pages: null
           id: 0
@@ -816,7 +817,6 @@ display:
             items_per_page_options_all_label: '- All -'
             offset: false
             offset_label: Offset
-          pagination_heading_level: h4
       exposed_form:
         type: basic
         options:
@@ -850,7 +850,7 @@ display:
       arguments:
         gid:
           id: gid
-          table: group_relationship_field_data
+          table: group_content_field_data
           field: gid
           relationship: group_content
           group_type: group
@@ -1439,7 +1439,7 @@ display:
           plugin_id: text
           empty: true
           content:
-            value: 'Add new content or use these filters to <a href="https://www.epa.gov/webcmstraining/finding-your-content">find content that you are looking for</a>. Type your User ID into the Author or the Last Updated By fields to find content you''ve worked on.'
+            value: 'Add new content or use these filters to <a href="https://www.epa.gov/webcmstraining/finding-your-content">find content that you are looking for</a>. Type your User ID into the Last updated by field to find content you''ve worked on.'
             format: ckeditor_5_test
           tokenize: false
       footer: {  }
@@ -2116,15 +2116,15 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
-        name:
-          id: name
-          table: users_field_data
-          field: name
-          relationship: uid_1
+        revision_uid:
+          id: revision_uid
+          table: node_revision
+          field: revision_uid
+          relationship: none
           group_type: group
-          admin_label: 'Revision User: Username'
-          entity_type: user
-          entity_field: name
+          admin_label: ''
+          entity_type: node
+          entity_field: revision_uid
           plugin_id: field
           label: 'Last updated by'
           exclude: false
@@ -2167,11 +2167,11 @@ display:
           hide_empty: false
           empty_zero: false
           hide_alter_empty: true
-          click_sort_column: value
-          type: user_name
+          click_sort_column: target_id
+          type: entity_reference_label
           settings:
-            link_to_entity: true
-          group_column: value
+            link: true
+          group_column: target_id
           group_columns: {  }
           group_rows: true
           delta_limit: 0
@@ -2235,7 +2235,7 @@ display:
       arguments:
         gid:
           id: gid
-          table: group_relationship_field_data
+          table: group_content_field_data
           field: gid
           relationship: group_content
           group_type: group
@@ -2405,11 +2405,11 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-        type_1:
-          id: type_1
-          table: node_field_revision
+        type:
+          id: type
+          table: node_field_data
           field: type
-          relationship: none
+          relationship: nid_1
           group_type: group
           admin_label: ''
           entity_type: node
@@ -2420,26 +2420,29 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: type_1_op
-            label: 'Content type'
+            operator_id: type_op
+            label: Type
             description: ''
             use_operator: false
-            operator: type_1_op
+            operator: type_op
             operator_limit_selection: false
             operator_list: {  }
-            identifier: type_1
+            identifier: type
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             reduce: false
           is_grouped: false
           group_info:
@@ -2548,10 +2551,12 @@ display:
             autocomplete_filter: 0
             autocomplete_min_chars: '0'
             autocomplete_items: '10'
+            autocomplete_field: ''
             autocomplete_raw_suggestion: 0
             autocomplete_raw_dropdown: 0
             autocomplete_dependent: 0
             autocomplete_contextual: 0
+            autocomplete_autosubmit: 0
           is_grouped: false
           group_info:
             label: ''
@@ -2567,7 +2572,7 @@ display:
           fields:
             mail: mail
             field_full_name: field_full_name
-            name: name
+            revision_uid: revision_uid
         moderation_state:
           id: moderation_state
           table: node_field_revision
@@ -2669,11 +2674,75 @@ display:
         groups:
           1: AND
       defaults:
-        relationships: true
+        relationships: false
         fields: false
         arguments: false
         filters: false
         filter_groups: false
+      relationships:
+        nid:
+          id: nid
+          table: node_field_revision
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: 'Get the actual content from a content revision.'
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+          required: false
+        group_content:
+          id: group_content
+          table: node_field_data
+          field: group_content
+          relationship: nid
+          group_type: group
+          admin_label: 'Content group content'
+          entity_type: node
+          plugin_id: group_content_to_entity_reverse
+          required: true
+          group_content_plugins:
+            'group_node:event': '0'
+            'group_node:faq': '0'
+            'group_node:news_release': '0'
+            'group_node:page': '0'
+            'group_node:public_notice': '0'
+            'group_node:regulation': '0'
+            'group_node:webform': '0'
+            'group_node:web_area': '0'
+        uid:
+          id: uid
+          table: node_field_revision
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: User
+          entity_type: node
+          entity_field: uid
+          plugin_id: standard
+          required: false
+        uid_1:
+          id: uid_1
+          table: node_field_revision
+          field: uid
+          relationship: none
+          group_type: group
+          admin_label: 'Revision User'
+          entity_type: node
+          entity_field: uid
+          plugin_id: standard
+          required: false
+        nid_1:
+          id: nid_1
+          table: node_field_revision
+          field: nid
+          relationship: none
+          group_type: group
+          admin_label: nid
+          entity_type: node
+          entity_field: nid
+          plugin_id: standard
+          required: false
       display_description: ''
       display_extenders:
         views_ajax_get:
@@ -3422,10 +3491,10 @@ display:
       redirect_path: '/group/[view:argument-1]'
       export_method: batch
       export_batch_size: 1000
+      export_filesystem: private
       custom_redirect_path: true
       redirect_to_display: none
       include_query_params: true
-      export_filesystem: private
     cache_metadata:
       max-age: -1
       contexts:

@@ -1,159 +1,93 @@
 <?php
 
-use Drupal\Core\Database\Database;
-use Drupal\Core\Utility\UpdateException;
+/**
+ * @file
+ * Install, update, and uninstall functions for the Custom News module.
+ */
+
+use Drupal\field\Entity\FieldStorageConfig;
 
 /**
- * Removes leftover custom 'type' column from paragraphs_item_revision.
+ * Converts field_release from date-only storage to date-and-time storage.
  */
-function epa_revision_update_10002() {
-  $connection = Database::getConnection();
-  $schema = $connection->schema();
+function epa_revision_update_10005(): string {
 
-  if (!$schema->tableExists('paragraphs_item_revision')) {
-    return 'Table paragraphs_item_revision does not exist. No changes made.';
+  // Load the actual FieldStorageConfig *entity*, not raw config. Saving
+  // through the entity API runs FieldStorageConfig::preSave()/postSave(),
+  // which re-checks the column schema and - critically - notifies the
+  // field_storage_definition.listener service, clearing the entity field
+  // definition cache. Editing configFactory()->getEditable() directly
+  // skips all of that.
+  $field_storage = FieldStorageConfig::loadByName('node', 'field_release');
+
+  if (!$field_storage) {
+    return 'field_release storage config was not found; nothing to update.';
   }
 
-  if (!$schema->fieldExists('paragraphs_item_revision', 'type')) {
-    return "Column 'type' does not exist on paragraphs_item_revision. No changes made.";
+  if ($field_storage->getType() !== 'datetime') {
+    // Bail loudly instead of silently doing nothing, in case this ever
+    // runs against a site where field_release isn't what we expect.
+    throw new \RuntimeException('field_release is not a "datetime" field; aborting.');
   }
+
+  if ($field_storage->getSetting('datetime_type') === 'datetime') {
+    // Already converted - makes this update safe to run more than once.
+    return 'field_release is already a date-and-time field; nothing to update.';
+  }
+
+  $database = \Drupal::database();
+  // Field storage tables hold rows for every content type that uses this
+  // field, not just News Release, so this naturally covers all of them.
+  $candidate_tables = ['node__field_release', 'node_revision__field_release'];
+  $updated_tables = [];
+  $rows_updated = 0;
+
+  // Wrap everything in a transaction so a failure partway through rolls
+  // back both the data changes and the config save together, rather than
+  // leaving the storage setting and the stored data out of sync.
+  $transaction = $database->startTransaction();
 
   try {
-    $indexes = $connection->query("
-      SELECT INDEX_NAME
-      FROM information_schema.statistics
-      WHERE table_schema = DATABASE()
-        AND table_name = :table
-        AND column_name = :column
-    ", [
-      ':table' => 'paragraphs_item_revision',
-      ':column' => 'type',
-    ])->fetchCol();
-
-    foreach ($indexes as $index_name) {
-      if ($index_name !== 'PRIMARY') {
-        $connection->query("ALTER TABLE {paragraphs_item_revision} DROP INDEX `$index_name`");
+    foreach ($candidate_tables as $table) {
+      if (!$database->schema()->tableExists($table)) {
+        continue;
       }
+
+      // Append a midnight time to every stored 'YYYY-MM-DD' value so it
+      // becomes a valid ISO 8601 'YYYY-MM-DDTHH:MM:SS' string. The
+      // conditions: skip NULLs, skip empty strings (an unconditional
+      // CONCAT would turn '' into the bogus string 'T00:00:00'), and
+      // skip rows that already contain a "T" so re-running this update
+      // is a safe no-op instead of double-appending the time.
+      $count = (int) $database->update($table)
+        ->expression('field_release_value', 'CONCAT(field_release_value, :suffix)', [
+          ':suffix' => 'T00:00:00',
+        ])
+        ->isNotNull('field_release_value')
+        ->condition('field_release_value', '', '<>')
+        ->condition('field_release_value', '%T%', 'NOT LIKE')
+        ->execute();
+
+      $rows_updated += $count;
+      $updated_tables[] = $table;
     }
+
+    // Only flip the storage setting after every stored row is already a
+    // valid datetime string, then save through the entity API (see the
+    // comment above) so caches are cleared correctly.
+    $field_storage->setSetting('datetime_type', 'datetime');
+    $field_storage->save();
   }
   catch (\Exception $e) {
-    // Continue and try to drop the column anyway.
+    // Roll back and re-throw so drush/update.php correctly reports this
+    // update as FAILED instead of silently moving on.
+    $transaction->rollBack();
+    throw $e;
   }
 
-  try {
-    $connection->query("ALTER TABLE {paragraphs_item_revision} DROP COLUMN `type`");
-  }
-  catch (\Exception $e) {
-    throw new UpdateException('Failed to drop paragraphs_item_revision.type: ' . $e->getMessage());
-  }
-
-  return "Removed leftover 'type' column from paragraphs_item_revision.";
+  return sprintf(
+    'Converted %d field_release row(s) across %s to date-and-time storage.',
+    $rows_updated,
+    implode(', ', $updated_tables) ?: 'no tables (none existed)'
+  );
 }
-
-/**
- * Removes leftover custom 'type' column from paragraphs_item_revision_field_data.
- */
-function epa_revision_update_10003() {
-    $connection = \Drupal::database();
-    $schema = $connection->schema();
-  
-    if (!$schema->tableExists('paragraphs_item_revision_field_data')) {
-      return 'Table paragraphs_item_revision_field_data does not exist. No changes made.';
-    }
-  
-    if (!$schema->fieldExists('paragraphs_item_revision_field_data', 'type')) {
-      return "Column 'type' does not exist on paragraphs_item_revision_field_data. No changes made.";
-    }
-  
-    try {
-      $indexes = $connection->query("
-        SELECT INDEX_NAME
-        FROM information_schema.statistics
-        WHERE table_schema = DATABASE()
-          AND table_name = :table
-          AND column_name = :column
-      ", [
-        ':table' => 'paragraphs_item_revision_field_data',
-        ':column' => 'type',
-      ])->fetchCol();
-  
-      foreach ($indexes as $index_name) {
-        if ($index_name !== 'PRIMARY') {
-          $connection->query("ALTER TABLE {paragraphs_item_revision_field_data} DROP INDEX `$index_name`");
-        }
-      }
-    }
-    catch (\Exception $e) {
-      // Continue and try to drop the column anyway.
-    }
-  
-    try {
-      $connection->query("ALTER TABLE {paragraphs_item_revision_field_data} DROP COLUMN `type`");
-    }
-    catch (\Exception $e) {
-      throw new \Drupal\Core\Utility\UpdateException('Failed to drop paragraphs_item_revision_field_data.type: ' . $e->getMessage());
-    }
-  
-    return "Removed leftover type column from paragraphs_item_revision_field_data.";
-  }
-
-  /**
- * Removes leftover custom type columns from revision tables.
- */
-function epa_revision_update_10004() {
-    $connection = \Drupal::database();
-    $schema = $connection->schema();
-  
-    $tables = [
-      'paragraphs_item_revision',
-      'paragraphs_item_revision_field_data',
-      'node_revision',
-      'node_field_revision',
-    ];
-  
-    $messages = [];
-  
-    foreach ($tables as $table) {
-      if (!$schema->tableExists($table)) {
-        $messages[] = "Table $table does not exist.";
-        continue;
-      }
-  
-      if (!$schema->fieldExists($table, 'type')) {
-        $messages[] = "Column type does not exist on $table.";
-        continue;
-      }
-  
-      try {
-        $indexes = $connection->query("
-          SELECT INDEX_NAME
-          FROM information_schema.statistics
-          WHERE table_schema = DATABASE()
-            AND table_name = :table
-            AND column_name = :column
-        ", [
-          ':table' => $table,
-          ':column' => 'type',
-        ])->fetchCol();
-  
-        foreach ($indexes as $index_name) {
-          if ($index_name !== 'PRIMARY') {
-            $connection->query("ALTER TABLE {" . $table . "} DROP INDEX `$index_name`");
-          }
-        }
-      }
-      catch (\Exception $e) {
-        // Continue and try dropping the column.
-      }
-  
-      try {
-        $connection->query("ALTER TABLE {" . $table . "} DROP COLUMN `type`");
-        $messages[] = "Removed type column from $table.";
-      }
-      catch (\Exception $e) {
-        throw new \Drupal\Core\Utility\UpdateException('Failed to drop ' . $table . '.type: ' . $e->getMessage());
-      }
-    }
-  
-    return implode(' ', $messages);
-  }

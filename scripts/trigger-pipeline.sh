@@ -1,11 +1,16 @@
 #!/bin/bash
-# Script to manually trigger GitLab pipeline for WebCMS development deployments
+# Script to manually trigger GitLab pipeline for WebCMS deployments
 #
 # Usage after pushing to GitHub:
 # 1. Go to GitLab: https://gitlab.epa.gov/drupalcloud/drupalclouddeployment/-/settings/repository
 # 2. Find "Mirroring repositories" section
 # 3. Click "Update now" button next to the GitHub mirror
-# 4. Run this script: ./scripts/trigger-pipeline.sh
+# 4. Run this script: ./scripts/trigger-pipeline.sh [branch]
+#
+# Examples:
+#   ./scripts/trigger-pipeline.sh                    # Current branch
+#   ./scripts/trigger-pipeline.sh development        # Development branch
+#   ./scripts/trigger-pipeline.sh WEBCMS-81-group    # Feature branch
 #
 # One-time Setup:
 # 1. Create a Personal Access Token in GitLab:
@@ -18,16 +23,16 @@
 # 2. Set your token as an environment variable (add to ~/.bashrc for persistence):
 #    export GITLAB_TOKEN="your-token-here"
 
-# Default to development branch (hardcoded for safety)
-BRANCH="${1:-development}"
-GITLAB_TOKEN="${2:-$GITLAB_TOKEN}"
-
-# Only allow development branch
-if [ "$BRANCH" != "development" ]; then
-  echo "❌ Error: This script only triggers pipelines for the development branch"
-  echo "Current branch: $BRANCH"
-  exit 1
+# Get branch from argument or use current branch
+if [ -n "$1" ]; then
+  BRANCH="$1"
+else
+  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "development")
+  echo "⚠️  No branch specified, using: $BRANCH"
+  echo ""
 fi
+
+GITLAB_TOKEN="${2:-$GITLAB_TOKEN}"
 
 # EPA GitLab Configuration
 GITLAB_URL="https://gitlab.epa.gov"
@@ -37,7 +42,7 @@ if [ -z "$GITLAB_TOKEN" ]; then
   echo "❌ Error: GitLab token not provided"
   echo ""
   echo "Usage: $0 [branch] [gitlab-token]"
-  echo "       branch defaults to 'development' (only development is allowed)"
+  echo "       branch defaults to current git branch"
   echo ""
   echo "Setup Instructions:"
   echo "1. Create a Personal Access Token:"
@@ -51,14 +56,14 @@ if [ -z "$GITLAB_TOKEN" ]; then
   echo "   Click 'Update now' next to the GitHub mirror"
   echo ""
   echo "4. Run this script:"
-  echo "   ./scripts/trigger-pipeline.sh"
+  echo "   ./scripts/trigger-pipeline.sh [branch]"
   exit 1
 fi
 
-echo "🚀 Triggering GitLab Pipeline for Development"
-echo "============================================="
+echo "🚀 Triggering GitLab Pipeline"
+echo "============================="
 echo "Project: $PROJECT_PATH"
-echo "Branch: $BRANCH (development only)"
+echo "Branch: $BRANCH"
 echo "GitLab: $GITLAB_URL"
 echo ""
 
@@ -180,11 +185,28 @@ echo "🔨 Triggering pipeline..."
 
 # Build pipeline variables JSON body
 VARIABLES_JSON=""
+VAR_ARRAY=""
+
 if [ "$SKIP_BUILD" == "true" ]; then
-  VARIABLES_JSON='{"variables": [{"key": "SKIP_BUILD", "value": "true"}]}'
+  VAR_ARRAY='[{"key": "SKIP_BUILD", "value": "true"}'
   echo "   Mode: DEPLOY-ONLY (SKIP_BUILD=true)"
 else
+  VAR_ARRAY='['
   echo "   Mode: FULL BUILD + DEPLOY"
+fi
+
+# Add DRUSH_ORDER variable if set
+if [ -n "$DRUSH_ORDER" ]; then
+  if [ "$VAR_ARRAY" != '[' ]; then
+    VAR_ARRAY="${VAR_ARRAY}, "
+  fi
+  VAR_ARRAY="${VAR_ARRAY}{\"key\": \"DRUSH_ORDER\", \"value\": \"${DRUSH_ORDER}\"}"
+  echo "   Drush Order: ${DRUSH_ORDER}"
+fi
+
+# Close the variables array and build final JSON
+if [ "$VAR_ARRAY" != '[' ]; then
+  VARIABLES_JSON="{\"variables\": ${VAR_ARRAY}]}"
 fi
 echo ""
 

@@ -32,13 +32,35 @@ const vars = require("./vars");
  *         PHP-serialized integers Drupal's State API stores for maintenance mode.
  *         Cache rebuild is handled by `drush deploy` (its final step is
  *         `cache:rebuild`), so a separate leading `cr` is redundant and risky.
+ *
+ * CUSTOM DRUSH ORDER SUPPORT:
+ *   Set DRUSH_ORDER="updb-first" to run database updates before config import.
+ *   This runs `drush updb` before `drush cim` instead of using `drush deploy`.
  */
 
-const drushScript = dedent`
+const defaultDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
   drush --debug --uri="$WEBCMS_SITE_URL" deploy -y
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
+
+const updbFirstDrushScript = dedent`
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "INSERT INTO key_value (collection, name, value) VALUES ('system.schema', 'flexible_permissions', 's:5:\"10300\";') ON DUPLICATE KEY UPDATE value = 's:5:\"10300\";'"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "UPDATE config SET data = CONCAT(SUBSTRING_INDEX(data, '\"module\":{', 1), '\"module\":{\"flexible_permissions\":0,', SUBSTRING_INDEX(data, '\"module\":{', -1)) WHERE name = 'core.extension' AND data NOT LIKE '%flexible_permissions%'"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_bootstrap"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_config"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
+`;
+
+// Select drush script based on DRUSH_ORDER environment variable
+const drushOrder = process.env.DRUSH_ORDER || "default";
+const drushScript = drushOrder === "updb-first" ? updbFirstDrushScript : defaultDrushScript;
+
+if (drushOrder === "updb-first") {
+  ui.log("⚠️  Using custom drush order: UPDB BEFORE CONFIG IMPORT");
+  ui.log();
+}
 
 /**
  * The main function for Drush updates. This function coordinates the three steps needed
@@ -133,7 +155,7 @@ async function main() {
   //         Drush task never reaches STOPPED, tying up a runner and hiding failures.
   //   WHAT/HOW: Cap the loop at `maxIterations` (360 × 5s = 30 min) and throw a
   //         clear timeout error if exceeded, so the job fails fast and visibly.
-  const maxIterations = 360; // 30 minutes at 5-second intervals
+  const maxIterations = 1440; // 2 hours at 5-second intervals (increased for Group 2.x migration)
   let iterationCount = 0;
 
   while (iterationCount < maxIterations) {
