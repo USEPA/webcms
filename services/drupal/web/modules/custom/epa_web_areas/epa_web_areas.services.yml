@@ -11,11 +11,9 @@ services:
     arguments: ['@module_handler']
     tags:
       - { name: event_subscriber }
-  # Temporarily disabled due to Docker cache issues - will re-enable after cache clears
-  # group_permission.checker.epa_web_areas:
-  #   public: false
-  #   class: 'Drupal\epa_web_areas\Access\GroupPermissionChecker'
-  #   decorates: group_permission.checker.outsider_in
-  #   arguments:
-  #     - '@group_permission.checker.epa_web_areas.inner'
-  #     - '@flexible_permissions.chain_calculator'
+  group_permission.checker.epa_web_areas:
+    public: false
+    class: 'Drupal\epa_web_areas\Access\GroupPermissionChecker'
+    decorates: group_permission.checker.outsider_in
+    arguments:
+      - '@group_permission.checker.epa_web_areas.inner'
