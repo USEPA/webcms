@@ -44,20 +44,20 @@ const defaultDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
 
-const updbFirstDrushScript = dedent`
+/*const updbFirstDrushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_bootstrap"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_config"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
-`;
+`;*/
 
 // Select drush script based on DRUSH_ORDER environment variable
-const drushOrder = process.env.DRUSH_ORDER || "default";
+/*const drushOrder = process.env.DRUSH_ORDER || "default";
 const drushScript = drushOrder === "updb-first" ? updbFirstDrushScript : defaultDrushScript;
 
 if (drushOrder === "updb-first") {
   ui.log("⚠️  Using custom drush order: UPDB BEFORE CONFIG IMPORT");
   ui.log();
-}
+}*/
 
 /**
  * The main function for Drush updates. This function coordinates the three steps needed
