@@ -45,8 +45,6 @@ const defaultDrushScript = dedent`
 `;
 
 const updbFirstDrushScript = dedent`
-  drush --debug --uri="$WEBCMS_SITE_URL" pm:enable devel_php -y
-  drush --debug --uri="$WEBCMS_SITE_URL" pm:enable devel -y
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_bootstrap"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_config"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
