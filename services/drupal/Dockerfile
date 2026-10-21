@@ -41,8 +41,11 @@ RUN set -ex \
     # TEMPORARY: Restore to 512M after PHP update
     # echo 'memory_limit=512M'; \
     echo 'memory_limit=-1'; \
-    echo 'upload_max_filesize=1G'; \
-    echo 'post_max_size=1G'; \
+    # TEMPORARY: Restore to 1G after PHP update
+    # echo 'upload_max_filesize=1G'; \
+    # echo 'post_max_size=1G'; \
+    echo 'upload_max_filesize=32M'; \
+    echo 'post_max_size=32M'; \
     # TEMPORARY: Emergency mitigation - remove after PHP update
     echo 'session.upload_progress.enabled=0'; \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
