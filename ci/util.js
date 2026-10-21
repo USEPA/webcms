@@ -159,10 +159,16 @@ async function getLogsUrl(task) {
   // matches up with the container name, but it's uncertain as to why there's a second.
   const logStream = `drush/drush/${id}`;
 
-  // Read the log group name from Parameter Store
-  const logGroup = await ssm.getParameter(
-    `${vars.site}/${vars.lang}/log-groups/drush`
+  // Read the log group name from Parameter Store.
+  const logGroupParameter = `${vars.site}/${vars.lang}/log-groups/drush`;
+
+  // TODO: Remove after correcting the production SSM parameter path.
+  // Parameter names are safe to log; do not log the parameter value.
+  console.log(
+    `Looking up Drush CloudWatch log-group parameter: /webcms/${vars.environment}/${logGroupParameter}`
   );
+
+  const logGroup = await ssm.getParameter(logGroupParameter);
 
   // Use the posix helper from the path module to simplify the process of constructing
   // the AJAX path to the log group.

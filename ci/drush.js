@@ -115,9 +115,15 @@ async function main() {
   ui.logHeading("ecs", "Running Drush");
 
   const task = await ecs.startDrushTask(drushScript);
-  const taskUrl = await util.getTaskUrl(task);
 
-  ui.log(ui.link(taskUrl, `Task ${task.split("/").pop()}`));
+  // Task URLs are helpful diagnostics, but the task has already started and
+  // their SSM lookup must not fail an otherwise valid deployment.
+  try {
+    const taskUrl = await util.getTaskUrl(task);
+    ui.log(ui.link(taskUrl, `Task ${task.split("/").pop()}`));
+  } catch (error) {
+    ui.log(`WARNING: Could not create ECS task link: ${error.message}`);
+  }
   ui.log();
 
   /**
@@ -206,8 +212,17 @@ async function main() {
   //         stored in SSM Parameter Store.
   ui.log();
 
-  const logsUrl =  await util.getLogsUrl(task);
-  ui.log(ui.link(logsUrl, `Task logs`));
+  // A CloudWatch link is optional observability. Do not report a successful
+  // Drush task as failed if its log-group SSM parameter is unavailable or
+  // malformed.
+  // TODO: Remove this fallback after correcting the production SSM log-group
+  // parameter path.
+  try {
+    const logsUrl = await util.getLogsUrl(task);
+    ui.log(ui.link(logsUrl, `Task logs`));
+  } catch (error) {
+    ui.log(`WARNING: Could not create CloudWatch task logs link: ${error.message}`);
+  }
 
   if (!info.success) {
     throw new Error("Drush task did not exit cleanly");
