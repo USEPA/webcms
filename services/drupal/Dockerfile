@@ -38,9 +38,13 @@ RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
   && { \
-    echo 'memory_limit=512M'; \
+    # TEMPORARY: Restore to 512M after PHP update
+    # echo 'memory_limit=512M'; \
+    echo 'memory_limit=-1'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
+    # TEMPORARY: Emergency mitigation - remove after PHP update
+    echo 'session.upload_progress.enabled=0'; \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
   } | tee /usr/local/etc/php/php-fpm-fcgi.ini \
   # Enable special PHP-FPM status pages:
