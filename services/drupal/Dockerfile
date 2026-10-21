@@ -24,7 +24,12 @@ RUN set -ex \
 WORKDIR /var/www/html
 
 # PHP packages needed by this image
-RUN install-php-extensions apcu sockets igbinary memcached \
+# TEMPORARY (2026-10-21): PECL extensions pinned to exact stable releases
+# because pecl.php.net was intermittently returning 500s and resolving
+# igbinary to a broken 3.2.17RC1 artifact during the PHP 8.3.36 security
+# rebuild. Revert to the unpinned line below once PECL is stable again.
+# RUN install-php-extensions apcu sockets igbinary memcached \
+RUN install-php-extensions apcu-5.1.28 sockets igbinary-3.2.16 memcached-3.3.0 \
   # APK packages needed by this image
   && apk add --no-cache \
   # Needed by the memcached extension
@@ -233,13 +238,19 @@ RUN set -ex \
 
 # Install PECL-dependent extensions in a separate layer to isolate pecl.php.net failures.
 # igbinary must precede memcached (memcached is compiled with igbinary serializer support).
-RUN install-php-extensions igbinary memcached
+# TEMPORARY (2026-10-21): versions pinned due to pecl.php.net instability.
+# Revert to the unpinned line below once PECL is stable again.
+# RUN install-php-extensions igbinary memcached
+RUN install-php-extensions igbinary-3.2.16 memcached-3.3.0
 
 ENV PATH=${PATH}:/var/www/html/vendor/bin
 WORKDIR /var/www/html
 
 # APK packages needed by this image
-RUN install-php-extensions apcu sockets \
+# TEMPORARY (2026-10-21): apcu version pinned due to pecl.php.net instability.
+# Revert to the unpinned line below once PECL is stable again.
+# RUN install-php-extensions apcu sockets \
+RUN install-php-extensions apcu-5.1.28 sockets \
   && apk add --no-cache \
   # Needed by the memcached extension
   libmemcached  \
