@@ -1,0 +1,6 @@
+# TEMPORARY: Emergency mitigation for PHP vulnerability
+# Remove this file after PHP update
+map $http_content_type $block_multipart {
+    default       0;
+    "~*multipart" 1;
+}
