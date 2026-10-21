@@ -13,14 +13,14 @@ use Drupal\group\Entity\GroupInterface;
 class GroupPermissionChecker implements GroupPermissionCheckerInterface {
 
   protected $innerService;
-  protected $groupPermissionCalculator;
+  //protected $groupPermissionCalculator;
 
   /**
    *
    */
-  public function __construct(GroupPermissionCheckerInterface $inner_service, ChainGroupPermissionCalculatorInterface $permission_calculator) {
+  public function __construct(GroupPermissionCheckerInterface $inner_service) {
     $this->innerService = $inner_service;
-    $this->groupPermissionCalculator = $permission_calculator;
+    //$this->groupPermissionCalculator = $permission_calculator;
   }
 
   /**
