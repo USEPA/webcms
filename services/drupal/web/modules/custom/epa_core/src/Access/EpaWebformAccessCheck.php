@@ -9,7 +9,7 @@ use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupRelationship;
-use Drupal\group\GroupMembershipLoader;
+use Drupal\group\Entity\GroupMembership;
 use Drupal\node\Entity\Node;
 
 /**
@@ -23,13 +23,6 @@ use Drupal\node\Entity\Node;
 class EpaWebformAccessCheck implements AccessInterface {
 
   /**
-   * The group membership loader service.
-   *
-   * @var \Drupal\group\GroupMembershipLoader
-   */
-  protected $groupMembershipLoader;
-
-  /**
    * The entity type manager service.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
@@ -39,10 +32,9 @@ class EpaWebformAccessCheck implements AccessInterface {
   /**
    * EpaWebformAccessCheck constructor.
    *
-   * @param \Drupal\group\GroupMembershipLoader $group_membership_loader
+   * @param \Drupal\group\GroupMembership $group_membership_loader
    */
-  public function __construct(GroupMembershipLoader $group_membership_loader, EntityTypeManagerInterface $entity_type_manager) {
-    $this->groupMembershipLoader = $group_membership_loader;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -53,7 +45,7 @@ class EpaWebformAccessCheck implements AccessInterface {
     }
 
     // User must belong to a group if they don't have the above roles
-    $group_memberships = $this->groupMembershipLoader->loadByUser($account);
+    $group_memberships = GroupMembership::loadByUser($account);
 
     if (empty($group_memberships)) {
       return AccessResultForbidden::forbidden('A user must belong to a group to view submissions.');

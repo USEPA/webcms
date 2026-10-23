@@ -8,6 +8,7 @@
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\filter\Render\FilteredMarkup;
+use Drupal\Core\StringTranslation\ByteSizeMarkup;
 
 /**
  * Implements hook_preprocess_filter_caption().
@@ -73,7 +74,7 @@ function epa_theme_preprocess_media(&$vars) {
   $vars['has_caption'] = isset($vars['attributes']['data-caption']);
   /** @var \Drupal\media\Entity\Media $media */
   $media = $vars['media'];
-  $vars['filesize'] = format_size($media->getSource()->getMetadata($media, 'filesize'), NULL, 1);
+  $vars['filesize'] = ByteSizeMarkup::create($media->getSource()->getMetadata($media, 'filesize'), NULL);
   if ($media->hasField('field_limit_file_accessibility')) {
     $vars['media_accessibility'] = $media->field_limit_file_accessibility->value ? 'private' : 'public';
   }
