@@ -27,7 +27,7 @@ class EPAGroup extends Group {
           && $this->label() != $this->original->label())
           || !$this->matchesOriginal('field_machine_name')
       ) {
-        $entities = $this->getContentEntities();
+        $entities = $this->getRelatedEntities();
         \Drupal::service('epa_web_areas.alias_batch')->startAliasBatch($entities);
       }
     }
@@ -57,7 +57,7 @@ class EPAGroup extends Group {
       $node->save();
 
       // Add node to group via entity reference and as group content.
-      $this->addContent($node, 'group_node:web_area');
+      $this->addRelationship($node, 'group_node:web_area');
       $this->field_homepage->target_id = $node->id();
       $this->save();
 

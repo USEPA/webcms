@@ -299,7 +299,10 @@ abstract class EPAModeration implements EPAModerationInterface {
     $content_entity_type = $this->moderationEntity->content_entity_type_id->value;
     $content_entity_revision_id = $this->moderationEntity->content_entity_revision_id->value;
 
-    $content_entity_revision = $this->entityTypeManager->getStorage($content_entity_type)->loadRevision($content_entity_revision_id);
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage($content_entity_type);
+
+    $content_entity_revision = $storage->loadRevision($content_entity_revision_id);
 
     $this->contentEntityRevision = $content_entity_revision;
   }

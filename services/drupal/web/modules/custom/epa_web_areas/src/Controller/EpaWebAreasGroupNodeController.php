@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\group\Entity\Controller\GroupRelationshipController;
 use Drupal\group\Entity\GroupInterface;
-use Drupal\group\Plugin\GroupRelationTypeManagerInterface;
+use Drupal\group\Plugin\Group\Relation\GroupRelationTypeManagerInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -38,7 +38,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
    *   The renderer.
    */
   public function __construct(GroupRelationTypeManagerInterface $plugin_manager, PrivateTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer) {
-    parent::__construct($temp_store_factory, $entity_type_manager, $entity_form_builder, $renderer);
+    parent::__construct($plugin_manager, $temp_store_factory, $entity_type_manager, $entity_form_builder, $renderer);
     $this->pluginManager = $plugin_manager;
   }
 
@@ -58,7 +58,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
   /**
    * {@inheritdoc}
    */
-  public function addPage(GroupInterface $group, $create_mode = FALSE) {
+  public function addPage(GroupInterface $group, $create_mode = FALSE, $base_plugin_id = null) {
     $build = parent::addPage($group, $create_mode);
     // Custom css library for styling as we want it to look.
     $build['#attached']['library'][] = 'epa_web_areas/group_node.add';
@@ -95,7 +95,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
   /**
    * {@inheritdoc}
    */
-  protected function addPageBundles(GroupInterface $group, $create_mode) {
+  protected function addPageBundles(GroupInterface $group, $create_mode, $base_plugin_id = null) {
     $bundles = [];
 
     // Retrieve all group_node plugins for the group's type.

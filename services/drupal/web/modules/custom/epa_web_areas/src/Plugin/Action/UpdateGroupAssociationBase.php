@@ -14,7 +14,7 @@ use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupRelationship;
-use Drupal\group\GroupMembershipLoaderInterface;
+use Drupal\group\Entity\GroupMembership;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Plugin\search_api\datasource\ContentEntityTrackingManager;
 use Drupal\search_api\Utility\TrackingHelper;
@@ -106,10 +106,9 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
    * @param $plugin_definition
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountProxyInterface $current_user, GroupMembershipLoaderInterface $group_membership_loader, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, ContentEntityTrackingManager $tracking_manager, TrackingHelper $tracking_helper) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, AccountProxyInterface $current_user, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, ContentEntityTrackingManager $tracking_manager, TrackingHelper $tracking_helper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->currentUser = $current_user;
-    $this->groupMembershipLoader = $group_membership_loader;
     $this->configFactory = $config_factory;
     $this->messenger = $messenger;
     $this->trackingManager = $tracking_manager;
@@ -158,7 +157,7 @@ abstract class UpdateGroupAssociationBase extends ViewsBulkOperationsActionBase 
     }
     else {
       // Get all groups the current user belongs to
-      $memberships = $this->groupMembershipLoader->loadByUser();
+      $memberships = GroupMembership::loadByUser();
       foreach ($memberships as $group) {
         $options[$group->getGroup()->id()] = "{$group->getGroup()->label()} ({$group->getGroup()->id()})";
       }

@@ -121,8 +121,9 @@ class EPAScheduledPublishCron extends ScheduledPublishCron {
             $entities = $query->execute();
             foreach ($entities as $entityRevision => $entityId) {
               try {
-                $entity = $this->entityTypeManager->getStorage($entityType)
-                  ->loadRevision($entityRevision);
+		/** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */      
+		$storage = $this->entityTypeManager->getStorage($entityType);
+                $entity = $storage->loadRevision($entityRevision);
                 $this->updateEntityField($entity, $scheduledField);
               }
               catch (\Exception $e) {

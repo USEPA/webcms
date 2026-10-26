@@ -3,7 +3,7 @@
 namespace Drupal\epa_web_areas\Plugin\views\filter;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\group\GroupMembershipLoaderInterface;
+use Drupal\group\Entity\GroupMembership;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\InOperator;
 use Drupal\views\ViewExecutable;
@@ -20,12 +20,6 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
 
   protected $valueFormType = 'select';
 
-  /**
-   * Group membership loader service.
-   *
-   * @var \Drupal\group\GroupMembershipLoaderInterface
-   */
-  protected $groupMembershipLoader;
 
   /**
    * UsersGroupsFilter constructor.
@@ -34,9 +28,8 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
    * @param $plugin_id
    * @param $plugin_definition
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, GroupMembershipLoaderInterface $group_membership_loader) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    $this->groupMembershipLoader = $group_membership_loader;
   }
 
   /**
@@ -89,7 +82,7 @@ class UsersGroupsFilter extends InOperator implements ContainerFactoryPluginInte
    */
   private function getAllGroupsByUser(): array {
     $groups = [];
-    $memberships = $this->groupMembershipLoader->loadByUser();
+    $memberships = GroupMembership::loadByUser();
     foreach ($memberships as $group) {
       $groups[] = $group->getGroup()->id();
     }

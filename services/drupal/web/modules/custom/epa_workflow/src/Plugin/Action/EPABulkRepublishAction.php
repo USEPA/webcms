@@ -198,6 +198,7 @@ class EPABulkRepublishAction extends ViewsBulkOperationsActionBase implements Co
    *   The latest revision of content entity.
    */
   protected function loadLatestRevision(ContentEntityInterface $entity) {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $entity_storage */
     $entity_storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $original_entity =
       ($revision_id = $entity_storage->getLatestTranslationAffectedRevisionId($entity->id(), $entity->language()->getId())) ?
