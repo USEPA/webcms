@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/php:8.3.35-fpm-alpine3.24 AS base
+FROM public.ecr.aws/docker/library/php:8.3.36-fpm-alpine3.24 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -96,7 +96,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM public.ecr.aws/docker/library/composer:2 AS deps
+FROM composer:2 AS deps
 
 # Cache-busting arg - set to current timestamp to force rebuild of composer layers
 ARG CACHE_BUST=1
@@ -212,7 +212,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # that are inappropriate for a server container image.
 # IMPORTANT: keep this PHP version in sync with the base FPM image above so that Drush
 # and the web container run identical language semantics against the same Drupal codebase.
-FROM public.ecr.aws/docker/library/php:8.3.35-cli-alpine3.24 AS drush
+FROM public.ecr.aws/docker/library/php:8.3.36-cli-alpine3.24 AS drush
 
 # Bump system packages
 RUN apk upgrade
