@@ -96,7 +96,7 @@ RUN set -ex \
   } | tee /usr/local/etc/php-fpm.d/zz-log.conf
 
 # Install Composer dependencies
-FROM public.ecr.aws/docker/library/composer:2 AS deps
+FROM composer:2 AS deps
 
 # Cache-busting arg - set to current timestamp to force rebuild of composer layers
 ARG CACHE_BUST=1
