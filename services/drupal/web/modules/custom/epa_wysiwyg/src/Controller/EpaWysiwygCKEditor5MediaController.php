@@ -7,7 +7,6 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\MediaInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use function GuzzleHttp\json_decode;
 
 class EpaWysiwygCKEditor5MediaController extends CKEditor5MediaController {
   public function mediaEntityMetadata(Request $request) {
