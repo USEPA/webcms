@@ -9,7 +9,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\group\Entity\GroupRelationship;
-use Drupal\group\GroupMembershipLoader;
+use Drupal\group\Entity\GroupMembership;
 use Drupal\linkit\Plugin\Linkit\Matcher\NodeMatcher;
 use Drupal\linkit\SubstitutionManagerInterface;
 use Drupal\linkit\Suggestion\SuggestionCollection;
@@ -83,17 +83,11 @@ class WebareaNodeMatcher extends NodeMatcher {
    */
   protected $substitutionManager;
 
-  /**
-   * The group membership loader.
-   *
-   * @var \Drupal\group\GroupMembershipLoader
-   */
-  protected $groupMembershipLoader;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityRepositoryInterface $entity_repository, ModuleHandlerInterface $module_handler, AccountInterface $current_user, SubstitutionManagerInterface $substitution_manager, GroupMembershipLoader $group_membership_loader) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityRepositoryInterface $entity_repository, ModuleHandlerInterface $module_handler, AccountInterface $current_user, SubstitutionManagerInterface $substitution_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $database, $entity_type_manager, $entity_type_bundle_info, $entity_repository, $module_handler, $current_user, $substitution_manager);
 
     if (empty($plugin_definition['target_entity'])) {
@@ -107,7 +101,6 @@ class WebareaNodeMatcher extends NodeMatcher {
     $this->currentUser = $current_user;
     $this->targetType = $plugin_definition['target_entity'];
     $this->substitutionManager = $substitution_manager;
-    $this->groupMembershipLoader = $group_membership_loader;
   }
 
   /**
@@ -145,7 +138,7 @@ class WebareaNodeMatcher extends NodeMatcher {
     }
 
     // Get the group ids for groups the current user is a member of.
-    $user_groups = $this->groupMembershipLoader->loadByUser();
+    $user_groups = GroupMembership::loadByUser();
     $user_group_ids = array_map(
       function ($group) {
         return $group->getGroup()->id();
