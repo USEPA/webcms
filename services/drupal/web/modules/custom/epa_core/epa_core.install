@@ -10,21 +10,21 @@
  */
 function epa_core_update_9200() {
   // Delete orphaned group_content records with NULL entity_id.
-  $database = \Drupal::database();
+  /*$database = \Drupal::database();
   $num_deleted = $database->delete('group_content')
     ->isNull('entity_id')
     ->execute();
   
-  \Drupal::messenger()->addStatus("Deleted {$num_deleted} orphaned group_content records with NULL entity_id.");
+  \Drupal::messenger()->addStatus("Deleted {$num_deleted} orphaned group_content records with NULL entity_id.");*/
   
   // Clean up missing module schema entries.
-  $missing_modules = ['ckeditor', 'ckeditor5_embedded_content', 'gmedia', 'jquery_ui_menu', 'variationcache'];
+  /*$missing_modules = ['ckeditor', 'ckeditor5_embedded_content', 'gmedia', 'jquery_ui_menu', 'variationcache'];
   \Drupal::keyValue('system.schema')->deleteMultiple($missing_modules);
   
-  \Drupal::messenger()->addStatus('Cleaned up schema entries for missing modules: ' . implode(', ', $missing_modules));
+  \Drupal::messenger()->addStatus('Cleaned up schema entries for missing modules: ' . implode(', ', $missing_modules));*/
   
   // Remove missing modules from core.extension config.
-  $config = \Drupal::configFactory()->getEditable('core.extension');
+ /* $config = \Drupal::configFactory()->getEditable('core.extension');
   $modules = $config->get('module');
   
   foreach (['gmedia', 'variationcache'] as $module) {
@@ -36,5 +36,6 @@ function epa_core_update_9200() {
   $config->set('module', $modules)->save();
   \Drupal::messenger()->addStatus('Removed gmedia and variationcache from core.extension config.');
   
-  return 'Cleaned up orphaned data to prepare for Group 2.x migration.';
+  return 'Cleaned up orphaned data to prepare for Group 2.x migration.';*/
+  return '';	
 }
