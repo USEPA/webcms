@@ -29,6 +29,7 @@ class EpaMediaFileLinkFormatter extends FileFormatterBase {
     $media = $items->getEntity();
 
     foreach ($this->getEntitiesToView($items, $langcode) as $delta => $file) {
+      $item = $items[$delta];
       $extension = pathinfo($file->getFileUri(), PATHINFO_EXTENSION);
 
       $content = [
