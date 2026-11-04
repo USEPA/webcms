@@ -282,12 +282,14 @@ display:
         - user.permissions
       tags:
         - 'config:search_api.index.frequent_questions'
+        - 'search_api_list:frequent_questions'
   feed_1:
     id: feed_1
     display_title: Feed
     display_plugin: feed
     position: 2
     display_options:
+      enabled: false
       fields:
         field_question:
           id: field_question
@@ -688,11 +690,12 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -703,6 +706,7 @@ display:
         - 'config:field.storage.node.field_last_published'
         - 'config:field.storage.node.field_question'
         - 'config:search_api.index.frequent_questions'
+        - 'search_api_list:frequent_questions'
   page_1:
     id: page_1
     display_title: Page
@@ -729,7 +733,7 @@ display:
           ajax_get: false
       path: faqs/search
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_interface'
         - url
@@ -740,3 +744,4 @@ display:
         - 'config:facets.facet.faqs_topic'
         - 'config:facets.facet.faqs_webarea'
         - 'config:search_api.index.frequent_questions'
+        - 'search_api_list:frequent_questions'
