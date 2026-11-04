@@ -267,7 +267,7 @@ display:
             operator_id: title_op
             label: Title
             description: ''
-            use_operator: true
+            use_operator: false
             operator: title_op
             operator_limit_selection: true
             operator_list:
@@ -281,12 +281,15 @@ display:
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
+              paragraphs_library_contributor: '0'
               layout_editor: '0'
               alerts_manager: '0'
               block_manager: '0'
               system_editor: '0'
               system_webmaster: '0'
+              menu_admin: '0'
               administrator: '0'
+              beta_tester: '0'
             placeholder: ''
             autocomplete_filter: 0
             autocomplete_min_chars: '0'
@@ -295,6 +298,8 @@ display:
             autocomplete_raw_suggestion: 1
             autocomplete_raw_dropdown: 1
             autocomplete_dependent: 0
+            autocomplete_contextual: 0
+            autocomplete_autosubmit: 0
           is_grouped: false
           group_info:
             label: ''
@@ -356,8 +361,8 @@ display:
             default_group_multiple: {  }
             group_items: {  }
           reduce_duplicates: false
-          handler: 'default:group'
           widget: autocomplete
+          handler: 'default:group'
           handler_settings:
             target_bundles:
               web_area: web_area
@@ -931,7 +936,6 @@ display:
         - url
         - 'url.query_args:sort_by'
         - 'url.query_args:sort_order'
-        - user
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
@@ -967,7 +971,6 @@ display:
         - url
         - 'url.query_args:sort_by'
         - 'url.query_args:sort_order'
-        - user
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }

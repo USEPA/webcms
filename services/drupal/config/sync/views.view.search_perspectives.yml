@@ -1,6 +1,6 @@
 uuid: b654afd5-e2a1-4089-8e54-369927f56efb
 langcode: en
-status: true
+status: false
 dependencies:
   config:
     - field.storage.node.field_description
@@ -680,6 +680,7 @@ display:
     display_plugin: feed
     position: 1
     display_options:
+      enabled: false
       style:
         type: epa_faceted_rss
         options:
@@ -706,11 +707,12 @@ display:
         page_1: page_1
         default: '0'
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags:
@@ -801,7 +803,7 @@ display:
           ajax_get: false
       path: perspectives/search
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
