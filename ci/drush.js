@@ -43,6 +43,21 @@ const drushScript = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
 
+// Custom deployment script: database updates BEFORE config import
+const drushScriptUpdbFirst = dedent`
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cachetags"
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
+  drush --debug --uri="$WEBCMS_SITE_URL" updb -y
+  drush --debug --uri="$WEBCMS_SITE_URL" cim -y
+  drush --debug --uri="$WEBCMS_SITE_URL" cr
+  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
+`;
+
+// Select the appropriate script based on DRUSH_ORDER environment variable
+const drushOrder = process.env.DRUSH_ORDER;
+const drushScript = drushOrder === 'updb-first' ? drushScriptUpdbFirst : drushScriptDefault;
+
 
 
 /**
