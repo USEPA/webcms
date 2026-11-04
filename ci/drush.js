@@ -35,7 +35,8 @@ const vars = require("./vars");
  *
  */
 
-const drushScript = dedent`
+// Default deployment script using drush deploy
+const drushScriptDefault = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cachetags"
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
