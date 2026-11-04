@@ -100,6 +100,11 @@ async function main() {
 
   ui.logHeading("ecs", "Running Drush");
 
+  if (drushOrder === 'updb-first') {
+    ui.log("⚠️  Using custom drush order: UPDB BEFORE CONFIG IMPORT");
+    ui.log();
+  }
+
   const task = await ecs.startDrushTask(drushScript);
 
   // Task URLs are helpful diagnostics, but the task has already started and
