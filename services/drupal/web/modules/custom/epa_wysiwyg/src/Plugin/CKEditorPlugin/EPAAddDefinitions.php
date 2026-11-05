@@ -5,6 +5,7 @@ namespace Drupal\epa_wysiwyg\Plugin\CKEditorPlugin;
 use Drupal\ckeditor\CKEditorPluginBase;
 use Drupal\ckeditor\CKEditorPluginCssInterface;
 use Drupal\editor\Entity\Editor;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines the "epaAddDefinitions" plugin.
@@ -20,6 +21,7 @@ use Drupal\editor\Entity\Editor;
  */
 class EPAAddDefinitions extends CKEditorPluginBase implements CKEditorPluginCssInterface {
 
+  use StringTranslationTrait;
   /**
    * Allow glossary to be filtered.
    */

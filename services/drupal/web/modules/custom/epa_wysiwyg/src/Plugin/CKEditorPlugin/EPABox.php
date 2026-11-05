@@ -4,6 +4,7 @@ namespace Drupal\epa_wysiwyg\Plugin\CKEditorPlugin;
 
 use Drupal\ckeditor\CKEditorPluginBase;
 use Drupal\editor\Entity\Editor;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines the "epaBox" plugin.
@@ -19,6 +20,7 @@ use Drupal\editor\Entity\Editor;
  */
 class EPABox extends CKEditorPluginBase {
 
+  use StringTranslationTrait;	
   /**
    * {@inheritdoc}
    *

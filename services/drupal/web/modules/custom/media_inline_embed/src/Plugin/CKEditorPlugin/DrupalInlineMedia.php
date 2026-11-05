@@ -7,6 +7,7 @@ use Drupal\editor\Entity\Editor;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\media_library\MediaLibraryUiBuilder;
 use Drupal\ckeditor\Plugin\CKEditorPlugin\DrupalMediaLibrary;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Defines the "drupalinlinemedia" plugin.
@@ -18,6 +19,7 @@ use Drupal\ckeditor\Plugin\CKEditorPlugin\DrupalMediaLibrary;
  */
 class DrupalInlineMedia extends DrupalMediaLibrary {
 
+  use StringTranslationTrait;	
   /**
    * {@inheritdoc}
    */
