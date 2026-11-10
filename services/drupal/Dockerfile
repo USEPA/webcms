@@ -3,6 +3,9 @@ FROM public.ecr.aws/docker/library/php:8.3.32-fpm-alpine3.24 AS base
 # Bump system packages
 RUN apk upgrade
 
+# CVE-2026-123158: Pin openssh to patched version
+RUN apk add openssh==10.6_p2-r0 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
+
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 # Install base extensions needed for Drupal
@@ -177,6 +180,9 @@ FROM public.ecr.aws/docker/library/nginx:mainline-alpine AS nginx
 # Bump system packages
 RUN apk upgrade
 
+# CVE-2026-123158: Pin openssh to patched version
+RUN apk add openssh==10.6_p2-r0 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
+
 # Copy only the web directory from the drupal stage.
 # Nginx serves static assets from web/ and proxies PHP requests to PHP-FPM;
 # vendor/, config/, drush/ etc. are PHP-runtime concerns only the drupal
@@ -213,6 +219,9 @@ FROM public.ecr.aws/docker/library/php:8.3.32-cli-alpine3.24 AS drush
 
 # Bump system packages
 RUN apk upgrade
+
+# CVE-2026-123158: Pin openssh to patched version
+RUN apk add openssh==10.6_p2-r0 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main
 
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
