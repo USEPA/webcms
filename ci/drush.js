@@ -38,8 +38,6 @@ const vars = require("./vars");
 // Default deployment script using drush deploy
 const drushScriptDefault = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cachetags"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
   drush --debug --uri="$WEBCMS_SITE_URL" deploy -y
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
@@ -47,8 +45,7 @@ const drushScriptDefault = dedent`
 // Custom deployment script: database updates BEFORE config import
 const drushScriptUpdbFirst = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cachetags"
-  drush --debug --uri="$WEBCMS_SITE_URL" sql:query "TRUNCATE cache_container"
+  drush --debug --uri="$WEBCMS_SITE_URL" php:eval "$config = \Drupal::configFactory()->getEditable('core.extension'); $modules = $config->get('module'); unset($modules['gmedia'], $modules['variationcache']); $config->set('module', $modules)->save();"
   drush --debug --uri="$WEBCMS_SITE_URL" updb -y
   drush --debug --uri="$WEBCMS_SITE_URL" cim -y
   drush --debug --uri="$WEBCMS_SITE_URL" cr
