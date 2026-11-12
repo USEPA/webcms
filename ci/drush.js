@@ -45,9 +45,8 @@ const drushScriptDefault = dedent`
 // Custom deployment script: database updates BEFORE config import
 const drushScriptUpdbFirst = dedent`
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:1;')"
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
   drush --debug --uri="$WEBCMS_SITE_URL" updb -y
-  drush --debug --uri="$WEBCMS_SITE_URL" cr
+  drush --debug --uri="$WEBCMS_SITE_URL" cim -y
   drush --debug --uri="$WEBCMS_SITE_URL" sql:query "REPLACE INTO key_value (collection, name, value) VALUES ('state', 'system.maintenance_mode', 'i:0;')"
 `;
 
