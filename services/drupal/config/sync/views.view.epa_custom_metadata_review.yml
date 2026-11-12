@@ -15,7 +15,6 @@ dependencies:
     - serialization
     - taxonomy
     - user
-    - views_autocomplete_filters
     - views_data_export
 id: epa_custom_metadata_review
 label: 'Metadata Review'
@@ -309,6 +308,7 @@ display:
             offset: false
             offset_label: Offset
           quantity: 9
+          pagination_heading_level: h4
       exposed_form:
         type: basic
         options:
@@ -627,7 +627,7 @@ display:
             'group_content_menu:web_area_menu': '0'
         gc__node:
           id: gc__node
-          table: group_content_field_data
+          table: group_relationship_field_data
           field: gc__node
           relationship: group_content_id
           group_type: group
@@ -691,10 +691,10 @@ display:
       automatic_download: true
       export_method: batch
       export_batch_size: 1000
-      store_in_public_file_directory: false
       custom_redirect_path: false
       redirect_to_display: page_1
       include_query_params: false
+      export_filesystem: private
     cache_metadata:
       max-age: -1
       contexts:
@@ -727,3 +727,4 @@ display:
       tags:
         - 'config:field.storage.group.field_publisher'
         - 'config:field.storage.node.field_description'
+
