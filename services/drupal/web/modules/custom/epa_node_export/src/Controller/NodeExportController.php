@@ -270,7 +270,7 @@ class NodeExportController extends ControllerBase {
     }
     catch (RequestException $e) {
       $this->logger->notice('Could not export page at @url.', ['@url' => $url]);
-      watchdog_exception('notice', $e);
+      Error::logException($this->logger, $e);
     }
 
     // If no reponse was returned, then something went wrong. Return a 404.
