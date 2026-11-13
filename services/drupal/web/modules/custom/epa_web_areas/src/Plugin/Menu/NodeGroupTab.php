@@ -18,7 +18,7 @@ class NodeGroupTab extends LocalTaskDefault implements ContainerFactoryPluginInt
   /**
    * GroupContent storage.
    *
-   * @var \Drupal\group\Entity\Storage\GroupContentStorageInterface
+   * @var \Drupal\group\Entity\Storage\GroupRelationshipStorageInterface
    */
   protected $groupStorage;
 

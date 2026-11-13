@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\group\Entity\GroupContent;
+use Drupal\group\Entity\GroupRelationship;
 use Drupal\group\GroupMembershipLoader;
 use Drupal\node\Entity\Node;
 
@@ -89,8 +89,8 @@ class EpaWebformAccessCheck implements AccessInterface {
 
     // Load the node and its group content.
     $node = Node::load($id);
-    /** @var \Drupal\group\Entity\GroupContent $gc */
-    $gc = GroupContent::loadByEntity($node);
+    /** @var \Drupal\group\Entity\GroupRelationship $gc */
+    $gc = GroupRelationship::loadByEntity($node);
 
     if (empty($gc)) {
       return AccessResult::forbidden("Cannot view content that does not belong to a web area.");
