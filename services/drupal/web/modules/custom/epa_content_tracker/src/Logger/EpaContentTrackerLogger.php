@@ -86,7 +86,8 @@ class EpaContentTrackerLogger {
     }
     catch (\Exception $e) {
       $transaction->rollBack();
-      watchdog_exception('EpaContentTracker', $e);
+      $logger = \Drupal::logger('epa_content_tracker');
+      Error::logException(logger, $e);
     }
     return NULL;
   }
