@@ -27,7 +27,7 @@ web_environment:
   - AWS_ENDPOINT_URL=http://cloudfront-mock:8080
 hooks:
   post-start:
-    - exec: "user=$(whoami) && group=$(groups) && sudo chown -R $user:$group /var/www/html/web/sites/default/files"
+    - exec: "user=$(whoami) && group=$(id -gn) && sudo chown -R $user:$group /var/www/html/web/sites/default/files"
 
 # Key features of ddev's config.yaml:
 
