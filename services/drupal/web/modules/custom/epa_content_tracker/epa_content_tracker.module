@@ -45,7 +45,9 @@ function epa_content_tracker_content_moderation_state_update(ContentModerationSt
 function _epa_content_tracker_process_moderated_entity(ContentModerationStateInterface $moderated_entity) {
   $id = $moderated_entity->content_entity_id->value;
   $entity_type = $moderated_entity->content_entity_type_id->value;
-  if ($node = \Drupal::entityTypeManager()->getStorage($entity_type)->loadRevision($moderated_entity->content_entity_revision_id->value)) {
+  /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+  $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
+  if ($node = $storage->loadRevision($moderated_entity->content_entity_revision_id->value)) {
     $logger = new EpaContentTrackerLogger();
     $env_state = getenv('WEBCMS_ENV_STATE');
     // Have to make special accommodations for migration since nodes will not proceed through the normal workflow.
