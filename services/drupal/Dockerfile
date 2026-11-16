@@ -38,7 +38,7 @@ RUN set -ex \
   # This construct echoes the configuration lines to the console as well as outputting them
   # to the ini file that PHP-FPM reads.
   && { \
-    echo 'memory_limit=512M'; \
+    echo 'memory_limit=1G'; \
     echo 'upload_max_filesize=1G'; \
     echo 'post_max_size=1G'; \
     echo "error_reporting=${PHP_ERROR_REPORTING}"; \
