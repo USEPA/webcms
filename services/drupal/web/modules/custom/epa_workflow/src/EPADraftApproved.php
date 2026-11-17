@@ -35,9 +35,12 @@ class EPADraftApproved extends EPAModeration {
     $entity_id = $this->contentEntityRevision->id();
     $current_revision_id = $this->contentEntityRevision->getLoadedRevisionId();
     $entity_type = $this->contentEntityRevision->getEntityTypeId();
-    $storage = $this->entityTypeManager()->getStorage($entity_type);
+    $entity_type_manager = \Drupal::entityTypeManager();
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = $entity_type_manager->getStorage($entity_type);
     $query = $storage->getQuery();
     $results = $query->allRevisions()
+      ->accessCheck(FALSE)
       ->condition('entity_id', $entity_id)
       ->condition('field_scheduled_transition_moderation_state', 'draft_approved')
       ->execute();
