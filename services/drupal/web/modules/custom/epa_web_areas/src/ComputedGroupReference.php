@@ -36,7 +36,7 @@ class ComputedGroupReference extends EntityReferenceFieldItemList {
 
     $entity = $this->getEntity();
     $group_content_bundle = 'web_area-group_node-' . $entity->bundle();
-    $group_query = $this->database->select('group_content_field_data', 'f')
+    $group_query = $this->database->select('group_relationship_field_data', 'f')
       ->fields('f', ['gid']);
     $group_query->join('group_content__entity_id', 'e', 'f.id = e.entity_id');
     $group_id = $group_query->condition('e.entity_id_target_id', $entity->id())

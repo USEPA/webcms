@@ -218,7 +218,7 @@ LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
     ON fi.revision_id = fbs.field_banner_slides_target_revision_id
 LEFT JOIN {node_revision__field_banner} AS nfb
     ON nfb.field_banner_target_revision_id = fbs.revision_id
-LEFT JOIN {group_content_field_data} gfd
+LEFT JOIN {group_relationship_field_data} gfd
     ON gfd.entity_id = nfb.entity_id
         AND gfd.type LIKE :group_type
 WHERE pfb.revision_id IS NULL
@@ -251,7 +251,7 @@ LEFT JOIN {paragraph_revision__field_banner_slides} AS fbs
     ON fi.revision_id = fbs.field_banner_slides_target_revision_id
 LEFT JOIN {node_revision__field_banner} AS nfb
     ON nfb.field_banner_target_revision_id = fbs.revision_id
-LEFT JOIN {group_content_field_data} gfd
+LEFT JOIN {group_relationship_field_data} gfd
     ON gfd.entity_id = nfb.entity_id
         AND gfd.type LIKE :group_type
 WHERE pfb.revision_id IS NULL

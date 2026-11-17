@@ -38,7 +38,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
    *   The renderer.
    */
   public function __construct(GroupRelationTypeManagerInterface $plugin_manager, PrivateTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RendererInterface $renderer) {
-    parent::__construct($temp_store_factory, $entity_type_manager, $entity_form_builder, $renderer);
+    parent::__construct($plugin_manager, $temp_store_factory, $entity_type_manager, $entity_form_builder, $renderer);
     $this->pluginManager = $plugin_manager;
   }
 
@@ -47,7 +47,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('plugin.manager.group_content_enabler'),
+      $container->get('group_relation_type.manager'),
       $container->get('tempstore.private'),
       $container->get('entity_type.manager'),
       $container->get('entity.form_builder'),
@@ -58,7 +58,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
   /**
    * {@inheritdoc}
    */
-  public function addPage(GroupInterface $group, $create_mode = FALSE) {
+  public function addPage(GroupInterface $group, $create_mode = FALSE, $base_plugin_id = null) {	  
     $build = parent::addPage($group, $create_mode);
     // Custom css library for styling as we want it to look.
     $build['#attached']['library'][] = 'epa_web_areas/group_node.add';
@@ -95,7 +95,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
   /**
    * {@inheritdoc}
    */
-  protected function addPageBundles(GroupInterface $group, $create_mode) {
+  protected function addPageBundles(GroupInterface $group, $create_mode, $base_plugin_id = null) {
     $bundles = [];
 
     // Retrieve all group_node plugins for the group's type.
@@ -107,7 +107,7 @@ class EpaWebAreasGroupNodeController extends GroupRelationshipController {
     }
 
     // Retrieve all of the responsible group content types, keyed by plugin ID.
-    $storage = $this->entityTypeManager->getStorage('group_content_type');
+    $storage = $this->entityTypeManager->getStorage('group_relationship_type');
     $properties = ['group_type' => $group->bundle(), 'content_plugin' => $plugin_ids];
     foreach ($storage->loadByProperties($properties) as $bundle => $group_content_type) {
       /** @var \Drupal\group\Entity\GroupRelationshipTypeInterface $group_content_type */
