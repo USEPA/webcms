@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\Core\Utility\Error;
 
 /**
  * Provides route responses for the archive creation.
@@ -270,7 +271,7 @@ class NodeExportController extends ControllerBase {
     }
     catch (RequestException $e) {
       $this->logger->notice('Could not export page at @url.', ['@url' => $url]);
-      Error::logException($this->logger, $e);
+      Error::logException($this->getLogger('epa_node_export'), $e);
     }
 
     // If no reponse was returned, then something went wrong. Return a 404.
