@@ -1,4 +1,4 @@
-FROM php:8.3.36-fpm-alpine3.24 AS base
+FROM php:8.3.37-fpm-alpine3.24 AS base
 
 # Bump system packages
 RUN apk upgrade
@@ -215,7 +215,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # that are inappropriate for a server container image.
 # IMPORTANT: keep this PHP version in sync with the base FPM image above so that Drush
 # and the web container run identical language semantics against the same Drupal codebase.
-FROM php:8.3.36-cli-alpine3.24 AS drush
+FROM php:8.3.37-cli-alpine3.24 AS drush
 
 # Bump system packages
 RUN apk upgrade
