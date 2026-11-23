@@ -466,8 +466,12 @@ function epa_web_areas_group_media_submit($form, FormStateInterface $form_state)
  * @ingroup menu
  */
 function epa_web_areas_menu_local_actions_alter(&$local_actions) {
-  $local_actions['group_content.group_node_add_page']['appears_on'] = ['entity.group.canonical'];
-  $local_actions['group_content.group_node_relate_page']['appears_on'] = ['entity.group.canonical'];
+  if (isset($local_actions['group_content.group_node_create_page'])) {
+    $local_actions['group_content.group_node_create_page']['appears_on'] = ['entity.group.canonical'];
+  }
+  if (isset($local_actions['group_content.group_node_add_page'])) {
+    $local_actions['group_content.group_node_add_page']['appears_on'] = ['entity.group.canonical'];
+  }
 }
 
 /**
