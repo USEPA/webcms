@@ -38,11 +38,13 @@ class EpaAdminSearchIndex extends QueueWorkerBase {
 
     $vid = $data['vid'];
     $type = $data['type'];
-    if ($node = node_revision_load($vid)) {
+    $storage = \Drupal::entityTypeManager()->getStorage('node');
+    $loaded_node_rev = $storage->loadRevision($vid);
+    if ($node = $loaded_node_rev) {
       $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
       $full_output = $view_builder->view($node, 'search_index');
       $full_output = strip_tags(\Drupal::service('renderer')
-        ->renderPlain($full_output));
+        ->renderInIsolation($full_output));
       $fields = [
         'bundle' => $node->bundle(),
         'deleted' => 0,

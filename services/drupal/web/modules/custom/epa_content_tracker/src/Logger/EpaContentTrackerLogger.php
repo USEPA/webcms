@@ -5,6 +5,7 @@ namespace Drupal\epa_content_tracker\Logger;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
+use Drupal\Core\Utility\Error;
 
 /**
  * Class EpaContentTrackerLogger.
@@ -87,7 +88,7 @@ class EpaContentTrackerLogger {
     catch (\Exception $e) {
       $transaction->rollBack();
       $logger = \Drupal::logger('epa_content_tracker');
-      Error::logException(logger, $e);
+      Error::logException($logger, $e);
     }
     return NULL;
   }
