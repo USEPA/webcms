@@ -7,13 +7,12 @@ use Drupal\file\Plugin\Field\FieldType\FileItem;
 use Drupal\media\MediaInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use function GuzzleHttp\json_decode;
 
 class EpaWysiwygCKEditor5MediaController extends CKEditor5MediaController {
   public function mediaEntityMetadata(Request $request) {
     $response =  parent::mediaEntityMetadata($request);
     $data = $response->getContent();
-    $data = json_decode($data, TRUE);
+    $data = json_decode((string)$data, TRUE);
     $uuid = $request->query->get('uuid');
 
     // Access is enforced on route level.
